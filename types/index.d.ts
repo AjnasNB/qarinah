@@ -95,3 +95,130 @@ export function tokenize(value: unknown): string[];
 export function compileContext(query?: string, options?: { cwd?: string; maxChars?: number; limit?: number }): Promise<QarinahContextPack>;
 export function renderContextPackMarkdown(pack: QarinahContextPack): string;
 export function captureCodexHook(input: Record<string, unknown>, options?: { cwd?: string }): Promise<{ captured: boolean; reason?: string; eventId?: string; hash?: string }>;
+
+export interface MaqamContextToolDescriptor {
+  readonly schemaVersion: "qarinah.maqam-context-adapter.v1";
+  readonly name: "context.query" | "context.append";
+  readonly transport: "function";
+  readonly description: string;
+  readonly effects: readonly ("read" | "write")[];
+  readonly networkOrigins: readonly [];
+  readonly risk: "low" | "high";
+  readonly approvalRequired: boolean;
+}
+export interface MaqamAdapterExecutionContext {
+  readonly runId?: string;
+  readonly toolName?: string;
+  readonly limits?: Readonly<Record<string, unknown>> | null;
+  readonly goal?: Readonly<{ budget?: Readonly<Record<string, unknown>> | null }> | null;
+  readonly approvals?: readonly Readonly<{
+    status?: string;
+    subject?: Readonly<{ runId?: unknown; toolName?: unknown }>;
+    consumptions?: readonly Readonly<{ runId?: unknown; toolName?: unknown }>[];
+  }>[];
+  readonly evidence?: {
+    addBatch(input?: {
+      evidence?: Array<{
+        sourceType?: string;
+        source?: string;
+        retrievedAt?: string;
+        excerpt?: string;
+        hash?: string;
+        confidence?: number;
+      }>;
+      claims?: Array<Record<string, unknown>>;
+    }): { readonly evidence: readonly unknown[] };
+  } | null;
+}
+export type MaqamStructuralJson = string | number | boolean | null | MaqamStructuralJson[] | { [key: string]: MaqamStructuralJson };
+export interface MaqamToolAdapterStructuralSpec<TInput = unknown, TOutput = unknown> {
+  schemaVersion: "maqam.tool-adapter.v1";
+  name: string;
+  transport: "function";
+  description: string;
+  effects: readonly string[];
+  risk: string;
+  metadata: { [key: string]: MaqamStructuralJson };
+  invoke(input: TInput, context: MaqamAdapterExecutionContext): Promise<TOutput>;
+}
+export interface MaqamContextQueryInput { query?: string; maxChars?: number; maxItems?: number }
+export interface MaqamContextQueryResult {
+  readonly schemaVersion: "qarinah.maqam-context-query-result.v1";
+  readonly pack: QarinahContextPack;
+  readonly evidence: readonly unknown[];
+}
+export interface MaqamContextAppendInput { event: QarinahEventInput }
+export interface MaqamContextAppendResult {
+  readonly schemaVersion: "qarinah.maqam-context-append-result.v1";
+  readonly event: QarinahEvent;
+  readonly evidence: unknown;
+}
+export interface MaqamContextRegistrationOptions<TGateway = unknown> {
+  gateway: TGateway;
+  defineToolAdapter(spec: MaqamToolAdapterStructuralSpec<any, any>): any;
+  registerToolAdapter(gateway: TGateway, adapter: any): unknown;
+  cwd?: string;
+  maxChars?: number;
+  maxItems?: number;
+}
+export interface MaqamContextRegistration {
+  readonly schemaVersion: "qarinah.maqam-context-registration.v1";
+  readonly queryToolName: "context.query";
+  readonly appendToolName: "context.append";
+}
+export const MAQAM_CONTEXT_ADAPTER_SCHEMA_VERSION: "qarinah.maqam-context-adapter.v1";
+export const MAQAM_CONTEXT_QUERY_TOOL: MaqamContextToolDescriptor & Readonly<{ name: "context.query"; effects: readonly ["read"]; risk: "low"; approvalRequired: false }>;
+export const MAQAM_CONTEXT_APPEND_TOOL: MaqamContextToolDescriptor & Readonly<{ name: "context.append"; effects: readonly ["write"]; risk: "high"; approvalRequired: true }>;
+export function registerMaqamContextAdapters<TGateway>(options: MaqamContextRegistrationOptions<TGateway>): MaqamContextRegistration;
+
+export interface CockroachSourceProvenanceBoundary {
+  readonly retrievedAt: string;
+  readonly method: string;
+  readonly authenticated: boolean;
+  readonly credentialed: boolean;
+}
+export interface CockroachSourceRecordBoundary {
+  readonly source: string;
+  readonly id: string;
+  readonly type: string;
+  readonly title: string;
+  readonly url: string;
+  readonly text: string;
+  readonly author: string | null;
+  readonly publishedAt: string | null;
+  readonly contentHash: `sha256:${string}`;
+  readonly adapterVersion: string;
+  readonly warnings: readonly string[];
+  readonly metadata: Readonly<Record<string, unknown>>;
+  readonly provenance: CockroachSourceProvenanceBoundary;
+}
+export interface CockroachIngestionOptions {
+  cwd?: string;
+  workspace?: QarinahWorkspace;
+  retentionClass?: "session" | "project" | "durable";
+}
+export const COCKROACH_SOURCE_RECORD_BOUNDARY_VERSION: "cockroach-crawler.source-record.structural.v1";
+export function validateCockroachSourceRecordBoundary(value: unknown): CockroachSourceRecordBoundary;
+export function cockroachSourceRecordToEventInput(value: unknown, options?: Pick<CockroachIngestionOptions, "retentionClass">): QarinahEventInput;
+export function ingestCockroachSourceRecord(value: unknown, options?: CockroachIngestionOptions): Promise<QarinahEvent>;
+
+export type ProductLoopJsonValue = string | number | boolean | null | ProductLoopJsonValue[] | { [key: string]: ProductLoopJsonValue };
+export interface ProductLoopRuntimeEventBoundary {
+  readonly runId: string;
+  readonly sequence: number;
+  readonly type: string;
+  readonly timestamp: string;
+  readonly data: Readonly<Record<string, ProductLoopJsonValue>>;
+  readonly receipt: Readonly<{
+    eventHash: string;
+    previousHash: string | null;
+    canonicalJson: string;
+  }>;
+}
+export interface ProductLoopProvenanceSink {
+  record(event: ProductLoopRuntimeEventBoundary): Promise<void>;
+}
+export const PRODUCTLOOP_RUNTIME_EVENT_BOUNDARY_VERSION: "ajnas-runtime.runtime-event.structural.v0.2.1";
+export function validateProductLoopRuntimeEvent(value: unknown): ProductLoopRuntimeEventBoundary;
+export function productLoopRuntimeEventToEventInput(value: unknown): QarinahEventInput;
+export function createProductLoopProvenanceSink(options?: { cwd?: string; workspace?: QarinahWorkspace }): ProductLoopProvenanceSink;

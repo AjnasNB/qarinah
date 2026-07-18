@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/AjnasNB/qarinah/schemas/maqam-context-adapter.schema.json",
+  "title": "Qarinah Maqam context tool descriptor v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion", "name", "transport", "description", "effects",
+    "networkOrigins", "risk", "approvalRequired"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "qarinah.maqam-context-adapter.v1" },
+    "name": { "enum": ["context.query", "context.append"] },
+    "transport": { "const": "function" },
+    "description": { "type": "string", "minLength": 1, "maxLength": 10000 },
+    "effects": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": { "enum": ["read", "write"] }
+    },
+    "networkOrigins": { "type": "array", "maxItems": 0 },
+    "risk": { "enum": ["low", "high"] },
+    "approvalRequired": { "type": "boolean" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "name": { "const": "context.query" } } },
+      "then": {
+        "properties": {
+          "effects": { "const": ["read"] },
+          "risk": { "const": "low" },
+          "approvalRequired": { "const": false }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "name": { "const": "context.append" } } },
+      "then": {
+        "properties": {
+          "effects": { "const": ["write"] },
+          "risk": { "const": "high" },
+          "approvalRequired": { "const": true }
+        }
+      }
+    }
+  ]
+}

@@ -30,5 +30,8 @@
 - Host lifecycle schemas may change. Adapters version and reject unknown shapes instead of silently guessing.
 - Local Codex hooks do not observe hosted `WebSearch` and may not cover specialized tool paths. They are not an enforcement boundary.
 - Content-mode capture stores host-exposed prompt/tool/completion values after bounded best-effort redaction; use metadata mode for unclassified data.
+- A valid ProductLoop receipt proves canonical hash continuity, not author identity or truth; signed provenance remains separate.
+- Cockroach Crawler does not yet export a runtime SourceRecord validator or hash-recomputation contract, so Qarinah enforces its own structural boundary and does not call the record certified.
+- Qarinah and Maqam evidence are separate append-only systems. A successful `context.append` emits both records, but there is no cross-ledger transaction: if Maqam's evidence ledger fails after the Qarinah append, the governed call fails while the Qarinah event remains reviewable.
 
 Report vulnerabilities privately to the repository owner before opening a public issue.

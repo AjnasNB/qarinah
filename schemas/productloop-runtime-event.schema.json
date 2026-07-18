@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/AjnasNB/qarinah/schemas/productloop-runtime-event.schema.json",
+  "title": "Qarinah structural boundary for ProductLoop RuntimeEvent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["runId", "sequence", "type", "timestamp", "data", "receipt"],
+  "properties": {
+    "runId": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$" },
+    "sequence": { "type": "integer", "minimum": 1 },
+    "type": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "timestamp": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T", "maxLength": 64 },
+    "data": { "type": "object", "additionalProperties": true },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eventHash", "previousHash", "canonicalJson"],
+      "properties": {
+        "eventHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "previousHash": {
+          "anyOf": [
+            { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+            { "type": "null" }
+          ]
+        },
+        "canonicalJson": { "type": "string", "minLength": 1, "maxLength": 8388608 }
+      }
+    }
+  }
+}
