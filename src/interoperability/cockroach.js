@@ -71,16 +71,23 @@ function mapperOptions(options) {
 }
 
 function revisionIdentity(record) {
-  return `${record.source}:${record.id}`;
+  return canonicalStringify({ source: record.source, id: record.id });
 }
 
-function revisionEventId(record) {
-  return uuidFromDigest(`cockroach-revision\0${revisionIdentity(record)}\0${record.contentHash}`);
+function revisionEventId(record, projection) {
+  return uuidFromDigest(canonicalStringify({
+    kind: "cockroach-revision",
+    source: record.source,
+    id: record.id,
+    contentHash: record.contentHash,
+    projection
+  }));
 }
 
-function acquisitionIdentity(record) {
+function acquisitionIdentity(record, projection) {
   return canonicalStringify({
-    revisionEventId: revisionEventId(record),
+    revisionEventId: revisionEventId(record, projection),
+    projection,
     sourceMetadata: {
       type: record.type,
       title: record.title,
@@ -168,8 +175,9 @@ export function validateCockroachSourceRecordBoundary(value) {
 export function cockroachSourceRecordToEventInput(value, options = {}) {
   const record = validateCockroachSourceRecordBoundary(value);
   const { capture, retentionClass } = mapperOptions(options);
+  const projection = { capture, retentionClass };
   const sourceIdentity = revisionIdentity(record);
-  const eventId = revisionEventId(record);
+  const eventId = revisionEventId(record, projection);
   const base = {
     eventId,
     kind: "source",
@@ -223,8 +231,9 @@ export function cockroachSourceRecordToEventInput(value, options = {}) {
 export function cockroachSourceRecordToAcquisitionEventInput(value, options = {}) {
   const record = validateCockroachSourceRecordBoundary(value);
   const { capture, retentionClass } = mapperOptions(options);
-  const revisionId = revisionEventId(record);
-  const eventId = uuidFromDigest(`cockroach-acquisition\0${acquisitionIdentity(record)}`);
+  const projection = { capture, retentionClass };
+  const revisionId = revisionEventId(record, projection);
+  const eventId = uuidFromDigest(`cockroach-acquisition\0${acquisitionIdentity(record, projection)}`);
   const base = {
     eventId,
     timestamp: record.provenance.retrievedAt,

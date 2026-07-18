@@ -276,6 +276,8 @@ test("Cockroach ingestion separates stable revisions from acquisitions and scrub
   const firstInput = cockroachSourceRecordToEventInput(input);
   const sameInput = cockroachSourceRecordToEventInput(structuredClone(input));
   assert.equal(firstInput.eventId, sameInput.eventId);
+  assert.notEqual(firstInput.eventId, cockroachSourceRecordToEventInput(input, { capture: "content" }).eventId);
+  assert.notEqual(firstInput.eventId, cockroachSourceRecordToEventInput(input, { retentionClass: "durable" }).eventId);
   assert.equal(firstInput.data.capture, "metadata");
   assert.equal(firstInput.data.trust, "untrusted");
   assert.equal(firstInput.data.upstreamContentHash, input.contentHash);
