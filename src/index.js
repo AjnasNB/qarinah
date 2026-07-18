@@ -35,7 +35,9 @@ export {
   registerMaqamContextAdapters
 } from "./interoperability/maqam.js";
 export {
+  COCKROACH_INGESTION_SCHEMA_VERSION,
   COCKROACH_SOURCE_RECORD_BOUNDARY_VERSION,
+  cockroachSourceRecordToAcquisitionEventInput,
   cockroachSourceRecordToEventInput,
   ingestCockroachSourceRecord,
   validateCockroachSourceRecordBoundary

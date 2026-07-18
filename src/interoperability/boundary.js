@@ -104,6 +104,14 @@ export function isoTimestamp(value, label) {
   return new Date(input).toISOString();
 }
 
+export function canonicalIsoTimestamp(value, label) {
+  const input = stringField(value, label, { maximumLength: 64 });
+  if (!Number.isFinite(Date.parse(input)) || new Date(input).toISOString() !== input) {
+    throw new TypeError(`${label} must be a canonical ISO timestamp with millisecond precision and a Z suffix.`);
+  }
+  return input;
+}
+
 export function dataFunction(value, key, label) {
   let current = value;
   while (current && (typeof current === "object" || typeof current === "function")) {

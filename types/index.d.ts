@@ -112,9 +112,10 @@ export interface MaqamAdapterExecutionContext {
   readonly limits?: Readonly<Record<string, unknown>> | null;
   readonly goal?: Readonly<{ budget?: Readonly<Record<string, unknown>> | null }> | null;
   readonly approvals?: readonly Readonly<{
+    approvalId?: string;
     status?: string;
-    subject?: Readonly<{ runId?: unknown; toolName?: unknown }>;
-    consumptions?: readonly Readonly<{ runId?: unknown; toolName?: unknown }>[];
+    subject?: Readonly<{ runId?: unknown; toolName?: unknown; inputHash?: unknown }>;
+    consumptions?: readonly Readonly<{ runId?: unknown; toolName?: unknown; consumedAt?: unknown }>[];
   }>[];
   readonly evidence?: {
     addBatch(input?: {
@@ -147,9 +148,10 @@ export interface MaqamContextQueryResult {
   readonly pack: QarinahContextPack;
   readonly evidence: readonly unknown[];
 }
-export interface MaqamContextAppendInput { event: QarinahEventInput }
+export interface MaqamContextAppendInput { event: QarinahEventInput; capture?: "metadata" | "content" }
 export interface MaqamContextAppendResult {
   readonly schemaVersion: "qarinah.maqam-context-append-result.v1";
+  readonly capture: "metadata" | "content";
   readonly event: QarinahEvent;
   readonly evidence: unknown;
 }
@@ -197,10 +199,22 @@ export interface CockroachIngestionOptions {
   workspace?: QarinahWorkspace;
   retentionClass?: "session" | "project" | "durable";
 }
+export interface CockroachEventMappingOptions {
+  capture?: "metadata" | "content";
+  retentionClass?: "session" | "project" | "durable";
+}
+export interface CockroachIngestionResult {
+  readonly schemaVersion: "qarinah.cockroach-ingestion.v1";
+  readonly capture: "metadata" | "content";
+  readonly revision: QarinahEvent;
+  readonly acquisition: QarinahEvent;
+}
 export const COCKROACH_SOURCE_RECORD_BOUNDARY_VERSION: "cockroach-crawler.source-record.structural.v1";
+export const COCKROACH_INGESTION_SCHEMA_VERSION: "qarinah.cockroach-ingestion.v1";
 export function validateCockroachSourceRecordBoundary(value: unknown): CockroachSourceRecordBoundary;
-export function cockroachSourceRecordToEventInput(value: unknown, options?: Pick<CockroachIngestionOptions, "retentionClass">): QarinahEventInput;
-export function ingestCockroachSourceRecord(value: unknown, options?: CockroachIngestionOptions): Promise<QarinahEvent>;
+export function cockroachSourceRecordToEventInput(value: unknown, options?: CockroachEventMappingOptions): QarinahEventInput;
+export function cockroachSourceRecordToAcquisitionEventInput(value: unknown, options?: CockroachEventMappingOptions): QarinahEventInput;
+export function ingestCockroachSourceRecord(value: unknown, options?: CockroachIngestionOptions): Promise<CockroachIngestionResult>;
 
 export type ProductLoopJsonValue = string | number | boolean | null | ProductLoopJsonValue[] | { [key: string]: ProductLoopJsonValue };
 export interface ProductLoopRuntimeEventBoundary {
@@ -220,5 +234,8 @@ export interface ProductLoopProvenanceSink {
 }
 export const PRODUCTLOOP_RUNTIME_EVENT_BOUNDARY_VERSION: "ajnas-runtime.runtime-event.structural.v0.2.1";
 export function validateProductLoopRuntimeEvent(value: unknown): ProductLoopRuntimeEventBoundary;
-export function productLoopRuntimeEventToEventInput(value: unknown): QarinahEventInput;
+export function productLoopRuntimeEventToEventInput(value: unknown, options?: {
+  capture?: "metadata" | "content";
+  retentionClass?: "session" | "project" | "durable";
+}): QarinahEventInput;
 export function createProductLoopProvenanceSink(options?: { cwd?: string; workspace?: QarinahWorkspace }): ProductLoopProvenanceSink;

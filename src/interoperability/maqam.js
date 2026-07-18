@@ -1,4 +1,5 @@
 import { appendEvent } from "../store.js";
+import { canonicalStringify, sha256 } from "../canonical.js";
 import { compileContext } from "../compiler.js";
 import { QarinahError } from "../errors.js";
 import { rebuildDerivedState } from "../indexer.js";
@@ -7,6 +8,11 @@ import {
   deepFreeze,
   snapshotRecordBoundary
 } from "./boundary.js";
+import {
+  contentSummary,
+  loadTrustedInteropWorkspace,
+  requestedCapture
+} from "./capture-policy.js";
 
 export const MAQAM_CONTEXT_ADAPTER_SCHEMA_VERSION = "qarinah.maqam-context-adapter.v1";
 
@@ -100,23 +106,83 @@ function evidenceCapability(context, toolName) {
   return dataFunction(context.evidence, "addBatch", "Maqam scoped evidence capability");
 }
 
-function assertExactApproval(context) {
+function maqamInputHash(input) {
+  // Compatibility copy of the inspected Maqam 0.3.0 internal
+  // snapshotHashedValue shape. This is not a public Maqam API; issue #24 tracks
+  // an opaque gateway capability that can replace this best-effort check.
+  return sha256(canonicalStringify(input)).slice(7);
+}
+
+function assertExactApproval(context, input) {
   if (!Array.isArray(context.approvals) || context.approvals.length === 0) {
     throw new QarinahError("MAQAM_APPROVAL_REQUIRED", "context.append requires a consumed approval bound to this exact Maqam tool call.");
   }
+  const runId = context.runId || "default";
+  const inputHash = maqamInputHash(input);
   const approved = context.approvals.some((approval) => (
-    approval?.status === "approved"
-    && approval?.subject?.runId === context.runId
+    typeof approval?.approvalId === "string"
+    && approval.approvalId.length > 0
+    && approval?.status === "approved"
+    && approval?.subject?.runId === runId
     && approval?.subject?.toolName === MAQAM_CONTEXT_APPEND_TOOL.name
+    && approval?.subject?.inputHash === inputHash
     && Array.isArray(approval?.consumptions)
     && approval.consumptions.some((consumption) => (
-      consumption?.runId === context.runId
+      consumption?.runId === runId
       && consumption?.toolName === MAQAM_CONTEXT_APPEND_TOOL.name
+      && typeof consumption?.consumedAt === "string"
     ))
   ));
   if (!approved) {
     throw new QarinahError("MAQAM_APPROVAL_SCOPE_MISMATCH", "context.append did not receive an exact consumed Maqam approval for this run and tool.");
   }
+}
+
+const EVENT_INPUT_KEYS = Object.freeze([
+  "eventId", "timestamp", "sessionId", "turnId", "kind", "actor", "title", "body", "data",
+  "confidence", "relations", "provenance", "retention"
+]);
+
+function metadataEventInput(value, workspace) {
+  const event = snapshotRecordBoundary(value, {
+    label: "context.append input.event",
+    keys: EVENT_INPUT_KEYS,
+    maximumDepth: 32,
+    maximumNodes: 20_000,
+    maximumArrayLength: 10_000,
+    maximumObjectKeys: 1_000,
+    maximumStringLength: 65_536,
+    maximumBytes: 256 * 1024
+  });
+  if (!Object.hasOwn(event, "kind")) throw new TypeError("context.append input.event.kind is required.");
+  const summary = contentSummary(event);
+  return {
+    ...(event.eventId === undefined ? {} : { eventId: event.eventId }),
+    ...(event.timestamp === undefined ? {} : { timestamp: event.timestamp }),
+    ...(event.sessionId === undefined || event.sessionId === null
+      ? {}
+      : { sessionId: `sha256:${sha256(event.sessionId).slice(7)}` }),
+    ...(event.turnId === undefined || event.turnId === null
+      ? {}
+      : { turnId: `sha256:${sha256(event.turnId).slice(7)}` }),
+    kind: event.kind,
+    actor: { type: "system", id: "maqam.context-append" },
+    title: `Maqam approved ${event.kind}`,
+    body: "",
+    data: {
+      capture: "metadata",
+      contentOmitted: true,
+      requestedKind: event.kind,
+      sourceEvent: summary
+    },
+    confidence: "extracted",
+    relations: [],
+    provenance: {
+      adapter: "maqam.context-append.metadata",
+      sourceId: event.eventId ?? `maqam-input:${summary.hash}`
+    },
+    retention: { class: workspace.config.retentionClass, expiresAt: null }
+  };
 }
 
 function confidenceNumber(value) {
@@ -165,6 +231,7 @@ function adapterSpec(tool, invoke, bounds) {
 
 export function registerMaqamContextAdapters(input) {
   const options = registrationOptions(input);
+  const locator = Object.freeze({ start: options.cwd ?? process.cwd() });
   const query = attachGovernance(async (rawInput = {}, context = {}) => {
     const addBatch = evidenceCapability(context, MAQAM_CONTEXT_QUERY_TOOL.name);
     const request = snapshotRecordBoundary(rawInput, {
@@ -197,16 +264,19 @@ export function registerMaqamContextAdapters(input) {
 
   const append = attachGovernance(async (rawInput = {}, context = {}) => {
     const addBatch = evidenceCapability(context, MAQAM_CONTEXT_APPEND_TOOL.name);
-    assertExactApproval(context);
     const request = snapshotRecordBoundary(rawInput, {
       label: "context.append input",
-      keys: ["event"],
+      keys: ["event", "capture"],
       maximumBytes: 256 * 1024,
       maximumStringLength: 65_536
     });
     if (!Object.hasOwn(request, "event")) throw new TypeError("context.append input.event is required.");
-    const event = await appendEvent(request.event, { cwd: options.cwd });
-    await rebuildDerivedState(options.cwd);
+    assertExactApproval(context, request);
+    const workspace = await loadTrustedInteropWorkspace(locator);
+    const capture = requestedCapture(request.capture, workspace);
+    const eventInput = capture === "content" ? request.event : metadataEventInput(request.event, workspace);
+    const event = await appendEvent(eventInput, { workspace });
+    await rebuildDerivedState(workspace.root);
     const evidence = addEvidence(addBatch, [{
       sourceType: "qarinah.context-event",
       source: `qarinah://${event.workspaceId}/events/${event.eventId}?eventHash=${event.hash}`,
@@ -214,7 +284,12 @@ export function registerMaqamContextAdapters(input) {
       excerpt: event.body,
       confidence: confidenceNumber(event.confidence)
     }]);
-    return deepFreeze({ schemaVersion: "qarinah.maqam-context-append-result.v1", event, evidence: evidence[0] });
+    return deepFreeze({
+      schemaVersion: "qarinah.maqam-context-append-result.v1",
+      capture,
+      event,
+      evidence: evidence[0]
+    });
   }, MAQAM_CONTEXT_APPEND_TOOL);
 
   const queryAdapter = options.defineToolAdapter(adapterSpec(MAQAM_CONTEXT_QUERY_TOOL, query, {

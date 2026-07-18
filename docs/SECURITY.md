@@ -31,7 +31,11 @@
 - Local Codex hooks do not observe hosted `WebSearch` and may not cover specialized tool paths. They are not an enforcement boundary.
 - Content-mode capture stores host-exposed prompt/tool/completion values after bounded best-effort redaction; use metadata mode for unclassified data.
 - A valid ProductLoop receipt proves canonical hash continuity, not author identity or truth; signed provenance remains separate.
+- ProductLoop sequence identity is durable in Qarinah, but a restarted sink must replay its run from sequence 1 because the sink does not use ProductLoop's `RunStore` as an ordering oracle.
 - Cockroach Crawler does not yet export a runtime SourceRecord validator or hash-recomputation contract, so Qarinah enforces its own structural boundary and does not call the record certified.
+- Cockroach revision and acquisition records are two idempotent serialized appends, not an atomic pair. A failed acquisition can be completed by retry while the already-written revision remains reviewable.
+- Interoperability adapters reload machine-local trust from a supplied root; a structural workspace object is only a locator, never an authority.
+- Maqam's inspected handler contract has no unforgeable gateway brand or authenticated input-hash capability. Qarinah reproduces the inspected internal digest and matches run, tool, and consumption, but that digest is not a stable public API and a caller with the handler can fabricate all plain context fields. Trusted `ToolGateway` routing remains part of the boundary until [Maqam issue #24](https://github.com/AjnasNB/maqam/issues/24) adds such a capability.
 - Qarinah and Maqam evidence are separate append-only systems. A successful `context.append` emits both records, but there is no cross-ledger transaction: if Maqam's evidence ledger fails after the Qarinah append, the governed call fails while the Qarinah event remains reviewable.
 
 Report vulnerabilities privately to the repository owner before opening a public issue.

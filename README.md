@@ -84,4 +84,4 @@ See [architecture](docs/ARCHITECTURE.md), [security model](docs/SECURITY.md), [l
 
 ## Optional interoperability
 
-Qarinah exposes dependency-free structural bridges for Maqam `ToolGateway` adapters, Cockroach Crawler `SourceRecord` ingestion, and the ProductLoop `ProvenanceSink` callback. Writes remain machine-trust-gated, Maqam query/append operations stay separate, and no bridge scrapes private trace arrays. See the [interoperability guide](docs/INTEROPERABILITY.md) for exact guarantees and the upstream contract gaps that remain visible.
+Qarinah exposes dependency-free structural bridges for Maqam `ToolGateway` adapters, Cockroach Crawler revision/acquisition ingestion, and the ProductLoop `ProvenanceSink` callback. Writes reload machine-local trust, metadata mode omits caller/source payloads, content retention requires explicit workspace consent, and no bridge scrapes private trace arrays. See the [interoperability guide](docs/INTEROPERABILITY.md) for exact guarantees and the upstream contract gaps that remain visible.

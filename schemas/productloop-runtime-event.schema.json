@@ -9,7 +9,7 @@
     "runId": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$" },
     "sequence": { "type": "integer", "minimum": 1 },
     "type": { "type": "string", "minLength": 1, "maxLength": 256 },
-    "timestamp": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T", "maxLength": 64 },
+    "timestamp": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$", "maxLength": 24 },
     "data": { "type": "object", "additionalProperties": true },
     "receipt": {
       "type": "object",

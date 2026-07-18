@@ -2,11 +2,16 @@ import { canonicalStringify, deepFreezeJson, sha256 } from "../canonical.js";
 import { QarinahError } from "../errors.js";
 import { appendEvent } from "../store.js";
 import {
-  isoTimestamp,
+  canonicalIsoTimestamp,
   snapshotJsonBoundary,
   snapshotRecordBoundary,
   stringField
 } from "./boundary.js";
+import {
+  contentSummary,
+  loadTrustedInteropWorkspace,
+  workspaceLocator
+} from "./capture-policy.js";
 
 export const PRODUCTLOOP_RUNTIME_EVENT_BOUNDARY_VERSION = "ajnas-runtime.runtime-event.structural.v0.2.1";
 
@@ -14,12 +19,30 @@ const EVENT_KEYS = Object.freeze(["runId", "sequence", "type", "timestamp", "dat
 const RECEIPT_KEYS = Object.freeze(["eventHash", "previousHash", "canonicalJson"]);
 const HEX_HASH = /^[a-f0-9]{64}$/;
 
-function uuidFromReceipt(value) {
+function uuidFromIdentity(value) {
   const hex = sha256(value).slice(7, 39).split("");
   hex[12] = "4";
   hex[16] = "8";
   const id = hex.join("");
   return `evt_${id.slice(0, 8)}-${id.slice(8, 12)}-${id.slice(12, 16)}-${id.slice(16, 20)}-${id.slice(20)}`;
+}
+
+function mappingOptions(options) {
+  const normalized = snapshotRecordBoundary(options, {
+    label: "ProductLoop event mapping options",
+    keys: ["capture", "retentionClass"],
+    maximumBytes: 1_024,
+    maximumStringLength: 16
+  });
+  const capture = normalized.capture ?? "metadata";
+  if (!["metadata", "content"].includes(capture)) {
+    throw new TypeError("ProductLoop event mapping capture is invalid.");
+  }
+  const retentionClass = normalized.retentionClass ?? "project";
+  if (!["session", "project", "durable"].includes(retentionClass)) {
+    throw new TypeError("ProductLoop event mapping retentionClass is invalid.");
+  }
+  return { capture, retentionClass };
 }
 
 function compactTarget(prefix, value) {
@@ -45,7 +68,7 @@ export function validateProductLoopRuntimeEvent(value) {
   if (!/^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/u.test(event.runId)) throw new TypeError("ProductLoop RuntimeEvent.runId is invalid.");
   if (!Number.isSafeInteger(event.sequence) || event.sequence < 1) throw new TypeError("ProductLoop RuntimeEvent.sequence must be a positive integer.");
   stringField(event.type, "ProductLoop RuntimeEvent.type", { maximumLength: 256 });
-  const timestamp = isoTimestamp(event.timestamp, "ProductLoop RuntimeEvent.timestamp");
+  const timestamp = canonicalIsoTimestamp(event.timestamp, "ProductLoop RuntimeEvent.timestamp");
   if (!event.data || typeof event.data !== "object" || Array.isArray(event.data)) {
     throw new TypeError("ProductLoop RuntimeEvent.data must be a JSON record.");
   }
@@ -91,8 +114,9 @@ export function validateProductLoopRuntimeEvent(value) {
   return deepFreezeJson({ ...event, timestamp, data, receipt });
 }
 
-export function productLoopRuntimeEventToEventInput(value) {
+export function productLoopRuntimeEventToEventInput(value, options = {}) {
   const event = validateProductLoopRuntimeEvent(value);
+  const { capture, retentionClass } = mappingOptions(options);
   const relations = [
     { type: "governed_by", target: compactTarget("productloop-run:", event.runId) },
     { type: "derived_from", target: `productloop-receipt:${event.receipt.eventHash}` }
@@ -101,7 +125,8 @@ export function productLoopRuntimeEventToEventInput(value) {
     relations.push({ type: "references", target: `productloop-receipt:${event.receipt.previousHash}` });
   }
   if (typeof event.data.stepId === "string" && event.data.stepId) {
-    relations.push({ type: "affects", target: compactTarget("productloop-step:", `${event.runId}:${event.data.stepId}`) });
+    const stepIdentity = capture === "content" ? event.data.stepId : `sha256:${sha256(event.data.stepId).slice(7)}`;
+    relations.push({ type: "affects", target: compactTarget("productloop-step:", `${event.runId}:${stepIdentity}`) });
   }
   const kind = event.type === "run.started"
     ? "session.started"
@@ -115,11 +140,16 @@ export function productLoopRuntimeEventToEventInput(value) {
             ? "turn.completed"
             : "artifact";
   return deepFreezeJson({
-    eventId: uuidFromReceipt(`${event.runId}\0${event.sequence}\0${event.receipt.eventHash}`),
+    // Stable for a logical ProductLoop sequence position. A divergent receipt at
+    // the same position therefore collides durably in Qarinah instead of creating
+    // a second history when another sink instance or process is used.
+    eventId: uuidFromIdentity(`productloop-event\0${event.runId}\0${event.sequence}`),
     timestamp: event.timestamp,
     sessionId: event.runId,
     turnId: typeof event.data.stepId === "string"
-      ? (event.data.stepId.length <= 256 ? event.data.stepId : `sha256:${sha256(event.data.stepId).slice(7)}`)
+      ? (capture === "content" && event.data.stepId.length <= 256
+          ? event.data.stepId
+          : `sha256:${sha256(event.data.stepId).slice(7)}`)
       : null,
     kind,
     actor: { type: "system", id: "productloop.runtime" },
@@ -127,11 +157,16 @@ export function productLoopRuntimeEventToEventInput(value) {
     body: "",
     data: {
       boundaryVersion: PRODUCTLOOP_RUNTIME_EVENT_BOUNDARY_VERSION,
+      capture,
+      ...(capture === "metadata" ? {
+        contentOmitted: true,
+        runtimeData: contentSummary(event.data)
+      } : {}),
       runtimeEvent: {
         runId: event.runId,
         sequence: event.sequence,
         type: event.type,
-        data: event.data,
+        ...(capture === "content" ? { data: event.data } : {}),
         receipt: {
           eventHash: event.receipt.eventHash,
           previousHash: event.receipt.previousHash
@@ -144,44 +179,33 @@ export function productLoopRuntimeEventToEventInput(value) {
       adapter: "productloop.provenance-sink",
       sourceId: compactTarget("productloop-event:", `${event.runId}:${event.sequence}`)
     },
-    retention: { class: "project", expiresAt: null }
+    retention: { class: retentionClass, expiresAt: null }
   });
 }
 
 export function createProductLoopProvenanceSink(options = {}) {
-  const configured = snapshotRecordBoundary(options, {
-    label: "ProductLoop provenance sink options",
-    keys: ["cwd", "workspace"],
-    maximumStringLength: 2_048,
-    maximumBytes: 4_096
-  });
-  if (configured.cwd !== undefined && (typeof configured.cwd !== "string" || configured.cwd.length === 0)) {
-    throw new TypeError("ProductLoop provenance sink options.cwd must be a non-empty string.");
-  }
+  const locator = workspaceLocator(options, "ProductLoop provenance sink options");
   const heads = new Map();
   let queue = Promise.resolve();
 
   async function write(event) {
+    const workspace = await loadTrustedInteropWorkspace(locator);
+    const eventInput = productLoopRuntimeEventToEventInput(event, {
+      capture: workspace.config.capture,
+      retentionClass: workspace.config.retentionClass
+    });
     const head = heads.get(event.runId);
     if (!head) {
       if (event.sequence !== 1 || event.receipt.previousHash !== null) {
         throw new QarinahError("PRODUCTLOOP_CHAIN_START_INVALID", `ProductLoop run '${event.runId}' must enter a new sink at sequence 1.`);
       }
     } else if (event.sequence === head.sequence && event.receipt.eventHash === head.eventHash) {
-      await appendEvent(productLoopRuntimeEventToEventInput(event), {
-        ...(configured.cwd === undefined ? {} : { cwd: configured.cwd }),
-        ...(configured.workspace === undefined ? {} : { workspace: configured.workspace }),
-        idempotent: true
-      });
+      await appendEvent(eventInput, { workspace, idempotent: true });
       return;
     } else if (event.sequence !== head.sequence + 1 || event.receipt.previousHash !== head.eventHash) {
       throw new QarinahError("PRODUCTLOOP_CHAIN_INVALID", `ProductLoop run '${event.runId}' broke sequence or receipt continuity.`);
     }
-    await appendEvent(productLoopRuntimeEventToEventInput(event), {
-      ...(configured.cwd === undefined ? {} : { cwd: configured.cwd }),
-      ...(configured.workspace === undefined ? {} : { workspace: configured.workspace }),
-      idempotent: true
-    });
+    await appendEvent(eventInput, { workspace, idempotent: true });
     heads.set(event.runId, { sequence: event.sequence, eventHash: event.receipt.eventHash });
   }
 

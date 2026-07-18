@@ -43,9 +43,9 @@ The event chain is authoritative. A machine-local trust record binds consent and
 
 - Codex: an installable skill plus exact lifecycle-schema hooks backed by a generated standalone runtime. Hooks are observability, not the security boundary; hosted `WebSearch` is not hook-covered.
 - Claude and other agents: adapters normalize only events the host explicitly exposes.
-- Cockroach Crawler: a strict Qarinah-owned `SourceRecord -> Qarinah ingest` boundary; the crawler never depends on Qarinah.
-- Maqam: separate governed query (`read`) and append (`write`) tools; writes require exact consumed approval.
-- ProductLoop: implement the existing `ProvenanceSink` callback without scraping traces; an independent `RunStore` remains composable.
+- Cockroach Crawler: a strict Qarinah-owned `SourceRecord -> stable revision + acquisition` boundary; the crawler never depends on Qarinah.
+- Maqam: separate governed query (`read`) and append (`write`) tools; writes match the exact canonical input approval and independently enforce metadata/content consent. Maqam still needs an upstream unforgeable gateway capability to make direct-handler provenance cryptographically distinguishable.
+- ProductLoop: implement the existing `ProvenanceSink` callback without scraping traces; stable run/sequence identities reject divergent histories and an independent `RunStore` remains composable.
 
 ## Governed Agent OS direction
 

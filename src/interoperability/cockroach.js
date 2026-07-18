@@ -1,13 +1,19 @@
-import { deepFreezeJson, sha256 } from "../canonical.js";
+import { canonicalStringify, deepFreezeJson, sha256 } from "../canonical.js";
 import { appendEvent } from "../store.js";
 import {
-  isoTimestamp,
+  canonicalIsoTimestamp,
   snapshotJsonBoundary,
   snapshotRecordBoundary,
   stringField
 } from "./boundary.js";
+import {
+  contentSummary,
+  loadTrustedInteropWorkspace,
+  workspaceLocator
+} from "./capture-policy.js";
 
 export const COCKROACH_SOURCE_RECORD_BOUNDARY_VERSION = "cockroach-crawler.source-record.structural.v1";
+export const COCKROACH_INGESTION_SCHEMA_VERSION = "qarinah.cockroach-ingestion.v1";
 
 const SOURCE_KEYS = Object.freeze([
   "source", "id", "type", "title", "url", "text", "author", "publishedAt",
@@ -36,12 +42,56 @@ function compactTarget(prefix, value) {
   return candidate.length <= 512 ? candidate : `${prefix}sha256:${sha256(value).slice(7)}`;
 }
 
+function privateTarget(prefix, value) {
+  return `${prefix}sha256:${sha256(value).slice(7)}`;
+}
+
 function uuidFromDigest(value) {
   const hex = sha256(value).slice(7, 39).split("");
   hex[12] = "4";
   hex[16] = "8";
   const id = hex.join("");
   return `evt_${id.slice(0, 8)}-${id.slice(8, 12)}-${id.slice(12, 16)}-${id.slice(16, 20)}-${id.slice(20)}`;
+}
+
+function mapperOptions(options) {
+  const normalized = snapshotRecordBoundary(options, {
+    label: "Cockroach event mapping options",
+    keys: ["capture", "retentionClass"],
+    maximumBytes: 1_024,
+    maximumStringLength: 16
+  });
+  const capture = normalized.capture ?? "metadata";
+  if (!["metadata", "content"].includes(capture)) throw new TypeError("Cockroach event mapping capture is invalid.");
+  const retentionClass = normalized.retentionClass ?? "project";
+  if (!["session", "project", "durable"].includes(retentionClass)) {
+    throw new TypeError("Cockroach event mapping retentionClass is invalid.");
+  }
+  return { capture, retentionClass };
+}
+
+function revisionIdentity(record) {
+  return `${record.source}:${record.id}`;
+}
+
+function revisionEventId(record) {
+  return uuidFromDigest(`cockroach-revision\0${revisionIdentity(record)}\0${record.contentHash}`);
+}
+
+function acquisitionIdentity(record) {
+  return canonicalStringify({
+    revisionEventId: revisionEventId(record),
+    adapterVersion: record.adapterVersion,
+    warnings: record.warnings,
+    metadata: record.metadata,
+    provenance: record.provenance
+  });
+}
+
+function uniqueRelations(relations) {
+  return relations.filter((relation, index, entries) => (
+    entries.findIndex((candidate) => candidate.type === relation.type && candidate.target === relation.target) === index
+  ));
 }
 
 export function validateCockroachSourceRecordBoundary(value) {
@@ -65,7 +115,9 @@ export function validateCockroachSourceRecordBoundary(value) {
   stringField(record.url, "Cockroach SourceRecord.url", { allowEmpty: true, maximumLength: 8_192 });
   stringField(record.text, "Cockroach SourceRecord.text", { allowEmpty: true, maximumLength: 1_000_000 });
   stringField(record.author, "Cockroach SourceRecord.author", { nullable: true, maximumLength: 512 });
-  if (record.publishedAt !== null) isoTimestamp(record.publishedAt, "Cockroach SourceRecord.publishedAt");
+  if (record.publishedAt !== null) {
+    canonicalIsoTimestamp(record.publishedAt, "Cockroach SourceRecord.publishedAt");
+  }
   if (typeof record.contentHash !== "string" || !HASH_PATTERN.test(record.contentHash)) {
     throw new TypeError("Cockroach SourceRecord.contentHash must be a lowercase sha256 digest.");
   }
@@ -98,48 +150,63 @@ export function validateCockroachSourceRecordBoundary(value) {
   for (const key of PROVENANCE_KEYS) {
     if (!Object.hasOwn(provenance, key)) throw new TypeError(`Cockroach SourceRecord.provenance is missing '${key}'.`);
   }
-  const retrievedAt = isoTimestamp(provenance.retrievedAt, "Cockroach SourceRecord.provenance.retrievedAt");
+  canonicalIsoTimestamp(provenance.retrievedAt, "Cockroach SourceRecord.provenance.retrievedAt");
   stringField(provenance.method, "Cockroach SourceRecord.provenance.method", { maximumLength: 128 });
   if (typeof provenance.authenticated !== "boolean" || typeof provenance.credentialed !== "boolean") {
     throw new TypeError("Cockroach SourceRecord provenance authentication flags must be booleans.");
   }
-  return deepFreezeJson({ ...record, metadata, provenance: { ...provenance, retrievedAt } });
+  return deepFreezeJson({ ...record, metadata, provenance });
 }
 
 export function cockroachSourceRecordToEventInput(value, options = {}) {
   const record = validateCockroachSourceRecordBoundary(value);
-  const optionRecord = snapshotRecordBoundary(options, {
-    label: "Cockroach ingestion options",
-    keys: ["retentionClass"],
-    maximumBytes: 1_024,
-    maximumStringLength: 16
-  });
-  const retentionClass = optionRecord.retentionClass ?? "project";
-  if (!["session", "project", "durable"].includes(retentionClass)) {
-    throw new TypeError("Cockroach ingestion retentionClass is invalid.");
+  const { capture, retentionClass } = mapperOptions(options);
+  const sourceIdentity = revisionIdentity(record);
+  const eventId = revisionEventId(record);
+  const base = {
+    eventId,
+    ...(record.publishedAt === null ? {} : { timestamp: record.publishedAt }),
+    kind: "source",
+    actor: { type: "source", id: capture === "content" ? compactTarget("cockroach:", record.source).slice(0, 256) : "cockroach" },
+    title: capture === "content"
+      ? compact(record.title || `${record.source} ${record.type} ${record.id}`, 512, "TITLE").value
+      : `Cockroach ${record.source} ${record.type} revision`,
+    body: capture === "content" ? compact(record.text, 16_000, "SOURCE_TEXT").value : "",
+    confidence: "extracted",
+    retention: { class: retentionClass, expiresAt: null }
+  };
+  if (capture === "metadata") {
+    return deepFreezeJson({
+      ...base,
+      data: {
+        boundaryVersion: COCKROACH_SOURCE_RECORD_BOUNDARY_VERSION,
+        capture: "metadata",
+        trust: "untrusted",
+        contentOmitted: true,
+        source: record.source,
+        sourceType: record.type,
+        upstreamContentHash: record.contentHash,
+        sourceText: contentSummary(record.text)
+      },
+      relations: [{ type: "derived_from", target: privateTarget("cockroach-source:", sourceIdentity) }],
+      provenance: {
+        adapter: "cockroach.metadata",
+        sourceId: privateTarget("cockroach-source:", sourceIdentity)
+      }
+    });
   }
   const title = compact(record.title || `${record.source} ${record.type} ${record.id}`, 512, "TITLE");
   const body = compact(record.text, 16_000, "SOURCE_TEXT");
-  const sourceIdentity = `${record.source}:${record.id}`;
-  const relations = [
-    { type: "derived_from", target: compactTarget("cockroach-source:", sourceIdentity) },
-    { type: "governed_by", target: compactTarget("cockroach-adapter:", `${record.source}@${record.adapterVersion}`) },
-    { type: "references", target: compactTarget("acquisition:", `${record.provenance.method}:${record.provenance.retrievedAt}`) }
-  ];
+  const relations = [{ type: "derived_from", target: compactTarget("cockroach-source:", sourceIdentity) }];
   if (record.url) relations.push({ type: "references", target: compactTarget("", record.url) });
   if (record.author) relations.push({ type: "references", target: compactTarget("author:", record.author) });
-  const uniqueRelations = relations.filter((relation, index, entries) => (
-    entries.findIndex((candidate) => candidate.type === relation.type && candidate.target === relation.target) === index
-  ));
   return deepFreezeJson({
-    eventId: uuidFromDigest(`${sourceIdentity}\0${record.contentHash}`),
-    timestamp: record.provenance.retrievedAt,
-    kind: "source",
-    actor: { type: "source", id: compactTarget("cockroach:", record.source).slice(0, 256) },
+    ...base,
     title: title.value,
     body: body.value,
     data: {
       boundaryVersion: COCKROACH_SOURCE_RECORD_BOUNDARY_VERSION,
+      capture: "content",
       trust: "untrusted",
       source: record.source,
       sourceRecordId: record.id,
@@ -154,38 +221,103 @@ export function cockroachSourceRecordToEventInput(value, options = {}) {
       author: record.author,
       publishedAt: record.publishedAt,
       upstreamContentHash: record.contentHash,
+      normalization: { titleTruncated: title.truncated, textTruncated: body.truncated }
+    },
+    relations: uniqueRelations(relations),
+    provenance: {
+      adapter: "cockroach.revision",
+      sourceId: compactTarget("cockroach-source:", sourceIdentity)
+    }
+  });
+}
+
+export function cockroachSourceRecordToAcquisitionEventInput(value, options = {}) {
+  const record = validateCockroachSourceRecordBoundary(value);
+  const { capture, retentionClass } = mapperOptions(options);
+  const revisionId = revisionEventId(record);
+  const eventId = uuidFromDigest(`cockroach-acquisition\0${acquisitionIdentity(record)}`);
+  const base = {
+    eventId,
+    timestamp: record.provenance.retrievedAt,
+    kind: "source",
+    actor: { type: "source", id: "cockroach" },
+    title: `Cockroach ${record.source} acquisition`,
+    body: "",
+    confidence: "extracted",
+    relations: [
+      { type: "derived_from", target: revisionId },
+      { type: "governed_by", target: compactTarget("cockroach-adapter:", `${record.source}@${record.adapterVersion}`) },
+      { type: "references", target: compactTarget("acquisition:", `${record.provenance.method}:${record.provenance.retrievedAt}`) }
+    ],
+    provenance: { adapter: "cockroach.acquisition", sourceId: eventId },
+    retention: { class: retentionClass, expiresAt: null }
+  };
+  if (capture === "metadata") {
+    return deepFreezeJson({
+      ...base,
+      data: {
+        boundaryVersion: COCKROACH_SOURCE_RECORD_BOUNDARY_VERSION,
+        capture: "metadata",
+        contentOmitted: true,
+        source: record.source,
+        sourceType: record.type,
+        upstreamContentHash: record.contentHash,
+        adapterVersion: record.adapterVersion,
+        warnings: contentSummary(record.warnings),
+        providerMetadata: contentSummary(record.metadata),
+        acquisition: record.provenance
+      }
+    });
+  }
+  return deepFreezeJson({
+    ...base,
+    data: {
+      boundaryVersion: COCKROACH_SOURCE_RECORD_BOUNDARY_VERSION,
+      capture: "content",
+      source: record.source,
+      sourceRecordId: record.id,
+      canonicalUrl: record.url,
+      upstreamContentHash: record.contentHash,
       adapterVersion: record.adapterVersion,
       warnings: record.warnings,
       metadata: record.metadata,
-      acquisition: record.provenance,
-      normalization: { titleTruncated: title.truncated, textTruncated: body.truncated }
-    },
-    confidence: "extracted",
-    relations: uniqueRelations,
-    provenance: {
-      adapter: compactTarget("cockroach:", `${record.source}@${record.adapterVersion}`).slice(0, 128),
-      sourceId: compactTarget("cockroach-source:", sourceIdentity)
-    },
-    retention: { class: retentionClass, expiresAt: null }
+      acquisition: record.provenance
+    }
   });
 }
 
 export async function ingestCockroachSourceRecord(value, options = {}) {
-  const boundaryOptions = snapshotRecordBoundary(options, {
-    label: "Cockroach ingestion options",
-    keys: ["cwd", "workspace", "retentionClass"],
-    maximumBytes: 4_096,
-    maximumStringLength: 2_048
-  });
-  if (boundaryOptions.cwd !== undefined && (typeof boundaryOptions.cwd !== "string" || boundaryOptions.cwd.length === 0)) {
-    throw new TypeError("Cockroach ingestion options.cwd must be a non-empty string.");
+  if (!options || typeof options !== "object" || Array.isArray(options)) {
+    throw new TypeError("Cockroach ingestion options must be a record.");
   }
-  const event = cockroachSourceRecordToEventInput(value, boundaryOptions.retentionClass === undefined
-    ? {}
-    : { retentionClass: boundaryOptions.retentionClass });
-  return appendEvent(event, {
-    ...(boundaryOptions.cwd === undefined ? {} : { cwd: boundaryOptions.cwd }),
-    ...(boundaryOptions.workspace === undefined ? {} : { workspace: boundaryOptions.workspace }),
-    idempotent: true
+  const descriptors = Object.getOwnPropertyDescriptors(options);
+  const allowed = new Set(["cwd", "workspace", "retentionClass"]);
+  if (Reflect.ownKeys(descriptors).some((key) => typeof key !== "string" || !allowed.has(key))) {
+    throw new TypeError("Cockroach ingestion options contain unknown fields.");
+  }
+  for (const [key, descriptor] of Object.entries(descriptors)) {
+    if (!descriptor.enumerable || !Object.hasOwn(descriptor, "value")) {
+      throw new TypeError(`Cockroach ingestion options.${key} must be an enumerable data property.`);
+    }
+  }
+  const retentionClass = descriptors.retentionClass?.value;
+  if (retentionClass !== undefined && !["session", "project", "durable"].includes(retentionClass)) {
+    throw new TypeError("Cockroach ingestion retentionClass is invalid.");
+  }
+  const locator = workspaceLocator({
+    ...(descriptors.cwd ? { cwd: descriptors.cwd.value } : {}),
+    ...(descriptors.workspace ? { workspace: descriptors.workspace.value } : {})
+  }, "Cockroach ingestion options");
+  const workspace = await loadTrustedInteropWorkspace(locator);
+  const mapping = { capture: workspace.config.capture, retentionClass: retentionClass ?? workspace.config.retentionClass };
+  const revisionInput = cockroachSourceRecordToEventInput(value, mapping);
+  const acquisitionInput = cockroachSourceRecordToAcquisitionEventInput(value, mapping);
+  const revision = await appendEvent(revisionInput, { workspace, idempotent: true });
+  const acquisition = await appendEvent(acquisitionInput, { workspace, idempotent: true });
+  return deepFreezeJson({
+    schemaVersion: COCKROACH_INGESTION_SCHEMA_VERSION,
+    capture: workspace.config.capture,
+    revision,
+    acquisition
   });
 }

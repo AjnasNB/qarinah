@@ -44,10 +44,14 @@ try {
   }, null, 2)}\n`);
   await writeFile(path.join(temporaryDirectory, "consumer.ts"), [
     "import {",
+    "  cockroachSourceRecordToAcquisitionEventInput,",
     "  createProductLoopProvenanceSink,",
+    "  ingestCockroachSourceRecord,",
     "  initializeWorkspace,",
     "  registerMaqamContextAdapters,",
     "  validateCockroachSourceRecordBoundary,",
+    "  type CockroachIngestionResult,",
+    "  type MaqamContextAppendInput,",
     "  type MaqamToolAdapterStructuralSpec,",
     "  type ProductLoopProvenanceSink,",
     "  type ProductLoopRuntimeEventBoundary,",
@@ -76,6 +80,12 @@ try {
     "  provenance: { retrievedAt: '2026-07-18T00:00:00.000Z', method: 'crawler', authenticated: false, credentialed: false }",
     "});",
     "void source;",
+    "const acquisition = cockroachSourceRecordToAcquisitionEventInput(source, { capture: 'metadata' });",
+    "void acquisition;",
+    "const ingestion: Promise<CockroachIngestionResult> = ingestCockroachSourceRecord(source);",
+    "void ingestion;",
+    "const appendInput: MaqamContextAppendInput = { event: { kind: 'decision', title: 'ship' }, capture: 'content' };",
+    "void appendInput;",
     ""
   ].join("\n"));
 
