@@ -1,0 +1,71 @@
+{
+  "name": "qarinah",
+  "version": "0.1.0-alpha.0",
+  "description": "Evidence-linked, local-first context compilation for software agents.",
+  "license": "UNLICENSED",
+  "private": true,
+  "author": "Ajnas NB",
+  "type": "module",
+  "sideEffects": false,
+  "bin": {
+    "qarinah": "bin/qarinah.js"
+  },
+  "main": "src/index.js",
+  "types": "types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./codex": {
+      "types": "./types/codex.d.ts",
+      "default": "./src/hooks/codex.js"
+    },
+    "./schemas/event.json": "./schemas/event.schema.json",
+    "./schemas/context-pack.json": "./schemas/context-pack.schema.json"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "types/",
+    "schemas/",
+    "docs/ARCHITECTURE.md",
+    "docs/SECURITY.md",
+    "docs/ROADMAP.md",
+    "integrations/codex/qarinah/",
+    "README.md"
+  ],
+  "scripts": {
+    "build:codex-plugin": "node scripts/build-codex-plugin.mjs",
+    "check:codex-plugin": "node scripts/build-codex-plugin.mjs --check",
+    "test": "node scripts/run-tests.mjs",
+    "typecheck": "node scripts/typecheck-consumer.mjs",
+    "check": "npm run check:codex-plugin && npm test && npm run typecheck && npm run benchmark && npm pack --dry-run --ignore-scripts",
+    "benchmark": "node scripts/benchmark.mjs"
+  },
+  "engines": {
+    "node": ">=20.18.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AjnasNB/qarinah.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AjnasNB/qarinah/issues"
+  },
+  "keywords": [
+    "agent-context",
+    "context-graph",
+    "provenance",
+    "governance",
+    "codex",
+    "claude-code",
+    "audit-log",
+    "knowledge-graph",
+    "context-engineering"
+  ],
+  "devDependencies": {
+    "esbuild": "0.28.1",
+    "typescript": "7.0.2"
+  }
+}

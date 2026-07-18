@@ -1,0 +1,27 @@
+{
+  "name": "qarinah",
+  "version": "0.1.0-alpha.0",
+  "description": "Opt-in, evidence-linked local context capture and compilation for Codex.",
+  "author": {
+    "name": "Ajnas NB",
+    "email": "ajnasnb@gmail.com",
+    "url": "https://github.com/AjnasNB"
+  },
+  "repository": "https://github.com/AjnasNB/qarinah",
+  "license": "UNLICENSED",
+  "keywords": ["context", "provenance", "governance", "codex"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Qarinah",
+    "shortDescription": "Evidence-linked context for every agent.",
+    "longDescription": "Capture explicitly permitted Codex lifecycle metadata into a local tamper-evident record and compile small cited context packs on demand.",
+    "developerName": "Ajnas NB",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Write"],
+    "defaultPrompt": [
+      "Build a cited context pack for this task.",
+      "Show the decisions related to this change.",
+      "Verify this workspace's context ledger."
+    ]
+  }
+}

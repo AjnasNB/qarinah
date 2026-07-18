@@ -1,0 +1,89 @@
+{
+  "SessionStart": {
+    "cwd": "__CWD__",
+    "hook_event_name": "SessionStart",
+    "model": "gpt-5.6-sol",
+    "permission_mode": "default",
+    "session_id": "session-test-001",
+    "source": "startup",
+    "transcript_path": null
+  },
+  "UserPromptSubmit": {
+    "cwd": "__CWD__",
+    "hook_event_name": "UserPromptSubmit",
+    "model": "gpt-5.6-sol",
+    "permission_mode": "default",
+    "prompt": "Implement the requested change.",
+    "session_id": "session-test-001",
+    "transcript_path": null,
+    "turn_id": "turn-test-001"
+  },
+  "PreToolUse": {
+    "cwd": "__CWD__",
+    "hook_event_name": "PreToolUse",
+    "model": "gpt-5.6-sol",
+    "permission_mode": "default",
+    "session_id": "session-test-001",
+    "tool_input": { "command": "npm test" },
+    "tool_name": "Bash",
+    "tool_use_id": "tool-test-001",
+    "transcript_path": null,
+    "turn_id": "turn-test-001"
+  },
+  "PostToolUse": {
+    "cwd": "__CWD__",
+    "hook_event_name": "PostToolUse",
+    "model": "gpt-5.6-sol",
+    "permission_mode": "default",
+    "session_id": "session-test-001",
+    "tool_input": { "command": "npm test" },
+    "tool_name": "Bash",
+    "tool_response": { "exit_code": 0, "output": "tests passed" },
+    "tool_use_id": "tool-test-001",
+    "transcript_path": null,
+    "turn_id": "turn-test-001"
+  },
+  "PreCompact": {
+    "cwd": "__CWD__",
+    "hook_event_name": "PreCompact",
+    "model": "gpt-5.6-sol",
+    "session_id": "session-test-001",
+    "transcript_path": null,
+    "trigger": "auto",
+    "turn_id": "turn-test-001"
+  },
+  "PostCompact": {
+    "cwd": "__CWD__",
+    "hook_event_name": "PostCompact",
+    "model": "gpt-5.6-sol",
+    "session_id": "session-test-001",
+    "transcript_path": null,
+    "trigger": "auto",
+    "turn_id": "turn-test-001"
+  },
+  "Stop": {
+    "cwd": "__CWD__",
+    "hook_event_name": "Stop",
+    "last_assistant_message": "Implementation and verification completed.",
+    "model": "gpt-5.6-sol",
+    "permission_mode": "default",
+    "session_id": "session-test-001",
+    "stop_hook_active": false,
+    "transcript_path": null,
+    "turn_id": "turn-test-001"
+  },
+  "SubagentStop": {
+    "agent_id": "agent-test-001",
+    "agent_transcript_path": null,
+    "agent_type": "worker",
+    "cwd": "__CWD__",
+    "hook_event_name": "SubagentStop",
+    "last_assistant_message": "Subtask completed.",
+    "model": "gpt-5.6-sol",
+    "permission_mode": "default",
+    "session_id": "session-test-001",
+    "stop_hook_active": false,
+    "transcript_path": null,
+    "turn_id": "turn-test-001"
+  }
+}

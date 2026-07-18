@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/AjnasNB/qarinah/schemas/context-pack.schema.json",
+  "title": "Qarinah context pack v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "workspaceId",
+    "query",
+    "budget",
+    "items",
+    "truncated",
+    "manifestHash"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "qarinah.context-pack.v1" },
+    "workspaceId": { "type": "string", "pattern": "^ws_[0-9a-f]{32}$" },
+    "query": { "type": "string", "maxLength": 4096 },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxChars", "usedChars", "estimatedTokens"],
+      "properties": {
+        "maxChars": { "type": "integer", "minimum": 512, "maximum": 1000000 },
+        "usedChars": { "type": "integer", "minimum": 0 },
+        "estimatedTokens": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "items": {
+      "type": "array",
+      "maxItems": 1000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["eventId", "kind", "timestamp", "title", "excerpt", "confidence", "reason", "hash"],
+        "properties": {
+          "eventId": { "type": "string", "maxLength": 64 },
+          "kind": { "type": "string", "maxLength": 64 },
+          "timestamp": { "type": "string", "format": "date-time", "maxLength": 64 },
+          "title": { "type": "string", "maxLength": 512 },
+          "excerpt": { "type": "string", "maxLength": 65536 },
+          "confidence": { "enum": ["extracted", "inferred", "claimed", "verified"] },
+          "reason": { "type": "string", "maxLength": 512 },
+          "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+        }
+      }
+    },
+    "truncated": { "type": "boolean" },
+    "manifestHash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  }
+}

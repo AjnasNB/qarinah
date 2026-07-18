@@ -1,0 +1,94 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+import test from "node:test";
+import { fileURLToPath } from "node:url";
+import { captureCodexHook, initializeWorkspace, readEvents } from "../src/index.js";
+import { temporaryDirectory } from "../test-support/helpers.js";
+
+const fixturePath = path.join(path.dirname(fileURLToPath(import.meta.url)), "fixtures", "codex-hooks.json");
+const fixtures = JSON.parse(await readFile(fixturePath, "utf8"));
+
+function fixture(name, cwd, overrides = {}) {
+  return { ...fixtures[name], cwd, ...overrides };
+}
+
+test("Codex capture is inert outside an opted-in workspace", async (t) => {
+  const root = await temporaryDirectory(t);
+  assert.deepEqual(await captureCodexHook(fixture("SessionStart", root)), {
+    captured: false,
+    reason: "WORKSPACE_NOT_INITIALIZED"
+  });
+});
+
+test("all exact upstream Codex hook fixtures are accepted", async (t) => {
+  const root = await temporaryDirectory(t);
+  await initializeWorkspace(root);
+  for (const eventName of Object.keys(fixtures)) {
+    const result = await captureCodexHook(fixture(eventName, root));
+    assert.equal(result.captured, true, eventName);
+  }
+  const events = await readEvents(root);
+  assert.equal(events.length, 8);
+  assert.equal(events.find((event) => event.data.hookEvent === "PreCompact").data.trigger, "auto");
+  assert.equal(events.find((event) => event.data.hookEvent === "SubagentStop").data.agentId, "agent-test-001");
+});
+
+test("replayed host hook events are idempotent", async (t) => {
+  const root = await temporaryDirectory(t);
+  await initializeWorkspace(root);
+  const input = fixture("PostToolUse", root);
+  const first = await captureCodexHook(input);
+  const second = await captureCodexHook(input);
+  assert.deepEqual(second, first);
+  assert.equal((await readEvents(root)).length, 1);
+});
+
+test("metadata capture hashes redacted values but does not persist content", async (t) => {
+  const root = await temporaryDirectory(t);
+  await initializeWorkspace(root);
+  const result = await captureCodexHook(fixture("PreToolUse", root, {
+    tool_input: { authorization: "Bearer top-secret-token", command: "npm test" }
+  }));
+  assert.equal(result.captured, true);
+  const [event] = await readEvents(root);
+  assert.equal(event.body, "");
+  assert.equal(Object.hasOwn(event.data, "content"), false);
+  assert.equal(event.data.toolInput.present, true);
+  assert.match(event.data.toolInput.hash, /^sha256:/);
+  assert.equal(JSON.stringify(event).includes("top-secret-token"), false);
+});
+
+test("content capture stores exposed completion data and recursively redacts", async (t) => {
+  const root = await temporaryDirectory(t);
+  await initializeWorkspace(root, { capture: "content" });
+  await captureCodexHook(fixture("Stop", root, {
+    last_assistant_message: "Deployed with sk-abcdefghijklmnopqrstuvwxyz"
+  }));
+  const [event] = await readEvents(root);
+  assert.equal(event.body, "Deployed with [REDACTED]");
+  assert.equal(event.data.content.assistantMessage, "Deployed with [REDACTED]");
+  assert.equal(event.data.assistantMessage.present, true);
+});
+
+test("known hook schemas reject missing and additional fields", async (t) => {
+  const root = await temporaryDirectory(t);
+  await initializeWorkspace(root);
+  const missing = fixture("PostToolUse", root);
+  delete missing.tool_response;
+  await assert.rejects(() => captureCodexHook(missing), (error) => error.code === "HOOK_INPUT_INVALID");
+  await assert.rejects(
+    () => captureCodexHook({ ...fixture("SessionStart", root), invented: true }),
+    (error) => error.code === "HOOK_INPUT_INVALID"
+  );
+});
+
+test("unknown host lifecycle events are ignored", async (t) => {
+  const root = await temporaryDirectory(t);
+  await initializeWorkspace(root);
+  assert.deepEqual(await captureCodexHook({ hook_event_name: "FutureEvent", cwd: root }), {
+    captured: false,
+    reason: "UNSUPPORTED_EVENT"
+  });
+  assert.equal((await readEvents(root)).length, 0);
+});
