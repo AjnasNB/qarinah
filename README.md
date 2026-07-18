@@ -81,3 +81,7 @@ The committed plugin contains a generated, dependency-free Node runtime and neve
 Codex hooks are observability, not total mediation. Hosted tools such as `WebSearch` do not emit local `PreToolUse` or `PostToolUse` hooks, and transcript files are deliberately not parsed because their format is unstable.
 
 See [architecture](docs/ARCHITECTURE.md), [security model](docs/SECURITY.md), [licensing decision](docs/LICENSE-STRATEGY.md), and [roadmap](docs/ROADMAP.md).
+
+## Optional interoperability
+
+Qarinah exposes dependency-free structural bridges for Maqam `ToolGateway` adapters, Cockroach Crawler revision/acquisition ingestion, and the ProductLoop `ProvenanceSink` callback. Writes reload machine-local trust, metadata mode omits caller/source payloads, content retention requires explicit workspace consent, and no bridge scrapes private trace arrays. See the [interoperability guide](docs/INTEROPERABILITY.md) for exact guarantees and the upstream contract gaps that remain visible.

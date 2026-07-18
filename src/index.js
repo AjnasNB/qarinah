@@ -28,3 +28,23 @@ export {
 } from "./indexer.js";
 export { compileContext, renderContextPackMarkdown } from "./compiler.js";
 export { captureCodexHook } from "./hooks/codex.js";
+export {
+  MAQAM_CONTEXT_ADAPTER_SCHEMA_VERSION,
+  MAQAM_CONTEXT_APPEND_TOOL,
+  MAQAM_CONTEXT_QUERY_TOOL,
+  registerMaqamContextAdapters
+} from "./interoperability/maqam.js";
+export {
+  COCKROACH_INGESTION_SCHEMA_VERSION,
+  COCKROACH_SOURCE_RECORD_BOUNDARY_VERSION,
+  cockroachSourceRecordToAcquisitionEventInput,
+  cockroachSourceRecordToEventInput,
+  ingestCockroachSourceRecord,
+  validateCockroachSourceRecordBoundary
+} from "./interoperability/cockroach.js";
+export {
+  PRODUCTLOOP_RUNTIME_EVENT_BOUNDARY_VERSION,
+  createProductLoopProvenanceSink,
+  productLoopRuntimeEventToEventInput,
+  validateProductLoopRuntimeEvent
+} from "./interoperability/productloop.js";
