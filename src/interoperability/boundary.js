@@ -9,6 +9,9 @@ const DEFAULT_LIMITS = Object.freeze({
   maximumBytes: 256 * 1024
 });
 
+export const CANONICAL_ISO_TIMESTAMP_PATTERN = "^(?:(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:[02468][048]|[13579][26])00)-02-29|[0-9]{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12][0-9]|3[01])|(?:0[469]|11)-(?:0[1-9]|[12][0-9]|30)|02-(?:0[1-9]|1[0-9]|2[0-8])))T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$";
+const CANONICAL_ISO_TIMESTAMP = new RegExp(CANONICAL_ISO_TIMESTAMP_PATTERN);
+
 export function snapshotJsonBoundary(value, options = {}) {
   const limits = { ...DEFAULT_LIMITS, ...options };
   const seen = new WeakSet();
@@ -106,7 +109,9 @@ export function isoTimestamp(value, label) {
 
 export function canonicalIsoTimestamp(value, label) {
   const input = stringField(value, label, { maximumLength: 64 });
-  if (!Number.isFinite(Date.parse(input)) || new Date(input).toISOString() !== input) {
+  if (!CANONICAL_ISO_TIMESTAMP.test(input)
+    || !Number.isFinite(Date.parse(input))
+    || new Date(input).toISOString() !== input) {
     throw new TypeError(`${label} must be a canonical ISO timestamp with millisecond precision and a Z suffix.`);
   }
   return input;

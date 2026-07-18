@@ -81,6 +81,13 @@ function revisionEventId(record) {
 function acquisitionIdentity(record) {
   return canonicalStringify({
     revisionEventId: revisionEventId(record),
+    sourceMetadata: {
+      type: record.type,
+      title: record.title,
+      url: record.url,
+      author: record.author,
+      publishedAt: record.publishedAt
+    },
     adapterVersion: record.adapterVersion,
     warnings: record.warnings,
     metadata: record.metadata,
@@ -165,13 +172,10 @@ export function cockroachSourceRecordToEventInput(value, options = {}) {
   const eventId = revisionEventId(record);
   const base = {
     eventId,
-    ...(record.publishedAt === null ? {} : { timestamp: record.publishedAt }),
     kind: "source",
     actor: { type: "source", id: capture === "content" ? compactTarget("cockroach:", record.source).slice(0, 256) : "cockroach" },
-    title: capture === "content"
-      ? compact(record.title || `${record.source} ${record.type} ${record.id}`, 512, "TITLE").value
-      : `Cockroach ${record.source} ${record.type} revision`,
-    body: capture === "content" ? compact(record.text, 16_000, "SOURCE_TEXT").value : "",
+    title: `Cockroach ${record.source} content revision`,
+    body: "",
     confidence: "extracted",
     retention: { class: retentionClass, expiresAt: null }
   };
@@ -184,7 +188,6 @@ export function cockroachSourceRecordToEventInput(value, options = {}) {
         trust: "untrusted",
         contentOmitted: true,
         source: record.source,
-        sourceType: record.type,
         upstreamContentHash: record.contentHash,
         sourceText: contentSummary(record.text)
       },
@@ -195,14 +198,10 @@ export function cockroachSourceRecordToEventInput(value, options = {}) {
       }
     });
   }
-  const title = compact(record.title || `${record.source} ${record.type} ${record.id}`, 512, "TITLE");
   const body = compact(record.text, 16_000, "SOURCE_TEXT");
   const relations = [{ type: "derived_from", target: compactTarget("cockroach-source:", sourceIdentity) }];
-  if (record.url) relations.push({ type: "references", target: compactTarget("", record.url) });
-  if (record.author) relations.push({ type: "references", target: compactTarget("author:", record.author) });
   return deepFreezeJson({
     ...base,
-    title: title.value,
     body: body.value,
     data: {
       boundaryVersion: COCKROACH_SOURCE_RECORD_BOUNDARY_VERSION,
@@ -210,18 +209,8 @@ export function cockroachSourceRecordToEventInput(value, options = {}) {
       trust: "untrusted",
       source: record.source,
       sourceRecordId: record.id,
-      sourceType: record.type,
-      canonicalUrl: record.url,
-      citation: record.url ? {
-        url: record.url,
-        title: compact(record.title, 512, "CITATION_TITLE").value,
-        author: record.author,
-        publishedAt: record.publishedAt
-      } : null,
-      author: record.author,
-      publishedAt: record.publishedAt,
       upstreamContentHash: record.contentHash,
-      normalization: { titleTruncated: title.truncated, textTruncated: body.truncated }
+      normalization: { textTruncated: body.truncated }
     },
     relations: uniqueRelations(relations),
     provenance: {
@@ -262,6 +251,12 @@ export function cockroachSourceRecordToAcquisitionEventInput(value, options = {}
         source: record.source,
         sourceType: record.type,
         upstreamContentHash: record.contentHash,
+        sourceMetadata: contentSummary({
+          title: record.title,
+          url: record.url,
+          author: record.author,
+          publishedAt: record.publishedAt
+        }),
         adapterVersion: record.adapterVersion,
         warnings: contentSummary(record.warnings),
         providerMetadata: contentSummary(record.metadata),
@@ -269,19 +264,35 @@ export function cockroachSourceRecordToAcquisitionEventInput(value, options = {}
       }
     });
   }
+  const title = compact(record.title, 512, "ACQUISITION_TITLE");
+  const relations = [...base.relations];
+  if (record.url) relations.push({ type: "references", target: compactTarget("", record.url) });
+  if (record.author) relations.push({ type: "references", target: compactTarget("author:", record.author) });
   return deepFreezeJson({
     ...base,
+    relations: uniqueRelations(relations),
     data: {
       boundaryVersion: COCKROACH_SOURCE_RECORD_BOUNDARY_VERSION,
       capture: "content",
       source: record.source,
       sourceRecordId: record.id,
+      sourceType: record.type,
+      title: title.value,
       canonicalUrl: record.url,
+      citation: record.url ? {
+        url: record.url,
+        title: title.value,
+        author: record.author,
+        publishedAt: record.publishedAt
+      } : null,
+      author: record.author,
+      publishedAt: record.publishedAt,
       upstreamContentHash: record.contentHash,
       adapterVersion: record.adapterVersion,
       warnings: record.warnings,
       metadata: record.metadata,
-      acquisition: record.provenance
+      acquisition: record.provenance,
+      normalization: { titleTruncated: title.truncated }
     }
   });
 }

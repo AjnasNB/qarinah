@@ -28,6 +28,7 @@
 - Appends validate the current head for bounded latency. `doctor`, rebuild, and query validate every canonical record and the complete chain.
 - Lexical retrieval is deterministic but does not provide semantic equivalence.
 - Host lifecycle schemas may change. Adapters version and reject unknown shapes instead of silently guessing.
+- Interoperability timestamps use the same calendar-valid, millisecond-precision UTC pattern in runtime validation and published schemas; impossible dates, offset forms, expanded years, and `24:00` are rejected.
 - Local Codex hooks do not observe hosted `WebSearch` and may not cover specialized tool paths. They are not an enforcement boundary.
 - Content-mode capture stores host-exposed prompt/tool/completion values after bounded best-effort redaction; use metadata mode for unclassified data.
 - A valid ProductLoop receipt proves canonical hash continuity, not author identity or truth; signed provenance remains separate.

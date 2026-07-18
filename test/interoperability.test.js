@@ -20,6 +20,7 @@ import {
   validateProductLoopRuntimeEvent
 } from "../src/index.js";
 import { canonicalStringify, sha256 } from "../src/canonical.js";
+import { CANONICAL_ISO_TIMESTAMP_PATTERN } from "../src/interoperability/boundary.js";
 import { eventInput, temporaryDirectory } from "../test-support/helpers.js";
 
 function approvalFor(input, runId = "default") {
@@ -331,6 +332,26 @@ test("Cockroach content retention follows trusted workspace consent", async (t) 
   });
   const result = await ingestCockroachSourceRecord(input, { cwd: root });
   assert.equal(result.capture, "content");
+  const changedMetadata = sourceRecord({
+    ...input,
+    type: "repository-release",
+    title: "CRAWLER_CHANGED_TITLE",
+    url: "https://example.com/changed-metadata",
+    author: "Changed Author",
+    publishedAt: "2026-07-19T10:00:00.000Z"
+  });
+  const changed = await ingestCockroachSourceRecord(changedMetadata, { cwd: root });
+  assert.equal(changed.revision.eventId, result.revision.eventId);
+  assert.equal(changed.revision.hash, result.revision.hash);
+  assert.notEqual(changed.acquisition.eventId, result.acquisition.eventId);
+  assert.equal(changed.acquisition.data.sourceType, "repository-release");
+  assert.equal(changed.acquisition.data.title, "CRAWLER_CHANGED_TITLE");
+  assert.equal(changed.acquisition.data.author, "Changed Author");
+  assert.equal(changed.acquisition.data.publishedAt, "2026-07-19T10:00:00.000Z");
+  assert.ok(changed.acquisition.relations.some((relation) => relation.target === "https://example.com/changed-metadata"));
+  const replay = await ingestCockroachSourceRecord(structuredClone(changedMetadata), { cwd: root });
+  assert.equal(replay.acquisition.hash, changed.acquisition.hash);
+  assert.equal((await readEvents(root)).length, 3);
   const serialized = await readFile(path.join(root, ".qarinah", "events", "events.jsonl"), "utf8");
   assert.match(serialized, /CRAWLER_CONTENT_BODY/);
   assert.match(serialized, /CRAWLER_CONTENT_WARNING/);
@@ -441,11 +462,43 @@ test("interoperability timestamps are canonical in both runtime validators and p
   const canonical = "2026-07-18T12:00:00.000Z";
   const offset = "2026-07-18T17:30:00.000+05:30";
   const cockroachTimestamp = new RegExp(cockroachSchema.properties.provenance.properties.retrievedAt.pattern);
+  const cockroachPublishedAt = new RegExp(cockroachSchema.properties.publishedAt.anyOf[0].pattern);
   const productLoopTimestamp = new RegExp(productLoopSchema.properties.timestamp.pattern);
+  assert.equal(cockroachSchema.properties.provenance.properties.retrievedAt.pattern, CANONICAL_ISO_TIMESTAMP_PATTERN);
+  assert.equal(cockroachSchema.properties.publishedAt.anyOf[0].pattern, CANONICAL_ISO_TIMESTAMP_PATTERN);
+  assert.equal(productLoopSchema.properties.timestamp.pattern, CANONICAL_ISO_TIMESTAMP_PATTERN);
   assert.equal(cockroachTimestamp.test(canonical), true);
   assert.equal(cockroachTimestamp.test(offset), false);
   assert.equal(productLoopTimestamp.test(canonical), true);
   assert.equal(productLoopTimestamp.test(offset), false);
+  for (const valid of [
+    "0000-02-29T00:00:00.000Z",
+    "2000-02-29T23:59:59.999Z",
+    "2024-02-29T12:00:00.000Z",
+    "2026-04-30T12:00:00.000Z"
+  ]) {
+    assert.equal(cockroachTimestamp.test(valid), true, valid);
+    assert.equal(cockroachPublishedAt.test(valid), true, valid);
+    assert.equal(productLoopTimestamp.test(valid), true, valid);
+    assert.doesNotThrow(() => validateProductLoopRuntimeEvent(runtimeEvent({ timestamp: valid })));
+  }
+  for (const invalid of [
+    "1900-02-29T00:00:00.000Z",
+    "2025-02-29T00:00:00.000Z",
+    "2026-02-30T00:00:00.000Z",
+    "2026-04-31T00:00:00.000Z",
+    "2026-07-18T24:00:00.000Z",
+    "+010000-01-01T00:00:00.000Z"
+  ]) {
+    assert.equal(cockroachTimestamp.test(invalid), false, invalid);
+    assert.equal(cockroachPublishedAt.test(invalid), false, invalid);
+    assert.equal(productLoopTimestamp.test(invalid), false, invalid);
+    assert.throws(() => validateProductLoopRuntimeEvent(runtimeEvent({ timestamp: invalid })), /canonical ISO timestamp/);
+    assert.throws(
+      () => validateCockroachSourceRecordBoundary(sourceRecord({ publishedAt: invalid })),
+      /canonical ISO timestamp/
+    );
+  }
   assert.throws(
     () => validateCockroachSourceRecordBoundary(sourceRecord({
       provenance: { ...sourceRecord().provenance, retrievedAt: offset }
