@@ -1,0 +1,4 @@
+interface:
+  display_name: "Qarinah Context"
+  short_description: "Compile evidence-linked context for agents"
+  default_prompt: "Use $qarinah-context to retrieve a compact evidence-linked context pack for this task."

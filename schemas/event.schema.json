@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/AjnasNB/qarinah/schemas/event.schema.json",
+  "title": "Qarinah event envelope v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "eventId",
+    "timestamp",
+    "workspaceId",
+    "sessionId",
+    "turnId",
+    "kind",
+    "actor",
+    "title",
+    "body",
+    "data",
+    "confidence",
+    "relations",
+    "provenance",
+    "retention",
+    "previousHash",
+    "hash"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "qarinah.event.v1" },
+    "eventId": { "type": "string", "pattern": "^evt_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$", "maxLength": 64 },
+    "timestamp": { "type": "string", "format": "date-time", "maxLength": 64 },
+    "workspaceId": { "type": "string", "pattern": "^ws_[0-9a-f]{32}$" },
+    "sessionId": { "type": ["string", "null"], "maxLength": 256 },
+    "turnId": { "type": ["string", "null"], "maxLength": 256 },
+    "kind": {
+      "enum": [
+        "session.started",
+        "prompt.submitted",
+        "tool.requested",
+        "tool.completed",
+        "turn.completed",
+        "compaction.started",
+        "compaction.completed",
+        "artifact",
+        "source",
+        "claim",
+        "decision",
+        "approval",
+        "summary"
+      ]
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": { "enum": ["human", "agent", "tool", "system", "source"] },
+        "id": { "type": "string", "minLength": 1, "maxLength": 256 }
+      }
+    },
+    "title": { "type": "string", "minLength": 1, "maxLength": 512 },
+    "body": { "type": "string", "maxLength": 65536 },
+    "data": { "type": "object", "maxProperties": 128 },
+    "confidence": { "enum": ["extracted", "inferred", "claimed", "verified"] },
+    "relations": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "target"],
+        "properties": {
+          "type": {
+            "enum": [
+              "derived_from",
+              "produced",
+              "changed",
+              "supports",
+              "contradicts",
+              "supersedes",
+              "authorized_by",
+              "governed_by",
+              "affects",
+              "references"
+            ]
+          },
+          "target": { "type": "string", "minLength": 1, "maxLength": 512 }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adapter", "sourceId", "contentHash"],
+      "properties": {
+        "adapter": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "sourceId": { "type": ["string", "null"], "maxLength": 512 },
+        "contentHash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    },
+    "retention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["class", "expiresAt"],
+      "properties": {
+        "class": { "enum": ["session", "project", "durable"] },
+        "expiresAt": { "type": ["string", "null"], "format": "date-time", "maxLength": 64 }
+      }
+    },
+    "previousHash": { "type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$" },
+    "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "description": "Opt-in Qarinah lifecycle capture. The command is inert outside an initialized workspace.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$PLUGIN_ROOT/runtime/qarinah.mjs\" hook codex --quiet",
+            "commandWindows": "node \"%PLUGIN_ROOT%\\runtime\\qarinah.mjs\" hook codex --quiet",
+            "timeout": 15,
+            "statusMessage": "Checking Qarinah workspace consent"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$PLUGIN_ROOT/runtime/qarinah.mjs\" hook codex --quiet",
+            "commandWindows": "node \"%PLUGIN_ROOT%\\runtime\\qarinah.mjs\" hook codex --quiet",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$PLUGIN_ROOT/runtime/qarinah.mjs\" hook codex --quiet",
+            "commandWindows": "node \"%PLUGIN_ROOT%\\runtime\\qarinah.mjs\" hook codex --quiet",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$PLUGIN_ROOT/runtime/qarinah.mjs\" hook codex --quiet",
+            "commandWindows": "node \"%PLUGIN_ROOT%\\runtime\\qarinah.mjs\" hook codex --quiet",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$PLUGIN_ROOT/runtime/qarinah.mjs\" hook codex --quiet",
+            "commandWindows": "node \"%PLUGIN_ROOT%\\runtime\\qarinah.mjs\" hook codex --quiet",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$PLUGIN_ROOT/runtime/qarinah.mjs\" hook codex --quiet",
+            "commandWindows": "node \"%PLUGIN_ROOT%\\runtime\\qarinah.mjs\" hook codex --quiet",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$PLUGIN_ROOT/runtime/qarinah.mjs\" hook codex --quiet",
+            "commandWindows": "node \"%PLUGIN_ROOT%\\runtime\\qarinah.mjs\" hook codex --quiet",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$PLUGIN_ROOT/runtime/qarinah.mjs\" hook codex --quiet",
+            "commandWindows": "node \"%PLUGIN_ROOT%\\runtime\\qarinah.mjs\" hook codex --quiet",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}
