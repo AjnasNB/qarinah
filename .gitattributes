@@ -1,2 +1,11 @@
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tgz binary
 integrations/codex/qarinah/runtime/qarinah.mjs text eol=lf linguist-generated=true
 integrations/claude/qarinah/runtime/qarinah.mjs text eol=lf linguist-generated=true

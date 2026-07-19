@@ -1,6 +1,6 @@
 {
   "name": "qarinah",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "description": "Qarinah: evidence-linked, local-first context compilation for software agents.",
   "license": "UNLICENSED",
   "private": true,
@@ -31,6 +31,7 @@
     },
     "./schemas/event.json": "./schemas/event.schema.json",
     "./schemas/context-pack.json": "./schemas/context-pack.schema.json",
+    "./schemas/okf-export.json": "./schemas/okf-export.schema.json",
     "./schemas/maqam-context-adapter.json": "./schemas/maqam-context-adapter.schema.json",
     "./schemas/cockroach-source-record.json": "./schemas/cockroach-source-record.schema.json",
     "./schemas/productloop-runtime-event.json": "./schemas/productloop-runtime-event.schema.json"
@@ -43,10 +44,12 @@
     "docs/ARCHITECTURE.md",
     "docs/SECURITY.md",
     "docs/ROADMAP.md",
+    "docs/PRODUCT-STRATEGY.md",
     "docs/INTEROPERABILITY.md",
     "docs/HOST-INTEGRATIONS.md",
     "docs/GOVERNED-BROWSER.md",
     "docs/LAUNCH.md",
+    "docs/LICENSE-STRATEGY.md",
     "examples/",
     "integrations/codex/qarinah/",
     "integrations/claude/qarinah/",
@@ -57,10 +60,13 @@
     "build:codex-plugin": "npm run build:plugins",
     "check:plugins": "node scripts/build-plugins.mjs --check",
     "check:codex-plugin": "npm run check:plugins",
+    "prepack": "npm run check:plugins",
+    "prepublishOnly": "npm run check",
     "test": "node scripts/run-tests.mjs",
     "typecheck": "node scripts/typecheck-consumer.mjs",
-    "check": "npm run check:plugins && npm test && npm run typecheck && npm run benchmark && npm pack --dry-run --ignore-scripts",
-    "benchmark": "node scripts/benchmark.mjs"
+    "check": "npm run check:plugins && npm test && npm run typecheck && npm run benchmark && npm run evaluate:context && npm pack --dry-run --ignore-scripts",
+    "benchmark": "node scripts/benchmark.mjs",
+    "evaluate:context": "node scripts/evaluate-context.mjs"
   },
   "engines": {
     "node": "^22.0.0 || ^24.0.0 || ^26.0.0"

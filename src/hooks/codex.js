@@ -1,4 +1,5 @@
 import path from "node:path";
+import { reviewMetadataEventInput } from "../capture-policy.js";
 import { sha256 } from "../canonical.js";
 import { QarinahError } from "../errors.js";
 import { snapshotJsonBoundary } from "../interoperability/boundary.js";
@@ -229,6 +230,11 @@ export async function captureCodexHook(input, options = {}) {
     throw error;
   }
   const payload = hookPayload(input, workspace);
-  const event = await appendEvent(payload, { workspace, idempotent: Object.hasOwn(payload, "eventId") });
+  const eventInput = workspace.config.capture === "metadata" ? reviewMetadataEventInput(payload) : payload;
+  const event = await appendEvent(eventInput, {
+    workspace,
+    capture: workspace.config.capture,
+    idempotent: Object.hasOwn(payload, "eventId")
+  });
   return Object.freeze({ captured: true, eventId: event.eventId, hash: event.hash });
 }

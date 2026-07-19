@@ -56,15 +56,16 @@ test("current Claude Code lifecycle shapes are captured without transcript reads
   assert.equal(JSON.stringify(events).includes("claude-transcript.jsonl"), false);
 });
 
-test("Claude hook capture is idempotent and ignores new host values without retaining them", async (t) => {
+test("Claude hook capture is idempotent and ignores new host fields without retaining names or values", async (t) => {
   const root = await temporaryDirectory(t);
   await initializeWorkspace(root);
-  const input = { ...inputs.PostToolUse(root), future_private_value: "DO_NOT_RETAIN" };
+  const input = { ...inputs.PostToolUse(root), PRIVATE_API_TOKEN_NAME_7f1b: "DO_NOT_RETAIN" };
   const first = await captureClaudeHook(input);
   const second = await captureClaudeHook(input);
   assert.deepEqual(second, first);
   const [event] = await readEvents(root);
-  assert.deepEqual(event.data.ignoredFields, ["future_private_value"]);
+  assert.equal(event.data.ignoredFieldCount, 1);
+  assert.equal(JSON.stringify(event).includes("PRIVATE_API_TOKEN_NAME_7f1b"), false);
   assert.equal(JSON.stringify(event).includes("DO_NOT_RETAIN"), false);
 });
 
@@ -94,6 +95,30 @@ test("Claude metadata uses coarse summaries and content mode retains bounded red
   assert.equal(contentEvent.body, "Keep [REDACTED] out of context.");
   assert.equal(Object.hasOwn(contentEvent.data.content, "compactSummary"), false);
   assert.equal(contentEvent.data.bodyRetention.truncated, false);
+});
+
+test("Claude metadata coarsens unrecognized session and failure strings", async (t) => {
+  const root = await temporaryDirectory(t);
+  await initializeWorkspace(root);
+  await captureClaudeHook(common(root, "StopFailure", {
+    error: "PRIVATE_FAILURE_TYPE_MARKER",
+    error_details: "PRIVATE_FAILURE_DETAIL_MARKER",
+    last_assistant_message: "PRIVATE_FAILURE_MESSAGE_MARKER"
+  }));
+  await captureClaudeHook(common(root, "SessionEnd", { reason: "PRIVATE_SESSION_REASON_MARKER" }));
+
+  const events = await readEvents(root);
+  const failure = events.find((event) => event.data.hookEvent === "StopFailure");
+  const ended = events.find((event) => event.data.hookEvent === "SessionEnd");
+  assert.equal(failure.data.failureType, "unknown");
+  assert.equal(ended.data.reason, "other");
+  const serialized = JSON.stringify(events);
+  for (const marker of [
+    "PRIVATE_FAILURE_TYPE_MARKER",
+    "PRIVATE_FAILURE_DETAIL_MARKER",
+    "PRIVATE_FAILURE_MESSAGE_MARKER",
+    "PRIVATE_SESSION_REASON_MARKER"
+  ]) assert.equal(serialized.includes(marker), false, marker);
 });
 
 test("Claude preserves repeated host events that have no guaranteed unique id", async (t) => {

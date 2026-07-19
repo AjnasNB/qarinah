@@ -1,4 +1,5 @@
 import { canonicalStringify, deepFreezeJson, sha256 } from "../canonical.js";
+import { reviewMetadataEventInput } from "../capture-policy.js";
 import { QarinahError } from "../errors.js";
 import { appendEvent } from "../store.js";
 import {
@@ -194,18 +195,21 @@ export function createProductLoopProvenanceSink(options = {}) {
       capture: workspace.config.capture,
       retentionClass: workspace.config.retentionClass
     });
+    const retainedInput = workspace.config.capture === "metadata"
+      ? reviewMetadataEventInput(eventInput)
+      : eventInput;
     const head = heads.get(event.runId);
     if (!head) {
       if (event.sequence !== 1 || event.receipt.previousHash !== null) {
         throw new QarinahError("PRODUCTLOOP_CHAIN_START_INVALID", `ProductLoop run '${event.runId}' must enter a new sink at sequence 1.`);
       }
     } else if (event.sequence === head.sequence && event.receipt.eventHash === head.eventHash) {
-      await appendEvent(eventInput, { workspace, idempotent: true });
+      await appendEvent(retainedInput, { workspace, capture: workspace.config.capture, idempotent: true });
       return;
     } else if (event.sequence !== head.sequence + 1 || event.receipt.previousHash !== head.eventHash) {
       throw new QarinahError("PRODUCTLOOP_CHAIN_INVALID", `ProductLoop run '${event.runId}' broke sequence or receipt continuity.`);
     }
-    await appendEvent(eventInput, { workspace, idempotent: true });
+    await appendEvent(retainedInput, { workspace, capture: workspace.config.capture, idempotent: true });
     heads.set(event.runId, { sequence: event.sequence, eventHash: event.receipt.eventHash });
   }
 

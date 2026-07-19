@@ -1,11 +1,10 @@
-import { readFile, stat } from "node:fs/promises";
 import { canonicalStringify, deepFreezeJson } from "./canonical.js";
 import { QarinahError } from "./errors.js";
 import { markdownDataBlock, markdownInline } from "./markdown.js";
 import { readEvents } from "./store.js";
-import { atomicWriteFile, loadWorkspace, secureStoragePath } from "./workspace.js";
+import { atomicWriteFile, loadWorkspace, openSecureReadFile, secureStoragePath } from "./workspace.js";
 
-export const INDEX_SCHEMA_VERSION = "qarinah.index.v1";
+export const INDEX_SCHEMA_VERSION = "qarinah.index.v2";
 export const GRAPH_SCHEMA_VERSION = "qarinah.graph.v1";
 
 const STOP_WORDS = new Set([
@@ -14,9 +13,20 @@ const STOP_WORDS = new Set([
 ]);
 
 export function tokenize(value) {
-  return [...new Set(String(value).normalize("NFKC").toLowerCase().match(/[\p{L}\p{N}][\p{L}\p{N}_-]{1,63}/gu) || [])]
+  return [...new Set(lexemes(value))]
     .filter((token) => !STOP_WORDS.has(token))
     .sort();
+}
+
+function lexemes(value) {
+  return (String(value).normalize("NFKC").toLowerCase().match(/[\p{L}\p{N}][\p{L}\p{N}_-]{1,63}/gu) || [])
+    .filter((token) => !STOP_WORDS.has(token));
+}
+
+function frequencyTable(values) {
+  const frequencies = Object.create(null);
+  for (const value of values) frequencies[value] = (frequencies[value] || 0) + 1;
+  return frequencies;
 }
 
 function searchableText(event) {
@@ -30,6 +40,8 @@ function searchableText(event) {
 }
 
 function eventProjection(event) {
+  const searchable = searchableText(event);
+  const eventLexemes = lexemes(searchable);
   return Object.freeze({
     eventId: event.eventId,
     timestamp: event.timestamp,
@@ -38,16 +50,22 @@ function eventProjection(event) {
     body: event.body,
     data: event.data,
     confidence: event.confidence,
+    authority: event.authority ?? null,
     relations: event.relations,
     provenance: event.provenance,
+    retention: event.retention,
     hash: event.hash,
-    terms: tokenize(searchableText(event))
+    terms: [...new Set(eventLexemes)].sort(),
+    titleTerms: tokenize(event.title),
+    termFrequencies: frequencyTable(eventLexemes),
+    documentLength: eventLexemes.length
   });
 }
 
 export function buildDerivedState(events, workspaceId) {
   const projections = events.map(eventProjection);
   const postings = Object.create(null);
+  const documentFrequency = Object.create(null);
   const adjacency = Object.create(null);
   const nodes = [];
   const edges = [];
@@ -65,6 +83,7 @@ export function buildDerivedState(events, workspaceId) {
     for (const term of event.terms) {
       if (!postings[term]) postings[term] = [];
       postings[term].push(event.eventId);
+      documentFrequency[term] = (documentFrequency[term] || 0) + 1;
     }
     for (const relation of event.relations) {
       adjacency[event.eventId].push({ type: relation.type, target: relation.target });
@@ -80,6 +99,9 @@ export function buildDerivedState(events, workspaceId) {
   edges.sort((left, right) => `${left.source}\0${left.type}\0${left.target}`.localeCompare(`${right.source}\0${right.type}\0${right.target}`));
 
   const headHash = events.at(-1)?.hash ?? null;
+  const averageDocumentLength = projections.length === 0
+    ? 0
+    : projections.reduce((total, event) => total + event.documentLength, 0) / projections.length;
   return deepFreezeJson({
     index: {
       schemaVersion: INDEX_SCHEMA_VERSION,
@@ -88,6 +110,8 @@ export function buildDerivedState(events, workspaceId) {
       headHash,
       events: projections,
       postings,
+      documentFrequency,
+      averageDocumentLength,
       adjacency
     },
     graph: {
@@ -159,13 +183,30 @@ export async function rebuildDerivedState(start = process.cwd()) {
   });
 }
 
-async function readBoundedIndex(indexPath, maximumBytes) {
-  const metadata = await stat(indexPath);
-  if (!metadata.isFile() || metadata.size > maximumBytes) {
+async function readBoundedFile(workspace, segments, maximumBytes, label) {
+  const opened = await openSecureReadFile(workspace, segments);
+  if (opened.metadata.size > maximumBytes) {
+    await opened.handle.close();
+    throw new QarinahError("INDEX_INVALID", `${label} is not a bounded regular file.`);
+  }
+  try {
+    const contents = await opened.handle.readFile();
+    if (contents.length !== opened.metadata.size) {
+      throw new QarinahError("INDEX_INVALID", `${label} changed while it was being read.`);
+    }
+    return contents;
+  } finally {
+    await opened.handle.close();
+  }
+}
+
+async function readBoundedIndex(workspace, segments, maximumBytes) {
+  const contents = await readBoundedFile(workspace, segments, maximumBytes, "Derived index");
+  if (contents.length > maximumBytes) {
     throw new QarinahError("INDEX_INVALID", "Derived index is not a bounded regular file.");
   }
   try {
-    return JSON.parse(await readFile(indexPath, "utf8"));
+    return JSON.parse(contents.toString("utf8"));
   } catch (error) {
     throw new QarinahError("INDEX_INVALID", "Derived index is not valid JSON.", { cause: error.message });
   }
@@ -179,15 +220,14 @@ export async function loadIndex(start = process.cwd(), options = {}) {
     return Object.freeze({ workspace, index: expected.index });
   }
   const rebuild = options.rebuild !== false && options.updateCheckpoint !== false;
-  const indexPath = await secureStoragePath(workspace, ["index", "index.json"], { type: "file", allowMissing: true });
   const maximumIndexBytes = Math.min(256 * 1024 * 1024, workspace.config.maxLogBytes * 4);
   let index;
   try {
-    index = await readBoundedIndex(indexPath, maximumIndexBytes);
+    index = await readBoundedIndex(workspace, ["index", "index.json"], maximumIndexBytes);
   } catch (error) {
     if (error?.code === "ENOENT" && rebuild) {
       await rebuildDerivedState(workspace.root);
-      index = await readBoundedIndex(indexPath, maximumIndexBytes);
+      index = await readBoundedIndex(workspace, ["index", "index.json"], maximumIndexBytes);
     } else {
       throw error;
     }
@@ -202,14 +242,17 @@ export async function loadIndex(start = process.cwd(), options = {}) {
     persistedViewsCurrent = false;
   }
   try {
-    const graphPath = await secureStoragePath(workspace, ["graph", "graph.json"], { type: "file" });
-    const graph = await readBoundedIndex(graphPath, Math.min(256 * 1024 * 1024, workspace.config.maxLogBytes * 4));
-    const markdownPath = await secureStoragePath(workspace, ["records", "CONTEXT.md"], { type: "file" });
-    const markdownMetadata = await stat(markdownPath);
-    if (!markdownMetadata.isFile() || markdownMetadata.size > Math.min(16 * 1024 * 1024, workspace.config.maxLogBytes)) {
-      throw new QarinahError("INDEX_INVALID", "Derived Markdown record is not a bounded regular file.");
-    }
-    const markdown = await readFile(markdownPath, "utf8");
+    const graph = await readBoundedIndex(
+      workspace,
+      ["graph", "graph.json"],
+      Math.min(256 * 1024 * 1024, workspace.config.maxLogBytes * 4)
+    );
+    const markdown = (await readBoundedFile(
+      workspace,
+      ["records", "CONTEXT.md"],
+      Math.min(16 * 1024 * 1024, workspace.config.maxLogBytes),
+      "Derived Markdown record"
+    )).toString("utf8");
     persistedViewsCurrent = persistedViewsCurrent
       && canonicalStringify(graph) === canonicalStringify(expected.graph)
       && markdown === markdownFor(events, workspace.config.workspaceId, expected.index.headHash);

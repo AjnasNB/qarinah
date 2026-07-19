@@ -12,6 +12,6 @@ for (let index = 0; index < count; index += 1) {
     confidence: "extracted",
     relations: [],
     provenance: { adapter: "test-worker", sourceId: `${workerId}:${index}` },
-    retention: { class: "session", expiresAt: null }
+    retention: { class: "project", expiresAt: null }
   }, { cwd: process.cwd() });
 }

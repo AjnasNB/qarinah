@@ -1,4 +1,5 @@
 import path from "node:path";
+import { reviewMetadataEventInput } from "../capture-policy.js";
 import { sha256 } from "../canonical.js";
 import { QarinahError } from "../errors.js";
 import { snapshotJsonBoundary } from "../interoperability/boundary.js";
@@ -12,6 +13,17 @@ import {
 
 const PERMISSION_MODES = new Set(["default", "plan", "acceptEdits", "auto", "dontAsk", "bypassPermissions"]);
 const EFFORT_LEVELS = new Set(["low", "medium", "high", "xhigh", "max"]);
+const SESSION_END_REASONS = new Set(["clear", "logout", "prompt_input_exit", "other"]);
+const STOP_FAILURE_TYPES = new Set([
+  "authentication",
+  "authorization",
+  "cancelled",
+  "network",
+  "rate_limit",
+  "server_error",
+  "timeout",
+  "unknown"
+]);
 const COMMON_FIELDS = Object.freeze([
   "session_id",
   "prompt_id",
@@ -178,8 +190,8 @@ function validateClaudeHookInput(value, eventName) {
     if (Object.hasOwn(input, field) && !Array.isArray(input[field])) hookError(`${field} must be an array.`);
   }
   const allowed = new Set([...COMMON_FIELDS, ...schema.required, ...schema.optional]);
-  const ignoredFields = Object.keys(input).filter((field) => !allowed.has(field)).sort();
-  return { input, ignoredFields };
+  const ignoredFieldCount = Object.keys(input).filter((field) => !allowed.has(field)).length;
+  return { input, ignoredFieldCount };
 }
 
 function selected(input, names) {
@@ -188,6 +200,14 @@ function selected(input, names) {
     if (Object.hasOwn(input, name) && input[name] !== undefined && input[name] !== null) output[name] = input[name];
   }
   return output;
+}
+
+function coarseSessionEndReason(value) {
+  return SESSION_END_REASONS.has(value) ? value : "other";
+}
+
+function coarseStopFailureType(value) {
+  return STOP_FAILURE_TYPES.has(value) ? value : "unknown";
 }
 
 function deterministicClaudeEventId(input) {
@@ -223,7 +243,7 @@ function bodyContentEntry(input) {
   }
 }
 
-function hookPayload(input, ignoredFields, workspace) {
+function hookPayload(input, ignoredFieldCount, workspace) {
   const eventName = input.hook_event_name;
   const mapping = EVENT_MAP[eventName];
   const requestedCwd = path.resolve(input.cwd);
@@ -241,16 +261,16 @@ function hookPayload(input, ignoredFields, workspace) {
     promptId: input.prompt_id ?? null,
     source: input.source ?? null,
     trigger: input.trigger ?? null,
-    reason: eventName === "SessionEnd" ? input.reason ?? null : null,
+    reason: eventName === "SessionEnd" ? coarseSessionEndReason(input.reason) : null,
     agentId: input.agent_id ?? null,
     agentType: input.agent_type ?? null,
     toolName: input.tool_name ?? null,
     toolUseId: input.tool_use_id ?? null,
     durationMs: input.duration_ms ?? null,
     isInterrupt: input.is_interrupt ?? null,
-    failureType: eventName === "StopFailure" ? input.error : null,
+    failureType: eventName === "StopFailure" ? coarseStopFailureType(input.error) : null,
     stopHookActive: input.stop_hook_active ?? null,
-    ignoredFields,
+    ignoredFieldCount,
     prompt: summarizeHookContent(input.prompt),
     toolInput: summarizeHookContent(input.tool_input),
     toolOutput: summarizeHookContent(input.tool_response),
@@ -319,7 +339,7 @@ export async function captureClaudeHook(value, options = {}) {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new TypeError("Claude Code hook input must be a JSON object.");
   const eventName = typeof value.hook_event_name === "string" ? value.hook_event_name : null;
   if (!Object.hasOwn(EVENT_MAP, eventName)) return Object.freeze({ captured: false, reason: "UNSUPPORTED_EVENT" });
-  const { input, ignoredFields } = validateClaudeHookInput(value, eventName);
+  const { input, ignoredFieldCount } = validateClaudeHookInput(value, eventName);
   let workspace;
   try {
     workspace = await loadWorkspace(options.cwd || input.cwd || process.cwd());
@@ -329,7 +349,12 @@ export async function captureClaudeHook(value, options = {}) {
     }
     throw error;
   }
-  const payload = hookPayload(input, ignoredFields, workspace);
-  const event = await appendEvent(payload, { workspace, idempotent: Object.hasOwn(payload, "eventId") });
+  const payload = hookPayload(input, ignoredFieldCount, workspace);
+  const eventInput = workspace.config.capture === "metadata" ? reviewMetadataEventInput(payload) : payload;
+  const event = await appendEvent(eventInput, {
+    workspace,
+    capture: workspace.config.capture,
+    idempotent: Object.hasOwn(payload, "eventId")
+  });
   return Object.freeze({ captured: true, eventId: event.eventId, hash: event.hash });
 }

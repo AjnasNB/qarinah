@@ -60,6 +60,20 @@
     "body": { "type": "string", "maxLength": 65536 },
     "data": { "type": "object", "maxProperties": 128 },
     "confidence": { "enum": ["extracted", "inferred", "claimed", "verified"] },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope", "rank", "assignedBy", "assignedAt", "expiresAt", "revokedAt", "basis"],
+      "properties": {
+        "scope": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "rank": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "assignedBy": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "assignedAt": { "type": "string", "format": "date-time", "pattern": "^(?:(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:[02468][048]|[13579][26])00)-02-29|[0-9]{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12][0-9]|3[01])|(?:0[469]|11)-(?:0[1-9]|[12][0-9]|30)|02-(?:0[1-9]|1[0-9]|2[0-8])))T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$", "maxLength": 24 },
+        "expiresAt": { "type": ["string", "null"], "format": "date-time", "pattern": "^(?:(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:[02468][048]|[13579][26])00)-02-29|[0-9]{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12][0-9]|3[01])|(?:0[469]|11)-(?:0[1-9]|[12][0-9]|30)|02-(?:0[1-9]|1[0-9]|2[0-8])))T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$", "maxLength": 24 },
+        "revokedAt": { "type": ["string", "null"], "format": "date-time", "pattern": "^(?:(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:[02468][048]|[13579][26])00)-02-29|[0-9]{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12][0-9]|3[01])|(?:0[469]|11)-(?:0[1-9]|[12][0-9]|30)|02-(?:0[1-9]|1[0-9]|2[0-8])))T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$", "maxLength": 24 },
+        "basis": { "type": "string", "minLength": 1, "maxLength": 512 }
+      }
+    },
     "relations": {
       "type": "array",
       "maxItems": 128,

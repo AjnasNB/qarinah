@@ -1,4 +1,6 @@
 import { canonicalStringify, deepFreezeJson, sha256 } from "../canonical.js";
+import { reviewMetadataEventInput } from "../capture-policy.js";
+import { QarinahError } from "../errors.js";
 import { appendEvent } from "../store.js";
 import {
   canonicalIsoTimestamp,
@@ -329,11 +331,19 @@ export async function ingestCockroachSourceRecord(value, options = {}) {
     ...(descriptors.workspace ? { workspace: descriptors.workspace.value } : {})
   }, "Cockroach ingestion options");
   const workspace = await loadTrustedInteropWorkspace(locator);
+  if (retentionClass !== undefined && retentionClass !== workspace.config.retentionClass) {
+    throw new QarinahError(
+      "RETENTION_NOT_APPROVED",
+      `Cockroach ingestion requested '${retentionClass}' retention, but this workspace permits '${workspace.config.retentionClass}'.`
+    );
+  }
   const mapping = { capture: workspace.config.capture, retentionClass: retentionClass ?? workspace.config.retentionClass };
   const revisionInput = cockroachSourceRecordToEventInput(value, mapping);
   const acquisitionInput = cockroachSourceRecordToAcquisitionEventInput(value, mapping);
-  const revision = await appendEvent(revisionInput, { workspace, idempotent: true });
-  const acquisition = await appendEvent(acquisitionInput, { workspace, idempotent: true });
+  const revisionEvent = mapping.capture === "metadata" ? reviewMetadataEventInput(revisionInput) : revisionInput;
+  const acquisitionEvent = mapping.capture === "metadata" ? reviewMetadataEventInput(acquisitionInput) : acquisitionInput;
+  const revision = await appendEvent(revisionEvent, { workspace, capture: mapping.capture, idempotent: true });
+  const acquisition = await appendEvent(acquisitionEvent, { workspace, capture: mapping.capture, idempotent: true });
   return deepFreezeJson({
     schemaVersion: COCKROACH_INGESTION_SCHEMA_VERSION,
     capture: workspace.config.capture,

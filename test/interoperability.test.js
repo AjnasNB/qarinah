@@ -274,7 +274,7 @@ test("Maqam adapters preserve separate read/write governance and scoped evidence
   assert.throws(() => { maqam.tools.get("context.append").handler.governance.effects.push("read"); }, TypeError);
 
   const queried = await maqam.gateway.call("context.query", {
-    query: "release",
+    query: "captured decision",
     maxChars: 500_000,
     maxItems: 500
   }, {
@@ -294,7 +294,7 @@ test("Maqam adapters preserve separate read/write governance and scoped evidence
   const indexPath = path.join(root, ".qarinah", "index", "index.json");
   const poisonedIndex = `${(await readFile(indexPath, "utf8")).replace('"eventCount":1', '"eventCount":0')}`;
   await writeFile(indexPath, poisonedIndex, "utf8");
-  const memoryQueried = await maqam.gateway.call("context.query", { query: "release" }, { runId: "run_stale_query" });
+  const memoryQueried = await maqam.gateway.call("context.query", { query: "captured decision" }, { runId: "run_stale_query" });
   assert.equal(memoryQueried.pack.items[0].eventId, queried.pack.items[0].eventId);
   assert.equal(await readFile(indexPath, "utf8"), poisonedIndex);
   await rebuildDerivedState(root);
@@ -480,6 +480,10 @@ test("Cockroach content retention follows trusted workspace consent", async (t) 
   assert.match(serialized, /CRAWLER_CONTENT_BODY/);
   assert.match(serialized, /CRAWLER_CONTENT_WARNING/);
   assert.match(serialized, /CRAWLER_CONTENT_METADATA/);
+  await assert.rejects(
+    () => ingestCockroachSourceRecord(input, { cwd: root, retentionClass: "durable" }),
+    (error) => error.code === "RETENTION_NOT_APPROVED"
+  );
 });
 
 test("ProductLoop ProvenanceSink validates receipts and records callback events without trace scraping", async (t) => {
