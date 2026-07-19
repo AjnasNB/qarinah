@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { access, readFile } from "node:fs/promises";
+import { access, readFile, realpath } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -81,6 +81,7 @@ test("doctor exit codes and trust controls are automation-safe", async (t) => {
 test("CLI exports deterministic OKF interchange to safe default and explicit paths", async (t) => {
   const root = await temporaryDirectory(t);
   assert.equal((await run(["init", root], repositoryRoot)).code, 0);
+  const canonicalRoot = await realpath(root);
   const recorded = await run([
     "record", "--kind", "decision", "--title", "Export portable context", "--body", "Keep JSONL authoritative."
   ], root);
@@ -91,12 +92,12 @@ test("CLI exports deterministic OKF interchange to safe default and explicit pat
   const result = JSON.parse(exported.stdout);
   assert.equal(result.okfVersion, "0.1");
   assert.equal(result.derived, true);
-  assert.equal(result.outputDirectory, path.join(root, ".qarinah", "records", "okf"));
+  assert.equal(result.outputDirectory, path.join(canonicalRoot, ".qarinah", "records", "okf"));
   assert.match(await readFile(path.join(result.outputDirectory, "index.md"), "utf8"), /JSONL/);
 
   const explicit = await run(["export", "okf", "--output", "docs/knowledge"], root);
   assert.equal(explicit.code, 0, explicit.stderr);
-  assert.equal(JSON.parse(explicit.stdout).outputDirectory, path.join(root, "docs", "knowledge"));
+  assert.equal(JSON.parse(explicit.stdout).outputDirectory, path.join(canonicalRoot, "docs", "knowledge"));
 
   const missing = await run(["export", "okf", "--output"], root);
   assert.equal(missing.code, 1);
