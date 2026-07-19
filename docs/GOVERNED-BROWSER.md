@@ -14,9 +14,9 @@ The crawler never receives authenticated browser state. Qarinah never dispatches
 
 This design is independent. A third-party DOM controller may be evaluated as an optional pinned observation driver, but its agent loop, extension bridge, prompts, branding, and enforcement model are not the product boundary.
 
-## Maqam 0.3.1 candidate tool split
+## Maqam 0.3.1 tool split
 
-This document targets Maqam 0.3.1 candidate source. Until that exact artifact is merged, evidenced, and published, the public npm release does not provide these browser tools; Qarinah must not advertise them as generally available.
+This document targets the published `maqam@0.3.1` artifact and matching [`v0.3.1`](https://github.com/AjnasNB/maqam/releases/tag/v0.3.1) release. Verify the live registry `gitHead` and integrity before installation; Qarinah must not infer availability from source metadata alone.
 
 | Tool | Effect | Risk | Rule |
 | --- | --- | --- | --- |
