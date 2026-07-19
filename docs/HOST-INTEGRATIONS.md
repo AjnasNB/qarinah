@@ -13,7 +13,7 @@ Qarinah keeps one local event/graph/compiler core and uses thin host adapters. A
 | Other MCP-capable hosts | User-supplied stdio MCP configuration | No implicit host capture | Local zero-write MCP diagnostics | Contract-compatible; host conformance required |
 | Hosts without MCP | Explicit CLI or future versioned JSONL adapter | Host-specific | CLI | No universal-support claim |
 
-The Codex package follows OpenAI's current plugin layout: `.codex-plugin/plugin.json`, `skills/`, `hooks/`, and `.mcp.json`. The Claude package follows Anthropic's plugin layout: `.claude-plugin/plugin.json`, `skills/`, `hooks/`, and `.mcp.json`.
+The Codex package follows OpenAI's current plugin layout: `.codex-plugin/plugin.json`, `skills/`, `hooks/`, and `.mcp.json`. The Claude package follows Anthropic's plugin layout: `.claude-plugin/plugin.json`, `skills/`, `hooks/`, and `.mcp.json`. Claude automatically discovers the standard `hooks/hooks.json` component, so its manifest intentionally does not name that file again.
 
 ## Local development
 

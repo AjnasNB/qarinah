@@ -92,7 +92,7 @@ test("Claude Code plugin uses portable exec hooks and a bundled read-only MCP se
   assert.equal(manifest.name, "qarinah");
   assert.equal(manifest.version, packageJson.version);
   assert.equal(Object.hasOwn(manifest, "openaiCapabilities"), false);
-  assert.equal(manifest.hooks, "./hooks/hooks.json");
+  assert.equal(Object.hasOwn(manifest, "hooks"), false);
   assert.equal(manifest.mcpServers, "./.mcp.json");
   const hooks = JSON.parse(await readFile(path.join(claudePlugin, "hooks", "hooks.json"), "utf8"));
   assert.deepEqual(Object.keys(hooks.hooks).sort(), [

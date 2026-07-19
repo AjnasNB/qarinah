@@ -11,6 +11,5 @@
   "license": "UNLICENSED",
   "keywords": ["context", "provenance", "governance", "claude-code"],
   "skills": "./skills/",
-  "hooks": "./hooks/hooks.json",
   "mcpServers": "./.mcp.json"
 }
