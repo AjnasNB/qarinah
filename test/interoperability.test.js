@@ -232,7 +232,7 @@ test("Codex hook capture is immediately queryable through Maqam without persiste
 
   const before = {
     workspace: await treeSnapshot(workspace.qarinahDir),
-    trust: await fileSnapshot(machineTrustPath(root))
+    trust: await fileSnapshot(machineTrustPath(workspace.root))
   };
   const maqam = fakeMaqam();
   registerMaqamContextAdapters({ gateway: maqam.gateway, cwd: root, maxChars: 20_000, maxItems: 10 });
@@ -244,7 +244,7 @@ test("Codex hook capture is immediately queryable through Maqam without persiste
 
   const after = {
     workspace: await treeSnapshot(workspace.qarinahDir),
-    trust: await fileSnapshot(machineTrustPath(root))
+    trust: await fileSnapshot(machineTrustPath(workspace.root))
   };
   assert.deepEqual(after, before);
 });

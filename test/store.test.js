@@ -166,16 +166,16 @@ test("workspace trust can always be revoked after mismatch, corruption, or prior
 
   await t.test("corrupt trust record", async (subtest) => {
     const root = await temporaryDirectory(subtest);
-    await initializeWorkspace(root);
-    await writeFile(machineTrustPath(root), "not-json\n", "utf8");
+    const workspace = await initializeWorkspace(root);
+    await writeFile(machineTrustPath(workspace.root), "not-json\n", "utf8");
     assert.equal((await revokeWorkspaceTrust(root)).trusted, false);
     await assert.rejects(() => loadWorkspace(root), (error) => error.code === "WORKSPACE_NOT_TRUSTED");
   });
 
   await t.test("already missing trust record", async (subtest) => {
     const root = await temporaryDirectory(subtest);
-    await initializeWorkspace(root);
-    await rm(machineTrustPath(root), { force: true });
+    const workspace = await initializeWorkspace(root);
+    await rm(machineTrustPath(workspace.root), { force: true });
     assert.equal((await revokeWorkspaceTrust(root)).trusted, false);
     await assert.rejects(() => loadWorkspace(root), (error) => error.code === "WORKSPACE_NOT_TRUSTED");
   });

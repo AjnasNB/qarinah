@@ -117,7 +117,7 @@ test("MCP status and doctor do not advance trust or mutate workspace state", asy
   await appendEvent(eventInput(), { workspace });
   await rebuildDerivedState(root);
   await unlink(path.join(root, ".qarinah", "index", "index.json"));
-  const trust = await rewindTrustCheckpoint(root);
+  const trust = await rewindTrustCheckpoint(workspace.root);
   const beforeWorkspace = await snapshotTree(path.join(root, ".qarinah"));
   const beforeTrust = await snapshotFile(trust);
   const messages = [];
