@@ -1,0 +1,18 @@
+{
+  "description": "Opt-in Qarinah context-ledger lifecycle capture. Every hook is inert outside an initialized and machine-trusted workspace.",
+  "hooks": {
+    "SessionStart": [{ "hooks": [{ "type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/qarinah.mjs", "hook", "claude", "--quiet"], "timeout": 15 }] }],
+    "UserPromptSubmit": [{ "hooks": [{ "type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/qarinah.mjs", "hook", "claude", "--quiet"], "timeout": 15 }] }],
+    "PreToolUse": [{ "matcher": "*", "hooks": [{ "type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/qarinah.mjs", "hook", "claude", "--quiet"], "timeout": 15 }] }],
+    "PostToolUse": [{ "matcher": "*", "hooks": [{ "type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/qarinah.mjs", "hook", "claude", "--quiet"], "timeout": 15 }] }],
+    "PostToolUseFailure": [{ "matcher": "*", "hooks": [{ "type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/qarinah.mjs", "hook", "claude", "--quiet"], "timeout": 15 }] }],
+    "PermissionDenied": [{ "matcher": "*", "hooks": [{ "type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/qarinah.mjs", "hook", "claude", "--quiet"], "timeout": 15 }] }],
+    "PreCompact": [{ "hooks": [{ "type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/qarinah.mjs", "hook", "claude", "--quiet"], "timeout": 15 }] }],
+    "PostCompact": [{ "hooks": [{ "type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/qarinah.mjs", "hook", "claude", "--quiet"], "timeout": 15 }] }],
+    "Stop": [{ "hooks": [{ "type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/qarinah.mjs", "hook", "claude", "--quiet"], "timeout": 15 }] }],
+    "StopFailure": [{ "hooks": [{ "type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/qarinah.mjs", "hook", "claude", "--quiet"], "timeout": 15 }] }],
+    "SubagentStart": [{ "matcher": "*", "hooks": [{ "type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/qarinah.mjs", "hook", "claude", "--quiet"], "timeout": 15 }] }],
+    "SubagentStop": [{ "matcher": "*", "hooks": [{ "type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/qarinah.mjs", "hook", "claude", "--quiet"], "timeout": 15 }] }],
+    "SessionEnd": [{ "hooks": [{ "type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/qarinah.mjs", "hook", "claude", "--quiet"] }] }]
+  }
+}

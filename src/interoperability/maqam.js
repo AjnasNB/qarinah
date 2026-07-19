@@ -1,5 +1,4 @@
 import { appendEvent } from "../store.js";
-import { canonicalStringify, sha256 } from "../canonical.js";
 import { compileContext } from "../compiler.js";
 import { QarinahError } from "../errors.js";
 import { rebuildDerivedState } from "../indexer.js";
@@ -20,7 +19,7 @@ export const MAQAM_CONTEXT_QUERY_TOOL = deepFreeze({
   schemaVersion: MAQAM_CONTEXT_ADAPTER_SCHEMA_VERSION,
   name: "context.query",
   transport: "function",
-  description: "Compile a bounded, evidence-linked Qarinah context pack.",
+  description: "Compile a bounded, evidence-linked context-ledger pack.",
   effects: ["read"],
   networkOrigins: [],
   risk: "low",
@@ -31,15 +30,18 @@ export const MAQAM_CONTEXT_APPEND_TOOL = deepFreeze({
   schemaVersion: MAQAM_CONTEXT_ADAPTER_SCHEMA_VERSION,
   name: "context.append",
   transport: "function",
-  description: "Append one approved event to the Qarinah context ledger.",
+  description: "Append one approved event to the context ledger.",
   effects: ["write"],
   networkOrigins: [],
   risk: "high",
   approvalRequired: true
 });
 
-const REGISTRATION_KEYS = Object.freeze([
-  "gateway", "defineToolAdapter", "registerToolAdapter", "cwd", "maxChars", "maxItems"
+const REGISTRATION_KEYS = Object.freeze(["gateway", "cwd", "maxChars", "maxItems"]);
+
+const APPEND_APPROVAL_ACTIONS = Object.freeze([
+  `tool:${MAQAM_CONTEXT_APPEND_TOOL.name}`,
+  "effect:write"
 ]);
 
 function registrationOptions(value) {
@@ -60,9 +62,6 @@ function registrationOptions(value) {
   }
   if (!result.gateway || (typeof result.gateway !== "object" && typeof result.gateway !== "function")) {
     throw new TypeError("Maqam registration options.gateway is required.");
-  }
-  for (const key of ["defineToolAdapter", "registerToolAdapter"]) {
-    if (typeof result[key] !== "function") throw new TypeError(`Maqam registration options.${key} must be a function.`);
   }
   if (result.cwd !== undefined && (typeof result.cwd !== "string" || result.cwd.length === 0)) {
     throw new TypeError("Maqam registration options.cwd must be a non-empty string.");
@@ -97,44 +96,40 @@ function effectivePositiveLimit(requested, configured, context, key, minimum) {
 }
 
 function evidenceCapability(context, toolName) {
-  if (!context || typeof context !== "object" || context.toolName !== toolName) {
-    throw new QarinahError("MAQAM_GATEWAY_CONTEXT_REQUIRED", `Tool '${toolName}' must execute through its registered Maqam ToolGateway path.`);
-  }
   if (!context.evidence || typeof context.evidence !== "object") {
     throw new QarinahError("MAQAM_EVIDENCE_REQUIRED", `Tool '${toolName}' requires a Maqam scoped evidence capability.`);
   }
   return dataFunction(context.evidence, "addBatch", "Maqam scoped evidence capability");
 }
 
-function maqamInputHash(input) {
-  // Compatibility copy of the inspected Maqam 0.3.0 internal
-  // snapshotHashedValue shape. This is not a public Maqam API; issue #24 tracks
-  // an opaque gateway capability that can replace this best-effort check.
-  return sha256(canonicalStringify(input)).slice(7);
+function assertGuardedReceipt(receipt, toolName) {
+  if (!receipt
+    || receipt.schemaVersion !== "maqam.tool-execution.v1"
+    || receipt.toolName !== toolName
+    || typeof receipt.runId !== "string"
+    || receipt.runId.length === 0
+    || typeof receipt.inputHash !== "string"
+    || !/^[a-f0-9]{64}$/.test(receipt.inputHash)
+    || !receipt.decision
+    || typeof receipt.decision !== "object"
+    || !Array.isArray(receipt.approvalIds)
+    || !Array.isArray(receipt.approvalActions)) {
+    throw new QarinahError(
+      "MAQAM_EXECUTION_GUARD_INVALID",
+      `Maqam returned an invalid guarded execution receipt for '${toolName}'.`
+    );
+  }
+  return receipt;
 }
 
-function assertExactApproval(context, input) {
-  if (!Array.isArray(context.approvals) || context.approvals.length === 0) {
-    throw new QarinahError("MAQAM_APPROVAL_REQUIRED", "context.append requires a consumed approval bound to this exact Maqam tool call.");
-  }
-  const runId = context.runId || "default";
-  const inputHash = maqamInputHash(input);
-  const approved = context.approvals.some((approval) => (
-    typeof approval?.approvalId === "string"
-    && approval.approvalId.length > 0
-    && approval?.status === "approved"
-    && approval?.subject?.runId === runId
-    && approval?.subject?.toolName === MAQAM_CONTEXT_APPEND_TOOL.name
-    && approval?.subject?.inputHash === inputHash
-    && Array.isArray(approval?.consumptions)
-    && approval.consumptions.some((consumption) => (
-      consumption?.runId === runId
-      && consumption?.toolName === MAQAM_CONTEXT_APPEND_TOOL.name
-      && typeof consumption?.consumedAt === "string"
-    ))
-  ));
-  if (!approved) {
-    throw new QarinahError("MAQAM_APPROVAL_SCOPE_MISMATCH", "context.append did not receive an exact consumed Maqam approval for this run and tool.");
+function assertExactApproval(receipt) {
+  assertGuardedReceipt(receipt, MAQAM_CONTEXT_APPEND_TOOL.name);
+  if (receipt.approvalIds.length === 0
+    || !receipt.approvalActions.some((action) => APPEND_APPROVAL_ACTIONS.includes(action))) {
+    throw new QarinahError(
+      "MAQAM_APPROVAL_REQUIRED",
+      "context.append requires an exact consumed Maqam tool or write-effect approval for this dispatch."
+    );
   }
 }
 
@@ -159,12 +154,6 @@ function metadataEventInput(value, workspace) {
   return {
     ...(event.eventId === undefined ? {} : { eventId: event.eventId }),
     ...(event.timestamp === undefined ? {} : { timestamp: event.timestamp }),
-    ...(event.sessionId === undefined || event.sessionId === null
-      ? {}
-      : { sessionId: `sha256:${sha256(event.sessionId).slice(7)}` }),
-    ...(event.turnId === undefined || event.turnId === null
-      ? {}
-      : { turnId: `sha256:${sha256(event.turnId).slice(7)}` }),
     kind: event.kind,
     actor: { type: "system", id: "maqam.context-append" },
     title: `Maqam approved ${event.kind}`,
@@ -179,7 +168,7 @@ function metadataEventInput(value, workspace) {
     relations: [],
     provenance: {
       adapter: "maqam.context-append.metadata",
-      sourceId: event.eventId ?? `maqam-input:${summary.hash}`
+      sourceId: event.eventId ?? "maqam-input:unidentified"
     },
     retention: { class: workspace.config.retentionClass, expiresAt: null }
   };
@@ -207,32 +196,35 @@ function attachGovernance(handler, tool) {
   return handler;
 }
 
-function adapterSpec(tool, invoke, bounds) {
+function registrationMetadata(tool, bounds) {
   return {
-    schemaVersion: "maqam.tool-adapter.v1",
-    name: tool.name,
-    transport: tool.transport,
-    description: tool.description,
     effects: [...tool.effects],
+    networkOrigins: [],
     risk: tool.risk,
-    metadata: {
-      networkOrigins: [],
-      qarinah: {
-        schemaVersion: MAQAM_CONTEXT_ADAPTER_SCHEMA_VERSION,
-        operation: tool.name,
-        approvalRequired: tool.approvalRequired,
-        localOnly: true,
-        ...bounds
-      }
-    },
-    invoke
+    qarinah: {
+      schemaVersion: MAQAM_CONTEXT_ADAPTER_SCHEMA_VERSION,
+      operation: tool.name,
+      approvalRequired: tool.approvalRequired,
+      localOnly: true,
+      ...bounds
+    }
   };
 }
 
 export function registerMaqamContextAdapters(input) {
   const options = registrationOptions(input);
   const locator = Object.freeze({ start: options.cwd ?? process.cwd() });
-  const query = attachGovernance(async (rawInput = {}, context = {}) => {
+  let registerGuardedTool;
+  try {
+    registerGuardedTool = dataFunction(options.gateway, "registerGuardedTool", "Maqam ToolGateway");
+  } catch {
+    throw new QarinahError(
+      "MAQAM_EXECUTION_GUARD_REQUIRED",
+      "Context adapters require Maqam's guarded ToolGateway registration contract."
+    );
+  }
+  const queryFactory = (verifier) => attachGovernance(async (rawInput = {}, context = {}) => {
+    assertGuardedReceipt(verifier.requireExecution(rawInput, context), MAQAM_CONTEXT_QUERY_TOOL.name);
     const addBatch = evidenceCapability(context, MAQAM_CONTEXT_QUERY_TOOL.name);
     const request = snapshotRecordBoundary(rawInput, {
       label: "context.query input",
@@ -243,7 +235,14 @@ export function registerMaqamContextAdapters(input) {
     if (request.query !== undefined && typeof request.query !== "string") throw new TypeError("context.query input.query must be a string.");
     const maxChars = effectivePositiveLimit(request.maxChars, options.maxChars, context, "maxContextChars", 512);
     const maxItems = effectivePositiveLimit(request.maxItems, options.maxItems, context, "maxContextItems", 1);
-    const pack = await compileContext(request.query ?? "", { cwd: options.cwd, maxChars, limit: maxItems });
+    const pack = await compileContext(request.query ?? "", {
+      cwd: locator.start,
+      maxChars,
+      limit: maxItems,
+      rebuild: false,
+      updateCheckpoint: false,
+      inMemory: true
+    });
     const items = pack.items.length > 0
       ? pack.items.map((item) => ({
           sourceType: "qarinah.context-event",
@@ -262,7 +261,8 @@ export function registerMaqamContextAdapters(input) {
     return deepFreeze({ schemaVersion: "qarinah.maqam-context-query-result.v1", pack, evidence });
   }, MAQAM_CONTEXT_QUERY_TOOL);
 
-  const append = attachGovernance(async (rawInput = {}, context = {}) => {
+  const appendFactory = (verifier) => attachGovernance(async (rawInput = {}, context = {}) => {
+    const receipt = verifier.requireExecution(rawInput, context);
     const addBatch = evidenceCapability(context, MAQAM_CONTEXT_APPEND_TOOL.name);
     const request = snapshotRecordBoundary(rawInput, {
       label: "context.append input",
@@ -271,7 +271,7 @@ export function registerMaqamContextAdapters(input) {
       maximumStringLength: 65_536
     });
     if (!Object.hasOwn(request, "event")) throw new TypeError("context.append input.event is required.");
-    assertExactApproval(context, request);
+    assertExactApproval(receipt);
     const workspace = await loadTrustedInteropWorkspace(locator);
     const capture = requestedCapture(request.capture, workspace);
     const eventInput = capture === "content" ? request.event : metadataEventInput(request.event, workspace);
@@ -292,13 +292,15 @@ export function registerMaqamContextAdapters(input) {
     });
   }, MAQAM_CONTEXT_APPEND_TOOL);
 
-  const queryAdapter = options.defineToolAdapter(adapterSpec(MAQAM_CONTEXT_QUERY_TOOL, query, {
+  registerGuardedTool(MAQAM_CONTEXT_QUERY_TOOL.name, queryFactory, registrationMetadata(MAQAM_CONTEXT_QUERY_TOOL, {
     maxChars: options.maxChars,
     maxItems: options.maxItems
   }));
-  const appendAdapter = options.defineToolAdapter(adapterSpec(MAQAM_CONTEXT_APPEND_TOOL, append, {}));
-  options.registerToolAdapter(options.gateway, queryAdapter);
-  options.registerToolAdapter(options.gateway, appendAdapter);
+  registerGuardedTool(
+    MAQAM_CONTEXT_APPEND_TOOL.name,
+    appendFactory,
+    registrationMetadata(MAQAM_CONTEXT_APPEND_TOOL, {})
+  );
   return deepFreeze({
     schemaVersion: "qarinah.maqam-context-registration.v1",
     queryToolName: MAQAM_CONTEXT_QUERY_TOOL.name,

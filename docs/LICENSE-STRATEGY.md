@@ -16,7 +16,7 @@ Primary references:
 ## Option A: genuine open source
 
 - AGPL-3.0-only core.
-- Registered Qarinah and Maqam trademarks with a public usage policy.
+- A professionally cleared context-product mark and the Maqam mark, each with a public usage policy.
 - Contributor License Agreement or Developer Certificate of Origin.
 - Commercial license for customers unwilling to satisfy AGPL obligations.
 - Proprietary hosted control plane, enterprise connectors, certification, support, and managed policy network.

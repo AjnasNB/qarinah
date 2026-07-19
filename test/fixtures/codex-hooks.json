@@ -30,6 +30,17 @@
     "transcript_path": null,
     "turn_id": "turn-test-001"
   },
+  "PermissionRequest": {
+    "cwd": "__CWD__",
+    "hook_event_name": "PermissionRequest",
+    "model": "gpt-5.6-sol",
+    "permission_mode": "default",
+    "session_id": "session-test-001",
+    "tool_input": { "command": "npm publish" },
+    "tool_name": "Bash",
+    "transcript_path": null,
+    "turn_id": "turn-test-001"
+  },
   "PostToolUse": {
     "cwd": "__CWD__",
     "hook_event_name": "PostToolUse",
@@ -69,6 +80,17 @@
     "permission_mode": "default",
     "session_id": "session-test-001",
     "stop_hook_active": false,
+    "transcript_path": null,
+    "turn_id": "turn-test-001"
+  },
+  "SubagentStart": {
+    "agent_id": "agent-test-001",
+    "agent_type": "worker",
+    "cwd": "__CWD__",
+    "hook_event_name": "SubagentStart",
+    "model": "gpt-5.6-sol",
+    "permission_mode": "default",
+    "session_id": "session-test-001",
     "transcript_path": null,
     "turn_id": "turn-test-001"
   },

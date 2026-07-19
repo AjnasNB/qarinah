@@ -22,7 +22,7 @@ function isWithin(root, candidate) {
 export function resolveWithin(root, ...segments) {
   const candidate = path.resolve(root, ...segments);
   if (!isWithin(path.resolve(root), candidate)) {
-    throw new QarinahError("PATH_OUTSIDE_WORKSPACE", "Resolved path escapes the Qarinah workspace.", { candidate });
+    throw new QarinahError("PATH_OUTSIDE_WORKSPACE", "Resolved path escapes the Context Ledger workspace.", { candidate });
   }
   return candidate;
 }
@@ -65,18 +65,19 @@ async function assertSafeRegularFile(candidate, root, label) {
   return metadata;
 }
 
-export async function atomicWriteFile(destination, contents) {
+export async function atomicWriteFile(destination, contents, options = {}) {
   const directory = path.dirname(destination);
   await mkdir(directory, { recursive: true });
   const temporary = path.join(directory, `.${path.basename(destination)}.${process.pid}.${randomBytes(6).toString("hex")}.tmp`);
-  const handle = await open(temporary, "wx", 0o600);
   try {
-    await handle.writeFile(contents, "utf8");
-    await handle.sync();
-  } finally {
-    await handle.close();
-  }
-  try {
+    const handle = await open(temporary, "wx", 0o600);
+    try {
+      await handle.writeFile(contents, "utf8");
+      if (options.sync !== false) await handle.sync();
+    } finally {
+      await handle.close();
+    }
+    if (typeof options.afterWrite === "function") await options.afterWrite();
     for (let attempt = 0; ; attempt += 1) {
       try {
         await rename(temporary, destination);
@@ -86,6 +87,7 @@ export async function atomicWriteFile(destination, contents) {
         await new Promise((resolve) => setTimeout(resolve, 5 + attempt * 5));
       }
     }
+    if (typeof options.afterRename === "function") await options.afterRename();
   } finally {
     await rm(temporary, { force: true });
   }
@@ -122,7 +124,7 @@ export async function secureStoragePath(workspace, segments, options = {}) {
 }
 
 function validateConfig(raw) {
-  const config = sanitizeJsonValue(raw, { label: "Qarinah config", maximumDepth: 4, maximumNodes: 100 });
+  const config = sanitizeJsonValue(raw, { label: "Context Ledger config", maximumDepth: 4, maximumNodes: 100 });
   const unknown = Object.keys(config).filter((key) => !CONFIG_KEYS.has(key));
   if (unknown.length) throw new QarinahError("CONFIG_INVALID", `Unknown config field(s): ${unknown.join(", ")}.`);
   if (config.schemaVersion !== CONFIG_SCHEMA_VERSION) throw new QarinahError("CONFIG_INVALID", "Unsupported config schemaVersion.");
@@ -156,7 +158,7 @@ export async function initializeWorkspace(target = process.cwd(), options = {}) 
   const configPath = resolveWithin(qarinahDir, "config.json");
   const existingConfig = await safeLstat(configPath, ".qarinah/config.json", { allowMissing: true });
   if (existingConfig) {
-    throw new QarinahError("WORKSPACE_EXISTS", `Qarinah is already initialized at ${root}.`);
+    throw new QarinahError("WORKSPACE_EXISTS", `Context Ledger is already initialized at ${root}.`);
   }
   const capture = options.capture ?? "metadata";
   if (!["metadata", "content"].includes(capture)) throw new QarinahError("CONFIG_INVALID", "capture must be metadata or content.");
@@ -208,7 +210,7 @@ export async function findWorkspaceRoot(start = process.cwd()) {
 
 export async function loadWorkspace(start = process.cwd(), options = {}) {
   const root = await findWorkspaceRoot(start);
-  if (!root) throw new QarinahError("WORKSPACE_NOT_INITIALIZED", "No enabled Qarinah workspace was found. Run `qarinah init` first.");
+  if (!root) throw new QarinahError("WORKSPACE_NOT_INITIALIZED", "No enabled Context Ledger workspace was found. Run `qarinah init` first.");
   const actualRoot = await realpath(root);
   const requestedQarinahDir = resolveWithin(actualRoot, ".qarinah");
   const qarinahLinkStat = await safeLstat(requestedQarinahDir, ".qarinah");
@@ -219,16 +221,16 @@ export async function loadWorkspace(start = process.cwd(), options = {}) {
   }
   const configPath = resolveWithin(qarinahDir, "config.json");
   const configMetadata = await assertSafeRegularFile(configPath, qarinahDir, ".qarinah/config.json");
-  if (configMetadata.size > MAX_CONFIG_BYTES) throw new QarinahError("CONFIG_INVALID", "Qarinah config exceeds the size limit.");
+  if (configMetadata.size > MAX_CONFIG_BYTES) throw new QarinahError("CONFIG_INVALID", "Context Ledger config exceeds the size limit.");
   let configRaw;
   try {
     configRaw = JSON.parse(await readFile(configPath, "utf8"));
   } catch (error) {
-    throw new QarinahError("CONFIG_INVALID", "Qarinah config is not valid JSON.", { cause: error.message });
+    throw new QarinahError("CONFIG_INVALID", "Context Ledger config is not valid JSON.", { cause: error.message });
   }
   const config = validateConfig(configRaw);
   if (!config.enabled && options.allowDisabled !== true) {
-    throw new QarinahError("WORKSPACE_DISABLED", "Qarinah capture is disabled for this workspace.");
+    throw new QarinahError("WORKSPACE_DISABLED", "Context Ledger capture is disabled for this workspace.");
   }
   const provisional = { root: actualRoot, qarinahDir, config, configPath };
   for (const directory of STORAGE_DIRECTORIES) {
@@ -257,7 +259,7 @@ export async function setWorkspaceEnabled(start, enabled) {
 }
 
 export async function revokeWorkspaceTrust(start = process.cwd()) {
-  const workspace = await loadWorkspace(start, { allowDisabled: true });
+  const workspace = await loadWorkspace(start, { allowDisabled: true, skipConsent: true });
   await revokeWorkspaceConsent(workspace.root);
   return Object.freeze({ root: workspace.root, workspaceId: workspace.config.workspaceId, trusted: false });
 }

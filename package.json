@@ -1,7 +1,7 @@
 {
   "name": "qarinah",
   "version": "0.1.0-alpha.0",
-  "description": "Evidence-linked, local-first context compilation for software agents.",
+  "description": "Qarinah: evidence-linked, local-first context compilation for software agents.",
   "license": "UNLICENSED",
   "private": true,
   "author": "Ajnas NB",
@@ -21,6 +21,14 @@
       "types": "./types/codex.d.ts",
       "default": "./src/hooks/codex.js"
     },
+    "./claude": {
+      "types": "./types/claude.d.ts",
+      "default": "./src/hooks/claude.js"
+    },
+    "./mcp": {
+      "types": "./types/mcp.d.ts",
+      "default": "./src/mcp/server.js"
+    },
     "./schemas/event.json": "./schemas/event.schema.json",
     "./schemas/context-pack.json": "./schemas/context-pack.schema.json",
     "./schemas/maqam-context-adapter.json": "./schemas/maqam-context-adapter.schema.json",
@@ -36,16 +44,22 @@
     "docs/SECURITY.md",
     "docs/ROADMAP.md",
     "docs/INTEROPERABILITY.md",
+    "docs/HOST-INTEGRATIONS.md",
+    "docs/GOVERNED-BROWSER.md",
+    "docs/LAUNCH.md",
     "examples/",
     "integrations/codex/qarinah/",
+    "integrations/claude/qarinah/",
     "README.md"
   ],
   "scripts": {
-    "build:codex-plugin": "node scripts/build-codex-plugin.mjs",
-    "check:codex-plugin": "node scripts/build-codex-plugin.mjs --check",
+    "build:plugins": "node scripts/build-plugins.mjs",
+    "build:codex-plugin": "npm run build:plugins",
+    "check:plugins": "node scripts/build-plugins.mjs --check",
+    "check:codex-plugin": "npm run check:plugins",
     "test": "node scripts/run-tests.mjs",
     "typecheck": "node scripts/typecheck-consumer.mjs",
-    "check": "npm run check:codex-plugin && npm test && npm run typecheck && npm run benchmark && npm pack --dry-run --ignore-scripts",
+    "check": "npm run check:plugins && npm test && npm run typecheck && npm run benchmark && npm pack --dry-run --ignore-scripts",
     "benchmark": "node scripts/benchmark.mjs"
   },
   "engines": {

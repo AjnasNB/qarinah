@@ -10,6 +10,14 @@ const SECRET_PATTERNS = [
   /-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----/g
 ];
 
+function sensitiveKey(value) {
+  const normalized = String(value)
+    .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+    .replace(/[^A-Za-z0-9]+/g, "_")
+    .toLowerCase();
+  return SENSITIVE_KEY.test(normalized);
+}
+
 export function redactText(value) {
   let output = value;
   for (const pattern of SECRET_PATTERNS) output = output.replace(pattern, "[REDACTED]");
@@ -20,7 +28,7 @@ export function redactValue(value, options = {}) {
   const safe = sanitizeJsonValue(value, options);
 
   function visit(candidate, key = "") {
-    if (SENSITIVE_KEY.test(key)) return "[REDACTED]";
+    if (sensitiveKey(key)) return "[REDACTED]";
     if (typeof candidate === "string") return redactText(candidate);
     if (Array.isArray(candidate)) return candidate.map((item) => visit(item));
     if (candidate && typeof candidate === "object") {

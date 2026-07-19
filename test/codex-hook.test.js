@@ -29,8 +29,10 @@ test("all exact upstream Codex hook fixtures are accepted", async (t) => {
     assert.equal(result.captured, true, eventName);
   }
   const events = await readEvents(root);
-  assert.equal(events.length, 8);
+  assert.equal(events.length, Object.keys(fixtures).length);
   assert.equal(events.find((event) => event.data.hookEvent === "PreCompact").data.trigger, "auto");
+  assert.equal(events.find((event) => event.data.hookEvent === "PermissionRequest").data.toolName, "Bash");
+  assert.equal(events.find((event) => event.data.hookEvent === "SubagentStart").data.agentId, "agent-test-001");
   assert.equal(events.find((event) => event.data.hookEvent === "SubagentStop").data.agentId, "agent-test-001");
 });
 
@@ -44,7 +46,25 @@ test("replayed host hook events are idempotent", async (t) => {
   assert.equal((await readEvents(root)).length, 1);
 });
 
-test("metadata capture hashes redacted values but does not persist content", async (t) => {
+test("Codex preserves repeated session starts that have no unique host event id", async (t) => {
+  const root = await temporaryDirectory(t);
+  await initializeWorkspace(root);
+  const first = await captureCodexHook(fixture("SessionStart", root, {
+    source: "resume",
+    model: "model-before-resume"
+  }));
+  const second = await captureCodexHook(fixture("SessionStart", root, {
+    source: "resume",
+    model: "model-after-resume"
+  }));
+  assert.notEqual(second.eventId, first.eventId);
+  assert.deepEqual((await readEvents(root)).map((event) => event.data.model), [
+    "model-before-resume",
+    "model-after-resume"
+  ]);
+});
+
+test("metadata capture stores only coarse content presence and size", async (t) => {
   const root = await temporaryDirectory(t);
   await initializeWorkspace(root);
   const result = await captureCodexHook(fixture("PreToolUse", root, {
@@ -55,7 +75,9 @@ test("metadata capture hashes redacted values but does not persist content", asy
   assert.equal(event.body, "");
   assert.equal(Object.hasOwn(event.data, "content"), false);
   assert.equal(event.data.toolInput.present, true);
-  assert.match(event.data.toolInput.hash, /^sha256:/);
+  assert.equal(typeof event.data.toolInput.sizeClass, "string");
+  assert.equal(Object.hasOwn(event.data.toolInput, "hash"), false);
+  assert.equal(Object.hasOwn(event.data.toolInput, "chars"), false);
   assert.equal(JSON.stringify(event).includes("top-secret-token"), false);
 });
 
@@ -67,8 +89,28 @@ test("content capture stores exposed completion data and recursively redacts", a
   }));
   const [event] = await readEvents(root);
   assert.equal(event.body, "Deployed with [REDACTED]");
-  assert.equal(event.data.content.assistantMessage, "Deployed with [REDACTED]");
+  assert.equal(Object.hasOwn(event.data.content, "assistantMessage"), false);
+  assert.equal(event.data.bodyRetention.truncated, false);
+  assert.equal(event.data.bodyRetention.retainedChars, event.body.length);
   assert.equal(event.data.assistantMessage.present, true);
+});
+
+test("content capture bounds oversized prompts without losing the event", async (t) => {
+  for (const length of [65_536, 65_537, 70_000, 512 * 1024]) {
+    const root = await temporaryDirectory(t);
+    await initializeWorkspace(root, { capture: "content" });
+    const secret = "sk-abcdefghijklmnopqrstuvwxyz";
+    const prompt = `${secret}\n${"x".repeat(length - secret.length - 1)}`;
+    const result = await captureCodexHook(fixture("UserPromptSubmit", root, {
+      prompt,
+      turn_id: `turn-${length}`
+    }));
+    assert.equal(result.captured, true);
+    const [event] = await readEvents(root);
+    assert.ok(event.body.length <= 48_000);
+    assert.equal(event.data.bodyRetention.sourceChars > event.data.bodyRetention.retainedChars, length > 48_000);
+    assert.equal(JSON.stringify(event).includes(secret), false);
+  }
 });
 
 test("known hook schemas reject missing and additional fields", async (t) => {

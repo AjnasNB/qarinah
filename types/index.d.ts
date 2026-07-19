@@ -43,7 +43,7 @@ export interface QarinahConfig {
   retentionClass: "session" | "project" | "durable";
   createdAt: string;
 }
-export interface QarinahCheckpoint { eventCount: number; headHash: string | null; logBytes: number; updatedAt: string }
+export interface QarinahCheckpoint { eventCount: number; headHash: string | null; logBytes: number; eventIdIndexHash: string | null; updatedAt: string }
 export interface QarinahConsent {
   schemaVersion: "qarinah.trust.v1";
   root: string;
@@ -73,6 +73,7 @@ export const CONTEXT_PACK_SCHEMA_VERSION: "qarinah.context-pack.v1";
 export const CONFIG_SCHEMA_VERSION: "qarinah.config.v1";
 export const INDEX_SCHEMA_VERSION: "qarinah.index.v1";
 export const GRAPH_SCHEMA_VERSION: "qarinah.graph.v1";
+export const QARINAH_VERSION: "0.1.0-alpha.0";
 export const EVENT_KINDS: readonly QarinahEventKind[];
 export const RELATION_TYPES: readonly QarinahRelationType[];
 export function initializeWorkspace(target?: string, options?: { capture?: "metadata" | "content" }): Promise<QarinahWorkspace>;
@@ -86,15 +87,28 @@ export function createEventEnvelope(input: QarinahEventInput, options: { workspa
 export function validateStoredEvent(value: unknown, options?: { expectedPreviousHash?: string | null; workspaceId?: string; maximumEventBytes?: number }): QarinahEvent;
 export function appendEvent(input: QarinahEventInput, options?: { cwd?: string; workspace?: QarinahWorkspace; clock?: () => Date; randomUUID?: () => string; idempotent?: boolean }): Promise<QarinahEvent>;
 export function approveWorkspaceTrust(start: string | undefined, expectedCapture: "metadata" | "content"): Promise<{ root: string; workspaceId: string; capture: "metadata" | "content"; trusted: true; eventCount: number; headHash: string | null }>;
-export function readEvents(workspaceOrStart?: QarinahWorkspace | string): Promise<QarinahEvent[]>;
-export function verifyStore(start?: string): Promise<{ ok: true; workspaceId: string; eventCount: number; headHash: string | null; capture: string; root: string }>;
+export function readEvents(workspaceOrStart?: QarinahWorkspace | string, options?: { skipCheckpoint?: boolean; updateCheckpoint?: boolean }): Promise<QarinahEvent[]>;
+export function verifyStore(start?: string, options?: { updateCheckpoint?: boolean; includeRoot?: boolean }): Promise<{ ok: true; workspaceId: string; eventCount: number; headHash: string | null; capture: string; root?: string }>;
 export function rebuildDerivedState(start?: string): Promise<{ workspaceId: string; eventCount: number; headHash: string | null }>;
-export function loadIndex(start?: string, options?: { rebuild?: boolean }): Promise<{ workspace: QarinahWorkspace; index: unknown }>;
+export function loadIndex(start?: string, options?: { rebuild?: boolean; updateCheckpoint?: boolean; inMemory?: boolean }): Promise<{ workspace: QarinahWorkspace; index: unknown }>;
 export function buildDerivedState(events: QarinahEvent[], workspaceId: string): { index: unknown; graph: unknown };
 export function tokenize(value: unknown): string[];
-export function compileContext(query?: string, options?: { cwd?: string; maxChars?: number; limit?: number }): Promise<QarinahContextPack>;
+export function compileContext(query?: string, options?: { cwd?: string; maxChars?: number; limit?: number; rebuild?: boolean; updateCheckpoint?: boolean; inMemory?: boolean }): Promise<QarinahContextPack>;
 export function renderContextPackMarkdown(pack: QarinahContextPack): string;
 export function captureCodexHook(input: Record<string, unknown>, options?: { cwd?: string }): Promise<{ captured: boolean; reason?: string; eventId?: string; hash?: string }>;
+export function captureClaudeHook(input: Record<string, unknown>, options?: { cwd?: string }): Promise<{ captured: boolean; reason?: string; eventId?: string; hash?: string }>;
+export interface QarinahMcpServer {
+  readonly tools: readonly Readonly<Record<string, unknown>>[];
+  handle(message: unknown): Promise<void>;
+  close(error?: Error): void;
+}
+export function createMcpServer(options?: { cwd?: string; write?: (message: unknown) => void }): QarinahMcpServer;
+export function runMcpServer(options?: {
+  cwd?: string;
+  input?: AsyncIterable<Uint8Array | string>;
+  maximumFrameBytes?: number;
+  write?: (message: unknown) => void;
+}): Promise<void>;
 
 export interface MaqamContextToolDescriptor {
   readonly schemaVersion: "qarinah.maqam-context-adapter.v1";
@@ -111,12 +125,6 @@ export interface MaqamAdapterExecutionContext {
   readonly toolName?: string;
   readonly limits?: Readonly<Record<string, unknown>> | null;
   readonly goal?: Readonly<{ budget?: Readonly<Record<string, unknown>> | null }> | null;
-  readonly approvals?: readonly Readonly<{
-    approvalId?: string;
-    status?: string;
-    subject?: Readonly<{ runId?: unknown; toolName?: unknown; inputHash?: unknown }>;
-    consumptions?: readonly Readonly<{ runId?: unknown; toolName?: unknown; consumedAt?: unknown }>[];
-  }>[];
   readonly evidence?: {
     addBatch(input?: {
       evidence?: Array<{
@@ -132,15 +140,26 @@ export interface MaqamAdapterExecutionContext {
   } | null;
 }
 export type MaqamStructuralJson = string | number | boolean | null | MaqamStructuralJson[] | { [key: string]: MaqamStructuralJson };
-export interface MaqamToolAdapterStructuralSpec<TInput = unknown, TOutput = unknown> {
-  schemaVersion: "maqam.tool-adapter.v1";
-  name: string;
-  transport: "function";
-  description: string;
-  effects: readonly string[];
-  risk: string;
-  metadata: { [key: string]: MaqamStructuralJson };
-  invoke(input: TInput, context: MaqamAdapterExecutionContext): Promise<TOutput>;
+export interface MaqamGuardedExecutionReceipt {
+  readonly schemaVersion: "maqam.tool-execution.v1";
+  readonly toolName: string;
+  readonly runId: string;
+  readonly inputHash: string;
+  readonly decision: Readonly<Record<string, unknown>>;
+  readonly approvalIds: readonly string[];
+  readonly approvalActions: readonly string[];
+}
+export interface MaqamExecutionVerifier {
+  requireExecution(input: unknown, context: MaqamAdapterExecutionContext): MaqamGuardedExecutionReceipt;
+}
+export interface MaqamGuardedToolGateway {
+  registerGuardedTool<TInput = unknown, TOutput = unknown>(
+    name: string,
+    factory: (
+      verifier: MaqamExecutionVerifier
+    ) => (input: TInput, context: MaqamAdapterExecutionContext) => TOutput | Promise<TOutput>,
+    metadata?: Readonly<Record<string, unknown>>
+  ): unknown;
 }
 export interface MaqamContextQueryInput { query?: string; maxChars?: number; maxItems?: number }
 export interface MaqamContextQueryResult {
@@ -155,10 +174,8 @@ export interface MaqamContextAppendResult {
   readonly event: QarinahEvent;
   readonly evidence: unknown;
 }
-export interface MaqamContextRegistrationOptions<TGateway = unknown> {
+export interface MaqamContextRegistrationOptions<TGateway extends MaqamGuardedToolGateway = MaqamGuardedToolGateway> {
   gateway: TGateway;
-  defineToolAdapter(spec: MaqamToolAdapterStructuralSpec<any, any>): any;
-  registerToolAdapter(gateway: TGateway, adapter: any): unknown;
   cwd?: string;
   maxChars?: number;
   maxItems?: number;
@@ -171,7 +188,7 @@ export interface MaqamContextRegistration {
 export const MAQAM_CONTEXT_ADAPTER_SCHEMA_VERSION: "qarinah.maqam-context-adapter.v1";
 export const MAQAM_CONTEXT_QUERY_TOOL: MaqamContextToolDescriptor & Readonly<{ name: "context.query"; effects: readonly ["read"]; risk: "low"; approvalRequired: false }>;
 export const MAQAM_CONTEXT_APPEND_TOOL: MaqamContextToolDescriptor & Readonly<{ name: "context.append"; effects: readonly ["write"]; risk: "high"; approvalRequired: true }>;
-export function registerMaqamContextAdapters<TGateway>(options: MaqamContextRegistrationOptions<TGateway>): MaqamContextRegistration;
+export function registerMaqamContextAdapters<TGateway extends MaqamGuardedToolGateway>(options: MaqamContextRegistrationOptions<TGateway>): MaqamContextRegistration;
 
 export interface CockroachSourceProvenanceBoundary {
   readonly retrievedAt: string;

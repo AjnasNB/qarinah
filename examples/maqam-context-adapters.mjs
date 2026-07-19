@@ -2,9 +2,7 @@ import {
   ApprovalQueue,
   EvidenceLedger,
   PolicyEngine,
-  ToolGateway,
-  defineToolAdapter,
-  registerToolAdapter
+  ToolGateway
 } from "maqam";
 import { registerMaqamContextAdapters } from "qarinah";
 
@@ -20,8 +18,6 @@ const gateway = new ToolGateway({
 
 registerMaqamContextAdapters({
   gateway,
-  defineToolAdapter,
-  registerToolAdapter,
   cwd: process.cwd(),
   maxChars: 20_000,
   maxItems: 20

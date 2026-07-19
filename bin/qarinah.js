@@ -4,6 +4,7 @@ import {
   QarinahError,
   appendEvent,
   approveWorkspaceTrust,
+  captureClaudeHook,
   captureCodexHook,
   compileContext,
   initializeWorkspace,
@@ -12,6 +13,7 @@ import {
   rebuildDerivedState,
   renderContextPackMarkdown,
   revokeWorkspaceTrust,
+  runMcpServer,
   setWorkspaceEnabled,
   verifyStore
 } from "../src/index.js";
@@ -67,12 +69,13 @@ async function readStdin(maximumBytes = 1_048_576) {
 }
 
 function help() {
-  return `Qarinah — evidence-linked context for every agent
+  return `Qarinah — evidence-linked context for AI agents
 
 Usage:
   qarinah init [path] [--capture metadata|content]
   qarinah record --kind <kind> --title <title> [--body <text>] [--data-json <json>] [--relation type:target]
-  qarinah hook codex
+  qarinah hook codex|claude
+  qarinah mcp
   qarinah build
   qarinah query [text] [--format json|markdown] [--limit n] [--max-chars n]
   qarinah trust [path] --capture metadata|content
@@ -127,10 +130,14 @@ async function run(argv) {
   }
   if (command === "hook") {
     const adapter = positionals(args)[0];
-    if (adapter !== "codex") throw new TypeError("Only the codex hook adapter is available in the foundation release.");
+    if (!["codex", "claude"].includes(adapter)) throw new TypeError("hook requires the codex or claude adapter.");
     const input = JSON.parse(await readStdin());
-    const result = await captureCodexHook(input);
+    const result = adapter === "codex" ? await captureCodexHook(input) : await captureClaudeHook(input);
     if (!args.includes("--quiet")) process.stdout.write(`${JSON.stringify(result)}\n`);
+    return;
+  }
+  if (command === "mcp") {
+    await runMcpServer();
     return;
   }
   if (command === "build") {

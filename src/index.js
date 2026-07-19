@@ -7,6 +7,7 @@ export {
   validateStoredEvent
 } from "./contracts.js";
 export { QarinahError } from "./errors.js";
+export { QARINAH_VERSION } from "./version.js";
 export { appendEvent, approveWorkspaceTrust, readEvents, verifyStore } from "./store.js";
 export {
   CONFIG_SCHEMA_VERSION,
@@ -28,6 +29,8 @@ export {
 } from "./indexer.js";
 export { compileContext, renderContextPackMarkdown } from "./compiler.js";
 export { captureCodexHook } from "./hooks/codex.js";
+export { captureClaudeHook } from "./hooks/claude.js";
+export { createMcpServer, runMcpServer } from "./mcp/server.js";
 export {
   MAQAM_CONTEXT_ADAPTER_SCHEMA_VERSION,
   MAQAM_CONTEXT_APPEND_TOOL,

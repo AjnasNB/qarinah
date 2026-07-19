@@ -1,7 +1,7 @@
 {
   "name": "qarinah",
   "version": "0.1.0-alpha.0",
-  "description": "Opt-in, evidence-linked local context capture and compilation for Codex.",
+  "description": "Qarinah: opt-in, evidence-linked local context capture and compilation for Codex.",
   "author": {
     "name": "Ajnas NB",
     "email": "ajnasnb@gmail.com",
@@ -11,10 +11,11 @@
   "license": "UNLICENSED",
   "keywords": ["context", "provenance", "governance", "codex"],
   "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "Qarinah",
-    "shortDescription": "Evidence-linked context for every agent.",
-    "longDescription": "Capture explicitly permitted Codex lifecycle metadata into a local tamper-evident record and compile small cited context packs on demand.",
+    "shortDescription": "Opt-in, evidence-linked local context.",
+    "longDescription": "Qarinah captures explicitly permitted Codex lifecycle metadata into a local tamper-evident record. Read-only MCP tools report status and integrity; explicit local or Maqam-governed queries compile small cited context packs.",
     "developerName": "Ajnas NB",
     "category": "Productivity",
     "capabilities": ["Interactive", "Write"],
