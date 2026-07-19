@@ -2,6 +2,7 @@ import { canonicalStringify, deepFreezeJson } from "./canonical.js";
 import { CONTEXT_PACK_SCHEMA_VERSION, createManifestHash } from "./contracts.js";
 import { QarinahError } from "./errors.js";
 import { loadIndex, tokenize } from "./indexer.js";
+import { markdownDataBlock, markdownInline } from "./markdown.js";
 
 function compactData(data, maximum = 1_200) {
   const json = canonicalStringify(data);
@@ -70,16 +71,6 @@ function boundedReason(value) {
   return value.length <= 512 ? value : `${value.slice(0, 509)}...`;
 }
 
-function markdownInline(value) {
-  return String(value)
-    .replace(/[\r\n]+/g, " ")
-    .replace(/([\\`*_{}\[\]()<>#+.!|-])/g, "\\$1");
-}
-
-function markdownDataBlock(value) {
-  return String(value).split(/\r?\n/).map((line) => `    ${line}`).join("\n");
-}
-
 function itemFor(entry, excerpt) {
   return {
     eventId: entry.event.eventId,
@@ -115,7 +106,11 @@ function finalizePack(base, maxChars) {
 }
 
 export async function compileContext(query = "", options = {}) {
-  const { workspace, index } = await loadIndex(options.cwd || process.cwd());
+  const { workspace, index } = await loadIndex(options.cwd || process.cwd(), {
+    rebuild: options.rebuild,
+    updateCheckpoint: options.updateCheckpoint,
+    inMemory: options.inMemory === true
+  });
   const maxChars = options.maxChars ?? workspace.config.contextMaxChars;
   const limit = options.limit ?? 20;
   if (!Number.isSafeInteger(maxChars) || maxChars < 512 || maxChars > 1_000_000) {
@@ -185,7 +180,7 @@ export async function compileContext(query = "", options = {}) {
 
 export function renderContextPackMarkdown(pack) {
   const lines = [
-    "# Qarinah Context Pack",
+    "# Context Ledger Pack",
     "",
     `- Query: ${markdownInline(pack.query || "(latest context)")}`,
     `- Workspace: \`${pack.workspaceId}\``,

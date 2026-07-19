@@ -1,17 +1,22 @@
-import { canonicalStringify, sha256 } from "../canonical.js";
+import { canonicalStringify } from "../canonical.js";
 import { QarinahError } from "../errors.js";
 import { redactText, redactValue } from "../redact.js";
 import { loadWorkspace } from "../workspace.js";
 
 export function contentSummary(value) {
-  if (value === undefined || value === null) return Object.freeze({ present: false, chars: 0, hash: null });
+  if (value === undefined || value === null) return Object.freeze({ present: false, sizeClass: "none" });
   let serialized;
   try {
     serialized = typeof value === "string" ? redactText(value) : canonicalStringify(redactValue(value));
   } catch {
     serialized = "[UNSERIALIZABLE_INTEROP_VALUE]";
   }
-  return Object.freeze({ present: true, chars: serialized.length, hash: sha256(serialized) });
+  const sizeClass = serialized.length === 0 ? "empty"
+    : serialized.length <= 64 ? "tiny"
+      : serialized.length <= 1_024 ? "small"
+        : serialized.length <= 16_384 ? "medium"
+          : serialized.length <= 65_536 ? "large" : "very_large";
+  return Object.freeze({ present: true, sizeClass });
 }
 
 export function workspaceLocator(options = {}, label = "Interoperability options") {
@@ -35,7 +40,7 @@ export function workspaceLocator(options = {}, label = "Interoperability options
   let workspaceRoot;
   if (suppliedWorkspace !== undefined) {
     if (!suppliedWorkspace || typeof suppliedWorkspace !== "object" || Array.isArray(suppliedWorkspace)) {
-      throw new TypeError(`${label}.workspace must be a Qarinah workspace object.`);
+      throw new TypeError(`${label}.workspace must be a Context Ledger workspace object.`);
     }
     const root = Object.getOwnPropertyDescriptor(suppliedWorkspace, "root");
     if (!root?.enumerable || !Object.hasOwn(root, "value") || typeof root.value !== "string" || root.value.length === 0) {

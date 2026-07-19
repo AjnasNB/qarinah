@@ -46,6 +46,28 @@ test("poisoned derived indexes are rejected and rebuilt from verified events", a
   assert.equal(pack.items[0].title, "Safe approval decision");
 });
 
+test("stale graph and Markdown views cannot pass derived-state verification", async (t) => {
+  const root = await temporaryDirectory(t);
+  const workspace = await initializeWorkspace(root);
+  await appendEvent(eventInput({ title: "Verified view" }), { workspace });
+  await rebuildDerivedState(root);
+  const graphPath = path.join(workspace.qarinahDir, "graph", "graph.json");
+  const markdownPath = path.join(workspace.qarinahDir, "records", "CONTEXT.md");
+  const originalGraph = await readFile(graphPath, "utf8");
+
+  const graph = JSON.parse(originalGraph);
+  graph.nodes[0].title = "Poisoned graph";
+  await writeFile(graphPath, `${JSON.stringify(graph)}\n`, "utf8");
+  await assert.rejects(() => loadIndex(root, { rebuild: false }), (error) => error.code === "INDEX_STALE");
+
+  await writeFile(graphPath, originalGraph, "utf8");
+  await writeFile(markdownPath, "# stale\n", "utf8");
+  await assert.rejects(() => loadIndex(root, { rebuild: false }), (error) => error.code === "INDEX_STALE");
+
+  await loadIndex(root);
+  assert.match(await readFile(markdownPath, "utf8"), /Verified view/);
+});
+
 test("budget covers complete JSON and Markdown packs, including title-only records", async (t) => {
   const root = await temporaryDirectory(t);
   const workspace = await initializeWorkspace(root);
@@ -74,6 +96,28 @@ test("Markdown rendering preserves untrusted-data boundaries", async (t) => {
   assert.doesNotMatch(markdown, /\n# Injected heading/);
   assert.doesNotMatch(markdown, /\n# Ignore active policy/);
   assert.match(markdown, /    # Ignore active policy/);
+});
+
+test("Markdown rendering normalizes line separators and visibly escapes terminal controls", async (t) => {
+  const root = await temporaryDirectory(t);
+  const workspace = await initializeWorkspace(root);
+  await appendEvent(eventInput({
+    title: "Safe\r# escaped title\u001b]8;;https://evil.invalid\u0007",
+    body: "safe\r# escaped CR\u2028# escaped LS\u2029# escaped PS\u001b[31mred\u009b31m"
+  }), { workspace });
+  await rebuildDerivedState(root);
+  const pack = await compileContext("safe", { cwd: root, maxChars: 8_000 });
+  const packMarkdown = renderContextPackMarkdown(pack);
+  const recordMarkdown = await readFile(path.join(workspace.qarinahDir, "records", "CONTEXT.md"), "utf8");
+  for (const markdown of [packMarkdown, recordMarkdown]) {
+    assert.doesNotMatch(markdown, /[\r\u2028\u2029\u001b\u009b\u0007]/u);
+    assert.doesNotMatch(markdown, /\n# escaped/);
+    assert.match(markdown, /\\u001b/);
+    assert.match(markdown, /\\u009b/);
+  }
+  assert.match(packMarkdown, /    # escaped CR/);
+  assert.match(packMarkdown, /    # escaped LS/);
+  assert.match(packMarkdown, /    # escaped PS/);
 });
 
 test("context compiler is cited, reproducible, and budget bounded", async (t) => {

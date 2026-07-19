@@ -11,11 +11,11 @@
 
 ## Integration 0.2
 
-- Claude Code and generic JSONL adapters;
+- Claude Code plugin and generic JSONL adapters;
 - Maqam governed read/write tools;
 - validated Cockroach `SourceRecord` ingestion;
 - ProductLoop `ProvenanceSink` and `RunStore` implementation;
-- read-only local MCP server;
+- read-only local MCP server for Codex, Claude Code, and compatible hosts;
 - retention, contradiction, supersession, and per-agent disclosure policy.
 
 ## Governed control plane

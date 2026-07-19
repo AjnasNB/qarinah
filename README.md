@@ -1,8 +1,10 @@
 # Qarinah
 
-**Evidence-linked context for every agent.**
+**Evidence-linked context for AI agents.**
 
-Qarinah is a local-first context compiler for agent work. It records explicitly permitted prompts, tool activity, artifacts, decisions, approvals, and source references as a tamper-evident event chain; materializes a human-readable Markdown/JSON graph; and compiles a small, cited context pack for the next agent instead of sending an entire database or transcript.
+Qarinah is a local-first context compiler and evidence-linked context ledger for agent work. It records explicitly permitted prompts, tool activity, artifacts, decisions, approvals, and source references as a tamper-evident event chain; materializes a human-readable Markdown/JSON graph; and compiles a small, cited context pack for the next agent instead of sending an entire database or transcript.
+
+> Naming status: **Qarinah** is the selected working product name and `qarinah` remains the compatibility identifier for the package, CLI, schemas, and `.qarinah/` storage. A professional trademark and naming clearance is still required before public launch; no trademark availability is claimed. “Context ledger” is the product descriptor, not a second brand.
 
 > Private foundation status: this repository is intentionally `UNLICENSED` and non-publishable while the founder chooses the public licensing and trademark model. It is not yet a public release.
 
@@ -17,7 +19,7 @@ Qarinah is not a vector database, a hidden chain-of-thought recorder, an operati
 
 ## Quick start
 
-Requires Node.js 20.18.1 or newer.
+Requires a maintained Node.js 22, 24, or 26 release.
 
 ```powershell
 npm install
@@ -40,6 +42,7 @@ node bin/qarinah.js doctor
   records/CONTEXT.md   human-readable materialized context
   graph/graph.json     canonical nodes and typed edges
   index/index.json     disposable deterministic lexical index
+  index/event-ids/     checkpoint-authenticated idempotency projection
   snapshots/           reproducible context-pack manifests (reserved)
 ```
 
@@ -51,7 +54,8 @@ The event log is authoritative. Graphs, indexes, Markdown, and packs are derived
 | --- | --- |
 | `qarinah init [path]` | Explicitly opt a workspace into metadata or content capture |
 | `qarinah record ...` | Append a validated event |
-| `qarinah hook codex` | Normalize one Codex lifecycle event from stdin |
+| `qarinah hook codex\|claude` | Normalize one Codex or Claude Code lifecycle event from stdin |
+| `qarinah mcp` | Run the local zero-write MCP status and integrity-diagnostics server |
 | `qarinah build` | Verify and rebuild the graph, index, and Markdown record |
 | `qarinah query <text>` | Compile a bounded JSON or Markdown context pack |
 | `qarinah trust --capture <mode>` | Explicitly trust an existing workspace on this machine after review |
@@ -66,21 +70,25 @@ The event log is authoritative. Graphs, indexes, Markdown, and packs are derived
 - metadata-only capture by default;
 - recursive best-effort secret redaction and hard size/depth ceilings;
 - context is treated as untrusted data, never executable instructions;
-- owner-token append locking, linked-path rejection, hash chaining, a machine-local rollback checkpoint, and deterministic rebuilds;
-- exact derived-index comparison before any context is returned;
+- renewable owner-token append locking, linked-path rejection, hash chaining, a machine-local rollback checkpoint, a checkpoint-authenticated bucketed idempotency projection, and deterministic rebuilds;
+- exact persisted index/graph/Markdown comparison for CLI/MCP diagnostics, plus a verified in-memory projection for zero-write governed reads;
 - whole-output character budgets for both pretty JSON and Markdown packs;
 - no API key, model provider, daemon, browser session, or database required;
 - no hidden reasoning or chain-of-thought capture.
 
 Content-mode redaction cannot prove that arbitrary tool output contains no secret. Metadata mode is the safe default; future governed disclosure policy belongs in Maqam.
 
-## Codex plugin coverage
+## Codex and Claude Code coverage
 
-The committed plugin contains a generated, dependency-free Node runtime and never resolves Qarinah from `PATH`. Successful hooks emit no model-visible output. Full coverage targets the current eight Codex lifecycle schemas. Older Codex versions may expose only a subset; this machine's `0.128.0` build lacks `PreCompact`, `PostCompact`, and `SubagentStop`, so upgrade before testing those events.
+The committed Codex and Claude Code plugins contain generated, dependency-free Node runtimes and never resolve the compatibility CLI from `PATH`. Successful hooks emit no model-visible output. Both plugins bundle accurately annotated, zero-write `context_status` and `context_doctor` MCP tools. Automatic MCP context disclosure is intentionally absent until a Maqam-scoped disclosure capability exists; explicit compatibility-CLI queries remain available for user-directed local workflows.
+
+Codex coverage targets its current ten lifecycle schemas. Claude Code coverage includes session, prompt, tool, compaction, subagent, stop, and session-end events. Host adapters retain only allowlisted exposed fields, store the names—not values—of unknown future fields, and never parse transcript files. Model subscriptions or provider access remain a host concern; the ledger, hooks, MCP server, and deterministic retrieval require no separate API key.
 
 Codex hooks are observability, not total mediation. Hosted tools such as `WebSearch` do not emit local `PreToolUse` or `PostToolUse` hooks, and transcript files are deliberately not parsed because their format is unstable.
 
-See [architecture](docs/ARCHITECTURE.md), [security model](docs/SECURITY.md), [licensing decision](docs/LICENSE-STRATEGY.md), and [roadmap](docs/ROADMAP.md).
+See [architecture](docs/ARCHITECTURE.md), [host integrations](docs/HOST-INTEGRATIONS.md), [governed browser design](docs/GOVERNED-BROWSER.md), [security model](docs/SECURITY.md), [launch runbook](docs/LAUNCH.md), [licensing decision](docs/LICENSE-STRATEGY.md), and [roadmap](docs/ROADMAP.md).
+
+The private-alpha repository includes local marketplace catalogs for real cached installs in Codex and Claude Code. Review the generated plugin directories first, then follow the exact install, validation, reload, and uninstall guidance in the [host integration guide](docs/HOST-INTEGRATIONS.md). These local catalogs are test fixtures, not public marketplace releases.
 
 ## Optional interoperability
 

@@ -1,0 +1,18 @@
+{
+  "name": "qarinah",
+  "owner": {
+    "name": "Ajnas NB"
+  },
+  "metadata": {
+    "description": "Private-alpha Qarinah integrations for evidence-linked local agent context"
+  },
+  "plugins": [
+    {
+      "name": "qarinah",
+      "source": "./integrations/claude/qarinah",
+      "description": "Opt-in, evidence-linked local context capture and bounded retrieval for Claude Code",
+      "category": "productivity",
+      "tags": ["context", "provenance", "governance"]
+    }
+  ]
+}

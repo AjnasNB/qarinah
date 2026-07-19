@@ -1,19 +1,26 @@
 import path from "node:path";
-import { canonicalStringify, sha256 } from "../canonical.js";
+import { sha256 } from "../canonical.js";
 import { QarinahError } from "../errors.js";
-import { redactText, redactValue } from "../redact.js";
+import { snapshotJsonBoundary } from "../interoperability/boundary.js";
 import { appendEvent } from "../store.js";
 import { loadWorkspace } from "../workspace.js";
+import {
+  hookRetentionMetadata,
+  retainHookContent,
+  summarizeHookContent
+} from "./capture-content.js";
 
 const PERMISSION_MODES = new Set(["default", "acceptEdits", "plan", "dontAsk", "bypassPermissions"]);
 const EVENT_MAP = Object.freeze({
   SessionStart: { kind: "session.started", title: "Codex session started", actor: { type: "system", id: "codex" } },
   UserPromptSubmit: { kind: "prompt.submitted", title: "User prompt submitted", actor: { type: "human", id: "local-user" } },
   PreToolUse: { kind: "tool.requested", title: "Codex tool requested", actor: { type: "agent", id: "codex" } },
+  PermissionRequest: { kind: "approval", title: "Codex tool approval requested", actor: { type: "system", id: "codex" } },
   PostToolUse: { kind: "tool.completed", title: "Codex tool completed", actor: { type: "tool", id: "codex-tool" } },
   PreCompact: { kind: "compaction.started", title: "Codex context compaction started", actor: { type: "system", id: "codex" } },
   PostCompact: { kind: "compaction.completed", title: "Codex context compaction completed", actor: { type: "system", id: "codex" } },
   Stop: { kind: "turn.completed", title: "Codex turn completed", actor: { type: "agent", id: "codex" } },
+  SubagentStart: { kind: "session.started", title: "Codex subagent started", actor: { type: "agent", id: "codex-subagent" } },
   SubagentStop: { kind: "turn.completed", title: "Codex subagent completed", actor: { type: "agent", id: "codex-subagent" } }
 });
 
@@ -30,6 +37,10 @@ const SCHEMAS = Object.freeze({
     required: ["cwd", "hook_event_name", "model", "permission_mode", "session_id", "tool_input", "tool_name", "tool_use_id", "transcript_path", "turn_id"],
     optional: ["agent_id", "agent_type"]
   },
+  PermissionRequest: {
+    required: ["cwd", "hook_event_name", "model", "permission_mode", "session_id", "tool_input", "tool_name", "transcript_path", "turn_id"],
+    optional: ["agent_id", "agent_type"]
+  },
   PostToolUse: {
     required: ["cwd", "hook_event_name", "model", "permission_mode", "session_id", "tool_input", "tool_name", "tool_response", "tool_use_id", "transcript_path", "turn_id"],
     optional: ["agent_id", "agent_type"]
@@ -44,6 +55,10 @@ const SCHEMAS = Object.freeze({
   },
   Stop: {
     required: ["cwd", "hook_event_name", "last_assistant_message", "model", "permission_mode", "session_id", "stop_hook_active", "transcript_path", "turn_id"],
+    optional: []
+  },
+  SubagentStart: {
+    required: ["agent_id", "agent_type", "cwd", "hook_event_name", "model", "permission_mode", "session_id", "transcript_path", "turn_id"],
     optional: []
   },
   SubagentStop: {
@@ -92,31 +107,33 @@ function selected(input, names) {
   return output;
 }
 
-function contentSummary(value) {
-  if (value === undefined || value === null) return { present: false, chars: 0, hash: null };
-  let serialized;
-  try {
-    serialized = typeof value === "string" ? redactText(value) : canonicalStringify(redactValue(value));
-  } catch {
-    serialized = "[UNSERIALIZABLE_HOST_VALUE]";
-  }
-  return { present: true, chars: serialized.length, hash: sha256(serialized) };
-}
-
 function deterministicHookEventId(input) {
+  const stableIdentity = input.tool_use_id
+    ? { toolUseId: input.tool_use_id }
+    : (input.agent_id && input.hook_event_name.startsWith("Subagent")
+      ? { agentId: input.agent_id }
+      : (input.turn_id && ["UserPromptSubmit", "Stop"].includes(input.hook_event_name)
+        ? { turnId: input.turn_id }
+        : null));
+  if (!stableIdentity) return null;
   const digest = sha256({
     sessionId: input.session_id,
-    turnId: input.turn_id ?? null,
     event: input.hook_event_name,
-    toolUseId: input.tool_use_id ?? null,
-    agentId: input.agent_id ?? null,
-    source: input.source ?? null,
-    trigger: input.trigger ?? null
+    ...stableIdentity
   }).slice("sha256:".length, "sha256:".length + 32).split("");
   digest[12] = "4";
   digest[16] = "8";
   const value = digest.join("");
   return `evt_${value.slice(0, 8)}-${value.slice(8, 12)}-${value.slice(12, 16)}-${value.slice(16, 20)}-${value.slice(20)}`;
+}
+
+function bodyContentEntry(input) {
+  switch (input.hook_event_name) {
+    case "UserPromptSubmit": return ["prompt", input.prompt];
+    case "Stop":
+    case "SubagentStop": return ["assistantMessage", input.last_assistant_message];
+    default: return null;
+  }
 }
 
 function hookPayload(input, workspace) {
@@ -139,34 +156,44 @@ function hookPayload(input, workspace) {
     toolName: input.tool_name ?? null,
     toolUseId: input.tool_use_id ?? null,
     stopHookActive: input.stop_hook_active ?? null,
-    prompt: contentSummary(input.prompt),
-    toolInput: contentSummary(input.tool_input),
-    toolOutput: contentSummary(input.tool_response),
-    assistantMessage: contentSummary(input.last_assistant_message),
+    prompt: summarizeHookContent(input.prompt),
+    toolInput: summarizeHookContent(input.tool_input),
+    toolOutput: summarizeHookContent(input.tool_response),
+    assistantMessage: summarizeHookContent(input.last_assistant_message),
     transcriptAvailable: typeof input.transcript_path === "string" && input.transcript_path.length > 0,
     agentTranscriptAvailable: typeof input.agent_transcript_path === "string" && input.agent_transcript_path.length > 0
   };
-  const content = selected({
+  const contentValues = selected({
     prompt: input.prompt,
     toolInput: input.tool_input,
     toolOutput: input.tool_response,
     assistantMessage: input.last_assistant_message
   }, ["prompt", "toolInput", "toolOutput", "assistantMessage"]);
-  const data = workspace.config.capture === "content" ? { ...metadata, content } : metadata;
-  const bodySource = eventName === "UserPromptSubmit" ? input.prompt
-    : (["Stop", "SubagentStop"].includes(eventName) ? input.last_assistant_message : "");
+  const bodyEntry = bodyContentEntry(input);
+  let bodyRetention = null;
+  if (workspace.config.capture === "content" && bodyEntry && typeof bodyEntry[1] === "string") {
+    bodyRetention = retainHookContent(bodyEntry[1]);
+    delete contentValues[bodyEntry[0]];
+  }
+  const content = Object.fromEntries(
+    Object.entries(contentValues).map(([key, value]) => [key, retainHookContent(value)])
+  );
+  const data = workspace.config.capture === "content"
+    ? { ...metadata, content, bodyRetention: hookRetentionMetadata(bodyRetention) }
+    : metadata;
   const relations = input.tool_use_id
     ? [{ type: eventName === "PostToolUse" ? "derived_from" : "references", target: `toolcall:${input.tool_use_id}` }]
     : [];
-  const actor = eventName === "SubagentStop"
+  const actor = eventName.startsWith("Subagent")
     ? { type: "agent", id: input.agent_id }
     : (input.agent_id && mapping.actor.type === "agent" ? { type: "agent", id: input.agent_id } : mapping.actor);
+  const eventId = deterministicHookEventId(input);
   return {
-    eventId: deterministicHookEventId(input),
+    ...(eventId ? { eventId } : {}),
     kind: mapping.kind,
     actor,
     title: input.tool_name ? `${mapping.title}: ${input.tool_name}` : mapping.title,
-    body: workspace.config.capture === "content" && typeof bodySource === "string" ? bodySource : "",
+    body: bodyRetention?.text ?? "",
     data,
     confidence: "extracted",
     relations,
@@ -184,6 +211,13 @@ export async function captureCodexHook(input, options = {}) {
   if (!input || typeof input !== "object" || Array.isArray(input)) throw new TypeError("Codex hook input must be a JSON object.");
   const eventName = typeof input.hook_event_name === "string" ? input.hook_event_name : null;
   if (!Object.hasOwn(EVENT_MAP, eventName)) return Object.freeze({ captured: false, reason: "UNSUPPORTED_EVENT" });
+  input = snapshotJsonBoundary(input, {
+    label: `Codex ${eventName} hook input`,
+    maximumBytes: 1024 * 1024,
+    maximumStringLength: 512 * 1024,
+    maximumArrayLength: 10_000,
+    maximumObjectKeys: 2_000
+  });
   validateHookInput(input, eventName);
   let workspace;
   try {
@@ -194,6 +228,7 @@ export async function captureCodexHook(input, options = {}) {
     }
     throw error;
   }
-  const event = await appendEvent(hookPayload(input, workspace), { workspace, idempotent: true });
+  const payload = hookPayload(input, workspace);
+  const event = await appendEvent(payload, { workspace, idempotent: Object.hasOwn(payload, "eventId") });
   return Object.freeze({ captured: true, eventId: event.eventId, hash: event.hash });
 }

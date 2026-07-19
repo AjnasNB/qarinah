@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "context": {
+      "command": "node",
+      "args": ["./runtime/qarinah.mjs", "mcp"],
+      "cwd": "."
+    }
+  }
+}

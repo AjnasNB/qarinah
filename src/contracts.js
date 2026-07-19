@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { canonicalStringify, deepFreezeJson, sanitizeJsonValue, sha256 } from "./canonical.js";
+import { canonicalIsoTimestamp } from "./interoperability/boundary.js";
 import { redactText, redactValue } from "./redact.js";
 
 export const EVENT_SCHEMA_VERSION = "qarinah.event.v1";
@@ -68,12 +69,6 @@ function boundedString(value, label, maximum, { nullable = false, empty = false 
   return redactText(value);
 }
 
-function timestamp(value, label) {
-  const normalized = boundedString(value, label, 64);
-  if (!Number.isFinite(Date.parse(normalized))) throw new TypeError(`${label} must be a valid timestamp.`);
-  return new Date(normalized).toISOString();
-}
-
 function normalizeActor(value) {
   const actor = record(value, "actor", new Set(["type", "id"]));
   if (!ACTOR_TYPES.has(actor.type)) throw new TypeError("actor.type is invalid.");
@@ -100,7 +95,7 @@ function normalizeRetention(value = {}) {
   if (!RETENTION_CLASSES.has(retentionClass)) throw new TypeError("retention.class is invalid.");
   const expiresAt = retention.expiresAt === undefined || retention.expiresAt === null
     ? null
-    : timestamp(retention.expiresAt, "retention.expiresAt");
+    : canonicalIsoTimestamp(retention.expiresAt, "retention.expiresAt");
   return Object.freeze({ class: retentionClass, expiresAt });
 }
 
@@ -127,10 +122,14 @@ export function createEventEnvelope(input, options) {
   const eventId = candidate.eventId ?? `evt_${(options?.randomUUID || randomUUID)()}`;
   if (!EVENT_ID_PATTERN.test(eventId)) throw new TypeError("eventId is invalid.");
   const now = candidate.timestamp ?? (options?.clock ? options.clock() : new Date()).toISOString();
-  const eventTimestamp = timestamp(typeof now === "string" ? now : now.toISOString(), "timestamp");
+  const eventTimestamp = canonicalIsoTimestamp(typeof now === "string" ? now : now.toISOString(), "timestamp");
   const title = boundedString(candidate.title, "title", 512);
   const body = boundedString(candidate.body ?? "", "body", 65_536, { empty: true });
-  const data = redactValue(candidate.data ?? {}, { label: "data", maximumStringLength: 65_536, maximumObjectKeys: 128 });
+  const rawData = candidate.data ?? {};
+  if (!rawData || typeof rawData !== "object" || Array.isArray(rawData)) {
+    throw new TypeError("data must be a record.");
+  }
+  const data = redactValue(rawData, { label: "data", maximumStringLength: 65_536, maximumObjectKeys: 128 });
   const relations = normalizeRelations(candidate.relations);
   const content = { title, body, data, relations };
   const previousHash = options?.previousHash ?? null;
@@ -191,6 +190,9 @@ export function validateStoredEvent(value, options = {}) {
   });
   if (event.hash !== reconstructed.hash || !HASH_PATTERN.test(event.hash)) {
     throw new TypeError(`Event '${event.eventId}' hash does not match its canonical contents.`);
+  }
+  if (canonicalStringify(event) !== canonicalStringify(reconstructed)) {
+    throw new TypeError(`Event '${event.eventId}' stored representation is not canonical.`);
   }
   if (options.expectedPreviousHash !== undefined && event.previousHash !== options.expectedPreviousHash) {
     throw new TypeError(`Event '${event.eventId}' breaks hash-chain continuity.`);

@@ -1,0 +1,16 @@
+{
+  "name": "qarinah",
+  "version": "0.1.0-alpha.0",
+  "description": "Qarinah: opt-in, evidence-linked local context capture and bounded retrieval for Claude Code.",
+  "author": {
+    "name": "Ajnas NB",
+    "email": "ajnasnb@gmail.com",
+    "url": "https://github.com/AjnasNB"
+  },
+  "repository": "https://github.com/AjnasNB/qarinah",
+  "license": "UNLICENSED",
+  "keywords": ["context", "provenance", "governance", "claude-code"],
+  "skills": "./skills/",
+  "hooks": "./hooks/hooks.json",
+  "mcpServers": "./.mcp.json"
+}

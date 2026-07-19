@@ -1,11 +1,14 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { readFile, readdir, stat, writeFile } from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import {
   MAQAM_CONTEXT_APPEND_TOOL,
   MAQAM_CONTEXT_QUERY_TOOL,
   appendEvent,
+  captureCodexHook,
   cockroachSourceRecordToAcquisitionEventInput,
   cockroachSourceRecordToEventInput,
   createProductLoopProvenanceSink,
@@ -22,6 +25,47 @@ import {
 import { canonicalStringify, sha256 } from "../src/canonical.js";
 import { CANONICAL_ISO_TIMESTAMP_PATTERN } from "../src/interoperability/boundary.js";
 import { eventInput, temporaryDirectory } from "../test-support/helpers.js";
+
+function machineStateRoot() {
+  if (process.env.QARINAH_STATE_DIR) return path.resolve(process.env.QARINAH_STATE_DIR);
+  if (process.platform === "win32") {
+    return path.join(process.env.LOCALAPPDATA || path.join(os.homedir(), "AppData", "Local"), "Qarinah");
+  }
+  if (process.platform === "darwin") return path.join(os.homedir(), "Library", "Application Support", "Qarinah");
+  return path.join(process.env.XDG_STATE_HOME || path.join(os.homedir(), ".local", "state"), "qarinah");
+}
+
+function machineTrustPath(root) {
+  const resolved = path.resolve(root);
+  const normalized = process.platform === "win32" ? resolved.toLowerCase() : resolved;
+  const digest = createHash("sha256").update(normalized).digest("hex");
+  return path.join(machineStateRoot(), "trusted-workspaces", `${digest}.json`);
+}
+
+async function fileSnapshot(candidate) {
+  const [metadata, contents] = await Promise.all([stat(candidate, { bigint: true }), readFile(candidate)]);
+  return Object.freeze({
+    bytes: metadata.size.toString(),
+    mtimeNs: metadata.mtimeNs.toString(),
+    sha256: createHash("sha256").update(contents).digest("hex")
+  });
+}
+
+async function treeSnapshot(root) {
+  const result = Object.create(null);
+  async function visit(directory, relative = "") {
+    const entries = await readdir(directory, { withFileTypes: true });
+    entries.sort((left, right) => left.name.localeCompare(right.name));
+    for (const entry of entries) {
+      const childRelative = relative ? path.join(relative, entry.name) : entry.name;
+      const child = path.join(directory, entry.name);
+      if (entry.isDirectory()) await visit(child, childRelative);
+      else result[childRelative.replaceAll("\\", "/")] = await fileSnapshot(child);
+    }
+  }
+  await visit(root);
+  return result;
+}
 
 function approvalFor(input, runId = "default") {
   return {
@@ -90,15 +134,39 @@ function runtimeEvent({
 function fakeMaqam() {
   const tools = new Map();
   const evidence = [];
+  const activeExecutions = new WeakMap();
+  const executionRequired = (name) => Object.assign(
+    new Error(`Tool '${name}' must execute through its registered Maqam gateway.`),
+    { code: "MAQAM_EXECUTION_GUARD_REQUIRED" }
+  );
   const gateway = {
     registerTool(name, handler, metadata) {
       tools.set(name, { handler, metadata });
+      return this;
+    },
+    registerGuardedTool(name, factory, metadata) {
+      const identity = Object.freeze(Object.create(null));
+      const verifier = Object.freeze({
+        requireExecution(input, context) {
+          const active = activeExecutions.get(context);
+          if (!active
+            || active.identity !== identity
+            || active.name !== name
+            || active.input !== input) {
+            throw executionRequired(name);
+          }
+          return active.receipt;
+        }
+      });
+      const handler = factory(verifier);
+      tools.set(name, { handler, metadata, identity });
       return this;
     },
     async call(name, input, context = {}) {
       const registered = tools.get(name);
       if (!registered) throw new Error(`Unknown tool '${name}'.`);
       const runId = context.runId ?? "default";
+      const approvals = context.approvals ?? [];
       const scopedEvidence = {
         addBatch(batch) {
           const records = batch.evidence.map((item, index) => Object.freeze({
@@ -112,24 +180,74 @@ function fakeMaqam() {
           return Object.freeze({ evidence: Object.freeze(records), claims: Object.freeze([]) });
         }
       };
-      return registered.handler(input, {
+      const handlerContext = {
         ...context,
         runId,
         toolName: name,
-        approvals: context.approvals ?? [],
+        approvals,
         evidence: scopedEvidence
+      };
+      const receipt = Object.freeze({
+        schemaVersion: "maqam.tool-execution.v1",
+        toolName: name,
+        runId,
+        inputHash: sha256(canonicalStringify(input)).slice(7),
+        decision: Object.freeze({
+          status: approvals.length > 0 ? "needs_approval" : "allow",
+          scope: Object.freeze({ allowedOrigins: Object.freeze([]), originsExplicit: false })
+        }),
+        approvalIds: Object.freeze(approvals.map((approval) => approval.approvalId)),
+        approvalActions: Object.freeze(approvals.map((approval) => approval.action ?? `tool:${name}`))
       });
+      activeExecutions.set(handlerContext, {
+        identity: registered.identity,
+        name,
+        input,
+        receipt
+      });
+      try {
+        return await registered.handler(input, handlerContext);
+      } finally {
+        activeExecutions.delete(handlerContext);
+      }
     }
   };
-  const defineToolAdapter = (spec) => {
-    assert.equal(spec.schemaVersion, "maqam.tool-adapter.v1");
-    assert.deepEqual(spec.invoke.governance.effects, spec.effects);
-    assert.equal(spec.invoke.governance.risk, spec.risk);
-    return Object.freeze(spec);
-  };
-  const registerToolAdapter = (target, adapter) => target.registerTool(adapter.name, adapter.invoke, adapter.metadata);
-  return { gateway, defineToolAdapter, registerToolAdapter, tools, evidence };
+  return { gateway, tools, evidence };
 }
+
+test("Codex hook capture is immediately queryable through Maqam without persisted-state writes", async (t) => {
+  const root = await temporaryDirectory(t);
+  const workspace = await initializeWorkspace(root);
+  const captured = await captureCodexHook({
+    cwd: root,
+    hook_event_name: "UserPromptSubmit",
+    model: "gpt-5.6",
+    permission_mode: "default",
+    prompt: "Prepare the Qarinah launch decision with governed context.",
+    session_id: "session_hook_to_maqam",
+    transcript_path: null,
+    turn_id: "turn_hook_to_maqam"
+  });
+  assert.equal(captured.captured, true);
+
+  const before = {
+    workspace: await treeSnapshot(workspace.qarinahDir),
+    trust: await fileSnapshot(machineTrustPath(workspace.root))
+  };
+  const maqam = fakeMaqam();
+  registerMaqamContextAdapters({ gateway: maqam.gateway, cwd: root, maxChars: 20_000, maxItems: 10 });
+  const queried = await maqam.gateway.call("context.query", { query: "User prompt submitted" }, {
+    runId: "run_hook_to_maqam"
+  });
+  assert.ok(queried.pack.items.some((item) => item.eventId === captured.eventId));
+  assert.ok(queried.evidence.some((item) => item.source.includes(captured.eventId)));
+
+  const after = {
+    workspace: await treeSnapshot(workspace.qarinahDir),
+    trust: await fileSnapshot(machineTrustPath(workspace.root))
+  };
+  assert.deepEqual(after, before);
+});
 
 test("Maqam adapters preserve separate read/write governance and scoped evidence", async (t) => {
   const root = await temporaryDirectory(t);
@@ -140,8 +258,6 @@ test("Maqam adapters preserve separate read/write governance and scoped evidence
 
   const registration = registerMaqamContextAdapters({
     gateway: maqam.gateway,
-    defineToolAdapter: maqam.defineToolAdapter,
-    registerToolAdapter: maqam.registerToolAdapter,
     cwd: root,
     maxChars: 20_000,
     maxItems: 10
@@ -175,6 +291,14 @@ test("Maqam adapters preserve separate read/write governance and scoped evidence
     /unknown field/
   );
 
+  const indexPath = path.join(root, ".qarinah", "index", "index.json");
+  const poisonedIndex = `${(await readFile(indexPath, "utf8")).replace('"eventCount":1', '"eventCount":0')}`;
+  await writeFile(indexPath, poisonedIndex, "utf8");
+  const memoryQueried = await maqam.gateway.call("context.query", { query: "release" }, { runId: "run_stale_query" });
+  assert.equal(memoryQueried.pack.items[0].eventId, queried.pack.items[0].eventId);
+  assert.equal(await readFile(indexPath, "utf8"), poisonedIndex);
+  await rebuildDerivedState(root);
+
   const before = (await readEvents(root)).length;
   await assert.rejects(
     maqam.gateway.call("context.append", { event: eventInput({ title: "Unapproved write" }) }, { runId: "run_append" }),
@@ -192,7 +316,7 @@ test("Maqam adapters preserve separate read/write governance and scoped evidence
       approvals: [forged],
       evidence: { addBatch: (batch) => ({ evidence: batch.evidence, claims: [] }) }
     }),
-    (error) => error.code === "MAQAM_APPROVAL_SCOPE_MISMATCH"
+    (error) => error.code === "MAQAM_EXECUTION_GUARD_REQUIRED"
   );
 
   const contentRequest = {
@@ -241,8 +365,6 @@ test("Maqam content append requires both exact approval and content capture cons
   const maqam = fakeMaqam();
   registerMaqamContextAdapters({
     gateway: maqam.gateway,
-    defineToolAdapter: maqam.defineToolAdapter,
-    registerToolAdapter: maqam.registerToolAdapter,
     cwd: root
   });
   const input = {

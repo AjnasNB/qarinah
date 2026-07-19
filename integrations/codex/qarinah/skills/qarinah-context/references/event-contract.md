@@ -1,6 +1,6 @@
-# Qarinah event contract
+# Context Ledger event contract
 
-Qarinah stores versioned event envelopes in `.qarinah/events/events.jsonl`.
+Context Ledger stores versioned event envelopes in the compatibility path `.qarinah/events/events.jsonl`.
 
 ## Confidence
 

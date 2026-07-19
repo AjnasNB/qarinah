@@ -70,12 +70,16 @@ async function atomicWrite(destination, contents) {
 function validateCheckpoint(value) {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new QarinahError("TRUST_INVALID", "Trust checkpoint is invalid.");
   const keys = Object.keys(value);
-  if (keys.some((key) => !["eventCount", "headHash", "logBytes", "updatedAt"].includes(key))) {
+  if (keys.some((key) => !["eventCount", "headHash", "logBytes", "eventIdIndexHash", "updatedAt"].includes(key))) {
     throw new QarinahError("TRUST_INVALID", "Trust checkpoint contains unknown fields.");
   }
   if (!Number.isSafeInteger(value.eventCount) || value.eventCount < 0) throw new QarinahError("TRUST_INVALID", "Trust eventCount is invalid.");
   if (!Number.isSafeInteger(value.logBytes) || value.logBytes < 0) throw new QarinahError("TRUST_INVALID", "Trust logBytes is invalid.");
   if (value.headHash !== null && !HASH_PATTERN.test(value.headHash)) throw new QarinahError("TRUST_INVALID", "Trust headHash is invalid.");
+  const eventIdIndexHash = value.eventIdIndexHash ?? null;
+  if (eventIdIndexHash !== null && !HASH_PATTERN.test(eventIdIndexHash)) {
+    throw new QarinahError("TRUST_INVALID", "Trust eventIdIndexHash is invalid.");
+  }
   if ((value.eventCount === 0) !== (value.headHash === null)) throw new QarinahError("TRUST_INVALID", "Trust checkpoint head/count disagree.");
   if (typeof value.updatedAt !== "string" || !Number.isFinite(Date.parse(value.updatedAt))) {
     throw new QarinahError("TRUST_INVALID", "Trust checkpoint timestamp is invalid.");
@@ -84,6 +88,7 @@ function validateCheckpoint(value) {
     eventCount: value.eventCount,
     headHash: value.headHash,
     logBytes: value.logBytes,
+    eventIdIndexHash,
     updatedAt: new Date(value.updatedAt).toISOString()
   });
 }
@@ -123,6 +128,7 @@ export async function grantWorkspaceConsent(root, config, checkpoint = {}) {
       eventCount: checkpoint.eventCount ?? 0,
       headHash: checkpoint.headHash ?? null,
       logBytes: checkpoint.logBytes ?? 0,
+      eventIdIndexHash: checkpoint.eventIdIndexHash ?? null,
       updatedAt: checkpoint.updatedAt ?? now
     }
   };
@@ -134,7 +140,7 @@ export async function grantWorkspaceConsent(root, config, checkpoint = {}) {
 export async function readWorkspaceConsent(root, config) {
   const candidate = trustPath(root);
   if (!(await exists(candidate))) {
-    throw new QarinahError("WORKSPACE_NOT_TRUSTED", "This machine has not approved Qarinah capture for this workspace. Run `qarinah trust --capture <mode>` after review.");
+    throw new QarinahError("WORKSPACE_NOT_TRUSTED", "This machine has not approved Context Ledger capture for this workspace. Run `qarinah trust --capture <mode>` after review.");
   }
   const metadata = await stat(candidate);
   if (!metadata.isFile() || metadata.size > MAX_TRUST_BYTES) throw new QarinahError("TRUST_INVALID", "Workspace trust record is not a bounded regular file.");

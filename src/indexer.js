@@ -1,6 +1,7 @@
 import { readFile, stat } from "node:fs/promises";
 import { canonicalStringify, deepFreezeJson } from "./canonical.js";
 import { QarinahError } from "./errors.js";
+import { markdownDataBlock, markdownInline } from "./markdown.js";
 import { readEvents } from "./store.js";
 import { atomicWriteFile, loadWorkspace, secureStoragePath } from "./workspace.js";
 
@@ -11,16 +12,6 @@ const STOP_WORDS = new Set([
   "a", "an", "and", "are", "as", "at", "be", "by", "for", "from", "has", "in", "is", "it", "of",
   "on", "or", "that", "the", "this", "to", "was", "were", "will", "with"
 ]);
-
-function markdownInline(value) {
-  return String(value)
-    .replace(/[\r\n]+/g, " ")
-    .replace(/([\\`*_{}\[\]()<>#+.!|-])/g, "\\$1");
-}
-
-function markdownDataBlock(value) {
-  return String(value).split(/\r?\n/).map((line) => `    ${line}`).join("\n");
-}
 
 export function tokenize(value) {
   return [...new Set(String(value).normalize("NFKC").toLowerCase().match(/[\p{L}\p{N}][\p{L}\p{N}_-]{1,63}/gu) || [])]
@@ -112,7 +103,7 @@ export function buildDerivedState(events, workspaceId) {
 
 function markdownFor(events, workspaceId, headHash) {
   const lines = [
-    "# Qarinah Context Record",
+    "# Context Ledger Record",
     "",
     `- Workspace: \`${workspaceId}\``,
     `- Events: ${events.length}`,
@@ -182,13 +173,19 @@ async function readBoundedIndex(indexPath, maximumBytes) {
 
 export async function loadIndex(start = process.cwd(), options = {}) {
   const workspace = await loadWorkspace(start);
+  if (options.inMemory === true) {
+    const events = await readEvents(workspace, { updateCheckpoint: options.updateCheckpoint !== false });
+    const expected = buildDerivedState(events, workspace.config.workspaceId);
+    return Object.freeze({ workspace, index: expected.index });
+  }
+  const rebuild = options.rebuild !== false && options.updateCheckpoint !== false;
   const indexPath = await secureStoragePath(workspace, ["index", "index.json"], { type: "file", allowMissing: true });
   const maximumIndexBytes = Math.min(256 * 1024 * 1024, workspace.config.maxLogBytes * 4);
   let index;
   try {
     index = await readBoundedIndex(indexPath, maximumIndexBytes);
   } catch (error) {
-    if (error?.code === "ENOENT" && options.rebuild !== false) {
+    if (error?.code === "ENOENT" && rebuild) {
       await rebuildDerivedState(workspace.root);
       index = await readBoundedIndex(indexPath, maximumIndexBytes);
     } else {
@@ -198,10 +195,30 @@ export async function loadIndex(start = process.cwd(), options = {}) {
   if (index.schemaVersion !== INDEX_SCHEMA_VERSION || index.workspaceId !== workspace.config.workspaceId) {
     throw new QarinahError("INDEX_INVALID", "Derived index has an unsupported schema or workspace id.");
   }
-  const events = await readEvents(workspace);
+  const events = await readEvents(workspace, { updateCheckpoint: options.updateCheckpoint !== false });
   const expected = buildDerivedState(events, workspace.config.workspaceId);
+  let persistedViewsCurrent = true;
   if (canonicalStringify(index) !== canonicalStringify(expected.index)) {
-    if (options.rebuild === false) throw new QarinahError("INDEX_STALE", "Derived index does not exactly match the verified event log.");
+    persistedViewsCurrent = false;
+  }
+  try {
+    const graphPath = await secureStoragePath(workspace, ["graph", "graph.json"], { type: "file" });
+    const graph = await readBoundedIndex(graphPath, Math.min(256 * 1024 * 1024, workspace.config.maxLogBytes * 4));
+    const markdownPath = await secureStoragePath(workspace, ["records", "CONTEXT.md"], { type: "file" });
+    const markdownMetadata = await stat(markdownPath);
+    if (!markdownMetadata.isFile() || markdownMetadata.size > Math.min(16 * 1024 * 1024, workspace.config.maxLogBytes)) {
+      throw new QarinahError("INDEX_INVALID", "Derived Markdown record is not a bounded regular file.");
+    }
+    const markdown = await readFile(markdownPath, "utf8");
+    persistedViewsCurrent = persistedViewsCurrent
+      && canonicalStringify(graph) === canonicalStringify(expected.graph)
+      && markdown === markdownFor(events, workspace.config.workspaceId, expected.index.headHash);
+  } catch (error) {
+    if (error?.code !== "ENOENT") throw error;
+    persistedViewsCurrent = false;
+  }
+  if (!persistedViewsCurrent) {
+    if (!rebuild) throw new QarinahError("INDEX_STALE", "Persisted index, graph, or Markdown does not exactly match the verified event log.");
     await rebuildDerivedState(workspace.root);
   }
   return Object.freeze({ workspace, index: expected.index });
