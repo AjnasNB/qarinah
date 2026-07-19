@@ -5,7 +5,10 @@ import { spawn } from "node:child_process";
 
 const stateDirectory = await mkdtemp(path.join(os.tmpdir(), "qarinah-test-state-"));
 try {
-  const child = spawn(process.execPath, ["--test"], {
+  // Test files deliberately mutate the shared machine-trust fixture. Keep files
+  // isolated from one another; concurrency is exercised explicitly by the
+  // multi-process append tests with separate workspace roots.
+  const child = spawn(process.execPath, ["--test", "--test-concurrency=1"], {
     cwd: process.cwd(),
     env: { ...process.env, QARINAH_STATE_DIR: stateDirectory },
     stdio: "inherit",
