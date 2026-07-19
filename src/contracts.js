@@ -40,11 +40,11 @@ const ACTOR_TYPES = new Set(["human", "agent", "tool", "system", "source"]);
 const RETENTION_CLASSES = new Set(["session", "project", "durable"]);
 const INPUT_KEYS = new Set([
   "eventId", "timestamp", "sessionId", "turnId", "kind", "actor", "title", "body", "data",
-  "confidence", "relations", "provenance", "retention"
+  "confidence", "authority", "relations", "provenance", "retention"
 ]);
 const STORED_KEYS = new Set([
   "schemaVersion", "eventId", "timestamp", "workspaceId", "sessionId", "turnId", "kind", "actor",
-  "title", "body", "data", "confidence", "relations", "provenance", "retention", "previousHash", "hash"
+  "title", "body", "data", "confidence", "authority", "relations", "provenance", "retention", "previousHash", "hash"
 ]);
 const EVENT_ID_PATTERN = /^evt_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 const WORKSPACE_ID_PATTERN = /^ws_[0-9a-f]{32}$/;
@@ -89,6 +89,34 @@ function normalizeRelations(value = []) {
   }));
 }
 
+function normalizeAuthority(value) {
+  if (value === undefined || value === null) return null;
+  const authority = record(value, "authority", new Set([
+    "scope", "rank", "assignedBy", "assignedAt", "expiresAt", "revokedAt", "basis"
+  ]));
+  const assignedAt = canonicalIsoTimestamp(authority.assignedAt, "authority.assignedAt");
+  const expiresAt = authority.expiresAt === undefined || authority.expiresAt === null
+    ? null
+    : canonicalIsoTimestamp(authority.expiresAt, "authority.expiresAt");
+  const revokedAt = authority.revokedAt === undefined || authority.revokedAt === null
+    ? null
+    : canonicalIsoTimestamp(authority.revokedAt, "authority.revokedAt");
+  if (expiresAt !== null && expiresAt < assignedAt) throw new TypeError("authority.expiresAt cannot precede authority.assignedAt.");
+  if (revokedAt !== null && revokedAt < assignedAt) throw new TypeError("authority.revokedAt cannot precede authority.assignedAt.");
+  if (!Number.isSafeInteger(authority.rank) || authority.rank < 0 || authority.rank > 100) {
+    throw new TypeError("authority.rank must be an integer from 0 to 100.");
+  }
+  return Object.freeze({
+    scope: boundedString(authority.scope, "authority.scope", 256),
+    rank: authority.rank,
+    assignedBy: boundedString(authority.assignedBy, "authority.assignedBy", 256),
+    assignedAt,
+    expiresAt,
+    revokedAt,
+    basis: boundedString(authority.basis ?? "host-assigned", "authority.basis", 512)
+  });
+}
+
 function normalizeRetention(value = {}) {
   const retention = record(value, "retention", new Set(["class", "expiresAt"]));
   const retentionClass = retention.class ?? "project";
@@ -131,7 +159,8 @@ export function createEventEnvelope(input, options) {
   }
   const data = redactValue(rawData, { label: "data", maximumStringLength: 65_536, maximumObjectKeys: 128 });
   const relations = normalizeRelations(candidate.relations);
-  const content = { title, body, data, relations };
+  const authority = normalizeAuthority(candidate.authority);
+  const content = { title, body, data, ...(authority === null ? {} : { authority }), relations };
   const previousHash = options?.previousHash ?? null;
   if (previousHash !== null && !HASH_PATTERN.test(previousHash)) throw new TypeError("previousHash is invalid.");
   const confidence = candidate.confidence ?? "extracted";
@@ -153,6 +182,7 @@ export function createEventEnvelope(input, options) {
     body,
     data,
     confidence,
+    ...(authority === null ? {} : { authority }),
     relations,
     provenance: normalizeProvenance(candidate.provenance, content),
     retention: normalizeRetention(candidate.retention),
@@ -180,6 +210,7 @@ export function validateStoredEvent(value, options = {}) {
     body: event.body,
     data: event.data,
     confidence: event.confidence,
+    ...(event.authority === undefined ? {} : { authority: event.authority }),
     relations: event.relations,
     provenance: event.provenance,
     retention: event.retention

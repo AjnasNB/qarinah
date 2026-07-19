@@ -144,7 +144,41 @@ test("event and context timestamps share one canonical calendar-valid contract",
 
   assert.equal(EVENT_SCHEMA.properties.timestamp.pattern, CANONICAL_ISO_TIMESTAMP_PATTERN);
   assert.equal(EVENT_SCHEMA.properties.retention.properties.expiresAt.pattern, CANONICAL_ISO_TIMESTAMP_PATTERN);
+  assert.equal(EVENT_SCHEMA.properties.authority.properties.assignedAt.pattern, CANONICAL_ISO_TIMESTAMP_PATTERN);
+  assert.equal(EVENT_SCHEMA.properties.authority.properties.expiresAt.pattern, CANONICAL_ISO_TIMESTAMP_PATTERN);
+  assert.equal(EVENT_SCHEMA.properties.authority.properties.revokedAt.pattern, CANONICAL_ISO_TIMESTAMP_PATTERN);
   assert.equal(CONTEXT_PACK_SCHEMA.properties.items.items.properties.timestamp.pattern, CANONICAL_ISO_TIMESTAMP_PATTERN);
+});
+
+test("authority is scoped, time-bounded, host-assigned metadata", () => {
+  const authority = {
+    scope: "release-policy",
+    rank: 80,
+    assignedBy: "policy-owner",
+    assignedAt: "2026-07-18T00:00:00.000Z",
+    expiresAt: "2026-08-18T00:00:00.000Z",
+    revokedAt: null,
+    basis: "reviewed registry entry"
+  };
+  const event = createEventEnvelope(eventInput({ authority }), {
+    workspaceId: WORKSPACE_ID,
+    previousHash: null,
+    randomUUID: () => UUID
+  });
+  assert.deepEqual(event.authority, authority);
+  assert.deepEqual(validateStoredEvent(event, { workspaceId: WORKSPACE_ID }), event);
+  assert.throws(
+    () => createEventEnvelope(eventInput({ authority: { ...authority, rank: 101 } }), { workspaceId: WORKSPACE_ID }),
+    /authority\.rank/
+  );
+  assert.throws(
+    () => createEventEnvelope(eventInput({ authority: { ...authority, expiresAt: "2026-07-17T00:00:00.000Z" } }), { workspaceId: WORKSPACE_ID }),
+    /cannot precede/
+  );
+  assert.throws(
+    () => validateStoredEvent({ ...event, authority: { ...event.authority, rank: 10 } }, { workspaceId: WORKSPACE_ID }),
+    /contentHash does not match|hash does not match/
+  );
 });
 
 test("returned envelopes are deeply immutable", () => {

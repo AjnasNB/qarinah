@@ -48,6 +48,9 @@ try {
     "  createProductLoopProvenanceSink,",
     "  ingestCockroachSourceRecord,",
     "  initializeWorkspace,",
+    "  inspectWorkspacePolicy,",
+    "  approveWorkspaceTrust,",
+    "  exportOkf,",
     "  registerMaqamContextAdapters,",
     "  createMcpServer,",
     "  validateCockroachSourceRecordBoundary,",
@@ -56,7 +59,9 @@ try {
     "  type MaqamGuardedToolGateway,",
     "  type ProductLoopProvenanceSink,",
     "  type ProductLoopRuntimeEventBoundary,",
-    "  type QarinahContextPack",
+    "  type QarinahContextPack,",
+    "  type QarinahCapturePolicy,",
+    "  type QarinahOkfExportResult",
     "} from \"qarinah\";",
     "import { captureCodexHook } from \"qarinah/codex\";",
     "import { captureClaudeHook } from \"qarinah/claude\";",
@@ -64,6 +69,11 @@ try {
     "// @ts-expect-error The Codex subpath exposes only the hook adapter.",
     "import { initializeWorkspace as invalidCodexExport } from \"qarinah/codex\";",
     "void initializeWorkspace;",
+    "const requestedPolicy: Promise<QarinahCapturePolicy> = inspectWorkspacePolicy();",
+    "void requestedPolicy;",
+    "void approveWorkspaceTrust;",
+    "const okfExport: Promise<QarinahOkfExportResult> = exportOkf({ output: 'docs/knowledge' });",
+    "void okfExport;",
     "void captureCodexHook;",
     "void captureClaudeHook;",
     "void createMcpServer;",
@@ -101,7 +111,7 @@ try {
   const checked = await runNode([typeScriptCli, "--project", path.join(temporaryDirectory, "tsconfig.json")], temporaryDirectory);
   assert.equal(checked.code, 0, `${checked.stdout}\n${checked.stderr}`);
   const installedPackage = JSON.parse(await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "package.json"), "utf8"));
-  assert.equal(installedPackage.version, "0.1.0-alpha.0");
+  assert.equal(installedPackage.version, "0.1.0-alpha.1");
   process.stdout.write("Clean consumer TypeScript contract passed.\n");
 } finally {
   await rm(temporaryDirectory, { recursive: true, force: true });

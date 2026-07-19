@@ -1,9 +1,14 @@
 import { randomBytes } from "node:crypto";
 import { constants } from "node:fs";
-import { access, lstat, mkdir, open, readFile, realpath, rename, rm } from "node:fs/promises";
+import { access, lstat, mkdir, open, realpath, rename, rm } from "node:fs/promises";
 import path from "node:path";
 import { sanitizeJsonValue } from "./canonical.js";
-import { grantWorkspaceConsent, readWorkspaceConsent, revokeWorkspaceConsent } from "./consent.js";
+import {
+  grantWorkspaceConsent,
+  readWorkspaceConsent,
+  revokeWorkspaceConsent,
+  updateWorkspaceEnabledConsent
+} from "./consent.js";
 import { QarinahError } from "./errors.js";
 
 export const CONFIG_SCHEMA_VERSION = "qarinah.config.v1";
@@ -57,14 +62,6 @@ async function ensureSafeDirectory(candidate, root, label) {
   return actual;
 }
 
-async function assertSafeRegularFile(candidate, root, label) {
-  const metadata = await safeLstat(candidate, label);
-  if (!metadata.isFile()) throw new QarinahError("WORKSPACE_INVALID", `${label} must be a regular file.`);
-  const actual = await realpath(candidate);
-  if (!isWithin(root, actual)) throw new QarinahError("PATH_OUTSIDE_WORKSPACE", `${label} resolves outside the workspace root.`);
-  return metadata;
-}
-
 export async function atomicWriteFile(destination, contents, options = {}) {
   const directory = path.dirname(destination);
   await mkdir(directory, { recursive: true });
@@ -115,12 +112,65 @@ export async function secureStoragePath(workspace, segments, options = {}) {
     if (final && options.type === "file" && !metadata.isFile()) {
       throw new QarinahError("WORKSPACE_INVALID", `.qarinah/${segments.join("/")} must be a regular file.`);
     }
+    if (final && options.type === "file" && metadata.nlink !== 1) {
+      throw new QarinahError("STORAGE_LINK_REJECTED", `.qarinah/${segments.join("/")} cannot have multiple filesystem links.`);
+    }
     const actual = await realpath(current);
     if (!isWithin(workspace.qarinahDir, actual)) {
       throw new QarinahError("PATH_OUTSIDE_WORKSPACE", `.qarinah/${segments.slice(0, index + 1).join("/")} resolves outside the workspace.`);
     }
   }
   return candidate;
+}
+
+async function verifyOpenedStorageFile(workspace, segments, candidate, handle) {
+  const label = `.qarinah/${segments.join("/")}`;
+  const opened = await handle.stat({ bigint: true });
+  if (!opened.isFile() || opened.nlink !== 1n) {
+    throw new QarinahError("STORAGE_LINK_REJECTED", `${label} is not a singly linked regular file.`);
+  }
+  const named = await lstat(candidate, { bigint: true });
+  if (named.isSymbolicLink() || !named.isFile() || named.nlink !== 1n) {
+    throw new QarinahError("STORAGE_LINK_REJECTED", `${label} changed to a linked or non-regular file.`);
+  }
+  if (opened.dev !== named.dev || opened.ino !== named.ino) {
+    throw new QarinahError("STORAGE_RACE_DETECTED", `${label} changed while it was being opened.`);
+  }
+  const actual = await realpath(candidate);
+  if (!isWithin(workspace.qarinahDir, actual)) {
+    throw new QarinahError("PATH_OUTSIDE_WORKSPACE", `${label} resolves outside the workspace.`);
+  }
+  if (opened.size > BigInt(Number.MAX_SAFE_INTEGER)) {
+    throw new QarinahError("STORAGE_LIMIT_EXCEEDED", `${label} is too large to read safely.`);
+  }
+  return Object.freeze({ size: Number(opened.size), dev: opened.dev, ino: opened.ino });
+}
+
+export async function openSecureReadFile(workspace, segments) {
+  const candidate = await secureStoragePath(workspace, segments, { type: "file" });
+  const flags = constants.O_RDONLY | (Number.isInteger(constants.O_NOFOLLOW) ? constants.O_NOFOLLOW : 0);
+  const handle = await open(candidate, flags);
+  try {
+    const metadata = await verifyOpenedStorageFile(workspace, segments, candidate, handle);
+    return Object.freeze({ handle, metadata });
+  } catch (error) {
+    await handle.close();
+    throw error;
+  }
+}
+
+export async function openSecureAppendFile(workspace, segments) {
+  const candidate = await secureStoragePath(workspace, segments, { type: "file" });
+  const flags = constants.O_RDWR | constants.O_APPEND
+    | (Number.isInteger(constants.O_NOFOLLOW) ? constants.O_NOFOLLOW : 0);
+  const handle = await open(candidate, flags, 0o600);
+  try {
+    const metadata = await verifyOpenedStorageFile(workspace, segments, candidate, handle);
+    return Object.freeze({ handle, metadata });
+  } catch (error) {
+    await handle.close();
+    throw error;
+  }
 }
 
 function validateConfig(raw) {
@@ -220,13 +270,22 @@ export async function loadWorkspace(start = process.cwd(), options = {}) {
     throw new QarinahError("PATH_OUTSIDE_WORKSPACE", ".qarinah resolves outside the workspace root.", { qarinahDir });
   }
   const configPath = resolveWithin(qarinahDir, "config.json");
-  const configMetadata = await assertSafeRegularFile(configPath, qarinahDir, ".qarinah/config.json");
-  if (configMetadata.size > MAX_CONFIG_BYTES) throw new QarinahError("CONFIG_INVALID", "Context Ledger config exceeds the size limit.");
+  const configRead = await openSecureReadFile({ qarinahDir }, ["config.json"]);
+  if (configRead.metadata.size > MAX_CONFIG_BYTES) {
+    await configRead.handle.close();
+    throw new QarinahError("CONFIG_INVALID", "Context Ledger config exceeds the size limit.");
+  }
   let configRaw;
   try {
-    configRaw = JSON.parse(await readFile(configPath, "utf8"));
+    const contents = await configRead.handle.readFile();
+    if (contents.length !== configRead.metadata.size) {
+      throw new QarinahError("CONFIG_INVALID", "Context Ledger config changed while it was being read.");
+    }
+    configRaw = JSON.parse(contents.toString("utf8"));
   } catch (error) {
     throw new QarinahError("CONFIG_INVALID", "Context Ledger config is not valid JSON.", { cause: error.message });
+  } finally {
+    await configRead.handle.close();
   }
   const config = validateConfig(configRaw);
   if (!config.enabled && options.allowDisabled !== true) {
@@ -250,16 +309,42 @@ export async function loadWorkspace(start = process.cwd(), options = {}) {
 }
 
 export async function setWorkspaceEnabled(start, enabled) {
-  const workspace = await loadWorkspace(start, { allowDisabled: true });
   if (typeof enabled !== "boolean") throw new TypeError("enabled must be a boolean.");
-  const next = { ...workspace.config, enabled };
-  await secureStoragePath(workspace, ["config.json"], { type: "file" });
-  await atomicWriteFile(workspace.configPath, `${JSON.stringify(next, null, 2)}\n`);
-  return Object.freeze(next);
+  let workspace = await loadWorkspace(start, { allowDisabled: true, skipConsent: true });
+  // Policy transitions share the append lock. An append that loaded the old
+  // policy before this operation must re-check the permit after it acquires the
+  // lock, while disable/revoke cannot race a checkpoint write that recreates an
+  // obsolete authorization record.
+  const { acquireWorkspaceWriteLock } = await import("./store.js");
+  const release = await acquireWorkspaceWriteLock(workspace);
+  try {
+    workspace = await loadWorkspace(workspace.root, { allowDisabled: true, skipConsent: true });
+    const next = Object.freeze({ ...workspace.config, enabled });
+    await secureStoragePath(workspace, ["config.json"], { type: "file" });
+    if (enabled) {
+      // Portable enablement is written first. Until the machine permit is
+      // updated, the mismatch fails closed; rerunning `enable` recovers it.
+      await atomicWriteFile(workspace.configPath, `${JSON.stringify(next, null, 2)}\n`);
+      await updateWorkspaceEnabledConsent(workspace.root, next, true);
+    } else {
+      // Machine-local revocation is written first. A crash can leave portable
+      // config enabled, but it cannot leave capture authorized.
+      await updateWorkspaceEnabledConsent(workspace.root, workspace.config, false);
+      await atomicWriteFile(workspace.configPath, `${JSON.stringify(next, null, 2)}\n`);
+    }
+    return next;
+  } finally {
+    await release();
+  }
 }
 
 export async function revokeWorkspaceTrust(start = process.cwd()) {
-  const workspace = await loadWorkspace(start, { allowDisabled: true, skipConsent: true });
-  await revokeWorkspaceConsent(workspace.root);
-  return Object.freeze({ root: workspace.root, workspaceId: workspace.config.workspaceId, trusted: false });
+  const located = await findWorkspaceRoot(start);
+  const root = await realpath(path.resolve(located ?? start));
+  const revocation = await revokeWorkspaceConsent(root);
+  return Object.freeze({
+    root,
+    workspaceId: revocation.workspaceId,
+    trusted: false
+  });
 }

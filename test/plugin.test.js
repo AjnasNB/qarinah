@@ -65,8 +65,8 @@ test("Codex plugin declares every supported lifecycle hook", async () => {
     for (const group of groups) {
       for (const hook of group.hooks) {
         assert.equal(hook.type, "command");
-        assert.match(hook.command, /^node "\$PLUGIN_ROOT\/runtime\/qarinah\.mjs" hook codex --quiet$/);
-        assert.match(hook.commandWindows, /^node "%PLUGIN_ROOT%\\runtime\\qarinah\.mjs" hook codex --quiet$/);
+        assert.equal(hook.command, "cd \"$PLUGIN_ROOT\" && node \"./runtime/qarinah.mjs\" hook codex --quiet");
+        assert.equal(hook.commandWindows, "cd /d \"%PLUGIN_ROOT%\" && node \".\\runtime\\qarinah.mjs\" hook codex --quiet");
         assert.doesNotMatch(`${hook.command}\n${hook.commandWindows}`, /scripts|\.cmd|npx/);
       }
     }
@@ -84,6 +84,19 @@ test("plugin package contains a synchronized self-contained runtime", async () =
   assert.doesNotMatch(runtime, /node:child_process|qarinah\.cmd|spawn\(/);
   const mcp = JSON.parse(await readFile(path.join(plugin, ".mcp.json"), "utf8"));
   assert.deepEqual(mcp.mcpServers.context.args, ["./runtime/qarinah.mjs", "mcp"]);
+  assert.equal(mcp.mcpServers.context.cwd, ".");
+});
+
+test("model-facing skills keep untrusted context values on bounded JSON stdin", async () => {
+  for (const directory of [plugin, claudePlugin]) {
+    const skill = await readFile(path.join(directory, "skills", "qarinah-context", "SKILL.md"), "utf8");
+    assert.match(skill, /query --stdin-json/);
+    assert.match(skill, /record --stdin-json/);
+    assert.match(skill, /Model-controlled text must never appear in a shell command or command argument/);
+    assert.doesNotMatch(skill, /\bquery\s+["']<[^>]+>["']/);
+    assert.doesNotMatch(skill, /\brecord\s+--kind\b/);
+    assert.doesNotMatch(skill, /\s--(?:title|body|data-json)\b/);
+  }
 });
 
 test("Claude Code plugin uses portable exec hooks and a bundled read-only MCP server", async () => {
@@ -94,6 +107,12 @@ test("Claude Code plugin uses portable exec hooks and a bundled read-only MCP se
   assert.equal(Object.hasOwn(manifest, "openaiCapabilities"), false);
   assert.equal(Object.hasOwn(manifest, "hooks"), false);
   assert.equal(manifest.mcpServers, "./.mcp.json");
+  assert.deepEqual(manifest.userConfig.node_path, {
+    type: "file",
+    title: "Trusted Node.js executable",
+    description: "Select an absolute Node.js 22, 24, or 26 executable outside the project workspace.",
+    required: true
+  });
   const hooks = JSON.parse(await readFile(path.join(claudePlugin, "hooks", "hooks.json"), "utf8"));
   assert.deepEqual(Object.keys(hooks.hooks).sort(), [
     "PermissionDenied", "PostCompact", "PostToolUse", "PostToolUseFailure", "PreCompact", "PreToolUse",
@@ -103,12 +122,14 @@ test("Claude Code plugin uses portable exec hooks and a bundled read-only MCP se
     for (const group of groups) {
       for (const hook of group.hooks) {
         assert.equal(hook.type, "command");
-        assert.equal(hook.command, "node");
+        assert.equal(hook.command, "${user_config.node_path}");
         assert.deepEqual(hook.args, ["${CLAUDE_PLUGIN_ROOT}/runtime/qarinah.mjs", "hook", "claude", "--quiet"]);
+        assert.equal(hook.timeout, 15);
       }
     }
   }
   const mcp = JSON.parse(await readFile(path.join(claudePlugin, ".mcp.json"), "utf8"));
+  assert.equal(mcp.mcpServers.context.command, "${user_config.node_path}");
   assert.deepEqual(mcp.mcpServers.context.args, ["${CLAUDE_PLUGIN_ROOT}/runtime/qarinah.mjs", "mcp"]);
   await access(path.join(claudePlugin, "skills", "qarinah-context", "SKILL.md"));
   const runtime = await readFile(path.join(claudePlugin, "runtime", "qarinah.mjs"), "utf8");
@@ -116,12 +137,13 @@ test("Claude Code plugin uses portable exec hooks and a bundled read-only MCP se
   assert.doesNotMatch(runtime, /node:child_process|qarinah\.cmd|spawn\(/);
 });
 
-test("copied standalone plugin captures with no parent package or PATH fallback", async (t) => {
+test("copied plugin avoids compatibility-CLI fallback and workspace Node shadowing", async (t) => {
   const sandbox = await temporaryDirectory(t);
   const copiedPlugin = path.join(sandbox, "standalone Qarinah ü plugin");
   const workspace = path.join(sandbox, "consumer workspace");
   const maliciousPath = path.join(sandbox, "malicious-path");
   const marker = path.join(sandbox, "path-fallback-ran.txt");
+  const nodeMarker = path.join(sandbox, "workspace-node-ran.txt");
   await cp(plugin, copiedPlugin, { recursive: true });
   await import("node:fs/promises").then(({ mkdir }) => mkdir(maliciousPath, { recursive: true }));
   await writeFile(path.join(maliciousPath, "qarinah.cmd"), `@echo compromised>"${marker}"\r\n`, "utf8");
@@ -134,6 +156,9 @@ test("copied standalone plugin captures with no parent package or PATH fallback"
   };
   const initialized = await run(process.execPath, [runtime, "init", workspace], { cwd: sandbox, env });
   assertSucceeded(initialized);
+  if (process.platform === "win32") {
+    await writeFile(path.join(workspace, "node.cmd"), `@echo compromised>"${nodeMarker}"\r\n`, "utf8");
+  }
 
   const hookInput = JSON.stringify({
     cwd: workspace,
@@ -160,6 +185,7 @@ test("copied standalone plugin captures with no parent package or PATH fallback"
     : await run("/bin/sh", ["-c", command.command], { cwd: workspace, env: hookEnv, input: hookInput });
   assertSucceeded(throughShell);
   assert.equal(throughShell.stdout, "");
+  await assert.rejects(() => access(nodeMarker));
 
   assertSucceeded(await run(process.execPath, [runtime, "build"], { cwd: workspace, env }));
   const doctor = await run(process.execPath, [runtime, "doctor"], { cwd: workspace, env });

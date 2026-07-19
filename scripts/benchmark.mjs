@@ -69,7 +69,12 @@ try {
   const buildMs = performance.now() - buildStarted;
 
   const queryStarted = performance.now();
-  const pack = await compileContext("Codex tool completed benchmark.tool", { cwd: root, limit: 20, maxChars: 12_000 });
+  const pack = await compileContext("Codex tool completed benchmark.tool", {
+    cwd: root,
+    limit: 20,
+    maxChars: 12_000,
+    asOf: "2026-07-20T00:00:00.000Z"
+  });
   const queryMs = performance.now() - queryStarted;
   const store = await verifyStore(root);
   if (store.eventCount !== records || pack.items.length === 0 || pack.budget.usedChars > pack.budget.maxChars) {

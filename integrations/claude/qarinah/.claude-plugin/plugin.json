@@ -1,6 +1,6 @@
 {
   "name": "qarinah",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "description": "Qarinah: opt-in, evidence-linked local context capture and bounded retrieval for Claude Code.",
   "author": {
     "name": "Ajnas NB",
@@ -10,6 +10,14 @@
   "repository": "https://github.com/AjnasNB/qarinah",
   "license": "UNLICENSED",
   "keywords": ["context", "provenance", "governance", "claude-code"],
+  "userConfig": {
+    "node_path": {
+      "type": "file",
+      "title": "Trusted Node.js executable",
+      "description": "Select an absolute Node.js 22, 24, or 26 executable outside the project workspace.",
+      "required": true
+    }
+  },
   "skills": "./skills/",
   "mcpServers": "./.mcp.json"
 }

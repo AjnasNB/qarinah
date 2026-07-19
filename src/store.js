@@ -1,12 +1,27 @@
 import { randomUUID } from "node:crypto";
-import { lstat, mkdir, open, readFile, readdir, rename, rm, rmdir, stat, utimes } from "node:fs/promises";
+import { constants } from "node:fs";
+import { lstat, mkdir, open, readdir, rename, rm, rmdir, utimes } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { canonicalStringify, sha256 } from "./canonical.js";
-import { grantWorkspaceConsent, readWorkspaceConsent, updateWorkspaceCheckpoint } from "./consent.js";
+import { isReviewedMetadataEventInput } from "./capture-policy.js";
+import {
+  describeCapturePolicy,
+  grantWorkspaceConsent,
+  readWorkspaceConsent,
+  readWorkspaceTrustForReview,
+  updateWorkspaceCheckpoint
+} from "./consent.js";
 import { createEventEnvelope, validateStoredEvent } from "./contracts.js";
 import { QarinahError } from "./errors.js";
-import { atomicWriteFile, loadWorkspace, resolveWithin, secureStoragePath } from "./workspace.js";
+import {
+  atomicWriteFile,
+  loadWorkspace,
+  openSecureAppendFile,
+  openSecureReadFile,
+  resolveWithin,
+  secureStoragePath
+} from "./workspace.js";
 
 const MAX_EVENTS = 100_000;
 const LOCK_STALE_MS = 120_000;
@@ -52,16 +67,28 @@ async function inspectLockOwner(lockPath) {
   const names = (await readdir(lockPath)).filter((name) => OWNER_NAME_PATTERN.test(name));
   if (names.length !== 1) return null;
   const ownerPath = resolveWithin(lockPath, names[0]);
-  const metadata = await lstat(ownerPath);
-  if (metadata.isSymbolicLink()) {
-    throw new QarinahError("STORAGE_LINK_REJECTED", ".qarinah/locks/append.lock owner cannot be a symbolic link or junction.");
-  }
-  if (!metadata.isFile() || metadata.size > LOCK_OWNER_MAX_BYTES) return null;
+  const flags = constants.O_RDONLY | (Number.isInteger(constants.O_NOFOLLOW) ? constants.O_NOFOLLOW : 0);
+  const handle = await open(ownerPath, flags);
+  let metadata;
   let value;
   try {
-    value = JSON.parse(await readFile(ownerPath, "utf8"));
-  } catch {
+    const opened = await handle.stat({ bigint: true });
+    const named = await lstat(ownerPath, { bigint: true });
+    if (named.isSymbolicLink() || !named.isFile() || named.nlink !== 1n
+      || !opened.isFile() || opened.nlink !== 1n
+      || opened.dev !== named.dev || opened.ino !== named.ino) {
+      throw new QarinahError("STORAGE_LINK_REJECTED", ".qarinah/locks/append.lock owner must be one singly linked regular file.");
+    }
+    if (opened.size > BigInt(LOCK_OWNER_MAX_BYTES)) return null;
+    const contents = await handle.readFile();
+    if (contents.length !== Number(opened.size)) return null;
+    metadata = Object.freeze({ mtimeMs: Number(opened.mtimeMs) });
+    value = JSON.parse(contents.toString("utf8"));
+  } catch (error) {
+    if (error instanceof QarinahError) throw error;
     return Object.freeze({ ownerPath, metadata, value: null });
+  } finally {
+    await handle.close();
   }
   const match = OWNER_NAME_PATTERN.exec(names[0]);
   if (!value
@@ -106,15 +133,25 @@ async function ensureEventIdIndexDirectories(workspace) {
 }
 
 async function readCanonicalIndexJson(workspace, segments, maximumBytes) {
-  const candidate = await secureStoragePath(workspace, segments, { type: "file" });
-  const metadata = await stat(candidate);
-  if (metadata.size > maximumBytes) throw new QarinahError("EVENT_ID_INDEX_INVALID", "Event-ID projection exceeds its size limit.");
+  const opened = await openSecureReadFile(workspace, segments);
+  if (opened.metadata.size > maximumBytes) {
+    await opened.handle.close();
+    throw new QarinahError("EVENT_ID_INDEX_INVALID", "Event-ID projection exceeds its size limit.");
+  }
   let parsed;
-  const contents = await readFile(candidate, "utf8");
+  let contents;
   try {
+    const buffer = await opened.handle.readFile();
+    if (buffer.length !== opened.metadata.size) {
+      throw new QarinahError("STORAGE_RACE_DETECTED", "Event-ID projection changed while it was being read.");
+    }
+    contents = buffer.toString("utf8");
     parsed = JSON.parse(contents);
   } catch (error) {
+    if (error instanceof QarinahError) throw error;
     throw new QarinahError("EVENT_ID_INDEX_INVALID", "Event-ID projection is not valid JSON.", { cause: error.message });
+  } finally {
+    await opened.handle.close();
   }
   if (contents !== `${canonicalStringify(parsed)}\n`) {
     throw new QarinahError("EVENT_ID_INDEX_INVALID", "Event-ID projection is not canonical JSON.");
@@ -324,17 +361,16 @@ async function appendEventIdProjection(workspace, trusted, event, location, opti
 }
 
 async function readIndexedEvent(workspace, eventId, entry) {
-  const eventPath = await secureStoragePath(workspace, ["events", "events.jsonl"], { type: "file" });
-  const metadata = await stat(eventPath);
-  if (entry.offset + entry.length > metadata.size) {
+  const opened = await openSecureReadFile(workspace, ["events", "events.jsonl"]);
+  if (entry.offset + entry.length > opened.metadata.size) {
+    await opened.handle.close();
     throw new QarinahError("EVENT_ID_INDEX_INVALID", `Event-ID projection entry '${eventId}' exceeds the authoritative log.`);
   }
   const buffer = Buffer.allocUnsafe(entry.length);
-  const handle = await open(eventPath, "r");
   try {
     let consumed = 0;
     while (consumed < buffer.length) {
-      const { bytesRead } = await handle.read(buffer, consumed, buffer.length - consumed, entry.offset + consumed);
+      const { bytesRead } = await opened.handle.read(buffer, consumed, buffer.length - consumed, entry.offset + consumed);
       if (bytesRead === 0) break;
       consumed += bytesRead;
     }
@@ -342,7 +378,7 @@ async function readIndexedEvent(workspace, eventId, entry) {
       throw new QarinahError("EVENT_ID_INDEX_INVALID", `Event-ID projection entry '${eventId}' could not be read completely.`);
     }
   } finally {
-    await handle.close();
+    await opened.handle.close();
   }
   if (buffer.at(-1) !== 0x0a) {
     throw new QarinahError("EVENT_ID_INDEX_INVALID", `Event-ID projection entry '${eventId}' does not end at a record boundary.`);
@@ -379,24 +415,28 @@ async function loadIndexedEvent(workspace, manifest, eventId) {
 }
 
 async function rebuildTrustedEventIdProjection(workspace) {
-  const events = await readEventsFromWorkspace(workspace, { updateCheckpoint: false });
-  const eventPath = await secureStoragePath(workspace, ["events", "events.jsonl"], { type: "file" });
-  const metadata = await stat(eventPath);
-  const projection = await writeEventIdProjection(workspace, events, metadata.size);
+  const snapshot = await readEventsFromWorkspace(workspace, { updateCheckpoint: false, includeLogMetadata: true });
+  const { events, logBytes } = snapshot;
+  const projection = await writeEventIdProjection(workspace, events, logBytes);
   const consent = await updateWorkspaceCheckpoint(workspace, {
     eventCount: events.length,
     headHash: events.at(-1)?.hash ?? null,
-    logBytes: metadata.size,
+    logBytes,
     eventIdIndexHash: projection.manifestHash
   });
   return Object.freeze({
-    head: Object.freeze({ event: events.at(-1) ?? null, size: metadata.size }),
+    head: Object.freeze({
+      event: events.at(-1) ?? null,
+      size: logBytes,
+      dev: snapshot.dev,
+      ino: snapshot.ino
+    }),
     consent,
     trustedProjection: projection
   });
 }
 
-async function acquireLock(workspace) {
+export async function acquireWorkspaceWriteLock(workspace) {
   const locksDirectory = await secureStoragePath(workspace, ["locks"], { type: "directory" });
   const lockPath = resolveWithin(locksDirectory, "append.lock");
   const ownerToken = randomUUID();
@@ -492,7 +532,7 @@ async function acquireLock(workspace) {
         if (metadata.isSymbolicLink()) throw new QarinahError("STORAGE_LINK_REJECTED", ".qarinah/locks/append.lock cannot be a symbolic link or junction.");
         if (!metadata.isDirectory()) throw new QarinahError("WORKSPACE_INVALID", ".qarinah/locks/append.lock must be a directory.");
         const owner = await inspectLockOwner(lockPath);
-        const heartbeatMtime = owner?.metadata.mtimeMs ?? metadata.mtimeMs;
+        const heartbeatMtime = owner?.metadata?.mtimeMs ?? metadata.mtimeMs;
         const locallyAlive = owner?.value?.hostname === HOSTNAME && processIsAlive(owner.value.pid);
         if (Date.now() - heartbeatMtime > LOCK_STALE_MS && !locallyAlive) {
           const latest = owner ? await lstat(owner.ownerPath) : await lstat(lockPath);
@@ -512,30 +552,18 @@ async function acquireLock(workspace) {
   throw new QarinahError("STORE_BUSY", "Timed out waiting for the Context Ledger append lock.");
 }
 
-async function readHeadEvent(workspace) {
-  let eventPath;
-  let metadata;
-  try {
-    eventPath = await secureStoragePath(workspace, ["events", "events.jsonl"], { type: "file" });
-    metadata = await stat(eventPath);
-  } catch (error) {
-    if (error?.code === "ENOENT") throw new QarinahError("EVENT_LOG_MISSING", "The authoritative event log is missing.");
-    throw error;
+async function readHeadFromHandle(workspace, handle, metadata) {
+  if (metadata.size === 0) {
+    return Object.freeze({ event: null, size: 0, dev: metadata.dev, ino: metadata.ino });
   }
-  if (metadata.size === 0) return Object.freeze({ event: null, size: 0 });
   if (metadata.size > workspace.config.maxLogBytes) {
     throw new QarinahError("LOG_LIMIT_EXCEEDED", "Event log exceeds the configured maximum size.");
   }
   const maximumTailBytes = workspace.config.maxEventBytes + 2;
   const length = Math.min(metadata.size, maximumTailBytes);
   const buffer = Buffer.allocUnsafe(length);
-  const handle = await open(eventPath, "r");
-  try {
-    const { bytesRead } = await handle.read(buffer, 0, length, metadata.size - length);
-    if (bytesRead !== length) throw new QarinahError("EVENT_LOG_READ_INCOMPLETE", "Could not read the event log tail.");
-  } finally {
-    await handle.close();
-  }
+  const { bytesRead } = await handle.read(buffer, 0, length, metadata.size - length);
+  if (bytesRead !== length) throw new QarinahError("EVENT_LOG_READ_INCOMPLETE", "Could not read the event log tail.");
   if (buffer[length - 1] !== 0x0a) {
     throw new QarinahError("EVENT_LOG_NON_CANONICAL", "Event log must end with a newline.");
   }
@@ -559,15 +587,28 @@ async function readHeadEvent(workspace) {
       workspaceId: workspace.config.workspaceId,
       maximumEventBytes: workspace.config.maxEventBytes
     });
-    return Object.freeze({ event, size: metadata.size });
+    return Object.freeze({ event, size: metadata.size, dev: metadata.dev, ino: metadata.ino });
   } catch (error) {
     throw new QarinahError("EVENT_INVALID", `The final event failed validation: ${error.message}`);
   }
 }
 
-async function reconcileCheckpoint(workspace, events, logBytes, options = {}) {
-  const consent = await readWorkspaceConsent(workspace.root, workspace.config);
-  const checkpoint = consent.checkpoint;
+async function readHeadEvent(workspace) {
+  let opened;
+  try {
+    opened = await openSecureReadFile(workspace, ["events", "events.jsonl"]);
+  } catch (error) {
+    if (error?.code === "ENOENT") throw new QarinahError("EVENT_LOG_MISSING", "The authoritative event log is missing.");
+    throw error;
+  }
+  try {
+    return await readHeadFromHandle(workspace, opened.handle, opened.metadata);
+  } finally {
+    await opened.handle.close();
+  }
+}
+
+function validateCheckpointContinuity(events, logBytes, checkpoint) {
   if (events.length < checkpoint.eventCount || logBytes < checkpoint.logBytes) {
     throw new QarinahError("CHECKPOINT_ROLLBACK", "The event log is older or shorter than this machine's trusted checkpoint.");
   }
@@ -579,6 +620,15 @@ async function reconcileCheckpoint(workspace, events, logBytes, options = {}) {
     if (headHash !== checkpoint.headHash || logBytes !== checkpoint.logBytes) {
       throw new QarinahError("CHECKPOINT_MISMATCH", "The event log differs from this machine's trusted checkpoint.");
     }
+  }
+  return headHash;
+}
+
+async function reconcileCheckpoint(workspace, events, logBytes, options = {}) {
+  const consent = await readWorkspaceConsent(workspace.root, workspace.config);
+  const checkpoint = consent.checkpoint;
+  const headHash = validateCheckpointContinuity(events, logBytes, checkpoint);
+  if (events.length === checkpoint.eventCount) {
     if (options.updateCheckpoint === false) return consent;
     try {
       await loadTrustedEventIdManifest(workspace, checkpoint);
@@ -619,19 +669,27 @@ function workspaceRootLocator(value, label) {
 }
 
 async function readEventsFromWorkspace(workspace, options = {}) {
-  let eventPath;
-  let metadata;
+  let opened;
   try {
-    eventPath = await secureStoragePath(workspace, ["events", "events.jsonl"], { type: "file" });
-    metadata = await stat(eventPath);
+    opened = await openSecureReadFile(workspace, ["events", "events.jsonl"]);
   } catch (error) {
     if (error?.code === "ENOENT") throw new QarinahError("EVENT_LOG_MISSING", "The authoritative event log is missing.");
     throw error;
   }
-  if (metadata.size > workspace.config.maxLogBytes) {
+  if (opened.metadata.size > workspace.config.maxLogBytes) {
+    await opened.handle.close();
     throw new QarinahError("LOG_LIMIT_EXCEEDED", "Event log exceeds the configured maximum size.");
   }
-  const contents = await readFile(eventPath, "utf8");
+  let contents;
+  try {
+    const buffer = await opened.handle.readFile();
+    if (buffer.length !== opened.metadata.size) {
+      throw new QarinahError("STORAGE_RACE_DETECTED", "The authoritative event log changed while it was being read.");
+    }
+    contents = buffer.toString("utf8");
+  } finally {
+    await opened.handle.close();
+  }
   if (contents !== "" && !contents.endsWith("\n")) {
     throw new QarinahError("EVENT_LOG_NON_CANONICAL", "Event log must end with a newline.");
   }
@@ -668,7 +726,15 @@ async function readEventsFromWorkspace(workspace, options = {}) {
     }
   }
   if (options.skipCheckpoint !== true) {
-    await reconcileCheckpoint(workspace, events, metadata.size, { updateCheckpoint: options.updateCheckpoint !== false });
+    await reconcileCheckpoint(workspace, events, opened.metadata.size, { updateCheckpoint: options.updateCheckpoint !== false });
+  }
+  if (options.includeLogMetadata === true) {
+    return Object.freeze({
+      events: Object.freeze(events),
+      logBytes: opened.metadata.size,
+      dev: opened.metadata.dev,
+      ino: opened.metadata.ino
+    });
   }
   return events;
 }
@@ -677,17 +743,126 @@ export async function readEvents(workspaceOrStart = process.cwd(), options = {})
   const start = typeof workspaceOrStart === "string"
     ? workspaceOrStart
     : workspaceRootLocator(workspaceOrStart, "workspace");
-  const workspace = await loadWorkspace(start);
-  return readEventsFromWorkspace(workspace, options);
+  let workspace = await loadWorkspace(start);
+  if (options.updateCheckpoint === false || options.skipCheckpoint === true) {
+    return readEventsFromWorkspace(workspace, options);
+  }
+  const release = await acquireWorkspaceWriteLock(workspace);
+  try {
+    workspace = await loadWorkspace(workspace.root);
+    return await readEventsFromWorkspace(workspace, options);
+  } finally {
+    await release();
+  }
+}
+
+function captureMode(requested, workspace) {
+  const capture = requested ?? workspace.config.capture;
+  if (!["metadata", "content"].includes(capture)) throw new TypeError("options.capture must be metadata or content.");
+  if (capture === "content" && workspace.consent?.capture !== "content") {
+    throw new QarinahError(
+      "CONTENT_CAPTURE_NOT_APPROVED",
+      "Content retention requires a current machine-local content capture permit."
+    );
+  }
+  return capture;
+}
+
+function sizeClass(bytes) {
+  if (bytes === 0) return "empty";
+  if (bytes <= 64) return "tiny";
+  if (bytes <= 1_024) return "small";
+  if (bytes <= 16_384) return "medium";
+  if (bytes <= 65_536) return "large";
+  return "very_large";
+}
+
+function coarseValueSummary(value) {
+  if (value === undefined || value === null) return Object.freeze({ present: false, sizeClass: "none" });
+  const serialized = typeof value === "string" ? value : canonicalStringify(value);
+  const bytes = Buffer.byteLength(serialized);
+  return Object.freeze({ present: true, sizeClass: sizeClass(bytes), bytes });
+}
+
+function sourceEventDescriptor(event) {
+  const { schemaVersion: _schemaVersion, workspaceId: _workspaceId, previousHash: _previousHash, hash: _hash, ...source } = event;
+  return source;
+}
+
+function metadataProjection(source, workspace) {
+  const descriptor = sourceEventDescriptor(source);
+  const serialized = canonicalStringify(descriptor);
+  return {
+    eventId: source.eventId,
+    timestamp: source.timestamp,
+    kind: source.kind,
+    actor: { type: "system", id: "qarinah.metadata-projection" },
+    title: `Captured ${source.kind} metadata`,
+    body: "",
+    data: {
+      capture: "metadata",
+      contentOmitted: true,
+      sourceEvent: {
+        digest: sha256(serialized),
+        bytes: Buffer.byteLength(serialized),
+        title: coarseValueSummary(source.title),
+        body: coarseValueSummary(source.body),
+        data: coarseValueSummary(source.data),
+        actorPresent: source.actor !== null,
+        relationCount: source.relations.length,
+        sessionIdPresent: source.sessionId !== null,
+        turnIdPresent: source.turnId !== null
+      }
+    },
+    confidence: "extracted",
+    relations: [],
+    provenance: { adapter: "qarinah.metadata-projection", sourceId: source.eventId },
+    retention: { class: workspace.config.retentionClass, expiresAt: null }
+  };
+}
+
+function createCapturedEvent(input, workspace, previousHash, options, capture, reviewedMetadata) {
+  const source = createEventEnvelope(input, {
+    workspaceId: workspace.config.workspaceId,
+    previousHash,
+    maximumEventBytes: workspace.config.maxEventBytes,
+    clock: options.clock,
+    randomUUID: options.randomUUID
+  });
+  if (source.retention.class !== workspace.config.retentionClass) {
+    throw new QarinahError(
+      "RETENTION_NOT_APPROVED",
+      `The event requests '${source.retention.class}' retention, but this workspace permits '${workspace.config.retentionClass}'.`
+    );
+  }
+  if (capture === "content") return source;
+  if (reviewedMetadata) {
+    if (source.body !== "") {
+      throw new QarinahError("METADATA_PROJECTION_INVALID", "Reviewed metadata events cannot retain a body.");
+    }
+    return source;
+  }
+  return createEventEnvelope(metadataProjection(source, workspace), {
+    workspaceId: workspace.config.workspaceId,
+    previousHash,
+    maximumEventBytes: workspace.config.maxEventBytes
+  });
 }
 
 export async function appendEvent(input, options = {}) {
   const start = options.workspace
     ? workspaceRootLocator(options.workspace, "options.workspace")
     : (options.cwd || process.cwd());
-  const workspace = await loadWorkspace(start);
-  const release = await acquireLock(workspace);
+  let workspace = await loadWorkspace(start);
+  await injectStoreFault(options, "after-initial-workspace-load", { workspaceId: workspace.config.workspaceId });
+  const release = await acquireWorkspaceWriteLock(workspace);
   try {
+    // The portable policy may have changed while this append waited for the
+    // lock. Reload both config and its machine-local permit before deciding
+    // whether content or a reviewed metadata projection is authorized.
+    workspace = await loadWorkspace(workspace.root);
+    const capture = captureMode(options.capture, workspace);
+    const reviewedMetadata = capture === "metadata" && isReviewedMetadataEventInput(input);
     let head = await readHeadEvent(workspace);
     let consent = await readWorkspaceConsent(workspace.root, workspace.config);
     if (head.size !== consent.checkpoint.logBytes || (head.event?.hash ?? null) !== consent.checkpoint.headHash) {
@@ -703,32 +878,32 @@ export async function appendEvent(input, options = {}) {
       ({ head, consent, trustedProjection } = await rebuildTrustedEventIdProjection(workspace));
     }
     const previousHash = head.event?.hash ?? null;
-    let event = createEventEnvelope(input, {
-      workspaceId: workspace.config.workspaceId,
-      previousHash,
-      maximumEventBytes: workspace.config.maxEventBytes,
-      clock: options.clock,
-      randomUUID: options.randomUUID
-    });
+    let event = createCapturedEvent(input, workspace, previousHash, options, capture, reviewedMetadata);
     let existing;
     try {
       existing = await loadIndexedEvent(workspace, trustedProjection.manifest, event.eventId);
     } catch (error) {
       if (!["ENOENT", "EVENT_ID_INDEX_INVALID", "EVENT_ID_INDEX_MISMATCH"].includes(error?.code)) throw error;
       ({ head, consent, trustedProjection } = await rebuildTrustedEventIdProjection(workspace));
-      event = createEventEnvelope({ ...input, eventId: event.eventId, timestamp: event.timestamp }, {
-        workspaceId: workspace.config.workspaceId,
-        previousHash: head.event?.hash ?? null,
-        maximumEventBytes: workspace.config.maxEventBytes
-      });
+      event = createCapturedEvent(
+        { ...input, eventId: event.eventId, timestamp: event.timestamp },
+        workspace,
+        head.event?.hash ?? null,
+        {},
+        capture,
+        reviewedMetadata
+      );
       existing = await loadIndexedEvent(workspace, trustedProjection.manifest, event.eventId);
     }
     if (existing && options.idempotent === true) {
-      const replay = createEventEnvelope({ ...input, timestamp: existing.timestamp }, {
-        workspaceId: workspace.config.workspaceId,
-        previousHash: existing.previousHash,
-        maximumEventBytes: workspace.config.maxEventBytes
-      });
+      const replay = createCapturedEvent(
+        { ...input, timestamp: existing.timestamp },
+        workspace,
+        existing.previousHash,
+        {},
+        capture,
+        reviewedMetadata
+      );
       if (replay.hash === existing.hash) return existing;
       throw new QarinahError("EVENT_ID_CONFLICT", `Event id '${event.eventId}' was reused with different content.`);
     }
@@ -737,17 +912,36 @@ export async function appendEvent(input, options = {}) {
     }
     const line = `${canonicalStringify(event)}\n`;
     const lineLength = Buffer.byteLength(line);
-    const eventPath = await secureStoragePath(workspace, ["events", "events.jsonl"], { type: "file" });
     if (head.size + lineLength > workspace.config.maxLogBytes) {
       throw new QarinahError("LOG_LIMIT_EXCEEDED", "Appending this event would exceed the configured log limit.");
     }
     await release.assertOwned();
-    const handle = await open(eventPath, "a", 0o600);
+    const opened = await openSecureAppendFile(workspace, ["events", "events.jsonl"]);
     try {
-      await handle.writeFile(line, "utf8");
-      await handle.sync();
+      if (opened.metadata.size !== head.size || opened.metadata.dev !== head.dev || opened.metadata.ino !== head.ino) {
+        throw new QarinahError("STORAGE_RACE_DETECTED", "The authoritative event log changed between verification and append.");
+      }
+      const confirmedHead = await readHeadFromHandle(workspace, opened.handle, opened.metadata);
+      if (confirmedHead.size !== head.size || (confirmedHead.event?.hash ?? null) !== (head.event?.hash ?? null)) {
+        throw new QarinahError("STORAGE_RACE_DETECTED", "The authoritative event log head changed between verification and append.");
+      }
+      await opened.handle.writeFile(line, "utf8");
+      await opened.handle.sync();
+      const finalStat = await opened.handle.stat({ bigint: true });
+      const expectedSize = head.size + lineLength;
+      if (finalStat.size > BigInt(Number.MAX_SAFE_INTEGER) || Number(finalStat.size) !== expectedSize) {
+        throw new QarinahError("STORAGE_RACE_DETECTED", "The authoritative event log changed during append.");
+      }
+      const finalHead = await readHeadFromHandle(workspace, opened.handle, {
+        size: Number(finalStat.size),
+        dev: finalStat.dev,
+        ino: finalStat.ino
+      });
+      if (finalHead.event?.hash !== event.hash) {
+        throw new QarinahError("STORAGE_RACE_DETECTED", "The appended event is not the authoritative log head.");
+      }
     } finally {
-      await handle.close();
+      await opened.handle.close();
     }
     await injectStoreFault(options, "after-event-log-fsync", {
       eventId: event.eventId,
@@ -790,33 +984,58 @@ export async function verifyStore(start = process.cwd(), options = {}) {
   return Object.freeze(result);
 }
 
-export async function approveWorkspaceTrust(start = process.cwd(), expectedCapture) {
+export async function inspectWorkspacePolicy(start = process.cwd()) {
+  const workspace = await loadWorkspace(start, { allowDisabled: true, skipConsent: true });
+  return describeCapturePolicy(workspace.root, workspace.config);
+}
+
+export async function approveWorkspaceTrust(start = process.cwd(), expectedCapture, expectedPolicyHash) {
   if (!['metadata', 'content'].includes(expectedCapture)) {
     throw new TypeError("expectedCapture must be explicitly set to metadata or content.");
   }
-  const workspace = await loadWorkspace(start, { allowDisabled: true, skipConsent: true });
-  if (workspace.config.capture !== expectedCapture) {
-    throw new QarinahError(
-      "CAPTURE_NOT_APPROVED",
-      `Workspace requests '${workspace.config.capture}' capture, but '${expectedCapture}' was approved.`
-    );
+  if (typeof expectedPolicyHash !== "string" || !HASH_PATTERN.test(expectedPolicyHash)) {
+    throw new TypeError("expectedPolicyHash must be the exact sha256 digest shown by inspectWorkspacePolicy or `qarinah policy`.");
   }
-  const events = await readEventsFromWorkspace(workspace, { skipCheckpoint: true });
-  const eventPath = await secureStoragePath(workspace, ["events", "events.jsonl"], { type: "file" });
-  const metadata = await stat(eventPath);
-  const projection = await writeEventIdProjection(workspace, events, metadata.size);
-  const consent = await grantWorkspaceConsent(workspace.root, workspace.config, {
-    eventCount: events.length,
-    headHash: events.at(-1)?.hash ?? null,
-    logBytes: metadata.size,
-    eventIdIndexHash: projection.manifestHash
-  });
-  return Object.freeze({
-    root: workspace.root,
-    workspaceId: workspace.config.workspaceId,
-    capture: consent.capture,
-    trusted: true,
-    eventCount: consent.checkpoint.eventCount,
-    headHash: consent.checkpoint.headHash
-  });
+  let workspace = await loadWorkspace(start, { allowDisabled: true, skipConsent: true });
+  const release = await acquireWorkspaceWriteLock(workspace);
+  try {
+    workspace = await loadWorkspace(workspace.root, { allowDisabled: true, skipConsent: true });
+    const requestedPolicy = describeCapturePolicy(workspace.root, workspace.config);
+    if (workspace.config.capture !== expectedCapture) {
+      throw new QarinahError(
+        "CAPTURE_NOT_APPROVED",
+        `Workspace requests '${workspace.config.capture}' capture, but '${expectedCapture}' was approved.`
+      );
+    }
+    if (requestedPolicy.policyHash !== expectedPolicyHash) {
+      throw new QarinahError(
+        "POLICY_NOT_APPROVED",
+        "The workspace policy does not match the exact reviewed policy digest. Run `qarinah policy` and review it again."
+      );
+    }
+    const priorTrust = await readWorkspaceTrustForReview(workspace.root, workspace.config.workspaceId);
+    const snapshot = await readEventsFromWorkspace(workspace, { skipCheckpoint: true, includeLogMetadata: true });
+    const { events, logBytes } = snapshot;
+    if (priorTrust !== null) {
+      validateCheckpointContinuity(events, logBytes, priorTrust.checkpoint);
+    }
+    const projection = await writeEventIdProjection(workspace, events, logBytes);
+    const consent = await grantWorkspaceConsent(workspace.root, workspace.config, {
+      eventCount: events.length,
+      headHash: events.at(-1)?.hash ?? null,
+      logBytes,
+      eventIdIndexHash: projection.manifestHash
+    });
+    return Object.freeze({
+      root: workspace.root,
+      workspaceId: workspace.config.workspaceId,
+      capture: consent.capture,
+      policyHash: consent.policyHash,
+      trusted: true,
+      eventCount: consent.checkpoint.eventCount,
+      headHash: consent.checkpoint.headHash
+    });
+  } finally {
+    await release();
+  }
 }

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/AjnasNB/qarinah/schemas/okf-export.schema.json",
+  "title": "Qarinah deterministic OKF export v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "okfVersion",
+    "derived",
+    "source",
+    "workspaceId",
+    "eventCount",
+    "headHash",
+    "bundleHash",
+    "fileCount"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "qarinah.okf-export.v1" },
+    "okfVersion": { "const": "0.1" },
+    "derived": { "const": true },
+    "source": { "const": ".qarinah/events/events.jsonl" },
+    "workspaceId": { "type": "string", "pattern": "^ws_[0-9a-f]{32}$" },
+    "eventCount": { "type": "integer", "minimum": 0, "maximum": 100000 },
+    "headHash": { "type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$" },
+    "bundleHash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "fileCount": { "type": "integer", "minimum": 3, "maximum": 100003 },
+    "outputDirectory": { "type": "string", "minLength": 1 }
+  }
+}

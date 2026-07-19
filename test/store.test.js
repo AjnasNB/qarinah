@@ -1,13 +1,15 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { cp, link, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import {
   appendEvent,
+  approveWorkspaceTrust,
   initializeWorkspace,
+  inspectWorkspacePolicy,
   loadWorkspace,
   readEvents,
   revokeWorkspaceTrust,
@@ -76,6 +78,191 @@ test("workspace append, verification, disable, and re-enable are consistent", as
   assert.equal((await loadWorkspace(root, { allowDisabled: true })).config.enabled, false);
   await setWorkspaceEnabled(root, true);
   assert.equal((await loadWorkspace(root)).config.enabled, true);
+});
+
+test("machine-local permit binds the complete capture policy and prevents portable reactivation", async (t) => {
+  const root = await temporaryDirectory(t);
+  const workspace = await initializeWorkspace(root);
+  const originalPolicy = await inspectWorkspacePolicy(root);
+  const trustPath = machineTrustPath(workspace.root);
+  let trust = JSON.parse(await readFile(trustPath, "utf8"));
+  assert.equal(trust.schemaVersion, "qarinah.trust.v2");
+  assert.equal(trust.root, workspace.root);
+  assert.equal(trust.workspaceId, workspace.config.workspaceId);
+  assert.equal(trust.enabled, true);
+  assert.equal(trust.capture, "metadata");
+  assert.equal(trust.maxEventBytes, workspace.config.maxEventBytes);
+  assert.equal(trust.maxLogBytes, workspace.config.maxLogBytes);
+  assert.equal(trust.contextMaxChars, workspace.config.contextMaxChars);
+  assert.equal(trust.retentionClass, workspace.config.retentionClass);
+  assert.match(trust.policyHash, /^sha256:[0-9a-f]{64}$/);
+
+  await setWorkspaceEnabled(root, false);
+  trust = JSON.parse(await readFile(trustPath, "utf8"));
+  assert.equal(trust.enabled, false);
+  const disabled = JSON.parse(await readFile(workspace.configPath, "utf8"));
+  await writeFile(workspace.configPath, `${JSON.stringify({ ...disabled, enabled: true }, null, 2)}\n`, "utf8");
+  await assert.rejects(() => loadWorkspace(root), (error) => error.code === "CAPTURE_NOT_APPROVED");
+  await assert.rejects(() => appendEvent(eventInput(), { cwd: root }), (error) => error.code === "CAPTURE_NOT_APPROVED");
+
+  // The explicit local enable action repairs a safely interrupted/tampered
+  // enabled transition, but it cannot approve any other portable policy edit.
+  await setWorkspaceEnabled(root, true);
+  assert.equal((await loadWorkspace(root)).consent.enabled, true);
+  const changed = JSON.parse(await readFile(workspace.configPath, "utf8"));
+  await writeFile(workspace.configPath, `${JSON.stringify({ ...changed, maxLogBytes: changed.maxLogBytes + 1 }, null, 2)}\n`, "utf8");
+  await assert.rejects(() => loadWorkspace(root), (error) => error.code === "CAPTURE_NOT_APPROVED");
+  await assert.rejects(() => setWorkspaceEnabled(root, false), (error) => error.code === "CAPTURE_NOT_APPROVED");
+
+  await assert.rejects(
+    () => approveWorkspaceTrust(root, "metadata", originalPolicy.policyHash),
+    (error) => error.code === "POLICY_NOT_APPROVED"
+  );
+  await assert.rejects(
+    () => approveWorkspaceTrust(root, "metadata"),
+    /expectedPolicyHash/
+  );
+  const requestedPolicy = await inspectWorkspacePolicy(root);
+  assert.equal(requestedPolicy.maxLogBytes, changed.maxLogBytes + 1);
+  assert.notEqual(requestedPolicy.policyHash, originalPolicy.policyHash);
+  const reviewed = await approveWorkspaceTrust(root, "metadata", requestedPolicy.policyHash);
+  assert.equal(reviewed.trusted, true);
+  assert.equal(reviewed.policyHash, requestedPolicy.policyHash);
+  assert.equal((await loadWorkspace(root)).config.maxLogBytes, changed.maxLogBytes + 1);
+});
+
+test("append reloads portable policy and permit after entering the write lock", async (t) => {
+  const root = await temporaryDirectory(t);
+  const workspace = await initializeWorkspace(root);
+  await assert.rejects(
+    () => appendEvent(eventInput({ body: "STALE_POLICY_APPEND_MARKER" }), {
+      workspace,
+      async __testFaultInjector(point) {
+        if (point !== "after-initial-workspace-load") return;
+        await writeFile(workspace.configPath, `${JSON.stringify({
+          ...workspace.config,
+          maxLogBytes: workspace.config.maxLogBytes + 1
+        }, null, 2)}\n`, "utf8");
+      }
+    }),
+    (error) => error.code === "CAPTURE_NOT_APPROVED"
+  );
+  const log = await readFile(path.join(workspace.qarinahDir, "events", "events.jsonl"), "utf8");
+  assert.equal(log, "");
+  assert.equal(log.includes("STALE_POLICY_APPEND_MARKER"), false);
+});
+
+test("legacy v1 trust records fail closed until an explicit verified re-trust", async (t) => {
+  const root = await temporaryDirectory(t);
+  const workspace = await initializeWorkspace(root);
+  const trustPath = machineTrustPath(workspace.root);
+  const current = JSON.parse(await readFile(trustPath, "utf8"));
+  await writeFile(trustPath, `${JSON.stringify({
+    schemaVersion: "qarinah.trust.v1",
+    root: workspace.root,
+    workspaceId: workspace.config.workspaceId,
+    capture: workspace.config.capture,
+    grantedAt: current.grantedAt,
+    checkpoint: current.checkpoint
+  }, null, 2)}\n`, "utf8");
+
+  await assert.rejects(() => loadWorkspace(root), (error) => error.code === "TRUST_REVIEW_REQUIRED");
+  const requestedPolicy = await inspectWorkspacePolicy(root);
+  await approveWorkspaceTrust(root, "metadata", requestedPolicy.policyHash);
+  const migrated = JSON.parse(await readFile(trustPath, "utf8"));
+  assert.equal(migrated.schemaVersion, "qarinah.trust.v2");
+  assert.match(migrated.policyHash, /^sha256:[0-9a-f]{64}$/);
+});
+
+test("re-trust cannot bless a ledger older than the existing machine checkpoint", async (t) => {
+  const root = await temporaryDirectory(t);
+  const workspace = await initializeWorkspace(root);
+  await appendEvent(eventInput({ eventId: "evt_00000000-0000-4000-8000-000000000061" }), { cwd: root });
+  await appendEvent(eventInput({ eventId: "evt_00000000-0000-4000-8000-000000000062" }), { cwd: root });
+  const trustPath = machineTrustPath(workspace.root);
+  const before = JSON.parse(await readFile(trustPath, "utf8"));
+  assert.equal(before.checkpoint.eventCount, 2);
+
+  const changed = JSON.parse(await readFile(workspace.configPath, "utf8"));
+  await writeFile(workspace.configPath, `${JSON.stringify({
+    ...changed,
+    contextMaxChars: changed.contextMaxChars + 1
+  }, null, 2)}\n`, "utf8");
+  await writeFile(path.join(workspace.qarinahDir, "events", "events.jsonl"), "", "utf8");
+  const requestedPolicy = await inspectWorkspacePolicy(root);
+
+  await assert.rejects(
+    () => approveWorkspaceTrust(root, "metadata", requestedPolicy.policyHash),
+    (error) => error.code === "CHECKPOINT_ROLLBACK"
+  );
+  const after = JSON.parse(await readFile(trustPath, "utf8"));
+  assert.equal(after.checkpoint.eventCount, 2);
+  assert.equal(after.checkpoint.headHash, before.checkpoint.headHash);
+  assert.equal(after.policyHash, before.policyHash);
+});
+
+test("revocation preserves rollback protection across a later trust grant", async (t) => {
+  const root = await temporaryDirectory(t);
+  const workspace = await initializeWorkspace(root);
+  await appendEvent(eventInput({ eventId: "evt_00000000-0000-4000-8000-000000000071" }), { cwd: root });
+  await appendEvent(eventInput({ eventId: "evt_00000000-0000-4000-8000-000000000072" }), { cwd: root });
+  await revokeWorkspaceTrust(root);
+  await writeFile(path.join(workspace.qarinahDir, "events", "events.jsonl"), "", "utf8");
+  const requestedPolicy = await inspectWorkspacePolicy(root);
+
+  await assert.rejects(
+    () => approveWorkspaceTrust(root, "metadata", requestedPolicy.policyHash),
+    (error) => error.code === "CHECKPOINT_ROLLBACK"
+  );
+  await assert.rejects(() => loadWorkspace(root), (error) => error.code === "WORKSPACE_NOT_TRUSTED");
+});
+
+test("central metadata capture removes arbitrary caller body and data", async (t) => {
+  const root = await temporaryDirectory(t);
+  const workspace = await initializeWorkspace(root);
+  const markers = [
+    "PRIVATE_TITLE_MARKER",
+    "PRIVATE_BODY_MARKER",
+    "PRIVATE_DATA_MARKER",
+    "PRIVATE_SESSION_MARKER",
+    "PRIVATE_RELATION_MARKER"
+  ];
+  const event = await appendEvent(eventInput({
+    title: markers[0],
+    body: markers[1],
+    data: { note: markers[2] },
+    sessionId: markers[3],
+    relations: [{ type: "references", target: markers[4] }]
+  }), { workspace });
+
+  assert.equal(event.title, "Captured decision metadata");
+  assert.equal(event.body, "");
+  assert.equal(event.actor.id, "qarinah.metadata-projection");
+  assert.equal(event.sessionId, null);
+  assert.deepEqual(event.relations, []);
+  assert.equal(event.data.capture, "metadata");
+  assert.equal(event.data.contentOmitted, true);
+  assert.match(event.data.sourceEvent.digest, /^sha256:[0-9a-f]{64}$/);
+  const persisted = await readFile(path.join(workspace.qarinahDir, "events", "events.jsonl"), "utf8");
+  for (const marker of markers) assert.equal(persisted.includes(marker), false, marker);
+
+  await assert.rejects(
+    () => appendEvent(eventInput({ title: "CONTENT_DENIED_MARKER" }), { workspace, capture: "content" }),
+    (error) => error.code === "CONTENT_CAPTURE_NOT_APPROVED"
+  );
+  assert.equal(persisted.includes("CONTENT_DENIED_MARKER"), false);
+});
+
+test("append cannot widen or relabel the machine-approved retention class", async (t) => {
+  const root = await temporaryDirectory(t);
+  await initializeWorkspace(root, { capture: "content" });
+  await assert.rejects(
+    () => appendEvent(eventInput({
+      retention: { class: "durable", expiresAt: null }
+    }), { cwd: root, capture: "content" }),
+    (error) => error.code === "RETENTION_NOT_APPROVED"
+  );
+  assert.equal((await readEvents(root)).length, 0);
 });
 
 test("concurrent appends serialize into one valid hash chain", async (t) => {
@@ -179,6 +366,26 @@ test("workspace trust can always be revoked after mismatch, corruption, or prior
     const workspace = await initializeWorkspace(root);
     await rm(machineTrustPath(workspace.root), { force: true });
     assert.equal((await revokeWorkspaceTrust(root)).trusted, false);
+    await assert.rejects(() => loadWorkspace(root), (error) => error.code === "WORKSPACE_NOT_TRUSTED");
+  });
+
+  await t.test("corrupt portable config", async (subtest) => {
+    const root = await temporaryDirectory(subtest);
+    const workspace = await initializeWorkspace(root);
+    const originalConfig = await readFile(workspace.configPath, "utf8");
+    await writeFile(workspace.configPath, "not-json\n", "utf8");
+    assert.equal((await revokeWorkspaceTrust(root)).trusted, false);
+    await writeFile(workspace.configPath, originalConfig, "utf8");
+    await assert.rejects(() => loadWorkspace(root), (error) => error.code === "WORKSPACE_NOT_TRUSTED");
+  });
+
+  await t.test("a late checkpoint write cannot erase revocation", async (subtest) => {
+    const root = await temporaryDirectory(subtest);
+    const workspace = await initializeWorkspace(root);
+    const trustPath = machineTrustPath(workspace.root);
+    const lateCheckpoint = await readFile(trustPath, "utf8");
+    await revokeWorkspaceTrust(root);
+    await writeFile(trustPath, lateCheckpoint, "utf8");
     await assert.rejects(() => loadWorkspace(root), (error) => error.code === "WORKSPACE_NOT_TRUSTED");
   });
 });
@@ -351,4 +558,20 @@ test("trusted checkpoints detect tail truncation and missing logs", async (t) =>
   await assert.rejects(() => readEvents(workspace), (error) => error.code === "CHECKPOINT_ROLLBACK");
   await rm(eventPath, { force: true });
   await assert.rejects(() => verifyStore(root), (error) => error.code === "EVENT_LOG_MISSING");
+});
+
+test("authoritative storage rejects hard-linked files before append", async (t) => {
+  const root = await temporaryDirectory(t);
+  const workspace = await initializeWorkspace(root);
+  const outside = path.join(await temporaryDirectory(t), "outside-ledger.jsonl");
+  const eventPath = path.join(workspace.qarinahDir, "events", "events.jsonl");
+  await writeFile(outside, "", "utf8");
+  await rm(eventPath);
+  await link(outside, eventPath);
+
+  await assert.rejects(
+    () => appendEvent(eventInput({ body: "HARD_LINK_ESCAPE_MARKER" }), { cwd: root }),
+    (error) => error.code === "STORAGE_LINK_REJECTED"
+  );
+  assert.equal(await readFile(outside, "utf8"), "");
 });

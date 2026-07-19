@@ -9,6 +9,15 @@ export type QarinahRelationType =
 
 export interface QarinahRelation { type: QarinahRelationType; target: string }
 export interface QarinahActor { type: "human" | "agent" | "tool" | "system" | "source"; id: string }
+export interface QarinahAuthority {
+  scope: string;
+  rank: number;
+  assignedBy: string;
+  assignedAt: string;
+  expiresAt: string | null;
+  revokedAt: string | null;
+  basis: string;
+}
 export interface QarinahEventInput {
   eventId?: string;
   timestamp?: string;
@@ -20,13 +29,15 @@ export interface QarinahEventInput {
   body?: string;
   data?: Record<string, unknown>;
   confidence?: QarinahConfidence;
+  authority?: QarinahAuthority;
   relations?: QarinahRelation[];
   provenance?: { adapter?: string; sourceId?: string | null; contentHash?: string };
   retention?: { class?: "session" | "project" | "durable"; expiresAt?: string | null };
 }
-export interface QarinahEvent extends Required<Omit<QarinahEventInput, "provenance" | "retention">> {
+export interface QarinahEvent extends Required<Omit<QarinahEventInput, "provenance" | "retention" | "authority">> {
   schemaVersion: "qarinah.event.v1";
   workspaceId: string;
+  authority?: QarinahAuthority;
   provenance: { adapter: string; sourceId: string | null; contentHash: string };
   retention: { class: "session" | "project" | "durable"; expiresAt: string | null };
   previousHash: string | null;
@@ -45,56 +56,157 @@ export interface QarinahConfig {
 }
 export interface QarinahCheckpoint { eventCount: number; headHash: string | null; logBytes: number; eventIdIndexHash: string | null; updatedAt: string }
 export interface QarinahConsent {
-  schemaVersion: "qarinah.trust.v1";
+  schemaVersion: "qarinah.trust.v2";
   root: string;
   workspaceId: string;
+  enabled: boolean;
   capture: "metadata" | "content";
+  maxEventBytes: number;
+  maxLogBytes: number;
+  contextMaxChars: number;
+  retentionClass: "session" | "project" | "durable";
+  policyHash: `sha256:${string}`;
   grantedAt: string;
   checkpoint: QarinahCheckpoint;
+}
+export interface QarinahCapturePolicy {
+  schemaVersion: "qarinah.capture-policy.v1";
+  root: string;
+  workspaceId: string;
+  enabled: boolean;
+  capture: "metadata" | "content";
+  maxEventBytes: number;
+  maxLogBytes: number;
+  contextMaxChars: number;
+  retentionClass: "session" | "project" | "durable";
+  policyHash: `sha256:${string}`;
 }
 export interface QarinahWorkspace { root: string; qarinahDir: string; config: QarinahConfig; configPath: string; consent: QarinahConsent | null }
 export interface QarinahContextItem {
   eventId: string; kind: string; timestamp: string; title: string; excerpt: string;
-  confidence: QarinahConfidence; reason: string; hash: string;
+  confidence: QarinahConfidence; authority?: QarinahAuthority; reason: string; hash: string;
+}
+export interface QarinahTokenEstimator {
+  id: string;
+  version: string;
+  exact?: boolean;
+  estimate(text: string): number;
+}
+export interface QarinahTokenReservation {
+  name: "framing" | "citations" | "content";
+  minimum: number;
+  target: number;
+  maximum: number;
+  priority: number;
+  overflow: "error" | "truncate";
 }
 export interface QarinahContextPack {
   schemaVersion: "qarinah.context-pack.v1";
   workspaceId: string;
   query: string;
-  budget: { maxChars: number; usedChars: number; estimatedTokens: number };
+  contentRole: "untrusted-data";
+  budget: {
+    maxChars: number;
+    usedChars: number;
+    estimatedTokens: number;
+    maxTokens?: number;
+    usedTokens?: number;
+    reservedTokens?: number;
+    availableTokens?: number;
+    estimator?: { id: string; version: string; exact: boolean };
+    allocations?: { framing: number; citations: number; content: number };
+    reservationPolicyHash?: string;
+  };
+  retrieval: {
+    strategy: "hybrid-local-v1";
+    supersessionPolicy: "prefer-current" | "include-history";
+    asOf: string;
+    authorityScope?: string;
+    filters?: { expired: number; future: number };
+    conflicts?: Array<{ eventIds: [string, string] }>;
+    exclusions?: Array<{ eventId: string; reason: "superseded"; by: string[] }>;
+  };
   items: QarinahContextItem[];
   truncated: boolean;
   manifestHash: string;
+}
+export interface QarinahOkfExportResult {
+  readonly schemaVersion: "qarinah.okf-export.v1";
+  readonly okfVersion: "0.1";
+  readonly derived: true;
+  readonly source: ".qarinah/events/events.jsonl";
+  readonly workspaceId: string;
+  readonly eventCount: number;
+  readonly headHash: string | null;
+  readonly bundleHash: string;
+  readonly fileCount: number;
+  readonly outputDirectory: string;
 }
 
 export class QarinahError extends Error { code: string; details?: unknown }
 export const EVENT_SCHEMA_VERSION: "qarinah.event.v1";
 export const CONTEXT_PACK_SCHEMA_VERSION: "qarinah.context-pack.v1";
+export const OKF_EXPORT_SCHEMA_VERSION: "qarinah.okf-export.v1";
+export const OKF_VERSION: "0.1";
 export const CONFIG_SCHEMA_VERSION: "qarinah.config.v1";
-export const INDEX_SCHEMA_VERSION: "qarinah.index.v1";
+export const INDEX_SCHEMA_VERSION: "qarinah.index.v2";
 export const GRAPH_SCHEMA_VERSION: "qarinah.graph.v1";
-export const QARINAH_VERSION: "0.1.0-alpha.0";
+export const QARINAH_VERSION: "0.1.0-alpha.1";
 export const EVENT_KINDS: readonly QarinahEventKind[];
 export const RELATION_TYPES: readonly QarinahRelationType[];
 export function initializeWorkspace(target?: string, options?: { capture?: "metadata" | "content" }): Promise<QarinahWorkspace>;
 export function findWorkspaceRoot(start?: string): Promise<string | null>;
 export function loadWorkspace(start?: string, options?: { allowDisabled?: boolean; skipConsent?: boolean }): Promise<QarinahWorkspace>;
 export function setWorkspaceEnabled(start: string | undefined, enabled: boolean): Promise<QarinahConfig>;
-export function revokeWorkspaceTrust(start?: string): Promise<{ root: string; workspaceId: string; trusted: false }>;
+export function revokeWorkspaceTrust(start?: string): Promise<{ root: string; workspaceId: string | null; trusted: false }>;
 export function resolveWithin(root: string, ...segments: string[]): string;
 export function secureStoragePath(workspace: QarinahWorkspace, segments: string[], options?: { allowMissing?: boolean; type?: "file" | "directory" }): Promise<string>;
 export function createEventEnvelope(input: QarinahEventInput, options: { workspaceId: string; previousHash?: string | null; maximumEventBytes?: number; clock?: () => Date; randomUUID?: () => string }): QarinahEvent;
 export function validateStoredEvent(value: unknown, options?: { expectedPreviousHash?: string | null; workspaceId?: string; maximumEventBytes?: number }): QarinahEvent;
-export function appendEvent(input: QarinahEventInput, options?: { cwd?: string; workspace?: QarinahWorkspace; clock?: () => Date; randomUUID?: () => string; idempotent?: boolean }): Promise<QarinahEvent>;
-export function approveWorkspaceTrust(start: string | undefined, expectedCapture: "metadata" | "content"): Promise<{ root: string; workspaceId: string; capture: "metadata" | "content"; trusted: true; eventCount: number; headHash: string | null }>;
+export function appendEvent(input: QarinahEventInput, options?: { cwd?: string; workspace?: QarinahWorkspace; capture?: "metadata" | "content"; clock?: () => Date; randomUUID?: () => string; idempotent?: boolean }): Promise<QarinahEvent>;
+export function inspectWorkspacePolicy(start?: string): Promise<QarinahCapturePolicy>;
+export function approveWorkspaceTrust(start: string | undefined, expectedCapture: "metadata" | "content", expectedPolicyHash: `sha256:${string}`): Promise<{ root: string; workspaceId: string; capture: "metadata" | "content"; policyHash: `sha256:${string}`; trusted: true; eventCount: number; headHash: string | null }>;
 export function readEvents(workspaceOrStart?: QarinahWorkspace | string, options?: { skipCheckpoint?: boolean; updateCheckpoint?: boolean }): Promise<QarinahEvent[]>;
 export function verifyStore(start?: string, options?: { updateCheckpoint?: boolean; includeRoot?: boolean }): Promise<{ ok: true; workspaceId: string; eventCount: number; headHash: string | null; capture: string; root?: string }>;
 export function rebuildDerivedState(start?: string): Promise<{ workspaceId: string; eventCount: number; headHash: string | null }>;
 export function loadIndex(start?: string, options?: { rebuild?: boolean; updateCheckpoint?: boolean; inMemory?: boolean }): Promise<{ workspace: QarinahWorkspace; index: unknown }>;
 export function buildDerivedState(events: QarinahEvent[], workspaceId: string): { index: unknown; graph: unknown };
 export function tokenize(value: unknown): string[];
-export function compileContext(query?: string, options?: { cwd?: string; maxChars?: number; limit?: number; rebuild?: boolean; updateCheckpoint?: boolean; inMemory?: boolean }): Promise<QarinahContextPack>;
+export function compileContext(query?: string, options?: {
+  cwd?: string;
+  maxChars?: number;
+  maxTokens?: number;
+  reserveTokens?: number;
+  tokenEstimator?: QarinahTokenEstimator;
+  reservations?: QarinahTokenReservation[];
+  limit?: number;
+  diversity?: number;
+  supersessionPolicy?: "prefer-current" | "include-history";
+  authorityScope?: string;
+  asOf?: string;
+  clock?: () => Date;
+  rebuild?: boolean;
+  updateCheckpoint?: boolean;
+  inMemory?: boolean;
+}): Promise<QarinahContextPack>;
 export function renderContextPackMarkdown(pack: QarinahContextPack): string;
+export function exportOkf(options?: { cwd?: string; output?: string }): Promise<QarinahOkfExportResult>;
+export const PORTABLE_TOKEN_ESTIMATOR: Readonly<QarinahTokenEstimator & { exact: false }>;
+export function normalizeTokenEstimator(candidate?: QarinahTokenEstimator): Readonly<QarinahTokenEstimator & { exact: boolean }>;
+export function estimateTokens(estimator: QarinahTokenEstimator, text: string): number;
+export function createTokenBudget(options: {
+  maxTokens?: number;
+  reserveTokens?: number;
+  tokenEstimator?: QarinahTokenEstimator;
+  reservations?: QarinahTokenReservation[];
+}, maxChars: number): Readonly<Record<string, unknown>>;
+export function rankContextEvents(index: unknown, query: string | undefined, options: {
+  limit?: number;
+  diversity?: number;
+  supersessionPolicy?: "prefer-current" | "include-history";
+  authorityScope?: string;
+  asOf: string;
+}): Readonly<Record<string, unknown>>;
 export function captureCodexHook(input: Record<string, unknown>, options?: { cwd?: string }): Promise<{ captured: boolean; reason?: string; eventId?: string; hash?: string }>;
 export function captureClaudeHook(input: Record<string, unknown>, options?: { cwd?: string }): Promise<{ captured: boolean; reason?: string; eventId?: string; hash?: string }>;
 export interface QarinahMcpServer {

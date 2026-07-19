@@ -1,5 +1,6 @@
 import { appendEvent } from "../store.js";
 import { compileContext } from "../compiler.js";
+import { reviewMetadataEventInput } from "../capture-policy.js";
 import { QarinahError } from "../errors.js";
 import { rebuildDerivedState } from "../indexer.js";
 import {
@@ -275,7 +276,8 @@ export function registerMaqamContextAdapters(input) {
     const workspace = await loadTrustedInteropWorkspace(locator);
     const capture = requestedCapture(request.capture, workspace);
     const eventInput = capture === "content" ? request.event : metadataEventInput(request.event, workspace);
-    const event = await appendEvent(eventInput, { workspace });
+    const retainedInput = capture === "metadata" ? reviewMetadataEventInput(eventInput) : eventInput;
+    const event = await appendEvent(retainedInput, { workspace, capture });
     await rebuildDerivedState(workspace.root);
     const evidence = addEvidence(addBatch, [{
       sourceType: "qarinah.context-event",

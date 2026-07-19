@@ -8,7 +8,7 @@ export {
 } from "./contracts.js";
 export { QarinahError } from "./errors.js";
 export { QARINAH_VERSION } from "./version.js";
-export { appendEvent, approveWorkspaceTrust, readEvents, verifyStore } from "./store.js";
+export { appendEvent, approveWorkspaceTrust, inspectWorkspacePolicy, readEvents, verifyStore } from "./store.js";
 export {
   CONFIG_SCHEMA_VERSION,
   findWorkspaceRoot,
@@ -28,6 +28,14 @@ export {
   tokenize
 } from "./indexer.js";
 export { compileContext, renderContextPackMarkdown } from "./compiler.js";
+export { OKF_EXPORT_SCHEMA_VERSION, OKF_VERSION, exportOkf } from "./okf.js";
+export { rankContextEvents } from "./retrieval.js";
+export {
+  PORTABLE_TOKEN_ESTIMATOR,
+  createTokenBudget,
+  estimateTokens,
+  normalizeTokenEstimator
+} from "./token-budget.js";
 export { captureCodexHook } from "./hooks/codex.js";
 export { captureClaudeHook } from "./hooks/claude.js";
 export { createMcpServer, runMcpServer } from "./mcp/server.js";
