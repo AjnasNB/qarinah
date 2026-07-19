@@ -11,6 +11,7 @@ import { atomicWriteFile, loadWorkspace, resolveWithin, secureStoragePath } from
 const MAX_EVENTS = 100_000;
 const LOCK_STALE_MS = 120_000;
 const LOCK_HEARTBEAT_MS = 10_000;
+const LOCK_RELEASE_RETRIES = 20;
 const LOCK_OWNER_MAX_BYTES = 4_096;
 const HOSTNAME = os.hostname();
 const OWNER_NAME_PATTERN = /^owner-([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\.json$/;
@@ -31,6 +32,10 @@ async function injectStoreFault(options, point, details = {}) {
 
 function delay(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
+function isTransientWindowsLockError(error) {
+  return process.platform === "win32" && ["EBUSY", "EPERM"].includes(error?.code);
 }
 
 function processIsAlive(pid) {
@@ -448,12 +453,32 @@ async function acquireLock(workspace) {
         if (!owner?.value || owner.ownerPath !== ownerPath || owner.value.ownerToken !== ownerToken) {
           throw new QarinahError("STORE_LOCK_LOST", "Refusing to release an append lock owned by another process.");
         }
-        try {
-          await rm(ownerPath);
-          await rmdir(lockPath);
-        } catch (error) {
-          if (!["ENOENT", "ENOTEMPTY", "EEXIST"].includes(error?.code)) throw error;
+
+        const releasedPath = resolveWithin(locksDirectory, `append.lock.released-${ownerToken}`);
+        let moved = false;
+        let moveError;
+        for (let attempt = 0; attempt < LOCK_RELEASE_RETRIES; attempt += 1) {
+          try {
+            await rename(lockPath, releasedPath);
+            moved = true;
+            break;
+          } catch (error) {
+            if (!isTransientWindowsLockError(error)) throw error;
+            moveError = error;
+            await delay(10 + Math.min(attempt, 10) * 5);
+          }
         }
+        if (!moved) throw moveError;
+
+        const releasedNames = await readdir(releasedPath);
+        const releasedOwner = await inspectLockOwner(releasedPath);
+        if (releasedNames.length !== 1
+          || releasedNames[0] !== ownerName
+          || !releasedOwner?.value
+          || releasedOwner.value.ownerToken !== ownerToken) {
+          throw new QarinahError("STORE_LOCK_LOST", "Refusing to remove a released append lock with unexpected contents.");
+        }
+        await rm(releasedPath, { recursive: true, force: true, maxRetries: 5, retryDelay: 25 });
       };
       Object.defineProperty(release, "assertOwned", { value: assertOwned });
       Object.defineProperty(release, "__testLock", {
@@ -478,7 +503,8 @@ async function acquireLock(workspace) {
           continue;
         }
       } catch (inspectionError) {
-        if (!["ENOENT", "EEXIST"].includes(inspectionError?.code)) throw inspectionError;
+        if (!["ENOENT", "EEXIST"].includes(inspectionError?.code)
+          && !isTransientWindowsLockError(inspectionError)) throw inspectionError;
       }
       await delay(25 + Math.min(attempt, 20) * 5);
     }

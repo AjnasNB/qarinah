@@ -39,7 +39,7 @@ try {
       bundle: true,
       platform: "node",
       format: "esm",
-      target: "node20",
+      target: "node22",
       sourcemap: false,
       minify: false,
       legalComments: "inline",

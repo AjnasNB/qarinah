@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -88,6 +88,7 @@ test("concurrent appends serialize into one valid hash chain", async (t) => {
   for (let index = 1; index < events.length; index += 1) {
     assert.equal(events[index].previousHash, events[index - 1].hash);
   }
+  assert.deepEqual(await readdir(path.join(root, ".qarinah", "locks")), []);
 });
 
 test("independent processes serialize through the owner-token lock", async (t) => {
@@ -100,6 +101,7 @@ test("independent processes serialize through the owner-token lock", async (t) =
   for (let index = 1; index < events.length; index += 1) {
     assert.equal(events[index].previousHash, events[index - 1].hash);
   }
+  assert.deepEqual(await readdir(path.join(root, ".qarinah", "locks")), []);
 });
 
 test("non-canonical log bytes and hash tampering are rejected", async (t) => {

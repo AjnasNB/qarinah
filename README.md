@@ -19,7 +19,7 @@ Qarinah is not a vector database, a hidden chain-of-thought recorder, an operati
 
 ## Quick start
 
-Requires Node.js 20.18.1 or newer.
+Requires a maintained Node.js 22, 24, or 26 release.
 
 ```powershell
 npm install
