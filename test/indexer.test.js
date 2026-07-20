@@ -129,8 +129,16 @@ test("Markdown rendering normalizes line separators and visibly escapes terminal
 test("context compiler is cited, reproducible, and budget bounded", async (t) => {
   const root = await temporaryDirectory(t);
   const workspace = await initializeWorkspace(root);
-  await appendEvent(eventInput({ title: "Maqam approval boundary", body: "Durable writes require exact approval." }), { workspace });
-  await appendEvent(eventInput({ title: "Unrelated crawler note", body: "A public source was normalized." }), { workspace });
+  await appendEvent(eventInput({
+    timestamp: "2026-07-19T12:00:00.000Z",
+    title: "Maqam approval boundary",
+    body: "Durable writes require exact approval."
+  }), { workspace });
+  await appendEvent(eventInput({
+    timestamp: "2026-07-19T12:01:00.000Z",
+    title: "Unrelated crawler note",
+    body: "A public source was normalized."
+  }), { workspace });
 
   const options = { cwd: root, maxChars: 1_024, limit: 10, asOf: "2026-07-20T00:00:00.000Z" };
   const first = await compileContext("Maqam approval", options);
@@ -147,16 +155,19 @@ test("hybrid retrieval combines fuzzy text, graph relations, and deterministic d
   const root = await temporaryDirectory(t);
   const workspace = await initializeWorkspace(root);
   const source = await appendEvent(eventInput({
+    timestamp: "2026-07-19T12:00:00.000Z",
     kind: "source",
     title: "PostgreSQL authentication runbook",
     body: "Rotate database credentials through the approved secret-management workflow."
   }), { workspace });
   const decision = await appendEvent(eventInput({
+    timestamp: "2026-07-19T12:01:00.000Z",
     title: "Keep database credential rotation governed",
     body: "The runbook remains the evidence source.",
     relations: [{ type: "derived_from", target: source.eventId }]
   }), { workspace });
   await appendEvent(eventInput({
+    timestamp: "2026-07-19T12:02:00.000Z",
     title: "Unrelated deployment note",
     body: "The frontend asset pipeline completed."
   }), { workspace });
@@ -309,6 +320,7 @@ test("explicit token budgets reserve output headroom with a pluggable estimator"
   const workspace = await initializeWorkspace(root);
   for (let index = 0; index < 8; index += 1) {
     await appendEvent(eventInput({
+      timestamp: `2026-07-19T12:0${index}:00.000Z`,
       title: `Context budget record ${index}`,
       body: `Relevant content ${index} ${"x".repeat(800)}`
     }), { workspace });

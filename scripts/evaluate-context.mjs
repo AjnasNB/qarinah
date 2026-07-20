@@ -10,8 +10,10 @@ import {
 
 const root = await mkdtemp(path.join(os.tmpdir(), "qarinah-context-eval-"));
 process.env.QARINAH_STATE_DIR = path.join(root, ".machine-state");
+let inputSequence = 0;
 
 function input(overrides = {}) {
+  const timestamp = new Date(Date.UTC(2026, 3, 1, 0, inputSequence++)).toISOString();
   return {
     kind: "decision",
     actor: { type: "human", id: "eval-owner" },
@@ -22,6 +24,7 @@ function input(overrides = {}) {
     relations: [],
     provenance: { adapter: "qarinah-context-eval", sourceId: null },
     retention: { class: "project", expiresAt: null },
+    timestamp,
     ...overrides
   };
 }
