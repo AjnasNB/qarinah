@@ -68,12 +68,13 @@ try {
   await rebuildDerivedState(root);
   const buildMs = performance.now() - buildStarted;
 
+  const queryAsOf = new Date().toISOString();
   const queryStarted = performance.now();
   const pack = await compileContext("Codex tool completed benchmark.tool", {
     cwd: root,
     limit: 20,
     maxChars: 12_000,
-    asOf: "2026-07-20T00:00:00.000Z"
+    asOf: queryAsOf
   });
   const queryMs = performance.now() - queryStarted;
   const store = await verifyStore(root);
