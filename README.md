@@ -4,13 +4,14 @@
 
 <h1 align="center">Qarinah</h1>
 
-<p align="center"><strong>The memory layer your agents can verify.</strong></p>
+<p align="center"><strong>Less context. More proof.</strong></p>
 
 <p align="center">
   <a href="docs/WHITEPAPER.md">Technical paper</a>&nbsp;&middot;&nbsp;
   <a href="docs/ARCHITECTURE.md">Architecture</a>&nbsp;&middot;&nbsp;
   <a href="docs/BENCHMARKS.md">Benchmarks</a>&nbsp;&middot;&nbsp;
-  <a href="docs/SECURITY.md">Security</a>
+  <a href="docs/SECURITY.md">Security</a>&nbsp;&middot;&nbsp;
+  <a href="docs/ECOSYSTEM-LAUNCH.md">Launch plan</a>
 </p>
 
 <p align="center">
@@ -57,35 +58,15 @@ Supported event classes include prompts, tool requests, tool completions, approv
 
 ```mermaid
 flowchart TD
-  hosts["Agent hosts<br/>Codex + Claude Code"]
-  interfaces["Explicit interfaces<br/>CLI + JSON stdin"]
-  ecosystem["Ecosystem records<br/>Crawler + ProductLoop"]
-  workspace["Project files"]
+  inputs["Codex · Claude Code · CLI<br/>Crawler · ProductLoop · project files"]
+  boundary["Explicit capture boundary<br/>Consent · strict adapters · bounded scan"]
+  ledger[("Hash-chained JSONL<br/>authoritative record")]
+  views["Deterministic views<br/>typed graph · hybrid index · Markdown · OKF"]
+  compiler["Coverage-aware compiler<br/>budget · optional Maqam gate"]
+  pack["Small cited context pack"]
 
-  consent["Workspace consent<br/>Metadata by default"]
-  adapters["Strict versioned adapters"]
-  scanner["Bounded project scanner"]
-
-  trust["Machine-local trust<br/>and rollback checkpoint"]
-  ledger[("Authoritative hash-chained JSONL<br/>events/events.jsonl")]
-
-  projections["Deterministic projections<br/>Typed graph + hybrid index + CONTEXT.md + OKF"]
-  retrieve["Coverage-aware hybrid retrieval"]
-  compiler["Budgeted context compiler"]
-  gate["Explicit disclosure<br/>Optional Maqam policy gate"]
-  pack["Cited context pack"]
-
-  hosts --> adapters
-  interfaces --> adapters
-  ecosystem --> adapters
-  consent --> adapters
-  workspace --> scanner
-  adapters --> ledger
-  scanner --> ledger
-  trust -. verifies policy and head .-> ledger
-  ledger --> projections --> retrieve --> compiler
-  ledger -. cited evidence .-> compiler
-  compiler --> gate --> pack
+  inputs --> boundary --> ledger --> views --> compiler --> pack
+  ledger -. event IDs + hashes .-> pack
 
   classDef input fill:#ecfdf3,stroke:#16803c,color:#12351f,stroke-width:1.5px;
   classDef boundaryNode fill:#fff7e6,stroke:#b76e00,color:#3d2a00,stroke-width:1.5px;
@@ -93,11 +74,11 @@ flowchart TD
   classDef projectionNode fill:#eaf4ff,stroke:#2474b5,color:#102f4c,stroke-width:1.5px;
   classDef disclosureNode fill:#e8fbfb,stroke:#087f8c,color:#07373c,stroke-width:1.5px;
 
-  class hosts,interfaces,ecosystem,workspace input;
-  class consent,adapters,scanner boundaryNode;
-  class trust,ledger authorityNode;
-  class projections projectionNode;
-  class retrieve,compiler,gate,pack disclosureNode;
+  class inputs input;
+  class boundary boundaryNode;
+  class ledger authorityNode;
+  class views projectionNode;
+  class compiler,pack disclosureNode;
 ```
 
 The project graph covers directories, files, content hashes, JavaScript and TypeScript module references, Markdown links, exact source spans, additions, changes, renames, and deletions. See the [architecture guide](docs/ARCHITECTURE.md) or open the [raw Mermaid source](docs/architecture.mmd).
