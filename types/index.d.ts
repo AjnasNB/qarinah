@@ -161,7 +161,7 @@ export const CONFIG_SCHEMA_VERSION: "qarinah.config.v1";
 export const INDEX_SCHEMA_VERSION: "qarinah.index.v2";
 export const GRAPH_SCHEMA_VERSION: "qarinah.graph.v2";
 export const PROJECT_STRUCTURE_SCHEMA_VERSION: "qarinah.project-structure.v1";
-export const QARINAH_VERSION: "0.1.0-alpha.2";
+export const QARINAH_VERSION: "0.1.0-alpha.3";
 export const EVENT_KINDS: readonly QarinahEventKind[];
 export const RELATION_TYPES: readonly QarinahRelationType[];
 export function initializeWorkspace(target?: string, options?: { capture?: "metadata" | "content" }): Promise<QarinahWorkspace>;

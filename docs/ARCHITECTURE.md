@@ -67,7 +67,7 @@ The compiler resolves one UTC `asOf` value when the caller omits it. Exact repla
 | --- | --- | --- |
 | Codex | Allowlisted lifecycle schemas, skill guidance, and zero-write MCP diagnostics | Hooks provide observability, not universal host mediation. Hosted search is not hook-covered. |
 | Claude Code | Allowlisted lifecycle hooks, subagent and compaction events, skill guidance, and zero-write MCP diagnostics | Transcript files are never parsed. |
-| Other hosts | Explicit CLI, JSON stdin, or stdio MCP roots where supported | No universal-host compatibility claim. |
+| Other hosts | Explicit CLI, JSON stdin, stdio MCP roots, or an exact MCP workspace selector | No universal-host compatibility claim. |
 | Cockroach Crawler | Strict `SourceRecord` mapped to a stable revision and acquisition | Crawler material remains untrusted evidence and the crawler never imports Qarinah. |
 | Maqam | Separately registered context query and append tools | Writes require exact approval and content consent; unregistered side effects remain outside the boundary. |
 | ProductLoop | Validated, sequenced provenance events through the public sink contract | Independent run storage remains composable and divergent sequence histories are rejected. |

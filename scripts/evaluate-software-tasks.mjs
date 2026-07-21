@@ -150,7 +150,7 @@ try {
 
   if (!process.argv.includes("--no-verify")) {
     const committed = JSON.parse(await readFile(
-      path.join(repositoryRoot, "bench", "results", "software-task-context-0.1.0-alpha.2.json"),
+      path.join(repositoryRoot, "bench", "results", "software-task-context-0.1.0-alpha.3.json"),
       "utf8"
     ));
     assert.equal(committed.schemaVersion, "qarinah.software-task-context-eval-result.v1");

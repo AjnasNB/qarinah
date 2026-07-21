@@ -27,7 +27,7 @@
   Local-first. Source-cited. Tamper-evident. No Qarinah API key.
 </p>
 
-> Benchmark: React editing, database migration, TypeScript refactoring, web research, production debugging, and governed release work across 240 retained records. Full-history replay plus the required task sources was estimated at 442,113 input tokens; the same sources plus Qarinah packs was estimated at 5,682. Every required target ranked in the top five with direct coverage, and no model-written summary items were used. Estimates use `ceil(characters / 4)` and are not provider-billed Codex or Claude usage. See the [machine-readable result](bench/results/software-task-context-0.1.0-alpha.2.json) and [methodology](docs/BENCHMARKS.md).
+> Benchmark: React editing, database migration, TypeScript refactoring, web research, production debugging, and governed release work across 240 retained records. Full-history replay plus the required task sources was estimated at 442,113 input tokens; the same sources plus Qarinah packs was estimated at 5,682. Every required target ranked in the top five with direct coverage, and no model-written summary items were used. Estimates use `ceil(characters / 4)` and are not provider-billed Codex or Claude usage. See the [machine-readable result](bench/results/software-task-context-0.1.0-alpha.3.json) and [methodology](docs/BENCHMARKS.md).
 
 Qarinah turns permitted agent activity, project structure, and explicitly committed decisions into small, cited context packs. It preserves the evidence in a typed graph and deterministic Markdown and JSON views instead of making an opaque summary the source of truth.
 
@@ -157,26 +157,26 @@ The repository includes generated, dependency-free plugin runtimes for Codex and
 
 - allowlisted lifecycle hooks;
 - a Qarinah context skill;
-- zero-write `context_status` and `context_doctor` MCP tools;
+- zero-write `context_status` and `context_doctor` MCP tools with exact workspace selection for hosts that do not expose MCP roots;
 - explicit CLI querying for user-directed local workflows.
 
 Codex and Claude Code plugin caches are immutable copies. Reinstall the reviewed plugin and start a new task after an upgrade. Claude requires an explicitly selected absolute Node 22, 24, or 26 executable. Codex still inherits the host's reviewed Node `PATH` boundary because its current plugin schema does not expose an equivalent file setting. See [host integrations](docs/HOST-INTEGRATIONS.md).
 
 Automatic MCP context disclosure remains disabled. A context pack must be explicitly requested or disclosed through a separately governed Maqam capability.
 
-The repository also runs `npm run mcp:smoke` against the exact bundled Codex and Claude runtimes. The smoke test starts each stdio server from its packaged manifest, negotiates an MCP filesystem root, lists the two annotated tools, calls both tools against a temporary trusted ledger, and verifies clean shutdown without stderr output.
+The repository also runs `npm run mcp:smoke` against the exact bundled Codex and Claude runtimes. The smoke test starts each stdio server from its packaged manifest, exercises Codex without MCP roots using an exact trusted workspace selector, exercises Claude with negotiated roots, lists the two annotated tools, calls both tools against a temporary trusted ledger, and verifies clean shutdown without stderr output.
 
 ### Install once, initialize each project
 
-After the public `v0.1.0-alpha.2` release is approved, install the reviewed plugin once in each host:
+After the public `v0.1.0-alpha.3` release is approved, install the reviewed plugin once in each host:
 
 ```sh
 # Codex: personal installation, available to opted-in projects.
-codex plugin marketplace add AjnasNB/qarinah --ref v0.1.0-alpha.2
+codex plugin marketplace add AjnasNB/qarinah --ref v0.1.0-alpha.3
 codex plugin add qarinah@qarinah
 
 # Claude Code: personal installation across projects.
-claude plugin marketplace add AjnasNB/qarinah@v0.1.0-alpha.2 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.1.0-alpha.3 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 

@@ -1,0 +1,132 @@
+{
+  "schemaVersion": "qarinah.software-task-context-eval-result.v1",
+  "packageVersion": "0.1.0-alpha.3",
+  "fixture": {
+    "records": 240,
+    "cases": 6,
+    "taskFamilies": [
+      "React accessibility edit",
+      "Database schema migration",
+      "Repository-wide TypeScript refactor",
+      "Web research to implementation",
+      "Production regression debugging",
+      "Governed release preparation"
+    ],
+    "baseline": "Current task source snippets plus replay of the complete retained 240-record history.",
+    "qarinah": "The identical current task source snippets plus a query-specific cited Qarinah context pack."
+  },
+  "expected": {
+    "records": 240,
+    "cases": 6,
+    "allTargetsInTopFive": true,
+    "allCoverageDirect": true,
+    "modelSummaryItems": 0,
+    "totalBaselineEstimatedTokens": 442113,
+    "totalQarinahEstimatedTokens": 5682,
+    "weightedEstimatedTokenReduction": 0.987148,
+    "minimumScenarioEstimatedTokenReduction": 0.986105,
+    "scenarios": [
+      {
+        "id": "react-accessibility-edit",
+        "label": "React accessibility edit",
+        "targetRank": 1,
+        "coverage": "direct",
+        "summaryItems": 0,
+        "currentSourceChars": 1033,
+        "fullHistoryChars": 294027,
+        "packChars": 3065,
+        "baselineChars": 295060,
+        "qarinahChars": 4098,
+        "baselineEstimatedTokens": 73765,
+        "qarinahEstimatedTokens": 1025,
+        "estimatedTokenReduction": 0.986105
+      },
+      {
+        "id": "database-schema-migration",
+        "label": "Database schema migration",
+        "targetRank": 1,
+        "coverage": "direct",
+        "summaryItems": 0,
+        "currentSourceChars": 785,
+        "fullHistoryChars": 294027,
+        "packChars": 3084,
+        "baselineChars": 294812,
+        "qarinahChars": 3869,
+        "baselineEstimatedTokens": 73703,
+        "qarinahEstimatedTokens": 968,
+        "estimatedTokenReduction": 0.986866
+      },
+      {
+        "id": "typescript-codebase-refactor",
+        "label": "Repository-wide TypeScript refactor",
+        "targetRank": 1,
+        "coverage": "direct",
+        "summaryItems": 0,
+        "currentSourceChars": 484,
+        "fullHistoryChars": 294027,
+        "packChars": 3095,
+        "baselineChars": 294511,
+        "qarinahChars": 3579,
+        "baselineEstimatedTokens": 73628,
+        "qarinahEstimatedTokens": 895,
+        "estimatedTokenReduction": 0.987844
+      },
+      {
+        "id": "web-research-to-code",
+        "label": "Web research to implementation",
+        "targetRank": 1,
+        "coverage": "direct",
+        "summaryItems": 0,
+        "currentSourceChars": 743,
+        "fullHistoryChars": 294027,
+        "packChars": 3106,
+        "baselineChars": 294770,
+        "qarinahChars": 3849,
+        "baselineEstimatedTokens": 73693,
+        "qarinahEstimatedTokens": 963,
+        "estimatedTokenReduction": 0.986932
+      },
+      {
+        "id": "production-debugging",
+        "label": "Production regression debugging",
+        "targetRank": 1,
+        "coverage": "direct",
+        "summaryItems": 0,
+        "currentSourceChars": 760,
+        "fullHistoryChars": 294027,
+        "packChars": 3054,
+        "baselineChars": 294787,
+        "qarinahChars": 3814,
+        "baselineEstimatedTokens": 73697,
+        "qarinahEstimatedTokens": 954,
+        "estimatedTokenReduction": 0.987055
+      },
+      {
+        "id": "governed-release-edit",
+        "label": "Governed release preparation",
+        "targetRank": 2,
+        "coverage": "direct",
+        "summaryItems": 0,
+        "currentSourceChars": 481,
+        "fullHistoryChars": 294027,
+        "packChars": 3025,
+        "baselineChars": 294508,
+        "qarinahChars": 3506,
+        "baselineEstimatedTokens": 73627,
+        "qarinahEstimatedTokens": 877,
+        "estimatedTokenReduction": 0.988089
+      }
+    ]
+  },
+  "tokenEstimator": {
+    "method": "ceil(chars/4)",
+    "exact": false,
+    "providerBillingMeasurement": false
+  },
+  "referenceRun": {
+    "date": "2026-07-21",
+    "node": "v24.15.0",
+    "platform": "win32-x64"
+  },
+  "claim": "98.71% fewer estimated context tokens than full-history replay across six committed software-task fixtures; every required target ranked in the top five with direct evidence coverage."
+}

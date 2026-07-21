@@ -18,14 +18,32 @@ const TOOLS = Object.freeze([
     name: "context_status",
     title: "Context ledger status",
     description: "Read the opt-in local context ledger status for the active workspace. This never initializes, trusts, or changes a workspace.",
-    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+    inputSchema: {
+      type: "object",
+      properties: {
+        workspace: {
+          type: "string",
+          description: "Absolute local workspace path or file URI. Pass the current task workspace when the MCP host does not advertise filesystem roots."
+        }
+      },
+      additionalProperties: false
+    },
     annotations: TOOL_ANNOTATIONS
   },
   {
     name: "context_doctor",
     title: "Verify context ledger",
     description: "Verify the local event chain, machine-local trust checkpoint, and derived index without repairing or changing them.",
-    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+    inputSchema: {
+      type: "object",
+      properties: {
+        workspace: {
+          type: "string",
+          description: "Absolute local workspace path or file URI. Pass the current task workspace when the MCP host does not advertise filesystem roots."
+        }
+      },
+      additionalProperties: false
+    },
     annotations: TOOL_ANNOTATIONS
   }
 ]);
@@ -93,6 +111,24 @@ function pathFromRoot(root) {
   }
 }
 
+function pathFromSelector(value) {
+  if (typeof value !== "string" || value.trim().length === 0) {
+    throw new QarinahError("MCP_WORKSPACE_INVALID", "The MCP workspace selector must be a non-empty absolute path or file URI.");
+  }
+  const selector = value.trim();
+  if (selector.startsWith("file:")) {
+    try {
+      return fileURLToPath(new URL(selector));
+    } catch {
+      throw new QarinahError("MCP_WORKSPACE_INVALID", "The MCP workspace selector is not a valid local file URI.");
+    }
+  }
+  if (!path.isAbsolute(selector)) {
+    throw new QarinahError("MCP_WORKSPACE_INVALID", "The MCP workspace selector must be an absolute local path.");
+  }
+  return selector;
+}
+
 export function createMcpServer(options = {}) {
   if (!options || typeof options !== "object" || Array.isArray(options)) throw new TypeError("MCP server options must be an object.");
   const write = options.write ?? ((message) => process.stdout.write(`${JSON.stringify(message)}\n`));
@@ -129,9 +165,11 @@ export function createMcpServer(options = {}) {
     return rootsCache;
   }
 
-  async function resolveWorkspace() {
+  async function resolveWorkspace(selector = undefined) {
     let candidates = [];
-    if (typeof options.cwd === "string" && options.cwd.length > 0) {
+    if (selector !== undefined) {
+      candidates = [{ value: pathFromSelector(selector), exact: true }];
+    } else if (typeof options.cwd === "string" && options.cwd.length > 0) {
       candidates = [{ value: options.cwd, exact: true }];
     }
     if (typeof process.env.CLAUDE_PROJECT_DIR === "string" && process.env.CLAUDE_PROJECT_DIR.length > 0) {
@@ -182,8 +220,8 @@ export function createMcpServer(options = {}) {
   async function callTool(name, rawArguments) {
     try {
       if (name === "context_status") {
-        validateToolInput(rawArguments, []);
-        const workspace = await resolveWorkspace();
+        const input = validateToolInput(rawArguments, ["workspace"]);
+        const workspace = await resolveWorkspace(input.workspace);
         const store = await verifyStore(workspace.root, { updateCheckpoint: false, includeRoot: false });
         return textResult({
           ...store,
@@ -193,8 +231,8 @@ export function createMcpServer(options = {}) {
         });
       }
       if (name === "context_doctor") {
-        validateToolInput(rawArguments, []);
-        const workspace = await resolveWorkspace();
+        const input = validateToolInput(rawArguments, ["workspace"]);
+        const workspace = await resolveWorkspace(input.workspace);
         const store = await verifyStore(workspace.root, { updateCheckpoint: false, includeRoot: false });
         let derived = "current";
         try {
@@ -223,7 +261,7 @@ export function createMcpServer(options = {}) {
         protocolVersion,
         capabilities: { tools: { listChanged: false } },
         serverInfo: { name: SERVER_NAME, title: "Qarinah Context", version: QARINAH_VERSION },
-        instructions: "Context Ledger MCP tools provide zero-write status and integrity diagnostics only. Context disclosure requires a separately governed Maqam capability."
+        instructions: "Context Ledger MCP tools provide zero-write status and integrity diagnostics only. Pass the current task's absolute workspace path in the workspace argument unless this client advertises filesystem roots. Context disclosure requires a separately governed Maqam capability."
       });
     }
     if (!initialized) return jsonRpcError(message.id, -32002, "The MCP server has not been initialized.");

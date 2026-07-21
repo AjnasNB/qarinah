@@ -26,7 +26,7 @@ Re-check registries and repositories immediately before publishing. As of the da
 | Maqam | `0.3.2` is the stable GitHub and npm release | Ready for demos that use only documented guarantees |
 | ProductLoop | `0.2.3` is the stable GitHub and npm release | Present as orchestration, not a second flagship launch |
 | Cockroach Crawler | `0.2.0` is stable; `0.3.0-alpha.3` is the npm `next` and GitHub prerelease line | Use the prerelease only in an explicitly labeled technical preview |
-| Qarinah | `0.1.0-alpha.2` is an unpublished candidate in a private repository | Do not announce, tag, or publish until every gate in [LAUNCH.md](LAUNCH.md) is complete |
+| Qarinah | `0.1.0-alpha.3` is an unpublished candidate in a private repository | Do not announce, tag, or publish until every gate in [LAUNCH.md](LAUNCH.md) is complete |
 
 Never describe a local version, candidate, or prerelease as the latest stable release.
 
@@ -95,7 +95,7 @@ Acceptance evidence:
 
 1. Make Qarinah public only after the secret and legal gates pass. Public visibility is required if npm provenance should point to a public source repository.
 2. Configure [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/) for the exact GitHub workflow and protected release environment.
-3. Stage Qarinah `0.1.0-alpha.2`, inspect the registry artifact, install it into a clean consumer, and approve the exact identity.
+3. Stage Qarinah `0.1.0-alpha.3`, inspect the registry artifact, install it into a clean consumer, and approve the exact identity.
 4. Publish Qarinah under npm `next`, create the matching prerelease tag and [GitHub release](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases) at the same commit, and verify provenance, integrity, package contents, links, and plugin installation.
 5. Do not republish Maqam or ProductLoop merely to synchronize dates. Reference their current stable releases unless code actually changed.
 6. Keep Cockroach Crawler on `next` until its prerelease exit criteria pass; do not move `latest` for launch optics.

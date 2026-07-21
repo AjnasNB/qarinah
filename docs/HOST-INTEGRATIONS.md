@@ -26,21 +26,21 @@ The host plugin and the project ledger have different scopes:
 After the public prerelease and tag are approved, install for personal use across projects:
 
 ```powershell
-codex plugin marketplace add AjnasNB/qarinah --ref v0.1.0-alpha.2
+codex plugin marketplace add AjnasNB/qarinah --ref v0.1.0-alpha.3
 codex plugin add qarinah@qarinah
 
-claude plugin marketplace add AjnasNB/qarinah@v0.1.0-alpha.2 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.1.0-alpha.3 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 
 Claude Code also supports repository-shared `project` scope and gitignored per-user `local` scope:
 
 ```powershell
-claude plugin marketplace add AjnasNB/qarinah@v0.1.0-alpha.2 --scope project
+claude plugin marketplace add AjnasNB/qarinah@v0.1.0-alpha.3 --scope project
 claude plugin install qarinah@qarinah --scope project
 
 # Or keep the enablement personal to this repository.
-claude plugin marketplace add AjnasNB/qarinah@v0.1.0-alpha.2 --scope local
+claude plugin marketplace add AjnasNB/qarinah@v0.1.0-alpha.3 --scope local
 claude plugin install qarinah@qarinah --scope local
 ```
 
@@ -93,7 +93,7 @@ npm run build:plugins
 npm run mcp:smoke
 ```
 
-The smoke probe runs both bundled host manifests, negotiates `roots/list`, calls `context_status` and `context_doctor` against a temporary opted-in ledger, requires the server to remain alive until the client closes stdin, and rejects unexpected stderr output.
+The smoke probe runs both bundled host manifests, calls `context_status` and `context_doctor` against a temporary opted-in ledger, requires the server to remain alive until the client closes stdin, and rejects unexpected stderr output. Its Codex case deliberately omits MCP roots and passes the exact workspace selector; its Claude case negotiates `roots/list`.
 
 ## Local development
 
@@ -122,13 +122,13 @@ claude plugin marketplace add . --scope local
 claude plugin install qarinah@qarinah --scope local
 ```
 
-After the repository is public and tag `v0.1.0-alpha.2` is approved, the intended version-pinned install flow is:
+After the repository is public and tag `v0.1.0-alpha.3` is approved, the intended version-pinned install flow is:
 
 ```powershell
-codex plugin marketplace add AjnasNB/qarinah --ref v0.1.0-alpha.2
+codex plugin marketplace add AjnasNB/qarinah --ref v0.1.0-alpha.3
 codex plugin add qarinah@qarinah
 
-claude plugin marketplace add AjnasNB/qarinah@v0.1.0-alpha.2
+claude plugin marketplace add AjnasNB/qarinah@v0.1.0-alpha.3
 claude plugin install qarinah@qarinah
 ```
 
@@ -150,8 +150,10 @@ Workspace re-trust is also exact: `qarinah policy` prints the requested capture 
 
 The bundled stdio server exposes only:
 
-- `context_status`: verifies that the active workspace opted in and is machine-trusted;
-- `context_doctor`: checks the hash chain, checkpoint, and persisted index/graph/Markdown currency without repair;
+- `context_status`: verifies that the selected workspace opted in and is machine-trusted;
+- `context_doctor`: checks the selected workspace's hash chain, checkpoint, and persisted index/graph/Markdown currency without repair;
+
+Both tools accept an optional `workspace` string containing an absolute local path or `file:` URI. Pass the current task workspace explicitly on Codex because current Codex hosts do not guarantee MCP filesystem roots to plugin servers. Claude can resolve its project through `CLAUDE_PROJECT_DIR` or negotiated roots, but the same explicit selector is portable. Qarinah treats every selector as an exact boundary: it never walks up into an opted-in parent, never initializes or trusts the target, and never returns the absolute path in the tool result.
 
 Both tools advertise `readOnlyHint: true`, `openWorldHint: false`, and `destructiveHint: false`. They do not advance the machine-local checkpoint, repair derived state, or disclose absolute workspace paths. The server negotiates MCP lifecycle/version, supports client filesystem roots, caps newline-delimited JSON-RPC frames, emits protocol messages only on stdout, and sends no credentials over the protocol.
 
