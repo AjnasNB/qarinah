@@ -150,7 +150,8 @@ export const OKF_EXPORT_SCHEMA_VERSION: "qarinah.okf-export.v1";
 export const OKF_VERSION: "0.1";
 export const CONFIG_SCHEMA_VERSION: "qarinah.config.v1";
 export const INDEX_SCHEMA_VERSION: "qarinah.index.v2";
-export const GRAPH_SCHEMA_VERSION: "qarinah.graph.v1";
+export const GRAPH_SCHEMA_VERSION: "qarinah.graph.v2";
+export const PROJECT_STRUCTURE_SCHEMA_VERSION: "qarinah.project-structure.v1";
 export const QARINAH_VERSION: "0.1.0-alpha.1";
 export const EVENT_KINDS: readonly QarinahEventKind[];
 export const RELATION_TYPES: readonly QarinahRelationType[];
@@ -190,6 +191,29 @@ export function compileContext(query?: string, options?: {
   inMemory?: boolean;
 }): Promise<QarinahContextPack>;
 export function renderContextPackMarkdown(pack: QarinahContextPack): string;
+export interface QarinahProjectStructureChanges {
+  readonly added: readonly string[];
+  readonly changed: readonly string[];
+  readonly deleted: readonly string[];
+  readonly renamed: readonly { readonly from: string; readonly to: string; readonly contentHash: string }[];
+}
+export interface QarinahProjectStructureScanResult {
+  readonly captured: boolean;
+  readonly unchanged: boolean;
+  readonly eventId: string;
+  readonly hash?: string;
+  readonly snapshotHash: string;
+  readonly fileCount: number;
+  readonly directoryCount: number;
+  readonly changes?: QarinahProjectStructureChanges;
+}
+export function scanProjectStructure(options?: {
+  cwd?: string;
+  maxFiles?: number;
+  maxFileBytes?: number;
+  maxTotalBytes?: number;
+  maxDepth?: number;
+}): Promise<QarinahProjectStructureScanResult>;
 export function exportOkf(options?: { cwd?: string; output?: string }): Promise<QarinahOkfExportResult>;
 export const PORTABLE_TOKEN_ESTIMATOR: Readonly<QarinahTokenEstimator & { exact: false }>;
 export function normalizeTokenEstimator(candidate?: QarinahTokenEstimator): Readonly<QarinahTokenEstimator & { exact: boolean }>;

@@ -44,4 +44,10 @@ Run `"<trusted-node-path>" "<absolute-runtime-path>" doctor` before relying on t
 
 Run `"<trusted-node-path>" "<absolute-runtime-path>" build` after explicit records are added. Graph, index, and Markdown files are derived; the JSONL event chain remains authoritative.
 
+## Record project structure
+
+Only when the user explicitly requests project indexing, run the bundled runtime with the fixed `scan` command from the trusted workspace directory, then run the fixed `build` command. `scan` records bounded paths, content identities, conservative module/Markdown references, and change/rename/delete metadata. It honors root `.gitignore` and `.qarinahignore`, excludes linked and generated paths, and never stores source-file contents. Do not auto-scan on every prompt or widen scanner limits without a separately reviewed user request.
+
+Codex completion events already mark each captured turn in the event graph. In content mode the exposed final assistant message becomes the bounded turn body; metadata mode deliberately records only presence and size class. Never weaken metadata mode to manufacture a task summary.
+
 Read [event contract](references/event-contract.md) only when interpreting record kinds, confidence classes, relations, or security boundaries.

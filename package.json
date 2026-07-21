@@ -31,6 +31,7 @@
     },
     "./schemas/event.json": "./schemas/event.schema.json",
     "./schemas/context-pack.json": "./schemas/context-pack.schema.json",
+    "./schemas/project-structure.json": "./schemas/project-structure.schema.json",
     "./schemas/okf-export.json": "./schemas/okf-export.schema.json",
     "./schemas/maqam-context-adapter.json": "./schemas/maqam-context-adapter.schema.json",
     "./schemas/cockroach-source-record.json": "./schemas/cockroach-source-record.schema.json",
@@ -50,6 +51,7 @@
     "docs/GOVERNED-BROWSER.md",
     "docs/LAUNCH.md",
     "docs/LICENSE-STRATEGY.md",
+    "docs/MIGRATIONS.md",
     "examples/",
     "integrations/codex/qarinah/",
     "integrations/claude/qarinah/",
@@ -92,5 +94,8 @@
   "devDependencies": {
     "esbuild": "0.28.1",
     "typescript": "7.0.2"
+  },
+  "dependencies": {
+    "ignore": "7.0.6"
   }
 }
