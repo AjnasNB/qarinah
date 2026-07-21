@@ -42,6 +42,7 @@
     "types/",
     "schemas/",
     "docs/ARCHITECTURE.md",
+    "docs/WHITEPAPER.md",
     "docs/BENCHMARKS.md",
     "docs/SECURITY.md",
     "docs/ROADMAP.md",

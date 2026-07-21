@@ -4,7 +4,14 @@
 
 <h1 align="center">Qarinah</h1>
 
-<p align="center"><strong>Evidence-linked project memory for AI agents.</strong></p>
+<p align="center"><strong>The memory layer your agents can verify.</strong></p>
+
+<p align="center">
+  <a href="docs/WHITEPAPER.md">Technical paper</a> ·
+  <a href="docs/ARCHITECTURE.md">Architecture</a> ·
+  <a href="docs/BENCHMARKS.md">Benchmarks</a> ·
+  <a href="docs/SECURITY.md">Security</a>
+</p>
 
 <p align="center">
   <strong>94.96% smaller context payload in the committed 54-record evaluator.</strong><br>
@@ -13,7 +20,7 @@
 
 > Benchmark scope: the committed evaluator measures characters, uses four fixed retrieval cases, and preserves all four tested targets. This is not a universal token, billing, cost, or answer-quality guarantee. See the [machine-readable result](bench/results/context-evaluation-0.1.0-alpha.2.json) and [methodology](docs/BENCHMARKS.md).
 
-Qarinah is pronounced **kuh-REE-nuh** and spelled **Q-A-R-I-N-A-H**. It records permitted agent lifecycle events and explicitly committed decisions, links them to evidence in a typed graph, materializes Markdown and JSON views, and retrieves a small cited pack instead of replaying an entire project history.
+Qarinah turns permitted agent activity, project structure, and explicitly committed decisions into small, cited context packs. It preserves the evidence in a typed graph and deterministic Markdown and JSON views instead of making an opaque summary the source of truth.
 
 ## Why Qarinah
 
@@ -114,6 +121,16 @@ printf '%s' '{"query":"release provenance","format":"json","minimumCoverage":"di
 ```
 
 Delete any derived graph, index, or Markdown view and run `qarinah build` to reproduce it from the verified event chain.
+
+## Portable by design
+
+Qarinah can export a verified workspace record as a deterministic [Google Open Knowledge Format 0.1 Draft](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) bundle:
+
+```sh
+npx qarinah export okf
+```
+
+The export is reviewable Markdown with a root index, a chronological log, one concept file per event, typed relations, citations, content hashes, and chain hashes. It can be diffed in Git, inspected without Qarinah, or passed to another system that understands OKF Markdown. The append-only JSONL event chain remains authoritative; OKF is a deterministic, replaceable interchange view rather than a second database or retrieval engine. See [interoperability](docs/INTEROPERABILITY.md#google-open-knowledge-format-derived-interchange).
 
 ## Retrieval
 
