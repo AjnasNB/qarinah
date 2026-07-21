@@ -88,7 +88,7 @@ const RECORD_STDIN_JSON_FIELDS = new Set([
   "relations", "sourceId", "retention"
 ]);
 const QUERY_STDIN_JSON_FIELDS = new Set([
-  "query", "format", "limit", "maxChars", "maxTokens", "reserveTokens", "asOf"
+  "query", "format", "limit", "maxChars", "maxTokens", "reserveTokens", "asOf", "minimumCoverage"
 ]);
 
 async function readStdin(maximumBytes = 1_048_576) {
@@ -161,6 +161,10 @@ function stdinQueryInput(request) {
   }
   const format = Object.hasOwn(request, "format") ? request.format : "json";
   if (!["json", "markdown"].includes(format)) throw new TypeError("format must be json or markdown.");
+  const minimumCoverage = Object.hasOwn(request, "minimumCoverage") ? request.minimumCoverage : "any";
+  if (!["any", "partial", "direct"].includes(minimumCoverage)) {
+    throw new TypeError("minimumCoverage must be any, partial, or direct.");
+  }
   return {
     query,
     format,
@@ -168,7 +172,8 @@ function stdinQueryInput(request) {
     maxChars: requestInteger(request, "maxChars", 512, 1_000_000),
     maxTokens: requestInteger(request, "maxTokens", 128, 1_000_000),
     reserveTokens: requestInteger(request, "reserveTokens", 0, 999_936),
-    asOf: Object.hasOwn(request, "asOf") ? request.asOf : undefined
+    asOf: Object.hasOwn(request, "asOf") ? request.asOf : undefined,
+    minimumCoverage
   };
 }
 
@@ -184,7 +189,7 @@ Usage:
   qarinah build
   qarinah scan [--max-files n] [--max-file-bytes n] [--max-total-bytes n] [--max-depth n]
   qarinah export okf [--output <path>]
-  qarinah query [text] [--format json|markdown] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp]
+  qarinah query [text] [--format json|markdown] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp] [--minimum-coverage any|partial|direct]
   qarinah query --stdin-json
   qarinah policy [path]
   qarinah trust [path] --capture metadata|content --policy-hash sha256:<digest>
@@ -326,7 +331,8 @@ async function run(argv) {
           maxChars: integerOption(args, "--max-chars", undefined),
           maxTokens: integerOption(args, "--max-tokens", undefined),
           reserveTokens: integerOption(args, "--reserve-tokens", undefined),
-          asOf: option(args, "--as-of", undefined)
+          asOf: option(args, "--as-of", undefined),
+          minimumCoverage: option(args, "--minimum-coverage", "any")
         }
       : stdinQueryInput(request);
     const pack = await compileContext(input.query, {
@@ -335,7 +341,8 @@ async function run(argv) {
       maxChars: input.maxChars,
       maxTokens: input.maxTokens,
       reserveTokens: input.reserveTokens,
-      asOf: input.asOf
+      asOf: input.asOf,
+      minimumCoverage: input.minimumCoverage
     });
     const format = input.format;
     if (format === "json") process.stdout.write(`${JSON.stringify(pack, null, 2)}\n`);

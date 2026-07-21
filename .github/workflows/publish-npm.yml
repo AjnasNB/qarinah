@@ -1,0 +1,206 @@
+name: Publish npm (trusted)
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Exact package version to publish
+        required: true
+        default: 0.1.0-alpha.2
+        type: string
+      expected_git_commit:
+        description: Exact reviewed lowercase 40-character commit SHA
+        required: true
+        type: string
+      dist_tag:
+        description: npm dist-tag
+        required: true
+        default: next
+        type: choice
+        options: [next, latest]
+      expected_size_bytes:
+        description: Approved npm tarball size in bytes
+        required: true
+        type: string
+      expected_sha256:
+        description: Approved SHA-256 of the npm tarball
+        required: true
+        type: string
+      expected_integrity:
+        description: Approved npm sha512 integrity
+        required: true
+        type: string
+      confirmation:
+        description: Type publish qarinah@VERSION
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npm-publish-qarinah
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify approved artifact
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      sha256: ${{ steps.pack.outputs.sha256 }}
+      size_bytes: ${{ steps.pack.outputs.size_bytes }}
+    env:
+      EXPECTED_VERSION: ${{ inputs.version }}
+      EXPECTED_GIT_COMMIT: ${{ inputs.expected_git_commit }}
+      DIST_TAG: ${{ inputs.dist_tag }}
+      EXPECTED_SIZE_BYTES: ${{ inputs.expected_size_bytes }}
+      EXPECTED_SHA256: ${{ inputs.expected_sha256 }}
+      EXPECTED_INTEGRITY: ${{ inputs.expected_integrity }}
+      CONFIRMATION: ${{ inputs.confirmation }}
+    steps:
+      - name: Validate dispatch
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "${GITHUB_REF}" == "refs/heads/main" ]] || { echo "Dispatch from main only." >&2; exit 1; }
+          [[ "${GITHUB_REPOSITORY}" == "AjnasNB/qarinah" ]] || { echo "Unexpected repository." >&2; exit 1; }
+          [[ "${EXPECTED_GIT_COMMIT}" =~ ^[0-9a-f]{40}$ ]] || { echo "Invalid reviewed commit." >&2; exit 1; }
+          [[ "${EXPECTED_GIT_COMMIT}" == "${GITHUB_SHA}" ]] || { echo "Reviewed commit does not match the workflow commit." >&2; exit 1; }
+          [[ "${EXPECTED_SIZE_BYTES}" =~ ^[1-9][0-9]*$ ]] || { echo "Invalid size." >&2; exit 1; }
+          [[ "${EXPECTED_SHA256}" =~ ^[0-9a-f]{64}$ ]] || { echo "Invalid SHA-256." >&2; exit 1; }
+          [[ "${EXPECTED_INTEGRITY}" =~ ^sha512-[A-Za-z0-9+/]+={0,2}$ ]] || { echo "Invalid integrity." >&2; exit 1; }
+          [[ "${CONFIRMATION}" == "publish qarinah@${EXPECTED_VERSION}" ]] || { echo "Confirmation mismatch." >&2; exit 1; }
+          if [[ "${EXPECTED_VERSION}" == *-* && "${DIST_TAG}" != "next" ]]; then
+            echo "Prereleases must use the next dist-tag." >&2
+            exit 1
+          fi
+      - name: Check out approved commit
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.15.0
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - name: Install reviewed npm CLI
+        run: npm install --global npm@12.0.1 --ignore-scripts --no-audit --no-fund
+      - name: Verify package identity
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from "node:fs";
+          const manifest = JSON.parse(fs.readFileSync("package.json", "utf8"));
+          if (manifest.name !== "qarinah") throw new Error(`Unexpected package: ${manifest.name}`);
+          if (manifest.version !== process.env.EXPECTED_VERSION) throw new Error(`Unexpected version: ${manifest.version}`);
+          if (manifest.license !== "Apache-2.0" || manifest.private === true) throw new Error("Package is not public Apache-2.0.");
+          if (manifest.repository?.url !== "git+https://github.com/AjnasNB/qarinah.git") throw new Error("Unexpected repository URL.");
+          for (const file of ["LICENSE", "NOTICE", "THIRD_PARTY_NOTICES.md"]) {
+            if (!fs.existsSync(file)) throw new Error(`Missing ${file}.`);
+          }
+          NODE
+      - name: Install exact dependencies
+        run: npm ci --ignore-scripts
+      - name: Run complete release gate
+        run: npm run check
+      - name: Confirm version is unpublished
+        shell: bash
+        run: |
+          error_file="${RUNNER_TEMP}/npm-view.err"
+          if npm view "qarinah@${EXPECTED_VERSION}" version >/dev/null 2>"${error_file}"; then
+            echo "Version already exists." >&2; exit 1
+          fi
+          grep -Eq "E404|404 Not Found" "${error_file}" || { cat "${error_file}" >&2; exit 1; }
+      - name: Pack and verify exact artifact
+        id: pack
+        shell: bash
+        run: |
+          set -euo pipefail
+          pack_dir="${RUNNER_TEMP}/approved-pack"; mkdir -p "${pack_dir}"
+          npm pack --ignore-scripts --pack-destination "${pack_dir}" --json > "${RUNNER_TEMP}/pack.json"
+          tarball="${pack_dir}/qarinah-${EXPECTED_VERSION}.tgz"; test -f "${tarball}"
+          size="$(wc -c < "${tarball}" | tr -d '[:space:]')"
+          sha256="$(sha256sum "${tarball}" | awk '{print $1}')"
+          integrity="sha512-$(openssl dgst -sha512 -binary "${tarball}" | openssl base64 -A)"
+          [[ "${size}" == "${EXPECTED_SIZE_BYTES}" ]] || { echo "Size mismatch: ${size}" >&2; exit 1; }
+          [[ "${sha256}" == "${EXPECTED_SHA256}" ]] || { echo "SHA-256 mismatch: ${sha256}" >&2; exit 1; }
+          [[ "${integrity}" == "${EXPECTED_INTEGRITY}" ]] || { echo "Integrity mismatch." >&2; exit 1; }
+          echo "sha256=${sha256}" >> "${GITHUB_OUTPUT}"
+          echo "size_bytes=${size}" >> "${GITHUB_OUTPUT}"
+          printf '## Approved artifact\n\n- Package: `qarinah@%s`\n- Tag: `%s`\n- Commit: `%s`\n- Size: `%s` bytes\n- SHA-256: `%s`\n- Integrity: `%s`\n' "${EXPECTED_VERSION}" "${DIST_TAG}" "${GITHUB_SHA}" "${size}" "${sha256}" "${integrity}" >> "${GITHUB_STEP_SUMMARY}"
+
+  publish:
+    name: Publish after maintainer approval
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: npm-publish
+      url: https://www.npmjs.com/package/qarinah/v/${{ inputs.version }}
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      EXPECTED_VERSION: ${{ inputs.version }}
+      EXPECTED_GIT_COMMIT: ${{ inputs.expected_git_commit }}
+      DIST_TAG: ${{ inputs.dist_tag }}
+      EXPECTED_SIZE_BYTES: ${{ inputs.expected_size_bytes }}
+      EXPECTED_SHA256: ${{ inputs.expected_sha256 }}
+      EXPECTED_INTEGRITY: ${{ inputs.expected_integrity }}
+    steps:
+      - name: Check out verified commit
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.15.0
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - name: Install reviewed npm CLI
+        run: npm install --global npm@12.0.1 --ignore-scripts --no-audit --no-fund
+      - name: Repack approved artifact
+        id: repack
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "${EXPECTED_GIT_COMMIT}" == "${GITHUB_SHA}" ]] || exit 1
+          pack_dir="${RUNNER_TEMP}/publish-pack"; mkdir -p "${pack_dir}"
+          npm pack --ignore-scripts --pack-destination "${pack_dir}" --json > "${RUNNER_TEMP}/pack.json"
+          tarball="${pack_dir}/qarinah-${EXPECTED_VERSION}.tgz"
+          size="$(wc -c < "${tarball}" | tr -d '[:space:]')"
+          sha256="$(sha256sum "${tarball}" | awk '{print $1}')"
+          integrity="sha512-$(openssl dgst -sha512 -binary "${tarball}" | openssl base64 -A)"
+          [[ "${size}" == "${EXPECTED_SIZE_BYTES}" && "${{ needs.verify.outputs.size_bytes }}" == "${EXPECTED_SIZE_BYTES}" ]] || exit 1
+          [[ "${sha256}" == "${EXPECTED_SHA256}" && "${{ needs.verify.outputs.sha256 }}" == "${EXPECTED_SHA256}" ]] || exit 1
+          [[ "${integrity}" == "${EXPECTED_INTEGRITY}" ]] || exit 1
+          echo "tarball=${tarball}" >> "${GITHUB_OUTPUT}"
+      - name: Publish with npm Trusted Publishing
+        run: npm publish "${{ steps.repack.outputs.tarball }}" --access public --ignore-scripts --provenance --tag "${DIST_TAG}"
+      - name: Verify registry identity and provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in {1..36}; do
+            version="$(npm view "qarinah@${EXPECTED_VERSION}" version 2>/dev/null || true)"
+            integrity="$(npm view "qarinah@${EXPECTED_VERSION}" dist.integrity 2>/dev/null || true)"
+            predicate="$(npm view "qarinah@${EXPECTED_VERSION}" dist.attestations.provenance.predicateType 2>/dev/null || true)"
+            tag_version="$(npm view "qarinah@${DIST_TAG}" version 2>/dev/null || true)"
+            if [[ "${version}" == "${EXPECTED_VERSION}" && "${integrity}" == "${EXPECTED_INTEGRITY}" && "${predicate}" == "https://slsa.dev/provenance/v1" && "${tag_version}" == "${EXPECTED_VERSION}" ]]; then break; fi
+            sleep 5
+          done
+          [[ "${version}" == "${EXPECTED_VERSION}" && "${integrity}" == "${EXPECTED_INTEGRITY}" && "${predicate}" == "https://slsa.dev/provenance/v1" && "${tag_version}" == "${EXPECTED_VERSION}" ]] || exit 1
+      - name: Verify clean consumer
+        shell: bash
+        run: |
+          set -euo pipefail
+          consumer="${RUNNER_TEMP}/consumer"; mkdir -p "${consumer}"; cd "${consumer}"
+          npm init --yes >/dev/null
+          npm install "qarinah@${EXPECTED_VERSION}" --ignore-scripts
+          node --input-type=module -e "await import('qarinah'); await import('qarinah/codex'); await import('qarinah/claude'); await import('qarinah/mcp')"
+          npm audit signatures

@@ -35,6 +35,26 @@ test("derived graph and index rebuild deterministically", async (t) => {
   assert.equal(await readFile(path.join(workspace.qarinahDir, "graph", "graph.json"), "utf8"), firstGraph);
 });
 
+test("derived graphs materialize every relation target as a node", async (t) => {
+  const root = await temporaryDirectory(t);
+  const workspace = await initializeWorkspace(root);
+  await appendEvent(eventInput({
+    title: "Tool result",
+    relations: [
+      { type: "references", target: "session:test-session" },
+      { type: "affects", target: "turn:test-turn" },
+      { type: "derived_from", target: "toolcall:test-tool" }
+    ]
+  }), { workspace });
+  await rebuildDerivedState(root);
+  const graph = JSON.parse(await readFile(path.join(workspace.qarinahDir, "graph", "graph.json"), "utf8"));
+  const nodeIds = new Set(graph.nodes.map((node) => node.id));
+  assert.equal(graph.edges.every((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target)), true);
+  assert.equal(graph.nodes.find((node) => node.id === "session:test-session").type, "entity.session");
+  assert.equal(graph.nodes.find((node) => node.id === "turn:test-turn").type, "entity.turn");
+  assert.equal(graph.nodes.find((node) => node.id === "toolcall:test-tool").type, "entity.toolcall");
+});
+
 test("poisoned derived indexes are rejected and rebuilt from verified events", async (t) => {
   const root = await temporaryDirectory(t);
   const workspace = await initializeWorkspace(root);
@@ -140,15 +160,54 @@ test("context compiler is cited, reproducible, and budget bounded", async (t) =>
     body: "A public source was normalized."
   }), { workspace });
 
-  const options = { cwd: root, maxChars: 1_024, limit: 10, asOf: "2026-07-20T00:00:00.000Z" };
+  const options = { cwd: root, maxChars: 1_600, limit: 10, asOf: "2026-07-20T00:00:00.000Z" };
   const first = await compileContext("Maqam approval", options);
   const second = await compileContext("Maqam approval", options);
   assert.deepEqual(first, second);
-  assert.ok(first.budget.usedChars <= 1_024);
+  assert.ok(first.budget.usedChars <= 1_600);
   assert.equal(first.items[0].title, "Maqam approval boundary");
   assert.match(first.items[0].hash, /^sha256:/);
   assert.match(first.manifestHash, /^sha256:/);
   assert.match(renderContextPackMarkdown(first), /untrusted data/i);
+  assert.equal(first.schemaVersion, "qarinah.context-pack.v2");
+  assert.equal(first.retrieval.coverage.status, "direct");
+});
+
+test("coverage reports missing evidence and callers can fail closed", async (t) => {
+  const root = await temporaryDirectory(t);
+  const workspace = await initializeWorkspace(root);
+  await appendEvent(eventInput({
+    timestamp: "2026-07-19T12:00:00.000Z",
+    title: "Release approval policy",
+    body: "Exact artifact identity is required before publishing."
+  }), { workspace });
+
+  const missing = await compileContext("qzvxjklp nonexistent-memory-subject", {
+    cwd: root,
+    maxChars: 8_000,
+    asOf: "2026-07-20T00:00:00.000Z"
+  });
+  assert.equal(missing.retrieval.coverage.status, "none");
+  assert.equal(missing.items.length, 0);
+  assert.match(missing.retrieval.coverage.warning, /No durable event/);
+
+  await assert.rejects(
+    () => compileContext("qzvxjklp nonexistent-memory-subject", {
+      cwd: root,
+      maxChars: 8_000,
+      minimumCoverage: "partial",
+      asOf: "2026-07-20T00:00:00.000Z"
+    }),
+    (error) => error.code === "CONTEXT_COVERAGE_TOO_LOW"
+  );
+
+  const direct = await compileContext("release approval policy", {
+    cwd: root,
+    maxChars: 8_000,
+    minimumCoverage: "direct",
+    asOf: "2026-07-20T00:00:00.000Z"
+  });
+  assert.equal(direct.retrieval.coverage.status, "direct");
 });
 
 test("hybrid retrieval combines fuzzy text, graph relations, and deterministic diversity", async (t) => {

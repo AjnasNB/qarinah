@@ -166,6 +166,27 @@ function eventProjection(event) {
   });
 }
 
+function relationEntityType(identifier) {
+  const prefix = typeof identifier === "string" ? identifier.split(":", 1)[0] : "";
+  return ["session", "turn", "toolcall", "agent"].includes(prefix)
+    ? `entity.${prefix}`
+    : "entity.reference";
+}
+
+function closeRelationTargets(nodes, edges) {
+  const nodeIds = new Set(nodes.map((node) => node.id));
+  for (const edge of edges) {
+    if (nodeIds.has(edge.target)) continue;
+    nodes.push({
+      id: edge.target,
+      type: relationEntityType(edge.target),
+      confidence: "extracted",
+      sourceEventId: edge.source
+    });
+    nodeIds.add(edge.target);
+  }
+}
+
 export function buildDerivedState(events, workspaceId) {
   const projections = events.map(eventProjection);
   const postings = Object.create(null);
@@ -196,6 +217,7 @@ export function buildDerivedState(events, workspaceId) {
   }
 
   const projectStructure = appendProjectGraph(events, nodes, edges);
+  closeRelationTargets(nodes, edges);
 
   for (const term of Object.keys(postings)) postings[term].sort();
   for (const id of Object.keys(adjacency)) {

@@ -1,3 +1,5 @@
+import { realpath } from "node:fs/promises";
+import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { QarinahError } from "../errors.js";
 import { loadIndex } from "../indexer.js";
@@ -128,25 +130,42 @@ export function createMcpServer(options = {}) {
   }
 
   async function resolveWorkspace() {
-    const candidates = [];
-    if (typeof options.cwd === "string" && options.cwd.length > 0) candidates.push(options.cwd);
+    let candidates = [];
+    if (typeof options.cwd === "string" && options.cwd.length > 0) {
+      candidates = [{ value: options.cwd, exact: true }];
+    }
     if (typeof process.env.CLAUDE_PROJECT_DIR === "string" && process.env.CLAUDE_PROJECT_DIR.length > 0) {
-      candidates.push(process.env.CLAUDE_PROJECT_DIR);
+      if (candidates.length === 0) candidates = [{ value: process.env.CLAUDE_PROJECT_DIR, exact: true }];
     }
-    try {
-      candidates.push(...await advertisedRoots());
-    } catch (error) {
-      if (candidates.length === 0) throw error;
+    if (candidates.length === 0) {
+      try {
+        const roots = await advertisedRoots();
+        candidates = roots.map((value) => ({ value, exact: true }));
+      } catch (error) {
+        throw error;
+      }
     }
-    candidates.push(process.cwd());
+    if (candidates.length === 0) candidates = [{ value: process.cwd(), exact: false }];
     const workspaces = new Map();
     let lastError = null;
-    for (const candidate of [...new Set(candidates)]) {
+    const uniqueCandidates = [...new Map(candidates.map((candidate) => [candidate.value, candidate])).values()];
+    for (const candidate of uniqueCandidates) {
       try {
-        const workspace = await loadWorkspace(candidate);
+        const workspace = await loadWorkspace(candidate.value);
+        if (candidate.exact) {
+          const expectedRoot = await realpath(path.resolve(candidate.value));
+          if (path.normalize(workspace.root) !== path.normalize(expectedRoot)) {
+            throw new QarinahError(
+              "WORKSPACE_NOT_INITIALIZED",
+              "The explicitly selected MCP root is not an initialized Context Ledger workspace."
+            );
+          }
+        }
         workspaces.set(workspace.root, workspace);
       } catch (error) {
-        lastError = error;
+        lastError = candidate.exact && error?.code === "ENOENT"
+          ? new QarinahError("WORKSPACE_NOT_INITIALIZED", "The explicitly selected MCP root is not initialized.")
+          : error;
       }
     }
     if (workspaces.size === 1) return [...workspaces.values()][0];

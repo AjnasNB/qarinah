@@ -1,6 +1,6 @@
 {
   "name": "qarinah",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "description": "Qarinah: opt-in, evidence-linked local context capture and compilation for Codex.",
   "author": {
     "name": "Ajnas NB",
@@ -8,7 +8,7 @@
     "url": "https://github.com/AjnasNB"
   },
   "repository": "https://github.com/AjnasNB/qarinah",
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "keywords": ["context", "provenance", "governance", "codex"],
   "skills": "./skills/",
   "mcpServers": "./.mcp.json",

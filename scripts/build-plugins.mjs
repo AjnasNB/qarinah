@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { copyFile, mkdtemp, readFile, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -63,6 +63,16 @@ try {
       );
     } else {
       process.stdout.write(`Built ${path.relative(repositoryRoot, outputFile)}\n`);
+    }
+    for (const legalFile of ["LICENSE", "THIRD_PARTY_NOTICES.md"]) {
+      const source = path.join(repositoryRoot, legalFile);
+      const target = path.join(plugin.root, legalFile);
+      if (checking) {
+        const [expected, committed] = await Promise.all([readFile(source), readFile(target)]);
+        assert.ok(expected.equals(committed), `${plugin.name} ${legalFile} is stale. Run \`npm run build:plugins\`.`);
+      } else {
+        await copyFile(source, target);
+      }
     }
   }
   if (checking) process.stdout.write("Codex and Claude Code plugin runtimes are current.\n");
