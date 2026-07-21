@@ -101,7 +101,7 @@ export interface QarinahTokenReservation {
   overflow: "error" | "truncate";
 }
 export interface QarinahContextPack {
-  schemaVersion: "qarinah.context-pack.v1";
+  schemaVersion: "qarinah.context-pack.v2";
   workspaceId: string;
   query: string;
   contentRole: "untrusted-data";
@@ -122,6 +122,15 @@ export interface QarinahContextPack {
     supersessionPolicy: "prefer-current" | "include-history";
     asOf: string;
     authorityScope?: string;
+    coverage: {
+      method: "query-term-overlap-v1";
+      status: "no-query" | "none" | "partial" | "direct";
+      queryTermCount: number;
+      bestExactTermCount: number;
+      bestExactTermRatio: number;
+      directCandidateCount: number;
+      warning?: string;
+    };
     filters?: { expired: number; future: number };
     conflicts?: Array<{ eventIds: [string, string] }>;
     exclusions?: Array<{ eventId: string; reason: "superseded"; by: string[] }>;
@@ -145,14 +154,14 @@ export interface QarinahOkfExportResult {
 
 export class QarinahError extends Error { code: string; details?: unknown }
 export const EVENT_SCHEMA_VERSION: "qarinah.event.v1";
-export const CONTEXT_PACK_SCHEMA_VERSION: "qarinah.context-pack.v1";
+export const CONTEXT_PACK_SCHEMA_VERSION: "qarinah.context-pack.v2";
 export const OKF_EXPORT_SCHEMA_VERSION: "qarinah.okf-export.v1";
 export const OKF_VERSION: "0.1";
 export const CONFIG_SCHEMA_VERSION: "qarinah.config.v1";
 export const INDEX_SCHEMA_VERSION: "qarinah.index.v2";
 export const GRAPH_SCHEMA_VERSION: "qarinah.graph.v2";
 export const PROJECT_STRUCTURE_SCHEMA_VERSION: "qarinah.project-structure.v1";
-export const QARINAH_VERSION: "0.1.0-alpha.1";
+export const QARINAH_VERSION: "0.1.0-alpha.2";
 export const EVENT_KINDS: readonly QarinahEventKind[];
 export const RELATION_TYPES: readonly QarinahRelationType[];
 export function initializeWorkspace(target?: string, options?: { capture?: "metadata" | "content" }): Promise<QarinahWorkspace>;
@@ -184,6 +193,7 @@ export function compileContext(query?: string, options?: {
   diversity?: number;
   supersessionPolicy?: "prefer-current" | "include-history";
   authorityScope?: string;
+  minimumCoverage?: "any" | "partial" | "direct";
   asOf?: string;
   clock?: () => Date;
   rebuild?: boolean;

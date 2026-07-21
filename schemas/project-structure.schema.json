@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://qarinah.dev/schemas/project-structure.v1.json",
+  "$id": "https://github.com/AjnasNB/qarinah/schemas/project-structure.schema.json",
   "title": "Qarinah project structure snapshot",
   "type": "object",
   "additionalProperties": false,

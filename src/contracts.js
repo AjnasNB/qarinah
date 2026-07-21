@@ -4,7 +4,7 @@ import { canonicalIsoTimestamp } from "./interoperability/boundary.js";
 import { redactText, redactValue } from "./redact.js";
 
 export const EVENT_SCHEMA_VERSION = "qarinah.event.v1";
-export const CONTEXT_PACK_SCHEMA_VERSION = "qarinah.context-pack.v1";
+export const CONTEXT_PACK_SCHEMA_VERSION = "qarinah.context-pack.v2";
 
 export const EVENT_KINDS = Object.freeze([
   "session.started",

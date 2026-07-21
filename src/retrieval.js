@@ -241,6 +241,43 @@ function reasonFor(entry) {
   return `hybrid rank ${components}; diversified=${entry.diversityScore}`;
 }
 
+function queryCoverage(index, queryTerms, eligibleEventIds, lexical, fuzzy) {
+  if (queryTerms.length === 0) {
+    return Object.freeze({
+      method: "query-term-overlap-v1",
+      status: "no-query",
+      queryTermCount: 0,
+      bestExactTermCount: 0,
+      bestExactTermRatio: 1,
+      directCandidateCount: 0
+    });
+  }
+  let bestExactTermCount = 0;
+  for (const event of index.events) {
+    if (!eligibleEventIds.has(event.eventId)) continue;
+    const matched = queryTerms.filter((term) => (event.termFrequencies?.[term] || 0) > 0).length;
+    bestExactTermCount = Math.max(bestExactTermCount, matched);
+  }
+  const directCandidateCount = new Set([...lexical.keys(), ...fuzzy.keys()]).size;
+  const bestExactTermRatio = rounded(bestExactTermCount / queryTerms.length);
+  const status = directCandidateCount === 0
+    ? "none"
+    : (bestExactTermCount === queryTerms.length ? "direct" : "partial");
+  return Object.freeze({
+    method: "query-term-overlap-v1",
+    status,
+    queryTermCount: queryTerms.length,
+    bestExactTermCount,
+    bestExactTermRatio,
+    directCandidateCount,
+    ...(status === "none"
+      ? { warning: "No durable event directly matched this query." }
+      : (status === "partial"
+        ? { warning: "Only partial lexical or typo-tolerant coverage was found. Verify the cited evidence before relying on this pack." }
+        : {}))
+  });
+}
+
 export function rankContextEvents(index, query = "", options = {}) {
   const allEventsById = new Map(index.events.map((event) => [event.eventId, event]));
   const queryTerms = tokenize(query);
@@ -295,12 +332,14 @@ export function rankContextEvents(index, query = "", options = {}) {
       supersessionPolicy,
       authorityScope: authorityScope ?? null,
       asOf,
-      filters: { expired: expiredEventIds.size, future: futureEventIds.size }
+      filters: { expired: expiredEventIds.size, future: futureEventIds.size },
+      coverage: queryCoverage(index, queryTerms, eligibleEventIds, new Map(), new Map())
     });
   }
 
   const lexical = bm25Scores(index, queryTerms, eligibleEventIds);
   const fuzzy = fuzzyScores(index, query, eligibleEventIds);
+  const coverage = queryCoverage(index, queryTerms, eligibleEventIds, lexical, fuzzy);
   const seedScores = new Map([...lexical, ...fuzzy].map(([eventId]) => [eventId, (lexical.get(eventId) || 0) + (fuzzy.get(eventId) || 0)]));
   const graph = graphScores(index, seedScores, eventsById);
   const authority = authorityScores(index, new Set(seedScores.keys()), authorityScope, asOf);
@@ -326,6 +365,7 @@ export function rankContextEvents(index, query = "", options = {}) {
     supersessionPolicy,
     authorityScope: authorityScope ?? null,
     asOf,
-    filters: { expired: expiredEventIds.size, future: futureEventIds.size }
+    filters: { expired: expiredEventIds.size, future: futureEventIds.size },
+    coverage
   });
 }

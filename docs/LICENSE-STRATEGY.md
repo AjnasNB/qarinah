@@ -1,36 +1,23 @@
-# Licensing and product ownership decision
+# Licensing and stewardship
 
-This repository stays private, `UNLICENSED`, and non-publishable until the founder approves a counsel-reviewed model.
+## Founder decision
 
-## Constraint
+Qarinah source is licensed under Apache License 2.0. This is a permissive, OSI-approved open-source license with an explicit patent grant. It permits compliant commercial use, modification, redistribution, and private use.
 
-The Open Source Definition requires free redistribution and forbids restricting business or another field of endeavor. Therefore a license that says competitors may not use or commercialize the software is not an open-source license.
+The authoritative license text is the root [LICENSE](../LICENSE). This document is product guidance, not a substitute for legal advice.
 
-Primary references:
+## What remains owned
 
-- Open Source Definition: https://opensource.org/osd
-- OSI commercial-use FAQ: https://opensource.org/faq
-- GNU AGPLv3: https://www.gnu.org/licenses/agpl-3.0.html
-- Business Source License 1.1: https://mariadb.com/bsl11/
+- Copyright stays with the applicable copyright holders.
+- Contributions use Developer Certificate of Origin 1.1 sign-off.
+- Apache-2.0 does not grant general rights to project names or logos.
+- Hosted services, enterprise connectors, policy networks, certifications, support, and future separately licensed products may remain commercial offerings.
+- Open source does not prevent another company from commercializing compliant copies.
 
-## Option A: genuine open source
+## Brand status
 
-- AGPL-3.0-only core.
-- A professionally cleared context-product mark and the Maqam mark, each with a public usage policy.
-- Contributor License Agreement or Developer Certificate of Origin.
-- Commercial license for customers unwilling to satisfy AGPL obligations.
-- Proprietary hosted control plane, enterprise connectors, certification, support, and managed policy network.
-
-AGPL still permits compliant commercial use. Trademark law protects the product identity, not the underlying idea.
-
-## Option B: commercial restriction
-
-- BSL-style source-available core with an explicit additional-use grant and change date.
-- Paid commercial/production licenses.
-- Open protocols, SDKs, schemas, and community tools under a permissive or copyleft license.
-
-This can restrict production/commercial use but must be described as source-available, not open source.
+Qarinah is the selected project name, but professional trademark clearance is still recommended before commercial enforcement or claims of exclusivity. See [TRADEMARKS.md](../TRADEMARKS.md).
 
 ## Existing ecosystem
 
-Published MIT versions of Maqam, Cockroach Crawler, and ProductLoop already grant commercial rights. Those grants cannot be retroactively withdrawn from copies already received. Future versions may adopt a different compatible strategy after dependency and contributor review.
+Published MIT versions of Maqam, Cockroach Crawler, and ProductLoop remain available under the license received with those versions. Qarinah is a separate Apache-2.0 package and does not silently relicense those projects.

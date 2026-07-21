@@ -229,11 +229,14 @@ export function registerMaqamContextAdapters(input) {
     const addBatch = evidenceCapability(context, MAQAM_CONTEXT_QUERY_TOOL.name);
     const request = snapshotRecordBoundary(rawInput, {
       label: "context.query input",
-      keys: ["query", "maxChars", "maxItems"],
+      keys: ["query", "maxChars", "maxItems", "minimumCoverage"],
       maximumBytes: 16 * 1024,
       maximumStringLength: 4_096
     });
     if (request.query !== undefined && typeof request.query !== "string") throw new TypeError("context.query input.query must be a string.");
+    if (request.minimumCoverage !== undefined && !["any", "partial", "direct"].includes(request.minimumCoverage)) {
+      throw new TypeError("context.query input.minimumCoverage must be any, partial, or direct.");
+    }
     const maxChars = effectivePositiveLimit(request.maxChars, options.maxChars, context, "maxContextChars", 512);
     const maxItems = effectivePositiveLimit(request.maxItems, options.maxItems, context, "maxContextItems", 1);
     const pack = await compileContext(request.query ?? "", {
@@ -242,7 +245,8 @@ export function registerMaqamContextAdapters(input) {
       limit: maxItems,
       rebuild: false,
       updateCheckpoint: false,
-      inMemory: true
+      inMemory: true,
+      minimumCoverage: request.minimumCoverage
     });
     const items = pack.items.length > 0
       ? pack.items.map((item) => ({

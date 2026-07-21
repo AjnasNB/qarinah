@@ -4,7 +4,7 @@
     "name": "Ajnas NB"
   },
   "metadata": {
-    "description": "Private-alpha Qarinah integrations for evidence-linked local agent context"
+    "description": "Qarinah integrations for evidence-linked local agent context"
   },
   "plugins": [
     {

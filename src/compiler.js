@@ -111,6 +111,10 @@ export async function compileContext(query = "", options = {}) {
   if (!Number.isSafeInteger(limit) || limit < 1 || limit > 1_000) throw new TypeError("limit must be an integer from 1 to 1000.");
   if (typeof query !== "string" || query.length > 4_096) throw new TypeError("query must be a string up to 4096 characters.");
   const tokenPlan = createTokenBudget(options, maxChars);
+  const minimumCoverage = options.minimumCoverage ?? "any";
+  if (!["any", "partial", "direct"].includes(minimumCoverage)) {
+    throw new TypeError("minimumCoverage must be any, partial, or direct.");
+  }
 
   const retrieval = rankContextEvents(index, query, {
     limit,
@@ -120,6 +124,16 @@ export async function compileContext(query = "", options = {}) {
     authorityScope: options.authorityScope
   });
   const ranked = retrieval.ranked;
+  const coverageAccepted = minimumCoverage === "any"
+    || (minimumCoverage === "partial" && ["partial", "direct"].includes(retrieval.coverage.status))
+    || (minimumCoverage === "direct" && retrieval.coverage.status === "direct");
+  if (!coverageAccepted) {
+    throw new QarinahError(
+      "CONTEXT_COVERAGE_TOO_LOW",
+      `Context coverage '${retrieval.coverage.status}' does not satisfy minimumCoverage '${minimumCoverage}'.`,
+      { minimumCoverage, coverage: retrieval.coverage }
+    );
+  }
   const candidateIds = new Set(ranked.map((entry) => entry.event.eventId));
   const relevantConflicts = retrieval.conflicts
     .filter((conflict) => conflict.eventIds.some((eventId) => candidateIds.has(eventId)))
@@ -129,6 +143,7 @@ export async function compileContext(query = "", options = {}) {
     strategy: retrieval.strategy,
     supersessionPolicy: retrieval.supersessionPolicy,
     asOf: retrieval.asOf,
+    coverage: retrieval.coverage,
     ...(retrieval.authorityScope === null ? {} : { authorityScope: retrieval.authorityScope })
   };
   if (retrieval.filters.expired > 0 || retrieval.filters.future > 0) {
@@ -221,6 +236,8 @@ export function renderContextPackMarkdown(pack) {
     `- Manifest: \`${pack.manifestHash}\``,
     `- Retrieval: \`${pack.retrieval.strategy}\``,
     `- Supersession: \`${pack.retrieval.supersessionPolicy}\``,
+    `- Evidence coverage: \`${pack.retrieval.coverage.status}\` (${pack.retrieval.coverage.bestExactTermCount}/${pack.retrieval.coverage.queryTermCount} exact query terms in the best event)`,
+    ...(pack.retrieval.coverage.warning ? [`- Coverage warning: ${markdownInline(pack.retrieval.coverage.warning)}`] : []),
     `- Unresolved conflicts: ${pack.retrieval.conflicts?.length || 0}`,
     `- Truncated: ${pack.truncated ? "yes" : "no"}`,
     "",

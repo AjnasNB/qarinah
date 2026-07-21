@@ -1,56 +1,59 @@
 # Qarinah launch runbook
 
-This repository is a private prototype. Do not publish an npm package, public repository, plugin marketplace entry, or immutable release until every release gate below is satisfied.
+Qarinah is preparing an Apache-2.0 alpha. Do not publish an npm package, public repository, plugin marketplace entry, or immutable release until every incomplete gate below is satisfied and the exact artifact is approved.
 
 ## Release gates
 
-1. Professional clearance of the working name **Qarinah** and reserved package, domain, and social identifiers. “Context ledger” remains the neutral descriptor until clearance is complete.
-2. Written license choice. `UNLICENSED` is correct for the private prototype but not a public open-source launch.
-3. Threat-model review for capture, disclosure, MCP roots, hooks, and browser receipts.
-4. Clean main commit, reproducible generated runtimes, clean-consumer types, tests, benchmark, and packed-artifact inspection.
-5. Exact artifact identity: package, version, registry, commit, tarball SHA-256, npm integrity, and explicit human approval of that identity.
-6. Privacy, security-reporting, support, contribution, trademark, and third-party-notice documents.
+1. Confirm the product name with professional trademark review and reserve the package, domains, and social identifiers.
+2. Confirm every copyright holder can license the work under Apache-2.0. Keep the DCO, brand-use policy, and complete third-party attributions in the artifact.
+3. Complete the capture, disclosure, MCP-root, hook, interpreter, and browser-receipt threat-model review.
+4. Use a clean main commit, reproducible generated runtimes, clean-consumer types, all tests, benchmarks, and packed-artifact inspection.
+5. Record exact artifact identity: package, version, registry, commit, tarball SHA-256, npm integrity, dist-tag, and explicit approval.
+6. Run a full current-tree and Git-history secret scan. Review historical Actions logs before changing repository visibility.
+7. Verify privacy, security reporting, support, contribution, trademark, and third-party notice documents.
+8. Test real Codex and Claude Code installs from the release artifacts on Node 22, 24, and 26.
 
-## Launch sequence
+## Release candidate
 
-### Private alpha
+- Validate both repository catalogs and Claude's install-free `--plugin-dir` path.
+- Use metadata-only capture in disposable workspaces.
+- Verify `doctor`, stale-index refusal, root negotiation, upgrade, reinstall, uninstall, and interpreter resolution.
+- Run adversarial prompt, secret, linked-path, rollback, concurrent append, malformed hook, and no-evidence retrieval fixtures.
+- Confirm the package contains `LICENSE`, `NOTICE`, third-party attributions, declarations, schemas, plugins, and no private files.
 
-- Validate the repository catalogs, then install both generated plugins from the local private-alpha marketplace; also test Claude's install-free `--plugin-dir` path.
-- Use metadata-only capture in disposable test workspaces.
-- Verify `doctor`, stale-index refusal, root negotiation, upgrade/reinstall, uninstall, and no-PATH-fallback behavior.
-- Run adversarial prompt, secret, symlink/junction, rollback, concurrent append, and malformed hook fixtures.
+## Public technical preview
 
-### Public technical preview
+- Publish source only after the incomplete legal, name, secret-scan, and artifact gates are resolved.
+- Use `v0.1.0-alpha.2` as a GitHub prerelease and npm `next`, not `latest`.
+- Lead with a 60-second proof: opt in, record a decision, scan, verify hashes, and retrieve a direct-evidence pack.
+- State limits beside the demo: hooks observe supported host events, metadata is default, MCP diagnostics are read-only, hidden reasoning is excluded, and no universal internet access is claimed.
+- Use trusted npm publishing with provenance after the first package is staged and approved.
 
-- Publish source only after the license and name are settled.
-- Ship one small package plus two host plugin artifacts from the same commit.
-- Lead with a 60-second proof: opt in, record a decision, hand off between Codex and Claude, verify hashes, retrieve a bounded cited pack.
-- State limits beside the demo: hooks are observability, metadata is default, MCP is read-only, no hidden reasoning, no universal internet claim.
+## Community launch
 
-### Community launch
-
-- GitHub release and documentation first; npm only after the exact artifact is approved.
 - Prepare a concise Show HN post, technical article, architecture diagram, reproducible benchmark, security model, and contributor issues.
-- Offer copy-paste install/uninstall and a five-minute local demo.
-- Keep browser automation as a separate experimental capability until its denial/approval/DOM-race suite passes.
+- Offer copy-paste install, verification, and uninstall instructions.
+- Keep browser automation as a separately governed experimental capability until denial, approval, and DOM-race suites pass.
+- Respond to technical feedback with fixtures and evidence instead of unsupported claims.
 
 ## Positioning
 
 Use:
 
-- “Qarinah — evidence-linked context for AI agents.”
-- “An evidence-linked context ledger for every governed agent.”
-- “Small cited context packs instead of entire transcripts.”
-- “Local-first and no separate ledger API key.”
-- “Maqam governs. Cockroach gathers. Qarinah remembers. ProductLoop orchestrates.”
+- "Qarinah - evidence-linked project memory for AI agents."
+- "Small cited context packs instead of entire transcripts."
+- "Local-first and no Qarinah API key."
+- "Maqam governs. Cockroach gathers. Qarinah remembers. ProductLoop orchestrates."
+- "70%+ smaller context payloads in current fixed fixtures," only with the benchmark qualification beside it.
 
 Avoid:
 
-- “Prompt-injection proof,” “tamper-proof,” or “fully autonomous.”
-- “Works with every agent/model/website.”
-- “No API key required for all internet and model access.”
-- “Agentic OS” until process, capability, secrets, filesystem, network, and device mediation exist.
+- "Prompt-injection proof," "tamper-proof," or "fully autonomous."
+- "Works with every agent, model, or website."
+- "No API key required for all internet and model access."
+- "70% lower token cost" until provider usage is measured.
+- "Agentic OS" until process, capability, secrets, filesystem, network, and device mediation exist.
 
-## Open-source ownership
+## Open-source stewardship
 
-OSI-approved open-source licenses permit commercial use. They cannot guarantee that nobody else commercializes the code. Founder control comes from copyright ownership, a Contributor License Agreement or Developer Certificate of Origin, a separately protected trademark, controlled hosted services, and execution quality. If commercial use must be prohibited, use a source-available license and do not market it as open source.
+Apache-2.0 permits commercial use. Stewardship comes from copyright, reviewed contributions, a distinct brand, maintained release infrastructure, hosted services, and execution quality. It does not come from prohibiting compliant commercial use of the open-source code.

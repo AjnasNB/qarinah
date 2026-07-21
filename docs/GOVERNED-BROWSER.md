@@ -78,8 +78,8 @@ The trusted host or local vault resolves the reference only inside the final app
 - raw credentials, personal fields, and entered values never reach logs, traces, context records, or model payloads;
 - uncertain post-dispatch outcomes are marked `partial` or `unknown`, never rolled back by claim.
 
-## Optional Page Agent controller
+## Optional DOM-agent controller
 
-Alibaba Page Agent can be evaluated as an independently installed DOM controller for embedded copilots, accessibility commands, form filling, multi-page extensions, or an MCP-facing browser host. Do not expose its broad natural-language `execute(task)` method as one approved write. Let it propose structural operations, map those operations into Maqam's preview/apply/submit contract, and resolve approved value references only inside the trusted driver. Its model credentials, local-model configuration, extension permissions, CORS behavior, and beta MCP transport remain separate host responsibilities.
+An independently installed DOM controller can support embedded copilots, accessibility commands, form filling, multi-page extensions, or an MCP-facing browser host. Do not expose a broad natural-language `execute(task)` method as one approved write. Let the controller propose structural operations, map those operations into Maqam's preview/apply/submit contract, and resolve approved value references only inside the trusted driver. Model credentials, local-model configuration, extension permissions, CORS behavior, and MCP transport remain separate host responsibilities.
 
 Safe launch claim: **governed browser actions for approved origins with preview-before-fill and separately approved submit**.

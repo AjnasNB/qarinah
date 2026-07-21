@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title description">
+  <title id="title">Qarinah evidence-path mark</title>
+  <desc id="description">A Q-shaped evidence path with linked nodes and a protected center.</desc>
+  <g fill="none" stroke="#25E6A1" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M194 174A84 84 0 1 0 174 194L216 216V184L194 174Z" stroke-width="18"/>
+    <path d="M174 194L201 201" stroke-width="18"/>
+  </g>
+  <g fill="#25E6A1">
+    <circle cx="128" cy="44" r="11"/>
+    <circle cx="52" cy="128" r="11"/>
+    <circle cx="128" cy="212" r="11"/>
+    <circle cx="128" cy="128" r="13"/>
+  </g>
+</svg>

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readFile, readdir, stat, unlink, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, stat, unlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { Readable } from "node:stream";
@@ -170,6 +170,25 @@ test("MCP failures return stable path-free messages", async (t) => {
   assert.equal(result.structuredContent.code, "WORKSPACE_NOT_INITIALIZED");
   assert.equal(JSON.stringify(result).includes(privatePath), false);
   assert.equal(JSON.stringify(result).includes("private-client-Bob-uninitialized"), false);
+  server.close();
+});
+
+test("explicit MCP roots never fall through to an opted-in parent workspace", async (t) => {
+  const parent = await temporaryDirectory(t);
+  const workspace = await initializeWorkspace(parent);
+  await appendEvent(eventInput(), { workspace });
+  await rebuildDerivedState(parent);
+  const child = path.join(parent, "uninitialized-child");
+  await mkdir(child, { recursive: true });
+
+  const messages = [];
+  const server = createMcpServer({ cwd: child, write: (message) => messages.push(message) });
+  await initialize(server, messages);
+  await server.handle({ jsonrpc: "2.0", id: 61, method: "tools/call", params: { name: "context_status", arguments: {} } });
+  const result = response(messages, 61).result;
+  assert.equal(result.isError, true);
+  assert.equal(result.structuredContent.code, "WORKSPACE_NOT_INITIALIZED");
+  assert.equal(JSON.stringify(result).includes(parent), false);
   server.close();
 });
 

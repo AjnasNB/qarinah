@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/AjnasNB/qarinah/schemas/context-pack.schema.json",
-  "title": "Qarinah context pack v1",
+  "title": "Qarinah context pack v2",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -16,7 +16,7 @@
     "manifestHash"
   ],
   "properties": {
-    "schemaVersion": { "const": "qarinah.context-pack.v1" },
+    "schemaVersion": { "const": "qarinah.context-pack.v2" },
     "workspaceId": { "type": "string", "pattern": "^ws_[0-9a-f]{32}$" },
     "query": { "type": "string", "maxLength": 4096 },
     "contentRole": { "const": "untrusted-data" },
@@ -61,12 +61,26 @@
     "retrieval": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["strategy", "supersessionPolicy", "asOf"],
+      "required": ["strategy", "supersessionPolicy", "asOf", "coverage"],
       "properties": {
         "strategy": { "const": "hybrid-local-v1" },
         "supersessionPolicy": { "enum": ["prefer-current", "include-history"] },
         "asOf": { "type": "string", "format": "date-time", "maxLength": 24 },
         "authorityScope": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "coverage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["method", "status", "queryTermCount", "bestExactTermCount", "bestExactTermRatio", "directCandidateCount"],
+          "properties": {
+            "method": { "const": "query-term-overlap-v1" },
+            "status": { "enum": ["no-query", "none", "partial", "direct"] },
+            "queryTermCount": { "type": "integer", "minimum": 0, "maximum": 4096 },
+            "bestExactTermCount": { "type": "integer", "minimum": 0, "maximum": 4096 },
+            "bestExactTermRatio": { "type": "number", "minimum": 0, "maximum": 1 },
+            "directCandidateCount": { "type": "integer", "minimum": 0 },
+            "warning": { "type": "string", "minLength": 1, "maxLength": 512 }
+          }
+        },
         "filters": {
           "type": "object",
           "additionalProperties": false,

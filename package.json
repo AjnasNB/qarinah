@@ -1,9 +1,8 @@
 {
   "name": "qarinah",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "description": "Qarinah: evidence-linked, local-first context compilation for software agents.",
-  "license": "UNLICENSED",
-  "private": true,
+  "license": "Apache-2.0",
   "author": "Ajnas NB",
   "type": "module",
   "sideEffects": false,
@@ -43,6 +42,7 @@
     "types/",
     "schemas/",
     "docs/ARCHITECTURE.md",
+    "docs/BENCHMARKS.md",
     "docs/SECURITY.md",
     "docs/ROADMAP.md",
     "docs/PRODUCT-STRATEGY.md",
@@ -52,6 +52,16 @@
     "docs/LAUNCH.md",
     "docs/LICENSE-STRATEGY.md",
     "docs/MIGRATIONS.md",
+    "LICENSE",
+    "NOTICE",
+    "THIRD_PARTY_NOTICES.md",
+    "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
+    "SUPPORT.md",
+    "PRIVACY.md",
+    "TRADEMARKS.md",
+    "SECURITY.md",
+    "assets/brand/qarinah-mark.svg",
     "examples/",
     "integrations/codex/qarinah/",
     "integrations/claude/qarinah/",
@@ -79,6 +89,12 @@
   },
   "bugs": {
     "url": "https://github.com/AjnasNB/qarinah/issues"
+  },
+  "homepage": "https://github.com/AjnasNB/qarinah#readme",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true,
+    "tag": "next"
   },
   "keywords": [
     "agent-context",
