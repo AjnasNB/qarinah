@@ -40,13 +40,13 @@ This is the repeatable Qarinah tagline. It is short enough for GitHub, npm, the 
 
 ### Current proof line
 
-> **94.96% smaller context payload in the committed 54-record evaluator.**
+> **98.71% fewer estimated context tokens than full-history replay across six committed software-task fixtures.**
 
-Keep the qualification beside the number: the evaluator compares character volume across four fixed retrieval cases and preserves the four tested targets. It is not a universal token, cost, latency, or answer-quality result.
+Keep the direct details beside the number: 240 retained records; identical current-task source snippets on both sides; full-history replay versus cited Qarinah packs; 442,113 versus 5,682 estimated tokens; every target in the top five with direct coverage; zero model-written summary items; `ceil(characters / 4)` estimate rather than provider billing.
 
 ### Claim that is not yet approved
 
-Do not say "90% fewer tokens in Codex and Claude," "90% lower AI cost," or an equivalent provider claim yet. The current live-workspace table uses a portable character-based estimator, not provider billing or provider-native token accounting.
+Do not shorten the result to "90% fewer tokens in Codex and Claude," "90% lower AI cost," or an equivalent provider claim. The software-task benchmark supports a 98.71% estimated-context reduction against its named full-history baseline, not provider billing or provider-native token accounting.
 
 Promote a provider claim only after a committed evaluator:
 

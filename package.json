@@ -55,7 +55,9 @@
     "docs/ECOSYSTEM-LAUNCH.md",
     "docs/LICENSE-STRATEGY.md",
     "docs/MIGRATIONS.md",
+    "bench/fixtures/software-task-scenarios.mjs",
     "bench/results/",
+    "scripts/evaluate-software-tasks.mjs",
     "LICENSE",
     "NOTICE",
     "THIRD_PARTY_NOTICES.md",
@@ -66,6 +68,7 @@
     "TRADEMARKS.md",
     "SECURITY.md",
     "assets/brand/qarinah-mark.svg",
+    "assets/architecture/",
     "examples/",
     "integrations/codex/qarinah/",
     "integrations/claude/qarinah/",
@@ -81,10 +84,11 @@
     "prepublishOnly": "npm run check",
     "test": "node scripts/run-tests.mjs",
     "typecheck": "node scripts/typecheck-consumer.mjs",
-    "check": "npm run check:plugins && npm run check:docs && npm test && npm run typecheck && npm run check:benchmark-evidence && npm run benchmark && npm run evaluate:context && npm pack --dry-run --ignore-scripts",
+    "check": "npm run check:plugins && npm run check:docs && npm test && npm run typecheck && npm run check:benchmark-evidence && npm run benchmark && npm run evaluate:context && npm run evaluate:software-tasks && npm pack --dry-run --ignore-scripts",
     "check:benchmark-evidence": "node scripts/verify-benchmark-evidence.mjs",
     "benchmark": "node scripts/benchmark.mjs",
-    "evaluate:context": "node scripts/evaluate-context.mjs"
+    "evaluate:context": "node scripts/evaluate-context.mjs",
+    "evaluate:software-tasks": "node scripts/evaluate-software-tasks.mjs"
   },
   "engines": {
     "node": "^22.0.0 || ^24.0.0 || ^26.0.0"

@@ -23,11 +23,11 @@
 </p>
 
 <p align="center">
-  <strong>94.96% smaller context payload in the committed 54-record evaluator.</strong><br>
+  <strong>98.71% fewer estimated context tokens across six committed software-task fixtures.</strong><br>
   Local-first. Source-cited. Tamper-evident. No Qarinah API key.
 </p>
 
-> Benchmark scope: the committed evaluator measures characters, uses four fixed retrieval cases, and preserves all four tested targets. This is not a universal token, billing, cost, or answer-quality guarantee. See the [machine-readable result](bench/results/context-evaluation-0.1.0-alpha.2.json) and [methodology](docs/BENCHMARKS.md).
+> Benchmark: React editing, database migration, TypeScript refactoring, web research, production debugging, and governed release work across 240 retained records. Full-history replay plus the required task sources was estimated at 442,113 input tokens; the same sources plus Qarinah packs was estimated at 5,682. Every required target ranked in the top five with direct coverage, and no model-written summary items were used. Estimates use `ceil(characters / 4)` and are not provider-billed Codex or Claude usage. See the [machine-readable result](bench/results/software-task-context-0.1.0-alpha.2.json) and [methodology](docs/BENCHMARKS.md).
 
 Qarinah turns permitted agent activity, project structure, and explicitly committed decisions into small, cited context packs. It preserves the evidence in a typed graph and deterministic Markdown and JSON views instead of making an opaque summary the source of truth.
 
@@ -56,32 +56,11 @@ Supported event classes include prompts, tool requests, tool completions, approv
 
 ## Architecture
 
-```mermaid
-flowchart TD
-  inputs["Codex · Claude Code · CLI<br/>Crawler · ProductLoop · project files"]
-  boundary["Explicit capture boundary<br/>Consent · strict adapters · bounded scan"]
-  ledger[("Hash-chained JSONL<br/>authoritative record")]
-  views["Deterministic views<br/>typed graph · hybrid index · Markdown · OKF"]
-  compiler["Coverage-aware compiler<br/>budget · optional Maqam gate"]
-  pack["Small cited context pack"]
+<p align="center">
+  <img src="assets/architecture/qarinah-flow.svg" width="420" alt="Qarinah flow from Codex, Claude Code, CLI, crawler, workflows, and project files through explicit capture, a hash-chained record, deterministic graph and index views, a coverage-aware compiler, and a small cited context pack.">
+</p>
 
-  inputs --> boundary --> ledger --> views --> compiler --> pack
-  ledger -. event IDs + hashes .-> pack
-
-  classDef input fill:#ecfdf3,stroke:#16803c,color:#12351f,stroke-width:1.5px;
-  classDef boundaryNode fill:#fff7e6,stroke:#b76e00,color:#3d2a00,stroke-width:1.5px;
-  classDef authorityNode fill:#f1edff,stroke:#6548c7,color:#241653,stroke-width:2px;
-  classDef projectionNode fill:#eaf4ff,stroke:#2474b5,color:#102f4c,stroke-width:1.5px;
-  classDef disclosureNode fill:#e8fbfb,stroke:#087f8c,color:#07373c,stroke-width:1.5px;
-
-  class inputs input;
-  class boundary boundaryNode;
-  class ledger authorityNode;
-  class views projectionNode;
-  class compiler,pack disclosureNode;
-```
-
-The project graph covers directories, files, content hashes, JavaScript and TypeScript module references, Markdown links, exact source spans, additions, changes, renames, and deletions. See the [architecture guide](docs/ARCHITECTURE.md) or open the [raw Mermaid source](docs/architecture.mmd).
+The project graph covers directories, files, content hashes, JavaScript and TypeScript module references, Markdown links, exact source spans, additions, changes, renames, and deletions. See the [architecture guide](docs/ARCHITECTURE.md) or the [editable diagram source](docs/architecture.mmd).
 
 ## Install
 
@@ -185,6 +164,40 @@ Codex and Claude Code plugin caches are immutable copies. Reinstall the reviewed
 
 Automatic MCP context disclosure remains disabled. A context pack must be explicitly requested or disclosed through a separately governed Maqam capability.
 
+### Install once, initialize each project
+
+After the public `v0.1.0-alpha.2` release is approved, install the reviewed plugin once in each host:
+
+```sh
+# Codex: personal installation, available to opted-in projects.
+codex plugin marketplace add AjnasNB/qarinah --ref v0.1.0-alpha.2
+codex plugin add qarinah@qarinah
+
+# Claude Code: personal installation across projects.
+claude plugin marketplace add AjnasNB/qarinah@v0.1.0-alpha.2 --scope user
+claude plugin install qarinah@qarinah --scope user
+```
+
+Then opt in from the root of each project that should retain context:
+
+```sh
+npx -y qarinah@next init . --capture content
+npx -y qarinah@next scan
+npx -y qarinah@next doctor
+```
+
+Use `--capture metadata` when event bodies should not be retained. Content mode records only bounded, redacted fields exposed by supported hooks; it does not parse hidden transcripts or reasoning. At the start of a later task, ask the installed Qarinah context skill for direct evidence related to the task, or run a bounded query:
+
+```sh
+npx -y qarinah@next query "checkout dialog focus trap" \
+  --minimum-coverage direct \
+  --max-tokens 1500 \
+  --reserve-tokens 200 \
+  --format markdown
+```
+
+The returned pack selects complete cited records from the verified event chain. It is not a model-written rolling summary. Plugin installation is host-wide; capture permission and retained context remain project-specific. See [host integrations](docs/HOST-INTEGRATIONS.md) for current private-clone testing, Claude project/local scopes, upgrades, and interpreter trust.
+
 ## Ecosystem boundary
 
 - **Maqam governs** which registered reads and writes are allowed.
@@ -228,31 +241,22 @@ Content-mode redaction cannot prove that arbitrary tool output contains no secre
 Run:
 
 ```sh
+npm run evaluate:software-tasks
 npm run evaluate:context
 npm run benchmark
 ```
 
-The evaluator covers exact retrieval, typo tolerance, conflict recall, and supersession on a deterministic 54-record fixture. Percentages on this page refer to fixture character volume, not provider-billed tokens. The portable token estimator is deliberately labeled inexact. See [BENCHMARKS.md](docs/BENCHMARKS.md) for raw fields, baselines, limits, and the claims we refuse to make.
+| Software task | Full history + current sources | Qarinah + same sources | Reduction |
+| --- | ---: | ---: | ---: |
+| React accessibility edit | 73,765 estimated tokens | 1,025 estimated tokens | 98.61% |
+| Database schema migration | 73,703 | 968 | 98.69% |
+| TypeScript codebase refactor | 73,628 | 895 | 98.78% |
+| Web research to implementation | 73,693 | 963 | 98.69% |
+| Production regression debugging | 73,697 | 954 | 98.71% |
+| Governed release preparation | 73,627 | 877 | 98.81% |
+| **Weighted total** | **442,113** | **5,682** | **98.71%** |
 
-### Reproducible release fixture
-
-| Context method | Characters per query | Result |
-| --- | ---: | ---: |
-| Qarinah selected pack | 2,237 | Baseline |
-| Raw 54-record event log | 44,364 | Qarinah used 94.96% less |
-
-Run `npm run evaluate:context` to regenerate the fixture and fail if its deterministic fields differ from the committed result.
-
-### Observed live workspace check
-
-| Context method | Estimated tokens | Reduction |
-| --- | ---: | ---: |
-| Qarinah live pack | 1,743 | Baseline |
-| Eight manually selected project documents | 18,370 | Qarinah used 90.51% less |
-| Entire generated `CONTEXT.md` | 15,306 | Qarinah used 88.61% less |
-| All 230 indexed files | 611,222 | Qarinah used 99.71% less |
-
-This second table uses `ceil(characters / 4)`, not a provider tokenizer. It is retained as [hash-linked development evidence](bench/results/live-workspace-volume-2026-07-21.json), but is not headline or claim-eligible evidence because the original eight-file selection manifest and pack payload were not retained as a public fixture. The whole-corpus row is intentionally naive.
+The 240-record task evaluator keeps the required current source snippets on both sides and replaces only accumulated-history replay. Its estimates use `ceil(characters / 4)`; they are not provider usage receipts. A separate 54-record regression fixture still verifies exact retrieval, typo tolerance, graph evidence, conflict visibility, and supersession. See [BENCHMARKS.md](docs/BENCHMARKS.md) for the committed sources, machine-readable results, commands, and arithmetic.
 
 ## License and ownership
 
