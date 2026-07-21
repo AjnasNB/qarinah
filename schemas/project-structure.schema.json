@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qarinah.dev/schemas/project-structure.v1.json",
+  "title": "Qarinah project structure snapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "adapter", "root", "limits", "directoryCount", "fileCount", "totalBytes", "directories", "files", "snapshotHash", "changes"],
+  "properties": {
+    "schemaVersion": { "const": "qarinah.project-structure.v1" },
+    "adapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "const": "qarinah.project-structure" },
+        "version": { "const": "1" }
+      }
+    },
+    "root": { "const": "." },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxFiles", "maxFileBytes", "maxTotalBytes", "maxDepth"],
+      "properties": {
+        "maxFiles": { "type": "integer", "minimum": 1, "maximum": 5000 },
+        "maxFileBytes": { "type": "integer", "minimum": 1024, "maximum": 4194304 },
+        "maxTotalBytes": { "type": "integer", "minimum": 1024, "maximum": 134217728 },
+        "maxDepth": { "type": "integer", "minimum": 1, "maximum": 64 }
+      }
+    },
+    "directoryCount": { "type": "integer", "minimum": 1 },
+    "fileCount": { "type": "integer", "minimum": 0 },
+    "totalBytes": { "type": "integer", "minimum": 0 },
+    "directories": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": { "$ref": "#/$defs/directory" }
+    },
+    "files": {
+      "type": "array",
+      "maxItems": 5000,
+      "items": { "$ref": "#/$defs/file" }
+    },
+    "snapshotHash": { "$ref": "#/$defs/hash" },
+    "changes": { "$ref": "#/$defs/changes" }
+  },
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "path": { "type": "string", "minLength": 1, "maxLength": 512 },
+    "directory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "path"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^project:directory:[0-9a-f]{32}$" },
+        "path": { "$ref": "#/$defs/path" }
+      }
+    },
+    "span": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end", "line", "column"],
+      "properties": {
+        "start": { "type": "integer", "minimum": 0 },
+        "end": { "type": "integer", "minimum": 0 },
+        "line": { "type": "integer", "minimum": 1 },
+        "column": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "specifier", "span", "confidence", "extractor", "target"],
+      "properties": {
+        "type": { "enum": ["imports", "links"] },
+        "specifier": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "span": { "$ref": "#/$defs/span" },
+        "confidence": { "const": "extracted" },
+        "extractor": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "target": { "type": ["string", "null"], "maxLength": 512 }
+      }
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "path", "language", "size", "contentHash", "skipped", "references"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^project:file:[0-9a-f]{32}$" },
+        "path": { "$ref": "#/$defs/path" },
+        "language": { "type": "string", "minLength": 1, "maxLength": 32 },
+        "size": { "type": "integer", "minimum": 0 },
+        "contentHash": { "anyOf": [{ "$ref": "#/$defs/hash" }, { "type": "null" }] },
+        "skipped": { "enum": [null, "binary", "oversized"] },
+        "references": { "type": "array", "maxItems": 4096, "items": { "$ref": "#/$defs/reference" } }
+      }
+    },
+    "rename": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "contentHash"],
+      "properties": {
+        "from": { "$ref": "#/$defs/path" },
+        "to": { "$ref": "#/$defs/path" },
+        "contentHash": { "$ref": "#/$defs/hash" }
+      }
+    },
+    "changes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["added", "changed", "deleted", "renamed"],
+      "properties": {
+        "added": { "type": "array", "items": { "$ref": "#/$defs/path" } },
+        "changed": { "type": "array", "items": { "$ref": "#/$defs/path" } },
+        "deleted": { "type": "array", "items": { "$ref": "#/$defs/path" } },
+        "renamed": { "type": "array", "items": { "$ref": "#/$defs/rename" } }
+      }
+    }
+  }
+}

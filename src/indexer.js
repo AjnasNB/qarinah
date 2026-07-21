@@ -1,11 +1,12 @@
-import { canonicalStringify, deepFreezeJson } from "./canonical.js";
+import path from "node:path";
+import { canonicalStringify, deepFreezeJson, sha256 } from "./canonical.js";
 import { QarinahError } from "./errors.js";
 import { markdownDataBlock, markdownInline } from "./markdown.js";
 import { readEvents } from "./store.js";
 import { atomicWriteFile, loadWorkspace, openSecureReadFile, secureStoragePath } from "./workspace.js";
 
 export const INDEX_SCHEMA_VERSION = "qarinah.index.v2";
-export const GRAPH_SCHEMA_VERSION = "qarinah.graph.v1";
+export const GRAPH_SCHEMA_VERSION = "qarinah.graph.v2";
 
 const STOP_WORDS = new Set([
   "a", "an", "and", "are", "as", "at", "be", "by", "for", "from", "has", "in", "is", "it", "of",
@@ -36,7 +37,110 @@ function searchableText(event) {
       selectedData.push(`${key} ${value}`);
     }
   }
+  const structure = event.data?.projectStructure;
+  if (structure?.schemaVersion === "qarinah.project-structure.v1" && Array.isArray(structure.files)) {
+    for (const file of structure.files) {
+      if (typeof file?.path === "string") selectedData.push(`project file ${file.path} ${file.language ?? ""}`);
+      if (Array.isArray(file?.references)) {
+        for (const reference of file.references) {
+          if (typeof reference?.specifier === "string") selectedData.push(`${reference.type ?? "reference"} ${reference.specifier}`);
+        }
+      }
+    }
+  }
   return `${event.title}\n${event.body}\n${selectedData.join("\n")}`;
+}
+
+function latestProjectStructure(events) {
+  for (let index = events.length - 1; index >= 0; index -= 1) {
+    const structure = events[index].data?.projectStructure;
+    if (structure?.schemaVersion === "qarinah.project-structure.v1"
+      && Array.isArray(structure.directories)
+      && Array.isArray(structure.files)) {
+      return Object.freeze({ sourceEventId: events[index].eventId, structure });
+    }
+  }
+  return null;
+}
+
+function projectNodeId(type, value) {
+  return `project:${type}:${sha256(value).slice("sha256:".length, "sha256:".length + 32)}`;
+}
+
+function appendProjectGraph(events, nodes, edges) {
+  const current = latestProjectStructure(events);
+  if (!current) return null;
+  const { sourceEventId, structure } = current;
+  const directoryIds = new Map(structure.directories.map((directory) => [directory.path, directory.id]));
+  const fileIds = new Map(structure.files.map((file) => [file.path, file.id]));
+  const moduleNodes = new Map();
+  for (const directory of structure.directories) {
+    nodes.push({
+      id: directory.id,
+      type: "project.directory",
+      path: directory.path,
+      confidence: "extracted",
+      sourceEventId
+    });
+    if (directory.path !== ".") {
+      const parent = path.posix.dirname(directory.path);
+      const parentId = directoryIds.get(parent === "" ? "." : parent);
+      if (parentId) edges.push({ source: parentId, type: "contains", target: directory.id, confidence: "extracted", sourceEventId });
+    }
+  }
+  for (const file of structure.files) {
+    nodes.push({
+      id: file.id,
+      type: "project.file",
+      path: file.path,
+      language: file.language,
+      size: file.size,
+      contentHash: file.contentHash,
+      skipped: file.skipped,
+      confidence: "extracted",
+      sourceEventId
+    });
+    const parent = path.posix.dirname(file.path);
+    const parentId = directoryIds.get(parent === "" ? "." : parent);
+    if (parentId) edges.push({ source: parentId, type: "contains", target: file.id, confidence: "extracted", sourceEventId });
+    for (const reference of file.references) {
+      let target = reference.target ? fileIds.get(reference.target) : null;
+      if (!target) {
+        const key = `${reference.type}:${reference.specifier}`;
+        target = moduleNodes.get(key);
+        if (!target) {
+          target = projectNodeId("reference", key);
+          moduleNodes.set(key, target);
+          nodes.push({
+            id: target,
+            type: reference.target ? "project.unresolved" : "project.external",
+            specifier: reference.specifier,
+            confidence: reference.confidence,
+            sourceEventId
+          });
+        }
+      }
+      edges.push({
+        source: file.id,
+        type: reference.type,
+        target,
+        specifier: reference.specifier,
+        span: reference.span,
+        confidence: reference.confidence,
+        extractor: reference.extractor,
+        sourceEventId
+      });
+    }
+  }
+  const rootId = directoryIds.get(".");
+  if (rootId) edges.push({ source: sourceEventId, type: "produced", target: rootId, confidence: "extracted", sourceEventId });
+  return Object.freeze({
+    schemaVersion: structure.schemaVersion,
+    sourceEventId,
+    snapshotHash: structure.snapshotHash,
+    directoryCount: structure.directoryCount,
+    fileCount: structure.fileCount
+  });
 }
 
 function eventProjection(event) {
@@ -91,6 +195,8 @@ export function buildDerivedState(events, workspaceId) {
     }
   }
 
+  const projectStructure = appendProjectGraph(events, nodes, edges);
+
   for (const term of Object.keys(postings)) postings[term].sort();
   for (const id of Object.keys(adjacency)) {
     adjacency[id].sort((left, right) => `${left.type}\0${left.target}`.localeCompare(`${right.type}\0${right.target}`));
@@ -119,6 +225,7 @@ export function buildDerivedState(events, workspaceId) {
       workspaceId,
       eventCount: projections.length,
       headHash,
+      projectStructure,
       nodes,
       edges
     }
@@ -152,6 +259,29 @@ function markdownFor(events, workspaceId, headHash) {
       const body = event.body.length > 1_000 ? `${event.body.slice(0, 997)}...` : event.body;
       lines.push(markdownDataBlock(body));
     }
+    lines.push("");
+  }
+  const current = latestProjectStructure(events);
+  if (current) {
+    const structure = current.structure;
+    lines.push("## Current project structure");
+    lines.push("");
+    lines.push(`- Source event: \`${current.sourceEventId}\``);
+    lines.push(`- Snapshot: \`${structure.snapshotHash}\``);
+    lines.push(`- Directories: ${structure.directoryCount}`);
+    lines.push(`- Files: ${structure.fileCount}`);
+    lines.push("");
+    lines.push("> Paths and extracted references below are untrusted source observations.");
+    lines.push("");
+    for (const file of structure.files.slice(0, 300)) {
+      const references = file.references
+        .slice(0, 8)
+        .map((reference) => `${reference.type} ${reference.specifier}${reference.target ? ` -> ${reference.target}` : ""}`)
+        .join("; ");
+      lines.push(`- \`${markdownInline(file.path)}\` - ${markdownInline(file.language)} - ${file.contentHash ? `\`${file.contentHash}\`` : markdownInline(file.skipped)}`);
+      if (references) lines.push(`  - ${markdownInline(references)}`);
+    }
+    if (structure.files.length > 300) lines.push(`- ${structure.files.length - 300} additional files are present in graph.json.`);
     lines.push("");
   }
   return `${lines.join("\n")}\n`;

@@ -16,6 +16,7 @@ import {
   renderContextPackMarkdown,
   revokeWorkspaceTrust,
   runMcpServer,
+  scanProjectStructure,
   setWorkspaceEnabled,
   verifyStore
 } from "../src/index.js";
@@ -181,6 +182,7 @@ Usage:
   qarinah hook codex|claude
   qarinah mcp
   qarinah build
+  qarinah scan [--max-files n] [--max-file-bytes n] [--max-total-bytes n] [--max-depth n]
   qarinah export okf [--output <path>]
   qarinah query [text] [--format json|markdown] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp]
   qarinah query --stdin-json
@@ -272,6 +274,26 @@ async function run(argv) {
   }
   if (command === "build") {
     process.stdout.write(`${JSON.stringify(await rebuildDerivedState(process.cwd()), null, 2)}\n`);
+    return;
+  }
+  if (command === "scan") {
+    const parsed = strictValueOptions(args, "scan", ["--max-files", "--max-file-bytes", "--max-total-bytes", "--max-depth"]);
+    if (parsed.positionals.length !== 0) throw new TypeError("scan accepts options only and always uses the trusted workspace root.");
+    const integer = (name) => {
+      const value = parsed.values.get(name);
+      if (value === undefined) return undefined;
+      if (!/^[0-9]+$/.test(value)) throw new TypeError(`${name} must be a positive integer.`);
+      return Number(value);
+    };
+    const result = await scanProjectStructure({
+      cwd: process.cwd(),
+      maxFiles: integer("--max-files"),
+      maxFileBytes: integer("--max-file-bytes"),
+      maxTotalBytes: integer("--max-total-bytes"),
+      maxDepth: integer("--max-depth")
+    });
+    if (result.captured) await rebuildDerivedState(process.cwd());
+    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
     return;
   }
   if (command === "export") {

@@ -25,6 +25,7 @@ Requires a maintained Node.js 22, 24, or 26 release.
 npm install
 node bin/qarinah.js init .
 node bin/qarinah.js record --kind decision --title "Keep writes governed" --body "All context writes route through an approval-capable Maqam tool."
+node bin/qarinah.js scan
 node bin/qarinah.js build
 node bin/qarinah.js export okf
 node bin/qarinah.js query "governed writes" --format markdown
@@ -59,6 +60,7 @@ The event log is authoritative. Graphs, indexes, Markdown, and packs are derived
 | `qarinah hook codex\|claude` | Normalize one Codex or Claude Code lifecycle event from stdin |
 | `qarinah mcp` | Run the local zero-write MCP status and integrity-diagnostics server |
 | `qarinah build` | Verify and rebuild the graph, index, and Markdown record |
+| `qarinah scan` | Explicitly record a bounded filesystem, import, and Markdown-link snapshot |
 | `qarinah export okf [--output <path>]` | Reproduce a portable Google OKF v0.1 Draft bundle from the verified event log |
 | `qarinah query --stdin-json` | Compile a bounded JSON or Markdown context pack from one strict JSON request on stdin |
 | `qarinah policy [path]` | Show the complete requested capture policy and exact digest without granting trust |
@@ -97,6 +99,14 @@ The bundle contains root `index.md` and `log.md` files plus one `events/<event-i
 
 OKF is interchange, not Qarinah's database, retrieval engine, or source of truth. `.qarinah/events/events.jsonl` remains authoritative; the OKF directory and its hidden ownership marker are disposable and rebuildable. The export targets the current `0.1` Draft and should be revalidated before claiming compatibility with a future OKF revision.
 
+## Project structure graph
+
+`qarinah scan` explicitly observes the trusted workspace root and appends one provenance-linked `artifact` event. The derived graph and Markdown record then contain directory/file nodes, content identities, containment edges, conservative JavaScript/TypeScript module references, Markdown links, exact source spans, and additions, changes, content-preserving renames, and deletions relative to the previous snapshot.
+
+The scanner is bounded to 750 supported source files, 512 KiB per parsed file, 16 MiB total input, and 24 directory levels by default. It honors root `.gitignore` and `.qarinahignore`, and excludes `.git`, `.qarinah`, dependencies, common generated output, hidden paths other than `.github`, binaries, symbolic links, and junctions. Oversized supported files are represented without reading their content. Limits can be reduced or explicitly raised within hard ceilings.
+
+This is a provenance-preserving project graph, not a claim of Graphify parity, compiler equivalence, or universal semantic understanding. The v1 reference extractor is conservative and lexical. Its observations are marked `extracted` with adapter identity and source span; deeper AST symbol adapters remain separately versioned work. See [graph migration notes](docs/MIGRATIONS.md).
+
 ## Codex and Claude Code coverage
 
 The committed Codex and Claude Code plugins contain generated, dependency-free Node runtimes and never resolve the compatibility CLI from `PATH`. Claude requires an explicitly selected absolute Node 22, 24, or 26 executable. Codex changes to the installed-plugin root before resolving Node, which prevents workspace-local current-directory shadowing, but still inherits its host's reviewed `PATH` boundary because its plugin schema does not expose an equivalent user setting. Successful hooks emit no model-visible output. Both plugins bundle accurately annotated, zero-write `context_status` and `context_doctor` MCP tools. Automatic MCP context disclosure is intentionally absent until a Maqam-scoped disclosure capability exists; explicit compatibility-CLI queries remain available for user-directed local workflows.
@@ -105,7 +115,7 @@ Codex coverage targets its current ten lifecycle schemas. Known Codex event shap
 
 Codex hooks are observability, not total mediation. Hosted tools such as `WebSearch` do not emit local `PreToolUse` or `PostToolUse` hooks, and transcript files are deliberately not parsed because their format is unstable.
 
-See [architecture](docs/ARCHITECTURE.md), [host integrations](docs/HOST-INTEGRATIONS.md), [governed browser design](docs/GOVERNED-BROWSER.md), [security model](docs/SECURITY.md), [launch runbook](docs/LAUNCH.md), [licensing decision](docs/LICENSE-STRATEGY.md), and [roadmap](docs/ROADMAP.md).
+See [architecture](docs/ARCHITECTURE.md), [host integrations](docs/HOST-INTEGRATIONS.md), [governed browser design](docs/GOVERNED-BROWSER.md), [security model](docs/SECURITY.md), [migration notes](docs/MIGRATIONS.md), [launch runbook](docs/LAUNCH.md), [licensing decision](docs/LICENSE-STRATEGY.md), and [roadmap](docs/ROADMAP.md).
 
 The private-alpha repository includes local marketplace catalogs for real cached installs in Codex and Claude Code. Review the generated plugin directories first, then follow the exact install, validation, reload, and uninstall guidance in the [host integration guide](docs/HOST-INTEGRATIONS.md). These local catalogs are test fixtures, not public marketplace releases.
 

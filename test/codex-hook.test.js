@@ -93,6 +93,9 @@ test("content capture stores exposed completion data and recursively redacts", a
   assert.equal(event.data.bodyRetention.truncated, false);
   assert.equal(event.data.bodyRetention.retainedChars, event.body.length);
   assert.equal(event.data.assistantMessage.present, true);
+  assert.ok(event.relations.some((relation) => relation.type === "references" && relation.target === `session:${fixtures.Stop.session_id}`));
+  assert.ok(event.relations.some((relation) => relation.type === "affects" && relation.target === `turn:${fixtures.Stop.turn_id}`));
+  assert.ok(event.relations.some((relation) => relation.type === "derived_from" && relation.target.startsWith("evt_")));
 });
 
 test("content capture bounds oversized prompts without losing the event", async (t) => {

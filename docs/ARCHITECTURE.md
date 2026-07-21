@@ -34,7 +34,7 @@ The event chain is authoritative. A machine-local v2 permit binds consent and th
 
 - `events/events.jsonl`: canonical append-only event envelopes.
 - `objects/`: reserved for content-addressed source snapshots.
-- `graph/graph.json`: event nodes and typed relations.
+- `graph/graph.json`: event nodes and typed relations plus the latest explicitly recorded project-structure projection.
 - `index/index.json`: term-to-event postings and adjacency.
 - `records/CONTEXT.md`: bounded human-readable latest record.
 - `records/okf/`: deterministic, replaceable Google OKF v0.1 Draft interchange; never authoritative storage or a retrieval index.

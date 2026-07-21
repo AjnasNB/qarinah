@@ -108,24 +108,45 @@ function selected(input, names) {
   return output;
 }
 
-function deterministicHookEventId(input) {
+function deterministicHookEventId(input, eventName = input.hook_event_name) {
   const stableIdentity = input.tool_use_id
     ? { toolUseId: input.tool_use_id }
-    : (input.agent_id && input.hook_event_name.startsWith("Subagent")
+    : (input.agent_id && eventName.startsWith("Subagent")
       ? { agentId: input.agent_id }
-      : (input.turn_id && ["UserPromptSubmit", "Stop"].includes(input.hook_event_name)
+      : (input.turn_id && ["UserPromptSubmit", "Stop"].includes(eventName)
         ? { turnId: input.turn_id }
         : null));
   if (!stableIdentity) return null;
   const digest = sha256({
     sessionId: input.session_id,
-    event: input.hook_event_name,
+    event: eventName,
     ...stableIdentity
   }).slice("sha256:".length, "sha256:".length + 32).split("");
   digest[12] = "4";
   digest[16] = "8";
   const value = digest.join("");
   return `evt_${value.slice(0, 8)}-${value.slice(8, 12)}-${value.slice(12, 16)}-${value.slice(16, 20)}-${value.slice(20)}`;
+}
+
+function hookRelations(input) {
+  const relations = [];
+  if (input.session_id) relations.push({ type: "references", target: `session:${input.session_id}` });
+  if (input.turn_id) relations.push({ type: "affects", target: `turn:${input.turn_id}` });
+  if (input.tool_use_id) {
+    relations.push({
+      type: input.hook_event_name === "PostToolUse" ? "derived_from" : "references",
+      target: `toolcall:${input.tool_use_id}`
+    });
+  }
+  if (input.hook_event_name === "PostToolUse") {
+    const requested = deterministicHookEventId(input, "PreToolUse");
+    if (requested) relations.push({ type: "derived_from", target: requested });
+  }
+  if (input.hook_event_name === "Stop") {
+    const prompt = deterministicHookEventId(input, "UserPromptSubmit");
+    if (prompt) relations.push({ type: "derived_from", target: prompt });
+  }
+  return relations;
 }
 
 function bodyContentEntry(input) {
@@ -182,9 +203,7 @@ function hookPayload(input, workspace) {
   const data = workspace.config.capture === "content"
     ? { ...metadata, content, bodyRetention: hookRetentionMetadata(bodyRetention) }
     : metadata;
-  const relations = input.tool_use_id
-    ? [{ type: eventName === "PostToolUse" ? "derived_from" : "references", target: `toolcall:${input.tool_use_id}` }]
-    : [];
+  const relations = hookRelations(input);
   const actor = eventName.startsWith("Subagent")
     ? { type: "agent", id: input.agent_id }
     : (input.agent_id && mapping.actor.type === "agent" ? { type: "agent", id: input.agent_id } : mapping.actor);
