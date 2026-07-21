@@ -72,6 +72,29 @@ For consistent task behavior, a repository `AGENTS.md` for Codex or `CLAUDE.md` 
 
 Start a new Codex task after installation. In an active Claude Code session, run `/reload-plugins`. Both hosts cache installed plugin contents, so source edits require a reviewed rebuild, reinstall, and reload rather than taking effect silently.
 
+### MCP health and recovery
+
+The host process owns the stdio pipe. Qarinah cannot reopen an already-closed pipe from inside the server process. After installing or upgrading the plugin:
+
+```powershell
+codex plugin list
+codex mcp list
+
+claude plugin list
+claude mcp list
+```
+
+Codex should list the enabled `context` server from the installed Qarinah cache. Start a new Codex task after a plugin reinstall or cache upgrade; an active task does not hot-swap its plugin MCP process. Claude should list `plugin:qarinah:context` as connected; run `/reload-plugins` after a plugin change. If either host still reports a closed transport, first verify that its listed command resolves to a trusted Node 22, 24, or 26 executable and that the installed plugin version matches the reviewed source.
+
+Repository maintainers can exercise the complete packaged stdio path without an AI model or API key:
+
+```powershell
+npm run build:plugins
+npm run mcp:smoke
+```
+
+The smoke probe runs both bundled host manifests, negotiates `roots/list`, calls `context_status` and `context_doctor` against a temporary opted-in ledger, requires the server to remain alive until the client closes stdin, and rejects unexpected stderr output.
+
 ## Local development
 
 Build both standalone runtimes:
@@ -86,6 +109,7 @@ Validate both packages and the Qarinah context skill:
 python C:\path\to\plugin-creator\scripts\validate_plugin.py integrations/codex/qarinah
 python C:\path\to\skill-creator\scripts\quick_validate.py integrations/codex/qarinah/skills/qarinah-context
 claude plugin validate integrations/claude/qarinah
+npm run mcp:smoke
 ```
 
 The repository contains local marketplace catalogs for both hosts. From a reviewed clone, install into an isolated development profile with:
