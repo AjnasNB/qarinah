@@ -164,6 +164,8 @@ Codex and Claude Code plugin caches are immutable copies. Reinstall the reviewed
 
 Automatic MCP context disclosure remains disabled. A context pack must be explicitly requested or disclosed through a separately governed Maqam capability.
 
+The repository also runs `npm run mcp:smoke` against the exact bundled Codex and Claude runtimes. The smoke test starts each stdio server from its packaged manifest, negotiates an MCP filesystem root, lists the two annotated tools, calls both tools against a temporary trusted ledger, and verifies clean shutdown without stderr output.
+
 ### Install once, initialize each project
 
 After the public `v0.1.0-alpha.2` release is approved, install the reviewed plugin once in each host:
