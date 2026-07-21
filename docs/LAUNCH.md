@@ -44,7 +44,7 @@ Use:
 - "Small cited context packs instead of entire transcripts."
 - "Local-first and no Qarinah API key."
 - "Maqam governs. Cockroach gathers. Qarinah remembers. ProductLoop orchestrates."
-- "70%+ smaller context payloads in current fixed fixtures," only with the benchmark qualification beside it.
+- "94.96% smaller context payload in the committed 54-record evaluator," only with the four-case, character-volume qualification beside it.
 
 Avoid:
 

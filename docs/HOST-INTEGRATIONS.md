@@ -41,6 +41,18 @@ claude plugin marketplace add . --scope local
 claude plugin install qarinah@qarinah --scope local
 ```
 
+After the repository is public and tag `v0.1.0-alpha.2` is approved, the intended version-pinned install flow is:
+
+```powershell
+codex plugin marketplace add AjnasNB/qarinah --ref v0.1.0-alpha.2
+codex plugin add qarinah@qarinah
+
+claude plugin marketplace add AjnasNB/qarinah@v0.1.0-alpha.2
+claude plugin install qarinah@qarinah
+```
+
+These commands are release instructions, not a statement that a public marketplace or tag already exists. Codex installs from a configured Git marketplace snapshot. Claude Code clones the Git marketplace and copies the plugin into its versioned cache. The repository catalogs use only paths inside the same reviewed checkout.
+
 Claude's plugin manifest requires `node_path` as a file-valued user setting and passes it in exec form to every hook and its MCP server. During enablement, use Claude's plugin configuration UI to select an absolute trusted Node 22, 24, or 26 executable outside the project. The installed Claude CLI may not yet expose the newer documented `plugin install --config` flag, so the command above intentionally uses only the broadly available `--scope` option. The host checks that a required file value exists; the user must review that its resolved path is absolute and outside project control. Qarinah then rejects unsupported Node major versions after launch.
 
 The current Codex plugin schema has no corresponding per-plugin executable-path setting. Its bundled hooks require a separate host trust review, change the process directory to the installed plugin root before invoking Node (preventing a workspace-local `node.exe`/`node.cmd` from winning Windows current-directory lookup), and its local MCP definition starts in that same plugin root. Both still follow the host's standard bare-`node` pattern. Before trusting the plugin, verify the remaining `PATH` resolution selects a trusted Node 22, 24, or 26 installation (for example, `(Get-Command node -CommandType Application).Source` on PowerShell). This host-level interpreter resolution is an explicit boundary, not protection Qarinah can enforce after an interpreter has already launched.

@@ -52,6 +52,7 @@
     "docs/LAUNCH.md",
     "docs/LICENSE-STRATEGY.md",
     "docs/MIGRATIONS.md",
+    "bench/results/",
     "LICENSE",
     "NOTICE",
     "THIRD_PARTY_NOTICES.md",
@@ -76,7 +77,8 @@
     "prepublishOnly": "npm run check",
     "test": "node scripts/run-tests.mjs",
     "typecheck": "node scripts/typecheck-consumer.mjs",
-    "check": "npm run check:plugins && npm test && npm run typecheck && npm run benchmark && npm run evaluate:context && npm pack --dry-run --ignore-scripts",
+    "check": "npm run check:plugins && npm test && npm run typecheck && npm run check:benchmark-evidence && npm run benchmark && npm run evaluate:context && npm pack --dry-run --ignore-scripts",
+    "check:benchmark-evidence": "node scripts/verify-benchmark-evidence.mjs",
     "benchmark": "node scripts/benchmark.mjs",
     "evaluate:context": "node scripts/evaluate-context.mjs"
   },
