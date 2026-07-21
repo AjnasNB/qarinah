@@ -7,10 +7,18 @@
 <p align="center"><strong>The memory layer your agents can verify.</strong></p>
 
 <p align="center">
-  <a href="docs/WHITEPAPER.md">Technical paper</a> ·
-  <a href="docs/ARCHITECTURE.md">Architecture</a> ·
-  <a href="docs/BENCHMARKS.md">Benchmarks</a> ·
+  <a href="docs/WHITEPAPER.md">Technical paper</a>&nbsp;&middot;&nbsp;
+  <a href="docs/ARCHITECTURE.md">Architecture</a>&nbsp;&middot;&nbsp;
+  <a href="docs/BENCHMARKS.md">Benchmarks</a>&nbsp;&middot;&nbsp;
   <a href="docs/SECURITY.md">Security</a>
+</p>
+
+<p align="center">
+  <code>LOCAL-FIRST</code>&nbsp;&nbsp;
+  <code>EVIDENCE-LINKED</code>&nbsp;&nbsp;
+  <code>GRAPH-AWARE</code>&nbsp;&nbsp;
+  <code>OKF-PORTABLE</code>&nbsp;&nbsp;
+  <code>GOVERNANCE-READY</code>
 </p>
 
 <p align="center">
@@ -26,15 +34,18 @@ Qarinah turns permitted agent activity, project structure, and explicitly commit
 
 Agent memory usually fails in one of two ways: the next model receives too much history, or it receives a compressed story with no way to verify the source. Qarinah keeps the source record and the compact context separate.
 
-- The append-only JSONL event chain is authoritative.
-- Graph, index, Markdown, and context packs are deterministic derived views.
-- Every retrieved item cites an event ID and content hash.
-- Conflicts, superseded decisions, scoped authority, retention, and time are explicit.
-- Coverage metadata distinguishes a direct match, a partial match, and no durable evidence.
-- `minimumCoverage` lets security-sensitive callers fail closed instead of accepting nearest-text retrieval.
-- Codex and Claude Code adapters capture only supported, allowlisted lifecycle fields.
-- Metadata-only capture is the default. Content capture requires explicit workspace consent.
-- Hidden reasoning, private transcripts, credentials, and browser session state are outside the product boundary.
+<table>
+  <tr>
+    <td width="50%"><strong>Evidence-linked</strong><br>Every selected item cites its event ID and content hash. Conflicts, supersession, authority, retention, and time remain explicit.</td>
+    <td width="50%"><strong>Budgeted</strong><br>Coverage-aware retrieval compiles a bounded pack instead of replaying the complete project history.</td>
+  </tr>
+  <tr>
+    <td width="50%"><strong>Rebuildable</strong><br>The JSONL chain is authoritative. Graph, index, Markdown, project structure, and OKF are deterministic derived views.</td>
+    <td width="50%"><strong>Governance-ready</strong><br>Explicit capture policy, fail-closed coverage, read-only diagnostics, and optional Maqam disclosure controls preserve boundaries.</td>
+  </tr>
+</table>
+
+Metadata-only capture is the default. Content capture requires explicit workspace consent. Hidden reasoning, private transcripts, credentials, and browser session state remain outside the product boundary.
 
 ## What it records
 
@@ -44,25 +55,52 @@ Supported event classes include prompts, tool requests, tool completions, approv
 
 ## Architecture
 
-```text
-Codex / Claude / CLI / connectors
-                |
-        strict host adapters
-                |
-  append-only hash-chained JSONL        bounded project scan
-                |                              |
-                +---------- typed graph -------+
-                |              |               |
-          JSON index      CONTEXT.md       OKF Markdown
-                \              |              /
-                 +--- coverage-aware query ---+
-                              |
-                  cited, budgeted context pack
-                              |
-                   optional Maqam governance
+```mermaid
+flowchart TD
+  hosts["Agent hosts<br/>Codex + Claude Code"]
+  interfaces["Explicit interfaces<br/>CLI + JSON stdin"]
+  ecosystem["Ecosystem records<br/>Crawler + ProductLoop"]
+  workspace["Project files"]
+
+  consent["Workspace consent<br/>Metadata by default"]
+  adapters["Strict versioned adapters"]
+  scanner["Bounded project scanner"]
+
+  trust["Machine-local trust<br/>and rollback checkpoint"]
+  ledger[("Authoritative hash-chained JSONL<br/>events/events.jsonl")]
+
+  projections["Deterministic projections<br/>Typed graph + hybrid index + CONTEXT.md + OKF"]
+  retrieve["Coverage-aware hybrid retrieval"]
+  compiler["Budgeted context compiler"]
+  gate["Explicit disclosure<br/>Optional Maqam policy gate"]
+  pack["Cited context pack"]
+
+  hosts --> adapters
+  interfaces --> adapters
+  ecosystem --> adapters
+  consent --> adapters
+  workspace --> scanner
+  adapters --> ledger
+  scanner --> ledger
+  trust -. verifies policy and head .-> ledger
+  ledger --> projections --> retrieve --> compiler
+  ledger -. cited evidence .-> compiler
+  compiler --> gate --> pack
+
+  classDef input fill:#ecfdf3,stroke:#16803c,color:#12351f,stroke-width:1.5px;
+  classDef boundaryNode fill:#fff7e6,stroke:#b76e00,color:#3d2a00,stroke-width:1.5px;
+  classDef authorityNode fill:#f1edff,stroke:#6548c7,color:#241653,stroke-width:2px;
+  classDef projectionNode fill:#eaf4ff,stroke:#2474b5,color:#102f4c,stroke-width:1.5px;
+  classDef disclosureNode fill:#e8fbfb,stroke:#087f8c,color:#07373c,stroke-width:1.5px;
+
+  class hosts,interfaces,ecosystem,workspace input;
+  class consent,adapters,scanner boundaryNode;
+  class trust,ledger authorityNode;
+  class projections projectionNode;
+  class retrieve,compiler,gate,pack disclosureNode;
 ```
 
-The project graph currently covers directories, files, content hashes, JavaScript and TypeScript module references, Markdown links, exact source spans, additions, changes, renames, and deletions. It is a bounded structural graph, not a compiler or a universal symbol graph. Deeper symbol adapters are on the roadmap.
+The project graph covers directories, files, content hashes, JavaScript and TypeScript module references, Markdown links, exact source spans, additions, changes, renames, and deletions. See the [architecture guide](docs/ARCHITECTURE.md) or open the [raw Mermaid source](docs/architecture.mmd).
 
 ## Install
 
