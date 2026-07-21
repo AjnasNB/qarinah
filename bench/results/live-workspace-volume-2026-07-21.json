@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "qarinah.workspace-volume-observation.v1",
+  "date": "2026-07-21",
+  "classification": "observational-development-evidence",
+  "claimEligible": false,
+  "reasonNotClaimEligible": "The durable summary retains totals and hashes, but the eight-file selection manifest and the original pack payload are not bundled in this public fixture.",
+  "tokenEstimator": {
+    "method": "ceil(chars/4)",
+    "exact": false,
+    "providerBillingMeasurement": false
+  },
+  "pack": {
+    "label": "Qarinah live pack",
+    "characters": 6971,
+    "estimatedTokens": 1743
+  },
+  "baselines": [
+    {
+      "label": "Eight manually selected project documents",
+      "characters": 73479,
+      "estimatedTokens": 18370,
+      "reduction": 0.905129,
+      "evidenceClass": "durable-summary-without-selection-manifest"
+    },
+    {
+      "label": "Entire generated CONTEXT.md",
+      "characters": 61223,
+      "estimatedTokens": 15306,
+      "reduction": 0.886138,
+      "evidenceClass": "development-measurement"
+    },
+    {
+      "label": "All 230 indexed files",
+      "characters": 2444888,
+      "estimatedTokens": 611222,
+      "reduction": 0.997149,
+      "evidenceClass": "hash-linked-project-snapshot"
+    }
+  ],
+  "provenance": {
+    "summaryEventId": "evt_d7ee88e9-8732-4db6-8869-91764d7825e4",
+    "summaryEventHash": "sha256:9ed441ea3fbecf62cc66a645f226f192a12d4ed459b33df6179319abe8f0fd07",
+    "projectSnapshotEventId": "evt_c1f17144-b0c1-4223-9328-a487f6875319",
+    "projectSnapshotEventHash": "sha256:c2b0331313febdf1e1cf0623f685b32ef11603bdbf18de5220d28213eca4c403",
+    "projectSnapshotHash": "sha256:42b34bf6d462a88fc62a50b2757e34b6c1edecdc786f6d22a7e980fdfb2ffb31",
+    "sourceAvailability": "private-development-ledger"
+  }
+}

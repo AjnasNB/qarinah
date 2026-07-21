@@ -1,13 +1,17 @@
+import assert from "node:assert/strict";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { performance } from "node:perf_hooks";
+import { fileURLToPath } from "node:url";
 import {
   appendEvent,
   compileContext,
   initializeWorkspace
 } from "../src/index.js";
 
+const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const packageJson = JSON.parse(await readFile(path.join(repositoryRoot, "package.json"), "utf8"));
 const root = await mkdtemp(path.join(os.tmpdir(), "qarinah-context-eval-"));
 process.env.QARINAH_STATE_DIR = path.join(root, ".machine-state");
 let inputSequence = 0;
@@ -126,6 +130,17 @@ try {
     characterReduction: Math.round((1 - averagePackChars / rawCharsPerQuery) * 10_000) / 10_000,
     queryMs: Math.round(queryMs * 100) / 100
   };
+  const committed = JSON.parse(await readFile(
+    path.join(repositoryRoot, "bench", "results", "context-evaluation-0.1.0-alpha.2.json"),
+    "utf8"
+  ));
+  assert.equal(committed.schemaVersion, "qarinah.context-eval-result.v1");
+  assert.equal(committed.packageVersion, packageJson.version);
+  assert.deepEqual(
+    Object.fromEntries(Object.keys(committed.expected).map((key) => [key, result[key]])),
+    committed.expected,
+    "The deterministic context evaluator no longer matches the committed release evidence."
+  );
   if (result.recallAt5 < 1
     || result.meanReciprocalRank < 0.75
     || result.conflictRecall !== 1

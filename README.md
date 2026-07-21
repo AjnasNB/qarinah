@@ -7,11 +7,11 @@
 <p align="center"><strong>Evidence-linked project memory for AI agents.</strong></p>
 
 <p align="center">
-  <strong>70%+ smaller context payloads in the current fixed benchmark fixtures.</strong><br>
+  <strong>94.96% smaller context payload in the committed 54-record evaluator.</strong><br>
   Local-first. Source-cited. Tamper-evident. No Qarinah API key.
 </p>
 
-> Benchmark scope: the committed 54-record evaluator currently measures a greater than 70% character reduction while preserving its tested retrieval targets. This is a fixed-fixture context-volume result, not a universal token, billing, cost, or answer-quality guarantee. See [benchmarks and methodology](docs/BENCHMARKS.md).
+> Benchmark scope: the committed evaluator measures characters, uses four fixed retrieval cases, and preserves all four tested targets. This is not a universal token, billing, cost, or answer-quality guarantee. See the [machine-readable result](bench/results/context-evaluation-0.1.0-alpha.2.json) and [methodology](docs/BENCHMARKS.md).
 
 Qarinah is pronounced **kuh-REE-nuh** and spelled **Q-A-R-I-N-A-H**. It records permitted agent lifecycle events and explicitly committed decisions, links them to evidence in a typed graph, materializes Markdown and JSON views, and retrieves a small cited pack instead of replaying an entire project history.
 
@@ -197,6 +197,26 @@ npm run benchmark
 ```
 
 The evaluator covers exact retrieval, typo tolerance, conflict recall, and supersession on a deterministic 54-record fixture. Percentages on this page refer to fixture character volume, not provider-billed tokens. The portable token estimator is deliberately labeled inexact. See [BENCHMARKS.md](docs/BENCHMARKS.md) for raw fields, baselines, limits, and the claims we refuse to make.
+
+### Reproducible release fixture
+
+| Context method | Characters per query | Result |
+| --- | ---: | ---: |
+| Qarinah selected pack | 2,237 | Baseline |
+| Raw 54-record event log | 44,364 | Qarinah used 94.96% less |
+
+Run `npm run evaluate:context` to regenerate the fixture and fail if its deterministic fields differ from the committed result.
+
+### Observed live workspace check
+
+| Context method | Estimated tokens | Reduction |
+| --- | ---: | ---: |
+| Qarinah live pack | 1,743 | Baseline |
+| Eight manually selected project documents | 18,370 | Qarinah used 90.51% less |
+| Entire generated `CONTEXT.md` | 15,306 | Qarinah used 88.61% less |
+| All 230 indexed files | 611,222 | Qarinah used 99.71% less |
+
+This second table uses `ceil(characters / 4)`, not a provider tokenizer. It is retained as [hash-linked development evidence](bench/results/live-workspace-volume-2026-07-21.json), but is not headline or claim-eligible evidence because the original eight-file selection manifest and pack payload were not retained as a public fixture. The whole-corpus row is intentionally naive.
 
 ## License and ownership
 
