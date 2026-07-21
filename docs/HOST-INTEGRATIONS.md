@@ -15,6 +15,63 @@ Qarinah keeps one local event/graph/compiler core and uses thin host adapters. A
 
 The Codex package follows OpenAI's current plugin layout: `.codex-plugin/plugin.json`, `skills/`, `hooks/`, and `.mcp.json`. The Claude package follows Anthropic's plugin layout: `.claude-plugin/plugin.json`, `skills/`, `hooks/`, and `.mcp.json`. Claude automatically discovers the standard `hooks/hooks.json` component, so its manifest intentionally does not name that file again.
 
+## Install once, initialize each project
+
+The host plugin and the project ledger have different scopes:
+
+- install the plugin once so Codex or Claude Code can load the reviewed hooks, context skill, and zero-write diagnostics;
+- initialize only the repository roots that are allowed to retain Qarinah records; and
+- request a cited pack when a task needs prior evidence. Qarinah does not inject the complete history automatically.
+
+After the public prerelease and tag are approved, install for personal use across projects:
+
+```powershell
+codex plugin marketplace add AjnasNB/qarinah --ref v0.1.0-alpha.2
+codex plugin add qarinah@qarinah
+
+claude plugin marketplace add AjnasNB/qarinah@v0.1.0-alpha.2 --scope user
+claude plugin install qarinah@qarinah --scope user
+```
+
+Claude Code also supports repository-shared `project` scope and gitignored per-user `local` scope:
+
+```powershell
+claude plugin marketplace add AjnasNB/qarinah@v0.1.0-alpha.2 --scope project
+claude plugin install qarinah@qarinah --scope project
+
+# Or keep the enablement personal to this repository.
+claude plugin marketplace add AjnasNB/qarinah@v0.1.0-alpha.2 --scope local
+claude plugin install qarinah@qarinah --scope local
+```
+
+Codex plugin installation is personal rather than repository-scoped. The Qarinah workspace boundary supplies the per-project opt-in. From each project root:
+
+```powershell
+npx -y qarinah@next init . --capture content
+npx -y qarinah@next scan
+npx -y qarinah@next doctor
+```
+
+Choose `metadata` instead of `content` when prompt, tool-output, source, and completion bodies should not be retained. Content capture is bounded and redacted but remains security-sensitive.
+
+To recover context in a later task, use the installed `qarinah-context` skill and request direct evidence for the task terms. The equivalent explicit local command is:
+
+```powershell
+npx -y qarinah@next query "orders idempotency migration" `
+  --minimum-coverage direct `
+  --max-tokens 1500 `
+  --reserve-tokens 200 `
+  --format markdown
+```
+
+The compiler selects retained event bodies and cites their event IDs and hashes. It does not make a model-generated summary authoritative. Required current source files still need to be read for the edit; Qarinah replaces replay of unrelated accumulated history.
+
+For consistent task behavior, a repository `AGENTS.md` for Codex or `CLAUDE.md` for Claude Code can include this instruction:
+
+> When prior project decisions, approvals, sources, or tool outcomes could affect the task, use the Qarinah context skill first. Request the smallest direct-evidence pack for the task terms. Do not load the complete event log or generated `CONTEXT.md` into the model.
+
+Start a new Codex task after installation. In an active Claude Code session, run `/reload-plugins`. Both hosts cache installed plugin contents, so source edits require a reviewed rebuild, reinstall, and reload rather than taking effect silently.
+
 ## Local development
 
 Build both standalone runtimes:

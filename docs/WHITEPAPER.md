@@ -144,9 +144,11 @@ Qarinah does not require a Qarinah API key, hosted database, model provider, ana
 
 ## 9. Evidence and measurement
 
-The committed `0.1.0-alpha.2` evaluator creates a deterministic 54-record workspace and tests exact retrieval, typo tolerance, conflict recall, and supersession. On that fixture, the selected context pack averaged 2,237 characters per query compared with 44,364 characters for raw event-log replay, a 94.96% reduction, while all four tested targets remained retrievable.
+The committed `0.1.0-alpha.2` software-task evaluator creates a deterministic 240-record workspace and tests React accessibility editing, a database migration, a repository-wide TypeScript refactor, research-to-code work, production regression debugging, and governed release preparation. Both paths retain the same current-task source snippets. Full-history replay produced 442,113 estimated input tokens across the six cases; the source snippets plus cited Qarinah packs produced 5,682, a weighted 98.71% reduction. Every required decision ranked in the top five with direct evidence coverage, and the packs used no model-written summary records.
 
-This is a fixture-level character-volume result. It is not a universal token, billing, latency, cost, or answer-quality guarantee. The evaluator, expected machine-readable result, environment notes, and claim boundaries are published in [BENCHMARKS.md](BENCHMARKS.md).
+Estimated tokens use `ceil(characters / 4)`. This is a context-volume result against a named full-history baseline, not a Codex, Claude, OpenAI, or Anthropic usage receipt and not a total task-cost or answer-quality result.
+
+A second deterministic 54-record workspace continues to test exact retrieval, typo tolerance, graph evidence, conflict recall, and supersession. On that focused regression fixture, the selected pack averaged 2,237 characters compared with 44,364 characters for raw replay, a 94.96% reduction, while all four targets remained retrievable. The evaluators, exact fixtures, machine-readable results, environment notes, and claim boundaries are published in [BENCHMARKS.md](BENCHMARKS.md).
 
 ## 10. What the alpha establishes
 

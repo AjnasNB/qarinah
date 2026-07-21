@@ -6,32 +6,11 @@ Qarinah is a governance-native context compiler. It preserves permitted agent ac
 
 ## System map
 
-```mermaid
-flowchart TD
-  inputs["Codex · Claude Code · CLI<br/>Crawler · ProductLoop · project files"]
-  boundary["Explicit capture boundary<br/>Consent · strict adapters · bounded scan"]
-  ledger[("Hash-chained JSONL<br/>authoritative record")]
-  views["Deterministic views<br/>typed graph · hybrid index · Markdown · OKF"]
-  compiler["Coverage-aware compiler<br/>budget · optional Maqam gate"]
-  pack["Small cited context pack"]
+<p align="center">
+  <img src="../assets/architecture/qarinah-flow.svg" width="420" alt="Qarinah flow from agent hosts and project inputs through explicit capture, an authoritative hash-chained record, deterministic views, a coverage-aware compiler, and a small cited context pack.">
+</p>
 
-  inputs --> boundary --> ledger --> views --> compiler --> pack
-  ledger -. event IDs + hashes .-> pack
-
-  classDef input fill:#ecfdf3,stroke:#16803c,color:#12351f,stroke-width:1.5px;
-  classDef boundaryNode fill:#fff7e6,stroke:#b76e00,color:#3d2a00,stroke-width:1.5px;
-  classDef authorityNode fill:#f1edff,stroke:#6548c7,color:#241653,stroke-width:2px;
-  classDef projectionNode fill:#eaf4ff,stroke:#2474b5,color:#102f4c,stroke-width:1.5px;
-  classDef disclosureNode fill:#e8fbfb,stroke:#087f8c,color:#07373c,stroke-width:1.5px;
-
-  class inputs input;
-  class boundary boundaryNode;
-  class ledger authorityNode;
-  class views projectionNode;
-  class compiler,pack disclosureNode;
-```
-
-[Open the canonical Mermaid source](architecture.mmd).
+[Open the editable diagram source](architecture.mmd).
 
 ## Guarantees at a glance
 
@@ -45,27 +24,13 @@ flowchart TD
 
 ## Write and rebuild lifecycle
 
-```mermaid
-sequenceDiagram
-  autonumber
-  actor User as User or governed workflow
-  participant Adapter as Strict adapter
-  participant Policy as Trusted capture policy
-  participant Ledger as JSONL event chain
-  participant Builder as Projection builder
-  participant Query as Context compiler
-
-  User->>Adapter: Submit a permitted lifecycle event or explicit record
-  Adapter->>Policy: Validate workspace, capture mode, and bounds
-  Policy-->>Adapter: Return metadata or content projection
-  Adapter->>Ledger: Append canonical event under the write lock
-  Ledger->>Ledger: Bind previous hash and persist the new head
-  Ledger-->>User: Return event ID and record hash
-  User->>Builder: Run build or start an explicit query
-  Builder->>Ledger: Verify the complete authoritative chain
-  Builder-->>Query: Supply deterministic graph and index projections
-  Query-->>User: Return a cited, budgeted context pack
-```
+1. A user or governed workflow submits a permitted lifecycle event through a strict adapter.
+2. The trusted capture policy validates the workspace, capture mode, and bounds.
+3. The ledger appends the canonical event under a renewable write lock and binds the previous hash.
+4. The caller receives the event ID and record hash.
+5. A build or explicit query verifies the complete authoritative chain.
+6. Deterministic graph and index projections feed the context compiler.
+7. The caller receives a cited pack that fits the complete-output budget.
 
 An append and every security-sensitive read reload the trusted workspace from its root. Caller-supplied workspace objects are locators, not proof of trust. Explicit builds can repair stale derived views only after the event chain and machine checkpoint verify successfully. Read-only MCP diagnostics never repair or advance the checkpoint.
 
@@ -92,29 +57,7 @@ The same verified event head and build inputs produce the same projections. An O
 
 ## Retrieval lifecycle
 
-```mermaid
-flowchart LR
-  query["Task query"] --> normalize["Normalize bounded terms"]
-  normalize --> candidates["BM25 + trigrams + one-hop graph candidates"]
-  candidates --> fusion["Reciprocal-rank fusion"]
-  fusion --> policy["Time + retention + authority filters"]
-  policy --> history["Conflict and supersession handling"]
-  history --> diversity["Deterministic diversity"]
-  diversity --> coverage{"Evidence coverage"}
-  coverage -->|direct or allowed partial| budget["Complete-output budget"]
-  coverage -->|below minimum| refuse["Fail closed"]
-  budget --> pack["Cited JSON and Markdown pack"]
-
-  classDef step fill:#eaf4ff,stroke:#2474b5,color:#102f4c,stroke-width:1.5px;
-  classDef decision fill:#fff7e6,stroke:#b76e00,color:#3d2a00,stroke-width:1.5px;
-  classDef output fill:#ecfdf3,stroke:#16803c,color:#12351f,stroke-width:1.5px;
-  classDef refusal fill:#fff0f0,stroke:#b42318,color:#4c1712,stroke-width:1.5px;
-
-  class query,normalize,candidates,fusion,policy,history,diversity step;
-  class coverage decision;
-  class budget,pack output;
-  class refuse refusal;
-```
+The compiler normalizes bounded query terms, builds BM25, trigram, and one-hop graph candidates, combines them through reciprocal-rank fusion, and applies time, retention, authority, conflict, supersession, and diversity rules. Evidence coverage then either admits a complete cited JSON or Markdown pack within budget, or fails closed when the caller's minimum is not met.
 
 The compiler resolves one UTC `asOf` value when the caller omits it. Exact replay supplies that value explicitly. Budgets cover the complete pretty-JSON and Markdown encodings, and every selected item records why it was chosen.
 
