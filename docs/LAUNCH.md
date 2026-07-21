@@ -34,6 +34,7 @@ Qarinah is preparing an Apache-2.0 alpha. Do not publish an npm package, public 
 ## Community launch
 
 - Prepare a concise Show HN post, technical article, architecture diagram, reproducible benchmark, security model, and contributor issues.
+- Coordinate the four packages through the [ecosystem launch plan](ECOSYSTEM-LAUNCH.md); do not announce them as four unrelated products.
 - Offer copy-paste install, verification, and uninstall instructions.
 - Keep browser automation as a separately governed experimental capability until denial, approval, and DOM-race suites pass.
 - Respond to technical feedback with fixtures and evidence instead of unsupported claims.
@@ -42,7 +43,7 @@ Qarinah is preparing an Apache-2.0 alpha. Do not publish an npm package, public 
 
 Use:
 
-- "Qarinah - the memory layer your agents can verify."
+- "Qarinah - less context. More proof."
 - "Small cited context packs instead of entire transcripts."
 - "Local-first and no Qarinah API key."
 - "Maqam governs. Cockroach gathers. Qarinah remembers. ProductLoop orchestrates."
@@ -53,7 +54,7 @@ Avoid:
 - "Prompt-injection proof," "tamper-proof," or "fully autonomous."
 - "Works with every agent, model, or website."
 - "No API key required for all internet and model access."
-- "70% lower token cost" until provider usage is measured.
+- "90% fewer Codex or Claude tokens" until provider-native usage is measured on a committed, reproducible task fixture.
 - "Agentic OS" until process, capability, secrets, filesystem, network, and device mediation exist.
 
 ## Open-source stewardship

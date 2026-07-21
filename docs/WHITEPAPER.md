@@ -1,4 +1,4 @@
-# Qarinah: The Memory Layer Your Agents Can Verify
+# Qarinah: Less Context. More Proof.
 
 ## A local-first architecture for evidence-linked project context
 
