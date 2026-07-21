@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "context": {
-      "command": "${user_config.node_path}",
+      "command": "node",
       "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/qarinah.mjs", "mcp"]
     }
   }
