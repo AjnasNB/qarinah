@@ -24,7 +24,7 @@ Qarinah is preparing an Apache-2.0 alpha. Do not publish an npm package, public 
 ## Public technical preview
 
 - Publish source only after the incomplete legal, name, secret-scan, and artifact gates are resolved.
-- Use `v0.1.0-alpha.2` as a GitHub prerelease and npm `next`, not `latest`.
+- Use `v0.1.0-alpha.3` as a GitHub prerelease and npm `next`, not `latest`.
 - Lead with a 60-second proof: opt in, record a decision, scan, verify hashes, and retrieve a direct-evidence pack.
 - Publish the [technical paper](WHITEPAPER.md) from the same reviewed release commit. It is a concise architecture and evidence document, not a claim of academic peer review.
 - Do not delay the technical preview for a longer paper once the release gates are satisfied. Expand the paper as public fixtures and held-out evaluations mature.

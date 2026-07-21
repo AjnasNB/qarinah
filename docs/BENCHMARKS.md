@@ -27,7 +27,7 @@ Every required decision ranked in the top five, every query returned direct evid
 
 Estimated tokens use `ceil(characters / 4)`. They are reproducible context-volume estimates, not usage receipts from Codex, Claude, OpenAI, or Anthropic. The required source files remain in both measurements; Qarinah replaces accumulated-history replay, not the code, schema, logs, tests, or research excerpts needed for the current task.
 
-The exact scenario sources, expected decisions, unrelated retained history, queries, arithmetic, and per-task results are committed in [`bench/fixtures/software-task-scenarios.mjs`](../bench/fixtures/software-task-scenarios.mjs), [`scripts/evaluate-software-tasks.mjs`](../scripts/evaluate-software-tasks.mjs), and [`bench/results/software-task-context-0.1.0-alpha.2.json`](../bench/results/software-task-context-0.1.0-alpha.2.json). The evaluator fails when any committed deterministic result changes.
+The exact scenario sources, expected decisions, unrelated retained history, queries, arithmetic, and per-task results are committed in [`bench/fixtures/software-task-scenarios.mjs`](../bench/fixtures/software-task-scenarios.mjs), [`scripts/evaluate-software-tasks.mjs`](../scripts/evaluate-software-tasks.mjs), and [`bench/results/software-task-context-0.1.0-alpha.3.json`](../bench/results/software-task-context-0.1.0-alpha.3.json). The evaluator fails when any committed deterministic result changes.
 
 ## Retrieval-regression fixture
 
@@ -49,11 +49,11 @@ The evaluator creates a deterministic 54-record local workspace, runs four fixed
 - character reduction;
 - local query time.
 
-The 2026-07-21 `0.1.0-alpha.2` release-candidate run on Node `24.15.0` for Windows x64 produced recall@5 `1.0`, mean reciprocal rank `1.0`, conflict recall `1.0`, supersession precision `1.0`, average pack size `2,237` characters, raw replay size `44,364` characters per query, and character reduction `94.96%`. Context-pack v2 is larger than v1 because it includes explicit evidence-coverage metadata.
+The 2026-07-21 `0.1.0-alpha.3` release-candidate run on Node `24.15.0` for Windows x64 produced recall@5 `1.0`, mean reciprocal rank `1.0`, conflict recall `1.0`, supersession precision `1.0`, average pack size `2,237` characters, raw replay size `44,364` characters per query, and character reduction `94.96%`. Context-pack v2 is larger than v1 because it includes explicit evidence-coverage metadata.
 
 This four-case fixture remains a focused regression check for exact retrieval, typo tolerance, graph evidence, conflict visibility, and supersession. The larger software-task benchmark above is the public context-volume example.
 
-The deterministic values are committed in [`bench/results/context-evaluation-0.1.0-alpha.2.json`](../bench/results/context-evaluation-0.1.0-alpha.2.json). The evaluator reads that file and fails when a release changes any expected retrieval or context-volume field without updating the evidence.
+The deterministic values are committed in [`bench/results/context-evaluation-0.1.0-alpha.3.json`](../bench/results/context-evaluation-0.1.0-alpha.3.json). The evaluator reads that file and fails when a release changes any expected retrieval or context-volume field without updating the evidence.
 
 ## Fixed-workspace volume observation
 

@@ -2,7 +2,7 @@
 
 ## A local-first architecture for evidence-linked project context
 
-Version: `0.1.0-alpha.2` technical preview
+Version: `0.1.0-alpha.3` technical preview
 
 Status: implementation paper for a prerelease system
 
@@ -144,7 +144,7 @@ Qarinah does not require a Qarinah API key, hosted database, model provider, ana
 
 ## 9. Evidence and measurement
 
-The committed `0.1.0-alpha.2` software-task evaluator creates a deterministic 240-record workspace and tests React accessibility editing, a database migration, a repository-wide TypeScript refactor, research-to-code work, production regression debugging, and governed release preparation. Both paths retain the same current-task source snippets. Full-history replay produced 442,113 estimated input tokens across the six cases; the source snippets plus cited Qarinah packs produced 5,682, a weighted 98.71% reduction. Every required decision ranked in the top five with direct evidence coverage, and the packs used no model-written summary records.
+The committed `0.1.0-alpha.3` software-task evaluator creates a deterministic 240-record workspace and tests React accessibility editing, a database migration, a repository-wide TypeScript refactor, research-to-code work, production regression debugging, and governed release preparation. Both paths retain the same current-task source snippets. Full-history replay produced 442,113 estimated input tokens across the six cases; the source snippets plus cited Qarinah packs produced 5,682, a weighted 98.71% reduction. Every required decision ranked in the top five with direct evidence coverage, and the packs used no model-written summary records.
 
 Estimated tokens use `ceil(characters / 4)`. This is a context-volume result against a named full-history baseline, not a Codex, Claude, OpenAI, or Anthropic usage receipt and not a total task-cost or answer-quality result.
 

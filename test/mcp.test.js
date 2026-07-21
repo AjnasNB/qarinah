@@ -158,6 +158,44 @@ test("MCP resolves the active workspace through negotiated roots", async (t) => 
   server.close();
 });
 
+test("MCP resolves an exact explicit workspace when the client has no roots capability", async (t) => {
+  const root = await temporaryDirectory(t);
+  const workspace = await initializeWorkspace(root);
+  await appendEvent(eventInput(), { workspace });
+  await rebuildDerivedState(root);
+  const messages = [];
+  const server = createMcpServer({ write: (message) => messages.push(message) });
+  await initialize(server, messages);
+  await server.handle({
+    jsonrpc: "2.0",
+    id: 51,
+    method: "tools/call",
+    params: { name: "context_status", arguments: { workspace: pathToFileURL(root).href } }
+  });
+  const result = response(messages, 51).result;
+  assert.equal(result.isError, undefined);
+  assert.equal(result.structuredContent.workspaceId, workspace.config.workspaceId);
+  assert.equal(JSON.stringify(result).includes(root), false);
+  server.close();
+});
+
+test("MCP rejects relative workspace selectors without probing the filesystem", async () => {
+  const messages = [];
+  const server = createMcpServer({ write: (message) => messages.push(message) });
+  await initialize(server, messages);
+  await server.handle({
+    jsonrpc: "2.0",
+    id: 52,
+    method: "tools/call",
+    params: { name: "context_doctor", arguments: { workspace: "relative/private-client-workspace" } }
+  });
+  const result = response(messages, 52).result;
+  assert.equal(result.isError, true);
+  assert.equal(result.structuredContent.code, "MCP_WORKSPACE_INVALID");
+  assert.equal(JSON.stringify(result).includes("private-client-workspace"), false);
+  server.close();
+});
+
 test("MCP failures return stable path-free messages", async (t) => {
   const sandbox = await temporaryDirectory(t);
   const privatePath = path.join(sandbox, "private-client-Bob-uninitialized");

@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const livePath = path.join(root, "bench", "results", "live-workspace-volume-2026-07-21.json");
 const live = JSON.parse(await readFile(livePath, "utf8"));
-const softwareTaskPath = path.join(root, "bench", "results", "software-task-context-0.1.0-alpha.2.json");
+const softwareTaskPath = path.join(root, "bench", "results", "software-task-context-0.1.0-alpha.3.json");
 const softwareTask = JSON.parse(await readFile(softwareTaskPath, "utf8"));
 
 assert.equal(live.schemaVersion, "qarinah.workspace-volume-observation.v1");

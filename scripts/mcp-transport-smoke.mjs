@@ -97,9 +97,10 @@ async function probe(host, workspaceRoot, stateRoot) {
   }
 
   try {
+    const clientSupportsRoots = host.name !== "codex";
     const initialized = await request("initialize", {
       protocolVersion: "2025-06-18",
-      capabilities: { roots: { listChanged: true } },
+      capabilities: clientSupportsRoots ? { roots: { listChanged: true } } : {},
       clientInfo: { name: "qarinah-transport-smoke", version: packageJson.version }
     });
     assert.equal(initialized.protocolVersion, "2025-06-18");
@@ -113,12 +114,13 @@ async function probe(host, workspaceRoot, stateRoot) {
       assert.deepEqual(tool.annotations, { readOnlyHint: true, destructiveHint: false, openWorldHint: false });
     }
 
-    const status = await request("tools/call", { name: "context_status", arguments: {} });
+    const toolArguments = clientSupportsRoots ? {} : { workspace: workspaceRoot };
+    const status = await request("tools/call", { name: "context_status", arguments: toolArguments });
     assert.equal(status.isError, undefined);
     assert.equal(status.structuredContent.enabled, true);
     assert.equal(status.structuredContent.eventCount, 1);
 
-    const doctor = await request("tools/call", { name: "context_doctor", arguments: {} });
+    const doctor = await request("tools/call", { name: "context_doctor", arguments: toolArguments });
     assert.equal(doctor.isError, undefined);
     assert.equal(doctor.structuredContent.ok, true);
     assert.equal(doctor.structuredContent.derived, "current");
@@ -144,7 +146,7 @@ try {
   await appendEvent({
     kind: "decision",
     title: "Verify packaged MCP transport",
-    body: "Both packaged hosts must initialize, negotiate roots, list tools, and read the same trusted ledger.",
+    body: "Both packaged hosts must initialize, resolve an exact workspace, list tools, and read the same trusted ledger.",
     confidence: "verified"
   }, { workspace });
   await rebuildDerivedState(workspaceRoot);

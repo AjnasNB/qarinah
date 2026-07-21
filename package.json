@@ -1,6 +1,6 @@
 {
   "name": "qarinah",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.3",
   "description": "Qarinah: evidence-linked, local-first context compilation for software agents.",
   "license": "Apache-2.0",
   "author": "Ajnas NB",
