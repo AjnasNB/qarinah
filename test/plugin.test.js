@@ -129,7 +129,7 @@ test("Claude Code plugin uses portable exec hooks and a bundled read-only MCP se
     }
   }
   const mcp = JSON.parse(await readFile(path.join(claudePlugin, ".mcp.json"), "utf8"));
-  assert.equal(mcp.mcpServers.context.command, "${user_config.node_path}");
+  assert.equal(mcp.mcpServers.context.command, "node");
   assert.deepEqual(mcp.mcpServers.context.args, ["${CLAUDE_PLUGIN_ROOT}/runtime/qarinah.mjs", "mcp"]);
   await access(path.join(claudePlugin, "skills", "qarinah-context", "SKILL.md"));
   const runtime = await readFile(path.join(claudePlugin, "runtime", "qarinah.mjs"), "utf8");
