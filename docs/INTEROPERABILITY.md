@@ -51,7 +51,7 @@ Direct invocation of a retained registered handler fails because the verifier ac
 
 ## Cockroach Crawler: SourceRecord ingestion
 
-Cockroach Crawler `0.3.0-alpha.1` exports a TypeScript `SourceRecord` and a JSON Schema. It does **not** expose a public runtime `normalizeSourceRecord()` or `validateSourceRecord()` function. Context Ledger therefore labels its validator as a structural boundary, not as Cockroach certification. Upstream should add a public runtime validator before issue #7 can claim full contract conformance.
+Cockroach Crawler `0.3.0` exports a TypeScript `SourceRecord` and a JSON Schema. It does **not** expose a public runtime `normalizeSourceRecord()` or `validateSourceRecord()` function. Qarinah therefore labels its validator as a structural boundary, not as Cockroach certification. Upstream should add a public runtime validator before issue #7 can claim full contract conformance.
 
 `validateCockroachSourceRecordBoundary()` rejects accessors, prototypes, unknown fields, non-JSON values, non-canonical timestamps, malformed hashes, and records above the ledger's documented ingestion ceilings. Ingestion creates two records:
 

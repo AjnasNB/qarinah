@@ -1,6 +1,6 @@
 # Governed agent stack: public release and launch plan
 
-Last verified: 2026-07-21.
+Last verified: 2026-07-22.
 
 This is the coordinated public plan for Qarinah, Maqam, Cockroach Crawler, and ProductLoop. The products keep separate repositories, packages, contracts, ledgers, and release versions. Publicly, they tell one useful story:
 
@@ -25,7 +25,7 @@ Re-check registries and repositories immediately before publishing. As of the da
 | --- | --- | --- |
 | Maqam | `0.3.2` is the stable GitHub and npm release | Ready for demos that use only documented guarantees |
 | ProductLoop | `0.2.3` is the stable GitHub and npm release | Present as orchestration, not a second flagship launch |
-| Cockroach Crawler | `0.2.0` is stable; `0.3.0-alpha.3` is the npm `next` and GitHub prerelease line | Use the prerelease only in an explicitly labeled technical preview |
+| Cockroach Crawler | `0.3.0` is the stable GitHub and npm `latest` release | Ready for bounded-crawl, provider-routing, optional reach, browser-host, and restricted serverless demos within documented limits |
 | Qarinah | `0.1.0-alpha.3` is an unpublished candidate in a private repository | Do not announce, tag, or publish until every gate in [LAUNCH.md](LAUNCH.md) is complete |
 
 Never describe a local version, candidate, or prerelease as the latest stable release.
@@ -87,7 +87,7 @@ Acceptance evidence:
 
 1. Finish Qarinah's name, copyright, third-party, privacy, threat-model, and complete Git-history secret reviews.
 2. Freeze one integration-demo manifest containing every package version, repository SHA, Node version, fixture hash, and command.
-3. Run each repository's complete check from a clean install. Keep the crawler prerelease label visible.
+3. Run each repository's complete check from a clean install. Keep Qarinah's prerelease label visible.
 4. Run a fresh-consumer install and the end-to-end demo on Windows, macOS, and Linux where the claim requires those platforms.
 5. Cut the demo only from the verified outputs and exact candidate artifacts.
 
@@ -98,7 +98,7 @@ Acceptance evidence:
 3. Stage Qarinah `0.1.0-alpha.3`, inspect the registry artifact, install it into a clean consumer, and approve the exact identity.
 4. Publish Qarinah under npm `next`, create the matching prerelease tag and [GitHub release](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases) at the same commit, and verify provenance, integrity, package contents, links, and plugin installation.
 5. Do not republish Maqam or ProductLoop merely to synchronize dates. Reference their current stable releases unless code actually changed.
-6. Keep Cockroach Crawler on `next` until its prerelease exit criteria pass; do not move `latest` for launch optics.
+6. Use Cockroach Crawler `0.3.0` from `latest`; do not revive prerelease install commands in current launch copy.
 
 For every package, the release record must bind name, version, registry, dist-tag, commit, tarball SHA-256, npm integrity, packed files, workflow run, and approver.
 

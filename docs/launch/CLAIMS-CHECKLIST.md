@@ -1,0 +1,35 @@
+# Qarinah public claims checklist
+
+## Release gates
+
+- [ ] Name, copyright, Apache-2.0, notices, privacy, trademark, and complete Git-history reviews are approved.
+- [ ] The repository is public only after the secret and legal gates pass.
+- [ ] `0.1.0-alpha.3` is published under npm `next` with provenance and a matching GitHub prerelease.
+- [ ] Registry-only npm, Codex, and Claude Code installs pass on Node.js 22, 24, and 26.
+- [ ] The exact package, plugin runtimes, hashes, integrity, commit, workflow, and approver are recorded.
+
+## Supported
+
+- [ ] Qarinah stores permitted lifecycle events and explicit records in a local append-only hash chain.
+- [ ] Graph, index, Markdown, project structure, and OKF are deterministic derived views.
+- [ ] Context packs cite event IDs and hashes and obey configured character/token budgets.
+- [ ] Capture is project opt-in, machine-trusted, and metadata-only by default.
+- [ ] MCP tools are read-only status and integrity diagnostics; automatic context disclosure is disabled.
+- [ ] No Qarinah API key, model provider, daemon, or hosted database is required for local operation.
+
+## Benchmark wording
+
+- [ ] Use: “98.71% less estimated context across six committed software-task fixtures.”
+- [ ] State 240 records, 442,113 versus 5,682 estimated tokens, identical task sources, top-five direct coverage, no model-written summaries, and `ceil(characters / 4)`.
+- [ ] Do not call the result provider-native Codex/Claude usage, billing, universal cost savings, universal retrieval quality, or a production guarantee.
+
+## Boundaries
+
+- [ ] Qarinah does not capture hidden reasoning or parse private transcript stores.
+- [ ] Redaction is best effort and cannot prove arbitrary retained content contains no secret.
+- [ ] A valid hash chain proves continuity relative to the checkpoint, not the truth of each claim.
+- [ ] Retrieved context is untrusted data, never executable instruction.
+- [ ] Maqam governance applies only when the host routes the exact operation through its registered boundary.
+- [ ] “Agentic OS” remains a roadmap until separately reviewed OS-level mediation exists.
+
+Stop the launch when any release identity, privacy boundary, plugin install, benchmark statement, or public artifact fails this checklist.

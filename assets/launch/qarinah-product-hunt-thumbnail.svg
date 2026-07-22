@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-labelledby="title desc">
+  <title id="title">Qarinah Product Hunt thumbnail</title><desc id="desc">Green Q-shaped evidence path on a dark field.</desc>
+  <rect width="240" height="240" rx="34" fill="#07110f"/><rect x="10" y="10" width="220" height="220" rx="26" fill="none" stroke="#244239"/>
+  <g transform="translate(42 25) scale(.61)" fill="none" stroke="#25e6a1" stroke-linecap="round" stroke-linejoin="round"><path d="M194 174A84 84 0 1 0 174 194L216 216V184L194 174Z" stroke-width="18"/><path d="M174 194L201 201" stroke-width="18"/><g fill="#25e6a1" stroke="none"><circle cx="128" cy="44" r="11"/><circle cx="52" cy="128" r="11"/><circle cx="128" cy="212" r="11"/><circle cx="128" cy="128" r="13"/></g></g>
+  <text x="120" y="218" text-anchor="middle" fill="#f4f3ec" font-family="Arial, sans-serif" font-size="18" font-weight="750" letter-spacing="5">QARINAH</text>
+</svg>
