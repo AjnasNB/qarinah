@@ -2,6 +2,14 @@
 
 Qarinah is preparing an Apache-2.0 alpha. Do not publish an npm package, public repository, plugin marketplace entry, or immutable release until every incomplete gate below is satisfied and the exact artifact is approved.
 
+## Launch message
+
+> Stop replaying entire agent histories.
+
+Qarinah turns permitted project activity and explicit decisions into small, cited context packs. Its committed six-task fixture used 98.71% less estimated context than full-history replay while keeping every required target in the top five with direct evidence coverage. The estimate is `ceil(characters / 4)`, not provider billing or a universal cost claim.
+
+The complete channel copy, media assignments, and claims gate are in [`docs/launch/`](launch/README.md).
+
 ## Release gates
 
 1. Confirm the product name with professional trademark review and reserve the package, domains, and social identifiers.
@@ -43,6 +51,7 @@ Qarinah is preparing an Apache-2.0 alpha. Do not publish an npm package, public 
 
 Use:
 
+- "Stop replaying entire agent histories."
 - "Qarinah - less context. More proof."
 - "Small cited context packs instead of entire transcripts."
 - "Local-first and no Qarinah API key."

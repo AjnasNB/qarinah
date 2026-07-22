@@ -4,7 +4,7 @@
 
 <h1 align="center">Qarinah</h1>
 
-<p align="center"><strong>Less context. More proof.</strong></p>
+<p align="center"><strong>Stop replaying entire agent histories.</strong></p>
 
 <p align="center">
   <a href="docs/WHITEPAPER.md">Technical paper</a>&nbsp;&middot;&nbsp;
@@ -23,9 +23,11 @@
 </p>
 
 <p align="center">
-  <strong>98.71% fewer estimated context tokens across six committed software-task fixtures.</strong><br>
-  Local-first. Source-cited. Tamper-evident. No Qarinah API key.
+  <strong>98.71% less estimated context across six committed software-task fixtures.</strong><br>
+  Small cited packs. Every selected result points back to evidence. No Qarinah API key.
 </p>
+
+<p align="center"><em>Less context. More proof.</em></p>
 
 > Benchmark: React editing, database migration, TypeScript refactoring, web research, production debugging, and governed release work across 240 retained records. Full-history replay plus the required task sources was estimated at 442,113 input tokens; the same sources plus Qarinah packs was estimated at 5,682. Every required target ranked in the top five with direct coverage, and no model-written summary items were used. Estimates use `ceil(characters / 4)` and are not provider-billed Codex or Claude usage. See the [machine-readable result](bench/results/software-task-context-0.1.0-alpha.3.json) and [methodology](docs/BENCHMARKS.md).
 
