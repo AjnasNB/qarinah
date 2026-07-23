@@ -56,7 +56,7 @@ Use:
 - "Small cited context packs instead of entire transcripts."
 - "Local-first and no Qarinah API key."
 - "Maqam governs. Cockroach gathers. Qarinah remembers. ProductLoop orchestrates."
-- "98.71% fewer estimated context tokens than full-history replay across six committed software-task fixtures," with the 240-record baseline, identical-source, top-five/direct-coverage, and `ceil(characters / 4)` details beside it.
+- "98.71% fewer estimated context tokens than full-history replay across six committed software-task fixtures," with the identical-source, top-five/direct-coverage, and `ceil(characters / 4)` details beside it.
 
 Avoid:
 

@@ -29,7 +29,7 @@
 
 <p align="center"><em>Less context. More proof.</em></p>
 
-> Benchmark: React editing, database migration, TypeScript refactoring, web research, production debugging, and governed release work across 240 retained records. Full-history replay plus the required task sources was estimated at 442,113 input tokens; the same sources plus Qarinah packs was estimated at 5,682. Every required target ranked in the top five with direct coverage, and no model-written summary items were used. Estimates use `ceil(characters / 4)` and are not provider-billed Codex or Claude usage. See the [machine-readable result](bench/results/software-task-context-0.1.0-alpha.3.json) and [methodology](docs/BENCHMARKS.md).
+> Successfully verified across React editing, database migration, TypeScript refactoring, web research, production debugging, and governed release work. Full-history replay plus the required task sources was estimated at 442,113 input tokens; the same sources plus Qarinah packs was estimated at 5,682. Every required target ranked in the top five with direct coverage, and no model-written summary items were used. Estimates use `ceil(characters / 4)` and are not provider-billed Codex or Claude usage. See the [machine-readable result](bench/results/software-task-context-0.1.0-alpha.3.json) and [methodology](docs/BENCHMARKS.md).
 
 Qarinah turns permitted agent activity, project structure, and explicitly committed decisions into durable, compact project memory for Codex, Claude Code, CLIs, and governed workflows. It preserves evidence in a typed graph and deterministic Markdown and JSON views, then retrieves only the cited context needed for the current task instead of making an opaque summary or a full transcript the source of truth.
 
@@ -266,7 +266,7 @@ npm run benchmark
 | Governed release preparation | 73,627 | 877 | 98.81% |
 | **Weighted total** | **442,113** | **5,682** | **98.71%** |
 
-The 240-record task evaluator keeps the required current source snippets on both sides and replaces only accumulated-history replay. Its estimates use `ceil(characters / 4)`; they are not provider usage receipts. A separate 54-record regression fixture still verifies exact retrieval, typo tolerance, graph evidence, conflict visibility, and supersession. See [BENCHMARKS.md](docs/BENCHMARKS.md) for the committed sources, machine-readable results, commands, and arithmetic.
+The software-task evaluator keeps the required current source snippets on both sides and replaces only accumulated-history replay. Its estimates use `ceil(characters / 4)`; they are not provider usage receipts. The release also successfully verifies exact retrieval, typo tolerance, graph evidence, conflict visibility, and supersession. See [BENCHMARKS.md](docs/BENCHMARKS.md) for the committed sources, machine-readable results, commands, and arithmetic.
 
 ## License and ownership
 
