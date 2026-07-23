@@ -14,7 +14,7 @@ Qarinah keeps permitted project activity and explicit decisions in a local evide
 
 > 98.71% less estimated context across six committed software-task fixtures.
 
-Keep the scope beside the number: 240 retained records; identical current-task source snippets in both paths; 442,113 estimated tokens for full-history replay versus 5,682 for Qarinah packs plus the same sources; every required target in the top five with direct coverage; no model-written summaries; `ceil(characters / 4)` estimation.
+Keep the scope beside the number: identical current-task source snippets in both paths; 442,113 estimated tokens for full-history replay versus 5,682 for Qarinah packs plus the same sources; every required target in the top five with direct coverage; no model-written summaries; `ceil(characters / 4)` estimation.
 
 ## Who should care
 

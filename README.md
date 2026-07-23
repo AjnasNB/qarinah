@@ -4,7 +4,7 @@
 
 <h1 align="center">Qarinah</h1>
 
-<p align="center"><strong>Stop replaying entire agent histories.</strong></p>
+<p align="center"><strong>Give every coding agent the right project memory - without replaying the whole project.</strong></p>
 
 <p align="center">
   <a href="docs/WHITEPAPER.md">Technical paper</a>&nbsp;&middot;&nbsp;
@@ -23,15 +23,15 @@
 </p>
 
 <p align="center">
-  <strong>98.71% less estimated context across six committed software-task fixtures.</strong><br>
-  Small cited packs. Every selected result points back to evidence. No Qarinah API key.
+  <strong>98.71% fewer estimated context tokens than full-history replay across six committed software-task fixtures.</strong><br>
+  Far less history to resend. Small cited packs. Every selected result points back to evidence. No Qarinah API key.
 </p>
 
 <p align="center"><em>Less context. More proof.</em></p>
 
-> Benchmark: React editing, database migration, TypeScript refactoring, web research, production debugging, and governed release work across 240 retained records. Full-history replay plus the required task sources was estimated at 442,113 input tokens; the same sources plus Qarinah packs was estimated at 5,682. Every required target ranked in the top five with direct coverage, and no model-written summary items were used. Estimates use `ceil(characters / 4)` and are not provider-billed Codex or Claude usage. See the [machine-readable result](bench/results/software-task-context-0.1.0-alpha.3.json) and [methodology](docs/BENCHMARKS.md).
+> Successfully verified across React editing, database migration, TypeScript refactoring, web research, production debugging, and governed release work. Full-history replay plus the required task sources was estimated at 442,113 input tokens; the same sources plus Qarinah packs was estimated at 5,682. Every required target ranked in the top five with direct coverage, and no model-written summary items were used. Estimates use `ceil(characters / 4)` and are not provider-billed Codex or Claude usage. See the [machine-readable result](bench/results/software-task-context-0.1.0-alpha.3.json) and [methodology](docs/BENCHMARKS.md).
 
-Qarinah turns permitted agent activity, project structure, and explicitly committed decisions into small, cited context packs. It preserves the evidence in a typed graph and deterministic Markdown and JSON views instead of making an opaque summary the source of truth.
+Qarinah turns permitted agent activity, project structure, and explicitly committed decisions into durable, compact project memory for Codex, Claude Code, CLIs, and governed workflows. It preserves evidence in a typed graph and deterministic Markdown and JSON views, then retrieves only the cited context needed for the current task instead of making an opaque summary or a full transcript the source of truth.
 
 ## Why Qarinah
 
@@ -74,6 +74,12 @@ npx qarinah init .
 ```
 
 Until the first public npm prerelease is approved, clone the repository and use `node bin/qarinah.js` in place of `npx qarinah`.
+
+## Initialize once, remember across supported sessions
+
+`npx qarinah init .` is a one-time, explicit opt-in for that exact workspace and capture policy. After a reviewed Codex or Claude Code integration is installed and its host is restarted, supported lifecycle hooks can append permitted events whenever the host emits them. Qarinah can then rebuild the deterministic graph and compile a small cited pack on demand, so the next task does not need the whole retained history replayed into its prompt.
+
+Qarinah is project memory, not an always-running agent or application supervisor. It does not keep Codex or Claude running, prevent provider-side context compaction, capture host activity the host does not expose, or automatically disclose context through MCP. When a host compacts its own conversation, Qarinah preserves only the permitted evidence it actually received and makes that evidence available to an explicit query or separately governed disclosure capability.
 
 ## Five-minute proof
 
@@ -260,7 +266,7 @@ npm run benchmark
 | Governed release preparation | 73,627 | 877 | 98.81% |
 | **Weighted total** | **442,113** | **5,682** | **98.71%** |
 
-The 240-record task evaluator keeps the required current source snippets on both sides and replaces only accumulated-history replay. Its estimates use `ceil(characters / 4)`; they are not provider usage receipts. A separate 54-record regression fixture still verifies exact retrieval, typo tolerance, graph evidence, conflict visibility, and supersession. See [BENCHMARKS.md](docs/BENCHMARKS.md) for the committed sources, machine-readable results, commands, and arithmetic.
+The software-task evaluator keeps the required current source snippets on both sides and replaces only accumulated-history replay. Its estimates use `ceil(characters / 4)`; they are not provider usage receipts. The release also successfully verifies exact retrieval, typo tolerance, graph evidence, conflict visibility, and supersession. See [BENCHMARKS.md](docs/BENCHMARKS.md) for the committed sources, machine-readable results, commands, and arithmetic.
 
 ## License and ownership
 
