@@ -59,6 +59,7 @@
     "bench/fixtures/software-task-scenarios.mjs",
     "bench/results/",
     "scripts/evaluate-software-tasks.mjs",
+    "scripts/evaluate-long-document.mjs",
     "LICENSE",
     "NOTICE",
     "THIRD_PARTY_NOTICES.md",
@@ -87,11 +88,12 @@
     "prepublishOnly": "npm run check",
     "test": "node scripts/run-tests.mjs",
     "typecheck": "node scripts/typecheck-consumer.mjs",
-    "check": "npm run check:plugins && npm run check:docs && npm run mcp:smoke && npm test && npm run typecheck && npm run check:benchmark-evidence && npm run benchmark && npm run evaluate:context && npm run evaluate:software-tasks && npm pack --dry-run --ignore-scripts",
+    "check": "npm run check:plugins && npm run check:docs && npm run mcp:smoke && npm test && npm run typecheck && npm run check:benchmark-evidence && npm run benchmark && npm run evaluate:context && npm run evaluate:software-tasks && npm run evaluate:long-document && npm pack --dry-run --ignore-scripts",
     "check:benchmark-evidence": "node scripts/verify-benchmark-evidence.mjs",
     "benchmark": "node scripts/benchmark.mjs",
     "evaluate:context": "node scripts/evaluate-context.mjs",
-    "evaluate:software-tasks": "node scripts/evaluate-software-tasks.mjs"
+    "evaluate:software-tasks": "node scripts/evaluate-software-tasks.mjs",
+    "evaluate:long-document": "node scripts/evaluate-long-document.mjs"
   },
   "engines": {
     "node": "^22.0.0 || ^24.0.0 || ^26.0.0"

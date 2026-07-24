@@ -29,6 +29,32 @@ Estimated tokens use `ceil(characters / 4)`. They are reproducible context-volum
 
 The exact scenario sources, expected decisions, unrelated retained history, queries, arithmetic, and per-task results are committed in [`bench/fixtures/software-task-scenarios.mjs`](../bench/fixtures/software-task-scenarios.mjs), [`scripts/evaluate-software-tasks.mjs`](../scripts/evaluate-software-tasks.mjs), and [`bench/results/software-task-context-0.1.0-alpha.3.json`](../bench/results/software-task-context-0.1.0-alpha.3.json). The evaluator fails when any committed deterministic result changes.
 
+## Long-document retrieval benchmark
+
+Command:
+
+```sh
+npm ci
+npm run evaluate:long-document
+```
+
+The evaluator constructs a deterministic 384-section synthetic operations handbook, segments it into retained source records, and distributes eight answer-bearing passages across the start, middle, and end. It then runs eight exact lookups, eight typo-tolerant lookups, and four unsupported controls. Every positive query uses the same fixed 600-token pack ceiling; the evaluator does not search for a favorable budget per query.
+
+| Measurement | Result |
+| --- | ---: |
+| Source size | 139,001 characters |
+| Portable token estimate | 34,751 |
+| Positive queries | 16 |
+| Answer-bearing passage at rank 1 | 16 / 16 |
+| Answers preserved in cited excerpts | 16 / 16 |
+| Average Qarinah pack | 534 estimated tokens |
+| Largest Qarinah pack | 556 estimated tokens |
+| Worst-case estimated reduction | 98.4% |
+| Unsupported questions rejected with direct coverage required | 4 / 4 |
+| Model-written summary items | 0 |
+
+The result verifies targeted, evidence-linked retrieval from a large pre-segmented source under a fixed budget. The unsupported controls require `direct` evidence coverage; the benchmark does not claim that every unsupported query is rejected when callers permit partial lexical coverage. It also does not demonstrate whole-book summarization, native PDF ingestion, semantic answer quality, or a provider's exact token bill. The portable estimate is `ceil(characters / 4)`. The source generator, assertions, and machine-readable expected result are committed in [`scripts/evaluate-long-document.mjs`](../scripts/evaluate-long-document.mjs) and [`bench/results/long-document-context-0.1.0-alpha.3.json`](../bench/results/long-document-context-0.1.0-alpha.3.json).
+
 ## Retrieval-regression fixture
 
 Command:
