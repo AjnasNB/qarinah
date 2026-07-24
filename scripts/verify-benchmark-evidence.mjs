@@ -84,6 +84,11 @@ for (const [surface, content] of [
 ]) {
   assert.ok(content.includes(publicPercent), `${surface} must carry the evidence-derived ${publicPercent} claim.`);
 }
+assert.equal(
+  `${readme}\n${packageJson.description}\n${platformCopy}`.toLowerCase().includes("in our six-task benchmark"),
+  false,
+  "Public-facing copy must lead with the result instead of the removed six-task qualifier."
+);
 assert.ok(readme.includes(`${compressionRatio}:1 context compression`));
 assert.ok(readme.includes(`$${baselineAtOneDollarPerMillion.toFixed(4)}`));
 assert.ok(readme.includes(`$${qarinahAtOneDollarPerMillion.toFixed(4)}`));

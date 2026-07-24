@@ -40,7 +40,7 @@ This is the repeatable Qarinah tagline. It is short enough for GitHub, npm, the 
 
 ### Current proof line
 
-> **98.71% fewer estimated context tokens than full-history replay across six committed software-task fixtures.**
+> **98.71% fewer estimated context tokens than full-history replay.**
 
 Keep the direct details beside the number: identical current-task source snippets on both sides; full-history replay versus cited Qarinah packs; 442,113 versus 5,682 estimated tokens; every target in the top five with direct coverage; zero model-written summary items; `ceil(characters / 4)` estimate rather than provider billing.
 

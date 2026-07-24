@@ -6,7 +6,7 @@
 | Product Hunt thumbnail | `assets/launch/qarinah-product-hunt-thumbnail.svg` and `.png` | 240 x 240 | Square mark and name |
 | General wide brand visual | `assets/brand/qarinah-brand-board.png` | 1672 x 941 | Website hero, press kit, and video backdrop |
 | Architecture gallery | `assets/architecture/qarinah-flow.svg` | Vector | Capture-to-pack system map |
-| Product Hunt gallery 1 | `assets/launch/qarinah-product-hunt-01-proof.svg` and `.png` | 1270 x 760 | Scoped six-task benchmark proof |
+| Product Hunt gallery 1 | `assets/launch/qarinah-product-hunt-01-proof.svg` and `.png` | 1270 x 760 | Scoped benchmark proof |
 | Product Hunt gallery 2 | `assets/launch/qarinah-product-hunt-02-retrieval.svg` and `.png` | 1270 x 760 | Hybrid retrieval and evidence-linked pack |
 | Product Hunt gallery 3 | `assets/launch/qarinah-product-hunt-03-boundary.svg` and `.png` | 1270 x 760 | Consent, supported hosts, and exclusions |
 
@@ -14,7 +14,7 @@ Before Product Hunt, verify all three 1270 x 760 gallery images and the square 2
 
 ## Alt text
 
-**Social preview:** Qarinah turns a large agent-history stream into a small cited context pack, with the six-task fixture reporting 98.71 percent less estimated context.
+**Social preview:** Qarinah turns a large agent-history stream into a small cited context pack with 98.71 percent less estimated context.
 
 **Architecture:** Supported host events cross explicit capture policy into a hash-chained record, rebuildable graph and index views, and a bounded cited context pack.
 

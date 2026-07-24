@@ -19,7 +19,7 @@
 
 ## Benchmark wording
 
-- [ ] Use: “98.71% less estimated context across six committed software-task fixtures.”
+- [ ] Use: “98.71% less estimated context.”
 - [ ] State 240 records, 442,113 versus 5,682 estimated tokens, identical task sources, top-five direct coverage, no model-written summaries, and `ceil(characters / 4)`.
 - [ ] If translating the result to cost, use the explicit flat-price example: $0.442113 versus $0.005682 at $1 per million uncached input tokens for the compared context slice.
 - [ ] Do not call the result provider-native Codex/Claude usage, a provider bill, total AI cost savings, universal retrieval quality, or a production guarantee.
