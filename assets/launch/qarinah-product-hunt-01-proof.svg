@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1270" height="760" viewBox="0 0 1270 760" role="img" aria-labelledby="title desc">
   <title id="title">Qarinah benchmark proof</title>
-  <desc id="desc">The committed six-task fixture compares full-history replay with small cited Qarinah packs.</desc>
+  <desc id="desc">The benchmark compares full-history replay with small cited Qarinah packs.</desc>
   <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#07110f"/><stop offset="1" stop-color="#050807"/></linearGradient><pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse"><path d="M44 0H0V44" fill="none" stroke="#244239" opacity=".28"/></pattern></defs>
   <rect width="1270" height="760" fill="url(#bg)"/><rect width="1270" height="760" fill="url(#grid)"/>
   <text x="62" y="72" fill="#25e6a1" font-family="monospace" font-size="15" letter-spacing="3">PRODUCT HUNT / PROOF 01</text>
@@ -9,7 +9,7 @@
   <g transform="translate(62 262)"><rect width="1146" height="328" rx="16" fill="#0b1713" stroke="#31564a"/>
     <text x="34" y="58" fill="#f4f3ec" font-family="monospace" font-size="16">FULL-HISTORY REPLAY</text><rect x="34" y="82" width="1010" height="48" rx="6" fill="#27463c"/><text x="1064" y="114" text-anchor="end" fill="#cbd8d2" font-family="monospace" font-size="17">442,113</text>
     <text x="34" y="188" fill="#25e6a1" font-family="monospace" font-size="16">QARINAH PACKS + SAME TASK SOURCES</text><rect x="34" y="212" width="13" height="48" rx="6" fill="#25e6a1"/><text x="67" y="244" fill="#25e6a1" font-family="monospace" font-size="17">5,682</text>
-    <text x="1110" y="244" text-anchor="end" fill="#25e6a1" font-family="Arial, sans-serif" font-size="42" font-weight="750">98.71% LESS</text><text x="1110" y="278" text-anchor="end" fill="#9fb2aa" font-family="monospace" font-size="13">ESTIMATED CONTEXT / SIX SOFTWARE TASKS</text>
+    <text x="1110" y="244" text-anchor="end" fill="#25e6a1" font-family="Arial, sans-serif" font-size="42" font-weight="750">98.71% LESS</text><text x="1110" y="278" text-anchor="end" fill="#9fb2aa" font-family="monospace" font-size="13">ESTIMATED CONTEXT / 442,113 → 5,682</text>
   </g>
   <text x="62" y="650" fill="#f4f3ec" font-family="Arial, sans-serif" font-size="20">Every required target was directly covered in the top five. No model-written summaries.</text>
   <text x="62" y="700" fill="#7e9189" font-family="monospace" font-size="13">240 RECORDS / CEIL(CHARACTERS / 4) ESTIMATE / NOT PROVIDER BILLING</text><text x="1208" y="700" text-anchor="end" fill="#25e6a1" font-family="monospace" font-size="13">QARINAH</text>

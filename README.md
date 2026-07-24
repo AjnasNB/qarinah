@@ -24,12 +24,12 @@
 
 <p align="center">
   <strong>What if your coding agents could send 98.71% less repeated project context?</strong><br>
-  Qarinah's six-task benchmark cut 442,113 estimated input-context tokens to 5,682 - 77.81:1 context compression with every required target directly covered in the top five.
+  442,113 estimated input-context tokens became 5,682 - 98.71% less repeated context and 77.81:1 context compression, with every required target directly covered in the top five.
 </p>
 
 <p align="center"><em>Nearly 99% less repeated context. Every selected memory points back to its source.</em></p>
 
-> Successfully verified across React editing, database migration, TypeScript refactoring, web research, production debugging, and governed release work. The benchmark sent 436,431 fewer estimated input-context tokens across those six runs. At a flat $1 per million uncached input tokens, that compared context slice moves from $0.4421 to $0.0057 - 98.71% less input-context cost under the same unit price. The percentage is independent of the chosen flat unit price; the portable token estimate excludes output, tools, caching, and fixed provider charges. See the [machine-readable result](bench/results/software-task-context-0.1.0-alpha.3.json) and [methodology](docs/BENCHMARKS.md).
+> Successfully verified across React editing, database migration, TypeScript refactoring, web research, production debugging, and governed release work. The evaluated tasks sent 436,431 fewer estimated input-context tokens. At a flat $1 per million uncached input tokens, that compared context slice moves from $0.4421 to $0.0057 - 98.71% less input-context cost under the same unit price. The percentage is independent of the chosen flat unit price; the portable token estimate excludes output, tools, caching, and fixed provider charges. See the [machine-readable result](bench/results/software-task-context-0.1.0-alpha.3.json) and [methodology](docs/BENCHMARKS.md).
 
 Your project already contains the decisions and evidence behind its changes. Qarinah lets the next agent query that record and receive a bounded, cited pack selected for the current task.
 

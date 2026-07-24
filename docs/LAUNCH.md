@@ -6,7 +6,7 @@ Qarinah is preparing an Apache-2.0 alpha. Do not publish an npm package, public 
 
 > Stop replaying entire agent histories.
 
-Qarinah turns permitted project activity and explicit decisions into small, cited context packs. Its committed six-task fixture used 98.71% less estimated context than full-history replay while keeping every required target in the top five with direct evidence coverage. The estimate is `ceil(characters / 4)`, not provider billing or a universal cost claim.
+Qarinah turns permitted project activity and explicit decisions into small, cited context packs. It used 98.71% less estimated context than full-history replay while keeping every required target in the top five with direct evidence coverage. The estimate is `ceil(characters / 4)`, not provider billing or a universal cost claim.
 
 The complete channel copy, media assignments, and claims gate are in [`docs/launch/`](launch/README.md).
 
@@ -56,7 +56,7 @@ Use:
 - "Small cited context packs instead of entire transcripts."
 - "Local-first and no Qarinah API key."
 - "Maqam governs. Cockroach gathers. Qarinah remembers. ProductLoop orchestrates."
-- "98.71% fewer estimated context tokens than full-history replay across six committed software-task fixtures," with the identical-source, top-five/direct-coverage, and `ceil(characters / 4)` details beside it.
+- "98.71% fewer estimated context tokens than full-history replay," with the identical-source, top-five/direct-coverage, and `ceil(characters / 4)` details available in the linked methodology.
 - "At a flat $1 per million uncached input tokens, the compared context slice moves from $0.442113 to $0.005682 - 98.71% less input-context cost under the same unit price," only as a transparent translation of the committed estimate.
 
 Avoid:
