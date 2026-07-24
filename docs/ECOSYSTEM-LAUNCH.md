@@ -44,6 +44,8 @@ This is the repeatable Qarinah tagline. It is short enough for GitHub, npm, the 
 
 Keep the direct details beside the number: identical current-task source snippets on both sides; full-history replay versus cited Qarinah packs; 442,113 versus 5,682 estimated tokens; every target in the top five with direct coverage; zero model-written summary items; `ceil(characters / 4)` estimate rather than provider billing.
 
+The approved cost translation is equally narrow: at a flat $1 per million uncached input tokens, the compared context slice moves from $0.442113 to $0.005682. That is 98.71% less input-context cost under the same unit price, not a measurement of output, tools, caching, retrieval, or a provider's total bill.
+
 ### Claim that is not yet approved
 
 Do not shorten the result to "90% fewer tokens in Codex and Claude," "90% lower AI cost," or an equivalent provider claim. The software-task benchmark supports a 98.71% estimated-context reduction against its named full-history baseline, not provider billing or provider-native token accounting.

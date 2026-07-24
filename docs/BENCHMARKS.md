@@ -27,6 +27,12 @@ Every required decision ranked in the top five, every query returned direct evid
 
 Estimated tokens use `ceil(characters / 4)`. They are reproducible context-volume estimates, not usage receipts from Codex, Claude, OpenAI, or Anthropic. The required source files remain in both measurements; Qarinah replaces accumulated-history replay, not the code, schema, logs, tests, or research excerpts needed for the current task.
 
+### Cost translation
+
+The six-task benchmark sends 436,431 fewer estimated input-context tokens. At a flat $1 per million uncached input tokens, the compared context slice moves from $0.442113 to $0.005682. That is 98.71% less input-context cost under the same unit price.
+
+This translation is useful because the percentage is independent of the chosen flat unit price. It is not a provider invoice: output tokens, tool calls, cached-input discounts, indexing, retrieval, and fixed provider charges remain separate.
+
 The exact scenario sources, expected decisions, unrelated retained history, queries, arithmetic, and per-task results are committed in [`bench/fixtures/software-task-scenarios.mjs`](../bench/fixtures/software-task-scenarios.mjs), [`scripts/evaluate-software-tasks.mjs`](../scripts/evaluate-software-tasks.mjs), and [`bench/results/software-task-context-0.1.0-alpha.3.json`](../bench/results/software-task-context-0.1.0-alpha.3.json). The evaluator fails when any committed deterministic result changes.
 
 ## Long-document retrieval benchmark

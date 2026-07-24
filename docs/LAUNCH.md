@@ -57,6 +57,7 @@ Use:
 - "Local-first and no Qarinah API key."
 - "Maqam governs. Cockroach gathers. Qarinah remembers. ProductLoop orchestrates."
 - "98.71% fewer estimated context tokens than full-history replay across six committed software-task fixtures," with the identical-source, top-five/direct-coverage, and `ceil(characters / 4)` details beside it.
+- "At a flat $1 per million uncached input tokens, the compared context slice moves from $0.442113 to $0.005682 - 98.71% less input-context cost under the same unit price," only as a transparent translation of the committed estimate.
 
 Avoid:
 
@@ -64,6 +65,7 @@ Avoid:
 - "Works with every agent, model, or website."
 - "No API key required for all internet and model access."
 - "90% fewer Codex or Claude tokens" until provider-native usage is measured on a committed, reproducible task fixture.
+- "90% lower AI cost," "90% lower model bill," or another total-cost claim that includes output, tools, caching, retrieval, or fixed charges.
 - "Agentic OS" until process, capability, secrets, filesystem, network, and device mediation exist.
 
 ## Open-source stewardship

@@ -1,7 +1,7 @@
 {
   "name": "qarinah",
   "version": "0.1.0-alpha.3",
-  "description": "Stop replaying entire agent histories: Qarinah compiles verified project memory into small, cited context packs.",
+  "description": "98.71% less estimated context in our six-task benchmark - local, cited project memory for Codex, Claude Code, and CLI workflows.",
   "license": "Apache-2.0",
   "author": "Ajnas NB",
   "type": "module",
