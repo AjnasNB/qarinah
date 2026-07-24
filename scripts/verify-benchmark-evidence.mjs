@@ -8,6 +8,8 @@ const livePath = path.join(root, "bench", "results", "live-workspace-volume-2026
 const live = JSON.parse(await readFile(livePath, "utf8"));
 const softwareTaskPath = path.join(root, "bench", "results", "software-task-context-0.1.0-alpha.3.json");
 const softwareTask = JSON.parse(await readFile(softwareTaskPath, "utf8"));
+const longDocumentPath = path.join(root, "bench", "results", "long-document-context-0.1.0-alpha.3.json");
+const longDocument = JSON.parse(await readFile(longDocumentPath, "utf8"));
 
 assert.equal(live.schemaVersion, "qarinah.workspace-volume-observation.v1");
 assert.equal(live.claimEligible, false);
@@ -62,5 +64,51 @@ assert.equal(
   softwareTask.expected.minimumScenarioEstimatedTokenReduction,
   Math.min(...softwareTask.expected.scenarios.map((scenario) => scenario.estimatedTokenReduction))
 );
+
+assert.equal(longDocument.schemaVersion, "qarinah.long-document-context-eval-result.v1");
+assert.equal(longDocument.packageVersion, softwareTask.packageVersion);
+assert.ok(longDocument.expected.fixture.sourceEstimatedTokens >= 10_000);
+assert.equal(
+  longDocument.expected.fixture.sourceEstimatedTokens,
+  Math.ceil(longDocument.expected.fixture.sourceChars / 4)
+);
+assert.match(longDocument.expected.fixture.sourceSha256, /^sha256:[a-f0-9]{64}$/u);
+assert.equal(longDocument.expected.fixture.providerBillingMeasurement, false);
+assert.equal(longDocument.expected.result.allAnswersPreserved, true);
+assert.equal(longDocument.expected.result.allTargetsRankedFirst, true);
+assert.equal(longDocument.expected.result.unsupportedQueriesFailedClosed, true);
+assert.equal(longDocument.expected.result.modelSummaryItems, 0);
+assert.ok(
+  longDocument.expected.result.maximumUsedTokens
+    <= longDocument.expected.fixture.fixedMaxTokens
+);
+assert.ok(longDocument.expected.result.minimumEstimatedTokenReduction >= 0.95);
+assert.equal(
+  longDocument.expected.result.cases.length,
+  longDocument.expected.fixture.positiveCases
+);
+assert.equal(
+  longDocument.expected.result.unsupported.length,
+  longDocument.expected.fixture.unsupportedCases
+);
+for (const scenario of longDocument.expected.result.cases) {
+  assert.equal(scenario.targetRank, 1);
+  assert.equal(scenario.answerPreserved, true);
+  assert.equal(scenario.sourceHashPresent, true);
+  assert.equal(scenario.manifestHashPresent, true);
+  assert.equal(scenario.summaryItems, 0);
+  assert.equal(scenario.usedTokens, Math.ceil(scenario.usedChars / 4));
+  assert.equal(
+    scenario.estimatedTokenReduction,
+    Math.round(
+      (1 - scenario.usedTokens / longDocument.expected.fixture.sourceEstimatedTokens)
+        * 1_000_000
+    ) / 1_000_000
+  );
+}
+for (const control of longDocument.expected.result.unsupported) {
+  assert.equal(control.failedClosed, true);
+  assert.equal(control.errorCode, "CONTEXT_COVERAGE_TOO_LOW");
+}
 
 process.stdout.write("Benchmark evidence arithmetic and claim boundaries are valid.\n");

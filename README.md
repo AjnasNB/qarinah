@@ -252,6 +252,7 @@ Run:
 
 ```sh
 npm run evaluate:software-tasks
+npm run evaluate:long-document
 npm run evaluate:context
 npm run benchmark
 ```
@@ -267,6 +268,8 @@ npm run benchmark
 | **Weighted total** | **442,113** | **5,682** | **98.71%** |
 
 The software-task evaluator keeps the required current source snippets on both sides and replaces only accumulated-history replay. Its estimates use `ceil(characters / 4)`; they are not provider usage receipts. The release also successfully verifies exact retrieval, typo tolerance, graph evidence, conflict visibility, and supersession. See [BENCHMARKS.md](docs/BENCHMARKS.md) for the committed sources, machine-readable results, commands, and arithmetic.
+
+The long-document evaluator adds a fixed 600-token ceiling over a deterministic 34,751-estimated-token handbook fixture. All 16 exact and typo-tolerant lookups return the cited answer-bearing section at rank 1, with an average pack of 534 estimated tokens and a worst-case estimated reduction of 98.4%; four unsupported questions fail closed when the caller requires direct evidence coverage. This is a segmented synthetic retrieval fixture—not whole-book summarization, native PDF ingestion, or provider-billed token usage.
 
 ## License and ownership
 
