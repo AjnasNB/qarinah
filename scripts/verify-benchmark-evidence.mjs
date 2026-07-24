@@ -11,6 +11,7 @@ const softwareTask = JSON.parse(await readFile(softwareTaskPath, "utf8"));
 const longDocumentPath = path.join(root, "bench", "results", "long-document-context-0.1.0-alpha.3.json");
 const longDocument = JSON.parse(await readFile(longDocumentPath, "utf8"));
 const readme = await readFile(path.join(root, "README.md"), "utf8");
+const whitePaper = await readFile(path.join(root, "docs", "WHITEPAPER.md"), "utf8");
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 const platformCopy = await readFile(path.join(root, "docs", "launch", "PLATFORM-COPY.md"), "utf8");
 
@@ -79,20 +80,28 @@ assert.equal(compressionRatio, "77.81");
 assert.equal(savedEstimatedTokens, 436_431);
 for (const [surface, content] of [
   ["README.md", readme],
+  ["docs/WHITEPAPER.md", whitePaper],
   ["package.json description", packageJson.description],
   ["docs/launch/PLATFORM-COPY.md", platformCopy]
 ]) {
   assert.ok(content.includes(publicPercent), `${surface} must carry the evidence-derived ${publicPercent} claim.`);
 }
 assert.equal(
-  `${readme}\n${packageJson.description}\n${platformCopy}`.toLowerCase().includes("in our six-task benchmark"),
+  `${readme}\n${whitePaper}\n${packageJson.description}\n${platformCopy}`.toLowerCase().includes("in our six-task benchmark"),
   false,
   "Public-facing copy must lead with the result instead of the removed six-task qualifier."
 );
 assert.ok(readme.includes(`${compressionRatio}:1 context compression`));
+assert.ok(whitePaper.includes(`${compressionRatio}:1 compression ratio`));
+assert.ok(whitePaper.includes(`**${totalBaselineEstimatedTokens.toLocaleString("en-US")}**`));
+assert.ok(whitePaper.includes(`**${totalQarinahEstimatedTokens.toLocaleString("en-US")}**`));
+assert.ok(whitePaper.includes(`${savedEstimatedTokens.toLocaleString("en-US")} fewer estimated input-context tokens`));
 assert.ok(readme.includes(`$${baselineAtOneDollarPerMillion.toFixed(4)}`));
 assert.ok(readme.includes(`$${qarinahAtOneDollarPerMillion.toFixed(4)}`));
 assert.ok(readme.includes(`${publicPercent} lower input-context cost at the same token rate.`));
+assert.ok(whitePaper.includes(`**${publicPercent} lower input-context cost at the same token rate**`));
+assert.ok(whitePaper.includes("not a claim of 98.71% lower total application cost"));
+assert.ok(whitePaper.includes("not peer-reviewed"));
 assert.ok(platformCopy.includes(`${publicPercent} lower input-context cost at the same input-token rate.`));
 
 for (const prohibitedClaim of [
@@ -100,12 +109,12 @@ for (const prohibitedClaim of [
   "every memory points back to proof",
   "only the evidence it needs",
   "only the cited context needed",
-  "automatically injects context",
-  "90% faster coding",
-  "80-90% lower total cost"
-]) {
+    "automatically injects context",
+    "90% faster coding",
+    "80-90% lower total cost"
+  ]) {
   assert.equal(
-    `${readme}\n${packageJson.description}\n${platformCopy}`.toLowerCase().includes(prohibitedClaim),
+    `${readme}\n${whitePaper}\n${packageJson.description}\n${platformCopy}`.toLowerCase().includes(prohibitedClaim),
     false,
     `Public copy contains the unsupported claim: ${prohibitedClaim}`
   );
@@ -156,5 +165,12 @@ for (const control of longDocument.expected.result.unsupported) {
   assert.equal(control.failedClosed, true);
   assert.equal(control.errorCode, "CONTEXT_COVERAGE_TOO_LOW");
 }
+assert.ok(whitePaper.includes(`${longDocument.expected.fixture.positiveCases}`));
+assert.ok(whitePaper.includes(`${longDocument.expected.result.unsupported.length} / ${longDocument.expected.result.unsupported.length}`));
+assert.ok(
+  whitePaper.includes(
+    `${(longDocument.expected.result.minimumEstimatedTokenReduction * 100).toFixed(1)}% estimated context reduction`
+  )
+);
 
 process.stdout.write("Benchmark evidence arithmetic and claim boundaries are valid.\n");
