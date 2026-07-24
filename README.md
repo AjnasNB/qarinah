@@ -4,6 +4,24 @@
 
 <h1 align="center">Qarinah</h1>
 
+<p align="center"><em>Less context. More proof.</em></p>
+
+<p align="center">
+  <code>LOCAL-FIRST</code>&nbsp;&nbsp;
+  <code>EVIDENCE-LINKED</code>&nbsp;&nbsp;
+  <code>GRAPH-AWARE</code>&nbsp;&nbsp;
+  <code>OKF-PORTABLE</code>&nbsp;&nbsp;
+  <code>GOVERNANCE-READY</code>
+</p>
+
+<p align="center">
+  <strong>98.71% less estimated context - 77.81:1 context compression.</strong><br>
+  442,113 &rarr; 5,682 estimated input tokens.
+  <a href="docs/BENCHMARKS.md">Reproduce it yourself.</a>
+</p>
+
+---
+
 <p align="center"><strong>Use your biggest coding model with compact, cited project memory.</strong></p>
 
 <p align="center">
@@ -12,14 +30,6 @@
   <a href="docs/BENCHMARKS.md">Benchmarks</a>&nbsp;&middot;&nbsp;
   <a href="docs/SECURITY.md">Security</a>&nbsp;&middot;&nbsp;
   <a href="docs/ECOSYSTEM-LAUNCH.md">Launch plan</a>
-</p>
-
-<p align="center">
-  <code>LOCAL-FIRST</code>&nbsp;&nbsp;
-  <code>EVIDENCE-LINKED</code>&nbsp;&nbsp;
-  <code>GRAPH-AWARE</code>&nbsp;&nbsp;
-  <code>OKF-PORTABLE</code>&nbsp;&nbsp;
-  <code>GOVERNANCE-READY</code>
 </p>
 
 <p align="center">
