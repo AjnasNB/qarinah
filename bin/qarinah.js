@@ -178,7 +178,7 @@ function stdinQueryInput(request) {
 }
 
 function help() {
-  return `Qarinah — evidence-linked context for AI agents
+  return `Qarinah - evidence-linked context for AI agents
 
 Usage:
   qarinah init [path] [--capture metadata|content]

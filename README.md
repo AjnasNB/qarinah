@@ -4,7 +4,7 @@
 
 <h1 align="center">Qarinah</h1>
 
-<p align="center"><strong>Give every coding agent the right project memory - without replaying the whole project.</strong></p>
+<p align="center"><strong>Use your biggest coding model with compact, cited project memory.</strong></p>
 
 <p align="center">
   <a href="docs/WHITEPAPER.md">Technical paper</a>&nbsp;&middot;&nbsp;
@@ -23,15 +23,17 @@
 </p>
 
 <p align="center">
-  <strong>98.71% fewer estimated context tokens than full-history replay across six committed software-task fixtures.</strong><br>
-  Far less history to resend. Small cited packs. Every selected result points back to evidence. No Qarinah API key.
+  <strong>What if your coding agents could send 98.71% less repeated project context?</strong><br>
+  Qarinah's six-task benchmark cut 442,113 estimated input-context tokens to 5,682 - 77.81:1 context compression with every required target directly covered in the top five.
 </p>
 
-<p align="center"><em>Less context. More proof.</em></p>
+<p align="center"><em>Nearly 99% less repeated context. Every selected memory points back to its source.</em></p>
 
-> Successfully verified across React editing, database migration, TypeScript refactoring, web research, production debugging, and governed release work. Full-history replay plus the required task sources was estimated at 442,113 input tokens; the same sources plus Qarinah packs was estimated at 5,682. Every required target ranked in the top five with direct coverage, and no model-written summary items were used. Estimates use `ceil(characters / 4)` and are not provider-billed Codex or Claude usage. See the [machine-readable result](bench/results/software-task-context-0.1.0-alpha.3.json) and [methodology](docs/BENCHMARKS.md).
+> Successfully verified across React editing, database migration, TypeScript refactoring, web research, production debugging, and governed release work. The benchmark sent 436,431 fewer estimated input-context tokens across those six runs. At a flat $1 per million uncached input tokens, that compared context slice moves from $0.4421 to $0.0057 - 98.71% less input-context cost under the same unit price. The percentage is independent of the chosen flat unit price; the portable token estimate excludes output, tools, caching, and fixed provider charges. See the [machine-readable result](bench/results/software-task-context-0.1.0-alpha.3.json) and [methodology](docs/BENCHMARKS.md).
 
-Qarinah turns permitted agent activity, project structure, and explicitly committed decisions into durable, compact project memory for Codex, Claude Code, CLIs, and governed workflows. It preserves evidence in a typed graph and deterministic Markdown and JSON views, then retrieves only the cited context needed for the current task instead of making an opaque summary or a full transcript the source of truth.
+Your project already contains the decisions and evidence behind its changes. Qarinah lets the next agent query that record and receive a bounded, cited pack selected for the current task.
+
+Qarinah is a local memory compiler for coding agents. It turns permitted agent activity, project structure, and explicitly committed decisions into durable project memory for Codex, Claude Code, CLIs, and governed workflows. It preserves evidence in a typed graph and deterministic Markdown and JSON views, then compiles a bounded cited pack selected for the current query instead of making an opaque summary or a full transcript the source of truth.
 
 ## Why Qarinah
 
@@ -50,6 +52,12 @@ Agent memory usually fails in one of two ways: the next model receives too much 
 
 Metadata-only capture is the default. Content capture requires explicit workspace consent. Hidden reasoning, private transcripts, credentials, and browser session state remain outside the product boundary.
 
+## Compile memory before the model request
+
+When a host or orchestrator queries Qarinah before constructing a model request, Qarinah compiles the retained project history into a bounded cited pack first. That same pack can be supplied to a small local model, a large-context model, or a high-reasoning Codex or Claude session. The compiler itself does not need an embedding API, a hosted memory service, or a Qarinah API key.
+
+Packs are requested explicitly. Hosts can call the CLI or JavaScript API, while sensitive automated disclosure can be registered through a separately governed Maqam capability. Qarinah's built-in MCP server remains a zero-write diagnostic surface.
+
 ## What it records
 
 Qarinah records every permitted lifecycle event delivered by a supported host adapter and every decision that a user or governed workflow explicitly commits. It does not claim to infer every cognitive decision automatically.
@@ -63,6 +71,21 @@ Supported event classes include prompts, tool requests, tool completions, approv
 </p>
 
 The project graph covers directories, files, content hashes, JavaScript and TypeScript module references, Markdown links, exact source spans, additions, changes, renames, and deletions. See the [architecture guide](docs/ARCHITECTURE.md) or the [editable diagram source](docs/architecture.mmd).
+
+## Technology
+
+Qarinah is intentionally small, local, and inspectable:
+
+| Layer | Technology |
+| --- | --- |
+| Runtime | Modern Node.js ESM on maintained Node 22, 24, and 26 releases |
+| Durable memory | Append-only canonical JSONL events, SHA-256 content and chain hashes, machine-local checkpoints, and renewable write locks |
+| Project graph | Typed event, evidence, relation, module, Markdown-link, file, rename, change, and deletion edges |
+| Retrieval | BM25, character-trigram typo tolerance, one-hop graph evidence, reciprocal-rank fusion, deterministic diversity, time, authority, retention, conflict, and supersession |
+| Context compiler | Complete-output character and token budgets, explicit output headroom, evidence-coverage gates, deterministic citations, and reproducible manifests |
+| Human-readable views | Rebuildable Markdown, JSON, graph, index, and Google OKF 0.1 Draft exports |
+| Agent integration | Codex and Claude Code lifecycle hooks, strict JSON stdin, local CLI, typed JavaScript API, and stdio MCP diagnostics |
+| Infrastructure | No vector database, hosted backend, embedding bill, model provider, daemon, analytics endpoint, or Qarinah API key |
 
 ## Install
 
@@ -269,7 +292,7 @@ npm run benchmark
 
 The software-task evaluator keeps the required current source snippets on both sides and replaces only accumulated-history replay. Its estimates use `ceil(characters / 4)`; they are not provider usage receipts. The release also successfully verifies exact retrieval, typo tolerance, graph evidence, conflict visibility, and supersession. See [BENCHMARKS.md](docs/BENCHMARKS.md) for the committed sources, machine-readable results, commands, and arithmetic.
 
-The long-document evaluator adds a fixed 600-token ceiling over a deterministic 34,751-estimated-token handbook fixture. All 16 exact and typo-tolerant lookups return the cited answer-bearing section at rank 1, with an average pack of 534 estimated tokens and a worst-case estimated reduction of 98.4%; four unsupported questions fail closed when the caller requires direct evidence coverage. This is a segmented synthetic retrieval fixture—not whole-book summarization, native PDF ingestion, or provider-billed token usage.
+The long-document evaluator adds a fixed 600-token ceiling over a deterministic 34,751-estimated-token handbook fixture. All 16 exact and typo-tolerant lookups return the cited answer-bearing section at rank 1, with an average pack of 534 estimated tokens and a worst-case estimated reduction of 98.4%; four unsupported questions fail closed when the caller requires direct evidence coverage. This is a segmented synthetic retrieval fixture - not whole-book summarization, native PDF ingestion, or provider-billed token usage.
 
 ## License and ownership
 

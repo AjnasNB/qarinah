@@ -4,13 +4,13 @@ Do not publish these drafts until the gates in [../LAUNCH.md](../LAUNCH.md) are 
 
 ## Canonical descriptions
 
-**Tagline:** Stop replaying entire agent histories.
+**Tagline:** Use your biggest coding model with compact, cited project memory.
 
-**Proof tagline:** 98.71% less estimated context in our six-task fixture. Every selected result points back to evidence.
+**Proof tagline:** Nearly 99% less repeated project context. Every selected memory points back to its source.
 
-**GitHub About:** Verified project memory for AI agents: small cited context packs instead of replaying entire histories.
+**GitHub About:** 98.71% less estimated context in our six-task benchmark - local, cited, graph-aware project memory for Codex, Claude Code, and CLI workflows, with MCP diagnostics.
 
-**npm description:** Stop replaying entire agent histories: Qarinah compiles verified project memory into small, cited context packs.
+**npm description:** 98.71% less estimated context in our six-task benchmark - local, cited project memory for Codex, Claude Code, and CLI workflows.
 
 **Short:** Qarinah is local-first project memory for AI agents. It records permitted activity and explicit decisions in an evidence-linked ledger, then compiles a small cited pack for the next task.
 
@@ -34,7 +34,7 @@ Possible factual title to rewrite:
 
 **Name:** Qarinah
 
-**Tagline:** Stop replaying entire agent histories
+**Tagline:** Use your biggest coding model with compact, cited project memory
 
 **Description (under 260 characters):** Local-first project memory for Codex, Claude Code, and other agents. Record permitted decisions and tool outcomes, then retrieve a small cited context pack instead of replaying the whole history. No Qarinah API key.
 
@@ -46,7 +46,7 @@ Possible factual title to rewrite:
 
 I built Qarinah because agent memory usually fails in two directions: the next model receives the entire noisy history, or it receives a short summary with no evidence trail. Qarinah keeps the source record separate from the compiled pack. The ledger is local and append-only; graph, index, Markdown, and OKF views are rebuildable; every selected item cites its event ID and hash.
 
-The committed six-task fixture used 98.71% less estimated context than full-history replay while keeping every required target directly covered in the top five. That is a scoped character-based estimate, not a provider bill or universal quality claim. I want real-project feedback on missing evidence, setup friction, and second-session usefulness.
+The committed six-task fixture cut 442,113 estimated input-context tokens to 5,682 while keeping every required target directly covered in the top five. That is 98.71% less repeated context and 77.81:1 context compression. At the same flat uncached input-token price, the context-input portion costs 98.71% less to send. I want real-project feedback on missing evidence, setup friction, and second-session usefulness.
 
 ## X thread
 

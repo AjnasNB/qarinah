@@ -277,7 +277,7 @@ function renderEventConcept(event, eventById) {
     citations.forEach((citation, index) => {
       const label = citation.title || citation.url;
       const details = [citation.author, citation.published_at].filter(Boolean).map(markdownInline);
-      lines.push(`[${index + 1}] [${markdownInline(label)}](${markdownUrl(citation.url)})${details.length ? ` — ${details.join(", ")}` : ""}`);
+      lines.push(`[${index + 1}] [${markdownInline(label)}](${markdownUrl(citation.url)})${details.length ? ` - ${details.join(", ")}` : ""}`);
     });
   }
   return `${lines.join("\n")}\n`;
@@ -327,7 +327,7 @@ function renderLog(events) {
       lines.push(`## ${nextDate}`, "");
       date = nextDate;
     }
-    lines.push(`* **Recorded**: [${markdownInline(event.title)}](events/${event.eventId}.md) — \`${event.kind}\` at \`${event.timestamp}\`; hash \`${event.hash}\`.`);
+    lines.push(`* **Recorded**: [${markdownInline(event.title)}](events/${event.eventId}.md) - \`${event.kind}\` at \`${event.timestamp}\`; hash \`${event.hash}\`.`);
   }
   if (events.length === 0) lines.push("_No events have been recorded._");
   return `${lines.join("\n")}\n`;

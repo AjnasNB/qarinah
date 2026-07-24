@@ -10,6 +10,9 @@ const softwareTaskPath = path.join(root, "bench", "results", "software-task-cont
 const softwareTask = JSON.parse(await readFile(softwareTaskPath, "utf8"));
 const longDocumentPath = path.join(root, "bench", "results", "long-document-context-0.1.0-alpha.3.json");
 const longDocument = JSON.parse(await readFile(longDocumentPath, "utf8"));
+const readme = await readFile(path.join(root, "README.md"), "utf8");
+const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
+const platformCopy = await readFile(path.join(root, "docs", "launch", "PLATFORM-COPY.md"), "utf8");
 
 assert.equal(live.schemaVersion, "qarinah.workspace-volume-observation.v1");
 assert.equal(live.claimEligible, false);
@@ -64,6 +67,40 @@ assert.equal(
   softwareTask.expected.minimumScenarioEstimatedTokenReduction,
   Math.min(...softwareTask.expected.scenarios.map((scenario) => scenario.estimatedTokenReduction))
 );
+
+const publicPercent = `${(weightedReduction * 100).toFixed(2)}%`;
+const compressionRatio = (totalBaselineEstimatedTokens / totalQarinahEstimatedTokens).toFixed(2);
+const savedEstimatedTokens = totalBaselineEstimatedTokens - totalQarinahEstimatedTokens;
+const baselineAtOneDollarPerMillion = totalBaselineEstimatedTokens / 1_000_000;
+const qarinahAtOneDollarPerMillion = totalQarinahEstimatedTokens / 1_000_000;
+
+assert.equal(publicPercent, "98.71%");
+assert.equal(compressionRatio, "77.81");
+assert.equal(savedEstimatedTokens, 436_431);
+for (const [surface, content] of [
+  ["README.md", readme],
+  ["package.json description", packageJson.description],
+  ["docs/launch/PLATFORM-COPY.md", platformCopy]
+]) {
+  assert.ok(content.includes(publicPercent), `${surface} must carry the evidence-derived ${publicPercent} claim.`);
+}
+assert.ok(readme.includes(`${compressionRatio}:1 context compression`));
+assert.ok(readme.includes(`$${baselineAtOneDollarPerMillion.toFixed(4)}`));
+assert.ok(readme.includes(`$${qarinahAtOneDollarPerMillion.toFixed(4)}`));
+
+for (const prohibitedClaim of [
+  "smallest verified project memory",
+  "every memory points back to proof",
+  "only the evidence it needs",
+  "only the cited context needed",
+  "automatically injects context"
+]) {
+  assert.equal(
+    `${readme}\n${packageJson.description}\n${platformCopy}`.toLowerCase().includes(prohibitedClaim),
+    false,
+    `Public copy contains the unsupported claim: ${prohibitedClaim}`
+  );
+}
 
 assert.equal(longDocument.schemaVersion, "qarinah.long-document-context-eval-result.v1");
 assert.equal(longDocument.packageVersion, softwareTask.packageVersion);
