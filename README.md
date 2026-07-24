@@ -16,13 +16,14 @@
 
 <p align="center">
   <strong>98.71% less estimated context - 77.81:1 context compression.</strong><br>
-  442,113 &rarr; 5,682 estimated input tokens.
+  442,113 &rarr; 5,682 estimated input tokens.<br>
+  <strong>98.71% lower input-context cost at the same token rate.</strong>
   <a href="docs/BENCHMARKS.md">Reproduce it yourself.</a>
 </p>
 
 ---
 
-<p align="center"><strong>Use your biggest coding model with compact, cited project memory.</strong></p>
+<p align="center"><strong>Less replay. More room for current code, tools, and cited project memory.</strong></p>
 
 <p align="center">
   <a href="docs/WHITEPAPER.md">Technical paper</a>&nbsp;&middot;&nbsp;
