@@ -8,6 +8,10 @@ Do not publish these drafts until the gates in [../LAUNCH.md](../LAUNCH.md) are 
 
 **Proof tagline:** Nearly 99% less repeated project context. Every selected memory points back to its source.
 
+**Measured cost line:** 98.71% lower input-context cost at the same input-token rate.
+
+**Coding value line:** Less replay. More room for current code, tools, and cited project memory.
+
 **GitHub About:** 98.71% less estimated context - local, cited, graph-aware project memory for Codex, Claude Code, and CLI workflows, with MCP diagnostics.
 
 **npm description:** 98.71% less estimated context - local, cited project memory for Codex, Claude Code, and CLI workflows.

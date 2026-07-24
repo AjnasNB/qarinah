@@ -92,13 +92,17 @@ assert.equal(
 assert.ok(readme.includes(`${compressionRatio}:1 context compression`));
 assert.ok(readme.includes(`$${baselineAtOneDollarPerMillion.toFixed(4)}`));
 assert.ok(readme.includes(`$${qarinahAtOneDollarPerMillion.toFixed(4)}`));
+assert.ok(readme.includes(`${publicPercent} lower input-context cost at the same token rate.`));
+assert.ok(platformCopy.includes(`${publicPercent} lower input-context cost at the same input-token rate.`));
 
 for (const prohibitedClaim of [
   "smallest verified project memory",
   "every memory points back to proof",
   "only the evidence it needs",
   "only the cited context needed",
-  "automatically injects context"
+  "automatically injects context",
+  "90% faster coding",
+  "80-90% lower total cost"
 ]) {
   assert.equal(
     `${readme}\n${packageJson.description}\n${platformCopy}`.toLowerCase().includes(prohibitedClaim),
