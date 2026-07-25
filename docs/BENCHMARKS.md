@@ -121,4 +121,6 @@ Keep these direct details beside the number:
 
 ## Next benchmark gate
 
-Before a stable release, expand to at least 100 held-out positive and negative queries covering exact lookup, paraphrase, typos, conflicts, supersession, time, authority, unsupported questions, and project-file impact. Separately run at least 20 task-paired Codex and Claude evaluations using the providers' reported input-token fields, identical models and tools, task-success checks, unsupported-answer review, latency, and cost. Publish raw fixtures, ablations, command lines, environment, package version, commit, and machine-readable results.
+## Next benchmark expansion
+
+Expand to at least 100 held-out positive and negative queries covering exact lookup, paraphrase, typos, conflicts, supersession, time, authority, unsupported questions, and project-file impact. Separately run at least 20 task-paired Codex and Claude evaluations using the providers' reported input-token fields, identical models and tools, task-success checks, unsupported-answer review, latency, and cost. Publish raw fixtures, ablations, command lines, environment, package version, commit, and machine-readable results.

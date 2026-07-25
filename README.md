@@ -5,6 +5,7 @@
 <h1 align="center">Qarinah</h1>
 
 <p align="center"><em>Less context. More proof.</em></p>
+<p align="center"><strong>Local project memory and a context compiler for coding agents.</strong></p>
 
 <p align="center">
   <a href="https://qarinah.io"><strong>Website</strong></a>&nbsp;&middot;&nbsp;
@@ -50,6 +51,24 @@
 <p align="center"><em>Nearly 99% less repeated context. Every selected memory points back to its source.</em></p>
 
 > Successfully verified across React editing, database migration, TypeScript refactoring, web research, production debugging, and governed release work. The evaluated tasks sent 436,431 fewer estimated input-context tokens. At a flat $1 per million uncached input tokens, that compared context slice moves from $0.4421 to $0.0057 - 98.71% less input-context cost under the same unit price. The percentage is independent of the chosen flat unit price; the portable token estimate excludes output, tools, caching, and fixed provider charges. See the [machine-readable result](bench/results/software-task-context-0.1.0.json) and [methodology](docs/BENCHMARKS.md).
+
+## Install and compile the first cited pack
+
+```sh
+npm install --save-dev qarinah
+npx qarinah init .
+npx qarinah record \
+  --kind decision \
+  --title "Keep releases provenance-bound" \
+  --body "Publish only the reviewed artifact from the reviewed commit."
+npx qarinah build
+npx qarinah query "release provenance" \
+  --minimum-coverage direct \
+  --max-tokens 1500 \
+  --format markdown
+```
+
+Start with the [five-minute guide](docs/GETTING-STARTED.md), then use the [CLI reference](docs/CLI-REFERENCE.md), [JavaScript API reference](docs/API-REFERENCE.md), [MCP guide](docs/MCP-GUIDE.md), [task recipes](docs/RECIPES.md), or [troubleshooting guide](docs/TROUBLESHOOTING.md).
 
 Your project already contains the decisions and evidence behind its changes. Qarinah lets the next agent query that record and receive a bounded, cited pack selected for the current task. The same local memory can support Codex, Claude Code, CLI workflows, and compatible MCP clients instead of locking project context to one editor.
 

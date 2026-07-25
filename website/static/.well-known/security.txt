@@ -1,0 +1,5 @@
+Contact: https://github.com/AjnasNB/qarinah/security/advisories/new
+Expires: 2027-07-24T23:59:59Z
+Preferred-Languages: en
+Canonical: https://qarinah.io/.well-known/security.txt
+Policy: https://github.com/AjnasNB/qarinah/blob/main/SECURITY.md
