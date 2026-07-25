@@ -1,0 +1,50 @@
+name: Host or tool integration
+description: Propose a Codex, Claude Code, CLI, MCP, editor, crawler, or governance integration.
+title: "integration: "
+labels:
+  - integration
+body:
+  - type: input
+    id: host
+    attributes:
+      label: Host or tool
+      placeholder: "VS Code, Codex, Claude Code, custom CLI"
+    validations:
+      required: true
+  - type: textarea
+    id: workflow
+    attributes:
+      label: End-to-end workflow
+      description: Show setup, capture, retrieval, handoff, and uninstall or revocation.
+    validations:
+      required: true
+  - type: textarea
+    id: contract
+    attributes:
+      label: Event and context contract
+      description: Identify documented fields, lifecycle events, workspace selection, and expected output.
+    validations:
+      required: true
+  - type: textarea
+    id: boundary
+    attributes:
+      label: Security boundary
+      description: State who controls paths, trust, capture mode, credentials, network access, and resource ceilings.
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification plan
+      description: Include supported versions, packed-consumer tests, negative cases, and manual host checks.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Integration checks
+      options:
+        - label: The integration fails closed for unknown lifecycle events and workspace selectors.
+          required: true
+        - label: Read-only diagnostics cannot create trust or mutate Qarinah state.
+          required: true

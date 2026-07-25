@@ -1,0 +1,47 @@
+name: Feature proposal
+description: Propose a bounded improvement to Qarinah's project-memory or context-compilation surface.
+title: "feat: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: User problem
+      description: Describe the workflow and failure without prescribing an implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed contract
+      description: Define inputs, outputs, bounds, and failure behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: authority
+    attributes:
+      label: Authority and privacy impact
+      description: Explain capture, filesystem, network, model, credential, or MCP authority changes.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and acceptance criteria
+      description: List deterministic tests, compatibility requirements, and evidence needed to call this complete.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Proposal checks
+      options:
+        - label: I searched existing issues and discussions.
+          required: true
+        - label: The proposal does not require capturing credentials, cookies, hidden reasoning, or unrelated files.
+          required: true

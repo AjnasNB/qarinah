@@ -1,0 +1,70 @@
+name: Reproducible defect
+description: Report a Qarinah behavior that can be reproduced with synthetic or public data.
+title: "bug: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include secrets, private project context, credentials, transcripts, or undisclosed security details. Use private vulnerability reporting for security issues.
+  - type: input
+    id: version
+    attributes:
+      label: Qarinah version
+      description: Output of `npm view qarinah version` and the installed version.
+      placeholder: "0.1.1"
+    validations:
+      required: true
+  - type: dropdown
+    id: node
+    attributes:
+      label: Node.js version
+      options:
+        - "22"
+        - "24"
+        - "26"
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Operating system and host
+      placeholder: "Windows 11 + Codex, macOS + Claude Code, Linux CLI"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Include exact commands or a minimal repository using synthetic data.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Redacted diagnostics
+      description: Include `qarinah doctor` or `qarinah status` output only after removing private paths and content.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Safety checks
+      options:
+        - label: I searched existing issues.
+          required: true
+        - label: This report contains no secrets, private context, or undisclosed vulnerability details.
+          required: true
