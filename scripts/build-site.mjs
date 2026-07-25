@@ -6,6 +6,7 @@ import { marked } from "marked";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const output = path.join(root, "site-dist");
 const github = "https://github.com/AjnasNB/qarinah";
+const zenodoPdf = "https://zenodo.org/records/21547685/files/Qarinah-Technical-White-Paper-v1.0.pdf?download=1";
 
 const docPages = [
   {
@@ -103,13 +104,30 @@ function rewriteMarkdownLinks(markdown, source) {
     } else if (resolved.startsWith("assets/")) {
       target = `/${resolved}`;
     } else if (resolved.endsWith("Qarinah-Technical-White-Paper-v1.0.pdf")) {
-      target = "/paper/Qarinah-Technical-White-Paper-v1.0.pdf";
+      target = source === "docs/WHITEPAPER.md"
+        ? zenodoPdf
+        : "/paper/Qarinah-Technical-White-Paper-v1.0.pdf";
     } else {
       target = `${github}/blob/main/${resolved}`;
     }
 
     return `${label}(${target}${anchor ? `#${anchor}` : ""})`;
   });
+}
+
+function rewriteMarkdownAssets(markdown) {
+  return markdown.replaceAll(
+    'src="../assets/architecture/qarinah-flow.svg"',
+    'src="/assets/qarinah-flow.svg"'
+  );
+}
+
+function rewritePublicationLink(markdown, source) {
+  if (source !== "docs/WHITEPAPER.md") return markdown;
+  return markdown.replace(
+    "https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.0.pdf",
+    zenodoPdf
+  );
 }
 
 function nav(active = "") {
@@ -227,14 +245,14 @@ function commandBlock(command, label = "Terminal") {
 function homePage() {
   return layout({
     title: "Qarinah",
-    description: "98.71% less repeated project context, compiled into small cited memory packs for coding agents.",
+    description: "Cross-editor project memory with 98.71% less repeated context in the published evaluation.",
     active: "home",
     canonical: "/",
     body: `
       <section class="hero">
         <div class="shell hero-grid">
           <div class="hero-copy">
-            <p class="eyebrow">Open-source project memory for coding agents</p>
+            <p class="eyebrow">Cross-editor project memory for coding agents</p>
             <h1>Your agents remember the project. You stop paying to replay it.</h1>
             <p class="hero-lede">Qarinah turns project decisions, code structure, tool outcomes, and evidence into a small cited memory pack for the task in front of you.</p>
             <div class="hero-actions">
@@ -242,21 +260,24 @@ function homePage() {
               <a class="btn btn-outline btn-large" href="${github}">View source</a>
             </div>
             ${commandBlock("npm install --save-dev qarinah", "Install")}
-          </div>
-          <div class="proof-panel" aria-label="Benchmark summary">
-            <div class="proof-number">98.71%</div>
-            <h2>less repeated context</h2>
-            <p>442,113 estimated input-context tokens became 5,682. Every required target was directly covered in the top five.</p>
-            <a href="/docs/benchmarks/">Open the evidence</a>
+            <div class="hero-proof" aria-label="Benchmark summary">
+              <div class="hero-proof-result">
+                <strong>98.71%</strong>
+                <span>less repeated context</span>
+              </div>
+              <p>442,113 estimated input-context tokens became 5,682. Every required target was directly covered in the top five, and the compared input-context cost fell by the same 98.71% at the same token rate.</p>
+              <a href="/docs/benchmarks/">Open the evidence</a>
+            </div>
           </div>
         </div>
       </section>
 
       <section class="proof-strip" aria-label="Qarinah proof points">
         <div class="shell proof-strip-grid">
-          <div><strong>77.81:1</strong><span>context compression</span></div>
+          <div><strong>98.71%</strong><span>less repeated context and input-context cost at the same token rate</span></div>
+          <div><strong>77.81×</strong><span>the full project history was 77.81 times larger than the compiled context pack</span></div>
           <div><strong>100%</strong><span>required target coverage in the evaluated tasks</span></div>
-          <div><strong>Local-first</strong><span>no hosted memory service or Qarinah API key</span></div>
+          <div><strong>Cross-editor</strong><span>Codex, Claude Code, CLI, and compatible MCP workflows</span></div>
         </div>
       </section>
 
@@ -307,7 +328,7 @@ function homePage() {
       <section class="section shell">
         <div class="section-heading">
           <p class="eyebrow">Works where you code</p>
-          <h2>One local memory layer for Codex, Claude Code, CLI workflows, and MCP diagnostics.</h2>
+          <h2>Keep one local project memory across Codex, Claude Code, CLI workflows, and compatible MCP clients.</h2>
         </div>
         <div class="integration-list">
           <a href="/docs/integrations/#codex"><span>Codex</span><strong>Lifecycle hooks and a Qarinah context skill</strong><i>Open guide</i></a>
@@ -387,7 +408,10 @@ function addHeadingIds(html) {
 
 async function markdownPage(page) {
   const raw = await readFile(path.join(root, page.source), "utf8");
-  const markdown = rewriteMarkdownLinks(normalizeVisibleCopy(raw), page.source);
+  const markdown = rewriteMarkdownLinks(
+    rewritePublicationLink(rewriteMarkdownAssets(normalizeVisibleCopy(raw)), page.source),
+    page.source
+  );
   const rendered = addHeadingIds(marked.parse(markdown));
   const active = page.route === "paper" ? "paper" : page.route.endsWith("benchmarks") ? "benchmarks" : "docs";
   const publicationLink = page.route === "paper"
@@ -414,7 +438,7 @@ async function markdownPage(page) {
         <article class="markdown-body doc-content">
           <div class="doc-meta">
             <span>Qarinah 0.1.0</span>
-            <span class="doc-meta-links">${publicationLink}<a href="${github}/blob/main/${page.source}">Edit on GitHub</a></span>
+            <span class="doc-meta-links">${publicationLink}<a href="${github}/blob/main/${page.source}">View on GitHub</a></span>
           </div>
           ${rendered}
         </article>

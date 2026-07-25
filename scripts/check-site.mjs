@@ -69,4 +69,19 @@ if (errors.length > 0) {
   throw new Error(`Website verification failed:\n${errors.join("\n")}`);
 }
 
+const home = await readFile(path.join(output, "index.html"), "utf8");
+const paper = await readFile(path.join(output, "paper", "index.html"), "utf8");
+if (!home.includes("<strong>98.71%</strong>") || !home.includes("the full project history was 77.81 times larger")) {
+  throw new Error("Homepage is missing the plain-language benchmark proof.");
+}
+if (!paper.includes('src="/assets/qarinah-flow.svg"')) {
+  throw new Error("Paper architecture image is not bound to the deployed asset.");
+}
+if (!paper.includes("https://zenodo.org/records/21547685/files/Qarinah-Technical-White-Paper-v1.0.pdf?download=1")) {
+  throw new Error("Paper download does not point to the permanent Zenodo record.");
+}
+if (!paper.includes("View on GitHub") || paper.includes("Edit on GitHub")) {
+  throw new Error("Paper source action must read View on GitHub.");
+}
+
 console.log(`Verified ${htmlFiles.length} HTML pages, required assets, internal routes, metadata, and visible dash policy.`);

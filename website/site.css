@@ -171,12 +171,16 @@ a {
 }
 
 .hero-grid {
-  min-height: 720px;
-  display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(330px, 0.65fr);
-  gap: clamp(48px, 8vw, 120px);
+  min-height: 680px;
+  display: flex;
   align-items: center;
-  padding-block: 96px;
+  justify-content: center;
+  padding-block: clamp(72px, 9vw, 112px);
+}
+
+.hero-copy {
+  width: min(100%, 960px);
+  text-align: center;
 }
 
 .eyebrow {
@@ -192,24 +196,27 @@ a {
 .hero h1,
 .docs-hero h1 {
   max-width: 870px;
-  margin: 0;
+  margin: 0 auto;
   font-family: var(--q-serif);
-  font-size: clamp(48px, 6.7vw, 88px);
+  font-size: clamp(46px, 6vw, 76px);
   font-weight: 500;
-  letter-spacing: -0.052em;
-  line-height: 0.98;
+  letter-spacing: -0.038em;
+  line-height: 1.02;
+  text-wrap: balance;
 }
 
 .hero-lede {
   max-width: 690px;
-  margin: 28px 0 0;
+  margin: 26px auto 0;
   color: var(--q-muted);
   font-size: clamp(18px, 2vw, 22px);
   line-height: 1.55;
+  text-wrap: pretty;
 }
 
 .hero-actions {
   display: flex;
+  justify-content: center;
   gap: 12px;
   margin-top: 32px;
 }
@@ -234,7 +241,7 @@ a {
 
 .command-block {
   width: min(100%, 640px);
-  margin-top: 24px;
+  margin: 24px auto 0;
   overflow: hidden;
   border: 1px solid var(--q-border);
   border-radius: 9px;
@@ -279,57 +286,49 @@ a {
   font: 600 13px/1.5 var(--q-mono);
 }
 
-.proof-panel {
-  position: relative;
-  padding: 42px 38px 38px;
-  border: 1px solid color-mix(in srgb, var(--q-accent) 65%, var(--q-border));
-  background: color-mix(in srgb, var(--q-canvas) 82%, transparent);
-  box-shadow: var(--q-shadow);
+.hero-proof {
+  width: min(100%, 820px);
+  margin: 30px auto 0;
+  padding: 30px clamp(24px, 5vw, 48px);
+  border-top: 1px solid var(--q-border-muted);
+  border-bottom: 1px solid var(--q-border-muted);
+  color: var(--q-muted);
+  text-align: center;
 }
 
-.proof-panel::before,
-.proof-panel::after {
-  position: absolute;
-  content: "";
-  background: var(--q-accent);
+.hero-proof-result {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 12px;
 }
 
-.proof-panel::before {
-  width: 28px;
-  height: 2px;
-  top: -1px;
-  left: -1px;
-}
-
-.proof-panel::after {
-  width: 2px;
-  height: 28px;
-  top: -1px;
-  left: -1px;
-}
-
-.proof-number {
+.hero-proof-result strong {
   color: var(--q-accent);
   font-family: var(--q-serif);
-  font-size: clamp(72px, 9vw, 116px);
-  letter-spacing: -0.075em;
-  line-height: 0.88;
+  font-size: clamp(48px, 7vw, 82px);
+  font-weight: 500;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
 }
 
-.proof-panel h2 {
-  margin: 18px 0 12px;
-  font-size: 26px;
-  letter-spacing: -0.025em;
+.hero-proof-result span {
+  color: var(--q-fg);
+  font-size: clamp(18px, 2.3vw, 25px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
-.proof-panel p {
-  color: var(--q-muted);
-  font-size: 16px;
+.hero-proof p {
+  max-width: 68ch;
+  margin: 20px auto 0;
+  font-size: 15px;
+  line-height: 1.65;
 }
 
-.proof-panel a {
+.hero-proof a {
   display: inline-block;
-  margin-top: 8px;
+  margin-top: 14px;
   font-weight: 700;
 }
 
@@ -340,7 +339,7 @@ a {
 
 .proof-strip-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
 }
 
 .proof-strip-grid > div {
@@ -754,6 +753,15 @@ a {
   background: var(--q-canvas);
 }
 
+.doc-content img[src="/assets/qarinah-flow.svg"] {
+  display: block;
+  width: min(100%, 520px);
+  max-height: 720px;
+  height: auto;
+  margin-inline: auto;
+  object-fit: contain;
+}
+
 .doc-content table {
   display: table;
   width: 100%;
@@ -855,12 +863,8 @@ a {
     padding-block: 72px;
   }
 
-  .proof-panel {
-    max-width: 560px;
-  }
-
   .proof-strip-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .proof-strip-grid > div {
@@ -901,13 +905,19 @@ a {
 }
 
 @media (max-width: 560px) {
+  .hero-proof-result {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
   .shell {
     width: min(100% - 28px, 1240px);
   }
 
   .hero h1,
   .docs-hero h1 {
-    font-size: 47px;
+    font-size: 44px;
   }
 
   .hero-actions {
@@ -917,6 +927,15 @@ a {
 
   .hero-actions .btn {
     text-align: center;
+  }
+
+  .hero-proof {
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .proof-strip-grid {
+    grid-template-columns: 1fr;
   }
 
   .section {
