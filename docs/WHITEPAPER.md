@@ -820,6 +820,10 @@ The central promise is intentionally simple:
 
 > Less context. More proof.
 
+## Acknowledgements
+
+The author gratefully acknowledges Shahin Ahammed, Qarinah's non-technical cofounder, for contributions to product direction, use-case definition, positioning, and review of the manuscript.
+
 ## Appendix A. Claim-to-evidence matrix
 
 | Public claim | Evidence | Qualification |
