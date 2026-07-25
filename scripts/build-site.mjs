@@ -6,6 +6,7 @@ import { marked } from "marked";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const output = path.join(root, "site-dist");
 const github = "https://github.com/AjnasNB/qarinah";
+const zenodoPdf = "https://zenodo.org/records/21547685/files/Qarinah-Technical-White-Paper-v1.0.pdf?download=1";
 
 const docPages = [
   {
@@ -103,13 +104,30 @@ function rewriteMarkdownLinks(markdown, source) {
     } else if (resolved.startsWith("assets/")) {
       target = `/${resolved}`;
     } else if (resolved.endsWith("Qarinah-Technical-White-Paper-v1.0.pdf")) {
-      target = "/paper/Qarinah-Technical-White-Paper-v1.0.pdf";
+      target = source === "docs/WHITEPAPER.md"
+        ? zenodoPdf
+        : "/paper/Qarinah-Technical-White-Paper-v1.0.pdf";
     } else {
       target = `${github}/blob/main/${resolved}`;
     }
 
     return `${label}(${target}${anchor ? `#${anchor}` : ""})`;
   });
+}
+
+function rewriteMarkdownAssets(markdown) {
+  return markdown.replaceAll(
+    'src="../assets/architecture/qarinah-flow.svg"',
+    'src="/assets/qarinah-flow.svg"'
+  );
+}
+
+function rewritePublicationLink(markdown, source) {
+  if (source !== "docs/WHITEPAPER.md") return markdown;
+  return markdown.replace(
+    "https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.0.pdf",
+    zenodoPdf
+  );
 }
 
 function nav(active = "") {
@@ -243,8 +261,11 @@ function homePage() {
             </div>
             ${commandBlock("npm install --save-dev qarinah", "Install")}
             <div class="hero-proof" aria-label="Benchmark summary">
-              <strong>98.71% less repeated context</strong>
-              <span>442,113 estimated input-context tokens became 5,682, with every required target directly covered in the top five.</span>
+              <div class="hero-proof-result">
+                <strong>98.71%</strong>
+                <span>less repeated context</span>
+              </div>
+              <p>442,113 estimated input-context tokens became 5,682. Every required target was directly covered in the top five, and the compared input-context cost fell by the same 98.71% at the same token rate.</p>
               <a href="/docs/benchmarks/">Open the evidence</a>
             </div>
           </div>
@@ -254,7 +275,7 @@ function homePage() {
       <section class="proof-strip" aria-label="Qarinah proof points">
         <div class="shell proof-strip-grid">
           <div><strong>98.71%</strong><span>less repeated context and input-context cost at the same token rate</span></div>
-          <div><strong>77.81×</strong><span>full-history replay was larger than the compiled context</span></div>
+          <div><strong>77.81×</strong><span>the full project history was 77.81 times larger than the compiled context pack</span></div>
           <div><strong>100%</strong><span>required target coverage in the evaluated tasks</span></div>
           <div><strong>Cross-editor</strong><span>Codex, Claude Code, CLI, and compatible MCP workflows</span></div>
         </div>
@@ -387,7 +408,10 @@ function addHeadingIds(html) {
 
 async function markdownPage(page) {
   const raw = await readFile(path.join(root, page.source), "utf8");
-  const markdown = rewriteMarkdownLinks(normalizeVisibleCopy(raw), page.source);
+  const markdown = rewriteMarkdownLinks(
+    rewritePublicationLink(rewriteMarkdownAssets(normalizeVisibleCopy(raw)), page.source),
+    page.source
+  );
   const rendered = addHeadingIds(marked.parse(markdown));
   const active = page.route === "paper" ? "paper" : page.route.endsWith("benchmarks") ? "benchmarks" : "docs";
   const publicationLink = page.route === "paper"
@@ -414,7 +438,7 @@ async function markdownPage(page) {
         <article class="markdown-body doc-content">
           <div class="doc-meta">
             <span>Qarinah 0.1.0</span>
-            <span class="doc-meta-links">${publicationLink}<a href="${github}/blob/main/${page.source}">Edit on GitHub</a></span>
+            <span class="doc-meta-links">${publicationLink}<a href="${github}/blob/main/${page.source}">View on GitHub</a></span>
           </div>
           ${rendered}
         </article>

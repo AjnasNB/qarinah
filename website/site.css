@@ -287,28 +287,48 @@ a {
 }
 
 .hero-proof {
+  width: min(100%, 820px);
+  margin: 30px auto 0;
+  padding: 30px clamp(24px, 5vw, 48px);
+  border-top: 1px solid var(--q-border-muted);
+  border-bottom: 1px solid var(--q-border-muted);
+  color: var(--q-muted);
+  text-align: center;
+}
+
+.hero-proof-result {
   display: flex;
-  flex-wrap: wrap;
   align-items: baseline;
   justify-content: center;
-  gap: 6px 16px;
-  width: min(100%, 760px);
-  margin: 26px auto 0;
-  padding-top: 22px;
-  border-top: 1px solid var(--q-border-muted);
-  color: var(--q-muted);
+  gap: 12px;
 }
 
-.hero-proof strong {
+.hero-proof-result strong {
   color: var(--q-accent);
-  font-size: 18px;
+  font-family: var(--q-serif);
+  font-size: clamp(48px, 7vw, 82px);
+  font-weight: 500;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
 }
 
-.hero-proof span {
-  max-width: 58ch;
+.hero-proof-result span {
+  color: var(--q-fg);
+  font-size: clamp(18px, 2.3vw, 25px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.hero-proof p {
+  max-width: 68ch;
+  margin: 20px auto 0;
+  font-size: 15px;
+  line-height: 1.65;
 }
 
 .hero-proof a {
+  display: inline-block;
+  margin-top: 14px;
   font-weight: 700;
 }
 
@@ -733,6 +753,15 @@ a {
   background: var(--q-canvas);
 }
 
+.doc-content img[src="/assets/qarinah-flow.svg"] {
+  display: block;
+  width: min(100%, 520px);
+  max-height: 720px;
+  height: auto;
+  margin-inline: auto;
+  object-fit: contain;
+}
+
 .doc-content table {
   display: table;
   width: 100%;
@@ -876,6 +905,12 @@ a {
 }
 
 @media (max-width: 560px) {
+  .hero-proof-result {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
   .shell {
     width: min(100% - 28px, 1240px);
   }
