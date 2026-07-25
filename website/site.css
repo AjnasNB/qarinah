@@ -682,11 +682,19 @@ a {
 .doc-meta {
   display: flex;
   justify-content: space-between;
+  gap: 16px;
   margin-bottom: 30px;
   padding-bottom: 14px;
   border-bottom: 1px solid var(--q-border-muted);
   color: var(--q-muted);
   font: 600 12px var(--q-mono);
+}
+
+.doc-meta-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px 18px;
 }
 
 .doc-content {
