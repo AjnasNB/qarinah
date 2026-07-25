@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "qarinah.context-eval-result.v1",
+  "packageVersion": "0.1.1",
+  "fixture": {
+    "records": 54,
+    "cases": 4,
+    "description": "Deterministic local fixture covering exact retrieval, typo tolerance, graph evidence, conflict visibility, and supersession."
+  },
+  "expected": {
+    "recallAt5": 1,
+    "meanReciprocalRank": 1,
+    "conflictRecall": 1,
+    "supersessionPrecision": 1,
+    "averagePackChars": 2237,
+    "rawCharsPerQuery": 44364,
+    "characterReduction": 0.9496
+  },
+  "tokenEstimator": {
+    "method": "ceil(chars/4)",
+    "exact": false,
+    "providerBillingMeasurement": false
+  },
+  "referenceRun": {
+    "date": "2026-07-21",
+    "node": "v24.15.0",
+    "platform": "win32-x64",
+    "queryMs": 277.16
+  },
+  "claim": "94.96% smaller context payload in the committed 54-record evaluator while preserving all four tested retrieval targets."
+}
