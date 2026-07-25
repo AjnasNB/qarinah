@@ -6,54 +6,147 @@ import { marked } from "marked";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const output = path.join(root, "site-dist");
 const github = "https://github.com/AjnasNB/qarinah";
+const siteOrigin = "https://qarinah.io";
+const npmPackage = "https://www.npmjs.com/package/qarinah";
+const doi = "https://doi.org/10.5281/zenodo.21547685";
 const zenodoPdf = "https://zenodo.org/records/21547685/files/Qarinah-Technical-White-Paper-v1.0.pdf?download=1";
+const releaseDate = "2026-07-25";
+const productVersion = "0.1.0";
 
 const docPages = [
   {
     route: "docs/getting-started",
     source: "docs/GETTING-STARTED.md",
     title: "Getting started",
-    description: "Install Qarinah, initialize one project, and compile the first cited memory pack."
+    description: "Install Qarinah local project memory, initialize one codebase, and compile the first cited context pack.",
+    section: "Start",
+    aliases: ["install qarinah", "project setup", "first query", "coding agent memory quickstart"]
+  },
+  {
+    route: "docs/cli",
+    source: "docs/CLI-REFERENCE.md",
+    title: "CLI reference",
+    description: "Use every Qarinah CLI command, option, input format, output mode, and verified failure behavior.",
+    section: "Reference",
+    aliases: ["command line", "qarinah commands", "init record scan build query doctor status export"]
+  },
+  {
+    route: "docs/api",
+    source: "docs/API-REFERENCE.md",
+    title: "JavaScript and TypeScript API",
+    description: "Embed Qarinah project memory with the exported JavaScript functions, TypeScript types, schemas, and examples.",
+    section: "Reference",
+    aliases: ["node api", "typescript api", "javascript sdk", "developer reference"]
   },
   {
     route: "docs/integrations",
     source: "docs/HOST-INTEGRATIONS.md",
-    title: "Codex and Claude Code",
-    description: "Connect Qarinah to Codex, Claude Code, local CLIs, and read-only MCP diagnostics."
+    title: "Codex and Claude Code project memory",
+    description: "Connect one local Qarinah project memory to Codex, Claude Code, local CLIs, and compatible MCP hosts.",
+    section: "Connect",
+    aliases: ["codex memory", "claude code memory", "cross editor memory", "coding agent integrations"]
+  },
+  {
+    route: "docs/mcp",
+    source: "docs/MCP-GUIDE.md",
+    title: "MCP server guide",
+    description: "Install, configure, verify, and troubleshoot Qarinah read-only MCP diagnostics for supported agent clients.",
+    section: "Connect",
+    aliases: ["model context protocol", "mcp tools", "context status", "context doctor", "stdio"]
+  },
+  {
+    route: "docs/token-efficient-context",
+    source: "docs/TOKEN-EFFICIENT-CONTEXT.md",
+    title: "Reduce repeated coding-agent context",
+    description: "Compile token-efficient cited context packs for coding agents without replaying accumulated project history.",
+    section: "Use",
+    aliases: ["save tokens", "token reduction", "context compression", "context window", "prompt compression"]
+  },
+  {
+    route: "docs/recipes",
+    source: "docs/RECIPES.md",
+    title: "Coding-agent memory recipes",
+    description: "Run practical Qarinah recipes for editing, refactoring, debugging, migrations, research, and governed releases.",
+    section: "Use",
+    aliases: ["examples", "workflows", "codex recipes", "claude code recipes", "use cases"]
   },
   {
     route: "docs/architecture",
     source: "docs/ARCHITECTURE.md",
     title: "Architecture",
-    description: "Understand the append-only record, typed graph, hybrid index, and coverage-aware compiler."
+    description: "Understand Qarinah's append-only record, knowledge graph, hybrid retrieval index, and context compiler.",
+    section: "Understand",
+    aliases: ["knowledge graph", "bm25", "retrieval", "provenance", "hash chain"]
   },
   {
     route: "docs/benchmarks",
     source: "docs/BENCHMARKS.md",
-    title: "Benchmarks",
-    description: "Reproduce the 98.71% context reduction and inspect every committed result."
+    title: "Context reduction benchmarks",
+    description: "Reproduce Qarinah's 98.71% estimated repeated-context reduction and inspect the committed evidence.",
+    section: "Verify",
+    aliases: ["token benchmark", "context compression", "cost comparison", "machine readable result"]
   },
   {
     route: "docs/security",
     source: "docs/SECURITY.md",
     title: "Security",
-    description: "Review workspace trust, capture consent, redaction, integrity, and disclosure boundaries."
+    description: "Review Qarinah workspace trust, capture consent, privacy, redaction, integrity, and disclosure boundaries.",
+    section: "Verify",
+    aliases: ["privacy", "capture policy", "local first", "redaction", "threat model"]
   },
   {
     route: "docs/interoperability",
     source: "docs/INTEROPERABILITY.md",
     title: "Interoperability",
-    description: "Use deterministic Markdown, JSON, graph, and Open Knowledge Format exports."
+    description: "Move Qarinah project memory across tools with deterministic Markdown, JSON, graph, and Open Knowledge Format exports.",
+    section: "Connect",
+    aliases: ["cross editor", "import export", "okf", "open knowledge format", "portable memory"]
+  },
+  {
+    route: "docs/troubleshooting",
+    source: "docs/TROUBLESHOOTING.md",
+    title: "Troubleshooting and recovery",
+    description: "Diagnose Qarinah installation, workspace trust, MCP transport, integrity, retrieval, and rebuild failures.",
+    section: "Operate",
+    aliases: ["errors", "repair", "mcp closed", "doctor", "recovery"]
+  },
+  {
+    route: "docs/faq",
+    source: "docs/FAQ.md",
+    title: "Frequently asked questions",
+    description: "Answers about Qarinah project memory, context reduction, token estimates, privacy, MCP, Codex, and Claude Code.",
+    section: "Start",
+    aliases: ["faq", "questions", "token savings", "does qarinah summarize", "vector database"]
+  },
+  {
+    route: "docs/migrations",
+    source: "docs/MIGRATIONS.md",
+    title: "Migration guide",
+    description: "Upgrade Qarinah releases, workspaces, plugins, schemas, and derived views without losing the source record.",
+    section: "Operate",
+    aliases: ["upgrade", "version migration", "plugin reinstall", "schema migration"]
   },
   {
     route: "paper",
     source: "docs/WHITEPAPER.md",
     title: "Technical white paper",
-    description: "The implementation-backed technical paper for Qarinah 0.1.0."
+    description: "The implementation-backed technical white paper for Qarinah local project memory and cited context compilation.",
+    section: "Verify",
+    aliases: ["research paper", "doi", "zenodo", "project memory compiler"]
   }
 ];
 
 const routesBySource = new Map(docPages.map((page) => [page.source.replaceAll("\\", "/"), `/${page.route}/`]));
+const searchEntries = [
+  {
+    route: "/",
+    title: "Qarinah - Local Project Memory and Context Compiler for Coding Agents",
+    description: "Local, cross-editor project memory that compiles small cited context packs for Codex, Claude Code, CLIs, and coding agents.",
+    headings: [],
+    keywords: ["coding agent memory", "project memory", "context compiler", "token-efficient context"],
+    content: "Qarinah keeps a local evidence-linked project record and compiles the small cited context pack needed for the current coding task."
+  }
+];
 
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
@@ -135,7 +228,8 @@ function nav(active = "") {
     ["Product", "/", "home"],
     ["Docs", "/docs/", "docs"],
     ["Benchmarks", "/docs/benchmarks/", "benchmarks"],
-    ["Paper", "/paper/", "paper"]
+    ["Paper", "/paper/", "paper"],
+    ["Search", "/search/", "search"]
   ];
 
   return `
@@ -144,7 +238,7 @@ function nav(active = "") {
         <a class="brand" href="/" aria-label="Qarinah home">
           <img src="/assets/qarinah-mark.svg" width="30" height="30" alt="">
           <span>Qarinah</span>
-          <span class="version-label">0.1.0</span>
+          <span class="version-label">${productVersion}</span>
         </a>
         <button class="mobile-menu" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
         <nav id="primary-nav" class="primary-nav" aria-label="Primary navigation">
@@ -167,8 +261,9 @@ function footer() {
         <div>
           <strong>Build</strong>
           <a href="/docs/getting-started/">Getting started</a>
+          <a href="/docs/cli/">CLI reference</a>
+          <a href="/docs/api/">JavaScript API</a>
           <a href="/docs/integrations/">Integrations</a>
-          <a href="/docs/architecture/">Architecture</a>
         </div>
         <div>
           <strong>Verify</strong>
@@ -178,6 +273,7 @@ function footer() {
         </div>
         <div>
           <strong>Project</strong>
+          <a href="${npmPackage}">npm package</a>
           <a href="${github}">Source</a>
           <a href="${github}/issues">Issues</a>
           <a href="${github}/blob/main/LICENSE">Apache-2.0</a>
@@ -185,14 +281,195 @@ function footer() {
       </div>
       <div class="shell footer-meta">
         <span>Built openly by Ajnas NB and contributors.</span>
-        <span>Qarinah 0.1.0</span>
+        <span>Qarinah ${productVersion}</span>
       </div>
     </footer>`;
 }
 
-function layout({ title, description, body, active = "", canonical = "/" }) {
-  const fullTitle = title === "Qarinah" ? "Qarinah - Less context. More proof." : `${title} - Qarinah`;
-  const url = `https://qarinah.io${canonical}`;
+function breadcrumbSchema(canonical, title) {
+  if (canonical === "/") return null;
+  const parts = [{ name: "Qarinah", item: `${siteOrigin}/` }];
+  if (canonical.startsWith("/docs/") && canonical !== "/docs/") {
+    parts.push({ name: "Documentation", item: `${siteOrigin}/docs/` });
+  }
+  parts.push({ name: title, item: `${siteOrigin}${canonical}` });
+  return {
+    "@type": "BreadcrumbList",
+    itemListElement: parts.map((part, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: part.name,
+      item: part.item
+    }))
+  };
+}
+
+function structuredData({ title, description, canonical, kind = "doc" }) {
+  const url = `${siteOrigin}${canonical}`;
+  const person = {
+    "@type": "Person",
+    "@id": `${siteOrigin}/#ajnas-nb`,
+    name: "Ajnas NB",
+    url: "https://github.com/AjnasNB"
+  };
+  const graph = [person];
+
+  if (kind === "home") {
+    graph.push(
+      {
+        "@type": "WebSite",
+        "@id": `${siteOrigin}/#website`,
+        url: `${siteOrigin}/`,
+        name: "Qarinah",
+        description,
+        inLanguage: "en",
+        publisher: { "@id": person["@id"] },
+        potentialAction: {
+          "@type": "SearchAction",
+          target: {
+            "@type": "EntryPoint",
+            urlTemplate: `${siteOrigin}/search/?q={search_term_string}`
+          },
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": `${siteOrigin}/#software`,
+        name: "Qarinah",
+        description,
+        applicationCategory: "DeveloperApplication",
+        applicationSubCategory: "Coding agent project memory and context management",
+        operatingSystem: "Windows, macOS, Linux",
+        softwareVersion: productVersion,
+        softwareRequirements: "Node.js 22, 24, or 26",
+        isAccessibleForFree: true,
+        license: "https://www.apache.org/licenses/LICENSE-2.0",
+        url: `${siteOrigin}/`,
+        downloadUrl: npmPackage,
+        installUrl: `${siteOrigin}/docs/getting-started/`,
+        codeRepository: github,
+        releaseNotes: `${github}/releases/tag/v${productVersion}`,
+        featureList: [
+          "Local append-only project memory",
+          "Evidence-linked cited context packs",
+          "Typed project and provenance graph",
+          "Budgeted hybrid retrieval",
+          "Codex and Claude Code integrations",
+          "Read-only MCP diagnostics",
+          "Deterministic Markdown, JSON, graph, and OKF exports"
+        ],
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "USD"
+        },
+        author: { "@id": person["@id"] },
+        sameAs: [github, npmPackage, doi]
+      },
+      {
+        "@type": "SoftwareSourceCode",
+        "@id": `${siteOrigin}/#source`,
+        name: "Qarinah source code",
+        description,
+        codeRepository: github,
+        programmingLanguage: ["JavaScript", "TypeScript"],
+        runtimePlatform: "Node.js 22, 24, and 26",
+        version: productVersion,
+        license: "https://www.apache.org/licenses/LICENSE-2.0",
+        author: { "@id": person["@id"] }
+      }
+    );
+  } else if (kind === "paper") {
+    graph.push({
+      "@type": "ScholarlyArticle",
+      "@id": `${url}#paper`,
+      headline: title,
+      description,
+      url,
+      inLanguage: "en",
+      datePublished: releaseDate,
+      dateModified: releaseDate,
+      version: "1.0",
+      identifier: doi,
+      license: "https://www.apache.org/licenses/LICENSE-2.0",
+      author: { "@id": person["@id"] },
+      contributor: {
+        "@type": "Person",
+        name: "Shahin Ahammed"
+      },
+      encoding: {
+        "@type": "MediaObject",
+        contentUrl: zenodoPdf,
+        encodingFormat: "application/pdf"
+      },
+      isPartOf: { "@id": `${siteOrigin}/#website` }
+    });
+  } else if (kind === "benchmark") {
+    graph.push(
+      {
+        "@type": "TechArticle",
+        headline: title,
+        description,
+        url,
+        dateModified: releaseDate,
+        inLanguage: "en",
+        author: { "@id": person["@id"] }
+      },
+      {
+        "@type": "Dataset",
+        name: "Qarinah software-task context evaluation",
+        description: "Committed inputs and machine-readable outputs for the Qarinah repeated-context evaluation.",
+        url,
+        version: productVersion,
+        license: "https://www.apache.org/licenses/LICENSE-2.0",
+        creator: { "@id": person["@id"] },
+        distribution: {
+          "@type": "DataDownload",
+          encodingFormat: "application/json",
+          contentUrl: `${github}/blob/main/bench/results/software-task-context-0.1.0.json`
+        }
+      }
+    );
+  } else if (kind === "howto") {
+    graph.push({
+      "@type": "HowTo",
+      name: title,
+      description,
+      url,
+      totalTime: "PT5M",
+      step: [
+        { "@type": "HowToStep", name: "Install Qarinah", text: "Install the qarinah npm package in the project." },
+        { "@type": "HowToStep", name: "Initialize the workspace", text: "Run qarinah init for the exact project root." },
+        { "@type": "HowToStep", name: "Compile a cited pack", text: "Record or capture permitted evidence, build the derived views, and query a bounded pack." }
+      ]
+    });
+  } else {
+    graph.push({
+      "@type": kind === "api" ? "APIReference" : "TechArticle",
+      headline: title,
+      description,
+      url,
+      dateModified: releaseDate,
+      inLanguage: "en",
+      author: { "@id": person["@id"] },
+      isPartOf: { "@id": `${siteOrigin}/#website` }
+    });
+  }
+
+  const breadcrumb = breadcrumbSchema(canonical, title);
+  if (breadcrumb) graph.push(breadcrumb);
+  return { "@context": "https://schema.org", "@graph": graph };
+}
+
+function layout({ title, description, body, active = "", canonical = "/", kind = "doc" }) {
+  const fullTitle = title === "Qarinah"
+    ? "Qarinah - Local Project Memory and Context Compiler for Coding Agents"
+    : `${title} - Qarinah`;
+  const url = `${siteOrigin}${canonical}`;
+  const ogType = kind === "home" || kind === "search" ? "website" : "article";
+  const schema = JSON.stringify(structuredData({ title: fullTitle, description, canonical, kind }))
+    .replaceAll("</", "<\\/");
   return `<!doctype html>
 <html lang="en" data-color-mode="auto" data-light-theme="light" data-dark-theme="dark">
 <head>
@@ -200,32 +477,30 @@ function layout({ title, description, body, active = "", canonical = "/" }) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${fullTitle}</title>
   <meta name="description" content="${description}">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
   <meta name="theme-color" content="#0d1117">
   <link rel="canonical" href="${url}">
-  <meta property="og:type" content="website">
+  <link rel="alternate" type="text/plain" href="/llms.txt" title="Qarinah machine-readable overview">
+  <meta property="og:type" content="${ogType}">
+  <meta property="og:site_name" content="Qarinah">
+  <meta property="og:locale" content="en_US">
   <meta property="og:title" content="${fullTitle}">
   <meta property="og:description" content="${description}">
   <meta property="og:url" content="${url}">
-  <meta property="og:image" content="https://qarinah.io/assets/qarinah-social-preview.png">
+  <meta property="og:image" content="${siteOrigin}/assets/qarinah-social-preview.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="640">
+  <meta property="og:image:alt" content="Qarinah local project memory for coding agents - less context, more proof.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${fullTitle}">
   <meta name="twitter:description" content="${description}">
-  <meta name="twitter:image" content="https://qarinah.io/assets/qarinah-social-preview.png">
+  <meta name="twitter:image" content="${siteOrigin}/assets/qarinah-social-preview.png">
+  <meta name="twitter:image:alt" content="Qarinah local project memory for coding agents - less context, more proof.">
   <link rel="icon" href="/assets/qarinah-mark.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/primer.css">
   <link rel="stylesheet" href="/site.css">
-  <script type="application/ld+json">${JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "Qarinah",
-    applicationCategory: "DeveloperApplication",
-    operatingSystem: "Windows, macOS, Linux",
-    softwareVersion: "0.1.0",
-    license: "https://www.apache.org/licenses/LICENSE-2.0",
-    url: "https://qarinah.io",
-    codeRepository: github,
-    author: { "@type": "Person", name: "Ajnas NB" }
-  })}</script>
+  <script type="application/ld+json">${schema}</script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -245,9 +520,10 @@ function commandBlock(command, label = "Terminal") {
 function homePage() {
   return layout({
     title: "Qarinah",
-    description: "Cross-editor project memory with 98.71% less repeated context in the published evaluation.",
+    description: "Local, cross-editor project memory that compiles small cited context packs for Codex, Claude Code, CLIs, and coding agents.",
     active: "home",
     canonical: "/",
+    kind: "home",
     body: `
       <section class="hero">
         <div class="shell hero-grid">
@@ -275,7 +551,7 @@ function homePage() {
       <section class="proof-strip" aria-label="Qarinah proof points">
         <div class="shell proof-strip-grid">
           <div><strong>98.71%</strong><span>less repeated context and input-context cost at the same token rate</span></div>
-          <div><strong>77.81×</strong><span>the full project history was 77.81 times larger than the compiled context pack</span></div>
+          <div><strong>77.81 to 1</strong><span>the evaluated full-history input was 77.81 times larger than the compiled context pack</span></div>
           <div><strong>100%</strong><span>required target coverage in the evaluated tasks</span></div>
           <div><strong>Cross-editor</strong><span>Codex, Claude Code, CLI, and compatible MCP workflows</span></div>
         </div>
@@ -331,9 +607,9 @@ function homePage() {
           <h2>Keep one local project memory across Codex, Claude Code, CLI workflows, and compatible MCP clients.</h2>
         </div>
         <div class="integration-list">
-          <a href="/docs/integrations/#codex"><span>Codex</span><strong>Lifecycle hooks and a Qarinah context skill</strong><i>Open guide</i></a>
-          <a href="/docs/integrations/#claude-code"><span>Claude Code</span><strong>Reviewed plugin runtime with project-specific opt-in</strong><i>Open guide</i></a>
-          <a href="/docs/integrations/#mcp"><span>MCP</span><strong>Read-only integrity and workspace diagnostics over stdio</strong><i>Open guide</i></a>
+          <a href="/docs/integrations/"><span>Codex</span><strong>Lifecycle hooks and a Qarinah context skill</strong><i>Open guide</i></a>
+          <a href="/docs/integrations/"><span>Claude Code</span><strong>Reviewed plugin runtime with project-specific opt-in</strong><i>Open guide</i></a>
+          <a href="/docs/mcp/"><span>MCP</span><strong>Read-only integrity and workspace diagnostics over stdio</strong><i>Open guide</i></a>
           <a href="/docs/interoperability/"><span>Open formats</span><strong>Markdown, JSON, typed graph, and Google OKF export</strong><i>Open guide</i></a>
         </div>
       </section>
@@ -356,7 +632,7 @@ function homePage() {
 function docsIndex() {
   const cards = docPages.filter((page) => page.route !== "paper").map((page, index) => `
     <a class="doc-card" href="/${page.route}/">
-      <span>${String(index + 1).padStart(2, "0")}</span>
+      <span>${page.section} · ${String(index + 1).padStart(2, "0")}</span>
       <h2>${page.title}</h2>
       <p>${page.description}</p>
       <strong>Read guide</strong>
@@ -364,20 +640,57 @@ function docsIndex() {
 
   return layout({
     title: "Documentation",
-    description: "Install, integrate, verify, and operate Qarinah project memory.",
+    description: "Complete Qarinah documentation for local coding-agent memory, context compilation, Codex, Claude Code, CLI, API, and MCP.",
     active: "docs",
     canonical: "/docs/",
     body: `
       <section class="docs-hero">
         <div class="shell">
           <p class="eyebrow">Qarinah documentation</p>
-          <h1>From one initialized project to a small cited memory pack.</h1>
-          <p>Install the package, opt in one workspace, connect a supported host, and verify every pack against the local event record.</p>
+          <h1>Build local project memory your coding agents can cite.</h1>
+          <p>Install the package, opt in one workspace, connect Codex or Claude Code, query a small cited context pack, and verify every result against the local event record.</p>
           ${commandBlock("npx qarinah init . && npx qarinah doctor")}
+          <form class="docs-search-form" action="/search/" method="get" role="search">
+            <label for="docs-search">Search every Qarinah command, API, integration, recipe, and failure mode</label>
+            <div>
+              <input id="docs-search" name="q" type="search" autocomplete="off" placeholder="Try “token budget”, “Codex”, “MCP closed”, or “export OKF”">
+              <button class="btn btn-primary" type="submit">Search docs</button>
+            </div>
+          </form>
         </div>
       </section>
       <section class="section shell">
         <div class="doc-card-grid">${cards}</div>
+      </section>`
+  });
+}
+
+function searchPage() {
+  return layout({
+    title: "Search documentation",
+    description: "Search Qarinah documentation, CLI commands, JavaScript APIs, coding-agent memory recipes, benchmarks, and troubleshooting.",
+    active: "search",
+    canonical: "/search/",
+    kind: "search",
+    body: `
+      <section class="docs-hero search-hero">
+        <div class="shell">
+          <p class="eyebrow">Local documentation search</p>
+          <h1>Find the exact Qarinah surface.</h1>
+          <p>Search the generated documentation index locally. Queries are processed in your browser and are not sent to Qarinah or a hosted search service.</p>
+          <form class="docs-search-form" action="/search/" method="get" role="search" data-search-form>
+            <label for="site-search">Search commands, functions, guides, recipes, and errors</label>
+            <div>
+              <input id="site-search" name="q" type="search" autocomplete="off" autofocus placeholder="Try “query --stdin-json” or “Claude Code project memory”">
+              <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+          </form>
+          <p class="search-shortcut">Press <kbd>/</kbd> anywhere in the documentation to focus search.</p>
+        </div>
+      </section>
+      <section class="section shell search-results-section" aria-live="polite">
+        <div class="search-status" data-search-status>Enter a term to search the complete documentation set.</div>
+        <div class="search-results" data-search-results></div>
       </section>`
   });
 }
@@ -406,6 +719,39 @@ function addHeadingIds(html) {
   });
 }
 
+function plainText(html) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replaceAll("&amp;", "&")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">")
+    .replaceAll("&quot;", '"')
+    .replaceAll("&#39;", "'")
+    .replaceAll("&nbsp;", " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function documentationSidebar(currentRoute) {
+  const sectionOrder = ["Start", "Use", "Connect", "Reference", "Operate", "Understand", "Verify"];
+  const pages = docPages.filter((candidate) => candidate.route !== "paper");
+  const groups = sectionOrder.map((section) => {
+    const links = pages
+      .filter((candidate) => candidate.section === section)
+      .map((candidate) => `<a class="${candidate.route === currentRoute ? "current" : ""}" href="/${candidate.route}/">${candidate.title}</a>`)
+      .join("");
+    return links ? `<div class="sidebar-group"><strong>${section}</strong>${links}</div>` : "";
+  }).join("");
+
+  return `
+    <div class="sidebar-label">Documentation</div>
+    <a class="sidebar-search-link" href="/search/">Search all documentation</a>
+    ${groups}
+    <div class="sidebar-group"><strong>Publication</strong><a class="${currentRoute === "paper" ? "current" : ""}" href="/paper/">Technical white paper</a></div>`;
+}
+
 async function markdownPage(page) {
   const raw = await readFile(path.join(root, page.source), "utf8");
   const markdown = rewriteMarkdownLinks(
@@ -413,6 +759,16 @@ async function markdownPage(page) {
     page.source
   );
   const rendered = addHeadingIds(marked.parse(markdown));
+  const headings = [...rendered.matchAll(/<h([1-3]) id="([^"]+)">([\s\S]*?)<\/h\1>/g)]
+    .map((match) => ({ id: match[2], text: plainText(match[3]) }));
+  searchEntries.push({
+    route: `/${page.route}/`,
+    title: page.title,
+    description: page.description,
+    headings,
+    keywords: page.aliases,
+    content: plainText(rendered).slice(0, 30_000)
+  });
   const active = page.route === "paper" ? "paper" : page.route.endsWith("benchmarks") ? "benchmarks" : "docs";
   const publicationLink = page.route === "paper"
     ? '<a href="https://doi.org/10.5281/zenodo.21547685">Cite on Zenodo</a>'
@@ -423,21 +779,23 @@ async function markdownPage(page) {
     description: page.description,
     active,
     canonical: `/${page.route}/`,
+    kind: page.route === "paper"
+      ? "paper"
+      : page.route === "docs/benchmarks"
+        ? "benchmark"
+        : page.route === "docs/getting-started"
+          ? "howto"
+          : page.route === "docs/api" || page.route === "docs/cli" || page.route === "docs/mcp"
+            ? "api"
+            : "doc",
     body: `
       <div class="doc-layout shell">
         <aside class="docs-sidebar" aria-label="Documentation sections">
-          <div class="sidebar-label">Documentation</div>
-          <a href="/docs/getting-started/">Getting started</a>
-          <a href="/docs/integrations/">Codex and Claude Code</a>
-          <a href="/docs/architecture/">Architecture</a>
-          <a href="/docs/benchmarks/">Benchmarks</a>
-          <a href="/docs/security/">Security</a>
-          <a href="/docs/interoperability/">Interoperability</a>
-          <a href="/paper/">White paper</a>
+          ${documentationSidebar(page.route)}
         </aside>
         <article class="markdown-body doc-content">
           <div class="doc-meta">
-            <span>Qarinah 0.1.0</span>
+            <span>Qarinah ${productVersion}</span>
             <span class="doc-meta-links">${publicationLink}<a href="${github}/blob/main/${page.source}">View on GitHub</a></span>
           </div>
           ${rendered}
@@ -460,10 +818,15 @@ for (const page of docPages) {
   await writeFile(path.join(destination, "index.html"), await markdownPage(page));
 }
 
-const sitemapRoutes = ["/", "/docs/", ...docPages.map((page) => `/${page.route}/`)];
+const searchDestination = path.join(output, "search");
+await mkdir(searchDestination, { recursive: true });
+await writeFile(path.join(searchDestination, "index.html"), searchPage());
+await writeFile(path.join(output, "search-index.json"), `${JSON.stringify(searchEntries, null, 2)}\n`);
+
+const sitemapRoutes = ["/", "/docs/", "/search/", ...docPages.map((page) => `/${page.route}/`)];
 await writeFile(
   path.join(output, "sitemap.xml"),
-  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapRoutes.map((route) => `  <url><loc>https://qarinah.io${route}</loc></url>`).join("\n")}\n</urlset>\n`
+  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapRoutes.map((route) => `  <url><loc>${siteOrigin}${route}</loc><lastmod>${releaseDate}</lastmod></url>`).join("\n")}\n</urlset>\n`
 );
 
 console.log(`Built ${sitemapRoutes.length} Qarinah pages in ${path.relative(root, output)}.`);

@@ -1,0 +1,42 @@
+# Qarinah
+
+> Qarinah is a local-first, evidence-linked project memory for coding agents. It records explicitly permitted project events and compiles bounded, cited context packs from the verified local record.
+
+This file is a convenience map for tools that choose to read it. It is not a ranking signal or a substitute for the canonical documentation.
+
+## Start here
+
+- [Homepage](https://qarinah.io/): Product overview, benchmark summary, and primary navigation.
+- [Getting started](https://qarinah.io/docs/getting-started/): Install Qarinah, opt in one workspace, connect a supported host, and compile a cited context pack.
+- [Documentation index](https://qarinah.io/docs/): Documentation by task.
+- [npm package](https://www.npmjs.com/package/qarinah): Published `qarinah` package and registry metadata.
+- [GitHub repository](https://github.com/AjnasNB/qarinah): Source, releases, issues, and contribution history.
+
+## Technical documentation
+
+- [CLI reference](https://qarinah.io/docs/cli/): Every command, option, stdin mode, exit code, and machine-readable output.
+- [JavaScript API reference](https://qarinah.io/docs/api/): Public exports, types, functions, and bounded programmatic workflows.
+- [Host integrations](https://qarinah.io/docs/integrations/): Codex, Claude Code, CLI, and read-only MCP integration guidance.
+- [MCP guide](https://qarinah.io/docs/mcp/): Configure the read-only MCP server for explicitly trusted workspace roots.
+- [Token-efficient context](https://qarinah.io/docs/token-efficient-context/): How Qarinah selects compact evidence without making the complete transcript the prompt.
+- [Task recipes](https://qarinah.io/docs/recipes/): Copyable workflows for refactors, debugging, migrations, research, releases, and handoffs.
+- [Architecture](https://qarinah.io/docs/architecture/): Append-only event record, deterministic derived state, typed graph, retrieval, and context-pack compilation.
+- [Benchmarks](https://qarinah.io/docs/benchmarks/): Reproducible methodology, qualifications, commands, and committed results.
+- [Security model](https://qarinah.io/docs/security/): Workspace trust, capture consent, redaction, integrity, disclosure boundaries, and known limits.
+- [Interoperability](https://qarinah.io/docs/interoperability/): Deterministic Markdown, JSON, graph, and Google Open Knowledge Format exports.
+- [Troubleshooting](https://qarinah.io/docs/troubleshooting/): Diagnose trust, capture, rebuild, query, MCP, and host-integration failures.
+- [FAQ](https://qarinah.io/docs/faq/): Direct answers about storage, privacy, context reduction, hosts, and operating boundaries.
+- [Migration guide](https://qarinah.io/docs/migrations/): Upgrade persisted Qarinah workspaces safely.
+- [Technical white paper](https://qarinah.io/paper/): Implementation-backed paper for Qarinah 0.1.0.
+
+## Publication and support
+
+- [White-paper PDF](https://qarinah.io/paper/Qarinah-Technical-White-Paper-v1.0.pdf): Website copy of the publication.
+- [DOI record](https://doi.org/10.5281/zenodo.21547685): Persistent Zenodo record.
+- [Support](https://github.com/AjnasNB/qarinah/blob/main/SUPPORT.md): Usage questions, defects, feature requests, and private security-reporting guidance.
+- [Security policy](https://github.com/AjnasNB/qarinah/blob/main/SECURITY.md): Vulnerability-reporting policy.
+- [License](https://github.com/AjnasNB/qarinah/blob/main/LICENSE): Apache License 2.0.
+
+## Optional
+
+- [Expanded machine-readable map](https://qarinah.io/llms-full.txt): Scope, evidence, limitations, commands, and canonical resources.
