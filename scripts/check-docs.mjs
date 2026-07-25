@@ -9,6 +9,19 @@ const architecture = (await read("docs/architecture.mmd")).trim();
 const architectureSvg = await read("assets/architecture/qarinah-flow.svg");
 const architectureDigest = createHash("sha256").update(`${architecture}\n`, "utf8").digest("hex");
 const committedDigest = (await read("assets/architecture/qarinah-flow.source.sha256")).trim();
+const whitePaperSource = await read("docs/WHITEPAPER.md");
+const whitePaperBuilder = await read("scripts/build-whitepaper-pdf.py");
+const whitePaperPdf = await readFile(
+  path.join(root, "output", "pdf", "Qarinah-Technical-White-Paper-v1.0.pdf")
+);
+const whitePaperPdfDigest = (
+  await read("output/pdf/Qarinah-Technical-White-Paper-v1.0.source.sha256")
+).trim();
+const expectedWhitePaperDigest = createHash("sha256")
+  .update(whitePaperSource, "utf8")
+  .update("\0", "utf8")
+  .update(whitePaperBuilder, "utf8")
+  .digest("hex");
 
 if (!/^flowchart T[BD]\b/u.test(architecture)) {
   throw new Error("docs/architecture.mmd must contain the canonical top-to-bottom Mermaid flowchart.");
@@ -22,6 +35,24 @@ for (const label of ["Codex + Claude Code + CLI", "Hash-chained JSONL", "Small c
 }
 if (/Â/u.test(architectureSvg)) {
   throw new Error("Rendered architecture image contains a likely text-encoding artifact.");
+}
+if (!whitePaperPdf.subarray(0, 5).equals(Buffer.from("%PDF-", "ascii"))) {
+  throw new Error("The publication white paper is not a valid PDF artifact.");
+}
+if (whitePaperPdf.byteLength < 150_000) {
+  throw new Error("The publication white paper is unexpectedly small.");
+}
+if (
+  whitePaperPdfDigest
+    !== `${expectedWhitePaperDigest}  docs/WHITEPAPER.md+scripts/build-whitepaper-pdf.py`
+) {
+  throw new Error("The publication white paper is stale. Rebuild it with scripts/build-whitepaper-pdf.py.");
+}
+for (const relativePath of ["README.md", "docs/WHITEPAPER.md"]) {
+  const markdown = await read(relativePath);
+  if (!markdown.includes("output/pdf/Qarinah-Technical-White-Paper-v1.0.pdf")) {
+    throw new Error(`${relativePath} does not link to the publication PDF.`);
+  }
 }
 
 for (const [relativePath, imagePath] of [

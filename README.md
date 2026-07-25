@@ -27,6 +27,7 @@
 
 <p align="center">
   <a href="docs/WHITEPAPER.md">Technical paper</a>&nbsp;&middot;&nbsp;
+  <a href="https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.0.pdf">Publication PDF</a>&nbsp;&middot;&nbsp;
   <a href="docs/ARCHITECTURE.md">Architecture</a>&nbsp;&middot;&nbsp;
   <a href="docs/BENCHMARKS.md">Benchmarks</a>&nbsp;&middot;&nbsp;
   <a href="docs/SECURITY.md">Security</a>&nbsp;&middot;&nbsp;
