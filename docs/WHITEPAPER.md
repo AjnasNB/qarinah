@@ -7,7 +7,7 @@
 **Implementation:** Qarinah `0.1.0-alpha.3` technical preview<br>
 **Date:** July 2026<br>
 **License:** Apache License 2.0<br>
-**Status:** Public technical white paper backed by a working prerelease implementation
+**Status:** Implementation-backed technical white paper. Qarinah is currently in alpha, and the paper has not undergone independent peer review.
 
 [Download the publication PDF](https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.0.pdf)
 

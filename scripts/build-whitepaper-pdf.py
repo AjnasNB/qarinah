@@ -741,8 +741,8 @@ def cover_story():
         ),
         Spacer(1, 6 * mm),
         Paragraph(
-            "<b>Release status:</b> implementation-backed technical white paper. "
-            "The implementation is an alpha and the paper is not peer-reviewed.",
+            "<b>Status:</b> Implementation-backed technical white paper. "
+            "Qarinah is currently in alpha, and the paper has not undergone independent peer review.",
             STYLES["cover-meta"],
         ),
         NextPageTemplate("Body"),
