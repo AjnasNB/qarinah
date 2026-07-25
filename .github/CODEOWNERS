@@ -1,0 +1,13 @@
+# Maintainer review is required for all repository changes.
+* @AjnasNB
+
+# Security, release, and public-contract surfaces receive explicit maintainer review.
+/.github/ @AjnasNB
+/SECURITY.md @AjnasNB
+/docs/SECURITY.md @AjnasNB
+/schemas/ @AjnasNB
+/src/storage/ @AjnasNB
+/src/mcp/ @AjnasNB
+/src/hooks/ @AjnasNB
+/package.json @AjnasNB
+/server.json @AjnasNB

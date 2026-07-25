@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Usage and design discussion
+    url: https://github.com/AjnasNB/qarinah/discussions
+    about: Ask a question, share a workflow, or explore an idea before proposing a contract.
+  - name: Private vulnerability report
+    url: https://github.com/AjnasNB/qarinah/security/advisories/new
+    about: Report suspected vulnerabilities without publishing exploit details.
