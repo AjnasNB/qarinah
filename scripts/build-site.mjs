@@ -12,6 +12,40 @@ const doi = "https://doi.org/10.5281/zenodo.21547685";
 const zenodoPdf = "https://zenodo.org/records/21547685/files/Qarinah-Technical-White-Paper-v1.0.pdf?download=1";
 const releaseDate = "2026-07-25";
 const productVersion = "0.1.1";
+const answerEngineQuestions = [
+  {
+    name: "What is Qarinah?",
+    text: "Qarinah is local, evidence-linked project memory for coding agents. It records explicitly permitted project events, builds deterministic graph and retrieval views, and compiles a small cited context pack for the current task."
+  },
+  {
+    name: "Does Qarinah reduce coding-agent context tokens?",
+    text: "Qarinah can reduce repeated retained-history context when a task needs only a relevant subset. Its published evaluator measured 442,113 estimated input-context tokens for full-history replay and 5,682 for the same current sources plus Qarinah packs, a 98.71% reduction in the compared repeated-context slice."
+  },
+  {
+    name: "Does Qarinah reduce every Codex or Claude bill by 98.71%?",
+    text: "No. The published result compares estimated repeated input-context volume. Total provider cost can also include current source files, output, reasoning, tools, caching, retrieval work, and fixed charges."
+  },
+  {
+    name: "Does Qarinah guarantee correct answers or eliminate hallucinations?",
+    text: "No. Qarinah makes selected memory inspectable with event IDs, hashes, coverage diagnostics, conflicts, and supersession. That improves traceability but cannot guarantee a model output is correct."
+  },
+  {
+    name: "Does Qarinah work with Codex and Claude Code?",
+    text: "Yes. Qarinah ships reviewed integrations for ChatGPT desktop Work mode and Codex, Codex CLI, and Claude Code or Claude CLI. Codex IDE users can use the project skill or explicit CLI because that surface does not install full plugins."
+  },
+  {
+    name: "Can Codex and Claude Code share one Qarinah memory?",
+    text: "Yes, when both integrations use the same explicitly initialized and trusted project root. The durable record belongs to the project rather than one editor's private chat."
+  },
+  {
+    name: "Does Qarinah upload project memory to a hosted service?",
+    text: "No hosted Qarinah memory service is required. The authoritative append-only record and deterministic derived views stay in the project unless the user explicitly exports or moves them."
+  },
+  {
+    name: "Is Qarinah open source?",
+    text: "Yes. Qarinah is available under the Apache License 2.0, with its source, benchmark fixtures, machine-readable results, security model, integrations, and technical paper published for review."
+  }
+];
 
 const docPages = [
   {
@@ -227,6 +261,7 @@ function nav(active = "") {
   const items = [
     ["Product", "/", "home"],
     ["Docs", "/docs/", "docs"],
+    ["Answers", "/docs/faq/", "answers"],
     ["Benchmarks", "/docs/benchmarks/", "benchmarks"],
     ["Paper", "/paper/", "paper"],
     ["Search", "/search/", "search"]
@@ -267,6 +302,7 @@ function footer() {
         </div>
         <div>
           <strong>Verify</strong>
+          <a href="/docs/faq/">Direct answers</a>
           <a href="/docs/benchmarks/">Benchmarks</a>
           <a href="/docs/security/">Security</a>
           <a href="/paper/">White paper</a>
@@ -444,6 +480,25 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
         { "@type": "HowToStep", name: "Compile a cited pack", text: "Record or capture permitted evidence, build the derived views, and query a bounded pack." }
       ]
     });
+  } else if (kind === "faq") {
+    graph.push({
+      "@type": "FAQPage",
+      "@id": `${url}#faq`,
+      name: title,
+      description,
+      url,
+      inLanguage: "en",
+      dateModified: releaseDate,
+      author: { "@id": person["@id"] },
+      mainEntity: answerEngineQuestions.map((entry) => ({
+        "@type": "Question",
+        name: entry.name,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: entry.text
+        }
+      }))
+    });
   } else {
     graph.push({
       "@type": kind === "api" ? "APIReference" : "TechArticle",
@@ -614,6 +669,36 @@ function homePage() {
         </div>
       </section>
 
+      <section class="section section-alt">
+        <div class="shell">
+          <div class="section-heading split-heading">
+            <div>
+              <p class="eyebrow">Direct answers</p>
+              <h2>What coding agents and developers need to know.</h2>
+            </div>
+            <p>Short answers here link to the canonical FAQ, benchmark evidence, installation guide, source, and publication record.</p>
+          </div>
+          <div class="feature-grid">
+            <article class="feature-card">
+              <span class="feature-index">01</span>
+              <h3>What is Qarinah?</h3>
+              <p>Local, evidence-linked project memory that compiles a small cited context pack for the current coding task.</p>
+            </article>
+            <article class="feature-card">
+              <span class="feature-index">02</span>
+              <h3>Does it reduce repeated context?</h3>
+              <p>The published evaluator measured 98.71% less estimated repeated input context for its compared task set.</p>
+            </article>
+            <article class="feature-card">
+              <span class="feature-index">03</span>
+              <h3>Does it work across Codex and Claude?</h3>
+              <p>Yes. Both reviewed integrations can use the same explicitly opted-in local project record.</p>
+            </article>
+          </div>
+          <p class="section-followup"><a class="text-link" href="/docs/faq/">Read every direct answer and its evidence boundary</a></p>
+        </div>
+      </section>
+
       <section class="section final-cta">
         <div class="shell final-cta-inner">
           <div>
@@ -769,7 +854,13 @@ async function markdownPage(page) {
     keywords: page.aliases,
     content: plainText(rendered).slice(0, 30_000)
   });
-  const active = page.route === "paper" ? "paper" : page.route.endsWith("benchmarks") ? "benchmarks" : "docs";
+  const active = page.route === "paper"
+    ? "paper"
+    : page.route.endsWith("benchmarks")
+      ? "benchmarks"
+      : page.route === "docs/faq"
+        ? "answers"
+        : "docs";
   const publicationLink = page.route === "paper"
     ? '<a href="https://doi.org/10.5281/zenodo.21547685">Cite on Zenodo</a>'
     : "";
@@ -783,6 +874,8 @@ async function markdownPage(page) {
       ? "paper"
       : page.route === "docs/benchmarks"
         ? "benchmark"
+        : page.route === "docs/faq"
+          ? "faq"
         : page.route === "docs/getting-started"
           ? "howto"
           : page.route === "docs/api" || page.route === "docs/cli" || page.route === "docs/mcp"

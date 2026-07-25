@@ -193,6 +193,7 @@ for (const crawler of ["Googlebot", "Bingbot", "OAI-SearchBot", "Claude-SearchBo
 const llms = await readFile(path.join(output, "llms.txt"), "utf8");
 for (const canonicalResource of [
   "https://qarinah.io/docs/",
+  "https://qarinah.io/docs/faq/",
   "https://www.npmjs.com/package/qarinah",
   "https://github.com/AjnasNB/qarinah",
   "https://doi.org/10.5281/zenodo.21547685"
@@ -202,8 +203,15 @@ for (const canonicalResource of [
 
 const home = await readFile(path.join(output, "index.html"), "utf8");
 const paper = await readFile(path.join(output, "paper", "index.html"), "utf8");
+const faq = await readFile(path.join(output, "docs", "faq", "index.html"), "utf8");
 if (!home.includes("<strong>98.71%</strong>") || !home.includes("the evaluated full-history input was 77.81 times larger")) {
   errors.push("Homepage is missing the plain-language benchmark proof.");
+}
+if (!home.includes("What coding agents and developers need to know.") || !home.includes('href="/docs/faq/"')) {
+  errors.push("Homepage is missing the direct answer-engine surface.");
+}
+if (!faq.includes('"@type":"FAQPage"') || !faq.includes('"mainEntity"')) {
+  errors.push("FAQ is missing answer-oriented structured data.");
 }
 if (!paper.includes('src="/assets/qarinah-flow.svg"')) {
   errors.push("Paper architecture image is not bound to the deployed asset.");

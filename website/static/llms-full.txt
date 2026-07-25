@@ -40,6 +40,36 @@ This file is a convenience map for tools that choose to read it. It does not con
 - Retention classification and expiry filtering do not physically rewrite the append-only event history.
 - Published benchmark estimates are not provider billing receipts and do not include output, tools, caching, or fixed provider charges.
 
+## Direct questions and answers
+
+### What is Qarinah?
+
+Qarinah is local, evidence-linked project memory for coding agents. It records explicitly permitted project events, builds deterministic graph and retrieval views, and compiles a small cited context pack for the current task.
+
+### Does Qarinah reduce coding-agent context tokens?
+
+It can reduce repeated retained-history context when a task needs only a relevant subset. The published evaluator measured 442,113 estimated input-context tokens for full-history replay and 5,682 for the same current sources plus Qarinah packs, a 98.71% reduction in the compared repeated-context slice.
+
+### Does Qarinah reduce every Codex or Claude bill by 98.71%?
+
+No. The result compares estimated repeated input-context volume. Total provider cost can also include current source files, output, reasoning, tools, caching, retrieval work, and fixed charges.
+
+### Does Qarinah guarantee correct answers or eliminate hallucinations?
+
+No. Qarinah makes selected memory inspectable with event IDs, hashes, coverage diagnostics, conflicts, and supersession. That improves traceability but cannot guarantee a model output is correct.
+
+### Does Qarinah work with Codex and Claude Code?
+
+Yes. Qarinah ships reviewed integrations for ChatGPT desktop Work mode and Codex, Codex CLI, and Claude Code or Claude CLI. Both integrations can use the same explicitly initialized and trusted project root.
+
+### Does Qarinah upload project memory?
+
+No hosted Qarinah memory service is required. The authoritative append-only record and deterministic derived views stay in the project unless the user explicitly exports or moves them.
+
+### Is Qarinah open source?
+
+Yes. Qarinah is available under the Apache License 2.0.
+
 ## Install and first run
 
 Requirements: Node.js 22, 24, or 26.

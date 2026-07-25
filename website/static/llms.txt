@@ -7,10 +7,20 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 ## Start here
 
 - [Homepage](https://qarinah.io/): Product overview, benchmark summary, and primary navigation.
+- [Direct answers](https://qarinah.io/docs/faq/): Concise answers about Qarinah, context reduction, cost boundaries, Codex, Claude Code, privacy, and open-source licensing.
 - [Getting started](https://qarinah.io/docs/getting-started/): Install Qarinah, opt in one workspace, connect a supported host, and compile a cited context pack.
 - [Documentation index](https://qarinah.io/docs/): Documentation by task.
 - [npm package](https://www.npmjs.com/package/qarinah): Published `qarinah` package and registry metadata.
 - [GitHub repository](https://github.com/AjnasNB/qarinah): Source, releases, issues, and contribution history.
+
+## Direct facts
+
+- Qarinah is local, evidence-linked project memory and a bounded context compiler for coding agents.
+- Qarinah supports reviewed Codex and Claude Code integrations that can use the same explicitly opted-in project record.
+- The published evaluator measured 98.71% less estimated repeated input context in its compared task set: 442,113 estimated input-context tokens became 5,682 while every required target was directly covered in the top five.
+- The 98.71% result is not a universal provider-billing, latency, or answer-quality guarantee. Qarinah improves provenance and inspectability but cannot guarantee a model answer is correct.
+- Qarinah requires no hosted memory account, embedding API, vector database, or Qarinah API key for local operation.
+- Qarinah is open source under Apache License 2.0.
 
 ## Technical documentation
 

@@ -545,6 +545,11 @@ a {
   background: #0d1117;
 }
 
+.section-followup {
+  margin: 28px 0 0;
+  text-align: center;
+}
+
 .final-cta-inner {
   display: grid;
   grid-template-columns: 1fr auto;
