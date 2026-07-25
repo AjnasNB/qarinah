@@ -26,9 +26,9 @@ Re-check registries and repositories immediately before publishing. As of the da
 | Maqam | `0.3.2` is the stable GitHub and npm release | Ready for demos that use only documented guarantees |
 | ProductLoop | `0.2.3` is the stable GitHub and npm release | Present as orchestration, not a second flagship launch |
 | Cockroach Crawler | `0.3.0` is the stable GitHub and npm `latest` release | Ready for bounded-crawl, provider-routing, optional reach, browser-host, and restricted serverless demos within documented limits |
-| Qarinah | `0.1.0-alpha.3` is an unpublished candidate in a private repository | Do not announce, tag, or publish until every gate in [LAUNCH.md](LAUNCH.md) is complete |
+| Qarinah | `0.1.0` stable release candidate | Publish only the reviewed source, package, paper, and website from one exact commit |
 
-Never describe a local version, candidate, or prerelease as the latest stable release.
+Never describe a local candidate as published until the registry, tag, and public verification agree.
 
 ## Message hierarchy
 
@@ -89,7 +89,7 @@ Acceptance evidence:
 
 1. Finish Qarinah's name, copyright, third-party, privacy, threat-model, and complete Git-history secret reviews.
 2. Freeze one integration-demo manifest containing every package version, repository SHA, Node version, fixture hash, and command.
-3. Run each repository's complete check from a clean install. Keep Qarinah's prerelease label visible.
+3. Run each repository's complete check from a clean install. Keep Qarinah's release version visible.
 4. Run a fresh-consumer install and the end-to-end demo on Windows, macOS, and Linux where the claim requires those platforms.
 5. Cut the demo only from the verified outputs and exact candidate artifacts.
 
@@ -97,8 +97,8 @@ Acceptance evidence:
 
 1. Make Qarinah public only after the secret and legal gates pass. Public visibility is required if npm provenance should point to a public source repository.
 2. Configure [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/) for the exact GitHub workflow and protected release environment.
-3. Stage Qarinah `0.1.0-alpha.3`, inspect the registry artifact, install it into a clean consumer, and approve the exact identity.
-4. Publish Qarinah under npm `next`, create the matching prerelease tag and [GitHub release](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases) at the same commit, and verify provenance, integrity, package contents, links, and plugin installation.
+3. Stage Qarinah `0.1.0`, inspect the registry artifact, install it into a clean consumer, and approve the exact identity.
+4. Publish Qarinah under npm `latest`, create the matching tag and [GitHub release](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases) at the same commit, and verify provenance, integrity, package contents, links, and plugin installation.
 5. Do not republish Maqam or ProductLoop merely to synchronize dates. Reference their current stable releases unless code actually changed.
 6. Use Cockroach Crawler `0.3.0` from `latest`; do not revive prerelease install commands in current launch copy.
 
@@ -222,7 +222,7 @@ Stars and raw npm downloads are supporting reach signals, not proof of product v
 
 ### First 14 public days
 
-- day 0: GitHub/npm/prerelease verification;
+- day 0: GitHub/npm/release verification;
 - day 1: personally authored Show HN submission and live technical support;
 - days 2-3: fix onboarding failures and publish corrections;
 - days 4-7: one technical article and targeted, rule-compliant community discussions;

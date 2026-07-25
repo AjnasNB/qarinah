@@ -23,33 +23,33 @@ The host plugin and the project ledger have different scopes:
 - initialize only the repository roots that are allowed to retain Qarinah records; and
 - request a cited pack when a task needs prior evidence. Qarinah does not inject the complete history automatically.
 
-After the public prerelease and tag are approved, install for personal use across projects:
+Install the version-pinned stable release for personal use across projects:
 
 ```powershell
-codex plugin marketplace add AjnasNB/qarinah --ref v0.1.0-alpha.3
+codex plugin marketplace add AjnasNB/qarinah --ref v0.1.0
 codex plugin add qarinah@qarinah
 
-claude plugin marketplace add AjnasNB/qarinah@v0.1.0-alpha.3 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.1.0 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 
 Claude Code also supports repository-shared `project` scope and gitignored per-user `local` scope:
 
 ```powershell
-claude plugin marketplace add AjnasNB/qarinah@v0.1.0-alpha.3 --scope project
+claude plugin marketplace add AjnasNB/qarinah@v0.1.0 --scope project
 claude plugin install qarinah@qarinah --scope project
 
 # Or keep the enablement personal to this repository.
-claude plugin marketplace add AjnasNB/qarinah@v0.1.0-alpha.3 --scope local
+claude plugin marketplace add AjnasNB/qarinah@v0.1.0 --scope local
 claude plugin install qarinah@qarinah --scope local
 ```
 
 Codex plugin installation is personal rather than repository-scoped. The Qarinah workspace boundary supplies the per-project opt-in. From each project root:
 
 ```powershell
-npx -y qarinah@next init . --capture content
-npx -y qarinah@next scan
-npx -y qarinah@next doctor
+npx -y qarinah@latest init . --capture content
+npx -y qarinah@latest scan
+npx -y qarinah@latest doctor
 ```
 
 Choose `metadata` instead of `content` when prompt, tool-output, source, and completion bodies should not be retained. Content capture is bounded and redacted but remains security-sensitive.
@@ -57,7 +57,7 @@ Choose `metadata` instead of `content` when prompt, tool-output, source, and com
 To recover context in a later task, use the installed `qarinah-context` skill and request direct evidence for the task terms. The equivalent explicit local command is:
 
 ```powershell
-npx -y qarinah@next query "orders idempotency migration" `
+npx -y qarinah@latest query "orders idempotency migration" `
   --minimum-coverage direct `
   --max-tokens 1500 `
   --reserve-tokens 200 `
@@ -122,17 +122,17 @@ claude plugin marketplace add . --scope local
 claude plugin install qarinah@qarinah --scope local
 ```
 
-After the repository is public and tag `v0.1.0-alpha.3` is approved, the intended version-pinned install flow is:
+The version-pinned install flow is:
 
 ```powershell
-codex plugin marketplace add AjnasNB/qarinah --ref v0.1.0-alpha.3
+codex plugin marketplace add AjnasNB/qarinah --ref v0.1.0
 codex plugin add qarinah@qarinah
 
-claude plugin marketplace add AjnasNB/qarinah@v0.1.0-alpha.3
+claude plugin marketplace add AjnasNB/qarinah@v0.1.0
 claude plugin install qarinah@qarinah
 ```
 
-These commands are release instructions, not a statement that a public marketplace or tag already exists. Codex installs from a configured Git marketplace snapshot. Claude Code clones the Git marketplace and copies the plugin into its versioned cache. The repository catalogs use only paths inside the same reviewed checkout.
+Codex installs from a configured Git marketplace snapshot. Claude Code clones the Git marketplace and copies the plugin into its versioned cache. The repository catalogs use only paths inside the same reviewed checkout.
 
 Claude's plugin manifest requires `node_path` as a file-valued user setting and passes it in exec form to every lifecycle hook. During enablement, use Claude's plugin configuration UI to select an absolute trusted Node 22, 24, or 26 executable outside the project. The installed Claude CLI may not yet expose the newer documented `plugin install --config` flag, so the command above intentionally uses only the broadly available `--scope` option. The host checks that a required file value exists; the user must review that its resolved path is absolute and outside project control. Qarinah then rejects unsupported Node major versions after launch.
 
@@ -140,7 +140,7 @@ Claude's plugin MCP manifest intentionally uses the documented portable `node` s
 
 The current Codex plugin schema has no corresponding per-plugin executable-path setting. Its bundled hooks require a separate host trust review, change the process directory to the installed plugin root before invoking Node (preventing a workspace-local `node.exe`/`node.cmd` from winning Windows current-directory lookup), and its local MCP definition starts in that same plugin root. Both still follow the host's standard bare-`node` pattern. Before trusting the plugin, verify the remaining `PATH` resolution selects a trusted Node 22, 24, or 26 installation (for example, `(Get-Command node -CommandType Application).Source` on PowerShell). This host-level interpreter resolution is an explicit boundary, not protection Qarinah can enforce after an interpreter has already launched.
 
-For an install-free Claude development session, use `claude --plugin-dir integrations/claude/qarinah` instead. Do not distribute either catalog as a public marketplace until the name, threat-model, and artifact gates in `docs/LAUNCH.md` are complete.
+For an install-free Claude development session, use `claude --plugin-dir integrations/claude/qarinah` instead. Distribute only the reviewed catalog from the release tag.
 
 Both hosts copy plugins into versioned caches. Editing the source folder does not mutate an installed plugin; reinstall after each reviewed build and start a new Codex task or reload Claude plugins so hooks, skills, and MCP servers use the new artifact. Treat bundled hooks as executable configuration: review the exact plugin, its resolved interpreter, and trust the configuration only when the host prompts for it. Qarinah does not bypass host trust decisions.
 

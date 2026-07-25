@@ -1,6 +1,6 @@
 {
   "name": "qarinah",
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0",
   "description": "Qarinah: opt-in, evidence-linked local context capture and bounded retrieval for Claude Code.",
   "author": {
     "name": "Ajnas NB",

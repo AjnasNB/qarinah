@@ -59,7 +59,7 @@ I built Qarinah because agent memory usually fails in two directions: the next m
 3. Graph, index, Markdown, and OKF views are deterministic and disposable. Every selected context item points back to an event ID and content hash.
 4. Qarinah packs plus identical task sources used 5,682 estimated tokens versus 442,113 for full-history replay: 98.71% less estimated context, with every target directly covered in the top five.
 5. The estimate is `ceil(characters / 4)`, not provider billing. Qarinah does not capture hidden reasoning, grant itself disclosure authority, or require a Qarinah API key.
-6. Public alpha install and plugin links: [ADD ONLY AFTER VERIFIED RELEASE]
+6. Stable install and plugin links: [ADD ONLY AFTER VERIFIED RELEASE]
 
 ## LinkedIn
 
@@ -69,7 +69,7 @@ Qarinah keeps a local, append-only record of permitted agent activity and explic
 
 The Qarinah path used 98.71% less estimated context than replaying the full history while keeping every required target directly covered in the top five. The measurement uses a transparent characters-divided-by-four estimate, not provider billing.
 
-The public alpha will support Codex and Claude Code plugins, a CLI, and read-only MCP diagnostics. Capture is opt-in per project, metadata-only by default, and requires machine-local trust. I am looking for developers willing to reproduce the fixture and report the first missing piece of evidence on a real codebase.
+The stable release supports Codex and Claude Code plugins, a CLI, and read-only MCP diagnostics. Capture is opt-in per project, metadata-only by default, and requires machine-local trust. I am looking for developers willing to reproduce the fixture and report the first missing piece of evidence on a real codebase.
 
 ## Reddit or technical forum
 

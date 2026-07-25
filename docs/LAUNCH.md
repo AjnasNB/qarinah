@@ -1,6 +1,6 @@
 # Qarinah launch runbook
 
-Qarinah is preparing an Apache-2.0 alpha. Do not publish an npm package, public repository, plugin marketplace entry, or immutable release until every incomplete gate below is satisfied and the exact artifact is approved.
+Qarinah 0.1.0 is the first stable open-source release. Publish only the exact artifact produced from the reviewed release commit, then verify the public package, tag, provenance, website, and plugin installs against that identity.
 
 ## Launch message
 
@@ -12,14 +12,13 @@ The complete channel copy, media assignments, and claims gate are in [`docs/laun
 
 ## Release gates
 
-1. Confirm the product name with professional trademark review and reserve the package, domains, and social identifiers.
-2. Confirm every copyright holder can license the work under Apache-2.0. Keep the DCO, brand-use policy, and complete third-party attributions in the artifact.
-3. Complete the capture, disclosure, MCP-root, hook, interpreter, and browser-receipt threat-model review.
-4. Use a clean main commit, reproducible generated runtimes, clean-consumer types, all tests, benchmarks, and packed-artifact inspection.
-5. Record exact artifact identity: package, version, registry, commit, tarball SHA-256, npm integrity, dist-tag, and explicit approval.
-6. Run a full current-tree and Git-history secret scan. Review historical Actions logs before changing repository visibility.
-7. Verify privacy, security reporting, support, contribution, trademark, and third-party notice documents.
-8. Test real Codex and Claude Code installs from the release artifacts on Node 22, 24, and 26.
+1. Confirm every copyright holder can license the work under Apache-2.0. Keep the DCO, brand-use policy, and complete third-party attributions in the artifact.
+2. Complete the capture, disclosure, MCP-root, hook, interpreter, and browser-receipt threat-model review.
+3. Use a clean main commit, reproducible generated runtimes, clean-consumer types, all tests, benchmarks, website checks, and packed-artifact inspection.
+4. Record exact artifact identity: package, version, registry, commit, tarball SHA-256, npm integrity, dist-tag, and explicit approval.
+5. Run a full current-tree and Git-history secret scan. Review historical Actions logs before changing repository visibility.
+6. Verify privacy, security reporting, support, contribution, brand-use, and third-party notice documents.
+7. Test real Codex and Claude Code installs from the release artifacts on Node 22, 24, and 26.
 
 ## Release candidate
 
@@ -29,13 +28,13 @@ The complete channel copy, media assignments, and claims gate are in [`docs/laun
 - Run adversarial prompt, secret, linked-path, rollback, concurrent append, malformed hook, and no-evidence retrieval fixtures.
 - Confirm the package contains `LICENSE`, `NOTICE`, third-party attributions, declarations, schemas, plugins, and no private files.
 
-## Public technical preview
+## Public stable release
 
-- Publish source only after the incomplete legal, name, secret-scan, and artifact gates are resolved.
-- Use `v0.1.0-alpha.3` as a GitHub prerelease and npm `next`, not `latest`.
+- Publish source only after the secret-scan and artifact gates are resolved.
+- Use `v0.1.0` as a GitHub release and npm `latest`.
 - Lead with a 60-second proof: opt in, record a decision, scan, verify hashes, and retrieve a direct-evidence pack.
 - Publish the [technical paper](WHITEPAPER.md) from the same reviewed release commit. It is a concise architecture and evidence document, not a claim of academic peer review.
-- Do not delay the technical preview for a longer paper once the release gates are satisfied. Expand the paper as public fixtures and held-out evaluations mature.
+- Do not delay the release for a longer paper once the release gates are satisfied. Expand the paper as public fixtures and held-out evaluations mature.
 - State limits beside the demo: hooks observe supported host events, metadata is default, MCP diagnostics are read-only, hidden reasoning is excluded, and no universal internet access is claimed.
 - Use trusted npm publishing with provenance after the first package is staged and approved.
 

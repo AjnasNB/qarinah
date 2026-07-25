@@ -4,10 +4,10 @@
 
 **Author:** Ajnas NB<br>
 **Paper version:** 1.0<br>
-**Implementation:** Qarinah `0.1.0-alpha.3` technical preview<br>
+**Implementation:** Qarinah `0.1.0` stable open-source release<br>
 **Date:** July 2026<br>
 **License:** Apache License 2.0<br>
-**Status:** Implementation-backed technical white paper. Qarinah is currently in alpha, and the paper has not undergone independent peer review.
+**Status:** Implementation-backed technical white paper for Qarinah 0.1.0. The paper has not undergone independent peer review.
 
 [Download the publication PDF](https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.0.pdf)
 
@@ -549,7 +549,7 @@ The implementation uses:
 
 ### 13.3 Residual risk
 
-The current alpha has known limits:
+The current implementation has known limits:
 
 - machine trust is local state and is not backed by a hardware key or external transparency log;
 - the lock is not a distributed coordination protocol;
@@ -728,9 +728,9 @@ npm run benchmark
 The relevant evidence is committed at:
 
 - [`bench/fixtures/software-task-scenarios.mjs`](../bench/fixtures/software-task-scenarios.mjs);
-- [`bench/results/software-task-context-0.1.0-alpha.3.json`](../bench/results/software-task-context-0.1.0-alpha.3.json);
-- [`bench/results/long-document-context-0.1.0-alpha.3.json`](../bench/results/long-document-context-0.1.0-alpha.3.json);
-- [`bench/results/context-evaluation-0.1.0-alpha.3.json`](../bench/results/context-evaluation-0.1.0-alpha.3.json);
+- [`bench/results/software-task-context-0.1.0.json`](../bench/results/software-task-context-0.1.0.json);
+- [`bench/results/long-document-context-0.1.0.json`](../bench/results/long-document-context-0.1.0.json);
+- [`bench/results/context-evaluation-0.1.0.json`](../bench/results/context-evaluation-0.1.0.json);
 - [`scripts/evaluate-software-tasks.mjs`](../scripts/evaluate-software-tasks.mjs);
 - [`scripts/evaluate-long-document.mjs`](../scripts/evaluate-long-document.mjs);
 - [`scripts/evaluate-context.mjs`](../scripts/evaluate-context.mjs); and
@@ -764,7 +764,7 @@ Qarinah meets that threshold for an **implementation-backed technical white pape
 - the project has an Apache-2.0 license; and
 - the paper distinguishes measured results from open research questions.
 
-The paper must not be represented as peer-reviewed academic research, independent third-party validation, a provider invoice, or a universal performance guarantee. The implementation remains an alpha and should be identified as such wherever the paper is distributed.
+The paper must not be represented as peer-reviewed academic research, independent third-party validation, a provider invoice, or a universal performance guarantee. Distribution should identify the exact implementation and paper versions.
 
 Recommended publication metadata:
 
@@ -772,7 +772,7 @@ Recommended publication metadata:
 - **Title:** *Qarinah: Less Context. More Proof.*
 - **Subtitle:** *An evidence-linked project-memory compiler for coding agents*
 - **Author:** Ajnas NB
-- **Implementation version:** `0.1.0-alpha.3`
+- **Implementation version:** `0.1.0`
 - **Paper version:** 1.0
 - **License:** Apache-2.0
 - **Canonical source:** this repository at one reviewed commit
@@ -791,7 +791,7 @@ Security vulnerabilities should be reported privately according to the repositor
 
 ## 20. Roadmap and research agenda
 
-The path to a stable release includes:
+The post-0.1 research and hardening roadmap includes:
 
 - at least 100 held-out positive and negative retrieval queries;
 - paraphrase, typo, conflict, supersession, time, authority, and unsupported-query coverage;
@@ -814,7 +814,7 @@ Coding agents need continuity, but continuity should not require replaying every
 
 Qarinah keeps durable evidence and task-time context as two different artifacts. The append-only ledger preserves the permitted project record. Deterministic projections make that record searchable and inspectable. The context compiler selects a small cited working set under an explicit budget. Conflicts, supersession, authority, retention, and evidence coverage remain visible rather than being compressed away.
 
-The current alpha demonstrates that this design works end to end across local storage, project structure, retrieval, Codex and Claude Code adapters, MCP diagnostics, Maqam governance, crawler evidence, workflow provenance, and portable OKF export. Its committed evaluations show large context-volume reductions while preserving the required evidence in the tested scenarios.
+Qarinah 0.1.0 demonstrates that this design works end to end across local storage, project structure, retrieval, Codex and Claude Code adapters, MCP diagnostics, Maqam governance, crawler evidence, workflow provenance, and portable OKF export. Its committed evaluations show large context-volume reductions while preserving the required evidence in the evaluated scenarios.
 
 The central promise is intentionally simple:
 
@@ -857,5 +857,5 @@ The author gratefully acknowledges Shahin Ahammed, Qarinah's non-technical cofou
 ```text
 Ajnas NB. "Qarinah: Less Context. More Proof. An evidence-linked
 project-memory compiler for coding agents." Technical white paper,
-version 1.0, July 2026. Qarinah 0.1.0-alpha.3.
+version 1.0, July 2026. Qarinah 0.1.0.
 ```

@@ -285,7 +285,7 @@ try {
 
   if (!process.argv.includes("--no-verify")) {
     const committed = JSON.parse(await readFile(
-      path.join(repositoryRoot, "bench", "results", "long-document-context-0.1.0-alpha.3.json"),
+      path.join(repositoryRoot, "bench", "results", "long-document-context-0.1.0.json"),
       "utf8"
     ));
     assert.equal(committed.schemaVersion, "qarinah.long-document-context-eval-result.v1");

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
+  "name": "io.github.AjnasNB/qarinah",
+  "description": "Read-only integrity and workspace diagnostics for local Qarinah project memory.",
+  "repository": {
+    "url": "https://github.com/AjnasNB/qarinah",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "qarinah",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "qarinah.context-eval-result.v1",
-  "packageVersion": "0.1.0-alpha.3",
+  "packageVersion": "0.1.0",
   "fixture": {
     "records": 54,
     "cases": 4,
