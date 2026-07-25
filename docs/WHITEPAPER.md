@@ -460,6 +460,8 @@ Context disclosure is not an ambient MCP side effect. A direct local query must 
 
 ### 12.1 Maqam
 
+[Maqam](https://github.com/AjnasNB/maqam) ([documentation](https://maqamagent.com/docs/)) is a TypeScript governance boundary for registered AI-agent operations. It evaluates policy before dispatch, can bind human approval to the exact run, tool, and input, consumes that approval once by default, and produces reviewable trace and evidence records. Qarinah remains a separate memory layer; Maqam can optionally govern exactly which Qarinah context reads and writes a host may perform.
+
 Maqam can register two separate Qarinah tools:
 
 | Tool | Effect | Risk | Required authority |
@@ -472,6 +474,8 @@ The gateway verifier binds the active input and context objects, tool registrati
 This governs registered calls. It does not mediate unregistered code, raw drivers retained by a host, or direct operating-system effects.
 
 ### 12.2 Cockroach Crawler
+
+[Cockroach Crawler](https://github.com/AjnasNB/cockroach-crawler) ([documentation](https://cockroachcrawler.com/docs/)) is a Node.js and TypeScript web-acquisition toolkit for AI agents. It crawls static and rendered pages, extracts normalized records, and routes supported public sources while keeping origins, credentials, browser capabilities, and resource ceilings under host control. Qarinah does not embed the crawler; it accepts reviewed `SourceRecord` values as source evidence through a strict interoperability boundary.
 
 Qarinah validates a strict structural boundary around Cockroach Crawler `SourceRecord` values. Ingestion separates:
 
