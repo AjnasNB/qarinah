@@ -131,7 +131,7 @@ try {
     queryMs: Math.round(queryMs * 100) / 100
   };
   const committed = JSON.parse(await readFile(
-    path.join(repositoryRoot, "bench", "results", "context-evaluation-0.1.0.json"),
+    path.join(repositoryRoot, "bench", "results", "context-evaluation-0.1.1.json"),
     "utf8"
   ));
   assert.equal(committed.schemaVersion, "qarinah.context-eval-result.v1");

@@ -8,7 +8,7 @@ This file is a convenience map for tools that choose to read it. It does not con
 
 - Name: Qarinah
 - Package: `qarinah`
-- Current documented release: `0.1.0`
+- Current documented release: `0.1.1`
 - Website: https://qarinah.io/
 - npm: https://www.npmjs.com/package/qarinah
 - Source: https://github.com/AjnasNB/qarinah
@@ -105,9 +105,9 @@ The documented retrieval benchmark reports recall@5 of 1.0, mean reciprocal rank
 The documented long-document fixture is segmented synthetic retrieval, not whole-book summarization, native PDF ingestion, or provider-billed token usage.
 
 - Methodology and qualifications: https://qarinah.io/docs/benchmarks/
-- Software-task machine-readable result: https://github.com/AjnasNB/qarinah/blob/main/bench/results/software-task-context-0.1.0.json
-- Retrieval machine-readable result: https://github.com/AjnasNB/qarinah/blob/main/bench/results/context-evaluation-0.1.0.json
-- Long-document machine-readable result: https://github.com/AjnasNB/qarinah/blob/main/bench/results/long-document-context-0.1.0.json
+- Software-task machine-readable result: https://github.com/AjnasNB/qarinah/blob/main/bench/results/software-task-context-0.1.1.json
+- Retrieval machine-readable result: https://github.com/AjnasNB/qarinah/blob/main/bench/results/context-evaluation-0.1.1.json
+- Long-document machine-readable result: https://github.com/AjnasNB/qarinah/blob/main/bench/results/long-document-context-0.1.1.json
 
 ## Documentation map
 

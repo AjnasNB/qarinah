@@ -11,7 +11,7 @@ const npmPackage = "https://www.npmjs.com/package/qarinah";
 const doi = "https://doi.org/10.5281/zenodo.21547685";
 const zenodoPdf = "https://zenodo.org/records/21547685/files/Qarinah-Technical-White-Paper-v1.0.pdf?download=1";
 const releaseDate = "2026-07-25";
-const productVersion = "0.1.0";
+const productVersion = "0.1.1";
 
 const docPages = [
   {
@@ -427,7 +427,7 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
         distribution: {
           "@type": "DataDownload",
           encodingFormat: "application/json",
-          contentUrl: `${github}/blob/main/bench/results/software-task-context-0.1.0.json`
+          contentUrl: `${github}/blob/main/bench/results/software-task-context-0.1.1.json`
         }
       }
     );
