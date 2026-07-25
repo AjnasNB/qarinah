@@ -9,6 +9,8 @@
 **License:** Apache License 2.0<br>
 **Status:** Public technical white paper backed by a working prerelease implementation
 
+[Download the publication PDF](https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.0.pdf)
+
 > Qarinah turns permitted agent activity, project structure, decisions, approvals, and source evidence into a local, verifiable record. When a later task needs context, Qarinah compiles a small cited pack instead of replaying the complete project history.
 
 <p align="center">
