@@ -27,7 +27,15 @@ function runNode(args, cwd) {
 try {
   const packed = await runNode([npmCli, "pack", "--json", "--ignore-scripts", "--pack-destination", temporaryDirectory], repositoryRoot);
   assert.equal(packed.code, 0, packed.stderr);
-  const [{ filename }] = JSON.parse(packed.stdout);
+  const packOutput = JSON.parse(packed.stdout);
+  const packRecords = Array.isArray(packOutput)
+    ? packOutput
+    : typeof packOutput?.filename === "string"
+      ? [packOutput]
+      : Object.values(packOutput ?? {}).filter((entry) => typeof entry?.filename === "string");
+  assert.equal(packRecords.length, 1, "npm pack --json did not return exactly one package record.");
+  const [packRecord] = packRecords;
+  const { filename } = packRecord;
   const tarball = path.join(temporaryDirectory, filename);
 
   await writeFile(path.join(temporaryDirectory, "package.json"), `${JSON.stringify({ name: "qarinah-clean-consumer", private: true, type: "module" }, null, 2)}\n`);
