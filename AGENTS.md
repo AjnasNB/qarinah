@@ -8,4 +8,4 @@
 - Use strict versioned contracts, bounded inputs, root-bound paths, atomic replacements, and adversarial tests.
 - A summary is lossy. Preserve its source event IDs and content digests.
 - Public API changes require JavaScript exports, declarations, schemas, clean-consumer tests, and migration notes.
-- Run `npm run check` before proposing a merge. Do not publish while `package.json` is private or issue #10 is open.
+- Run `npm run check` before proposing a merge. Publish only an exact reviewed artifact from an exact reviewed commit.

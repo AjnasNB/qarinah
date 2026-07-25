@@ -1,4 +1,4 @@
-# Qarinah public-alpha launch kit
+# Qarinah 0.1.0 launch kit
 
 Last verified: 2026-07-22.
 
@@ -26,7 +26,7 @@ Keep the scope beside the number: identical current-task source snippets in both
 ## First proof after release
 
 ```sh
-npm install --save-dev qarinah@next
+npm install --save-dev qarinah
 npx qarinah init .
 npx qarinah record --kind decision --title "Keep releases provenance-bound" --body "Publish only the reviewed artifact."
 npx qarinah scan
@@ -39,7 +39,7 @@ npx qarinah doctor
 
 1. Complete name, copyright, third-party, secret-history, privacy, and threat-model gates.
 2. Pass the full check and real Codex/Claude plugin install matrix on Node.js 22, 24, and 26.
-3. Publish the exact reviewed `0.1.0-alpha.3` artifact under npm `next` with provenance and a matching GitHub prerelease.
+3. Publish the exact reviewed `0.1.0` artifact under npm `latest` with provenance and a matching GitHub release.
 4. Verify a registry-only install, plugin reinstall, new-task startup, project opt-in, query, doctor, and uninstall.
 5. Publish one personally written Show HN submission with a runnable no-signup proof.
 6. Publish different technical artifacts during the next week: ledger integrity, retrieval coverage, host integration, benchmark method, and Maqam disclosure.

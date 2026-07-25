@@ -736,13 +736,13 @@ def cover_story():
         HRFlowable(width="100%", thickness=1.1, color=GREEN, spaceAfter=5 * mm),
         Paragraph(
             "<b>Ajnas NB</b><br/>Paper version 1.0 - July 2026<br/>"
-            "Qarinah 0.1.0-alpha.3 technical preview<br/>Apache License 2.0",
+            "Qarinah 0.1.0 stable open-source release<br/>Apache License 2.0",
             STYLES["cover-meta"],
         ),
         Spacer(1, 6 * mm),
         Paragraph(
             "<b>Status:</b> Implementation-backed technical white paper. "
-            "Qarinah is currently in alpha, and the paper has not undergone independent peer review.",
+            "The paper documents Qarinah 0.1.0 and has not undergone independent peer review.",
             STYLES["cover-meta"],
         ),
         NextPageTemplate("Body"),

@@ -7,6 +7,12 @@
 <p align="center"><em>Less context. More proof.</em></p>
 
 <p align="center">
+  <a href="https://qarinah.io"><strong>Website</strong></a>&nbsp;&middot;&nbsp;
+  <a href="https://qarinah.io/docs/"><strong>Documentation</strong></a>&nbsp;&middot;&nbsp;
+  <a href="https://qarinah.io/paper/"><strong>White paper</strong></a>
+</p>
+
+<p align="center">
   <code>LOCAL-FIRST</code>&nbsp;&nbsp;
   <code>EVIDENCE-LINKED</code>&nbsp;&nbsp;
   <code>GRAPH-AWARE</code>&nbsp;&nbsp;
@@ -41,7 +47,7 @@
 
 <p align="center"><em>Nearly 99% less repeated context. Every selected memory points back to its source.</em></p>
 
-> Successfully verified across React editing, database migration, TypeScript refactoring, web research, production debugging, and governed release work. The evaluated tasks sent 436,431 fewer estimated input-context tokens. At a flat $1 per million uncached input tokens, that compared context slice moves from $0.4421 to $0.0057 - 98.71% less input-context cost under the same unit price. The percentage is independent of the chosen flat unit price; the portable token estimate excludes output, tools, caching, and fixed provider charges. See the [machine-readable result](bench/results/software-task-context-0.1.0-alpha.3.json) and [methodology](docs/BENCHMARKS.md).
+> Successfully verified across React editing, database migration, TypeScript refactoring, web research, production debugging, and governed release work. The evaluated tasks sent 436,431 fewer estimated input-context tokens. At a flat $1 per million uncached input tokens, that compared context slice moves from $0.4421 to $0.0057 - 98.71% less input-context cost under the same unit price. The percentage is independent of the chosen flat unit price; the portable token estimate excludes output, tools, caching, and fixed provider charges. See the [machine-readable result](bench/results/software-task-context-0.1.0.json) and [methodology](docs/BENCHMARKS.md).
 
 Your project already contains the decisions and evidence behind its changes. Qarinah lets the next agent query that record and receive a bounded, cited pack selected for the current task.
 
@@ -104,11 +110,11 @@ Qarinah is intentionally small, local, and inspectable:
 Qarinah requires a maintained Node.js 22, 24, or 26 release.
 
 ```sh
-npm install --save-dev qarinah@next
+npm install --save-dev qarinah
 npx qarinah init .
 ```
 
-Until the first public npm prerelease is approved, clone the repository and use `node bin/qarinah.js` in place of `npx qarinah`.
+The package is designed for local use. It does not require a hosted Qarinah account, embedding service, or Qarinah API key.
 
 ## Initialize once, remember across supported sessions
 
@@ -211,30 +217,30 @@ The repository also runs `npm run mcp:smoke` against the exact bundled Codex and
 
 ### Install once, initialize each project
 
-After the public `v0.1.0-alpha.3` release is approved, install the reviewed plugin once in each host:
+Install the reviewed `v0.1.0` plugin once in each host:
 
 ```sh
 # Codex: personal installation, available to opted-in projects.
-codex plugin marketplace add AjnasNB/qarinah --ref v0.1.0-alpha.3
+codex plugin marketplace add AjnasNB/qarinah --ref v0.1.0
 codex plugin add qarinah@qarinah
 
 # Claude Code: personal installation across projects.
-claude plugin marketplace add AjnasNB/qarinah@v0.1.0-alpha.3 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.1.0 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 
 Then opt in from the root of each project that should retain context:
 
 ```sh
-npx -y qarinah@next init . --capture content
-npx -y qarinah@next scan
-npx -y qarinah@next doctor
+npx -y qarinah@latest init . --capture content
+npx -y qarinah@latest scan
+npx -y qarinah@latest doctor
 ```
 
 Use `--capture metadata` when event bodies should not be retained. Content mode records only bounded, redacted fields exposed by supported hooks; it does not parse hidden transcripts or reasoning. At the start of a later task, ask the installed Qarinah context skill for direct evidence related to the task, or run a bounded query:
 
 ```sh
-npx -y qarinah@next query "checkout dialog focus trap" \
+npx -y qarinah@latest query "checkout dialog focus trap" \
   --minimum-coverage direct \
   --max-tokens 1500 \
   --reserve-tokens 200 \

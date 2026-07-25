@@ -4,3 +4,5 @@ coverage/
 .qarinah/
 benchmark-results/
 *.tgz
+site-dist/
+tmp/

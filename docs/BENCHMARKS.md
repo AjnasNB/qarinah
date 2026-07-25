@@ -33,7 +33,7 @@ The six-task benchmark sends 436,431 fewer estimated input-context tokens. At a 
 
 This translation is useful because the percentage is independent of the chosen flat unit price. It is not a provider invoice: output tokens, tool calls, cached-input discounts, indexing, retrieval, and fixed provider charges remain separate.
 
-The exact scenario sources, expected decisions, unrelated retained history, queries, arithmetic, and per-task results are committed in [`bench/fixtures/software-task-scenarios.mjs`](../bench/fixtures/software-task-scenarios.mjs), [`scripts/evaluate-software-tasks.mjs`](../scripts/evaluate-software-tasks.mjs), and [`bench/results/software-task-context-0.1.0-alpha.3.json`](../bench/results/software-task-context-0.1.0-alpha.3.json). The evaluator fails when any committed deterministic result changes.
+The exact scenario sources, expected decisions, unrelated retained history, queries, arithmetic, and per-task results are committed in [`bench/fixtures/software-task-scenarios.mjs`](../bench/fixtures/software-task-scenarios.mjs), [`scripts/evaluate-software-tasks.mjs`](../scripts/evaluate-software-tasks.mjs), and [`bench/results/software-task-context-0.1.0.json`](../bench/results/software-task-context-0.1.0.json). The evaluator fails when any committed deterministic result changes.
 
 ## Long-document retrieval benchmark
 
@@ -59,7 +59,7 @@ The evaluator constructs a deterministic 384-section synthetic operations handbo
 | Unsupported questions rejected with direct coverage required | 4 / 4 |
 | Model-written summary items | 0 |
 
-The result verifies targeted, evidence-linked retrieval from a large pre-segmented source under a fixed budget. The unsupported controls require `direct` evidence coverage; the benchmark does not claim that every unsupported query is rejected when callers permit partial lexical coverage. It also does not demonstrate whole-book summarization, native PDF ingestion, semantic answer quality, or a provider's exact token bill. The portable estimate is `ceil(characters / 4)`. The source generator, assertions, and machine-readable expected result are committed in [`scripts/evaluate-long-document.mjs`](../scripts/evaluate-long-document.mjs) and [`bench/results/long-document-context-0.1.0-alpha.3.json`](../bench/results/long-document-context-0.1.0-alpha.3.json).
+The result verifies targeted, evidence-linked retrieval from a large pre-segmented source under a fixed budget. The unsupported controls require `direct` evidence coverage; the benchmark does not claim that every unsupported query is rejected when callers permit partial lexical coverage. It also does not demonstrate whole-book summarization, native PDF ingestion, semantic answer quality, or a provider's exact token bill. The portable estimate is `ceil(characters / 4)`. The source generator, assertions, and machine-readable expected result are committed in [`scripts/evaluate-long-document.mjs`](../scripts/evaluate-long-document.mjs) and [`bench/results/long-document-context-0.1.0.json`](../bench/results/long-document-context-0.1.0.json).
 
 ## Retrieval-regression fixture
 
@@ -81,11 +81,11 @@ The evaluator creates a deterministic 54-record local workspace, runs four fixed
 - character reduction;
 - local query time.
 
-The 2026-07-21 `0.1.0-alpha.3` release-candidate run on Node `24.15.0` for Windows x64 produced recall@5 `1.0`, mean reciprocal rank `1.0`, conflict recall `1.0`, supersession precision `1.0`, average pack size `2,237` characters, raw replay size `44,364` characters per query, and character reduction `94.96%`. Context-pack v2 is larger than v1 because it includes explicit evidence-coverage metadata.
+The preserved 2026-07-21 release-candidate run on Node `24.15.0` for Windows x64 produced recall@5 `1.0`, mean reciprocal rank `1.0`, conflict recall `1.0`, supersession precision `1.0`, average pack size `2,237` characters, raw replay size `44,364` characters per query, and character reduction `94.96%`. Context-pack v2 is larger than v1 because it includes explicit evidence-coverage metadata.
 
 This four-case fixture remains a focused regression check for exact retrieval, typo tolerance, graph evidence, conflict visibility, and supersession. The larger software-task benchmark above is the public context-volume example.
 
-The deterministic values are committed in [`bench/results/context-evaluation-0.1.0-alpha.3.json`](../bench/results/context-evaluation-0.1.0-alpha.3.json). The evaluator reads that file and fails when a release changes any expected retrieval or context-volume field without updating the evidence.
+The deterministic values are committed in [`bench/results/context-evaluation-0.1.0.json`](../bench/results/context-evaluation-0.1.0.json). The evaluator reads that file and fails when a release changes any expected retrieval or context-volume field without updating the evidence.
 
 ## Fixed-workspace volume observation
 

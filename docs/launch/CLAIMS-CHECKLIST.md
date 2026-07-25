@@ -4,7 +4,7 @@
 
 - [ ] Name, copyright, Apache-2.0, notices, privacy, trademark, and complete Git-history reviews are approved.
 - [ ] The repository is public only after the secret and legal gates pass.
-- [ ] `0.1.0-alpha.3` is published under npm `next` with provenance and a matching GitHub prerelease.
+- [ ] `0.1.0` is published under npm `latest` with provenance and a matching GitHub release.
 - [ ] Registry-only npm, Codex, and Claude Code installs pass on Node.js 22, 24, and 26.
 - [ ] The exact package, plugin runtimes, hashes, integrity, commit, workflow, and approver are recorded.
 

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "qarinah.long-document-context-eval-result.v1",
-  "packageVersion": "0.1.0-alpha.3",
+  "packageVersion": "0.1.0",
   "expected": {
     "fixture": {
       "description": "Deterministic 384-section synthetic operations handbook segmented into retained source records, with eight answer-bearing sections, fixed-budget exact and typo-tolerant queries, near-match distractors, and unsupported controls.",
