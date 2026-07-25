@@ -390,6 +390,9 @@ async function markdownPage(page) {
   const markdown = rewriteMarkdownLinks(normalizeVisibleCopy(raw), page.source);
   const rendered = addHeadingIds(marked.parse(markdown));
   const active = page.route === "paper" ? "paper" : page.route.endsWith("benchmarks") ? "benchmarks" : "docs";
+  const publicationLink = page.route === "paper"
+    ? '<a href="https://doi.org/10.5281/zenodo.21547685">Cite on Zenodo</a>'
+    : "";
 
   return layout({
     title: page.title,
@@ -409,7 +412,10 @@ async function markdownPage(page) {
           <a href="/paper/">White paper</a>
         </aside>
         <article class="markdown-body doc-content">
-          <div class="doc-meta"><span>Qarinah 0.1.0</span><a href="${github}/blob/main/${page.source}">Edit on GitHub</a></div>
+          <div class="doc-meta">
+            <span>Qarinah 0.1.0</span>
+            <span class="doc-meta-links">${publicationLink}<a href="${github}/blob/main/${page.source}">Edit on GitHub</a></span>
+          </div>
           ${rendered}
         </article>
         <aside class="page-toc" aria-label="On this page">
