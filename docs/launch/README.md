@@ -8,7 +8,7 @@ This kit is prepared but blocked from publication until every gate in [../LAUNCH
 
 > Stop replaying entire agent histories.
 
-Qarinah keeps permitted project activity and explicit decisions in a local evidence-linked record, then returns only the small cited pack a later agent needs.
+Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust. It keeps permitted project activity and explicit decisions in a local evidence-linked record, then returns only the small cited pack a later agent needs.
 
 ## Proof line
 

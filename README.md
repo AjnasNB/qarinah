@@ -5,7 +5,7 @@
 <h1 align="center">Qarinah</h1>
 
 <p align="center"><em>Less context. More proof.</em></p>
-<p align="center"><strong>Local project memory and a context compiler for coding agents.</strong></p>
+<p align="center"><strong>Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.</strong></p>
 
 <p align="center">
   <a href="https://qarinah.io"><strong>Website</strong></a>&nbsp;&middot;&nbsp;

@@ -1,17 +1,17 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
   "name": "io.github.AjnasNB/qarinah",
-  "description": "Read-only integrity and workspace diagnostics for local Qarinah project memory.",
+  "description": "Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.",
   "repository": {
     "url": "https://github.com/AjnasNB/qarinah",
     "source": "github"
   },
-  "version": "0.1.1",
+  "version": "0.1.2",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "qarinah",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "transport": {
         "type": "stdio"
       }

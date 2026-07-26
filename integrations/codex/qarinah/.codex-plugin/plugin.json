@@ -1,7 +1,7 @@
 {
   "name": "qarinah",
-  "version": "0.1.1",
-  "description": "Qarinah: opt-in, evidence-linked local context capture and compilation for Codex.",
+  "version": "0.1.2",
+  "description": "Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.",
   "author": {
     "name": "Ajnas NB",
     "email": "ajnasnb@gmail.com",
@@ -15,7 +15,7 @@
   "interface": {
     "displayName": "Qarinah",
     "shortDescription": "Opt-in, evidence-linked local context.",
-    "longDescription": "Qarinah captures explicitly permitted Codex lifecycle metadata into a local tamper-evident record. Read-only MCP tools report status and integrity; explicit local or Maqam-governed queries compile small cited context packs.",
+    "longDescription": "Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust. It captures explicitly permitted Codex lifecycle metadata into a local tamper-evident record. Read-only MCP tools report status and integrity; explicit local or Maqam-governed queries compile small cited context packs.",
     "developerName": "Ajnas NB",
     "category": "Productivity",
     "capabilities": ["Interactive", "Write"],

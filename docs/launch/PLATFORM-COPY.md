@@ -4,7 +4,7 @@ Do not publish these drafts until the gates in [../LAUNCH.md](../LAUNCH.md) are 
 
 ## Canonical descriptions
 
-**Tagline:** Use your biggest coding model with compact, cited project memory.
+**Tagline:** Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.
 
 **Proof tagline:** Nearly 99% less repeated project context. Every selected memory points back to its source.
 
@@ -12,9 +12,9 @@ Do not publish these drafts until the gates in [../LAUNCH.md](../LAUNCH.md) are 
 
 **Coding value line:** Less replay. More room for current code, tools, and cited project memory.
 
-**GitHub About:** 98.71% less estimated context - local, cited, graph-aware project memory for Codex, Claude Code, and CLI workflows, with MCP diagnostics.
+**GitHub About:** Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.
 
-**npm description:** 98.71% less estimated context - local, cited project memory for Codex, Claude Code, and CLI workflows.
+**npm description:** Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust. 98.71% less estimated repeated context.
 
 **Short:** Qarinah is local-first project memory for AI agents. It records permitted activity and explicit decisions in an evidence-linked ledger, then compiles a small cited pack for the next task.
 
@@ -40,7 +40,7 @@ Possible factual title to rewrite:
 
 **Tagline:** Use your biggest coding model with compact, cited project memory
 
-**Description (under 260 characters):** Local-first project memory for Codex, Claude Code, and other agents. Record permitted decisions and tool outcomes, then retrieve a small cited context pack instead of replaying the whole history. No Qarinah API key.
+**Description (under 260 characters):** Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust. Works locally with Codex, Claude Code, CLI, and compatible MCP clients. No Qarinah API key.
 
 **Topics:** Developer Tools, Artificial Intelligence, Open Source, Productivity
 

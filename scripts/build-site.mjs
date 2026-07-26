@@ -10,12 +10,13 @@ const siteOrigin = "https://qarinah.io";
 const npmPackage = "https://www.npmjs.com/package/qarinah";
 const doi = "https://doi.org/10.5281/zenodo.21547685";
 const zenodoPdf = "https://zenodo.org/records/21547685/files/Qarinah-Technical-White-Paper-v1.0.pdf?download=1";
-const releaseDate = "2026-07-25";
-const productVersion = "0.1.1";
+const releaseDate = "2026-07-26";
+const productVersion = "0.1.2";
+const productPositioning = "Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.";
 const answerEngineQuestions = [
   {
     name: "What is Qarinah?",
-    text: "Qarinah is local, evidence-linked project memory for coding agents. It records explicitly permitted project events, builds deterministic graph and retrieval views, and compiles a small cited context pack for the current task."
+    text: `${productPositioning} It records explicitly permitted project events, builds deterministic graph and retrieval views, and compiles a small cited context pack for the current task.`
   },
   {
     name: "Does Qarinah reduce coding-agent context tokens?",
@@ -175,7 +176,7 @@ const searchEntries = [
   {
     route: "/",
     title: "Qarinah - Local Project Memory and Context Compiler for Coding Agents",
-    description: "Local, cross-editor project memory that compiles small cited context packs for Codex, Claude Code, CLIs, and coding agents.",
+    description: productPositioning,
     headings: [],
     keywords: ["coding agent memory", "project memory", "context compiler", "token-efficient context"],
     content: "Qarinah keeps a local evidence-linked project record and compiles the small cited context pack needed for the current coding task."
@@ -291,7 +292,7 @@ function footer() {
       <div class="shell footer-grid">
         <div>
           <a class="brand footer-brand" href="/"><img src="/assets/qarinah-mark.svg" width="28" height="28" alt=""><span>Qarinah</span></a>
-          <p>Less context. More proof.</p>
+          <p>${productPositioning}</p>
         </div>
         <div>
           <strong>Build</strong>
@@ -575,7 +576,7 @@ function commandBlock(command, label = "Terminal") {
 function homePage() {
   return layout({
     title: "Qarinah",
-    description: "Local, cross-editor project memory that compiles small cited context packs for Codex, Claude Code, CLIs, and coding agents.",
+    description: productPositioning,
     active: "home",
     canonical: "/",
     kind: "home",
@@ -585,7 +586,7 @@ function homePage() {
           <div class="hero-copy">
             <p class="eyebrow">Cross-editor project memory for coding agents</p>
             <h1>Your agents remember the project. You stop paying to replay it.</h1>
-            <p class="hero-lede">Qarinah turns project decisions, code structure, tool outcomes, and evidence into a small cited memory pack for the task in front of you.</p>
+            <p class="hero-lede"><strong>${productPositioning}</strong> It turns project decisions, code structure, tool outcomes, and evidence into a small cited memory pack for the task in front of you.</p>
             <div class="hero-actions">
               <a class="btn btn-primary btn-large" href="/docs/getting-started/">Install Qarinah</a>
               <a class="btn btn-outline btn-large" href="${github}">View source</a>
