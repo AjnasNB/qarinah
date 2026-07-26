@@ -1,6 +1,6 @@
 # Getting started
 
-Qarinah gives a coding agent a small, cited slice of project memory instead of replaying the full retained history. The record stays in the project and the generated graph, index, Markdown, JSON, and OKF views can be rebuilt from it.
+Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust. It gives a coding agent a small, cited slice of project memory instead of replaying the full retained history. The record stays in the project and the generated graph, index, Markdown, JSON, and OKF views can be rebuilt from it.
 
 ## Requirements
 

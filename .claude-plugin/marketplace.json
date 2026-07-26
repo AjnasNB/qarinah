@@ -4,13 +4,13 @@
     "name": "Ajnas NB"
   },
   "metadata": {
-    "description": "Qarinah integrations for evidence-linked local agent context"
+    "description": "Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust."
   },
   "plugins": [
     {
       "name": "qarinah",
       "source": "./integrations/claude/qarinah",
-      "description": "Opt-in, evidence-linked local context capture and bounded retrieval for Claude Code",
+      "description": "Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.",
       "category": "productivity",
       "tags": ["context", "provenance", "governance"]
     }

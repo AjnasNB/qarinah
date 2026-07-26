@@ -1,7 +1,7 @@
 {
   "name": "qarinah",
-  "version": "0.1.1",
-  "description": "Local project memory and cited context packs for coding agents, with 98.71% less estimated repeated context in the published benchmark.",
+  "version": "0.1.2",
+  "description": "Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust. 98.71% less estimated repeated context.",
   "license": "Apache-2.0",
   "author": "Ajnas NB",
   "mcpName": "io.github.AjnasNB/qarinah",

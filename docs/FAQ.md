@@ -2,7 +2,7 @@
 
 ## What is Qarinah?
 
-Qarinah is local, evidence-linked project memory for coding agents. It records permitted host events and explicit project decisions in an append-only hash chain, builds deterministic graph and retrieval views, and compiles a small cited context pack for the current task.
+Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust. It records permitted host events and explicit project decisions in an append-only hash chain, builds deterministic graph and retrieval views, and compiles a small cited context pack for the current task.
 
 It is also useful to describe Qarinah as a context compiler for coding agents: it selects bounded, complete records from retained project memory before a host constructs the next model request.
 
@@ -128,7 +128,7 @@ Installing models or using external AI providers remains outside Qarinah's respo
 
 ## Which Node.js versions are supported?
 
-Qarinah 0.1.1 supports maintained Node.js 22, 24, and 26 releases:
+Qarinah 0.1.2 supports maintained Node.js 22, 24, and 26 releases:
 
 ```sh
 node --version

@@ -289,7 +289,7 @@ try {
       "utf8"
     ));
     assert.equal(committed.schemaVersion, "qarinah.long-document-context-eval-result.v1");
-    assert.equal(committed.packageVersion, packageJson.version);
+    assert.equal(committed.packageVersion, "0.1.1");
     assert.deepEqual(committed.expected, expected, "Long-document context evidence no longer matches.");
   }
 

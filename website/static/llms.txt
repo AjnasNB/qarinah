@@ -1,6 +1,8 @@
 # Qarinah
 
-> Qarinah is a local-first, evidence-linked project memory for coding agents. It records explicitly permitted project events and compiles bounded, cited context packs from the verified local record.
+> Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.
+
+It records explicitly permitted project events and compiles bounded, cited context packs from the verified local record.
 
 This file is a convenience map for tools that choose to read it. It is not a ranking signal or a substitute for the canonical documentation.
 
@@ -15,7 +17,7 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 
 ## Direct facts
 
-- Qarinah is local, evidence-linked project memory and a bounded context compiler for coding agents.
+- Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.
 - Qarinah supports reviewed Codex and Claude Code integrations that can use the same explicitly opted-in project record.
 - The published evaluator measured 98.71% less estimated repeated input context in its compared task set: 442,113 estimated input-context tokens became 5,682 while every required target was directly covered in the top five.
 - The 98.71% result is not a universal provider-billing, latency, or answer-quality guarantee. Qarinah improves provenance and inspectability but cannot guarantee a model answer is correct.

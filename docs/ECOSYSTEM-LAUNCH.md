@@ -34,9 +34,9 @@ Never describe a local candidate as published until the registry, tag, and publi
 
 ### Brand line
 
-> **Less context. More proof.**
+> **Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.**
 
-This is the repeatable Qarinah tagline. It is short enough for GitHub, npm, the website, video end cards, and social profiles.
+This is the canonical Qarinah positioning line for GitHub, npm, the website, launch pages, and social profiles. **Less context. More proof.** remains the compact campaign sign-off.
 
 ### Current proof line
 

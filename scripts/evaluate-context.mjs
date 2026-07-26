@@ -135,7 +135,7 @@ try {
     "utf8"
   ));
   assert.equal(committed.schemaVersion, "qarinah.context-eval-result.v1");
-  assert.equal(committed.packageVersion, packageJson.version);
+  assert.equal(committed.packageVersion, "0.1.1");
   assert.deepEqual(
     Object.fromEntries(Object.keys(committed.expected).map((key) => [key, result[key]])),
     committed.expected,

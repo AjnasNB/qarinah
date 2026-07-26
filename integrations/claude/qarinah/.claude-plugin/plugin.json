@@ -1,7 +1,7 @@
 {
   "name": "qarinah",
-  "version": "0.1.1",
-  "description": "Qarinah: opt-in, evidence-linked local context capture and bounded retrieval for Claude Code.",
+  "version": "0.1.2",
+  "description": "Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.",
   "author": {
     "name": "Ajnas NB",
     "email": "ajnasnb@gmail.com",

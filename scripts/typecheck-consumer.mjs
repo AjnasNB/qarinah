@@ -119,7 +119,7 @@ try {
   const checked = await runNode([typeScriptCli, "--project", path.join(temporaryDirectory, "tsconfig.json")], temporaryDirectory);
   assert.equal(checked.code, 0, `${checked.stdout}\n${checked.stderr}`);
   const installedPackage = JSON.parse(await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "package.json"), "utf8"));
-  assert.equal(installedPackage.version, "0.1.1");
+  assert.equal(installedPackage.version, "0.1.2");
   process.stdout.write("Clean consumer TypeScript contract passed.\n");
 } finally {
   await rm(temporaryDirectory, { recursive: true, force: true });

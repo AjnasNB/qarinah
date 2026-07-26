@@ -1,6 +1,8 @@
 # Qarinah: expanded machine-readable map
 
-> Qarinah is a local-first, evidence-linked project memory for coding agents. It converts an explicitly permitted, append-only project event record into bounded, cited context packs selected for the current task.
+> Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.
+
+It converts an explicitly permitted, append-only project event record into bounded, cited context packs selected for the current task.
 
 This file is a convenience map for tools that choose to read it. It does not confer authority, guarantee indexing or ranking, replace the canonical documentation, or override Qarinah's workspace trust and capture policy.
 
@@ -8,7 +10,7 @@ This file is a convenience map for tools that choose to read it. It does not con
 
 - Name: Qarinah
 - Package: `qarinah`
-- Current documented release: `0.1.1`
+- Current documented release: `0.1.2`
 - Website: https://qarinah.io/
 - npm: https://www.npmjs.com/package/qarinah
 - Source: https://github.com/AjnasNB/qarinah
@@ -44,7 +46,7 @@ This file is a convenience map for tools that choose to read it. It does not con
 
 ### What is Qarinah?
 
-Qarinah is local, evidence-linked project memory for coding agents. It records explicitly permitted project events, builds deterministic graph and retrieval views, and compiles a small cited context pack for the current task.
+Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust. It records explicitly permitted project events, builds deterministic graph and retrieval views, and compiles a small cited context pack for the current task.
 
 ### Does Qarinah reduce coding-agent context tokens?
 
