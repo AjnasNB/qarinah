@@ -607,6 +607,7 @@ import { captureClaudeHook } from "qarinah/claude";
 function createMcpServer(options?: {
   cwd?: string;
   write?: (message: unknown) => void;
+  queryPermit?: { policyHash: `sha256:${string}`; maxChars?: number; maxItems?: number };
 }): QarinahMcpServer;
 ```
 
@@ -628,12 +629,38 @@ function runMcpServer(options?: {
   input?: AsyncIterable<Uint8Array | string>;
   maximumFrameBytes?: number;
   write?: (message: unknown) => void;
+  queryPermit?: { policyHash: `sha256:${string}`; maxChars?: number; maxItems?: number };
 }): Promise<void>;
 ```
 
 Runs newline-delimited stdio transport. Default maximum frame size is 1 MiB; the accepted configured range is 1,024 through 16,777,216 bytes.
 
-The server exposes read-only `context_status` and `context_doctor`, not context disclosure or writes. See [MCP guide](MCP-GUIDE.md).
+The server always exposes zero-write `context_status` and `context_doctor`. A matching `queryPermit` adds bounded, zero-write `context.query`. It never exposes ledger writes. See [MCP guide](MCP-GUIDE.md).
+
+## Team-memory platform APIs
+
+The root package also exports:
+
+```text
+setupWorkspace
+buildMemoryDashboard
+renderMemoryDashboard
+writeMemoryDashboard
+inspectMemoryFreshness
+TASK_MEMORY_PACKS
+compileTaskMemoryPack
+compileFederatedContext
+rerankContextPack
+createTeamManifest
+createEncryptedSyncBundle
+decryptEncryptedSyncBundle
+createSignedCheckpoint
+verifySignedCheckpoint
+evaluateContextQuality
+createCausalReceipt
+```
+
+See [Shared and verifiable team memory](TEAM-MEMORY.md) for runnable examples and authority boundaries.
 
 ## Maqam interoperability
 

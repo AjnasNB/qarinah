@@ -4,7 +4,7 @@ Do not publish these drafts until the gates in [../LAUNCH.md](../LAUNCH.md) are 
 
 ## Canonical descriptions
 
-**Tagline:** Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.
+**Tagline:** The shared, verifiable memory layer for teams deploying multiple AI agents.
 
 **Proof tagline:** Nearly 99% less repeated project context. Every selected memory points back to its source.
 
@@ -12,9 +12,9 @@ Do not publish these drafts until the gates in [../LAUNCH.md](../LAUNCH.md) are 
 
 **Coding value line:** Less replay. More room for current code, tools, and cited project memory.
 
-**GitHub About:** Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.
+**GitHub About:** The shared, verifiable memory layer for teams deploying multiple AI agents.
 
-**npm description:** Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust. 98.71% less estimated repeated context.
+**npm description:** The shared, verifiable memory layer for teams deploying multiple AI agents. 98.71% less estimated repeated context in the published benchmark.
 
 **Short:** Qarinah is local-first project memory for AI agents. It records permitted activity and explicit decisions in an evidence-linked ledger, then compiles a small cited pack for the next task.
 
@@ -26,7 +26,7 @@ Hacker News asks users not to post generated or AI-edited text. Do not paste thi
 - Human problem: replaying the whole project history is expensive and noisy; opaque summaries are hard to verify.
 - Product: an append-only local event chain plus rebuildable graph, index, Markdown, and OKF projections.
 - Retrieval: BM25, typo-tolerant character trigrams, graph evidence, reciprocal-rank fusion, diversity, supersession, conflict, retention, time, authority, and explicit coverage checks.
-- Security: project opt-in and machine-local trust, metadata-only default, bounded redaction, read-only MCP diagnostics, and no hidden reasoning capture.
+- Security: project opt-in and machine-local trust, metadata-only default, bounded redaction, consent-gated zero-write MCP retrieval, and no hidden reasoning capture.
 - Benchmark: 98.71% less estimated context, with identical task sources and every target directly covered in the top five; not provider billing.
 - Ask: which real project should become the first independently reproduced fixture, and which missing-evidence failure should become a test?
 

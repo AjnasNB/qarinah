@@ -12,6 +12,7 @@ const required = [
   "docs/api/index.html",
   "docs/integrations/index.html",
   "docs/mcp/index.html",
+  "docs/team-memory/index.html",
   "docs/token-efficient-context/index.html",
   "docs/recipes/index.html",
   "docs/architecture/index.html",

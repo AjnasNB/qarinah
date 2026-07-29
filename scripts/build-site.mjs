@@ -12,7 +12,7 @@ const doi = "https://doi.org/10.5281/zenodo.21547685";
 const zenodoPdf = "https://zenodo.org/records/21547685/files/Qarinah-Technical-White-Paper-v1.0.pdf?download=1";
 const releaseDate = "2026-07-26";
 const productVersion = "0.1.2";
-const productPositioning = "Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.";
+const productPositioning = "The shared, verifiable memory layer for teams deploying multiple AI agents.";
 const answerEngineQuestions = [
   {
     name: "What is Qarinah?",
@@ -85,9 +85,17 @@ const docPages = [
     route: "docs/mcp",
     source: "docs/MCP-GUIDE.md",
     title: "MCP server guide",
-    description: "Install, configure, verify, and troubleshoot Qarinah read-only MCP diagnostics for supported agent clients.",
+    description: "Configure diagnostic-only or explicitly consent-gated, zero-write MCP context retrieval for supported agent clients.",
     section: "Connect",
     aliases: ["model context protocol", "mcp tools", "context status", "context doctor", "stdio"]
+  },
+  {
+    route: "docs/team-memory",
+    source: "docs/TEAM-MEMORY.md",
+    title: "Shared team memory",
+    description: "Set up shared, verifiable multi-agent memory, dashboards, freshness, federation, encrypted sync, evaluation, and causal receipts.",
+    section: "Connect",
+    aliases: ["team memory", "dashboard", "freshness", "multi repo", "encrypted sync", "context query", "task packs"]
   },
   {
     route: "docs/token-efficient-context",
@@ -393,7 +401,10 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
           "Typed project and provenance graph",
           "Budgeted hybrid retrieval",
           "Codex and Claude Code integrations",
-          "Read-only MCP diagnostics",
+          "Consent-gated MCP context retrieval",
+          "Multi-repository memory with separate authority",
+          "Freshness checks and a visual memory dashboard",
+          "Encrypted team bundles and signed checkpoints",
           "Deterministic Markdown, JSON, graph, and OKF exports"
         ],
         offers: {
@@ -609,7 +620,7 @@ function homePage() {
           <div><strong>98.71%</strong><span>less repeated context and input-context cost at the same token rate</span></div>
           <div><strong>77.81 to 1</strong><span>the evaluated full-history input was 77.81 times larger than the compiled context pack</span></div>
           <div><strong>100%</strong><span>required target coverage in the evaluated tasks</span></div>
-          <div><strong>Cross-editor</strong><span>Codex, Claude Code, CLI, and compatible MCP workflows</span></div>
+          <div><strong>Shared memory</strong><span>Codex, Claude Code, Cursor, CLI, and compatible MCP workflows</span></div>
         </div>
       </section>
 
@@ -660,12 +671,13 @@ function homePage() {
       <section class="section shell">
         <div class="section-heading">
           <p class="eyebrow">Works where you code</p>
-          <h2>Keep one local project memory across Codex, Claude Code, CLI workflows, and compatible MCP clients.</h2>
+          <h2>Keep one shared, verifiable project memory across Codex, Claude Code, Cursor, CLI workflows, and compatible MCP clients.</h2>
         </div>
         <div class="integration-list">
           <a href="/docs/integrations/"><span>Codex</span><strong>Lifecycle hooks and a Qarinah context skill</strong><i>Open guide</i></a>
           <a href="/docs/integrations/"><span>Claude Code</span><strong>Reviewed plugin runtime with project-specific opt-in</strong><i>Open guide</i></a>
-          <a href="/docs/mcp/"><span>MCP</span><strong>Read-only integrity and workspace diagnostics over stdio</strong><i>Open guide</i></a>
+          <a href="/docs/mcp/"><span>MCP</span><strong>Diagnostics by default, cited context only after explicit workspace authorization</strong><i>Open guide</i></a>
+          <a href="/docs/team-memory/"><span>Teams</span><strong>Dashboard, freshness, multi-repo packs, encrypted sync, evaluation, and causal receipts</strong><i>Open guide</i></a>
           <a href="/docs/interoperability/"><span>Open formats</span><strong>Markdown, JSON, typed graph, and Google OKF export</strong><i>Open guide</i></a>
         </div>
       </section>

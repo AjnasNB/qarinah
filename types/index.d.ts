@@ -161,7 +161,7 @@ export const CONFIG_SCHEMA_VERSION: "qarinah.config.v1";
 export const INDEX_SCHEMA_VERSION: "qarinah.index.v2";
 export const GRAPH_SCHEMA_VERSION: "qarinah.graph.v2";
 export const PROJECT_STRUCTURE_SCHEMA_VERSION: "qarinah.project-structure.v1";
-export const QARINAH_VERSION: "0.1.1";
+export const QARINAH_VERSION: "0.1.2";
 export const EVENT_KINDS: readonly QarinahEventKind[];
 export const RELATION_TYPES: readonly QarinahRelationType[];
 export function initializeWorkspace(target?: string, options?: { capture?: "metadata" | "content" }): Promise<QarinahWorkspace>;
@@ -234,6 +234,183 @@ export function createTokenBudget(options: {
   tokenEstimator?: QarinahTokenEstimator;
   reservations?: QarinahTokenReservation[];
 }, maxChars: number): Readonly<Record<string, unknown>>;
+export const TASK_MEMORY_PACKS: Readonly<Record<
+  "debugging" | "code-review" | "feature-implementation" | "database-migration"
+  | "incident-response" | "release-preparation" | "security-review",
+  Readonly<{ label: string; focus: string; minimumCoverage: "partial" }>
+>>;
+export function compileTaskMemoryPack(
+  task: keyof typeof TASK_MEMORY_PACKS,
+  query?: string,
+  options?: Parameters<typeof compileContext>[1]
+): Promise<Readonly<{
+  schemaVersion: "qarinah.task-memory-pack.v1";
+  task: keyof typeof TASK_MEMORY_PACKS;
+  label: string;
+  requestedQuery: string;
+  pack: QarinahContextPack;
+}>>;
+export function rerankContextPack(
+  pack: QarinahContextPack,
+  options?: {
+    adapter?: null | {
+      id?: string;
+      score(input: {
+        query: string;
+        candidates: readonly { eventId: string; title: string; excerpt: string }[];
+      }): Promise<Record<string, number>> | Record<string, number>;
+    };
+  }
+): Promise<QarinahContextPack & {
+  semanticRerank?: { adapter: string; candidateCount: number; scoredCount: number; authority: "rerank-only" };
+}>;
+export function compileFederatedContext(query: string, options: {
+  workspaces: Array<{ cwd: string; authority: string; maxChars?: number; limit?: number }>;
+  maxChars?: number;
+  limit?: number;
+  minimumCoverage?: "any" | "partial" | "direct";
+  rebuild?: boolean;
+  updateCheckpoint?: boolean;
+}): Promise<Readonly<{
+  schemaVersion: "qarinah.federated-context.v1";
+  query: string;
+  authorityBoundary: "separate-packs";
+  workspaces: Array<{ authority: string; workspaceId: string; pack: QarinahContextPack }>;
+  manifestHash: string;
+}>>;
+export interface QarinahFreshnessReport {
+  schemaVersion: "qarinah.memory-freshness.v1";
+  workspaceId: string;
+  status: "unavailable" | "current" | "stale";
+  snapshotEventId: string | null;
+  snapshotHash?: string;
+  counts: { current: number; changed: number; missing: number; unsafe: number };
+  files: Array<{
+    path: string;
+    status: "current" | "changed" | "missing" | "unsafe";
+    expectedHash: string;
+    observedHash?: string | null;
+    reason?: string;
+  }>;
+}
+export function inspectMemoryFreshness(options?: { cwd?: string; paths?: string[] }): Promise<Readonly<QarinahFreshnessReport>>;
+export interface QarinahTeamManifest {
+  schemaVersion: "qarinah.team-manifest.v1";
+  workspaceId: string;
+  teamId: string;
+  members: Array<{ id: string; role: "owner" | "maintainer" | "reader"; publicKey: string | null }>;
+  github: { organization: string; repository: string } | null;
+  manifestHash: string;
+}
+export function createTeamManifest(input: {
+  workspaceId: string;
+  teamId: string;
+  members: Array<{ id: string; role: "owner" | "maintainer" | "reader"; publicKey?: string }>;
+  github?: { organization: string; repository: string } | null;
+}): Readonly<QarinahTeamManifest>;
+export function createEncryptedSyncBundle(options: {
+  cwd?: string;
+  manifest: Parameters<typeof createTeamManifest>[0];
+  memberId: string;
+  key: Uint8Array;
+}): Promise<Readonly<Record<string, unknown>>>;
+export function decryptEncryptedSyncBundle(
+  bundle: Record<string, unknown>,
+  options: {
+    manifest: Parameters<typeof createTeamManifest>[0];
+    memberId: string;
+    key: Uint8Array;
+  }
+): Readonly<Record<string, unknown>>;
+export function createSignedCheckpoint(options: {
+  cwd?: string;
+  signer: string;
+  privateKey: string | object;
+  clock?: () => Date;
+}): Promise<Readonly<Record<string, unknown>>>;
+export function verifySignedCheckpoint(checkpoint: Record<string, unknown>, publicKey?: string): boolean;
+export function createCausalReceipt(input: Record<
+  "evidence" | "memory" | "policy" | "execution" | "observation",
+  { id: string; hash: `sha256:${string}`; system: string; timestamp: string }
+>): Readonly<Record<string, unknown>>;
+export interface QarinahMemoryDashboard {
+  schemaVersion: "qarinah.memory-dashboard.v1";
+  workspaceId: string;
+  generatedAt: string;
+  capture: "metadata" | "content";
+  totals: Record<string, number>;
+  contextSavings: {
+    status: "not-measured" | "measured";
+    baselineTokens: number | null;
+    deliveredTokens: number | null;
+    savedTokens: number | null;
+    savingsPercent: number | null;
+  };
+  currentDecisions: Record<string, unknown>[];
+  supersededDecisions: Record<string, unknown>[];
+  conflicts: Record<string, unknown>[];
+  citations: Record<string, unknown>[];
+  activity: Record<string, unknown>[];
+  affectedFiles: Record<string, unknown>[];
+}
+export function buildMemoryDashboard(options?: {
+  cwd?: string;
+  baselineTokens?: number;
+  deliveredTokens?: number;
+  clock?: () => Date;
+}): Promise<Readonly<QarinahMemoryDashboard>>;
+export function renderMemoryDashboard(data: QarinahMemoryDashboard): string;
+export function writeMemoryDashboard(options?: {
+  cwd?: string;
+  output?: string;
+  baselineTokens?: number;
+  deliveredTokens?: number;
+  clock?: () => Date;
+}): Promise<Readonly<{ output: string; data: QarinahMemoryDashboard }>>;
+export interface QarinahContextEvaluationCase {
+  id?: string;
+  requiredDecisionIds?: string[];
+  recalledDecisionIds?: string[];
+  returnedCitationIds?: string[];
+  validCitationIds?: string[];
+  expectedStaleIds?: string[];
+  rejectedStaleIds?: string[];
+  expectedConflictIds?: string[];
+  detectedConflictIds?: string[];
+  taskCompleted?: boolean;
+  repeatedMistakeExpected?: boolean;
+  repeatedMistakeAvoided?: boolean;
+  latencyMs?: number;
+  baselineCost?: number;
+  actualCost?: number;
+}
+export function evaluateContextQuality(cases: QarinahContextEvaluationCase[]): Readonly<{
+  schemaVersion: "qarinah.context-quality-evaluation.v1";
+  caseCount: number;
+  metrics: Readonly<{
+    decisionRecall: number | null;
+    citationAccuracy: number | null;
+    staleContextRejection: number | null;
+    conflictDetection: number | null;
+    taskCompletionQuality: number;
+    repeatedMistakePrevention: number | null;
+    meanLatencyMs: number;
+    costPerCompletedTask: number | null;
+    costReduction: number | null;
+  }>;
+  totals: Readonly<Record<string, number>>;
+  cases: ReadonlyArray<Readonly<Record<string, unknown>>>;
+}>;
+export function setupWorkspace(options?: {
+  cwd?: string;
+  capture?: "metadata" | "content";
+  codex?: boolean;
+  claude?: boolean;
+  cursor?: boolean;
+  allowQuery?: boolean;
+  maxChars?: number;
+  maxItems?: number;
+}): Promise<Readonly<Record<string, unknown>>>;
 export function rankContextEvents(index: unknown, query: string | undefined, options: {
   limit?: number;
   diversity?: number;
@@ -248,12 +425,17 @@ export interface QarinahMcpServer {
   handle(message: unknown): Promise<void>;
   close(error?: Error): void;
 }
-export function createMcpServer(options?: { cwd?: string; write?: (message: unknown) => void }): QarinahMcpServer;
+export function createMcpServer(options?: {
+  cwd?: string;
+  write?: (message: unknown) => void;
+  queryPermit?: { workspaceId: `ws_${string}`; policyHash: `sha256:${string}`; maxChars?: number; maxItems?: number };
+}): QarinahMcpServer;
 export function runMcpServer(options?: {
   cwd?: string;
   input?: AsyncIterable<Uint8Array | string>;
   maximumFrameBytes?: number;
   write?: (message: unknown) => void;
+  queryPermit?: { workspaceId: `ws_${string}`; policyHash: `sha256:${string}`; maxChars?: number; maxItems?: number };
 }): Promise<void>;
 
 export interface MaqamContextToolDescriptor {

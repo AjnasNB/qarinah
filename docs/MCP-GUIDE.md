@@ -1,12 +1,12 @@
 # MCP guide
 
-Qarinah 0.1.0 includes a native Model Context Protocol server for **read-only local ledger status and integrity diagnostics**. It does not automatically inject context, return a context pack, append events, initialize projects, grant trust, repair state, read browser sessions, or access a hosted service.
+Qarinah 0.1.2 includes a native, zero-write Model Context Protocol server. It always provides local ledger status and integrity diagnostics. It provides `context.query` only after the user creates an explicit permit bound to the exact workspace, current consent-policy hash, and response ceilings.
 
 That narrow boundary is intentional:
 
 - project capture is explicit;
 - durable writes remain CLI operations or separately governed Maqam capabilities;
-- model-facing context disclosure is explicit;
+- model-facing context disclosure is explicit and consent-gated;
 - diagnostic tools cannot expand their own authority.
 
 ## Package and registry identity
@@ -15,10 +15,11 @@ That narrow boundary is intentional:
 | --- | --- |
 | MCP name | `io.github.AjnasNB/qarinah` |
 | npm package | `qarinah` |
-| Version | `0.1.0` |
+| Version | `0.1.2` |
 | Transport | `stdio` |
 | CLI entry | `npx qarinah mcp` |
-| Public tools | `context_status`, `context_doctor` |
+| Default tools | `context_status`, `context_doctor` |
+| Permitted tool | `context.query` |
 
 The registry declaration is stored in the repository's `server.json`. The npm package also publishes `mcpName: "io.github.AjnasNB/qarinah"`.
 
@@ -30,22 +31,28 @@ The registry declaration is stored in the repository's `server.json`. The npm pa
 - Valid machine-local trust for that exact workspace and policy.
 - A host that supports newline-delimited stdio MCP.
 
-Initialize and verify a project before connecting a host:
+Initialize, install the three supported host integrations, authorize bounded retrieval, and verify the project:
 
 ```sh
-npx -y qarinah@latest init . --capture metadata
-npx -y qarinah@latest policy .
-# Review and approve the exact policy if trust is requested.
-npx -y qarinah@latest build
-npx -y qarinah@latest doctor
+npx -y qarinah@latest setup . --codex --claude --cursor --capture content --allow-query
 ```
 
 ## Direct stdio command
 
-The server command is:
+The diagnostic-only server command is:
 
 ```sh
 npx qarinah mcp
+```
+
+An authorized query server must receive the exact reviewed policy hash:
+
+```sh
+npx qarinah mcp \
+  --allow-query \
+  --policy-hash sha256:<reviewed-policy-digest> \
+  --max-chars 12000 \
+  --max-items 20
 ```
 
 For a host configuration that accepts an MCP command object:
@@ -377,16 +384,23 @@ await runMcpServer({
 });
 ```
 
-## Context retrieval is deliberately separate
+## Context retrieval is explicit and consent-gated
 
-The MCP server does **not** expose a `query` tool. To obtain a cited pack:
+The MCP server exposes `context.query` only when all of these conditions hold:
 
-1. the user can explicitly run `qarinah query` or call `compileContext`; or
-2. an orchestrator can register Qarinah's separately exported Maqam `context.query` capability and apply its own disclosure policy.
+1. the exact workspace is initialized, enabled, and trusted;
+2. setup or the caller passes `--allow-query`;
+3. the supplied `--policy-hash` matches the workspace's current consent policy;
+4. the request selects the exact workspace rather than an opted-in parent; and
+5. the requested item and character limits remain within the permit.
 
-Durable append is similarly absent from MCP. The Maqam `context.append` adapter is a high-risk write capability with exact execution verification and required approval.
+The tool performs a verified, zero-write compilation with no implicit rebuild or checkpoint advancement. It returns a bounded cited context pack and cannot initialize, grant trust, append, repair, walk into another workspace, or enlarge its own permit.
 
-Do not describe `context_status` or `context_doctor` as model memory injection.
+Without a query permit, only `context_status` and `context_doctor` are listed. Users may also run `qarinah query`, call `compileContext`, or register Qarinah's separately exported Maqam `context.query` capability.
+
+Durable append remains absent from MCP. The Maqam `context.append` adapter is a high-risk write capability with exact execution verification and required approval.
+
+Do not describe the diagnostic tools as model memory injection or describe permitted `context.query` as ambient disclosure.
 
 ## Verification
 
@@ -403,8 +417,8 @@ The smoke suite:
 - negotiates lifecycle;
 - tests Codex without advertised roots using an explicit workspace;
 - tests Claude with negotiated roots;
-- lists both tools;
-- calls both tools against a temporary trusted ledger;
+- verifies the default diagnostic tools;
+- verifies that `context.query` is absent without a permit and bounded by an exact permit when enabled;
 - requires the process to remain alive until the client closes stdin;
 - rejects unexpected standard-error output.
 
