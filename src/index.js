@@ -40,6 +40,21 @@ export {
 export { captureCodexHook } from "./hooks/codex.js";
 export { captureClaudeHook } from "./hooks/claude.js";
 export { createMcpServer, runMcpServer } from "./mcp/server.js";
+export { setupWorkspace } from "./setup.js";
+export { TASK_MEMORY_PACKS, compileTaskMemoryPack } from "./task-packs.js";
+export { rerankContextPack } from "./semantic.js";
+export { compileFederatedContext } from "./federation.js";
+export { inspectMemoryFreshness } from "./freshness.js";
+export {
+  createEncryptedSyncBundle,
+  createSignedCheckpoint,
+  createTeamManifest,
+  decryptEncryptedSyncBundle,
+  verifySignedCheckpoint
+} from "./team-sync.js";
+export { createCausalReceipt } from "./receipts.js";
+export { buildMemoryDashboard, renderMemoryDashboard, writeMemoryDashboard } from "./dashboard.js";
+export { evaluateContextQuality } from "./evaluation.js";
 export {
   MAQAM_CONTEXT_ADAPTER_SCHEMA_VERSION,
   MAQAM_CONTEXT_APPEND_TOOL,

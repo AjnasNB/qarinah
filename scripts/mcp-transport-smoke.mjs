@@ -4,7 +4,6 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { appendEvent, initializeWorkspace, rebuildDerivedState } from "../src/index.js";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const packageJson = JSON.parse(await readFile(path.join(repositoryRoot, "package.json"), "utf8"));
@@ -38,9 +37,11 @@ async function loadHost(name, pluginRoot) {
 }
 
 async function probe(host, workspaceRoot, stateRoot) {
+  const environment = { ...process.env, QARINAH_STATE_DIR: stateRoot };
+  delete environment.CLAUDE_PROJECT_DIR;
   const child = spawn(host.command, host.args, {
     cwd: host.cwd,
-    env: { ...process.env, QARINAH_STATE_DIR: stateRoot },
+    env: environment,
     shell: false,
     stdio: ["pipe", "pipe", "pipe"]
   });
@@ -116,12 +117,12 @@ async function probe(host, workspaceRoot, stateRoot) {
 
     const toolArguments = clientSupportsRoots ? {} : { workspace: workspaceRoot };
     const status = await request("tools/call", { name: "context_status", arguments: toolArguments });
-    assert.equal(status.isError, undefined);
+    assert.equal(status.isError, undefined, `${host.name}: ${stderr}${JSON.stringify(status)}`);
     assert.equal(status.structuredContent.enabled, true);
     assert.equal(status.structuredContent.eventCount, 1);
 
     const doctor = await request("tools/call", { name: "context_doctor", arguments: toolArguments });
-    assert.equal(doctor.isError, undefined);
+    assert.equal(doctor.isError, undefined, `${host.name}: ${JSON.stringify(doctor)}`);
     assert.equal(doctor.structuredContent.ok, true);
     assert.equal(doctor.structuredContent.derived, "current");
     assert.equal(child.exitCode, null, `${host.name} MCP process exited before the client closed stdin.`);
@@ -142,6 +143,7 @@ const previousStateRoot = process.env.QARINAH_STATE_DIR;
 
 try {
   process.env.QARINAH_STATE_DIR = stateRoot;
+  const { appendEvent, initializeWorkspace, rebuildDerivedState } = await import("../src/index.js");
   const workspace = await initializeWorkspace(workspaceRoot);
   await appendEvent({
     kind: "decision",

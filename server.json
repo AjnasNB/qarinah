@@ -1,7 +1,7 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
   "name": "io.github.AjnasNB/qarinah",
-  "description": "Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.",
+  "description": "The shared, verifiable memory layer for teams deploying multiple AI agents.",
   "repository": {
     "url": "https://github.com/AjnasNB/qarinah",
     "source": "github"

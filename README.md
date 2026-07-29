@@ -5,7 +5,7 @@
 <h1 align="center">Qarinah</h1>
 
 <p align="center"><em>Less context. More proof.</em></p>
-<p align="center"><strong>Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.</strong></p>
+<p align="center"><strong>The shared, verifiable memory layer for teams deploying multiple AI agents.</strong></p>
 
 <p align="center">
   <a href="https://qarinah.io"><strong>Website</strong></a>&nbsp;&middot;&nbsp;
@@ -68,7 +68,7 @@ npx qarinah query "release provenance" \
   --format markdown
 ```
 
-Start with the [five-minute guide](docs/GETTING-STARTED.md), then use the [CLI reference](docs/CLI-REFERENCE.md), [JavaScript API reference](docs/API-REFERENCE.md), [MCP guide](docs/MCP-GUIDE.md), [task recipes](docs/RECIPES.md), or [troubleshooting guide](docs/TROUBLESHOOTING.md).
+Start with the [five-minute guide](docs/GETTING-STARTED.md), then use the [team-memory guide](docs/TEAM-MEMORY.md), [CLI reference](docs/CLI-REFERENCE.md), [JavaScript API reference](docs/API-REFERENCE.md), [MCP guide](docs/MCP-GUIDE.md), [task recipes](docs/RECIPES.md), or [troubleshooting guide](docs/TROUBLESHOOTING.md).
 
 Your project already contains the decisions and evidence behind its changes. Qarinah lets the next agent query that record and receive a bounded, cited pack selected for the current task. The same local memory can support Codex, Claude Code, CLI workflows, and compatible MCP clients instead of locking project context to one editor.
 
@@ -85,7 +85,7 @@ Agent memory usually fails in one of two ways: the next model receives too much 
   </tr>
   <tr>
     <td width="50%"><strong>Rebuildable</strong><br>The JSONL chain is authoritative. Graph, index, Markdown, project structure, and OKF are deterministic derived views.</td>
-    <td width="50%"><strong>Governance-ready</strong><br>Explicit capture policy, fail-closed coverage, read-only diagnostics, and optional Maqam disclosure controls preserve boundaries.</td>
+    <td width="50%"><strong>Governance-ready</strong><br>Explicit capture policy, fail-closed coverage, consent-gated MCP retrieval, and optional Maqam disclosure controls preserve boundaries.</td>
   </tr>
 </table>
 
@@ -95,7 +95,7 @@ Metadata-only capture is the default. Content capture requires explicit workspac
 
 When a host or orchestrator queries Qarinah before constructing a model request, Qarinah compiles the retained project history into a bounded cited pack first. That same pack can be supplied to a small local model, a large-context model, or a high-reasoning Codex or Claude session. The compiler itself does not need an embedding API, a hosted memory service, or a Qarinah API key.
 
-Packs are requested explicitly. Hosts can call the CLI or JavaScript API, while sensitive automated disclosure can be registered through a separately governed Maqam capability. Qarinah's built-in MCP server remains a zero-write diagnostic surface.
+Packs are requested explicitly. Hosts can call the CLI or JavaScript API, use a separately governed Maqam capability, or enable Qarinah's zero-write MCP `context.query` tool with a permit bound to the exact workspace and current consent-policy hash. Without that permit, the built-in MCP server exposes diagnostics only.
 
 ## What it records
 
@@ -123,7 +123,7 @@ Qarinah is intentionally small, local, and inspectable:
 | Retrieval | BM25, character-trigram typo tolerance, one-hop graph evidence, reciprocal-rank fusion, deterministic diversity, time, authority, retention, conflict, and supersession |
 | Context compiler | Complete-output character and token budgets, explicit output headroom, evidence-coverage gates, deterministic citations, and reproducible manifests |
 | Human-readable views | Rebuildable Markdown, JSON, graph, index, and Google OKF 0.1 Draft exports |
-| Agent integration | Codex and Claude Code lifecycle hooks, strict JSON stdin, local CLI, typed JavaScript API, and stdio MCP diagnostics |
+| Agent integration | One-command Codex, Claude Code, and Cursor setup; lifecycle hooks; strict JSON stdin; typed JavaScript API; and consent-gated stdio MCP retrieval |
 | Infrastructure | No vector database, hosted backend, embedding bill, model provider, daemon, analytics endpoint, or Qarinah API key |
 
 ## Install
@@ -132,16 +132,33 @@ Qarinah requires a maintained Node.js 22, 24, or 26 release.
 
 ```sh
 npm install --save-dev qarinah
-npx qarinah init .
+npx qarinah setup . --codex --claude --cursor --capture content --allow-query
 ```
 
 The package is designed for local use. It does not require a hosted Qarinah account, embedding service, or Qarinah API key.
 
 ## Initialize once, remember across supported sessions
 
-`npx qarinah init .` is a one-time, explicit opt-in for that exact workspace and capture policy. After a reviewed Codex or Claude Code integration is installed and its host is restarted, supported lifecycle hooks can append permitted events whenever the host emits them. Qarinah can then rebuild the deterministic graph and compile a small cited pack on demand, so the next task does not need the whole retained history replayed into its prompt.
+`npx qarinah setup . --codex --claude --cursor --capture content --allow-query` is the one-time, explicit opt-in for that exact workspace and capture policy. It initializes the project, installs project-local integrations, configures consent-gated MCP retrieval, rebuilds derived views, and runs a health check. After a supported host restarts, reviewed lifecycle hooks can append permitted events whenever the host emits them. Qarinah can then compile a small cited pack on demand, so a new task in that folder does not need the whole retained history replayed into its prompt.
 
-Qarinah is project memory, not an always-running agent or application supervisor. It does not keep Codex or Claude running, prevent provider-side context compaction, capture host activity the host does not expose, or automatically disclose context through MCP. When a host compacts its own conversation, Qarinah preserves only the permitted evidence it actually received and makes that evidence available to an explicit query or separately governed disclosure capability.
+Qarinah is project memory, not an always-running agent or application supervisor. It does not keep an agent running, prevent provider-side context compaction, or capture host activity the host does not expose. When a host compacts its own conversation, Qarinah preserves only the permitted evidence it actually received and makes it available to an explicit CLI/API query or a workspace-authorized, bounded MCP query.
+
+## Team-memory platform
+
+The public package now includes:
+
+- consent-gated, zero-write MCP `context.query` with exact workspace and policy-hash authorization;
+- one-command Codex, Claude Code, and Cursor setup;
+- a local visual dashboard for decisions, supersession, conflicts, citations, activity, savings, and affected files;
+- freshness checks for changed, missing, or unsafe cited files;
+- task packs for debugging, code review, feature work, database migration, incident response, release preparation, and security review;
+- multi-repository context that keeps authority in separate cited packs;
+- optional semantic reranking that cannot introduce unadmitted sources;
+- an encrypted team-sync protocol with roles, GitHub binding, and signed checkpoints;
+- evaluation for recall, citation accuracy, stale rejection, conflict detection, completion, latency, cost, and repeated mistakes; and
+- causal receipts connecting Cockroach evidence, Qarinah memory, Maqam policy, execution, and observed results.
+
+See [Shared and verifiable team memory](docs/TEAM-MEMORY.md) for commands, APIs, and security boundaries.
 
 ## Five-minute proof
 
@@ -227,26 +244,26 @@ The repository includes generated, dependency-free plugin runtimes for Codex and
 
 - allowlisted lifecycle hooks;
 - a Qarinah context skill;
-- zero-write `context_status` and `context_doctor` MCP tools with exact workspace selection for hosts that do not expose MCP roots;
+- zero-write `context_status` and `context_doctor` MCP tools plus optional consent-gated `context.query`, all with exact workspace selection;
 - explicit CLI querying for user-directed local workflows.
 
 Codex and Claude Code plugin caches are immutable copies. Reinstall the reviewed plugin and start a new task after an upgrade. Claude requires an explicitly selected absolute Node 22, 24, or 26 executable. Codex still inherits the host's reviewed Node `PATH` boundary because its current plugin schema does not expose an equivalent file setting. See [host integrations](docs/HOST-INTEGRATIONS.md).
 
-Automatic MCP context disclosure remains disabled. A context pack must be explicitly requested or disclosed through a separately governed Maqam capability.
+Ambient MCP context disclosure remains disabled. `context.query` appears only after explicit setup with `--allow-query`; its permit is bound to the exact workspace policy hash and strict item and character limits. Durable MCP writes remain unavailable.
 
 The repository also runs `npm run mcp:smoke` against the exact bundled Codex and Claude runtimes. The smoke test starts each stdio server from its packaged manifest, exercises Codex without MCP roots using an exact trusted workspace selector, exercises Claude with negotiated roots, lists the two annotated tools, calls both tools against a temporary trusted ledger, and verifies clean shutdown without stderr output.
 
 ### Install once, initialize each project
 
-Install the reviewed `v0.1.0` plugin once in each host:
+Install the reviewed `v0.1.2` plugin once in each host:
 
 ```sh
 # Codex: personal installation, available to opted-in projects.
-codex plugin marketplace add AjnasNB/qarinah --ref v0.1.0
+codex plugin marketplace add AjnasNB/qarinah --ref v0.1.2
 codex plugin add qarinah@qarinah
 
 # Claude Code: personal installation across projects.
-claude plugin marketplace add AjnasNB/qarinah@v0.1.0 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.1.2 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 

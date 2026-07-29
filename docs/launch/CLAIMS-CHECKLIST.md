@@ -14,7 +14,7 @@
 - [ ] Graph, index, Markdown, project structure, and OKF are deterministic derived views.
 - [ ] Context packs cite event IDs and hashes and obey configured character/token budgets.
 - [ ] Capture is project opt-in, machine-trusted, and metadata-only by default.
-- [ ] MCP tools are read-only status and integrity diagnostics; automatic context disclosure is disabled.
+- [ ] MCP is zero-write; diagnostics are always available and `context.query` appears only with an exact workspace policy permit and hard response ceilings.
 - [ ] No Qarinah API key, model provider, daemon, or hosted database is required for local operation.
 
 ## Benchmark wording

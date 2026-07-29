@@ -7,6 +7,12 @@ export interface QarinahMcpServer {
 export function createMcpServer(options?: {
   cwd?: string;
   write?: (message: unknown) => void;
+  queryPermit?: {
+    workspaceId: `ws_${string}`;
+    policyHash: `sha256:${string}`;
+    maxChars?: number;
+    maxItems?: number;
+  };
 }): QarinahMcpServer;
 
 export function runMcpServer(options?: {
@@ -14,4 +20,10 @@ export function runMcpServer(options?: {
   input?: AsyncIterable<Uint8Array | string>;
   maximumFrameBytes?: number;
   write?: (message: unknown) => void;
+  queryPermit?: {
+    workspaceId: `ws_${string}`;
+    policyHash: `sha256:${string}`;
+    maxChars?: number;
+    maxItems?: number;
+  };
 }): Promise<void>;

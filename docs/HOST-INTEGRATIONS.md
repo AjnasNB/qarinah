@@ -6,11 +6,11 @@ Qarinah keeps one local event/graph/compiler core and uses thin host adapters. A
 
 | Surface | Distribution | Capture | Retrieval | Status |
 | --- | --- | --- | --- | --- |
-| ChatGPT desktop Work mode/Codex, Codex CLI | Codex plugin | Ten Codex lifecycle hooks on supported local hosts | Skill, CLI, local zero-write MCP diagnostics | Implemented, packaged, and tested |
+| ChatGPT desktop Work mode/Codex, Codex CLI | Codex project setup/plugin | Ten Codex lifecycle hooks on supported local hosts | Skill, CLI, MCP diagnostics, optional consent-gated query | Implemented, packaged, and tested |
 | Codex IDE extension | Project/global skill or explicit CLI | No plugin lifecycle-hook claim | Skill or CLI | Plugin installation is not supported by this surface |
-| Claude Code / Claude CLI | Claude plugin | Session, prompt, tool, compaction, stop, subagent, session-end hooks | Skill, CLI, local zero-write MCP diagnostics | Implemented; native manifest validation passes |
+| Claude Code / Claude CLI | Claude project setup/plugin | Session, prompt, tool, compaction, stop, subagent, session-end hooks | Skill, CLI, MCP diagnostics, optional consent-gated query | Implemented; native manifest validation passes |
 | ChatGPT web Work mode / Claude.ai web | Remote authenticated MCP app or connector | No local filesystem hooks | Remote service only | Not shipped; the local ledger is not uploaded implicitly |
-| Other MCP-capable hosts | User-supplied stdio MCP configuration | No implicit host capture | Local zero-write MCP diagnostics | Contract-compatible; host conformance required |
+| Cursor and other MCP-capable hosts | Project setup or user-supplied stdio MCP configuration | No implicit host capture | Local zero-write diagnostics and optional consent-gated query | Contract-compatible; host conformance required |
 | Hosts without MCP | Explicit CLI or future versioned JSONL adapter | Host-specific | CLI | No universal-support claim |
 
 The Codex package follows OpenAI's current plugin layout: `.codex-plugin/plugin.json`, `skills/`, `hooks/`, and `.mcp.json`. The Claude package follows Anthropic's plugin layout: `.claude-plugin/plugin.json`, `skills/`, `hooks/`, and `.mcp.json`. Claude automatically discovers the standard `hooks/hooks.json` component, so its manifest intentionally does not name that file again.
@@ -19,7 +19,7 @@ The Codex package follows OpenAI's current plugin layout: `.codex-plugin/plugin.
 
 The host plugin and the project ledger have different scopes:
 
-- install the plugin once so Codex or Claude Code can load the reviewed hooks, context skill, and zero-write diagnostics;
+- run `qarinah setup --codex --claude --cursor` so supported hosts can load reviewed hooks, context guidance, and zero-write MCP tools;
 - initialize only the repository roots that are allowed to retain Qarinah records; and
 - request a cited pack when a task needs prior evidence. Qarinah does not inject the complete history automatically.
 
@@ -157,7 +157,7 @@ Both tools accept an optional `workspace` string containing an absolute local pa
 
 Both tools advertise `readOnlyHint: true`, `openWorldHint: false`, and `destructiveHint: false`. They do not advance the machine-local checkpoint, repair derived state, or disclose absolute workspace paths. The server negotiates MCP lifecycle/version, supports client filesystem roots, caps newline-delimited JSON-RPC frames, emits protocol messages only on stdout, and sends no credentials over the protocol.
 
-Durable writes and automatic context disclosure are intentionally absent. Writes remain explicit CLI operations or Maqam `ToolGateway` calls with exact one-use approval. Context packs are available through a Maqam-scoped `context.query` capability, or through the compatibility CLI when the user explicitly requests a direct local query. Model-facing CLI calls use only `record --stdin-json` and `query --stdin-json`: the bounded request object travels through process stdin, never through shell-interpolated text or model-controlled argv.
+Durable MCP writes and ambient context disclosure are intentionally absent. Writes remain explicit CLI operations or Maqam `ToolGateway` calls with exact one-use approval. Context packs are available through a workspace-authorized MCP `context.query`, a Maqam-scoped capability, or the CLI/API. Model-facing CLI calls use only `record --stdin-json` and `query --stdin-json`: the bounded request object travels through process stdin, never through shell-interpolated text or model-controlled argv.
 
 ## Context and model budgets
 

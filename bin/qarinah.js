@@ -7,8 +7,10 @@ import {
   captureClaudeHook,
   captureCodexHook,
   compileContext,
+  compileTaskMemoryPack,
   exportOkf,
   initializeWorkspace,
+  inspectMemoryFreshness,
   inspectWorkspacePolicy,
   loadIndex,
   loadWorkspace,
@@ -18,7 +20,9 @@ import {
   runMcpServer,
   scanProjectStructure,
   setWorkspaceEnabled,
-  verifyStore
+  setupWorkspace,
+  verifyStore,
+  writeMemoryDashboard
 } from "../src/index.js";
 
 function option(args, name, fallback = undefined) {
@@ -182,15 +186,19 @@ function help() {
 
 Usage:
   qarinah init [path] [--capture metadata|content]
+  qarinah setup [path] [--codex] [--claude] [--cursor] [--capture metadata|content] [--allow-query]
   qarinah record --kind <kind> --title <title> [--body <text>] [--data-json <json>] [--relation type:target]
   qarinah record --stdin-json
   qarinah hook codex|claude
-  qarinah mcp
+  qarinah mcp [--allow-query --workspace-id ws_<id> --policy-hash sha256:<digest>] [--max-chars n] [--max-items n]
   qarinah build
   qarinah scan [--max-files n] [--max-file-bytes n] [--max-total-bytes n] [--max-depth n]
   qarinah export okf [--output <path>]
   qarinah query [text] [--format json|markdown] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp] [--minimum-coverage any|partial|direct]
   qarinah query --stdin-json
+  qarinah task-pack debugging|code-review|feature-implementation|database-migration|incident-response|release-preparation|security-review [query]
+  qarinah freshness
+  qarinah dashboard [--output <path>] [--baseline-tokens n --delivered-tokens n]
   qarinah policy [path]
   qarinah trust [path] --capture metadata|content --policy-hash sha256:<digest>
   qarinah untrust
@@ -214,6 +222,47 @@ async function run(argv) {
     const target = positionals(args)[0] || process.cwd();
     const workspace = await initializeWorkspace(target, { capture: option(args, "--capture", "metadata") });
     process.stdout.write(`${JSON.stringify({ ok: true, root: workspace.root, workspaceId: workspace.config.workspaceId, capture: workspace.config.capture }, null, 2)}\n`);
+    return;
+  }
+  if (command === "setup") {
+    const flags = new Set(["--codex", "--claude", "--cursor", "--allow-query"]);
+    const values = new Set(["--capture", "--max-chars", "--max-items"]);
+    const parsed = { positionals: [], flags: new Set(), values: new Map() };
+    for (let index = 0; index < args.length; index += 1) {
+      const value = args[index];
+      if (!value.startsWith("--")) {
+        parsed.positionals.push(value);
+        continue;
+      }
+      if (flags.has(value)) {
+        if (parsed.flags.has(value)) throw new TypeError(`setup received ${value} more than once.`);
+        parsed.flags.add(value);
+        continue;
+      }
+      if (!values.has(value)) throw new TypeError(`setup does not support ${value}.`);
+      if (parsed.values.has(value)) throw new TypeError(`setup received ${value} more than once.`);
+      if (index === args.length - 1 || args[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
+      parsed.values.set(value, args[index + 1]);
+      index += 1;
+    }
+    if (parsed.positionals.length > 1) throw new TypeError("setup accepts at most one workspace path.");
+    const positive = (name) => {
+      const value = parsed.values.get(name);
+      if (value === undefined) return undefined;
+      if (!/^[0-9]+$/.test(value) || Number(value) < 1) throw new TypeError(`${name} must be a positive integer.`);
+      return Number(value);
+    };
+    const result = await setupWorkspace({
+      cwd: parsed.positionals[0] || process.cwd(),
+      capture: parsed.values.get("--capture"),
+      codex: parsed.flags.has("--codex"),
+      claude: parsed.flags.has("--claude"),
+      cursor: parsed.flags.has("--cursor"),
+      allowQuery: parsed.flags.has("--allow-query"),
+      maxChars: positive("--max-chars"),
+      maxItems: positive("--max-items")
+    });
+    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
     return;
   }
   if (command === "trust") {
@@ -274,7 +323,42 @@ async function run(argv) {
     return;
   }
   if (command === "mcp") {
-    await runMcpServer();
+    const valueOptions = new Set(["--workspace-id", "--policy-hash", "--max-chars", "--max-items"]);
+    const parsed = { allowQuery: false, values: new Map() };
+    for (let index = 0; index < args.length; index += 1) {
+      const value = args[index];
+      if (value === "--allow-query") {
+        if (parsed.allowQuery) throw new TypeError("mcp received --allow-query more than once.");
+        parsed.allowQuery = true;
+        continue;
+      }
+      if (!valueOptions.has(value)) throw new TypeError(`mcp does not support ${value}.`);
+      if (parsed.values.has(value)) throw new TypeError(`mcp received ${value} more than once.`);
+      if (index === args.length - 1 || args[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
+      parsed.values.set(value, args[index + 1]);
+      index += 1;
+    }
+    const allowQuery = parsed.allowQuery;
+    const workspaceId = parsed.values.get("--workspace-id");
+    const policyHash = parsed.values.get("--policy-hash");
+    if (allowQuery !== (workspaceId !== undefined && policyHash !== undefined)) {
+      throw new TypeError("mcp context disclosure requires --allow-query, --workspace-id, and --policy-hash together.");
+    }
+    const bounded = (name, fallback) => {
+      const value = parsed.values.get(name);
+      if (value === undefined) return fallback;
+      if (!/^[0-9]+$/.test(value) || Number(value) < 1) throw new TypeError(`${name} must be a positive integer.`);
+      return Number(value);
+    };
+    const queryPermit = allowQuery
+      ? {
+          workspaceId,
+          policyHash,
+          maxChars: bounded("--max-chars", 12_000),
+          maxItems: bounded("--max-items", 20)
+        }
+      : undefined;
+    await runMcpServer({ queryPermit });
     return;
   }
   if (command === "build") {
@@ -348,6 +432,43 @@ async function run(argv) {
     if (format === "json") process.stdout.write(`${JSON.stringify(pack, null, 2)}\n`);
     else if (format === "markdown") process.stdout.write(renderContextPackMarkdown(pack));
     else throw new TypeError("--format must be json or markdown.");
+    return;
+  }
+  if (command === "task-pack") {
+    const values = positionals(args);
+    const task = values[0];
+    if (!task) throw new TypeError("task-pack requires a task name.");
+    if (args.some((value) => value.startsWith("--"))) throw new TypeError("task-pack accepts a task name and optional query text only.");
+    const pack = await compileTaskMemoryPack(task, values.slice(1).join(" "), { cwd: process.cwd() });
+    process.stdout.write(`${JSON.stringify(pack, null, 2)}\n`);
+    return;
+  }
+  if (command === "freshness") {
+    if (args.length !== 0) throw new TypeError("freshness accepts no arguments.");
+    process.stdout.write(`${JSON.stringify(await inspectMemoryFreshness({ cwd: process.cwd() }), null, 2)}\n`);
+    return;
+  }
+  if (command === "dashboard") {
+    const parsed = strictValueOptions(args, "dashboard", ["--output", "--baseline-tokens", "--delivered-tokens"]);
+    if (parsed.positionals.length !== 0) throw new TypeError("dashboard accepts options only.");
+    const usage = (name) => {
+      const value = parsed.values.get(name);
+      if (value === undefined) return undefined;
+      if (!/^[0-9]+$/.test(value)) throw new TypeError(`${name} must be a non-negative integer.`);
+      return Number(value);
+    };
+    const result = await writeMemoryDashboard({
+      cwd: process.cwd(),
+      output: parsed.values.get("--output"),
+      baselineTokens: usage("--baseline-tokens"),
+      deliveredTokens: usage("--delivered-tokens")
+    });
+    process.stdout.write(`${JSON.stringify({
+      ok: true,
+      output: result.output,
+      totals: result.data.totals,
+      contextSavings: result.data.contextSavings
+    }, null, 2)}\n`);
     return;
   }
   if (command === "doctor") {

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qarinah.io/schemas/causal-receipt.schema.json",
+  "title": "Qarinah causal receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "sequence", "chain", "receiptHash"],
+  "properties": {
+    "schemaVersion": { "const": "qarinah.causal-receipt.v1" },
+    "sequence": { "type": "string" },
+    "chain": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["stage", "id", "hash", "system", "timestamp", "previousStageHash"],
+        "properties": {
+          "stage": { "enum": ["evidence", "memory", "policy", "execution", "observation"] },
+          "id": { "type": "string", "minLength": 1, "maxLength": 512 },
+          "hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "system": { "type": "string", "minLength": 1, "maxLength": 128 },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "previousStageHash": {
+            "oneOf": [
+              { "type": "null" },
+              { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+            ]
+          }
+        }
+      }
+    },
+    "receiptHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+  }
+}

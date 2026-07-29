@@ -1,6 +1,6 @@
 # Token-efficient context for coding agents
 
-Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust. It keeps permitted project events and explicit decisions in an evidence-linked record, then retrieves a small, cited context pack for the current task. The goal is to avoid replaying an entire retained project history when Codex, Claude Code, a CLI workflow, or another reviewed host needs only a few relevant records.
+Qarinah is the shared, verifiable memory layer for teams deploying multiple AI agents. It keeps permitted project events and explicit decisions in an evidence-linked record, then retrieves a small, cited context pack for the current task. The goal is to avoid replaying an entire retained project history when Codex, Claude Code, Cursor, a CLI workflow, or another reviewed host needs only a few relevant records.
 
 Qarinah does not remove the current code, schema, logs, tests, or other task inputs a model still needs. It reduces repeated retained history in a reproducible benchmark, not every token in every model request.
 
@@ -177,7 +177,7 @@ npx -y qarinah@latest doctor
 
 Plugin installation can be host-wide; capture permission remains project-specific. Restart the host after installing or upgrading a plugin.
 
-Qarinah's MCP server exposes read-only status and integrity diagnostics. It does not automatically disclose project context. Context retrieval remains an explicit CLI or JavaScript operation, or a separately reviewed and governed host capability.
+Qarinah's MCP server exposes zero-write status and integrity diagnostics by default. Bounded `context.query` retrieval appears only after explicit workspace authorization bound to the current consent-policy hash. Context retrieval can also be an explicit CLI or JavaScript operation, or a separately reviewed Maqam capability.
 
 ## Inspect an earlier project state
 
@@ -239,7 +239,7 @@ See [benchmarks](BENCHMARKS.md), the [machine-readable software-task result](../
 - Content capture requires explicit workspace consent and cannot prove arbitrary retained tool output contains no secret.
 - Qarinah does not prevent provider-side conversation compaction.
 - A coverage result measures retrieval evidence, not model-answer correctness.
-- Automatic MCP context disclosure is disabled.
+- Ambient MCP context disclosure is disabled; permitted `context.query` is explicit, bounded, and zero-write.
 - No benchmark result is a universal token, cost, latency, or accuracy guarantee.
 
 Continue with [recipes](RECIPES.md), [host integrations](HOST-INTEGRATIONS.md), [security](SECURITY.md), and the [FAQ](FAQ.md).

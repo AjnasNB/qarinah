@@ -2,7 +2,7 @@
 
 ## What is Qarinah?
 
-Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust. It records permitted host events and explicit project decisions in an append-only hash chain, builds deterministic graph and retrieval views, and compiles a small cited context pack for the current task.
+Qarinah is the shared, verifiable memory layer for teams deploying multiple AI agents. It records permitted host events and explicit project decisions in an append-only hash chain, builds deterministic graph and retrieval views, and compiles a small cited context pack for the current task.
 
 It is also useful to describe Qarinah as a context compiler for coding agents: it selects bounded, complete records from retained project memory before a host constructs the next model request.
 
@@ -112,13 +112,13 @@ See [Codex and Claude Code integrations](HOST-INTEGRATIONS.md).
 
 No universal compatibility claim is made.
 
-The stable release provides a local CLI, typed JavaScript API, Codex and Claude Code integrations, strict JSON stdin interfaces, and read-only MCP diagnostics. Other hosts need a reviewed adapter or an explicit CLI/API integration.
+The stable release provides a local CLI, typed JavaScript API, one-command Codex, Claude Code, and Cursor setup, strict JSON stdin interfaces, MCP diagnostics, and optional consent-gated MCP context retrieval. Other hosts need a reviewed adapter or an explicit CLI/API integration.
 
 ## Does the MCP server automatically give an agent project context?
 
-No. The built-in MCP server exposes only read-only status and integrity diagnostics.
+No. The default MCP server exposes only zero-write status and integrity diagnostics.
 
-It does not initialize a workspace, grant trust, repair state, append events, or disclose context packs automatically. Retrieve context explicitly with `qarinah query` or through a separately reviewed and governed capability.
+The `context.query` tool appears only after explicit setup with `--allow-query`. Its permit is bound to the exact workspace, current consent-policy hash, and response ceilings. It cannot initialize a workspace, grant trust, repair state, append events, or disclose another workspace. Retrieve context explicitly with that tool, `qarinah query`, the JavaScript API, or a separately reviewed Maqam capability.
 
 ## Does Qarinah require an API key, cloud account, or hosted database?
 
