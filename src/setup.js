@@ -121,15 +121,21 @@ function addHookEvents(settings, adapter) {
   return next;
 }
 
-async function installSkill(workspace, host) {
-  const skillRoot = resolveWithin(workspace.root, `.${host}`, "skills", "qarinah-context");
-  const referenceRoot = resolveWithin(skillRoot, "references");
+async function installSkill(workspace, host, skillName, files) {
+  const skillRoot = resolveWithin(workspace.root, `.${host}`, "skills", skillName);
   await ensureDirectory(resolveWithin(workspace.root, `.${host}`), workspace.root, `.${host}`);
   await ensureDirectory(resolveWithin(workspace.root, `.${host}`, "skills"), workspace.root, `.${host}/skills`);
-  await ensureDirectory(skillRoot, workspace.root, `.${host}/skills/qarinah-context`);
-  await ensureDirectory(referenceRoot, workspace.root, `.${host}/skills/qarinah-context/references`);
-  const sourceRoot = path.join(PACKAGE_ROOT, "integrations", host, "qarinah", "skills", "qarinah-context");
-  for (const relative of ["SKILL.md", path.join("references", "event-contract.md")]) {
+  await ensureDirectory(skillRoot, workspace.root, `.${host}/skills/${skillName}`);
+  const sourceRoot = path.join(PACKAGE_ROOT, "integrations", host, "qarinah", "skills", skillName);
+  for (const relative of files) {
+    const destinationDirectory = path.dirname(resolveWithin(skillRoot, relative));
+    if (destinationDirectory !== skillRoot) {
+      await ensureDirectory(
+        destinationDirectory,
+        workspace.root,
+        `.${host}/skills/${skillName}/${path.relative(skillRoot, destinationDirectory)}`
+      );
+    }
     const contents = await readFile(path.join(sourceRoot, relative), "utf8");
     const destination = resolveWithin(skillRoot, relative);
     const existing = await safeRead(destination, `${host} Qarinah skill`);
@@ -141,6 +147,14 @@ async function installSkill(workspace, host) {
     }
     if (existing === null) await atomicWriteFile(destination, contents);
   }
+}
+
+async function installHostSkills(workspace, host) {
+  await installSkill(workspace, host, "qarinah-context", [
+    "SKILL.md",
+    path.join("references", "event-contract.md")
+  ]);
+  await installSkill(workspace, host, "qarinah", ["SKILL.md"]);
 }
 
 async function configureCodex(workspace, options) {
@@ -168,8 +182,13 @@ async function configureCodex(workspace, options) {
     : `${existing.trimEnd()}${existing.trim() ? "\n\n" : ""}${block}\n`;
   await atomicWriteFile(configPath, next);
   await writeJsonMerged(resolveWithin(root, "hooks.json"), workspace.root, ".codex/hooks.json", (value) => addHookEvents(value, "codex"));
-  await installSkill(workspace, "codex");
-  return [".codex/config.toml", ".codex/hooks.json", ".codex/skills/qarinah-context/SKILL.md"];
+  await installHostSkills(workspace, "codex");
+  return [
+    ".codex/config.toml",
+    ".codex/hooks.json",
+    ".codex/skills/qarinah/SKILL.md",
+    ".codex/skills/qarinah-context/SKILL.md"
+  ];
 }
 
 async function configureClaude(workspace, options) {
@@ -188,8 +207,13 @@ async function configureClaude(workspace, options) {
     }
   }));
   await writeJsonMerged(resolveWithin(root, "settings.json"), workspace.root, ".claude/settings.json", (value) => addHookEvents(value, "claude"));
-  await installSkill(workspace, "claude");
-  return [".mcp.json", ".claude/settings.json", ".claude/skills/qarinah-context/SKILL.md"];
+  await installHostSkills(workspace, "claude");
+  return [
+    ".mcp.json",
+    ".claude/settings.json",
+    ".claude/skills/qarinah/SKILL.md",
+    ".claude/skills/qarinah-context/SKILL.md"
+  ];
 }
 
 async function configureCursor(workspace, options) {

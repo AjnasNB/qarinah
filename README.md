@@ -23,15 +23,53 @@
 </p>
 
 <p align="center">
-  <strong>98.71% less estimated context - 77.81:1 context compression.</strong><br>
-  442,113 &rarr; 5,682 estimated input tokens.<br>
-  <strong>98.71% lower input-context cost at the same token rate.</strong>
-  <a href="docs/BENCHMARKS.md">Reproduce it yourself.</a>
+  <strong>Install once in a repository. Use its cited memory in every supported session for that project.</strong>
+</p>
+
+```sh
+npm install --save-dev qarinah
+npx qarinah setup . --codex --claude --cursor --capture content --allow-query
+```
+
+<p align="center">
+  <strong>Claude Code:</strong> <code>/qarinah release provenance</code>&nbsp;&middot;&nbsp;
+  <strong>Codex:</strong> <code>$qarinah</code>&nbsp;&middot;&nbsp;
+  <strong>Any host:</strong> <code>npx qarinah query "release provenance"</code>
+</p>
+
+<p align="center">
+  Setup installs project-local skills, lifecycle hooks, and consent-gated MCP retrieval. New chats opened in that repository can discover the same cited memory without replaying the complete retained history.
+</p>
+
+<p align="center">
+  <strong>98.71% fewer estimated repeated-project-context tokens - 77.81:1 compression.</strong><br>
+  442,113 &rarr; 5,682 estimated input tokens.
+  <a href="docs/BENCHMARKS.md">Reproduce the published benchmark.</a>
 </p>
 
 ---
 
 <p align="center"><strong>Less replay. More room for current code, tools, and cited project memory.</strong></p>
+
+Qarinah achieved 98.71% fewer estimated repeated-project-context tokens in its published software-task benchmark. We found no directly comparable public benchmark measuring the same project-history replay baseline. That is 98.71% lower input-context cost at the same token rate. The result measures estimated input context, not provider billing, output tokens, latency, or universal task quality.
+
+## What appears in your repository
+
+```text
+.qarinah/
+├── events/events.jsonl       # append-only evidence record
+├── graph/graph.json          # typed decisions, sources, files, and relations
+├── index/index.json          # deterministic lexical retrieval index
+├── CONTEXT.md                # rebuildable human-readable view
+├── okf/                      # portable Open Knowledge Format export
+└── dashboard/                # decisions, conflicts, freshness, and savings
+
+.codex/skills/qarinah/        # invoke with $qarinah
+.claude/skills/qarinah/       # invoke with /qarinah <task>
+.cursor/                      # MCP and always-on project rule
+```
+
+The JSONL chain remains authoritative. Graph, index, Markdown, dashboard, and OKF files are rebuildable views; Qarinah does not replace evidence with an opaque model summary.
 
 <p align="center">
   <a href="docs/WHITEPAPER.md">Technical paper</a>&nbsp;&middot;&nbsp;

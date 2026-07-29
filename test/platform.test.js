@@ -53,7 +53,9 @@ test("one-command setup configures Codex, Claude, Cursor, hooks, skills, and con
   assert.ok(claudeMcp.mcpServers.qarinah.args.includes("--allow-query"));
   const cursorMcp = JSON.parse(await readFile(path.join(root, ".cursor", "mcp.json"), "utf8"));
   assert.ok(cursorMcp.mcpServers.qarinah.args.includes("--policy-hash"));
+  assert.match(await readFile(path.join(root, ".codex", "skills", "qarinah", "SKILL.md"), "utf8"), /name: qarinah/);
   assert.match(await readFile(path.join(root, ".codex", "skills", "qarinah-context", "SKILL.md"), "utf8"), /Qarinah/);
+  assert.match(await readFile(path.join(root, ".claude", "skills", "qarinah", "SKILL.md"), "utf8"), /\$ARGUMENTS/);
   assert.match(await readFile(path.join(root, ".claude", "settings.json"), "utf8"), /UserPromptSubmit/);
   assert.match(await readFile(path.join(root, ".cursor", "rules", "qarinah.mdc"), "utf8"), /bounded, cited memory pack/);
 
