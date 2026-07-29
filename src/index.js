@@ -55,6 +55,13 @@ export {
   validateCockroachSourceRecordBoundary
 } from "./interoperability/cockroach.js";
 export {
+  COCKROACH_BROWSER_MEMORY_SCHEMA_VERSION,
+  appendCockroachBrowserOutcome,
+  cockroachBrowserMemoryOutcomeToEventInput,
+  createCockroachBrowserMemorySink,
+  validateCockroachBrowserMemoryOutcome
+} from "./interoperability/cockroach-browser.js";
+export {
   PRODUCTLOOP_RUNTIME_EVENT_BOUNDARY_VERSION,
   createProductLoopProvenanceSink,
   productLoopRuntimeEventToEventInput,

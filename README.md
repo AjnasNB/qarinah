@@ -274,10 +274,11 @@ The returned pack selects complete cited records from the verified event chain. 
 
 - **Maqam governs** which registered reads and writes are allowed.
 - **Cockroach Crawler gathers** bounded public source records.
+- **Cockroach Browser emits** cited browser-outcome metadata under host-owned authority.
 - **Qarinah remembers** decisions, evidence, provenance, and outcomes.
 - **ProductLoop orchestrates** workflows across those explicit boundaries.
 
-These are composable packages, not one silently merged runtime. Qarinah also works without the other packages.
+These are composable packages, not one silently merged runtime. Qarinah also works without the other packages. Its Cockroach Browser adapter is a passive, metadata-only sink: it cannot launch a browser, inspect a session, approve an action, or grant origin access. See the [interoperability contract](docs/INTEROPERABILITY.md#cockroach-browser-cited-metadata-outcomes).
 
 ## Security model
 

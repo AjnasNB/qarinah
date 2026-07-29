@@ -21,3 +21,14 @@ Qarinah is the selected project name, but professional trademark clearance is st
 ## Existing ecosystem
 
 Published MIT versions of Maqam, Cockroach Crawler, and ProductLoop remain available under the license received with those versions. Qarinah is a separate Apache-2.0 package and does not silently relicense those projects.
+
+## Cockroach Browser interoperability boundary
+
+`cockroach-browser@0.1.0` is licensed `AGPL-3.0-or-later`. Qarinah uses that exact release only as a development-time conformance fixture for its descriptive browser-memory contract:
+
+- it is not a runtime, optional, or peer dependency of the public Qarinah package;
+- its source and package files are not copied into or bundled with Qarinah;
+- installing the Qarinah tarball alone does not install Cockroach Browser; and
+- users who install or run Cockroach Browser obtain it separately under its own license.
+
+The structurally compatible sink does not combine the packages at runtime, grant browser authority, or relicense either project. Qarinah remains Apache-2.0.

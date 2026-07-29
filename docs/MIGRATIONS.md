@@ -1,5 +1,11 @@
 # Migrations
 
+## Cockroach Browser metadata-outcome boundary
+
+The `cockroach.browser-memory.v1` receiving API is additive and does not change `qarinah.event.v1` or existing workspaces. No ledger migration or rebuild is required. New consumers may pass a passive `createCockroachBrowserMemorySink()` to the public Cockroach Browser Qarinah recorder.
+
+The boundary intentionally retains only cited metadata projections. The sink ignores uncited lifecycle notifications; `appendCockroachBrowserOutcome()` rejects them. Content-enabled Qarinah workspaces still receive browser outcomes in metadata mode. Callers that previously wrote browser objects through generic event APIs should migrate to the versioned sink if they need the strict evidence-citation, secret-omission, replay, and conflict behavior. The sink receives outcomes only and grants no browser authority.
+
 ## Context pack v1 to v2
 
 Qarinah `0.1.0-alpha.2` emits `qarinah.context-pack.v2`. Every pack now includes `retrieval.coverage` with a deterministic query-term-overlap status, counts, ratio, direct candidate count, and an optional warning. Callers that validate exact schemas must accept v2 before upgrading. Use `minimumCoverage: "partial"` or `"direct"` to fail closed when evidence is missing or incomplete. The event ledger, graph, and index formats are unchanged by this context-pack migration.

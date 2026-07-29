@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { spawn } from "node:child_process";
@@ -9,6 +9,8 @@ const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url))
 const temporaryDirectory = await mkdtemp(path.join(os.tmpdir(), "qarinah-consumer-"));
 const npmCli = process.env.npm_execpath;
 if (!npmCli) throw new Error("npm_execpath is required for the clean-consumer test.");
+const COCKROACH_BROWSER_INTEGRITY = "sha512-jo8kbcaXtF+zVgnZl9m0Fslzjx7iVFhALD109HOKjTHrtzP9pndVDeIOySJUaYwGzF1kTHzXhn/PM8d6fOqGSw==";
+const COCKROACH_BROWSER_TARBALL = "https://registry.npmjs.org/cockroach-browser/-/cockroach-browser-0.1.0.tgz";
 
 function runNode(args, cwd) {
   return new Promise((resolve, reject) => {
@@ -52,6 +54,8 @@ try {
   }, null, 2)}\n`);
   await writeFile(path.join(temporaryDirectory, "consumer.ts"), [
     "import {",
+    "  appendCockroachBrowserOutcome,",
+    "  createCockroachBrowserMemorySink,",
     "  cockroachSourceRecordToAcquisitionEventInput,",
     "  createProductLoopProvenanceSink,",
     "  ingestCockroachSourceRecord,",
@@ -61,7 +65,10 @@ try {
     "  exportOkf,",
     "  registerMaqamContextAdapters,",
     "  createMcpServer,",
+    "  validateCockroachBrowserMemoryOutcome,",
     "  validateCockroachSourceRecordBoundary,",
+    "  type CockroachBrowserMemoryOutcomeBoundary,",
+    "  type CockroachBrowserMemorySink,",
     "  type CockroachIngestionResult,",
     "  type MaqamContextAppendInput,",
     "  type MaqamGuardedToolGateway,",
@@ -71,6 +78,7 @@ try {
     "  type QarinahCapturePolicy,",
     "  type QarinahOkfExportResult",
     "} from \"qarinah\";",
+    "import type { QarinahBrowserSink as PublicCockroachBrowserSink } from \"cockroach-browser/qarinah\";",
     "import { captureCodexHook } from \"qarinah/codex\";",
     "import { captureClaudeHook } from \"qarinah/claude\";",
     "import { createMcpServer as createSubpathMcpServer } from \"qarinah/mcp\";",
@@ -87,6 +95,23 @@ try {
     "void createMcpServer;",
     "void createSubpathMcpServer;",
     "void invalidCodexExport;",
+    "const browserOutcome: CockroachBrowserMemoryOutcomeBoundary = validateCockroachBrowserMemoryOutcome({",
+    "  schemaVersion: 'cockroach.browser-memory.v1',",
+    "  type: 'browser.action.completed',",
+    "  sessionId: 'session_consumer',",
+    "  purpose: 'Capture cited evidence',",
+    "  timestamp: '2026-07-29T16:00:00.000Z',",
+    "  evidenceIds: ['evidence_consumer'],",
+    "  metadata: { action: 'snapshot', effect: 'read' }",
+    "});",
+    "void browserOutcome;",
+    "const browserSink: CockroachBrowserMemorySink = createCockroachBrowserMemorySink();",
+    "const upstreamCompatibleBrowserSink: { appendBrowserOutcome(value: unknown): Promise<void> } = browserSink;",
+    "const publicCockroachBrowserSink: PublicCockroachBrowserSink = browserSink;",
+    "void upstreamCompatibleBrowserSink;",
+    "void publicCockroachBrowserSink;",
+    "const browserAppend = appendCockroachBrowserOutcome(browserOutcome);",
+    "void browserAppend;",
     "const pack: QarinahContextPack | null = null;",
     "void pack;",
     "const gateway: MaqamGuardedToolGateway = {",
@@ -113,14 +138,64 @@ try {
     ""
   ].join("\n"));
 
-  const installed = await runNode([npmCli, "install", "--ignore-scripts", "--no-audit", "--no-fund", tarball], temporaryDirectory);
+  const installed = await runNode([
+    npmCli,
+    "install",
+    "--ignore-scripts",
+    "--no-audit",
+    "--no-fund",
+    tarball
+  ], temporaryDirectory);
   assert.equal(installed.code, 0, installed.stderr);
+  const installedPackage = JSON.parse(await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "package.json"), "utf8"));
+  assert.equal(installedPackage.version, "0.1.2");
+  assert.equal(installedPackage.dependencies["cockroach-browser"], undefined);
+  assert.equal(installedPackage.optionalDependencies?.["cockroach-browser"], undefined);
+  assert.equal(installedPackage.peerDependencies?.["cockroach-browser"], undefined);
+  assert.equal(installedPackage.devDependencies["cockroach-browser"], "0.1.0");
+  const qarinahOnlyModules = await readdir(path.join(temporaryDirectory, "node_modules"));
+  assert.equal(qarinahOnlyModules.includes("cockroach-browser"), false);
+  const audited = await runNode([npmCli, "audit", "--omit=dev", "--json"], temporaryDirectory);
+  assert.equal(audited.code, 0, audited.stderr);
+  const audit = JSON.parse(audited.stdout);
+  assert.equal(audit.metadata.vulnerabilities.total, 0);
+  process.stdout.write("Clean consumer runtime audit passed; cockroach-browser was not installed transitively.\n");
+
+  const fixtureInstalled = await runNode([
+    npmCli,
+    "install",
+    "--save-dev",
+    "--save-exact",
+    "--ignore-scripts",
+    "--no-audit",
+    "--no-fund",
+    "cockroach-browser@0.1.0"
+  ], temporaryDirectory);
+  assert.equal(fixtureInstalled.code, 0, fixtureInstalled.stderr);
+  const consumerLock = JSON.parse(await readFile(path.join(temporaryDirectory, "package-lock.json"), "utf8"));
+  const browserLock = consumerLock.packages["node_modules/cockroach-browser"];
+  assert.equal(browserLock.version, "0.1.0");
+  assert.equal(browserLock.resolved, COCKROACH_BROWSER_TARBALL);
+  assert.equal(browserLock.integrity, COCKROACH_BROWSER_INTEGRITY);
+  assert.equal(browserLock.dev, true);
+  const installedBrowserPackage = JSON.parse(
+    await readFile(path.join(temporaryDirectory, "node_modules", "cockroach-browser", "package.json"), "utf8")
+  );
+  assert.equal(installedBrowserPackage.version, "0.1.0");
+  assert.equal(installedBrowserPackage.license, "AGPL-3.0-or-later");
+
   const typeScriptCli = path.join(repositoryRoot, "node_modules", "typescript", "bin", "tsc");
   const checked = await runNode([typeScriptCli, "--project", path.join(temporaryDirectory, "tsconfig.json")], temporaryDirectory);
   assert.equal(checked.code, 0, `${checked.stdout}\n${checked.stderr}`);
-  const installedPackage = JSON.parse(await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "package.json"), "utf8"));
-  assert.equal(installedPackage.version, "0.1.2");
-  process.stdout.write("Clean consumer TypeScript contract passed.\n");
+  assert.equal(
+    installedPackage.exports["./schemas/cockroach-browser-memory.json"],
+    "./schemas/cockroach-browser-memory.schema.json"
+  );
+  await readFile(
+    path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "cockroach-browser-memory.schema.json"),
+    "utf8"
+  );
+  process.stdout.write("Exact cockroach-browser@0.1.0 TypeScript and registry-integrity contract passed.\n");
 } finally {
   await rm(temporaryDirectory, { recursive: true, force: true });
 }

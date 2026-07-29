@@ -35,6 +35,7 @@
     "./schemas/okf-export.json": "./schemas/okf-export.schema.json",
     "./schemas/maqam-context-adapter.json": "./schemas/maqam-context-adapter.schema.json",
     "./schemas/cockroach-source-record.json": "./schemas/cockroach-source-record.schema.json",
+    "./schemas/cockroach-browser-memory.json": "./schemas/cockroach-browser-memory.schema.json",
     "./schemas/productloop-runtime-event.json": "./schemas/productloop-runtime-event.schema.json"
   },
   "files": [
@@ -155,6 +156,7 @@
   ],
   "devDependencies": {
     "@primer/css": "^22.3.0",
+    "cockroach-browser": "0.1.0",
     "esbuild": "0.28.1",
     "marked": "^18.0.7",
     "typescript": "7.0.2"
