@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdir, readFile, readdir, stat, unlink, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, realpath, stat, unlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { Readable } from "node:stream";
@@ -29,14 +29,15 @@ function stateRoot() {
   return path.join(process.env.XDG_STATE_HOME || path.join(os.homedir(), ".local", "state"), "qarinah");
 }
 
-function trustPath(root) {
-  const normalized = process.platform === "win32" ? path.resolve(root).toLowerCase() : path.resolve(root);
+async function trustPath(root) {
+  const resolved = await realpath(root);
+  const normalized = process.platform === "win32" ? resolved.toLowerCase() : resolved;
   const digest = createHash("sha256").update(normalized).digest("hex");
   return path.join(stateRoot(), "trusted-workspaces", `${digest}.json`);
 }
 
 async function rewindTrustCheckpoint(root) {
-  const target = trustPath(root);
+  const target = await trustPath(root);
   const trust = JSON.parse(await readFile(target, "utf8"));
   trust.checkpoint = {
     eventCount: 0,
@@ -115,7 +116,7 @@ test("MCP exposes bounded cited retrieval only with an exact workspace disclosur
   const workspace = await initializeWorkspace(root, { capture: "content" });
   await appendEvent(eventInput(), { workspace });
   await rebuildDerivedState(root);
-  const trust = trustPath(root);
+  const trust = await trustPath(root);
   const beforeWorkspace = await snapshotTree(path.join(root, ".qarinah"));
   const beforeTrust = await snapshotFile(trust);
   const messages = [];
