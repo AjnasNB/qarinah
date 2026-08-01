@@ -17,6 +17,7 @@
 
 - Capturing hidden model reasoning or chain of thought.
 - Reading browser cookies, authentication state, environment secrets, or unrelated files.
+- Authorizing, dispatching, or proving governance of a browser action.
 - Treating a hook as a complete enforcement layer.
 - Providing a privileged operating-system sandbox in the library process.
 - Proving that a retained claim is true merely because its hash is valid.
@@ -42,6 +43,7 @@
 - ProductLoop sequence identity is durable in Qarinah, but a restarted sink must replay its run from sequence 1 because the sink does not use ProductLoop's `RunStore` as an ordering oracle.
 - Cockroach Crawler does not yet export a runtime SourceRecord validator or hash-recomputation contract, so Qarinah enforces its own structural boundary and does not call the record certified.
 - Cockroach revision and acquisition records are two idempotent serialized appends, not an atomic pair. A failed acquisition can be completed by retry while the already-written revision remains reviewable.
+- Cockroach Browser outcomes are passive, cited metadata inputs. Qarinah recursively omits known secret-bearing metadata keys and retains only an allowlisted projection, but it does not inspect the cited evidence bytes, authenticate the browser host, or turn receipt hashes into action authority or signatures.
 - Interoperability adapters reload machine-local trust from a supplied root; a structural workspace object is only a locator, never an authority.
 - Maqam adapters require the private, one-dispatch verifier supplied by `ToolGateway.registerGuardedTool`. It binds the exact active input and context objects, tool registration, run, input hash, decision, and consumed approvals; retained handlers and fabricated plain contexts fail before Qarinah access. [Maqam issue #24](https://github.com/AjnasNB/maqam/issues/24) records this contract. This does not mediate unregistered code or direct host side effects.
 - Qarinah and Maqam evidence are separate append-only systems. A successful `context.append` emits both records, but there is no cross-ledger transaction: if Maqam's evidence ledger fails after the Qarinah append, the governed call fails while the context event remains reviewable.

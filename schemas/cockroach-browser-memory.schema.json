@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/AjnasNB/qarinah/schemas/cockroach-browser-memory.schema.json",
+  "title": "Qarinah receiving boundary for Cockroach Browser metadata outcomes",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "type",
+    "sessionId",
+    "purpose",
+    "timestamp",
+    "evidenceIds",
+    "metadata"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "cockroach.browser-memory.v1" },
+    "type": {
+      "type": "string",
+      "pattern": "^browser\\.[a-z0-9]+(?:[._-][a-z0-9]+)*$",
+      "maxLength": 128
+    },
+    "sessionId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:@-]{0,255}$",
+      "maxLength": 256
+    },
+    "actor": { "type": "string", "maxLength": 256 },
+    "purpose": { "type": "string", "minLength": 3, "maxLength": 4096 },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^(?:(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:[02468][048]|[13579][26])00)-02-29|[0-9]{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12][0-9]|3[01])|(?:0[469]|11)-(?:0[1-9]|[12][0-9]|30)|02-(?:0[1-9]|1[0-9]|2[0-8])))T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$",
+      "maxLength": 24
+    },
+    "inputDigest": { "$ref": "#/$defs/sha256" },
+    "outputDigest": { "$ref": "#/$defs/sha256" },
+    "receiptHash": { "$ref": "#/$defs/sha256" },
+    "evidenceIds": { "$ref": "#/$defs/evidenceIds" },
+    "metadata": {
+      "type": "object",
+      "maxProperties": 128,
+      "properties": {
+        "action": {
+          "enum": [
+            "navigate", "back", "forward", "reload", "click", "doubleClick", "fill", "type", "press",
+            "hover", "focus", "check", "uncheck", "select", "scroll", "drag", "upload", "download",
+            "evaluate", "wait", "screenshot", "pdf", "snapshot", "extract", "cookies.read", "cookies.write",
+            "storage.read", "storage.write", "tab.open", "tab.close", "tab.switch", "trace.start", "trace.stop"
+          ]
+        },
+        "status": { "enum": ["succeeded", "denied", "failed", "challenge"] },
+        "inputDigest": { "$ref": "#/$defs/sha256" },
+        "outputDigest": { "$ref": "#/$defs/sha256" },
+        "receiptHash": { "$ref": "#/$defs/sha256" },
+        "receiptId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:@-]{0,255}$",
+          "maxLength": 256
+        },
+        "evidenceIds": { "$ref": "#/$defs/evidenceIds" },
+        "policyDigest": { "$ref": "#/$defs/sha256" },
+        "mode": { "enum": ["headless", "headed"] },
+        "effect": { "enum": ["read", "write", "execute", "upload", "download", "credential"] },
+        "risk": { "enum": ["low", "medium", "high", "critical"] },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:[02468][048]|[13579][26])00)-02-29|[0-9]{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12][0-9]|3[01])|(?:0[469]|11)-(?:0[1-9]|[12][0-9]|30)|02-(?:0[1-9]|1[0-9]|2[0-8])))T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$",
+          "maxLength": 24
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "anyOf": [
+    {
+      "properties": {
+        "evidenceIds": { "minItems": 1 }
+      }
+    },
+    {
+      "properties": {
+        "metadata": {
+          "required": ["evidenceIds"],
+          "properties": {
+            "evidenceIds": { "minItems": 1 }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "evidenceIds": {
+      "type": "array",
+      "maxItems": 128,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:@-]{0,255}$",
+        "maxLength": 256
+      }
+    }
+  }
+}

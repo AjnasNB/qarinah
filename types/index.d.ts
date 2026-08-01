@@ -336,6 +336,46 @@ export const MAQAM_CONTEXT_QUERY_TOOL: MaqamContextToolDescriptor & Readonly<{ n
 export const MAQAM_CONTEXT_APPEND_TOOL: MaqamContextToolDescriptor & Readonly<{ name: "context.append"; effects: readonly ["write"]; risk: "high"; approvalRequired: true }>;
 export function registerMaqamContextAdapters<TGateway extends MaqamGuardedToolGateway>(options: MaqamContextRegistrationOptions<TGateway>): MaqamContextRegistration;
 
+export type CockroachBrowserMemoryJsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | CockroachBrowserMemoryJsonValue[]
+  | { [key: string]: CockroachBrowserMemoryJsonValue };
+export interface CockroachBrowserMemoryOutcomeBoundary {
+  readonly schemaVersion: "cockroach.browser-memory.v1";
+  readonly type: string;
+  readonly sessionId: string;
+  readonly actor?: string;
+  readonly purpose: string;
+  readonly timestamp: string;
+  readonly inputDigest?: `sha256:${string}`;
+  readonly outputDigest?: `sha256:${string}`;
+  readonly evidenceIds: readonly string[];
+  readonly receiptHash?: `sha256:${string}`;
+  readonly metadata: Readonly<Record<string, CockroachBrowserMemoryJsonValue>>;
+}
+export interface CockroachBrowserMemorySink {
+  appendBrowserOutcome(value: unknown): Promise<void>;
+}
+export interface CockroachBrowserMemoryOptions {
+  cwd?: string;
+  workspace?: QarinahWorkspace;
+}
+export const COCKROACH_BROWSER_MEMORY_SCHEMA_VERSION: "cockroach.browser-memory.v1";
+export function validateCockroachBrowserMemoryOutcome(value: unknown): CockroachBrowserMemoryOutcomeBoundary;
+export function cockroachBrowserMemoryOutcomeToEventInput(value: unknown, options?: {
+  retentionClass?: "session" | "project" | "durable";
+}): QarinahEventInput;
+export function appendCockroachBrowserOutcome(
+  value: unknown,
+  options?: CockroachBrowserMemoryOptions
+): Promise<QarinahEvent>;
+export function createCockroachBrowserMemorySink(
+  options?: CockroachBrowserMemoryOptions
+): CockroachBrowserMemorySink;
+
 export interface CockroachSourceProvenanceBoundary {
   readonly retrievedAt: string;
   readonly method: string;

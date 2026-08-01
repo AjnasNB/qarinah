@@ -1,6 +1,6 @@
 # Governed interoperability boundaries
 
-Qarinah keeps Maqam, Cockroach Crawler, and ProductLoop optional. The adapters in this document use their public shapes without adding any of those packages as a runtime dependency. Every durable write still passes Qarinah's machine-local workspace trust check.
+Qarinah keeps Maqam, Cockroach Browser, Cockroach Crawler, and ProductLoop optional. The adapters in this document use their public shapes without adding any of those packages as a runtime dependency. Every durable write still passes Qarinah's machine-local workspace trust check.
 
 ## Maqam: governed query and append
 
@@ -48,6 +48,34 @@ const result = await gateway.call("context.query", { query: "release decision" }
 ```
 
 Direct invocation of a retained registered handler fails because the verifier accepts only the exact input and context objects active inside the matching `ToolGateway.call()`. The capability is revoked after dispatch and cannot be serialized, copied to another tool, or replayed. [Maqam issue #24](https://github.com/AjnasNB/maqam/issues/24) records the upstream contract and acceptance criteria. This proves gateway-authenticated handler invocation, not total mediation: unregistered code, a raw driver retained by the host, and direct operating-system or network side effects remain outside Maqam.
+
+## Cockroach Browser: cited metadata outcomes
+
+The published `cockroach-browser@0.1.0` package exports `cockroach-browser/qarinah` and the versioned `cockroach.browser-memory.v1` schema. Qarinah does not import that package at runtime. Version `0.1.0` is pinned only as a development fixture so the receiving boundary is tested against the public artifact rather than a copied local shape.
+
+Cockroach Browser retains its `AGPL-3.0-or-later` license and Qarinah retains Apache-2.0. The package, distribution, and authority boundary is documented in [Licensing and stewardship](LICENSE-STRATEGY.md).
+
+`createCockroachBrowserMemorySink()` is a passive receiving adapter. It has one method, `appendBrowserOutcome(value)`, and no browser session, navigation, observation, action, profile, cookie, storage, secret, approval, or dispatch capability. Passing the sink to another component therefore grants no browser authority. Qarinah does not claim that an outcome was Maqam-authorized merely because it carries hashes or receipt metadata.
+
+Qarinah receives cited browser outcomes only. A durable outcome must carry at least one bounded, unique evidence ID, either in the schema's top-level `evidenceIds` or in `metadata.evidenceIds`, where the public `0.1.0` recorder currently places action evidence. The sink ignores uncited lifecycle notifications such as session-created and session-closed records. Direct calls to `appendCockroachBrowserOutcome()` reject uncited values. Evidence IDs become opaque `references` relations; Qarinah does not open browser evidence files, inherit browser authentication, or independently prove what an evidence ID contains.
+
+The validator rejects unknown envelope fields, accessors, prototypes, repeated object references, non-JSON values, non-canonical timestamps, malformed hashes, duplicate citations, conflicting top-level/metadata hashes, action/effect/risk mismatches, and inputs above fixed depth, node, field, string, array, and byte ceilings. Secret-bearing metadata keys are omitted recursively, including authorization, cookie, credential, password, passphrase, profile, secret, token, storage, form-value, API-key, private-key, and value-reference variants. Recognized token patterns in remaining strings are redacted. Qarinah retains only bounded operational fields, hashes the session identifier, coarsens actor and purpose presence, and never retains the browser body or arbitrary metadata.
+
+This boundary is always metadata-only, even in a workspace whose machine-local permit allows content capture. Every cited append reloads the exact workspace root and its current machine-local trust record; a repository config or forged workspace object is not consent. Exact replay is idempotent. Reusing one receipt-backed logical outcome identity with different digests, citations, or retained operational metadata fails with `EVENT_ID_CONFLICT`.
+
+```js
+import { createQarinahContextRecorder } from "cockroach-browser/qarinah";
+import { createCockroachBrowserMemorySink } from "qarinah";
+
+const qarinahSink = createCockroachBrowserMemorySink({ cwd: process.cwd() });
+const recorder = createQarinahContextRecorder(qarinahSink);
+
+// Connect the recorder only as an outcome observer. Cockroach Browser and the
+// host still own browser lifecycle, authorization, execution, and evidence.
+void recorder;
+```
+
+The accepted receiving schema is exported as `qarinah/schemas/cockroach-browser-memory.json`. It is intentionally narrower than a browser control API: it describes cited outcome metadata, not an action request, approval, capability token, or complete causal proof.
 
 ## Cockroach Crawler: SourceRecord ingestion
 
