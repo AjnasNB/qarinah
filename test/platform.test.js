@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { generateKeyPairSync, randomBytes } from "node:crypto";
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, realpath, writeFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import {
@@ -74,7 +74,7 @@ test("parallel workers initialize once and descendants reuse the same ledger", a
   })));
   assert.equal(new Set(workspaces.map(({ config }) => config.workspaceId)).size, 1);
   const nestedWorkspace = await import("../src/workspace.js").then(({ loadWorkspace }) => loadWorkspace(nested));
-  assert.equal(nestedWorkspace.root, root);
+  assert.equal(nestedWorkspace.root, await realpath(root));
   assert.equal(nestedWorkspace.config.workspaceId, workspaces[0].config.workspaceId);
   const recorded = await appendEvent(eventInput({
     title: "Agent A selected the release pipeline",
