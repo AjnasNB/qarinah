@@ -86,10 +86,10 @@ function sortJsonValue(value) {
 function sanitizeJsonValue(value, options = {}) {
   const limits = { ...DEFAULT_LIMITS, ...options };
   let nodes = 0;
-  function visit(candidate, path11, depth) {
+  function visit(candidate, path12, depth) {
     nodes += 1;
     if (nodes > limits.maximumNodes) throw new TypeError(`JSON value exceeds ${limits.maximumNodes} nodes.`);
-    if (depth > limits.maximumDepth) throw new TypeError(`JSON value exceeds depth ${limits.maximumDepth} at ${path11}.`);
+    if (depth > limits.maximumDepth) throw new TypeError(`JSON value exceeds depth ${limits.maximumDepth} at ${path12}.`);
     if (candidate === null || typeof candidate === "boolean") return candidate;
     if (typeof candidate === "string") {
       if (candidate.length > limits.maximumStringLength) {
@@ -99,42 +99,42 @@ function sanitizeJsonValue(value, options = {}) {
       return candidate;
     }
     if (typeof candidate === "number") {
-      if (!Number.isFinite(candidate)) throw new TypeError(`${path11} must contain only finite numbers.`);
+      if (!Number.isFinite(candidate)) throw new TypeError(`${path12} must contain only finite numbers.`);
       return Object.is(candidate, -0) ? 0 : candidate;
     }
     if (Array.isArray(candidate)) {
       if (candidate.length > limits.maximumArrayLength) {
-        throw new TypeError(`${path11} exceeds ${limits.maximumArrayLength} array items.`);
+        throw new TypeError(`${path12} exceeds ${limits.maximumArrayLength} array items.`);
       }
       const descriptors2 = Object.getOwnPropertyDescriptors(candidate);
       const allowed = /* @__PURE__ */ new Set(["length", ...Array.from({ length: candidate.length }, (_, index) => String(index))]);
       for (const key of Reflect.ownKeys(descriptors2)) {
-        if (typeof key !== "string" || !allowed.has(key)) throw new TypeError(`${path11} contains an unsupported array property.`);
+        if (typeof key !== "string" || !allowed.has(key)) throw new TypeError(`${path12} contains an unsupported array property.`);
       }
       return Array.from({ length: candidate.length }, (_, index) => {
         const descriptor = descriptors2[String(index)];
         if (!descriptor?.enumerable || !Object.hasOwn(descriptor, "value")) {
-          throw new TypeError(`${path11}[${index}] must be an enumerable data property.`);
+          throw new TypeError(`${path12}[${index}] must be an enumerable data property.`);
         }
-        return visit(descriptor.value, `${path11}[${index}]`, depth + 1);
+        return visit(descriptor.value, `${path12}[${index}]`, depth + 1);
       });
     }
-    if (!candidate || typeof candidate !== "object") throw new TypeError(`${path11} contains an unsupported value.`);
+    if (!candidate || typeof candidate !== "object") throw new TypeError(`${path12} contains an unsupported value.`);
     const prototype = Object.getPrototypeOf(candidate);
     if (prototype !== Object.prototype && prototype !== null) {
-      throw new TypeError(`${path11} must contain only plain records.`);
+      throw new TypeError(`${path12} must contain only plain records.`);
     }
     const descriptors = Object.getOwnPropertyDescriptors(candidate);
     const keys = Reflect.ownKeys(descriptors);
-    if (keys.length > limits.maximumObjectKeys) throw new TypeError(`${path11} exceeds ${limits.maximumObjectKeys} fields.`);
+    if (keys.length > limits.maximumObjectKeys) throw new TypeError(`${path12} exceeds ${limits.maximumObjectKeys} fields.`);
     const result = /* @__PURE__ */ Object.create(null);
     for (const key of keys) {
-      if (typeof key !== "string") throw new TypeError(`${path11} cannot contain symbol keys.`);
+      if (typeof key !== "string") throw new TypeError(`${path12} cannot contain symbol keys.`);
       const descriptor = descriptors[key];
       if (!descriptor.enumerable || !Object.hasOwn(descriptor, "value") || descriptor.value === void 0) {
-        throw new TypeError(`${path11}.${key} must be an enumerable data property with a defined value.`);
+        throw new TypeError(`${path12}.${key} must be an enumerable data property with a defined value.`);
       }
-      result[key] = visit(descriptor.value, `${path11}.${key}`, depth + 1);
+      result[key] = visit(descriptor.value, `${path12}.${key}`, depth + 1);
     }
     return result;
   }
@@ -159,56 +159,56 @@ function snapshotJsonBoundary(value, options = {}) {
   const limits = { ...DEFAULT_LIMITS2, ...options };
   const seen = /* @__PURE__ */ new WeakSet();
   let nodes = 0;
-  function visit(candidate, path11, depth) {
+  function visit(candidate, path12, depth) {
     nodes += 1;
     if (nodes > limits.maximumNodes) throw new TypeError(`${limits.label} exceeds ${limits.maximumNodes} JSON nodes.`);
-    if (depth > limits.maximumDepth) throw new TypeError(`${limits.label} exceeds depth ${limits.maximumDepth} at ${path11}.`);
+    if (depth > limits.maximumDepth) throw new TypeError(`${limits.label} exceeds depth ${limits.maximumDepth} at ${path12}.`);
     if (candidate === null || typeof candidate === "boolean") return candidate;
     if (typeof candidate === "string") {
       if (candidate.length > limits.maximumStringLength) {
-        throw new TypeError(`${path11} exceeds ${limits.maximumStringLength} characters.`);
+        throw new TypeError(`${path12} exceeds ${limits.maximumStringLength} characters.`);
       }
       return candidate;
     }
     if (typeof candidate === "number") {
       if (!Number.isFinite(candidate) || Object.is(candidate, -0)) {
-        throw new TypeError(`${path11} must be a finite JSON number other than negative zero.`);
+        throw new TypeError(`${path12} must be a finite JSON number other than negative zero.`);
       }
       return candidate;
     }
-    if (!candidate || typeof candidate !== "object") throw new TypeError(`${path11} contains a non-JSON value.`);
-    if (seen.has(candidate)) throw new TypeError(`${path11} contains a cyclic or repeated object reference.`);
+    if (!candidate || typeof candidate !== "object") throw new TypeError(`${path12} contains a non-JSON value.`);
+    if (seen.has(candidate)) throw new TypeError(`${path12} contains a cyclic or repeated object reference.`);
     seen.add(candidate);
     if (Array.isArray(candidate)) {
       if (candidate.length > limits.maximumArrayLength) {
-        throw new TypeError(`${path11} exceeds ${limits.maximumArrayLength} array entries.`);
+        throw new TypeError(`${path12} exceeds ${limits.maximumArrayLength} array entries.`);
       }
       const descriptors2 = Object.getOwnPropertyDescriptors(candidate);
       const expected = /* @__PURE__ */ new Set(["length", ...Array.from({ length: candidate.length }, (_, index) => String(index))]);
       for (const key of Reflect.ownKeys(descriptors2)) {
-        if (typeof key !== "string" || !expected.has(key)) throw new TypeError(`${path11} contains an unsupported array property.`);
+        if (typeof key !== "string" || !expected.has(key)) throw new TypeError(`${path12} contains an unsupported array property.`);
       }
       return Array.from({ length: candidate.length }, (_, index) => {
         const descriptor = descriptors2[String(index)];
         if (!descriptor?.enumerable || !Object.hasOwn(descriptor, "value")) {
-          throw new TypeError(`${path11}[${index}] must be an enumerable data property.`);
+          throw new TypeError(`${path12}[${index}] must be an enumerable data property.`);
         }
-        return visit(descriptor.value, `${path11}[${index}]`, depth + 1);
+        return visit(descriptor.value, `${path12}[${index}]`, depth + 1);
       });
     }
     const prototype = Object.getPrototypeOf(candidate);
-    if (prototype !== Object.prototype && prototype !== null) throw new TypeError(`${path11} must be a plain record.`);
+    if (prototype !== Object.prototype && prototype !== null) throw new TypeError(`${path12} must be a plain record.`);
     const descriptors = Object.getOwnPropertyDescriptors(candidate);
     const keys = Reflect.ownKeys(descriptors);
-    if (keys.length > limits.maximumObjectKeys) throw new TypeError(`${path11} exceeds ${limits.maximumObjectKeys} fields.`);
+    if (keys.length > limits.maximumObjectKeys) throw new TypeError(`${path12} exceeds ${limits.maximumObjectKeys} fields.`);
     const result = /* @__PURE__ */ Object.create(null);
     for (const key of keys) {
-      if (typeof key !== "string") throw new TypeError(`${path11} cannot contain symbol keys.`);
+      if (typeof key !== "string") throw new TypeError(`${path12} cannot contain symbol keys.`);
       const descriptor = descriptors[key];
       if (!descriptor.enumerable || !Object.hasOwn(descriptor, "value") || descriptor.value === void 0) {
-        throw new TypeError(`${path11}.${key} must be an enumerable data property with a defined value.`);
+        throw new TypeError(`${path12}.${key} must be an enumerable data property with a defined value.`);
       }
-      result[key] = visit(descriptor.value, `${path11}.${key}`, depth + 1);
+      result[key] = visit(descriptor.value, `${path12}.${key}`, depth + 1);
     }
     return result;
   }
@@ -256,12 +256,64 @@ var init_boundary = __esm({
 });
 
 // src/redact.js
+function privateKeyLabel(value, start, end) {
+  if (end - start < PRIVATE_KEY_LABEL_SUFFIX.length) return false;
+  const suffixStart = end - PRIVATE_KEY_LABEL_SUFFIX.length;
+  if (!value.startsWith(PRIVATE_KEY_LABEL_SUFFIX, suffixStart)) return false;
+  for (let index = start; index < suffixStart; index += 1) {
+    const code = value.charCodeAt(index);
+    if (code !== 32 && (code < 65 || code > 90)) return false;
+  }
+  return true;
+}
+function privateKeyMarkerEnd(value, start, prefix) {
+  if (!value.startsWith(prefix, start)) return -1;
+  const labelStart = start + prefix.length;
+  const suffixStart = value.indexOf(PEM_MARKER_SUFFIX, labelStart);
+  if (suffixStart === -1 || !privateKeyLabel(value, labelStart, suffixStart)) return -1;
+  return suffixStart + PEM_MARKER_SUFFIX.length;
+}
+function redactPrivateKeyBlocks(value) {
+  let pieces;
+  let copiedThrough = 0;
+  let searchFrom = 0;
+  while (searchFrom < value.length) {
+    const beginStart = value.indexOf(PEM_BEGIN_PREFIX, searchFrom);
+    if (beginStart === -1) break;
+    const beginEnd = privateKeyMarkerEnd(value, beginStart, PEM_BEGIN_PREFIX);
+    if (beginEnd === -1) {
+      searchFrom = beginStart + PEM_BEGIN_PREFIX.length;
+      continue;
+    }
+    let endEnd = -1;
+    let endSearchFrom = beginEnd;
+    while (endSearchFrom < value.length) {
+      const endStart = value.indexOf(PEM_END_PREFIX, endSearchFrom);
+      if (endStart === -1) break;
+      endEnd = privateKeyMarkerEnd(value, endStart, PEM_END_PREFIX);
+      if (endEnd !== -1) break;
+      endSearchFrom = endStart + PEM_END_PREFIX.length;
+    }
+    pieces ??= [];
+    pieces.push(value.slice(copiedThrough, beginStart), "[REDACTED]");
+    if (endEnd === -1) {
+      copiedThrough = value.length;
+      searchFrom = value.length;
+    } else {
+      copiedThrough = endEnd;
+      searchFrom = endEnd;
+    }
+  }
+  if (pieces === void 0) return value;
+  pieces.push(value.slice(copiedThrough));
+  return pieces.join("");
+}
 function sensitiveKey(value) {
   const normalized = String(value).replace(/([a-z0-9])([A-Z])/g, "$1_$2").replace(/[^A-Za-z0-9]+/g, "_").toLowerCase();
   return SENSITIVE_KEY.test(normalized);
 }
 function redactText(value) {
-  let output = value;
+  let output = redactPrivateKeyBlocks(value);
   for (const pattern of SECRET_PATTERNS) output = output.replace(pattern, "[REDACTED]");
   return output;
 }
@@ -280,7 +332,7 @@ function redactValue(value, options = {}) {
   }
   return visit(safe);
 }
-var SENSITIVE_KEY, SECRET_PATTERNS;
+var SENSITIVE_KEY, SECRET_PATTERNS, PEM_BEGIN_PREFIX, PEM_END_PREFIX, PEM_MARKER_SUFFIX, PRIVATE_KEY_LABEL_SUFFIX;
 var init_redact = __esm({
   "src/redact.js"() {
     init_canonical();
@@ -290,9 +342,12 @@ var init_redact = __esm({
       /\bsk-[A-Za-z0-9_-]{16,}\b/g,
       /\b(?:gh[pousr]|github_pat)_[A-Za-z0-9_]{16,}\b/g,
       /\bnpm_[A-Za-z0-9]{16,}\b/g,
-      /\bAKIA[0-9A-Z]{16}\b/g,
-      /-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----/g
+      /\bAKIA[0-9A-Z]{16}\b/g
     ];
+    PEM_BEGIN_PREFIX = "-----BEGIN ";
+    PEM_END_PREFIX = "-----END ";
+    PEM_MARKER_SUFFIX = "-----";
+    PRIVATE_KEY_LABEL_SUFFIX = "PRIVATE KEY";
   }
 });
 
@@ -361,6 +416,65 @@ function normalizeAuthority(value) {
     basis: boundedString(authority.basis ?? "host-assigned", "authority.basis", 512)
   });
 }
+function normalizeTemporal(value, eventTimestamp) {
+  if (value === void 0 || value === null) return null;
+  const temporal = record(value, "temporal", /* @__PURE__ */ new Set(["validFrom", "validUntil"]));
+  const validFrom = temporal.validFrom === void 0 ? eventTimestamp : canonicalIsoTimestamp(temporal.validFrom, "temporal.validFrom");
+  const validUntil = temporal.validUntil === void 0 || temporal.validUntil === null ? null : canonicalIsoTimestamp(temporal.validUntil, "temporal.validUntil");
+  if (validUntil !== null && validUntil <= validFrom) {
+    throw new TypeError("temporal.validUntil must be later than temporal.validFrom.");
+  }
+  return Object.freeze({ validFrom, validUntil });
+}
+function normalizeRepository(value) {
+  if (value === void 0 || value === null) return null;
+  const repository = record(value, "repository", /* @__PURE__ */ new Set(["id", "branch", "commit"]));
+  return Object.freeze({
+    id: boundedString(repository.id, "repository.id", 256),
+    branch: repository.branch === void 0 || repository.branch === null ? null : boundedString(repository.branch, "repository.branch", 512),
+    commit: repository.commit === void 0 || repository.commit === null ? null : boundedString(repository.commit, "repository.commit", 128)
+  });
+}
+function normalizeFreshness(value) {
+  if (value === void 0 || value === null) return null;
+  const freshness = record(value, "freshness", /* @__PURE__ */ new Set(["files", "dependencies"]));
+  const files = freshness.files ?? [];
+  const dependencies = freshness.dependencies ?? [];
+  if (!Array.isArray(files) || files.length > 512) throw new TypeError("freshness.files must contain at most 512 entries.");
+  if (!Array.isArray(dependencies) || dependencies.length > 512) {
+    throw new TypeError("freshness.dependencies must contain at most 512 entries.");
+  }
+  const normalizedFiles = files.map((candidate, index) => {
+    const file = record(candidate, `freshness.files[${index}]`, /* @__PURE__ */ new Set(["path", "hash"]));
+    const hash = boundedString(file.hash, `freshness.files[${index}].hash`, 71);
+    if (!HASH_PATTERN.test(hash)) throw new TypeError(`freshness.files[${index}].hash is invalid.`);
+    return Object.freeze({ path: boundedString(file.path, `freshness.files[${index}].path`, 1024), hash });
+  });
+  const normalizedDependencies = dependencies.map((candidate, index) => {
+    const dependency = record(candidate, `freshness.dependencies[${index}]`, /* @__PURE__ */ new Set(["name", "version", "hash"]));
+    const hash = boundedString(dependency.hash, `freshness.dependencies[${index}].hash`, 71);
+    if (!HASH_PATTERN.test(hash)) throw new TypeError(`freshness.dependencies[${index}].hash is invalid.`);
+    return Object.freeze({
+      name: boundedString(dependency.name, `freshness.dependencies[${index}].name`, 512),
+      version: dependency.version === void 0 || dependency.version === null ? null : boundedString(dependency.version, `freshness.dependencies[${index}].version`, 256),
+      hash
+    });
+  });
+  return Object.freeze({ files: Object.freeze(normalizedFiles), dependencies: Object.freeze(normalizedDependencies) });
+}
+function normalizeDisclosure(value) {
+  if (value === void 0 || value === null) return null;
+  const disclosure = record(value, "disclosure", /* @__PURE__ */ new Set(["scopes", "classification"]));
+  const scopes = disclosure.scopes ?? [];
+  if (!Array.isArray(scopes) || scopes.length > 64) throw new TypeError("disclosure.scopes must contain at most 64 entries.");
+  const normalized = scopes.map((scope, index) => boundedString(scope, `disclosure.scopes[${index}]`, 256));
+  if (new Set(normalized).size !== normalized.length) throw new TypeError("disclosure.scopes cannot contain duplicates.");
+  const classification = disclosure.classification ?? "workspace";
+  if (!["public", "workspace", "restricted"].includes(classification)) {
+    throw new TypeError("disclosure.classification is invalid.");
+  }
+  return Object.freeze({ scopes: Object.freeze([...normalized].sort()), classification });
+}
 function normalizeRetention(value = {}) {
   const retention = record(value, "retention", /* @__PURE__ */ new Set(["class", "expiresAt"]));
   const retentionClass = retention.class ?? "project";
@@ -398,7 +512,21 @@ function createEventEnvelope(input, options) {
   const data = redactValue(rawData, { label: "data", maximumStringLength: 65536, maximumObjectKeys: 128 });
   const relations = normalizeRelations(candidate.relations);
   const authority = normalizeAuthority(candidate.authority);
-  const content = { title, body, data, ...authority === null ? {} : { authority }, relations };
+  const temporal = normalizeTemporal(candidate.temporal, eventTimestamp);
+  const repository = normalizeRepository(candidate.repository);
+  const freshness = normalizeFreshness(candidate.freshness);
+  const disclosure = normalizeDisclosure(candidate.disclosure);
+  const content = {
+    title,
+    body,
+    data,
+    ...authority === null ? {} : { authority },
+    ...temporal === null ? {} : { temporal },
+    ...repository === null ? {} : { repository },
+    ...freshness === null ? {} : { freshness },
+    ...disclosure === null ? {} : { disclosure },
+    relations
+  };
   const previousHash = options?.previousHash ?? null;
   if (previousHash !== null && !HASH_PATTERN.test(previousHash)) throw new TypeError("previousHash is invalid.");
   const confidence = candidate.confidence ?? "extracted";
@@ -417,6 +545,10 @@ function createEventEnvelope(input, options) {
     data,
     confidence,
     ...authority === null ? {} : { authority },
+    ...temporal === null ? {} : { temporal },
+    ...repository === null ? {} : { repository },
+    ...freshness === null ? {} : { freshness },
+    ...disclosure === null ? {} : { disclosure },
     relations,
     provenance: normalizeProvenance(candidate.provenance, content),
     retention: normalizeRetention(candidate.retention),
@@ -444,6 +576,10 @@ function validateStoredEvent(value, options = {}) {
     data: event.data,
     confidence: event.confidence,
     ...event.authority === void 0 ? {} : { authority: event.authority },
+    ...event.temporal === void 0 ? {} : { temporal: event.temporal },
+    ...event.repository === void 0 ? {} : { repository: event.repository },
+    ...event.freshness === void 0 ? {} : { freshness: event.freshness },
+    ...event.disclosure === void 0 ? {} : { disclosure: event.disclosure },
     relations: event.relations,
     provenance: event.provenance,
     retention: event.retention
@@ -490,7 +626,10 @@ var init_contracts = __esm({
       "claim",
       "decision",
       "approval",
-      "summary"
+      "summary",
+      "memory.scope.attached",
+      "memory.scope.revoked",
+      "context.pack.compiled"
     ]);
     RELATION_TYPES = Object.freeze([
       "derived_from",
@@ -519,6 +658,10 @@ var init_contracts = __esm({
       "data",
       "confidence",
       "authority",
+      "temporal",
+      "repository",
+      "freshness",
+      "disclosure",
       "relations",
       "provenance",
       "retention"
@@ -537,6 +680,10 @@ var init_contracts = __esm({
       "data",
       "confidence",
       "authority",
+      "temporal",
+      "repository",
+      "freshness",
+      "disclosure",
       "relations",
       "provenance",
       "retention",
@@ -2617,7 +2764,7 @@ var require_ignore = __commonJS({
       //   path matching.
       // - check `string` either `MODE_IGNORE` or `MODE_CHECK_IGNORE`
       // @returns {TestResult} true if a file is ignored
-      test(path11, checkUnignored, mode) {
+      test(path12, checkUnignored, mode) {
         let ignored = false;
         let unignored = false;
         let matchedRule;
@@ -2626,7 +2773,7 @@ var require_ignore = __commonJS({
           if (unignored === negative && ignored !== unignored || negative && !ignored && !unignored && !checkUnignored) {
             return;
           }
-          const matched = rule[mode].test(path11);
+          const matched = rule[mode].test(path12);
           if (!matched) {
             return;
           }
@@ -2647,17 +2794,17 @@ var require_ignore = __commonJS({
     var throwError = (message, Ctor) => {
       throw new Ctor(message);
     };
-    var checkPath = (path11, originalPath, doThrow) => {
-      if (!isString(path11)) {
+    var checkPath = (path12, originalPath, doThrow) => {
+      if (!isString(path12)) {
         return doThrow(
           `path must be a string, but got \`${originalPath}\``,
           TypeError
         );
       }
-      if (!path11) {
+      if (!path12) {
         return doThrow(`path must not be empty`, TypeError);
       }
-      if (checkPath.isNotRelative(path11)) {
+      if (checkPath.isNotRelative(path12)) {
         const r = "`path.relative()`d";
         return doThrow(
           `path should be a ${r} string, but got "${originalPath}"`,
@@ -2666,7 +2813,7 @@ var require_ignore = __commonJS({
       }
       return true;
     };
-    var isNotRelative = (path11) => REGEX_TEST_INVALID_PATH.test(path11);
+    var isNotRelative = (path12) => REGEX_TEST_INVALID_PATH.test(path12);
     checkPath.isNotRelative = isNotRelative;
     checkPath.convert = (p) => p;
     var Ignore = class {
@@ -2696,19 +2843,19 @@ var require_ignore = __commonJS({
       }
       // @returns {TestResult}
       _test(originalPath, cache, checkUnignored, slices) {
-        const path11 = originalPath && checkPath.convert(originalPath);
+        const path12 = originalPath && checkPath.convert(originalPath);
         checkPath(
-          path11,
+          path12,
           originalPath,
           this._strictPathCheck ? throwError : RETURN_FALSE
         );
-        return this._t(path11, cache, checkUnignored, slices);
+        return this._t(path12, cache, checkUnignored, slices);
       }
-      checkIgnore(path11) {
-        if (!REGEX_TEST_TRAILING_SLASH.test(path11)) {
-          return this.test(path11);
+      checkIgnore(path12) {
+        if (!REGEX_TEST_TRAILING_SLASH.test(path12)) {
+          return this.test(path12);
         }
-        const slices = path11.split(SLASH).filter(Boolean);
+        const slices = path12.split(SLASH).filter(Boolean);
         slices.pop();
         if (slices.length) {
           const parent = this._t(
@@ -2721,18 +2868,18 @@ var require_ignore = __commonJS({
             return parent;
           }
         }
-        return this._rules.test(path11, false, MODE_CHECK_IGNORE);
+        return this._rules.test(path12, false, MODE_CHECK_IGNORE);
       }
-      _t(path11, cache, checkUnignored, slices) {
-        if (path11 in cache) {
-          return cache[path11];
+      _t(path12, cache, checkUnignored, slices) {
+        if (path12 in cache) {
+          return cache[path12];
         }
         if (!slices) {
-          slices = path11.split(SLASH).filter(Boolean);
+          slices = path12.split(SLASH).filter(Boolean);
         }
         slices.pop();
         if (!slices.length) {
-          return cache[path11] = this._rules.test(path11, checkUnignored, MODE_IGNORE);
+          return cache[path12] = this._rules.test(path12, checkUnignored, MODE_IGNORE);
         }
         const parent = this._t(
           slices.join(SLASH) + SLASH,
@@ -2740,29 +2887,29 @@ var require_ignore = __commonJS({
           checkUnignored,
           slices
         );
-        return cache[path11] = parent.ignored ? parent : this._rules.test(path11, checkUnignored, MODE_IGNORE);
+        return cache[path12] = parent.ignored ? parent : this._rules.test(path12, checkUnignored, MODE_IGNORE);
       }
-      ignores(path11) {
-        return this._test(path11, this._ignoreCache, false).ignored;
+      ignores(path12) {
+        return this._test(path12, this._ignoreCache, false).ignored;
       }
       createFilter() {
-        return (path11) => !this.ignores(path11);
+        return (path12) => !this.ignores(path12);
       }
       filter(paths) {
         return makeArray(paths).filter(this.createFilter());
       }
       // @returns {TestResult}
-      test(path11) {
-        return this._test(path11, this._testCache, true);
+      test(path12) {
+        return this._test(path12, this._testCache, true);
       }
     };
     var factory = (options) => new Ignore(options);
-    var isPathValid = (path11) => checkPath(path11 && checkPath.convert(path11), path11, RETURN_FALSE);
+    var isPathValid = (path12) => checkPath(path12 && checkPath.convert(path12), path12, RETURN_FALSE);
     var setupWindows = () => {
       const makePosix = (str) => /^\\\\\?\\/.test(str) || /["<>|\u0000-\u001F]+/u.test(str) ? str : str.replace(/\\/g, "/");
       checkPath.convert = makePosix;
       const REGEX_TEST_WINDOWS_PATH_ABSOLUTE = /^[a-z]:\//i;
-      checkPath.isNotRelative = (path11) => REGEX_TEST_WINDOWS_PATH_ABSOLUTE.test(path11) || isNotRelative(path11);
+      checkPath.isNotRelative = (path12) => REGEX_TEST_WINDOWS_PATH_ABSOLUTE.test(path12) || isNotRelative(path12);
     };
     if (
       // Detect `process` so that it can run in browsers.
@@ -2793,7 +2940,7 @@ init_workspace();
 // src/indexer.js
 init_canonical();
 init_errors();
-import path3 from "node:path";
+import path4 from "node:path";
 
 // src/markdown.js
 var UNSAFE_CONTROL_CHARACTER = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/g;
@@ -2812,6 +2959,448 @@ function markdownDataBlock(value) {
 
 // src/indexer.js
 init_store();
+
+// src/sqlite-read-model.js
+init_canonical();
+init_errors();
+init_workspace();
+import { randomBytes as randomBytes3 } from "node:crypto";
+import { rm as rm4, rename as rename4 } from "node:fs/promises";
+import path3 from "node:path";
+import { pathToFileURL } from "node:url";
+var SQLITE_READ_MODEL_SCHEMA_VERSION = 1;
+var SQLITE_READ_MODEL_FILENAME = "qarinah.db";
+var databaseSyncPromise;
+function loadDatabaseSync() {
+  databaseSyncPromise ??= import("node:sqlite").then(({ DatabaseSync }) => DatabaseSync);
+  return databaseSyncPromise;
+}
+var SCHEMA = `
+  PRAGMA foreign_keys = ON;
+  PRAGMA trusted_schema = OFF;
+  CREATE TABLE read_model_meta (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+  ) STRICT;
+  CREATE TABLE read_model_migrations (
+    version INTEGER PRIMARY KEY,
+    applied_at TEXT NOT NULL,
+    description TEXT NOT NULL
+  ) STRICT;
+  CREATE TABLE events (
+    event_id TEXT PRIMARY KEY,
+    workspace_id TEXT NOT NULL,
+    timestamp TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    title TEXT NOT NULL,
+    body TEXT NOT NULL,
+    data_json TEXT NOT NULL,
+    confidence TEXT NOT NULL,
+    authority_scope TEXT,
+    repository_id TEXT,
+    valid_from TEXT NOT NULL,
+    valid_until TEXT,
+    event_hash TEXT NOT NULL UNIQUE
+  ) STRICT;
+  CREATE TABLE nodes (
+    node_id TEXT PRIMARY KEY,
+    node_type TEXT NOT NULL,
+    source_event_id TEXT,
+    payload_json TEXT NOT NULL
+  ) STRICT;
+  CREATE TABLE edges (
+    source_id TEXT NOT NULL,
+    edge_type TEXT NOT NULL,
+    target_id TEXT NOT NULL,
+    source_event_id TEXT,
+    payload_json TEXT NOT NULL,
+    PRIMARY KEY (source_id, edge_type, target_id, source_event_id)
+  ) STRICT;
+  CREATE TABLE citations (
+    event_id TEXT NOT NULL REFERENCES events(event_id) ON DELETE CASCADE,
+    source_id TEXT,
+    adapter TEXT NOT NULL,
+    content_hash TEXT NOT NULL,
+    PRIMARY KEY (event_id, content_hash)
+  ) STRICT;
+  CREATE TABLE documents (
+    document_id TEXT PRIMARY KEY,
+    repository_id TEXT,
+    path TEXT NOT NULL,
+    content_hash TEXT,
+    source_event_id TEXT NOT NULL,
+    payload_json TEXT NOT NULL
+  ) STRICT;
+  CREATE TABLE sources (
+    source_id TEXT PRIMARY KEY,
+    adapter TEXT NOT NULL,
+    latest_event_id TEXT NOT NULL,
+    content_hash TEXT NOT NULL
+  ) STRICT;
+  CREATE TABLE decisions (
+    event_id TEXT PRIMARY KEY REFERENCES events(event_id) ON DELETE CASCADE,
+    status TEXT NOT NULL CHECK (status IN ('current', 'superseded')),
+    valid_from TEXT NOT NULL,
+    valid_until TEXT
+  ) STRICT;
+  CREATE TABLE conflicts (
+    left_event_id TEXT NOT NULL,
+    right_event_id TEXT NOT NULL,
+    detected_by_event_id TEXT NOT NULL,
+    PRIMARY KEY (left_event_id, right_event_id, detected_by_event_id)
+  ) STRICT;
+  CREATE TABLE supersessions (
+    superseding_event_id TEXT NOT NULL,
+    superseded_event_id TEXT NOT NULL,
+    effective_at TEXT NOT NULL,
+    PRIMARY KEY (superseding_event_id, superseded_event_id)
+  ) STRICT;
+  CREATE TABLE freshness (
+    event_id TEXT NOT NULL REFERENCES events(event_id) ON DELETE CASCADE,
+    subject_type TEXT NOT NULL CHECK (subject_type IN ('file', 'dependency')),
+    subject_id TEXT NOT NULL,
+    expected_hash TEXT NOT NULL,
+    branch TEXT,
+    commit_id TEXT,
+    PRIMARY KEY (event_id, subject_type, subject_id)
+  ) STRICT;
+  CREATE TABLE context_packs (
+    manifest_hash TEXT PRIMARY KEY,
+    event_id TEXT,
+    query_text TEXT NOT NULL,
+    compiled_at TEXT NOT NULL,
+    as_of TEXT NOT NULL,
+    payload_json TEXT NOT NULL
+  ) STRICT;
+  CREATE TABLE context_pack_items (
+    manifest_hash TEXT NOT NULL REFERENCES context_packs(manifest_hash) ON DELETE CASCADE,
+    event_id TEXT NOT NULL,
+    rank INTEGER NOT NULL,
+    PRIMARY KEY (manifest_hash, event_id)
+  ) STRICT;
+  CREATE TABLE agent_disclosures (
+    attachment_id TEXT PRIMARY KEY,
+    agent_id TEXT NOT NULL,
+    run_id TEXT,
+    scopes_json TEXT NOT NULL,
+    repositories_json TEXT NOT NULL,
+    attached_at TEXT NOT NULL,
+    expires_at TEXT,
+    revoked_at TEXT,
+    assigned_by TEXT NOT NULL,
+    source_event_id TEXT NOT NULL
+  ) STRICT;
+  CREATE TABLE sync_outbox (
+    event_id TEXT PRIMARY KEY,
+    queued_at TEXT NOT NULL,
+    destination TEXT NOT NULL,
+    state TEXT NOT NULL CHECK (state IN ('pending', 'sent', 'failed')),
+    payload_hash TEXT NOT NULL
+  ) STRICT;
+  CREATE VIRTUAL TABLE events_fts USING fts5(
+    event_id UNINDEXED,
+    title,
+    body,
+    data_text,
+    tokenize = 'unicode61 remove_diacritics 2'
+  );
+  CREATE INDEX events_temporal_idx ON events(valid_from, valid_until);
+  CREATE INDEX events_repository_idx ON events(repository_id, timestamp);
+  CREATE INDEX edges_target_idx ON edges(target_id, edge_type);
+  CREATE INDEX freshness_subject_idx ON freshness(subject_type, subject_id);
+`;
+function primitiveDataText(value, output = [], depth = 0) {
+  if (depth > 4 || output.length >= 512) return output;
+  if (value === null || value === void 0) return output;
+  if (["string", "number", "boolean"].includes(typeof value)) {
+    output.push(String(value).slice(0, 4096));
+    return output;
+  }
+  if (Array.isArray(value)) {
+    for (const entry of value.slice(0, 128)) primitiveDataText(entry, output, depth + 1);
+    return output;
+  }
+  if (typeof value === "object") {
+    for (const [key, entry] of Object.entries(value).slice(0, 128)) {
+      output.push(key);
+      primitiveDataText(entry, output, depth + 1);
+    }
+  }
+  return output;
+}
+function canonical(value) {
+  return canonicalStringify(value ?? null);
+}
+function normalizedPair(left, right) {
+  return left.localeCompare(right) <= 0 ? [left, right] : [right, left];
+}
+function insertEvents(database, events) {
+  const insertEvent = database.prepare(`INSERT INTO events (
+    event_id, workspace_id, timestamp, kind, title, body, data_json, confidence,
+    authority_scope, repository_id, valid_from, valid_until, event_hash
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+  const insertFts = database.prepare("INSERT INTO events_fts(event_id, title, body, data_text) VALUES (?, ?, ?, ?)");
+  const insertCitation = database.prepare("INSERT INTO citations(event_id, source_id, adapter, content_hash) VALUES (?, ?, ?, ?)");
+  const insertSource = database.prepare(`INSERT INTO sources(source_id, adapter, latest_event_id, content_hash)
+    VALUES (?, ?, ?, ?) ON CONFLICT(source_id) DO UPDATE SET
+      adapter = excluded.adapter, latest_event_id = excluded.latest_event_id, content_hash = excluded.content_hash`);
+  const insertDecision = database.prepare("INSERT INTO decisions(event_id, status, valid_from, valid_until) VALUES (?, ?, ?, ?)");
+  const insertFreshness = database.prepare(`INSERT INTO freshness(
+    event_id, subject_type, subject_id, expected_hash, branch, commit_id
+  ) VALUES (?, ?, ?, ?, ?, ?)`);
+  const insertDisclosure = database.prepare(`INSERT INTO agent_disclosures(
+    attachment_id, agent_id, run_id, scopes_json, repositories_json, attached_at, expires_at,
+    revoked_at, assigned_by, source_event_id
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  ON CONFLICT(attachment_id) DO UPDATE SET
+    agent_id = excluded.agent_id, run_id = excluded.run_id, scopes_json = excluded.scopes_json,
+    repositories_json = excluded.repositories_json, expires_at = excluded.expires_at,
+    revoked_at = COALESCE(excluded.revoked_at, agent_disclosures.revoked_at),
+    assigned_by = excluded.assigned_by, source_event_id = excluded.source_event_id`);
+  const insertPack = database.prepare(`INSERT OR REPLACE INTO context_packs(
+    manifest_hash, event_id, query_text, compiled_at, as_of, payload_json
+  ) VALUES (?, ?, ?, ?, ?, ?)`);
+  const insertPackItem = database.prepare("INSERT OR REPLACE INTO context_pack_items(manifest_hash, event_id, rank) VALUES (?, ?, ?)");
+  for (const event of events) {
+    const validFrom = event.temporal?.validFrom ?? event.timestamp;
+    const validUntil = event.temporal?.validUntil ?? null;
+    insertEvent.run(
+      event.eventId,
+      event.workspaceId,
+      event.timestamp,
+      event.kind,
+      event.title,
+      event.body,
+      canonical(event.data),
+      event.confidence,
+      event.authority?.scope ?? null,
+      event.repository?.id ?? null,
+      validFrom,
+      validUntil,
+      event.hash
+    );
+    insertFts.run(event.eventId, event.title, event.body, primitiveDataText(event.data).join("\n"));
+    insertCitation.run(event.eventId, event.provenance.sourceId, event.provenance.adapter, event.provenance.contentHash);
+    if (event.provenance.sourceId) {
+      insertSource.run(event.provenance.sourceId, event.provenance.adapter, event.eventId, event.provenance.contentHash);
+    }
+    if (event.kind === "decision") insertDecision.run(event.eventId, "current", validFrom, validUntil);
+    for (const file of event.freshness?.files ?? []) {
+      insertFreshness.run(event.eventId, "file", file.path, file.hash, event.repository?.branch ?? null, event.repository?.commit ?? null);
+    }
+    for (const dependency of event.freshness?.dependencies ?? []) {
+      insertFreshness.run(event.eventId, "dependency", dependency.name, dependency.hash, event.repository?.branch ?? null, event.repository?.commit ?? null);
+    }
+    const disclosure = event.data?.memoryAttachment;
+    if (["memory.scope.attached", "memory.scope.revoked"].includes(event.kind) && disclosure && typeof disclosure === "object") {
+      insertDisclosure.run(
+        disclosure.attachmentId,
+        disclosure.agentId,
+        disclosure.runId ?? null,
+        canonical(disclosure.scopes ?? []),
+        canonical(disclosure.repositories ?? []),
+        disclosure.attachedAt ?? event.timestamp,
+        disclosure.expiresAt ?? null,
+        event.kind === "memory.scope.revoked" ? disclosure.revokedAt ?? event.timestamp : null,
+        disclosure.assignedBy ?? event.actor.id,
+        event.eventId
+      );
+    }
+    const pack = event.data?.contextPack;
+    if (event.kind === "context.pack.compiled" && pack?.manifestHash) {
+      insertPack.run(
+        pack.manifestHash,
+        event.eventId,
+        pack.query ?? "",
+        event.timestamp,
+        pack.asOf ?? event.timestamp,
+        canonical(pack)
+      );
+      for (const [rank, item] of (pack.items ?? []).entries()) {
+        if (typeof item?.eventId === "string") insertPackItem.run(pack.manifestHash, item.eventId, rank + 1);
+      }
+    }
+  }
+}
+function insertGraph(database, graph, eventsById) {
+  const insertNode = database.prepare("INSERT INTO nodes(node_id, node_type, source_event_id, payload_json) VALUES (?, ?, ?, ?)");
+  const insertEdge = database.prepare("INSERT INTO edges(source_id, edge_type, target_id, source_event_id, payload_json) VALUES (?, ?, ?, ?, ?)");
+  const insertConflict = database.prepare("INSERT OR IGNORE INTO conflicts(left_event_id, right_event_id, detected_by_event_id) VALUES (?, ?, ?)");
+  const insertSupersession = database.prepare("INSERT OR IGNORE INTO supersessions(superseding_event_id, superseded_event_id, effective_at) VALUES (?, ?, ?)");
+  const markSuperseded = database.prepare("UPDATE decisions SET status = 'superseded', valid_until = COALESCE(valid_until, ?) WHERE event_id = ?");
+  const insertDocument = database.prepare(`INSERT OR REPLACE INTO documents(
+    document_id, repository_id, path, content_hash, source_event_id, payload_json
+  ) VALUES (?, ?, ?, ?, ?, ?)`);
+  for (const node of graph.nodes) {
+    insertNode.run(node.id, node.type, node.sourceEventId ?? null, canonical(node));
+    if (node.type === "project.file" && node.sourceEventId) {
+      const source = eventsById.get(node.sourceEventId);
+      insertDocument.run(node.id, source?.repository?.id ?? null, node.path, node.contentHash ?? null, node.sourceEventId, canonical(node));
+    }
+  }
+  for (const edge of graph.edges) {
+    insertEdge.run(edge.source, edge.type, edge.target, edge.sourceEventId ?? edge.source ?? null, canonical(edge));
+    if (edge.type === "contradicts" && eventsById.has(edge.source) && eventsById.has(edge.target)) {
+      const [left, right] = normalizedPair(edge.source, edge.target);
+      insertConflict.run(left, right, edge.source);
+    }
+    if (edge.type === "supersedes" && eventsById.has(edge.source) && eventsById.has(edge.target)) {
+      const effectiveAt = eventsById.get(edge.source).temporal?.validFrom ?? eventsById.get(edge.source).timestamp;
+      insertSupersession.run(edge.source, edge.target, effectiveAt);
+      markSuperseded.run(effectiveAt, edge.target);
+    }
+  }
+}
+async function replaceDatabase(temporary, destination) {
+  const backup = `${destination}.${process.pid}.${randomBytes3(6).toString("hex")}.previous`;
+  let movedExisting = false;
+  let installedReplacement = false;
+  try {
+    try {
+      await rename4(destination, backup);
+      movedExisting = true;
+    } catch (error) {
+      if (error?.code !== "ENOENT") throw error;
+    }
+    await rename4(temporary, destination);
+    installedReplacement = true;
+    if (movedExisting) {
+      await rm4(backup, { force: true });
+      movedExisting = false;
+    }
+  } catch (error) {
+    if (movedExisting && !installedReplacement) {
+      try {
+        await rename4(backup, destination);
+        movedExisting = false;
+      } catch (restoreError) {
+        throw new AggregateError(
+          [error, restoreError],
+          `SQLite read-model replacement failed and the original database remains at ${backup}.`
+        );
+      }
+    }
+    throw error;
+  } finally {
+    await rm4(temporary, { force: true });
+  }
+}
+async function rebuildSqliteReadModel(workspace, events, derived) {
+  const DatabaseSync = await loadDatabaseSync();
+  const destination = await secureStoragePath(workspace, ["index", SQLITE_READ_MODEL_FILENAME], {
+    type: "file",
+    allowMissing: true
+  });
+  const temporary = path3.join(path3.dirname(destination), `.${SQLITE_READ_MODEL_FILENAME}.${process.pid}.${randomBytes3(6).toString("hex")}.tmp`);
+  let database;
+  try {
+    database = new DatabaseSync(temporary, { enableForeignKeyConstraints: true, allowExtension: false, timeout: 5e3 });
+    database.exec("PRAGMA journal_mode = WAL; PRAGMA synchronous = NORMAL;");
+    database.exec(SCHEMA);
+    database.exec(`PRAGMA user_version = ${SQLITE_READ_MODEL_SCHEMA_VERSION}; BEGIN IMMEDIATE;`);
+    try {
+      const insertMeta = database.prepare("INSERT INTO read_model_meta(key, value) VALUES (?, ?)");
+      database.prepare("INSERT INTO read_model_migrations(version, applied_at, description) VALUES (?, ?, ?)").run(
+        SQLITE_READ_MODEL_SCHEMA_VERSION,
+        events.at(-1)?.timestamp ?? workspace.config.createdAt,
+        "Initial ledger-derived SQLite read model"
+      );
+      for (const [key, value] of [
+        ["schemaVersion", String(SQLITE_READ_MODEL_SCHEMA_VERSION)],
+        ["workspaceId", workspace.config.workspaceId],
+        ["eventCount", String(events.length)],
+        ["headHash", derived.index.headHash ?? ""],
+        ["journalMode", "wal"]
+      ]) insertMeta.run(key, value);
+      insertEvents(database, events);
+      insertGraph(database, derived.graph, new Map(events.map((event) => [event.eventId, event])));
+      database.exec("COMMIT;");
+    } catch (error) {
+      database.exec("ROLLBACK;");
+      throw error;
+    }
+    database.exec("PRAGMA wal_checkpoint(TRUNCATE); PRAGMA optimize;");
+    database.close();
+    database = null;
+    await replaceDatabase(temporary, destination);
+    return deepFreezeJson({
+      schemaVersion: SQLITE_READ_MODEL_SCHEMA_VERSION,
+      path: destination,
+      workspaceId: workspace.config.workspaceId,
+      eventCount: events.length,
+      headHash: derived.index.headHash
+    });
+  } finally {
+    if (database) database.close();
+    await rm4(temporary, { force: true });
+    await rm4(`${temporary}-wal`, { force: true });
+    await rm4(`${temporary}-shm`, { force: true });
+  }
+}
+function ftsQuery(value) {
+  const tokens = String(value).normalize("NFKC").toLowerCase().match(/[\p{L}\p{N}][\p{L}\p{N}_-]{1,63}/gu) ?? [];
+  return [...new Set(tokens)].slice(0, 64).map((token) => `"${token.replaceAll('"', '""')}"`).join(" OR ");
+}
+function immutableDatabaseUrl(databasePath) {
+  const url = pathToFileURL(databasePath);
+  url.searchParams.set("immutable", "1");
+  return url;
+}
+async function querySqliteReadModel(workspace, query, options = {}) {
+  const source = ftsQuery(query);
+  if (!source) return deepFreezeJson({ schemaVersion: SQLITE_READ_MODEL_SCHEMA_VERSION, candidates: [] });
+  const DatabaseSync = await loadDatabaseSync();
+  const databasePath = await secureStoragePath(workspace, ["index", SQLITE_READ_MODEL_FILENAME], { type: "file" });
+  const database = new DatabaseSync(immutableDatabaseUrl(databasePath), {
+    readOnly: true,
+    allowExtension: false,
+    timeout: 5e3
+  });
+  try {
+    database.exec("PRAGMA query_only = ON; PRAGMA trusted_schema = OFF;");
+    const meta = Object.fromEntries(database.prepare("SELECT key, value FROM read_model_meta").all().map((row) => [row.key, row.value]));
+    if (Number(meta.schemaVersion) !== SQLITE_READ_MODEL_SCHEMA_VERSION || meta.workspaceId !== workspace.config.workspaceId || meta.headHash !== (options.headHash ?? "")) {
+      throw new QarinahError("SQLITE_READ_MODEL_STALE", "SQLite read model does not match the verified ledger head.");
+    }
+    const rows = database.prepare(`SELECT e.event_id AS eventId, bm25(events_fts, 0.0, 4.0, 2.0, 1.0) AS score
+      FROM events_fts JOIN events e ON e.event_id = events_fts.event_id
+      WHERE events_fts MATCH ?
+      ORDER BY score ASC, e.timestamp DESC, e.event_id ASC
+      LIMIT ?`).all(source, options.limit ?? 256);
+    return deepFreezeJson({
+      schemaVersion: SQLITE_READ_MODEL_SCHEMA_VERSION,
+      candidates: rows.map((row, index) => ({ eventId: row.eventId, rank: index + 1 }))
+    });
+  } finally {
+    database.close();
+  }
+}
+async function inspectSqliteReadModel(workspace) {
+  const DatabaseSync = await loadDatabaseSync();
+  const databasePath = await secureStoragePath(workspace, ["index", SQLITE_READ_MODEL_FILENAME], { type: "file" });
+  const database = new DatabaseSync(immutableDatabaseUrl(databasePath), {
+    readOnly: true,
+    allowExtension: false,
+    timeout: 5e3
+  });
+  try {
+    database.exec("PRAGMA query_only = ON; PRAGMA trusted_schema = OFF;");
+    const meta = Object.fromEntries(database.prepare("SELECT key, value FROM read_model_meta").all().map((row) => [row.key, row.value]));
+    const tables = database.prepare("SELECT name FROM sqlite_schema WHERE type IN ('table', 'view') ORDER BY name").all().map((row) => row.name);
+    return deepFreezeJson({
+      schemaVersion: Number(meta.schemaVersion),
+      workspaceId: meta.workspaceId,
+      eventCount: Number(meta.eventCount),
+      headHash: meta.headHash || null,
+      journalMode: meta.journalMode,
+      tables
+    });
+  } finally {
+    database.close();
+  }
+}
+
+// src/indexer.js
 init_workspace();
 var INDEX_SCHEMA_VERSION = "qarinah.index.v2";
 var GRAPH_SCHEMA_VERSION = "qarinah.graph.v2";
@@ -2903,7 +3492,7 @@ function appendProjectGraph(events, nodes, edges) {
       sourceEventId
     });
     if (directory.path !== ".") {
-      const parent = path3.posix.dirname(directory.path);
+      const parent = path4.posix.dirname(directory.path);
       const parentId = directoryIds.get(parent === "" ? "." : parent);
       if (parentId) edges.push({ source: parentId, type: "contains", target: directory.id, confidence: "extracted", sourceEventId });
     }
@@ -2920,7 +3509,7 @@ function appendProjectGraph(events, nodes, edges) {
       confidence: "extracted",
       sourceEventId
     });
-    const parent = path3.posix.dirname(file.path);
+    const parent = path4.posix.dirname(file.path);
     const parentId = directoryIds.get(parent === "" ? "." : parent);
     if (parentId) edges.push({ source: parentId, type: "contains", target: file.id, confidence: "extracted", sourceEventId });
     for (const reference of file.references) {
@@ -2974,6 +3563,10 @@ function eventProjection(event) {
     data: event.data,
     confidence: event.confidence,
     authority: event.authority ?? null,
+    temporal: event.temporal ?? null,
+    repository: event.repository ?? null,
+    freshness: event.freshness ?? null,
+    disclosure: event.disclosure ?? null,
     relations: event.relations,
     provenance: event.provenance,
     retention: event.retention,
@@ -3134,10 +3727,12 @@ async function rebuildDerivedState(start = process.cwd()) {
     markdownPath,
     markdownFor(events, workspace.config.workspaceId, derived.index.headHash)
   );
+  const readModel = await rebuildSqliteReadModel(workspace, events, derived);
   return Object.freeze({
     workspaceId: workspace.config.workspaceId,
     eventCount: events.length,
-    headHash: derived.index.headHash
+    headHash: derived.index.headHash,
+    readModel
   });
 }
 async function readBoundedFile(workspace, segments, maximumBytes, label) {
@@ -3213,8 +3808,17 @@ async function loadIndex(start = process.cwd(), options = {}) {
     if (error?.code !== "ENOENT") throw error;
     persistedViewsCurrent = false;
   }
+  try {
+    const readModel = await inspectSqliteReadModel(workspace);
+    persistedViewsCurrent = persistedViewsCurrent && readModel.schemaVersion === SQLITE_READ_MODEL_SCHEMA_VERSION && readModel.workspaceId === workspace.config.workspaceId && readModel.eventCount === events.length && readModel.headHash === expected.index.headHash;
+  } catch (error) {
+    if (error?.code !== "ENOENT" && error?.code !== "SQLITE_READ_MODEL_STALE") {
+      if (!rebuild) throw error;
+    }
+    persistedViewsCurrent = false;
+  }
   if (!persistedViewsCurrent) {
-    if (!rebuild) throw new QarinahError("INDEX_STALE", "Persisted index, graph, or Markdown does not exactly match the verified event log.");
+    if (!rebuild) throw new QarinahError("INDEX_STALE", "Persisted index, graph, Markdown, or SQLite read model does not exactly match the verified event log.");
     await rebuildDerivedState(workspace.root);
   }
   return Object.freeze({ workspace, index: expected.index });
@@ -3243,7 +3847,7 @@ var RELATION_WEIGHTS = Object.freeze({
 function rounded(value) {
   return Math.round(value * 1e6) / 1e6;
 }
-function primitiveDataText(data) {
+function primitiveDataText2(data) {
   return Object.entries(data || {}).filter(([, value]) => ["string", "number", "boolean"].includes(typeof value)).map(([key, value]) => `${key} ${value}`).join("\n");
 }
 function normalizedText(value, maximum = 8192) {
@@ -3252,7 +3856,7 @@ function normalizedText(value, maximum = 8192) {
 function eventSearchText(event) {
   return normalizedText(`${event.title}
 ${event.body}
-${primitiveDataText(event.data)}`);
+${primitiveDataText2(event.data)}`);
 }
 function ngrams(value, size = 3) {
   const text = normalizedText(value, 4096);
@@ -3341,16 +3945,41 @@ function graphScores(index, seedScores, eventsById) {
   }
   return scores;
 }
-function authorityScores(index, candidateIds, scope, asOf) {
+function authorityScores(index, candidateIds, scopes, asOf) {
   const scores = /* @__PURE__ */ new Map();
-  if (scope === void 0) return scores;
+  if (scopes.length === 0) return scores;
   for (const event of index.events) {
     if (!candidateIds.has(event.eventId)) continue;
     const authority = event.authority;
-    if (!authority || authority.scope !== scope || authority.assignedAt > asOf) continue;
+    if (!authority || !scopes.includes(authority.scope) || authority.assignedAt > asOf) continue;
     if (authority.expiresAt !== null && authority.expiresAt <= asOf) continue;
     if (authority.revokedAt !== null && authority.revokedAt <= asOf) continue;
     scores.set(event.eventId, 1 + authority.rank / 100);
+  }
+  return scores;
+}
+function normalizedSelectors(value, label) {
+  if (value === void 0) return [];
+  const list2 = typeof value === "string" ? [value] : value;
+  if (!Array.isArray(list2) || list2.length > 64 || list2.some((entry) => typeof entry !== "string" || entry.length < 1 || entry.length > 256)) {
+    throw new TypeError(`${label} must contain at most 64 non-empty strings up to 256 characters.`);
+  }
+  if (new Set(list2).size !== list2.length) throw new TypeError(`${label} cannot contain duplicates.`);
+  return [...list2].sort();
+}
+function permittedByDisclosure(event, scopes) {
+  const disclosure = event.disclosure;
+  if (!disclosure || disclosure.classification !== "restricted") return true;
+  return disclosure.scopes.some((scope) => scopes.includes(scope));
+}
+function permittedRepository(event, repositoryIds) {
+  return repositoryIds.length === 0 || event.repository === null || repositoryIds.includes(event.repository.id);
+}
+function sqliteScores(candidates, eligibleEventIds) {
+  const scores = /* @__PURE__ */ new Map();
+  for (const candidate of candidates ?? []) {
+    if (!eligibleEventIds.has(candidate.eventId) || !Number.isSafeInteger(candidate.rank) || candidate.rank < 1) continue;
+    scores.set(candidate.eventId, 1 / candidate.rank);
   }
   return scores;
 }
@@ -3392,7 +4021,8 @@ function activeSupersessions(index, eventsById, asOf) {
   const supersededBy = /* @__PURE__ */ new Map();
   for (const [source, relations] of Object.entries(index.adjacency || {})) {
     const sourceEvent = eventsById.get(source);
-    if (!sourceEvent || sourceEvent.timestamp > asOf) continue;
+    const effectiveFrom = sourceEvent?.temporal?.validFrom ?? sourceEvent?.timestamp;
+    if (!sourceEvent || effectiveFrom > asOf) continue;
     for (const relation of relations) {
       if (relation.type !== "supersedes" || !eventsById.has(relation.target)) continue;
       if (!supersededBy.has(relation.target)) supersededBy.set(relation.target, []);
@@ -3473,7 +4103,8 @@ function rankContextEvents(index, query = "", options = {}) {
     options.asOf,
     "asOf"
   );
-  const authorityScope = options.authorityScope;
+  const authorityScopes = normalizedSelectors(options.authorityScopes ?? options.authorityScope, "authorityScopes");
+  const repositoryIds = normalizedSelectors(options.repositoryIds, "repositoryIds");
   if (!Number.isSafeInteger(limit) || limit < 1 || limit > 1e3) throw new TypeError("limit must be an integer from 1 to 1000.");
   if (typeof diversity !== "number" || !Number.isFinite(diversity) || diversity < 0 || diversity > 1) {
     throw new TypeError("diversity must be a number from 0 to 1.");
@@ -3481,12 +4112,12 @@ function rankContextEvents(index, query = "", options = {}) {
   if (!["prefer-current", "include-history"].includes(supersessionPolicy)) {
     throw new TypeError("supersessionPolicy must be prefer-current or include-history.");
   }
-  if (authorityScope !== void 0 && (typeof authorityScope !== "string" || authorityScope.length < 1 || authorityScope.length > 256)) {
-    throw new TypeError("authorityScope must be a non-empty string up to 256 characters.");
-  }
   const expiredEventIds = new Set(index.events.filter((event) => event.retention?.expiresAt !== null && event.retention?.expiresAt <= asOf).map((event) => event.eventId));
   const futureEventIds = new Set(index.events.filter((event) => event.timestamp > asOf).map((event) => event.eventId));
-  const eventsById = new Map([...allEventsById].filter(([eventId]) => !expiredEventIds.has(eventId) && !futureEventIds.has(eventId)));
+  const notYetValidEventIds = new Set(index.events.filter((event) => event.temporal?.validFrom !== void 0 && event.temporal.validFrom > asOf).map((event) => event.eventId));
+  const staleEventIds = new Set(index.events.filter((event) => event.temporal?.validUntil !== null && event.temporal?.validUntil !== void 0 && event.temporal.validUntil <= asOf).map((event) => event.eventId));
+  const unauthorizedEventIds = new Set(index.events.filter((event) => !permittedByDisclosure(event, authorityScopes) || !permittedRepository(event, repositoryIds)).map((event) => event.eventId));
+  const eventsById = new Map([...allEventsById].filter(([eventId]) => !expiredEventIds.has(eventId) && !futureEventIds.has(eventId) && !notYetValidEventIds.has(eventId) && !staleEventIds.has(eventId) && !unauthorizedEventIds.has(eventId)));
   const eligibleEventIds = new Set(eventsById.keys());
   if (queryTerms.length === 0) {
     const newest = [...eventsById.values()].sort((left, right) => right.timestamp.localeCompare(left.timestamp) || left.eventId.localeCompare(right.eventId)).map((event, index2) => ({ event, score: 1 / (index2 + 1), components: [{ name: "recency", rank: index2 + 1 }] }));
@@ -3503,19 +4134,32 @@ function rankContextEvents(index, query = "", options = {}) {
       conflicts: conflictPairs(index, eventsById),
       exclusions: exclusions2,
       supersessionPolicy,
-      authorityScope: authorityScope ?? null,
+      authorityScopes,
+      repositoryIds,
       asOf,
-      filters: { expired: expiredEventIds.size, future: futureEventIds.size },
+      filters: {
+        expired: expiredEventIds.size,
+        future: futureEventIds.size,
+        notYetValid: notYetValidEventIds.size,
+        stale: staleEventIds.size,
+        unauthorized: unauthorizedEventIds.size
+      },
       coverage: queryCoverage(index, queryTerms, eligibleEventIds, /* @__PURE__ */ new Map(), /* @__PURE__ */ new Map())
     });
   }
   const lexical = bm25Scores(index, queryTerms, eligibleEventIds);
   const fuzzy = fuzzyScores(index, query, eligibleEventIds);
   const coverage = queryCoverage(index, queryTerms, eligibleEventIds, lexical, fuzzy);
-  const seedScores = new Map([...lexical, ...fuzzy].map(([eventId]) => [eventId, (lexical.get(eventId) || 0) + (fuzzy.get(eventId) || 0)]));
+  const sqlite = sqliteScores(options.sqliteCandidates, eligibleEventIds);
+  const candidateIds = /* @__PURE__ */ new Set([...lexical.keys(), ...fuzzy.keys(), ...sqlite.keys()]);
+  const seedScores = new Map([...candidateIds].map((eventId) => [
+    eventId,
+    (lexical.get(eventId) || 0) + (fuzzy.get(eventId) || 0) + (sqlite.get(eventId) || 0)
+  ]));
   const graph = graphScores(index, seedScores, eventsById);
-  const authority = authorityScores(index, new Set(seedScores.keys()), authorityScope, asOf);
+  const authority = authorityScores(index, candidateIds, authorityScopes, asOf);
   const lists = [
+    { name: "sqlite-fts5", weight: 1.05, entries: sortedScores(sqlite, eventsById) },
     { name: "bm25", weight: 1, entries: sortedScores(lexical, eventsById) },
     { name: "fuzzy", weight: 0.75, entries: sortedScores(fuzzy, eventsById) },
     { name: "graph", weight: 0.65, entries: sortedScores(graph, eventsById) },
@@ -3535,9 +4179,16 @@ function rankContextEvents(index, query = "", options = {}) {
     conflicts: conflictPairs(index, eventsById),
     exclusions,
     supersessionPolicy,
-    authorityScope: authorityScope ?? null,
+    authorityScopes,
+    repositoryIds,
     asOf,
-    filters: { expired: expiredEventIds.size, future: futureEventIds.size },
+    filters: {
+      expired: expiredEventIds.size,
+      future: futureEventIds.size,
+      notYetValid: notYetValidEventIds.size,
+      stale: staleEventIds.size,
+      unauthorized: unauthorizedEventIds.size
+    },
     coverage
   });
 }
@@ -3712,6 +4363,9 @@ function itemFor(entry, excerpt) {
     excerpt,
     confidence: entry.event.confidence,
     ...entry.event.authority ? { authority: entry.event.authority } : {},
+    ...entry.event.temporal ? { temporal: entry.event.temporal } : {},
+    ...entry.event.repository ? { repository: entry.event.repository } : {},
+    ...entry.event.disclosure ? { disclosure: entry.event.disclosure } : {},
     reason: boundedReason(entry.reason),
     hash: entry.event.hash
   };
@@ -3779,17 +4433,38 @@ async function compileContext(query = "", options = {}) {
   const maxChars = Math.min(requestedMaxChars, workspace.config.contextMaxChars);
   if (!Number.isSafeInteger(limit) || limit < 1 || limit > 1e3) throw new TypeError("limit must be an integer from 1 to 1000.");
   if (typeof query !== "string" || query.length > 4096) throw new TypeError("query must be a string up to 4096 characters.");
+  let retrievalQuery = query;
+  let queryExpansion = null;
+  if (options.queryExpansion !== void 0 && options.queryExpansion !== null) {
+    if (!options.queryExpansion || typeof options.queryExpansion !== "object" || typeof options.queryExpansion.expand !== "function") {
+      throw new TypeError("queryExpansion.expand must be a function.");
+    }
+    const adapter = typeof options.queryExpansion.id === "string" && options.queryExpansion.id.trim() ? options.queryExpansion.id.trim() : "local-query-expansion";
+    const expanded = await options.queryExpansion.expand({ query });
+    if (!Array.isArray(expanded) || expanded.length > 16 || expanded.some((value) => typeof value !== "string" || value.trim() === "" || value.length > 256)) {
+      throw new TypeError("queryExpansion.expand must return at most 16 non-empty strings up to 256 characters.");
+    }
+    const terms = [...new Set(expanded.map((value) => value.trim()))].sort();
+    retrievalQuery = [query, ...terms].filter(Boolean).join(" ").slice(0, 4096);
+    queryExpansion = { adapter, addedTermCount: terms.length };
+  }
   const tokenPlan = createTokenBudget(options, maxChars);
   const minimumCoverage = options.minimumCoverage ?? "any";
   if (!["any", "partial", "direct"].includes(minimumCoverage)) {
     throw new TypeError("minimumCoverage must be any, partial, or direct.");
   }
-  const retrieval = rankContextEvents(index, query, {
+  const sqliteCandidates = options.inMemory === true || retrievalQuery.trim() === "" ? [] : (await querySqliteReadModel(workspace, retrievalQuery, {
+    headHash: index.headHash,
+    limit: Math.min(1e3, limit * 16)
+  })).candidates;
+  const retrieval = rankContextEvents(index, retrievalQuery, {
     limit,
     diversity: options.diversity,
     supersessionPolicy: options.supersessionPolicy,
     asOf: resolveQueryTime(options),
-    authorityScope: options.authorityScope
+    authorityScopes: options.authorityScopes ?? options.authorityScope,
+    repositoryIds: options.repositoryIds,
+    sqliteCandidates
   });
   const ranked = retrieval.ranked;
   const coverageAccepted = minimumCoverage === "any" || minimumCoverage === "partial" && ["partial", "direct"].includes(retrieval.coverage.status) || minimumCoverage === "direct" && retrieval.coverage.status === "direct";
@@ -3808,9 +4483,12 @@ async function compileContext(query = "", options = {}) {
     supersessionPolicy: retrieval.supersessionPolicy,
     asOf: retrieval.asOf,
     coverage: retrieval.coverage,
-    ...retrieval.authorityScope === null ? {} : { authorityScope: retrieval.authorityScope }
+    ...queryExpansion === null ? {} : { queryExpansion },
+    ...typeof options.authorityScope === "string" ? { authorityScope: options.authorityScope } : {},
+    ...retrieval.authorityScopes.length === 0 ? {} : { authorityScopes: retrieval.authorityScopes },
+    ...retrieval.repositoryIds.length === 0 ? {} : { repositoryIds: retrieval.repositoryIds }
   };
-  if (retrieval.filters.expired > 0 || retrieval.filters.future > 0) {
+  if (Object.values(retrieval.filters).some((count) => count > 0)) {
     retrievalSummary.filters = retrieval.filters;
   }
   if (relevantConflicts.length > 0) retrievalSummary.conflicts = relevantConflicts;
@@ -3924,7 +4602,7 @@ init_store();
 init_workspace();
 import { lstat as lstat4, readFile, readdir as readdir2, realpath as realpath3 } from "node:fs/promises";
 import { createHash as createHash3 } from "node:crypto";
-import path4 from "node:path";
+import path5 from "node:path";
 var PROJECT_STRUCTURE_SCHEMA_VERSION = "qarinah.project-structure.v1";
 var DEFAULT_MAX_FILES = 750;
 var DEFAULT_MAX_FILE_BYTES = 512 * 1024;
@@ -4009,22 +4687,22 @@ function scanOptions(options = {}) {
   });
 }
 function portablePath(root, absolute) {
-  const relative = path4.relative(root, absolute);
+  const relative = path5.relative(root, absolute);
   if (relative === "") return ".";
-  if (relative.startsWith("..") || path4.isAbsolute(relative)) {
+  if (relative.startsWith("..") || path5.isAbsolute(relative)) {
     throw new QarinahError("PATH_OUTSIDE_WORKSPACE", "Project structure path escaped the trusted workspace root.");
   }
-  const portable = relative.split(path4.sep).join("/");
+  const portable = relative.split(path5.sep).join("/");
   if (portable.length > MAX_PATH_CHARS) {
     throw new QarinahError("PROJECT_PATH_TOO_LONG", `Project path exceeds ${MAX_PATH_CHARS} characters.`);
   }
   return portable;
 }
 function isCandidateFile(name) {
-  return SOURCE_FILENAMES.has(name) || SOURCE_EXTENSIONS.has(path4.extname(name).toLowerCase());
+  return SOURCE_FILENAMES.has(name) || SOURCE_EXTENSIONS.has(path5.extname(name).toLowerCase());
 }
 function languageFor(filePath) {
-  const extension = path4.extname(filePath).toLowerCase();
+  const extension = path5.extname(filePath).toLowerCase();
   const languages = {
     ".cjs": "javascript",
     ".js": "javascript",
@@ -4113,10 +4791,10 @@ function looksBinary(bytes) {
 }
 function resolveReference(fromPath, specifier, filesByPath) {
   if (!specifier.startsWith(".")) return null;
-  const base = path4.posix.normalize(path4.posix.join(path4.posix.dirname(fromPath), specifier));
-  if (base === ".." || base.startsWith("../") || path4.posix.isAbsolute(base)) return null;
+  const base = path5.posix.normalize(path5.posix.join(path5.posix.dirname(fromPath), specifier));
+  if (base === ".." || base.startsWith("../") || path5.posix.isAbsolute(base)) return null;
   const candidates = [base];
-  if (!path4.posix.extname(base)) {
+  if (!path5.posix.extname(base)) {
     for (const extension of RESOLUTION_EXTENSIONS) candidates.push(`${base}${extension}`);
     for (const extension of RESOLUTION_EXTENSIONS) candidates.push(`${base}/index${extension}`);
   }
@@ -4132,7 +4810,7 @@ async function assertReadableWorkspaceEntry(workspace, absolute) {
 async function loadIgnoreMatcher(workspace) {
   const matcher = (0, import_ignore.default)();
   for (const name of [".gitignore", ".qarinahignore"]) {
-    const absolute = path4.join(workspace.root, name);
+    const absolute = path5.join(workspace.root, name);
     try {
       const metadata = await assertReadableWorkspaceEntry(workspace, absolute);
       if (!metadata?.isFile() || metadata.size > MAX_IGNORE_BYTES) continue;
@@ -4157,7 +4835,7 @@ async function collectStructure(workspace, options) {
     const entries = (await readdir2(absoluteDirectory, { withFileTypes: true })).sort((left, right) => left.name.localeCompare(right.name));
     for (const entry of entries) {
       if (entry.name.includes("\0")) continue;
-      const absolute = path4.join(absoluteDirectory, entry.name);
+      const absolute = path5.join(absoluteDirectory, entry.name);
       const metadata = await assertReadableWorkspaceEntry(workspace, absolute);
       if (!metadata) continue;
       const entryPath = portablePath(workspace.root, absolute);
@@ -4351,9 +5029,9 @@ async function scanProjectStructure(rawOptions = {}) {
 // src/okf.js
 init_canonical();
 init_errors();
-import { randomBytes as randomBytes3 } from "node:crypto";
-import { lstat as lstat5, mkdir as mkdir4, readFile as readFile2, readdir as readdir3, realpath as realpath4, rename as rename4, rm as rm4 } from "node:fs/promises";
-import path5 from "node:path";
+import { randomBytes as randomBytes4 } from "node:crypto";
+import { lstat as lstat5, mkdir as mkdir4, readFile as readFile2, readdir as readdir3, realpath as realpath4, rename as rename5, rm as rm5 } from "node:fs/promises";
+import path6 from "node:path";
 init_store();
 init_workspace();
 var OKF_VERSION = "0.1";
@@ -4369,8 +5047,8 @@ function compareText(left, right) {
   return left < right ? -1 : left > right ? 1 : 0;
 }
 function isWithin3(root, candidate) {
-  const relative = path5.relative(root, candidate);
-  return relative === "" || !relative.startsWith("..") && !path5.isAbsolute(relative);
+  const relative = path6.relative(root, candidate);
+  return relative === "" || !relative.startsWith("..") && !path6.isAbsolute(relative);
 }
 async function optionalLstat(candidate) {
   try {
@@ -4402,11 +5080,11 @@ function validateOptions(value) {
 }
 function resolveOutputDirectory(workspace, output) {
   const outputDirectory = output === void 0 ? resolveWithin(workspace.root, ...DEFAULT_OUTPUT_SEGMENTS) : resolveWithin(workspace.root, output);
-  const relative = path5.relative(workspace.root, outputDirectory);
+  const relative = path6.relative(workspace.root, outputDirectory);
   if (relative === "") {
     throw new QarinahError("OKF_OUTPUT_PROTECTED", "The workspace root cannot be replaced by an OKF export.");
   }
-  const segments = relative.split(path5.sep).filter(Boolean);
+  const segments = relative.split(path6.sep).filter(Boolean);
   const normalized = segments.map((segment) => process.platform === "win32" ? segment.toLowerCase() : segment);
   if (normalized[0] === ".git") {
     throw new QarinahError("OKF_OUTPUT_PROTECTED", "An OKF export cannot be written inside .git.");
@@ -4423,13 +5101,13 @@ function resolveOutputDirectory(workspace, output) {
   return outputDirectory;
 }
 async function ensureSafeDirectoryChain(root, directory) {
-  const relative = path5.relative(root, directory);
+  const relative = path6.relative(root, directory);
   if (!isWithin3(root, directory)) {
     throw new QarinahError("PATH_OUTSIDE_WORKSPACE", "OKF output parent escapes the workspace root.");
   }
   let current = root;
-  for (const segment of relative.split(path5.sep).filter(Boolean)) {
-    current = path5.join(current, segment);
+  for (const segment of relative.split(path6.sep).filter(Boolean)) {
+    current = path6.join(current, segment);
     let metadata = await optionalLstat(current);
     if (!metadata) {
       try {
@@ -4733,7 +5411,7 @@ async function assertOwnedOutput(outputDirectory, workspace) {
   if (entries.join("\0") !== [...ROOT_FILES].sort(compareText).join("\0")) {
     throw new QarinahError("OKF_OUTPUT_NOT_OWNED", "Existing OKF output contains unexpected or missing entries.");
   }
-  const eventDirectory = path5.join(outputDirectory, "events");
+  const eventDirectory = path6.join(outputDirectory, "events");
   const eventMetadata = await lstat5(eventDirectory);
   if (eventMetadata.isSymbolicLink()) {
     throw new QarinahError("STORAGE_LINK_REJECTED", "OKF event directory cannot be a symbolic link or junction.");
@@ -4745,13 +5423,13 @@ async function assertOwnedOutput(outputDirectory, workspace) {
   if (eventFiles.length > MAX_EVENTS2 || eventFiles.some((name) => !EVENT_FILE_PATTERN.test(name))) {
     throw new QarinahError("OKF_OUTPUT_NOT_OWNED", "Existing OKF output contains invalid event concept paths.");
   }
-  await assertRegularFile(path5.join(outputDirectory, EXPORT_MARKER), "OKF ownership marker", 64 * 1024);
-  await assertRegularFile(path5.join(outputDirectory, "index.md"), "OKF root index", 64 * 1024 * 1024);
-  await assertRegularFile(path5.join(outputDirectory, "log.md"), "OKF root log", 64 * 1024 * 1024);
+  await assertRegularFile(path6.join(outputDirectory, EXPORT_MARKER), "OKF ownership marker", 64 * 1024);
+  await assertRegularFile(path6.join(outputDirectory, "index.md"), "OKF root index", 64 * 1024 * 1024);
+  await assertRegularFile(path6.join(outputDirectory, "log.md"), "OKF root log", 64 * 1024 * 1024);
   for (const name of eventFiles) {
-    await assertRegularFile(path5.join(eventDirectory, name), `OKF event concept '${name}'`, 2 * 1024 * 1024);
+    await assertRegularFile(path6.join(eventDirectory, name), `OKF event concept '${name}'`, 2 * 1024 * 1024);
   }
-  const markerText = await readFile2(path5.join(outputDirectory, EXPORT_MARKER), "utf8");
+  const markerText = await readFile2(path6.join(outputDirectory, EXPORT_MARKER), "utf8");
   let marker;
   try {
     marker = JSON.parse(markerText);
@@ -4764,12 +5442,12 @@ async function assertOwnedOutput(outputDirectory, workspace) {
   }
   validateMarker(marker, workspace.config.workspaceId, eventFiles.length);
   const existingFiles = /* @__PURE__ */ new Map([
-    ["index.md", await readFile2(path5.join(outputDirectory, "index.md"), "utf8")],
-    ["log.md", await readFile2(path5.join(outputDirectory, "log.md"), "utf8")]
+    ["index.md", await readFile2(path6.join(outputDirectory, "index.md"), "utf8")],
+    ["log.md", await readFile2(path6.join(outputDirectory, "log.md"), "utf8")]
   ]);
   let totalBytes = Buffer.byteLength(existingFiles.get("index.md")) + Buffer.byteLength(existingFiles.get("log.md"));
   for (const name of eventFiles) {
-    const contents = await readFile2(path5.join(eventDirectory, name), "utf8");
+    const contents = await readFile2(path6.join(eventDirectory, name), "utf8");
     totalBytes += Buffer.byteLength(contents);
     if (totalBytes > 256 * 1024 * 1024) {
       throw new QarinahError("OKF_OUTPUT_NOT_OWNED", "Existing OKF output exceeds its bounded aggregate size.");
@@ -4784,7 +5462,7 @@ async function assertOwnedOutput(outputDirectory, workspace) {
 async function renameWithRetry(source, destination) {
   for (let attempt = 0; ; attempt += 1) {
     try {
-      await rename4(source, destination);
+      await rename5(source, destination);
       return;
     } catch (error) {
       if (attempt >= 19 || !["EPERM", "EACCES", "EBUSY"].includes(error?.code)) throw error;
@@ -4798,9 +5476,9 @@ async function replaceOutput(stage, outputDirectory, workspace) {
     await renameWithRetry(stage, outputDirectory);
     return;
   }
-  const parent = path5.dirname(outputDirectory);
-  const backup = path5.join(parent, `.${path5.basename(outputDirectory)}.qarinah-okf-backup-${process.pid}-${randomBytes3(8).toString("hex")}`);
-  resolveWithin(workspace.root, path5.relative(workspace.root, backup));
+  const parent = path6.dirname(outputDirectory);
+  const backup = path6.join(parent, `.${path6.basename(outputDirectory)}.qarinah-okf-backup-${process.pid}-${randomBytes4(8).toString("hex")}`);
+  resolveWithin(workspace.root, path6.relative(workspace.root, backup));
   await renameWithRetry(outputDirectory, backup);
   try {
     await renameWithRetry(stage, outputDirectory);
@@ -4815,14 +5493,14 @@ async function replaceOutput(stage, outputDirectory, workspace) {
     }
     throw error;
   }
-  await rm4(backup, { recursive: true, force: true });
+  await rm5(backup, { recursive: true, force: true });
 }
 async function writeStage(stage, files) {
   await mkdir4(stage, { mode: 448 });
-  await mkdir4(path5.join(stage, "events"), { mode: 448 });
+  await mkdir4(path6.join(stage, "events"), { mode: 448 });
   for (const [relativePath, contents] of [...files.entries()].sort(([left], [right]) => compareText(left, right))) {
     const segments = relativePath.split("/");
-    const destination = path5.join(stage, ...segments);
+    const destination = path6.join(stage, ...segments);
     if (!isWithin3(stage, destination)) throw new QarinahError("PATH_OUTSIDE_WORKSPACE", "Generated OKF path escaped its staging directory.");
     await atomicWriteFile(destination, contents);
   }
@@ -4831,19 +5509,19 @@ async function exportOkf(options = {}) {
   const normalized = validateOptions(options);
   const workspace = await loadWorkspace(normalized.cwd ?? process.cwd());
   const outputDirectory = resolveOutputDirectory(workspace, normalized.output);
-  const parent = path5.dirname(outputDirectory);
+  const parent = path6.dirname(outputDirectory);
   await ensureSafeDirectoryChain(workspace.root, parent);
   await assertOwnedOutput(outputDirectory, workspace);
   const events = await readEvents(workspace.root);
   const { files, manifest } = buildBundle(events, workspace.config.workspaceId);
-  const stage = path5.join(parent, `.${path5.basename(outputDirectory)}.qarinah-okf-stage-${process.pid}-${randomBytes3(8).toString("hex")}`);
-  resolveWithin(workspace.root, path5.relative(workspace.root, stage));
+  const stage = path6.join(parent, `.${path6.basename(outputDirectory)}.qarinah-okf-stage-${process.pid}-${randomBytes4(8).toString("hex")}`);
+  resolveWithin(workspace.root, path6.relative(workspace.root, stage));
   if (await optionalLstat(stage)) throw new QarinahError("OKF_OUTPUT_INVALID", "Generated OKF staging path already exists.");
   try {
     await writeStage(stage, files);
     await replaceOutput(stage, outputDirectory, workspace);
   } finally {
-    await rm4(stage, { recursive: true, force: true });
+    await rm5(stage, { recursive: true, force: true });
   }
   return Object.freeze({ ...manifest, outputDirectory });
 }
@@ -4855,7 +5533,7 @@ init_errors();
 init_boundary();
 init_store();
 init_workspace();
-import path6 from "node:path";
+import path7 from "node:path";
 
 // src/hooks/capture-content.js
 init_canonical();
@@ -5062,9 +5740,9 @@ function bodyContentEntry(input) {
 function hookPayload(input, workspace) {
   const eventName = input.hook_event_name;
   const mapping = EVENT_MAP[eventName];
-  const requestedCwd = path6.resolve(input.cwd);
-  const relativeCwd = path6.relative(workspace.root, requestedCwd);
-  const workspaceRelativeCwd = relativeCwd === "" || !relativeCwd.startsWith("..") && !path6.isAbsolute(relativeCwd) ? relativeCwd || "." : "[outside-workspace]";
+  const requestedCwd = path7.resolve(input.cwd);
+  const relativeCwd = path7.relative(workspace.root, requestedCwd);
+  const workspaceRelativeCwd = relativeCwd === "" || !relativeCwd.startsWith("..") && !path7.isAbsolute(relativeCwd) ? relativeCwd || "." : "[outside-workspace]";
   const metadata = {
     hookEvent: eventName,
     model: input.model,
@@ -5159,7 +5837,7 @@ init_errors();
 init_boundary();
 init_store();
 init_workspace();
-import path7 from "node:path";
+import path8 from "node:path";
 var PERMISSION_MODES2 = /* @__PURE__ */ new Set(["default", "plan", "acceptEdits", "auto", "dontAsk", "bypassPermissions"]);
 var EFFORT_LEVELS = /* @__PURE__ */ new Set(["low", "medium", "high", "xhigh", "max"]);
 var SESSION_END_REASONS = /* @__PURE__ */ new Set(["clear", "logout", "prompt_input_exit", "other"]);
@@ -5398,9 +6076,9 @@ function bodyContentEntry2(input) {
 function hookPayload2(input, ignoredFieldCount, workspace) {
   const eventName = input.hook_event_name;
   const mapping = EVENT_MAP2[eventName];
-  const requestedCwd = path7.resolve(input.cwd);
-  const relativeCwd = path7.relative(workspace.root, requestedCwd);
-  const workspaceRelativeCwd = relativeCwd === "" || !relativeCwd.startsWith("..") && !path7.isAbsolute(relativeCwd) ? relativeCwd || "." : "[outside-workspace]";
+  const requestedCwd = path8.resolve(input.cwd);
+  const relativeCwd = path8.relative(workspace.root, requestedCwd);
+  const workspaceRelativeCwd = relativeCwd === "" || !relativeCwd.startsWith("..") && !path8.isAbsolute(relativeCwd) ? relativeCwd || "." : "[outside-workspace]";
   const metadata = {
     host: "claude-code",
     hookEvent: eventName,
@@ -5504,7 +6182,7 @@ async function captureClaudeHook(value, options = {}) {
 
 // src/mcp/server.js
 import { realpath as realpath5 } from "node:fs/promises";
-import path8 from "node:path";
+import path9 from "node:path";
 import { fileURLToPath } from "node:url";
 init_errors();
 init_store();
@@ -5658,7 +6336,7 @@ function pathFromSelector(value) {
       throw new QarinahError("MCP_WORKSPACE_INVALID", "The MCP workspace selector is not a valid local file URI.");
     }
   }
-  if (!path8.isAbsolute(selector)) {
+  if (!path9.isAbsolute(selector)) {
     throw new QarinahError("MCP_WORKSPACE_INVALID", "The MCP workspace selector must be an absolute local path.");
   }
   return selector;
@@ -5751,8 +6429,8 @@ function createMcpServer(options = {}) {
       try {
         const workspace = await loadWorkspace(candidate.value);
         if (candidate.exact) {
-          const expectedRoot = await realpath5(path8.resolve(candidate.value));
-          if (path8.normalize(workspace.root) !== path8.normalize(expectedRoot)) {
+          const expectedRoot = await realpath5(path9.resolve(candidate.value));
+          if (path9.normalize(workspace.root) !== path9.normalize(expectedRoot)) {
             throw new QarinahError(
               "WORKSPACE_NOT_INITIALIZED",
               "The explicitly selected MCP root is not an initialized Context Ledger workspace."
@@ -5993,15 +6671,15 @@ async function runMcpServer(options = {}) {
 // src/setup.js
 init_errors();
 import { lstat as lstat6, mkdir as mkdir5, readFile as readFile3 } from "node:fs/promises";
-import path9 from "node:path";
+import path10 from "node:path";
 import { fileURLToPath as fileURLToPath2 } from "node:url";
 init_store();
 init_workspace();
 var MAX_MANAGED_FILE_BYTES = 512 * 1024;
 var MANAGED_TOML_START = "# qarinah:managed:start";
 var MANAGED_TOML_END = "# qarinah:managed:end";
-var PACKAGE_ROOT = path9.resolve(path9.dirname(fileURLToPath2(import.meta.url)), "..");
-var BIN_PATH = path9.join(PACKAGE_ROOT, "bin", "qarinah.js");
+var PACKAGE_ROOT = path10.resolve(path10.dirname(fileURLToPath2(import.meta.url)), "..");
+var BIN_PATH = path10.join(PACKAGE_ROOT, "bin", "qarinah.js");
 function tomlString(value) {
   return JSON.stringify(String(value));
 }
@@ -6039,10 +6717,10 @@ async function ensureDirectory(candidate, root, label) {
   if (metadata.isSymbolicLink() || !metadata.isDirectory()) {
     throw new QarinahError("SETUP_LINK_REJECTED", `${label} must be a real directory.`);
   }
-  resolveWithin(root, path9.relative(root, candidate));
+  resolveWithin(root, path10.relative(root, candidate));
 }
 async function writeJsonMerged(candidate, root, label, update) {
-  resolveWithin(root, path9.relative(root, candidate));
+  resolveWithin(root, path10.relative(root, candidate));
   const existing = await safeRead(candidate, label);
   let value = {};
   if (existing !== null && existing.trim() !== "") {
@@ -6102,23 +6780,23 @@ async function installSkill(workspace, host, skillName, files) {
   await ensureDirectory(resolveWithin(workspace.root, `.${host}`), workspace.root, `.${host}`);
   await ensureDirectory(resolveWithin(workspace.root, `.${host}`, "skills"), workspace.root, `.${host}/skills`);
   await ensureDirectory(skillRoot, workspace.root, `.${host}/skills/${skillName}`);
-  const sourceRoot = path9.join(PACKAGE_ROOT, "integrations", host, "qarinah", "skills", skillName);
+  const sourceRoot = path10.join(PACKAGE_ROOT, "integrations", host, "qarinah", "skills", skillName);
   for (const relative of files) {
-    const destinationDirectory = path9.dirname(resolveWithin(skillRoot, relative));
+    const destinationDirectory = path10.dirname(resolveWithin(skillRoot, relative));
     if (destinationDirectory !== skillRoot) {
       await ensureDirectory(
         destinationDirectory,
         workspace.root,
-        `.${host}/skills/${skillName}/${path9.relative(skillRoot, destinationDirectory)}`
+        `.${host}/skills/${skillName}/${path10.relative(skillRoot, destinationDirectory)}`
       );
     }
-    const contents = await readFile3(path9.join(sourceRoot, relative), "utf8");
+    const contents = await readFile3(path10.join(sourceRoot, relative), "utf8");
     const destination = resolveWithin(skillRoot, relative);
     const existing = await safeRead(destination, `${host} Qarinah skill`);
     if (existing !== null && existing !== contents) {
       throw new QarinahError(
         "SETUP_CONFLICT",
-        `${path9.relative(workspace.root, destination)} already exists with different content. Preserve it or remove it before setup.`
+        `${path10.relative(workspace.root, destination)} already exists with different content. Preserve it or remove it before setup.`
       );
     }
     if (existing === null) await atomicWriteFile(destination, contents);
@@ -6127,7 +6805,7 @@ async function installSkill(workspace, host, skillName, files) {
 async function installHostSkills(workspace, host) {
   await installSkill(workspace, host, "qarinah-context", [
     "SKILL.md",
-    path9.join("references", "event-contract.md")
+    path10.join("references", "event-contract.md")
   ]);
   await installSkill(workspace, host, "qarinah", ["SKILL.md"]);
 }
@@ -6216,7 +6894,7 @@ Before replaying broad project history, query the Qarinah MCP server for a bound
   return [".cursor/mcp.json", ".cursor/rules/qarinah.mdc"];
 }
 async function setupWorkspace(options = {}) {
-  const target = path9.resolve(options.cwd ?? process.cwd());
+  const target = path10.resolve(options.cwd ?? process.cwd());
   let workspace;
   try {
     workspace = await loadWorkspace(target);
@@ -6311,7 +6989,7 @@ init_canonical();
 init_errors();
 import { createHash as createHash4 } from "node:crypto";
 import { lstat as lstat7, readFile as readFile4, realpath as realpath6 } from "node:fs/promises";
-import path10 from "node:path";
+import path11 from "node:path";
 init_store();
 init_workspace();
 function latestSnapshot(events) {
@@ -6332,61 +7010,116 @@ async function inspectFile(workspace, file) {
   try {
     metadata = await lstat7(absolute);
   } catch (error) {
-    if (error?.code === "ENOENT") return { path: file.path, status: "missing", expectedHash: file.contentHash };
+    if (error?.code === "ENOENT") return { path: file.path, status: "missing", expectedHash: file.contentHash ?? file.hash };
     throw error;
   }
   if (metadata.isSymbolicLink() || !metadata.isFile()) {
-    return { path: file.path, status: "unsafe", expectedHash: file.contentHash };
+    return { path: file.path, status: "unsafe", expectedHash: file.contentHash ?? file.hash };
   }
   const resolved = await realpath6(absolute);
-  const relative = path10.relative(workspace.root, resolved);
-  if (relative.startsWith("..") || path10.isAbsolute(relative)) {
+  const relative = path11.relative(workspace.root, resolved);
+  if (relative.startsWith("..") || path11.isAbsolute(relative)) {
     throw new QarinahError("PATH_OUTSIDE_WORKSPACE", "A freshness target resolves outside the trusted workspace.");
   }
-  if (metadata.size > file.bytes || metadata.size > 4 * 1024 * 1024) {
+  if (file.bytes !== void 0 && metadata.size > file.bytes || metadata.size > 4 * 1024 * 1024) {
     return {
       path: file.path,
       status: "changed",
-      expectedHash: file.contentHash,
+      expectedHash: file.contentHash ?? file.hash,
       observedHash: null,
       reason: "size-changed"
     };
   }
   const observedHash = hashBytes2(await readFile4(resolved));
-  return observedHash === file.contentHash ? { path: file.path, status: "current", expectedHash: file.contentHash, observedHash } : { path: file.path, status: "changed", expectedHash: file.contentHash, observedHash, reason: "content-changed" };
+  const expectedHash = file.contentHash ?? file.hash;
+  return observedHash === expectedHash ? { path: file.path, status: "current", expectedHash, observedHash } : { path: file.path, status: "changed", expectedHash, observedHash, reason: "content-changed" };
+}
+function latestCitedFiles(events) {
+  const files = /* @__PURE__ */ new Map();
+  for (const event of events) {
+    for (const file of event.freshness?.files ?? []) {
+      files.set(file.path, {
+        path: file.path,
+        hash: file.hash,
+        eventId: event.eventId,
+        repository: event.repository ?? null
+      });
+    }
+  }
+  return [...files.values()].sort((left, right) => left.path.localeCompare(right.path));
+}
+async function dependencyFreshness(events, resolver) {
+  const latest = /* @__PURE__ */ new Map();
+  for (const event of events) {
+    for (const dependency of event.freshness?.dependencies ?? []) {
+      latest.set(dependency.name, { ...dependency, eventId: event.eventId, repository: event.repository ?? null });
+    }
+  }
+  const results = [];
+  for (const dependency of latest.values()) {
+    if (resolver === void 0) {
+      results.push({ ...dependency, expectedHash: dependency.hash, observedHash: null, status: "unverified" });
+      continue;
+    }
+    const observedHash = await resolver({ name: dependency.name, version: dependency.version, repository: dependency.repository });
+    if (observedHash !== null && (typeof observedHash !== "string" || !/^sha256:[a-f0-9]{64}$/.test(observedHash))) {
+      throw new TypeError("dependencyResolver must return null or a sha256 hash.");
+    }
+    results.push({
+      ...dependency,
+      expectedHash: dependency.hash,
+      observedHash,
+      status: observedHash === null ? "missing" : observedHash === dependency.hash ? "current" : "changed"
+    });
+  }
+  return results.sort((left, right) => left.name.localeCompare(right.name));
 }
 async function inspectMemoryFreshness(options = {}) {
   const workspace = await loadWorkspace(options.cwd ?? process.cwd());
   const events = await readEvents(workspace, { updateCheckpoint: false });
   const latest = latestSnapshot(events);
-  if (!latest) {
+  const citedFiles = latestCitedFiles(events);
+  if (!latest && citedFiles.length === 0) {
     return deepFreezeJson({
       schemaVersion: "qarinah.memory-freshness.v1",
       workspaceId: workspace.config.workspaceId,
       status: "unavailable",
       snapshotEventId: null,
-      counts: { current: 0, changed: 0, missing: 0, unsafe: 0 },
-      files: []
+      counts: { current: 0, changed: 0, missing: 0, unsafe: 0, unverified: 0 },
+      files: [],
+      dependencies: [],
+      staleEventIds: []
     });
   }
-  if (latest.snapshot.files.length > 5e3) throw new QarinahError("PROJECT_SCAN_LIMIT", "Freshness inspection exceeds 5000 files.");
+  if ((latest?.snapshot.files.length ?? 0) + citedFiles.length > 5e3) {
+    throw new QarinahError("PROJECT_SCAN_LIMIT", "Freshness inspection exceeds 5000 files.");
+  }
   const requested = options.paths === void 0 ? null : new Set(options.paths);
   if (requested && (!Array.isArray(options.paths) || options.paths.length > 5e3 || options.paths.some((value) => typeof value !== "string" || value.trim() === ""))) {
     throw new TypeError("paths must be an array of at most 5000 non-empty project-relative paths.");
   }
-  const targets = latest.snapshot.files.filter((file) => requested === null || requested.has(file.path));
+  const latestByPath = new Map((latest?.snapshot.files ?? []).map((file) => [file.path, file]));
+  for (const file of citedFiles) latestByPath.set(file.path, file);
+  const targets = [...latestByPath.values()].filter((file) => requested === null || requested.has(file.path));
   const files = [];
   for (const file of targets) files.push(await inspectFile(workspace, file));
-  const counts = { current: 0, changed: 0, missing: 0, unsafe: 0 };
+  const dependencies = await dependencyFreshness(events, options.dependencyResolver);
+  const counts = { current: 0, changed: 0, missing: 0, unsafe: 0, unverified: 0 };
   for (const file of files) counts[file.status] += 1;
+  for (const dependency of dependencies) counts[dependency.status] += 1;
+  const stalePaths = new Set(files.filter((file) => file.status !== "current").map((file) => file.path));
+  const staleDependencies = new Set(dependencies.filter((entry) => !["current", "unverified"].includes(entry.status)).map((entry) => entry.name));
+  const staleEventIds = events.filter((event) => (event.freshness?.files ?? []).some((file) => stalePaths.has(file.path)) || (event.freshness?.dependencies ?? []).some((entry) => staleDependencies.has(entry.name))).map((event) => event.eventId).sort();
   return deepFreezeJson({
     schemaVersion: "qarinah.memory-freshness.v1",
     workspaceId: workspace.config.workspaceId,
     status: counts.changed + counts.missing + counts.unsafe > 0 ? "stale" : "current",
-    snapshotEventId: latest.eventId,
-    snapshotHash: latest.snapshot.snapshotHash,
+    snapshotEventId: latest?.eventId ?? null,
+    snapshotHash: latest?.snapshot.snapshotHash ?? null,
     counts,
-    files
+    files,
+    dependencies,
+    staleEventIds
   });
 }
 
@@ -6592,7 +7325,11 @@ var RECORD_STDIN_JSON_FIELDS = /* @__PURE__ */ new Set([
   "confidence",
   "relations",
   "sourceId",
-  "retention"
+  "retention",
+  "temporal",
+  "repository",
+  "freshness",
+  "disclosure"
 ]);
 var QUERY_STDIN_JSON_FIELDS = /* @__PURE__ */ new Set([
   "query",
@@ -6602,7 +7339,9 @@ var QUERY_STDIN_JSON_FIELDS = /* @__PURE__ */ new Set([
   "maxTokens",
   "reserveTokens",
   "asOf",
-  "minimumCoverage"
+  "minimumCoverage",
+  "authorityScopes",
+  "repositoryIds"
 ]);
 async function readStdin(maximumBytes = 1048576) {
   const chunks = [];
@@ -6657,6 +7396,10 @@ function stdinRecordInput(request) {
     data: Object.hasOwn(request, "data") ? request.data : {},
     confidence: Object.hasOwn(request, "confidence") ? request.confidence : "claimed",
     relations: Object.hasOwn(request, "relations") ? request.relations : [],
+    ...Object.hasOwn(request, "temporal") ? { temporal: request.temporal } : {},
+    ...Object.hasOwn(request, "repository") ? { repository: request.repository } : {},
+    ...Object.hasOwn(request, "freshness") ? { freshness: request.freshness } : {},
+    ...Object.hasOwn(request, "disclosure") ? { disclosure: request.disclosure } : {},
     provenance: { adapter: "qarinah-cli", sourceId: request.sourceId ?? null },
     retention: Object.hasOwn(request, "retention") ? request.retention : { class: "project", expiresAt: null }
   };
@@ -6672,6 +7415,13 @@ function stdinQueryInput(request) {
   if (!["any", "partial", "direct"].includes(minimumCoverage)) {
     throw new TypeError("minimumCoverage must be any, partial, or direct.");
   }
+  const selectors = (field) => {
+    if (!Object.hasOwn(request, field)) return void 0;
+    if (!Array.isArray(request[field]) || request[field].length > 64 || request[field].some((value) => typeof value !== "string" || value.length < 1 || value.length > 256)) {
+      throw new TypeError(`${field} must contain at most 64 non-empty strings.`);
+    }
+    return request[field];
+  };
   return {
     query,
     format,
@@ -6680,7 +7430,9 @@ function stdinQueryInput(request) {
     maxTokens: requestInteger(request, "maxTokens", 128, 1e6),
     reserveTokens: requestInteger(request, "reserveTokens", 0, 999936),
     asOf: Object.hasOwn(request, "asOf") ? request.asOf : void 0,
-    minimumCoverage
+    minimumCoverage,
+    authorityScopes: selectors("authorityScopes"),
+    repositoryIds: selectors("repositoryIds")
   };
 }
 function help() {
@@ -6693,7 +7445,7 @@ Usage:
   qarinah record --stdin-json
   qarinah hook codex|claude
   qarinah mcp [--allow-query --workspace-id ws_<id> --policy-hash sha256:<digest>] [--max-chars n] [--max-items n]
-  qarinah build
+  qarinah build | rebuild
   qarinah scan [--max-files n] [--max-file-bytes n] [--max-total-bytes n] [--max-depth n]
   qarinah export okf [--output <path>]
   qarinah query [text] [--format json|markdown] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp] [--minimum-coverage any|partial|direct]
@@ -6710,8 +7462,8 @@ Usage:
 `;
 }
 async function run(argv) {
-  const nodeMajor = Number.parseInt(process2.versions.node.split(".")[0], 10);
-  if (![22, 24, 26].includes(nodeMajor)) {
+  const [nodeMajor, nodeMinor] = process2.versions.node.split(".").map(Number);
+  if (![22, 24, 26].includes(nodeMajor) || nodeMajor === 22 && nodeMinor < 13) {
     throw new TypeError(`Qarinah requires Node.js 22, 24, or 26; received ${process2.versions.node}.`);
   }
   const [command = "help", ...args] = argv;
@@ -6865,7 +7617,7 @@ async function run(argv) {
     await runMcpServer({ queryPermit });
     return;
   }
-  if (command === "build") {
+  if (command === "build" || command === "rebuild") {
     process2.stdout.write(`${JSON.stringify(await rebuildDerivedState(process2.cwd()), null, 2)}
 `);
     return;
@@ -6930,7 +7682,9 @@ async function run(argv) {
       maxTokens: input.maxTokens,
       reserveTokens: input.reserveTokens,
       asOf: input.asOf,
-      minimumCoverage: input.minimumCoverage
+      minimumCoverage: input.minimumCoverage,
+      authorityScopes: input.authorityScopes,
+      repositoryIds: input.repositoryIds
     });
     const format = input.format;
     if (format === "json") process2.stdout.write(`${JSON.stringify(pack, null, 2)}

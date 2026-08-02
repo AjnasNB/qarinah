@@ -35,10 +35,12 @@
     "./schemas/okf-export.json": "./schemas/okf-export.schema.json",
     "./schemas/maqam-context-adapter.json": "./schemas/maqam-context-adapter.schema.json",
     "./schemas/cockroach-source-record.json": "./schemas/cockroach-source-record.schema.json",
+    "./schemas/cockroach-browser-memory.json": "./schemas/cockroach-browser-memory.schema.json",
     "./schemas/productloop-runtime-event.json": "./schemas/productloop-runtime-event.schema.json",
     "./schemas/team-manifest.json": "./schemas/team-manifest.schema.json",
     "./schemas/causal-receipt.json": "./schemas/causal-receipt.schema.json",
-    "./schemas/federated-context.json": "./schemas/federated-context.schema.json"
+    "./schemas/federated-context.json": "./schemas/federated-context.schema.json",
+    "./schemas/memory-attachment.json": "./schemas/memory-attachment.schema.json"
   },
   "files": [
     "bin/",
@@ -69,6 +71,8 @@
     "docs/LICENSE-STRATEGY.md",
     "docs/MIGRATIONS.md",
     "docs/TEAM-MEMORY.md",
+    "docs/SQLITE-READ-MODEL.md",
+    "docs/TEMPORAL-AUTHORITY.md",
     "bench/fixtures/software-task-scenarios.mjs",
     "bench/results/",
     "scripts/evaluate-software-tasks.mjs",
@@ -113,7 +117,7 @@
     "evaluate:long-document": "node scripts/evaluate-long-document.mjs"
   },
   "engines": {
-    "node": "^22.0.0 || ^24.0.0 || ^26.0.0"
+    "node": "^22.13.0 || ^24.0.0 || ^26.0.0"
   },
   "repository": {
     "type": "git",
@@ -159,6 +163,7 @@
   ],
   "devDependencies": {
     "@primer/css": "^22.3.0",
+    "cockroach-browser": "0.1.0",
     "esbuild": "0.28.1",
     "marked": "^18.0.7",
     "typescript": "7.0.2"

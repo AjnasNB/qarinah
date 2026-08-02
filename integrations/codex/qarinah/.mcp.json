@@ -2,7 +2,7 @@
   "mcpServers": {
     "context": {
       "command": "node",
-      "args": ["./runtime/qarinah.mjs", "mcp"],
+      "args": ["--disable-warning=ExperimentalWarning", "./runtime/qarinah.mjs", "mcp"],
       "cwd": "."
     }
   }

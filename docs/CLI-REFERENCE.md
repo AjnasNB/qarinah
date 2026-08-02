@@ -392,15 +392,16 @@ The result includes:
 
 If a new snapshot is captured, the CLI rebuilds derived state before returning.
 
-## `build`
+## `build` and `rebuild`
 
 Verify the authoritative event record and deterministically rebuild its graph, retrieval index, Markdown view, and event-ID projection.
 
 ```sh
 npx qarinah build
+npx qarinah rebuild
 ```
 
-The result reports the workspace ID, event count, and head hash.
+The commands are exact aliases. The result reports the workspace ID, event count, head hash, and rebuilt projections, including `.qarinah/index/qarinah.db`.
 
 Use `build` after moving a valid ledger between machines, after deleting a disposable derived view, or when `doctor` reports derived state as missing or stale. It does not repair a corrupt authoritative event chain.
 

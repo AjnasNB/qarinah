@@ -30,7 +30,7 @@ if (!/^flowchart T[BD]\b/u.test(architecture)) {
 if (committedDigest !== `${architectureDigest}  docs/architecture.mmd`) {
   throw new Error("The rendered architecture source digest is stale. Regenerate assets/architecture/qarinah-flow.svg.");
 }
-for (const label of ["Codex + Claude Code + CLI", "Hash-chained JSONL", "Small cited context pack"]) {
+for (const label of ["Codex / Claude Code / Cursor", "Hash-chained JSONL ledger", "SQLite WAL + FTS5", "Maqam policy", "Small cited context pack"]) {
   if (!architectureSvg.includes(label)) throw new Error(`Rendered architecture image is missing ${label}.`);
 }
 if (/Â/u.test(architectureSvg)) {

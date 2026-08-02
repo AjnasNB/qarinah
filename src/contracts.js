@@ -19,7 +19,10 @@ export const EVENT_KINDS = Object.freeze([
   "claim",
   "decision",
   "approval",
-  "summary"
+  "summary",
+  "memory.scope.attached",
+  "memory.scope.revoked",
+  "context.pack.compiled"
 ]);
 
 export const RELATION_TYPES = Object.freeze([
@@ -40,11 +43,13 @@ const ACTOR_TYPES = new Set(["human", "agent", "tool", "system", "source"]);
 const RETENTION_CLASSES = new Set(["session", "project", "durable"]);
 const INPUT_KEYS = new Set([
   "eventId", "timestamp", "sessionId", "turnId", "kind", "actor", "title", "body", "data",
-  "confidence", "authority", "relations", "provenance", "retention"
+  "confidence", "authority", "temporal", "repository", "freshness", "disclosure",
+  "relations", "provenance", "retention"
 ]);
 const STORED_KEYS = new Set([
   "schemaVersion", "eventId", "timestamp", "workspaceId", "sessionId", "turnId", "kind", "actor",
-  "title", "body", "data", "confidence", "authority", "relations", "provenance", "retention", "previousHash", "hash"
+  "title", "body", "data", "confidence", "authority", "temporal", "repository", "freshness", "disclosure",
+  "relations", "provenance", "retention", "previousHash", "hash"
 ]);
 const EVENT_ID_PATTERN = /^evt_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 const WORKSPACE_ID_PATTERN = /^ws_[0-9a-f]{32}$/;
@@ -117,6 +122,79 @@ function normalizeAuthority(value) {
   });
 }
 
+function normalizeTemporal(value, eventTimestamp) {
+  if (value === undefined || value === null) return null;
+  const temporal = record(value, "temporal", new Set(["validFrom", "validUntil"]));
+  const validFrom = temporal.validFrom === undefined
+    ? eventTimestamp
+    : canonicalIsoTimestamp(temporal.validFrom, "temporal.validFrom");
+  const validUntil = temporal.validUntil === undefined || temporal.validUntil === null
+    ? null
+    : canonicalIsoTimestamp(temporal.validUntil, "temporal.validUntil");
+  if (validUntil !== null && validUntil <= validFrom) {
+    throw new TypeError("temporal.validUntil must be later than temporal.validFrom.");
+  }
+  return Object.freeze({ validFrom, validUntil });
+}
+
+function normalizeRepository(value) {
+  if (value === undefined || value === null) return null;
+  const repository = record(value, "repository", new Set(["id", "branch", "commit"]));
+  return Object.freeze({
+    id: boundedString(repository.id, "repository.id", 256),
+    branch: repository.branch === undefined || repository.branch === null
+      ? null
+      : boundedString(repository.branch, "repository.branch", 512),
+    commit: repository.commit === undefined || repository.commit === null
+      ? null
+      : boundedString(repository.commit, "repository.commit", 128)
+  });
+}
+
+function normalizeFreshness(value) {
+  if (value === undefined || value === null) return null;
+  const freshness = record(value, "freshness", new Set(["files", "dependencies"]));
+  const files = freshness.files ?? [];
+  const dependencies = freshness.dependencies ?? [];
+  if (!Array.isArray(files) || files.length > 512) throw new TypeError("freshness.files must contain at most 512 entries.");
+  if (!Array.isArray(dependencies) || dependencies.length > 512) {
+    throw new TypeError("freshness.dependencies must contain at most 512 entries.");
+  }
+  const normalizedFiles = files.map((candidate, index) => {
+    const file = record(candidate, `freshness.files[${index}]`, new Set(["path", "hash"]));
+    const hash = boundedString(file.hash, `freshness.files[${index}].hash`, 71);
+    if (!HASH_PATTERN.test(hash)) throw new TypeError(`freshness.files[${index}].hash is invalid.`);
+    return Object.freeze({ path: boundedString(file.path, `freshness.files[${index}].path`, 1_024), hash });
+  });
+  const normalizedDependencies = dependencies.map((candidate, index) => {
+    const dependency = record(candidate, `freshness.dependencies[${index}]`, new Set(["name", "version", "hash"]));
+    const hash = boundedString(dependency.hash, `freshness.dependencies[${index}].hash`, 71);
+    if (!HASH_PATTERN.test(hash)) throw new TypeError(`freshness.dependencies[${index}].hash is invalid.`);
+    return Object.freeze({
+      name: boundedString(dependency.name, `freshness.dependencies[${index}].name`, 512),
+      version: dependency.version === undefined || dependency.version === null
+        ? null
+        : boundedString(dependency.version, `freshness.dependencies[${index}].version`, 256),
+      hash
+    });
+  });
+  return Object.freeze({ files: Object.freeze(normalizedFiles), dependencies: Object.freeze(normalizedDependencies) });
+}
+
+function normalizeDisclosure(value) {
+  if (value === undefined || value === null) return null;
+  const disclosure = record(value, "disclosure", new Set(["scopes", "classification"]));
+  const scopes = disclosure.scopes ?? [];
+  if (!Array.isArray(scopes) || scopes.length > 64) throw new TypeError("disclosure.scopes must contain at most 64 entries.");
+  const normalized = scopes.map((scope, index) => boundedString(scope, `disclosure.scopes[${index}]`, 256));
+  if (new Set(normalized).size !== normalized.length) throw new TypeError("disclosure.scopes cannot contain duplicates.");
+  const classification = disclosure.classification ?? "workspace";
+  if (!["public", "workspace", "restricted"].includes(classification)) {
+    throw new TypeError("disclosure.classification is invalid.");
+  }
+  return Object.freeze({ scopes: Object.freeze([...normalized].sort()), classification });
+}
+
 function normalizeRetention(value = {}) {
   const retention = record(value, "retention", new Set(["class", "expiresAt"]));
   const retentionClass = retention.class ?? "project";
@@ -160,7 +238,19 @@ export function createEventEnvelope(input, options) {
   const data = redactValue(rawData, { label: "data", maximumStringLength: 65_536, maximumObjectKeys: 128 });
   const relations = normalizeRelations(candidate.relations);
   const authority = normalizeAuthority(candidate.authority);
-  const content = { title, body, data, ...(authority === null ? {} : { authority }), relations };
+  const temporal = normalizeTemporal(candidate.temporal, eventTimestamp);
+  const repository = normalizeRepository(candidate.repository);
+  const freshness = normalizeFreshness(candidate.freshness);
+  const disclosure = normalizeDisclosure(candidate.disclosure);
+  const content = {
+    title, body, data,
+    ...(authority === null ? {} : { authority }),
+    ...(temporal === null ? {} : { temporal }),
+    ...(repository === null ? {} : { repository }),
+    ...(freshness === null ? {} : { freshness }),
+    ...(disclosure === null ? {} : { disclosure }),
+    relations
+  };
   const previousHash = options?.previousHash ?? null;
   if (previousHash !== null && !HASH_PATTERN.test(previousHash)) throw new TypeError("previousHash is invalid.");
   const confidence = candidate.confidence ?? "extracted";
@@ -183,6 +273,10 @@ export function createEventEnvelope(input, options) {
     data,
     confidence,
     ...(authority === null ? {} : { authority }),
+    ...(temporal === null ? {} : { temporal }),
+    ...(repository === null ? {} : { repository }),
+    ...(freshness === null ? {} : { freshness }),
+    ...(disclosure === null ? {} : { disclosure }),
     relations,
     provenance: normalizeProvenance(candidate.provenance, content),
     retention: normalizeRetention(candidate.retention),
@@ -211,6 +305,10 @@ export function validateStoredEvent(value, options = {}) {
     data: event.data,
     confidence: event.confidence,
     ...(event.authority === undefined ? {} : { authority: event.authority }),
+    ...(event.temporal === undefined ? {} : { temporal: event.temporal }),
+    ...(event.repository === undefined ? {} : { repository: event.repository }),
+    ...(event.freshness === undefined ? {} : { freshness: event.freshness }),
+    ...(event.disclosure === undefined ? {} : { disclosure: event.disclosure }),
     relations: event.relations,
     provenance: event.provenance,
     retention: event.retention

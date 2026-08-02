@@ -4,7 +4,7 @@
   "title": "Qarinah federated context",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "query", "authorityBoundary", "workspaces", "manifestHash"],
+  "required": ["schemaVersion", "query", "authorityBoundary", "workspaces", "repositoryGraph", "manifestHash"],
   "properties": {
     "schemaVersion": { "const": "qarinah.federated-context.v1" },
     "query": { "type": "string", "maxLength": 4096 },
@@ -16,11 +16,26 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["authority", "workspaceId", "pack"],
+        "required": ["authority", "repositoryId", "workspaceId", "pack"],
         "properties": {
           "authority": { "type": "string", "minLength": 1, "maxLength": 256 },
+          "repositoryId": { "type": "string", "minLength": 1, "maxLength": 256 },
           "workspaceId": { "type": "string" },
           "pack": { "type": "object" }
+        }
+      }
+    },
+    "repositoryGraph": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to", "type"],
+        "properties": {
+          "from": { "type": "string", "minLength": 1, "maxLength": 256 },
+          "to": { "type": "string", "minLength": 1, "maxLength": 256 },
+          "type": { "enum": ["depends_on", "documents", "deploys", "shares_contract", "owned_by", "references"] }
         }
       }
     },

@@ -364,7 +364,32 @@ function rebuildDerivedState(start?: string): Promise<{
 }>;
 ```
 
-Verifies the canonical record and atomically replaces deterministic graph, index, Markdown, and event-ID projections.
+Verifies the canonical record and atomically replaces deterministic graph, index, Markdown, event-ID, and SQLite projections.
+
+### SQLite read-model APIs
+
+```ts
+function rebuildSqliteReadModel(
+  workspace: QarinahWorkspace,
+  events: QarinahEvent[],
+  derived: { index: unknown; graph: unknown }
+): Promise<Readonly<Record<string, unknown>>>;
+
+function inspectSqliteReadModel(
+  workspace: QarinahWorkspace
+): Promise<Readonly<Record<string, unknown>>>;
+
+function querySqliteReadModel(
+  workspace: QarinahWorkspace,
+  query: string,
+  options?: { headHash?: string | null; limit?: number }
+): Promise<Readonly<{
+  schemaVersion: number;
+  candidates: Array<{ eventId: string; rank: number }>;
+}>>;
+```
+
+The database at `.qarinah/index/qarinah.db` is a disposable read model. Rebuild verifies the hash-chained JSONL authority, derives typed tables and FTS5 rows, commits a temporary SQLite database, checkpoints WAL, and atomically replaces the previous projection. Inspect and query reject a schema, workspace, or ledger-head mismatch.
 
 ### `loadIndex(start?, options?)`
 
@@ -400,6 +425,8 @@ function rankContextEvents(
     diversity?: number;
     supersessionPolicy?: "prefer-current" | "include-history";
     authorityScope?: string;
+    authorityScopes?: string[];
+    repositoryIds?: string[];
     asOf: string;
   }
 ): Readonly<Record<string, unknown>>;
@@ -425,6 +452,12 @@ function compileContext(
     diversity?: number;
     supersessionPolicy?: "prefer-current" | "include-history";
     authorityScope?: string;
+    authorityScopes?: string[];
+    repositoryIds?: string[];
+    queryExpansion?: {
+      id?: string;
+      expand(input: { query: string }): string[] | Promise<string[]>;
+    };
     minimumCoverage?: "any" | "partial" | "direct";
     asOf?: string;
     clock?: () => Date;
@@ -658,6 +691,14 @@ createSignedCheckpoint
 verifySignedCheckpoint
 evaluateContextQuality
 createCausalReceipt
+rebuildSqliteReadModel
+inspectSqliteReadModel
+querySqliteReadModel
+createMemoryScopeAttachmentEvent
+createMemoryScopeRevocationEvent
+recordMemoryScopeAttachment
+resolveActiveMemoryScopes
+revokeMemoryScopeAttachment
 ```
 
 See [Shared and verifiable team memory](TEAM-MEMORY.md) for runnable examples and authority boundaries.
@@ -682,6 +723,16 @@ function registerMaqamContextAdapters<TGateway extends MaqamGuardedToolGateway>(
     cwd?: string;
     maxChars?: number;
     maxItems?: number;
+    requireMemoryAttachment?: boolean;
+    resolveMemoryAttachment?(input: {
+      runId: string | null;
+      agentId: string | null;
+      toolName: "context.query";
+    }): Promise<{
+      attachmentIds: string[];
+      authorityScopes: string[];
+      repositoryIds: string[];
+    } | null>;
   }
 ): {
   schemaVersion: "qarinah.maqam-context-registration.v1";
@@ -690,9 +741,67 @@ function registerMaqamContextAdapters<TGateway extends MaqamGuardedToolGateway>(
 };
 ```
 
-The gateway must provide guarded registration and exact execution verification. The active Maqam context must provide scoped evidence. A retained handler or fabricated plain context is not sufficient authority.
+The gateway must provide guarded registration and exact execution verification. The active Maqam context must provide scoped evidence. With `requireMemoryAttachment`, the host resolves temporary scopes and repositories for the exact run and agent; query input has no field that can widen those permissions. A retained handler, fabricated plain context, expired attachment, revoked attachment, or missing required attachment is not sufficient authority.
 
 The structural adapter schema is exported as `qarinah/schemas/maqam-context-adapter.json`.
+
+## Cockroach Browser interoperability
+
+Exports:
+
+```text
+COCKROACH_BROWSER_MEMORY_SCHEMA_VERSION
+validateCockroachBrowserMemoryOutcome
+cockroachBrowserMemoryOutcomeToEventInput
+appendCockroachBrowserOutcome
+createCockroachBrowserMemorySink
+```
+
+### `validateCockroachBrowserMemoryOutcome(value)`
+
+Validates and snapshots one `cockroach.browser-memory.v1` value under Qarinah's bounded receiving contract. A valid durable outcome needs at least one evidence ID. Secret-bearing metadata keys are recursively omitted and recognized secret strings are redacted.
+
+### `cockroachBrowserMemoryOutcomeToEventInput(value, options?)`
+
+```ts
+function cockroachBrowserMemoryOutcomeToEventInput(
+  value: unknown,
+  options?: {
+    retentionClass?: "session" | "project" | "durable";
+  }
+): QarinahEventInput;
+```
+
+Maps one cited outcome to an untrusted metadata-only event input without appending. The result grants no browser authority and contains only opaque evidence references, hashes, coarse content summaries, and bounded operational metadata.
+
+### `appendCockroachBrowserOutcome(value, options?)`
+
+```ts
+function appendCockroachBrowserOutcome(
+  value: unknown,
+  options?: {
+    cwd?: string;
+    workspace?: QarinahWorkspace;
+  }
+): Promise<QarinahEvent>;
+```
+
+Reloads current machine-local workspace trust, appends the reviewed metadata projection, and treats exact replay as idempotent. An uncited direct append is rejected; a divergent replay at the same receipt-backed identity fails with `EVENT_ID_CONFLICT`.
+
+### `createCockroachBrowserMemorySink(options?)`
+
+```ts
+function createCockroachBrowserMemorySink(options?: {
+  cwd?: string;
+  workspace?: QarinahWorkspace;
+}): {
+  appendBrowserOutcome(value: unknown): Promise<void>;
+};
+```
+
+Returns the passive sink shape accepted by the public Cockroach Browser Qarinah recorder. The sink ignores uncited lifecycle notifications and forwards cited outcomes to the trusted metadata-only append path. It cannot create a session, inspect browser state, execute an action, or grant approval.
+
+The receiving schema is exported as `qarinah/schemas/cockroach-browser-memory.json`.
 
 ## Cockroach Crawler interoperability
 
@@ -801,6 +910,7 @@ qarinah/schemas/context-pack.json
 qarinah/schemas/project-structure.json
 qarinah/schemas/okf-export.json
 qarinah/schemas/maqam-context-adapter.json
+qarinah/schemas/cockroach-browser-memory.json
 qarinah/schemas/cockroach-source-record.json
 qarinah/schemas/productloop-runtime-event.json
 ```

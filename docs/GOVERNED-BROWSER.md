@@ -7,12 +7,27 @@ Natural-language form filling and multi-page browser assistance are valuable onl
 ```text
 Cockroach Crawler -> bounded public-source records -> Qarinah
 agent / ProductLoop -> Maqam policy + exact approval -> browser driver
-browser driver -> receipt -> Maqam evidence + redacted Qarinah events
+browser host -> cited metadata outcome -> Qarinah
 ```
 
 The crawler never receives authenticated browser state. Qarinah never dispatches browser actions. The browser driver never approves its own request.
 
 This design is independent. A third-party DOM controller may be evaluated as an optional pinned observation driver, but its agent loop, extension bridge, prompts, branding, and enforcement model are not the product boundary.
+
+## Published Cockroach Browser receiving boundary
+
+`cockroach-browser@0.1.0` is now public and exports a `cockroach.browser-memory.v1` outcome shape. Qarinah implements only the receiving side of that shape:
+
+- `createCockroachBrowserMemorySink()` accepts outcome notifications and exposes no browser operation;
+- only outcomes with at least one evidence ID are retained, while uncited lifecycle notifications are ignored;
+- every retained event is an untrusted, metadata-only projection, even when the Qarinah workspace allows content capture;
+- session IDs are hashed, actor and purpose are coarsened, and arbitrary browser metadata is not retained;
+- secret-bearing metadata keys are recursively omitted before the event reaches the ledger; and
+- the current machine-local Qarinah trust record is reloaded before every durable append.
+
+The exact public package is a development-only conformance fixture, not a Qarinah runtime dependency. Qarinah does not launch Cockroach Browser, attach to its profiles, read its cookies or storage, resolve its value references, verify its Maqam approvals, or grant it origin or action authority. Evidence IDs are opaque citations to browser-host evidence; receiving them does not independently verify the evidence bytes or turn receipt hashes into signatures.
+
+See [governed interoperability boundaries](INTEROPERABILITY.md#cockroach-browser-cited-metadata-outcomes) for the schema, sink, replay, and conflict contract.
 
 ## Maqam 0.3.1 tool split
 

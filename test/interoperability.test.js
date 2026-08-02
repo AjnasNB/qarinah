@@ -359,6 +359,64 @@ test("Maqam adapters preserve separate read/write governance and scoped evidence
   assert.ok(refreshed.pack.items.some((item) => item.eventId === appended.event.eventId));
 });
 
+test("Maqam alone assigns revocable memory authority to an agent run", async (t) => {
+  const root = await temporaryDirectory(t);
+  const workspace = await initializeWorkspace(root, { capture: "content" });
+  const frontend = await appendEvent(eventInput({
+    title: "Frontend deployment decision",
+    body: "Deploy the frontend through the reviewed preview workflow.",
+    repository: { id: "frontend", branch: "main", commit: "abc123" },
+    disclosure: { scopes: ["engineering.frontend"], classification: "restricted" }
+  }), { workspace });
+  await appendEvent(eventInput({
+    title: "Production infrastructure decision",
+    body: "Rotate the infrastructure deployment credential.",
+    repository: { id: "infrastructure", branch: "main", commit: "def456" },
+    disclosure: { scopes: ["engineering.infrastructure"], classification: "restricted" },
+    provenance: { adapter: "test", sourceId: "infrastructure-fixture" }
+  }), { workspace });
+  await rebuildDerivedState(root);
+
+  const maqam = fakeMaqam();
+  const resolutions = [];
+  registerMaqamContextAdapters({
+    gateway: maqam.gateway,
+    cwd: root,
+    requireMemoryAttachment: true,
+    resolveMemoryAttachment(context) {
+      resolutions.push(context);
+      if (context.runId !== "run_frontend" || context.agentId !== "frontend-agent") return null;
+      return {
+        attachmentIds: ["policy_frontend_run"],
+        scopes: ["engineering.frontend"],
+        repositories: ["frontend"]
+      };
+    }
+  });
+
+  const result = await maqam.gateway.call("context.query", { query: "deployment decision" }, {
+    runId: "run_frontend",
+    agentId: "frontend-agent"
+  });
+  assert.deepEqual(result.pack.items.map((item) => item.eventId), [frontend.eventId]);
+  assert.deepEqual(result.memoryAttachment.scopes, ["engineering.frontend"]);
+  assert.deepEqual(resolutions, [{ runId: "run_frontend", agentId: "frontend-agent", toolName: "context.query" }]);
+  await assert.rejects(
+    maqam.gateway.call("context.query", {
+      query: "deployment decision",
+      authorityScopes: ["engineering.infrastructure"]
+    }, { runId: "run_frontend", agentId: "frontend-agent" }),
+    /unknown field/
+  );
+  await assert.rejects(
+    maqam.gateway.call("context.query", { query: "deployment decision" }, {
+      runId: "run_unattached",
+      agentId: "frontend-agent"
+    }),
+    (error) => error.code === "MAQAM_MEMORY_ATTACHMENT_REQUIRED"
+  );
+});
+
 test("Maqam content append requires both exact approval and content capture consent", async (t) => {
   const root = await temporaryDirectory(t);
   await initializeWorkspace(root, { capture: "content" });
