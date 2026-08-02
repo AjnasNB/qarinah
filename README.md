@@ -144,7 +144,7 @@ Supported event classes include prompts, tool requests, tool completions, approv
 ## Architecture
 
 <p align="center">
-  <img src="assets/architecture/qarinah-flow.svg" width="420" alt="Qarinah flow from Codex, Claude Code, CLI, crawler, workflows, and project files through explicit capture, a hash-chained record, deterministic graph and index views, a coverage-aware compiler, and a small cited context pack.">
+  <img src="assets/architecture/qarinah-flow.svg" width="920" alt="Detailed Qarinah architecture showing capture controls, authoritative JSONL, temporal memory, rebuildable SQLite and graph projections, Maqam scopes, deterministic retrieval, cited packs, and evaluation.">
 </p>
 
 The project graph covers directories, files, content hashes, JavaScript and TypeScript module references, Markdown links, exact source spans, additions, changes, renames, and deletions. See the [architecture guide](docs/ARCHITECTURE.md) or the [editable diagram source](docs/architecture.mmd).
@@ -156,13 +156,15 @@ Qarinah is intentionally small, local, and inspectable:
 | Layer | Technology |
 | --- | --- |
 | Runtime | Modern Node.js ESM on maintained Node 22, 24, and 26 releases |
-| Durable memory | Append-only canonical JSONL events, SHA-256 content and chain hashes, machine-local checkpoints, and renewable write locks |
-| Project graph | Typed event, evidence, relation, module, Markdown-link, file, rename, change, and deletion edges |
-| Retrieval | BM25, character-trigram typo tolerance, one-hop graph evidence, reciprocal-rank fusion, deterministic diversity, time, authority, retention, conflict, and supersession |
+| Durable memory | Append-only canonical JSONL events, SHA-256 content and chain hashes, temporal validity, repository identity, machine-local checkpoints, and renewable write locks |
+| Fast local reads | Disposable SQLite WAL database with FTS5, schema migrations, typed tables, and a complete ledger-derived rebuild path |
+| Project graph | Typed event, evidence, repository, dependency, module, Markdown-link, citation, conflict, supersession, file, rename, change, and deletion edges |
+| Retrieval | SQLite FTS5, BM25, typo tolerance, graph traversal, reciprocal-rank fusion, time and freshness filters, host-owned authority scopes, repository isolation, conflict/supersession handling, and diversity |
 | Context compiler | Complete-output character and token budgets, explicit output headroom, evidence-coverage gates, deterministic citations, and reproducible manifests |
 | Human-readable views | Rebuildable Markdown, JSON, graph, index, and Google OKF 0.1 Draft exports |
 | Agent integration | One-command Codex, Claude Code, and Cursor setup; lifecycle hooks; strict JSON stdin; typed JavaScript API; and consent-gated stdio MCP retrieval |
-| Infrastructure | No vector database, hosted backend, embedding bill, model provider, daemon, analytics endpoint, or Qarinah API key |
+| Optional adapters | Local or customer-provided embeddings, query expansion, and rerankers may reorder admitted cited evidence without replacing ledger authority |
+| Infrastructure | No required vector database, hosted backend, embedding bill, model provider, daemon, analytics endpoint, or Qarinah API key |
 
 ## Install
 
@@ -189,11 +191,14 @@ The public package now includes:
 - one-command Codex, Claude Code, and Cursor setup;
 - a local visual dashboard for decisions, supersession, conflicts, citations, activity, savings, and affected files;
 - freshness checks for changed, missing, or unsafe cited files;
+- temporal validity, point-in-time queries, stale-citation detection, conflicts, and supersessions;
+- a rebuildable SQLite WAL/FTS5 read model derived from the JSONL authority;
+- Maqam-owned temporary memory attachments that agents cannot self-grant;
 - task packs for debugging, code review, feature work, database migration, incident response, release preparation, and security review;
-- multi-repository context that keeps authority in separate cited packs;
+- multi-repository context with typed cross-repository relationships and separate cited authority;
 - optional semantic reranking that cannot introduce unadmitted sources;
 - an encrypted team-sync protocol with roles, GitHub binding, and signed checkpoints;
-- evaluation for recall, citation accuracy, stale rejection, conflict detection, completion, latency, cost, and repeated mistakes; and
+- evaluation for recall, citation accuracy, stale rejection, conflict and supersession correctness, repository isolation, unauthorized-disclosure rejection, supplied tokens, net task cost, latency, completion, and repeated mistakes; and
 - causal receipts connecting Cockroach evidence, Qarinah memory, Maqam policy, execution, and observed results.
 
 See [Shared and verifiable team memory](docs/TEAM-MEMORY.md) for commands, APIs, and security boundaries.

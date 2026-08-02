@@ -98,6 +98,22 @@ const docPages = [
     aliases: ["team memory", "dashboard", "freshness", "multi repo", "encrypted sync", "context query", "task packs"]
   },
   {
+    route: "docs/sqlite-read-model",
+    source: "docs/SQLITE-READ-MODEL.md",
+    title: "SQLite read model",
+    description: "Use the WAL and FTS5 read model without replacing Qarinah's authoritative hash-chained JSONL ledger.",
+    section: "Understand",
+    aliases: ["sqlite", "fts5", "wal", "read database", "rebuild database", "schema migrations"]
+  },
+  {
+    route: "docs/temporal-authority",
+    source: "docs/TEMPORAL-AUTHORITY.md",
+    title: "Temporal memory and authority",
+    description: "Apply point-in-time validity, freshness, Maqam-owned scopes, supersession, conflicts, and repository isolation.",
+    section: "Understand",
+    aliases: ["temporal memory", "stale context", "supersession", "memory scopes", "repository isolation"]
+  },
+  {
     route: "docs/token-efficient-context",
     source: "docs/TOKEN-EFFICIENT-CONTEXT.md",
     title: "Reduce repeated coding-agent context",
@@ -117,7 +133,7 @@ const docPages = [
     route: "docs/architecture",
     source: "docs/ARCHITECTURE.md",
     title: "Architecture",
-    description: "Understand Qarinah's append-only record, knowledge graph, hybrid retrieval index, and context compiler.",
+    description: "Understand Qarinah's authoritative ledger, SQLite read model, temporal graph, Maqam scopes, retrieval pipeline, and cited compiler.",
     section: "Understand",
     aliases: ["knowledge graph", "bm25", "retrieval", "provenance", "hash chain"]
   },

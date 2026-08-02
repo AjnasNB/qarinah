@@ -1,13 +1,13 @@
 # Architecture
 
-> One authoritative event chain. Deterministic projections. Small, cited context at task time.
+> One authoritative event chain. A fast rebuildable SQLite read model. Temporally correct, authority-scoped context at task time.
 
 Qarinah is a governance-native context compiler. It preserves permitted agent activity, explicit decisions, source evidence, and bounded project structure in a verified local record, then compiles only the context relevant to a later task.
 
 ## System map
 
 <p align="center">
-  <img src="../assets/architecture/qarinah-flow.svg" width="420" alt="Qarinah flow from agent hosts and project inputs through explicit capture, an authoritative hash-chained record, deterministic views, a coverage-aware compiler, and a small cited context pack.">
+  <img src="../assets/architecture/qarinah-flow.svg" width="920" alt="Detailed Qarinah architecture showing hosts, capture controls, the authoritative hash-chained JSONL ledger, temporal memory, the rebuildable SQLite and graph projections, Maqam-assigned disclosure scopes, deterministic retrieval, cited packs, and evaluation.">
 </p>
 
 [Open the editable diagram source](architecture.mmd).
@@ -18,9 +18,9 @@ Qarinah is a governance-native context compiler. It preserves permitted agent ac
 | --- | --- | --- |
 | Capture | An initialized workspace and machine-local permit control whether metadata or reviewed content may be retained. | No silent global capture and no hidden-reasoning or transcript scraping. |
 | Authority | Canonical JSONL events bind the previous hash, content hash, record hash, provenance, confidence, retention, and typed relations. | A valid chain proves continuity relative to the checkpoint, not the factual truth of every claim. |
-| Derivation | Graph, index, Markdown, project structure, and OKF are disposable deterministic projections. | Derived state never replaces the event chain. |
-| Retrieval | Hybrid retrieval applies time, retention, authority, conflict, supersession, coverage, and complete-output budgets. | Coverage describes retained evidence, not model-answer correctness. |
-| Disclosure | Every selected item cites an event ID and hash. Sensitive reads may pass through Maqam. | Direct operating-system or unregistered tool activity remains outside Maqam's registered-tool boundary. |
+| Derivation | SQLite, graph, index, Markdown, project structure, dashboard, and OKF are disposable projections. | Derived state never replaces the event chain and can be deleted and rebuilt. |
+| Retrieval | FTS5/BM25, typo tolerance, graph traversal, time, freshness, authority, conflict, supersession, diversity, coverage, and output budgets are composed deterministically. | Optional caller-owned semantic adapters may rerank admitted evidence but cannot introduce authority. |
+| Disclosure | Every selected item cites an event ID and hash. Maqam may temporarily attach exact scopes and repositories to one run. | Agent input cannot grant itself a scope or cross a repository boundary. |
 
 ## Write and rebuild lifecycle
 
@@ -29,8 +29,9 @@ Qarinah is a governance-native context compiler. It preserves permitted agent ac
 3. The ledger appends the canonical event under a renewable write lock and binds the previous hash.
 4. The caller receives the event ID and record hash.
 5. A build or explicit query verifies the complete authoritative chain.
-6. Deterministic graph and index projections feed the context compiler.
-7. The caller receives a cited pack that fits the complete-output budget.
+6. Deterministic graph, JSON index, and SQLite FTS5 projections feed the context compiler.
+7. Temporal validity, freshness, supersession, conflicts, repository identity, and host-assigned disclosure scopes filter the candidate set.
+8. The caller receives a cited pack that fits the complete-output budget.
 
 An append and every security-sensitive read reload the trusted workspace from its root. Caller-supplied workspace objects are locators, not proof of trust. Explicit builds can repair stale derived views only after the event chain and machine checkpoint verify successfully. Read-only MCP diagnostics never repair or advance the checkpoint.
 
@@ -47,17 +48,18 @@ A machine-local permit binds the trusted real path, workspace ID, enabled state,
 | `events/events.jsonl` | Canonical append-only event envelopes | Authoritative |
 | `graph/graph.json` | Event nodes, typed relations, and the latest project-structure projection | Rebuildable |
 | `index/index.json` | Lexical postings, trigram terms, and graph adjacency | Rebuildable |
+| `index/qarinah.db` | SQLite WAL read model with FTS5, typed tables, temporal state, citations, disclosures, and pack metadata | Disposable and rebuildable from the ledger |
 | `records/CONTEXT.md` | Bounded human-readable current record | Rebuildable |
 | `records/okf/` | Deterministic Google OKF 0.1 Draft Markdown interchange | Rebuildable |
 | `index/event-ids/` | Checkpoint-authenticated idempotency buckets | Disposable and verified before use |
 | `objects/` | Reserved content-addressed source snapshots | Reserved |
 | `snapshots/` | Reserved signed context-pack manifests | Reserved |
 
-The same verified event head and build inputs produce the same projections. An OKF export is portable interchange, not a second source of truth or retrieval engine.
+The same verified event head and build inputs produce the same projections. `qarinah rebuild` recreates the database and every other derived view from the verified ledger. The SQLite schema has an explicit version and migration record; a future migration may rebuild rather than mutating authoritative history. An OKF export is portable interchange, not a second source of truth or retrieval engine.
 
 ## Retrieval lifecycle
 
-The compiler normalizes bounded query terms, builds BM25, trigram, and one-hop graph candidates, combines them through reciprocal-rank fusion, and applies time, retention, authority, conflict, supersession, and diversity rules. Evidence coverage then either admits a complete cited JSON or Markdown pack within budget, or fails closed when the caller's minimum is not met.
+The compiler normalizes bounded query terms, uses SQLite FTS5 and the portable BM25 index, adds typo-tolerant character n-grams and typed graph neighbors, combines candidates through reciprocal-rank fusion, and applies time, retention, freshness, repository, authority, conflict, supersession, and diversity rules. Optional local embeddings, customer-owned models, query expansion, or rerankers can reorder only evidence already admitted by those rules. Evidence coverage then either emits a complete cited JSON or Markdown pack within budget, or fails closed when the caller's minimum is not met.
 
 The compiler resolves one UTC `asOf` value when the caller omits it. Exact replay supplies that value explicitly. Budgets cover the complete pretty-JSON and Markdown encodings, and every selected item records why it was chosen.
 
@@ -71,6 +73,16 @@ The compiler resolves one UTC `asOf` value when the caller omits it. Exact repla
 | Cockroach Crawler | Strict `SourceRecord` mapped to a stable revision and acquisition | Crawler material remains untrusted evidence and the crawler never imports Qarinah. |
 | Maqam | Separately registered context query and append tools | Writes require exact approval and content consent; unregistered side effects remain outside the boundary. |
 | ProductLoop | Validated, sequenced provenance events through the public sink contract | Independent run storage remains composable and divergent sequence histories are rejected. |
+
+## Temporal memory and disclosure scopes
+
+Events may bind `validFrom`, `validUntil`, repository branch and commit identity, file and dependency hashes, and disclosure scopes. Supersession and contradiction stay as typed relations rather than destructive updates. A point-in-time query excludes facts that were not yet valid, had expired, or were superseded at the selected instant. Freshness inspection separately reports changed, missing, unsafe, and unverified sources.
+
+Maqam owns dynamic attachment. Its host callback resolves the scopes and repositories for an exact agent and run. The public `context.query` input intentionally has no `authorityScopes` or `repositoryIds` field, so an agent cannot enlarge its own memory authority. Revocation or expiry removes the attachment without rewriting prior events.
+
+## Multi-repository graph
+
+Each repository keeps its own ledger, trust state, project graph, and cited pack. Federation returns separate packs plus explicitly declared typed relationships such as `depends_on`, `documents`, `deploys`, and `shares_contract`. A cross-repository relationship aids navigation; it does not merge permissions, disclose secrets, or turn one repository into an authority for another.
 
 ## Cross-platform control-plane direction
 

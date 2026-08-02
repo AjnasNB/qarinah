@@ -1,22 +1,88 @@
-flowchart TD
-  inputs["Codex + Claude Code + CLI<br/>Crawler + ProductLoop + project files"]
-  boundary["Explicit capture boundary<br/>Consent + strict adapters + bounded scan"]
-  ledger[("Hash-chained JSONL<br/>authoritative record")]
-  views["Deterministic views<br/>typed graph + hybrid index + Markdown + OKF"]
-  compiler["Coverage-aware compiler<br/>budget + optional Maqam gate"]
-  pack["Small cited context pack"]
+flowchart TB
+  subgraph row1["INGRESS AND AUTHORITY"]
+    direction LR
+    subgraph hosts["01 · AGENT HOSTS + PROJECT SYSTEMS"]
+      direction TB
+      sources["Codex / Claude Code / Cursor<br/>CLI / MCP / JavaScript API<br/>frontend / backend / infra / docs<br/>Cockroach evidence / ProductLoop receipts"]
+      ingress["Explicit workspace ingress"]
+      sources --> ingress
+    end
+    subgraph control["02 · CAPTURE + DISCLOSURE CONTROL"]
+      direction TB
+      consent["Workspace consent<br/>machine-local trust"]
+      adapters["Strict adapters<br/>validation + redaction"]
+      maqam["Maqam policy<br/>run + agent + temporary scopes"]
+      gate["Authorized capture"]
+      consent --> gate
+      adapters --> gate
+      maqam --> gate
+    end
+    ingress --> consent
+    ingress --> adapters
+  end
 
-  inputs --> boundary --> ledger --> views --> compiler --> pack
-  ledger -. event IDs + hashes .-> pack
+  subgraph row2["AUTHORITATIVE AND REBUILDABLE MEMORY"]
+    direction LR
+    subgraph authority["03 · AUTHORITATIVE MEMORY"]
+      direction TB
+      ledger[("Hash-chained JSONL ledger<br/>events + provenance + retention")]
+      temporal["Temporal facts<br/>validity + stale state<br/>conflicts + supersessions"]
+      checkpoint["Verified head<br/>checkpoint + recovery"]
+      ledger --> temporal
+      ledger --> checkpoint
+    end
+    subgraph projections["04 · DISPOSABLE READ + INTERCHANGE MODELS"]
+      direction TB
+      sqlite[("SQLite WAL + FTS5<br/>migrations + full rebuild")]
+      graphview["Typed multi-repository graph<br/>edges + citations + authority boundaries"]
+      freshness["Freshness index<br/>file + dependency hashes"]
+      views["Markdown / JSON / OKF<br/>dashboard views"]
+    end
+    ledger --> sqlite
+    ledger --> graphview
+    ledger --> freshness
+    ledger --> views
+  end
 
-  classDef input fill:#ecfdf3,stroke:#16803c,color:#12351f,stroke-width:1.5px;
-  classDef boundaryNode fill:#fff7e6,stroke:#b76e00,color:#3d2a00,stroke-width:1.5px;
+  subgraph row3["RETRIEVAL AND DISCLOSURE"]
+    direction LR
+    subgraph retrieval["05 · DETERMINISTIC RETRIEVAL"]
+      direction TB
+      candidates["BM25 + FTS5<br/>typo-tolerant candidates"]
+      traverse["Point-in-time filter<br/>typed graph traversal"]
+      govern["Authority + repository isolation<br/>conflict + supersession rules"]
+      rank["Fusion + diversity<br/>optional local adapters"]
+      candidates --> traverse --> govern --> rank
+    end
+    subgraph output["06 · BOUNDED OUTPUT + VERIFICATION"]
+      direction TB
+      pack["Small cited context pack<br/>event IDs + hashes + coverage"]
+      agents["Authorized agent run<br/>temporary memory attachment"]
+      eval["Evaluation<br/>recall + citations + stale rejection<br/>isolation + cost + repeated errors"]
+      pack --> agents --> eval
+    end
+    rank --> pack
+  end
+
+  gate --> ledger
+  sqlite --> candidates
+  graphview --> traverse
+  freshness --> traverse
+  temporal --> traverse
+  maqam -. "disclosure authority" .-> govern
+  ledger -. "cited event IDs + hashes" .-> pack
+  checkpoint -. "verified head" .-> pack
+
+  classDef host fill:#ecfdf3,stroke:#16803c,color:#12351f,stroke-width:1.5px;
+  classDef controlNode fill:#fff7e6,stroke:#b76e00,color:#3d2a00,stroke-width:1.5px;
   classDef authorityNode fill:#f1edff,stroke:#6548c7,color:#241653,stroke-width:2px;
   classDef projectionNode fill:#eaf4ff,stroke:#2474b5,color:#102f4c,stroke-width:1.5px;
-  classDef disclosureNode fill:#e8fbfb,stroke:#087f8c,color:#07373c,stroke-width:1.5px;
+  classDef retrievalNode fill:#e8fbfb,stroke:#087f8c,color:#07373c,stroke-width:1.5px;
+  classDef outputNode fill:#f7f7f7,stroke:#444,color:#161616,stroke-width:1.5px;
 
-  class inputs input;
-  class boundary boundaryNode;
-  class ledger authorityNode;
-  class views projectionNode;
-  class compiler,pack disclosureNode;
+  class sources,ingress host;
+  class consent,adapters,maqam,gate controlNode;
+  class ledger,temporal,checkpoint authorityNode;
+  class sqlite,graphview,views,freshness projectionNode;
+  class candidates,traverse,govern,rank retrievalNode;
+  class pack,eval,agents outputNode;

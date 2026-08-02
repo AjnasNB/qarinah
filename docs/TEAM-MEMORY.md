@@ -80,6 +80,25 @@ npx qarinah freshness
 
 Qarinah compares the most recent recorded project-structure snapshot with current files and reports each cited file as `current`, `changed`, `missing`, or `unsafe`. Hosts should run this check before supplying durable context for a consequential task. A changed or missing source is a warning to rebuild or retrieve newer evidence, not permission to overwrite the decision.
 
+Events can also carry expected file and dependency hashes together with repository branch and commit identity. File citations are checked locally. Dependency citations are reported as `unverified` unless the host supplies an explicit resolver; Qarinah never guesses a package or service state from ambient network access.
+
+## Maqam-owned dynamic memory attachment
+
+Maqam can attach memory to an exact agent run without exposing scope selection to the agent:
+
+```js
+registerMaqamContextAdapters({
+  gateway,
+  cwd: ".",
+  requireMemoryAttachment: true,
+  async resolveMemoryAttachment({ runId, agentId }) {
+    return policyStore.resolve({ runId, agentId });
+  }
+});
+```
+
+The resolver returns attachment IDs, disclosure scopes, and repository IDs. `context.query` rejects caller-provided scope fields, an absent required attachment fails closed, and a revoked or expired ledger attachment no longer resolves. The agent can ask a question; only the host decides which memory it is allowed to search.
+
 ## Task-specific memory packs
 
 Ready-made retrieval profiles are available for:
@@ -105,9 +124,13 @@ import { compileFederatedContext } from "qarinah";
 
 const result = await compileFederatedContext("release contract", {
   workspaces: [
-    { cwd: "../web", authority: "frontend" },
-    { cwd: "../api", authority: "backend" },
-    { cwd: "../infra", authority: "infrastructure" }
+    { cwd: "../web", authority: "frontend-team", repositoryId: "frontend" },
+    { cwd: "../api", authority: "backend-team", repositoryId: "backend" },
+    { cwd: "../infra", authority: "platform-team", repositoryId: "infrastructure" }
+  ],
+  relationships: [
+    { from: "frontend", to: "backend", type: "shares_contract" },
+    { from: "backend", to: "infrastructure", type: "deploys" }
   ],
   maxChars: 12_000
 });
@@ -180,9 +203,13 @@ Key generation, key custody, transport, object storage, device enrollment, ident
 - citation accuracy;
 - stale-context rejection;
 - conflict detection;
+- supersession correctness;
+- cross-repository isolation;
+- unauthorized-disclosure rejection;
+- context tokens supplied;
 - task completion quality;
 - mean retrieval latency;
-- cost per completed task;
+- net cost per completed task;
 - repeated-mistake prevention; and
 - compared cost reduction.
 
