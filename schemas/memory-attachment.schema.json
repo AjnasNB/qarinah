@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qarinah.io/schemas/memory-attachment.schema.json",
+  "title": "Qarinah host-authorized memory attachment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "attachmentId", "agentId", "runId", "scopes", "repositories", "attachedAt", "expiresAt", "revokedAt", "assignedBy"],
+  "properties": {
+    "schemaVersion": { "const": "qarinah.memory-attachment.v1" },
+    "attachmentId": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "agentId": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "runId": { "type": ["string", "null"], "minLength": 1, "maxLength": 256 },
+    "scopes": { "type": "array", "maxItems": 64, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 256 } },
+    "repositories": { "type": "array", "maxItems": 64, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 256 } },
+    "attachedAt": { "type": "string", "format": "date-time" },
+    "expiresAt": { "type": ["string", "null"], "format": "date-time" },
+    "revokedAt": { "type": ["string", "null"], "format": "date-time" },
+    "assignedBy": { "type": "string", "minLength": 1, "maxLength": 256 }
+  }
+}

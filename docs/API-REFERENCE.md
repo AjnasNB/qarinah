@@ -364,7 +364,32 @@ function rebuildDerivedState(start?: string): Promise<{
 }>;
 ```
 
-Verifies the canonical record and atomically replaces deterministic graph, index, Markdown, and event-ID projections.
+Verifies the canonical record and atomically replaces deterministic graph, index, Markdown, event-ID, and SQLite projections.
+
+### SQLite read-model APIs
+
+```ts
+function rebuildSqliteReadModel(
+  workspace: QarinahWorkspace,
+  events: QarinahEvent[],
+  derived: { index: unknown; graph: unknown }
+): Promise<Readonly<Record<string, unknown>>>;
+
+function inspectSqliteReadModel(
+  workspace: QarinahWorkspace
+): Promise<Readonly<Record<string, unknown>>>;
+
+function querySqliteReadModel(
+  workspace: QarinahWorkspace,
+  query: string,
+  options?: { headHash?: string | null; limit?: number }
+): Promise<Readonly<{
+  schemaVersion: number;
+  candidates: Array<{ eventId: string; rank: number }>;
+}>>;
+```
+
+The database at `.qarinah/index/qarinah.db` is a disposable read model. Rebuild verifies the hash-chained JSONL authority, derives typed tables and FTS5 rows, commits a temporary SQLite database, checkpoints WAL, and atomically replaces the previous projection. Inspect and query reject a schema, workspace, or ledger-head mismatch.
 
 ### `loadIndex(start?, options?)`
 
@@ -400,6 +425,8 @@ function rankContextEvents(
     diversity?: number;
     supersessionPolicy?: "prefer-current" | "include-history";
     authorityScope?: string;
+    authorityScopes?: string[];
+    repositoryIds?: string[];
     asOf: string;
   }
 ): Readonly<Record<string, unknown>>;
@@ -425,6 +452,12 @@ function compileContext(
     diversity?: number;
     supersessionPolicy?: "prefer-current" | "include-history";
     authorityScope?: string;
+    authorityScopes?: string[];
+    repositoryIds?: string[];
+    queryExpansion?: {
+      id?: string;
+      expand(input: { query: string }): string[] | Promise<string[]>;
+    };
     minimumCoverage?: "any" | "partial" | "direct";
     asOf?: string;
     clock?: () => Date;
@@ -607,6 +640,7 @@ import { captureClaudeHook } from "qarinah/claude";
 function createMcpServer(options?: {
   cwd?: string;
   write?: (message: unknown) => void;
+  queryPermit?: { policyHash: `sha256:${string}`; maxChars?: number; maxItems?: number };
 }): QarinahMcpServer;
 ```
 
@@ -628,12 +662,46 @@ function runMcpServer(options?: {
   input?: AsyncIterable<Uint8Array | string>;
   maximumFrameBytes?: number;
   write?: (message: unknown) => void;
+  queryPermit?: { policyHash: `sha256:${string}`; maxChars?: number; maxItems?: number };
 }): Promise<void>;
 ```
 
 Runs newline-delimited stdio transport. Default maximum frame size is 1 MiB; the accepted configured range is 1,024 through 16,777,216 bytes.
 
-The server exposes read-only `context_status` and `context_doctor`, not context disclosure or writes. See [MCP guide](MCP-GUIDE.md).
+The server always exposes zero-write `context_status` and `context_doctor`. A matching `queryPermit` adds bounded, zero-write `context.query`. It never exposes ledger writes. See [MCP guide](MCP-GUIDE.md).
+
+## Team-memory platform APIs
+
+The root package also exports:
+
+```text
+setupWorkspace
+buildMemoryDashboard
+renderMemoryDashboard
+writeMemoryDashboard
+inspectMemoryFreshness
+TASK_MEMORY_PACKS
+compileTaskMemoryPack
+compileFederatedContext
+rerankContextPack
+createTeamManifest
+createEncryptedSyncBundle
+decryptEncryptedSyncBundle
+createSignedCheckpoint
+verifySignedCheckpoint
+evaluateContextQuality
+createCausalReceipt
+rebuildSqliteReadModel
+inspectSqliteReadModel
+querySqliteReadModel
+createMemoryScopeAttachmentEvent
+createMemoryScopeRevocationEvent
+recordMemoryScopeAttachment
+resolveActiveMemoryScopes
+revokeMemoryScopeAttachment
+```
+
+See [Shared and verifiable team memory](TEAM-MEMORY.md) for runnable examples and authority boundaries.
 
 ## Maqam interoperability
 
@@ -655,6 +723,16 @@ function registerMaqamContextAdapters<TGateway extends MaqamGuardedToolGateway>(
     cwd?: string;
     maxChars?: number;
     maxItems?: number;
+    requireMemoryAttachment?: boolean;
+    resolveMemoryAttachment?(input: {
+      runId: string | null;
+      agentId: string | null;
+      toolName: "context.query";
+    }): Promise<{
+      attachmentIds: string[];
+      authorityScopes: string[];
+      repositoryIds: string[];
+    } | null>;
   }
 ): {
   schemaVersion: "qarinah.maqam-context-registration.v1";
@@ -663,7 +741,7 @@ function registerMaqamContextAdapters<TGateway extends MaqamGuardedToolGateway>(
 };
 ```
 
-The gateway must provide guarded registration and exact execution verification. The active Maqam context must provide scoped evidence. A retained handler or fabricated plain context is not sufficient authority.
+The gateway must provide guarded registration and exact execution verification. The active Maqam context must provide scoped evidence. With `requireMemoryAttachment`, the host resolves temporary scopes and repositories for the exact run and agent; query input has no field that can widen those permissions. A retained handler, fabricated plain context, expired attachment, revoked attachment, or missing required attachment is not sufficient authority.
 
 The structural adapter schema is exported as `qarinah/schemas/maqam-context-adapter.json`.
 

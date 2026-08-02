@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qarinah.io/schemas/team-manifest.schema.json",
+  "title": "Qarinah team manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "workspaceId", "teamId", "members", "github", "manifestHash"],
+  "properties": {
+    "schemaVersion": { "const": "qarinah.team-manifest.v1" },
+    "workspaceId": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "teamId": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "members": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 500,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "role", "publicKey"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1, "maxLength": 256 },
+          "role": { "enum": ["owner", "maintainer", "reader"] },
+          "publicKey": { "type": ["string", "null"], "maxLength": 16384 }
+        }
+      }
+    },
+    "github": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["organization", "repository"],
+          "properties": {
+            "organization": { "type": "string", "minLength": 1, "maxLength": 256 },
+            "repository": { "type": "string", "minLength": 1, "maxLength": 256 }
+          }
+        }
+      ]
+    },
+    "manifestHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+  }
+}

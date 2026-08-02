@@ -392,15 +392,16 @@ The result includes:
 
 If a new snapshot is captured, the CLI rebuilds derived state before returning.
 
-## `build`
+## `build` and `rebuild`
 
 Verify the authoritative event record and deterministically rebuild its graph, retrieval index, Markdown view, and event-ID projection.
 
 ```sh
 npx qarinah build
+npx qarinah rebuild
 ```
 
-The result reports the workspace ID, event count, and head hash.
+The commands are exact aliases. The result reports the workspace ID, event count, head hash, and rebuilt projections, including `.qarinah/index/qarinah.db`.
 
 Use `build` after moving a valid ledger between machines, after deleting a disposable derived view, or when `doctor` reports derived state as missing or stale. It does not repair a corrupt authoritative event chain.
 
@@ -554,20 +555,46 @@ npx qarinah status
 
 The result includes store verification fields plus `enabled` and `maxLogBytes`. Unlike `doctor`, this command does not separately report whether persisted derived state is current.
 
+## `setup`
+
+Initialize one project, install project-local Codex, Claude Code, and Cursor integrations, configure MCP, rebuild views, and run an integrity check:
+
+```sh
+npx qarinah setup . --codex --claude --cursor --capture content --allow-query
+```
+
+Omit host flags to configure all three. Omit `--allow-query` for diagnostic-only MCP. With `--allow-query`, setup binds the zero-write `context.query` tool to the exact workspace's current consent-policy hash and response ceilings.
+
 ## `mcp`
 
-Start the native read-only MCP stdio server:
+Start the native zero-write diagnostic MCP stdio server:
 
 ```sh
 npx qarinah mcp
 ```
 
-The process reads newline-delimited JSON-RPC from standard input and writes protocol messages only to standard output. It exposes exactly two zero-write tools:
+The process reads newline-delimited JSON-RPC from standard input and writes protocol messages only to standard output. It exposes two zero-write diagnostic tools:
 
 - `context_status`
 - `context_doctor`
 
-It does not expose context-pack retrieval or ledger writes. See [MCP guide](MCP-GUIDE.md).
+Enable bounded context retrieval only with an exact reviewed permit:
+
+```sh
+npx qarinah mcp --allow-query --policy-hash sha256:<digest> --max-chars 12000 --max-items 20
+```
+
+This adds the zero-write `context.query` tool. Ledger writes remain unavailable. See [MCP guide](MCP-GUIDE.md).
+
+## Team-memory commands
+
+```sh
+npx qarinah task-pack debugging "checkout timeout"
+npx qarinah freshness
+npx qarinah dashboard --baseline-tokens 100000 --delivered-tokens 5000
+```
+
+See [Shared and verifiable team memory](TEAM-MEMORY.md) for all seven task profiles, freshness states, dashboard fields, multi-repository retrieval, semantic adapters, encrypted team bundles, evaluation, and causal receipts.
 
 ## Common errors
 

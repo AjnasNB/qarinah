@@ -6,6 +6,22 @@ The `cockroach.browser-memory.v1` receiving API is additive and does not change 
 
 The boundary intentionally retains only cited metadata projections. The sink ignores uncited lifecycle notifications; `appendCockroachBrowserOutcome()` rejects them. Content-enabled Qarinah workspaces still receive browser outcomes in metadata mode. Callers that previously wrote browser objects through generic event APIs should migrate to the versioned sink if they need the strict evidence-citation, secret-omission, replay, and conflict behavior. The sink receives outcomes only and grants no browser authority.
 
+## Team-memory platform additions in 0.1.2
+
+The following additions do not change the authoritative event-ledger schema:
+
+- consent-gated MCP `context.query`;
+- `qarinah setup` for Codex, Claude Code, and Cursor;
+- local dashboards and freshness inspection;
+- task-specific memory packs;
+- separate-authority multi-repository context;
+- optional semantic reranking;
+- encrypted team bundles, role manifests, and signed checkpoints;
+- context-quality evaluation; and
+- causal receipt chains.
+
+Existing workspaces need no ledger migration. Run `qarinah setup . --codex --claude --cursor` to install project-local integrations. Add `--allow-query` only after reviewing the workspace's current consent policy. See [Shared and verifiable team memory](TEAM-MEMORY.md).
+
 ## Context pack v1 to v2
 
 Qarinah `0.1.0-alpha.2` emits `qarinah.context-pack.v2`. Every pack now includes `retrieval.coverage` with a deterministic query-term-overlap status, counts, ratio, direct candidate count, and an optional warning. Callers that validate exact schemas must accept v2 before upgrading. Use `minimumCoverage: "partial"` or `"direct"` to fail closed when evidence is missing or incomplete. The event ledger, graph, and index formats are unchanged by this context-pack migration.

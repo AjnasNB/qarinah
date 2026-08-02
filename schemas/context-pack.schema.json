@@ -67,6 +67,18 @@
         "supersessionPolicy": { "enum": ["prefer-current", "include-history"] },
         "asOf": { "type": "string", "format": "date-time", "maxLength": 24 },
         "authorityScope": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "authorityScopes": { "type": "array", "maxItems": 64, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 256 } },
+        "repositoryIds": { "type": "array", "maxItems": 64, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 256 } },
+        "readModel": { "enum": ["sqlite-fts5", "verified-ledger-memory"] },
+        "queryExpansion": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["adapter", "addedTermCount"],
+          "properties": {
+            "adapter": { "type": "string", "minLength": 1, "maxLength": 256 },
+            "addedTermCount": { "type": "integer", "minimum": 0, "maximum": 16 }
+          }
+        },
         "coverage": {
           "type": "object",
           "additionalProperties": false,
@@ -84,14 +96,20 @@
         "filters": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["expired", "future"],
+          "required": ["expired", "future", "notYetValid", "stale", "unauthorized"],
           "properties": {
             "expired": { "type": "integer", "minimum": 0 },
-            "future": { "type": "integer", "minimum": 0 }
+            "future": { "type": "integer", "minimum": 0 },
+            "notYetValid": { "type": "integer", "minimum": 0 },
+            "stale": { "type": "integer", "minimum": 0 },
+            "unauthorized": { "type": "integer", "minimum": 0 }
           },
           "anyOf": [
             { "properties": { "expired": { "minimum": 1 } } },
-            { "properties": { "future": { "minimum": 1 } } }
+            { "properties": { "future": { "minimum": 1 } } },
+            { "properties": { "notYetValid": { "minimum": 1 } } },
+            { "properties": { "stale": { "minimum": 1 } } },
+            { "properties": { "unauthorized": { "minimum": 1 } } }
           ]
         },
         "conflicts": {
@@ -160,6 +178,28 @@
               "expiresAt": { "type": ["string", "null"], "maxLength": 24 },
               "revokedAt": { "type": ["string", "null"], "maxLength": 24 },
               "basis": { "type": "string", "minLength": 1, "maxLength": 512 }
+            }
+          },
+          "temporal": {
+            "type": "object", "additionalProperties": false,
+            "properties": {
+              "validFrom": { "type": "string", "format": "date-time", "maxLength": 24 },
+              "validUntil": { "type": ["string", "null"], "format": "date-time", "maxLength": 24 }
+            }
+          },
+          "repository": {
+            "type": "object", "additionalProperties": false, "required": ["id"],
+            "properties": {
+              "id": { "type": "string", "minLength": 1, "maxLength": 256 },
+              "branch": { "type": "string", "minLength": 1, "maxLength": 256 },
+              "commit": { "type": "string", "minLength": 7, "maxLength": 128 }
+            }
+          },
+          "disclosure": {
+            "type": "object", "additionalProperties": false, "required": ["scopes", "classification"],
+            "properties": {
+              "scopes": { "type": "array", "maxItems": 64, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 256 } },
+              "classification": { "enum": ["public", "workspace", "restricted"] }
             }
           },
           "reason": { "type": "string", "maxLength": 512 },

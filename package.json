@@ -1,7 +1,7 @@
 {
   "name": "qarinah",
   "version": "0.1.2",
-  "description": "Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust. 98.71% less estimated repeated context.",
+  "description": "The shared, verifiable memory layer for teams deploying multiple AI agents. Evidence-linked project memory with 98.71% less estimated repeated context in its published benchmark.",
   "license": "Apache-2.0",
   "author": "Ajnas NB",
   "mcpName": "io.github.AjnasNB/qarinah",
@@ -36,7 +36,11 @@
     "./schemas/maqam-context-adapter.json": "./schemas/maqam-context-adapter.schema.json",
     "./schemas/cockroach-source-record.json": "./schemas/cockroach-source-record.schema.json",
     "./schemas/cockroach-browser-memory.json": "./schemas/cockroach-browser-memory.schema.json",
-    "./schemas/productloop-runtime-event.json": "./schemas/productloop-runtime-event.schema.json"
+    "./schemas/productloop-runtime-event.json": "./schemas/productloop-runtime-event.schema.json",
+    "./schemas/team-manifest.json": "./schemas/team-manifest.schema.json",
+    "./schemas/causal-receipt.json": "./schemas/causal-receipt.schema.json",
+    "./schemas/federated-context.json": "./schemas/federated-context.schema.json",
+    "./schemas/memory-attachment.json": "./schemas/memory-attachment.schema.json"
   },
   "files": [
     "bin/",
@@ -66,6 +70,9 @@
     "docs/ECOSYSTEM-LAUNCH.md",
     "docs/LICENSE-STRATEGY.md",
     "docs/MIGRATIONS.md",
+    "docs/TEAM-MEMORY.md",
+    "docs/SQLITE-READ-MODEL.md",
+    "docs/TEMPORAL-AUTHORITY.md",
     "bench/fixtures/software-task-scenarios.mjs",
     "bench/results/",
     "scripts/evaluate-software-tasks.mjs",
@@ -110,7 +117,7 @@
     "evaluate:long-document": "node scripts/evaluate-long-document.mjs"
   },
   "engines": {
-    "node": "^22.0.0 || ^24.0.0 || ^26.0.0"
+    "node": "^22.13.0 || ^24.0.0 || ^26.0.0"
   },
   "repository": {
     "type": "git",

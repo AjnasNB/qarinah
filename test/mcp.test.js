@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdir, readFile, readdir, stat, unlink, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, realpath, stat, unlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { Readable } from "node:stream";
@@ -29,14 +29,15 @@ function stateRoot() {
   return path.join(process.env.XDG_STATE_HOME || path.join(os.homedir(), ".local", "state"), "qarinah");
 }
 
-function trustPath(root) {
-  const normalized = process.platform === "win32" ? path.resolve(root).toLowerCase() : path.resolve(root);
+async function trustPath(root) {
+  const resolved = await realpath(root);
+  const normalized = process.platform === "win32" ? resolved.toLowerCase() : resolved;
   const digest = createHash("sha256").update(normalized).digest("hex");
   return path.join(stateRoot(), "trusted-workspaces", `${digest}.json`);
 }
 
 async function rewindTrustCheckpoint(root) {
-  const target = trustPath(root);
+  const target = await trustPath(root);
   const trust = JSON.parse(await readFile(target, "utf8"));
   trust.checkpoint = {
     eventCount: 0,
@@ -108,6 +109,120 @@ test("MCP exposes only accurately annotated zero-write diagnostic tools", async 
   assert.equal(result.structuredContent.code, "MCP_TOOL_NOT_FOUND");
   assert.equal(JSON.stringify(result).includes("Govern browser writes"), false);
   server.close();
+});
+
+test("MCP exposes bounded cited retrieval only with an exact workspace disclosure permit", async (t) => {
+  const root = await temporaryDirectory(t);
+  const workspace = await initializeWorkspace(root, { capture: "content" });
+  await appendEvent(eventInput(), { workspace });
+  await rebuildDerivedState(root);
+  const trust = await trustPath(root);
+  const beforeWorkspace = await snapshotTree(path.join(root, ".qarinah"));
+  const beforeTrust = await snapshotFile(trust);
+  const messages = [];
+  const server = createMcpServer({
+    cwd: root,
+    queryPermit: {
+      workspaceId: workspace.config.workspaceId,
+      policyHash: workspace.consent.policyHash,
+      maxChars: 4_000,
+      maxItems: 5
+    },
+    write: (message) => messages.push(message)
+  });
+  await initialize(server, messages);
+  await server.handle({ jsonrpc: "2.0", id: 20, method: "tools/list", params: {} });
+  assert.deepEqual(
+    response(messages, 20).result.tools.map((tool) => tool.name),
+    ["context_status", "context_doctor", "context.query"]
+  );
+  await server.handle({
+    jsonrpc: "2.0",
+    id: 21,
+    method: "tools/call",
+    params: {
+      name: "context.query",
+      arguments: {
+        workspace: root,
+        query: "Govern browser writes",
+        maxChars: 4_000,
+        limit: 3,
+        minimumCoverage: "any"
+      }
+    }
+  });
+  const result = response(messages, 21).result;
+  assert.equal(result.isError, undefined, JSON.stringify(result));
+  assert.equal(result.structuredContent.contentRole, "untrusted-data");
+  assert.equal(result.structuredContent.workspaceId, workspace.config.workspaceId);
+  assert.equal(result.structuredContent.items[0].title, "Govern browser writes");
+  assert.equal(result.structuredContent.budget.maxChars, 4_000);
+  assert.ok(result.structuredContent.budget.usedChars <= 4_000);
+  assert.equal(JSON.stringify(result).includes(root), false);
+  assert.deepEqual(await snapshotTree(path.join(root, ".qarinah")), beforeWorkspace);
+  assert.deepEqual(await snapshotFile(trust), beforeTrust);
+  server.close();
+});
+
+test("MCP refuses context disclosure when the permit does not match workspace consent", async (t) => {
+  const root = await temporaryDirectory(t);
+  const workspace = await initializeWorkspace(root);
+  await appendEvent(eventInput(), { workspace });
+  await rebuildDerivedState(root);
+  const messages = [];
+  const server = createMcpServer({
+    cwd: root,
+    queryPermit: {
+      workspaceId: workspace.config.workspaceId,
+      policyHash: `sha256:${"0".repeat(64)}`,
+      maxChars: 4_000,
+      maxItems: 5
+    },
+    write: (message) => messages.push(message)
+  });
+  await initialize(server, messages);
+  await server.handle({
+    jsonrpc: "2.0",
+    id: 22,
+    method: "tools/call",
+    params: {
+      name: "context.query",
+      arguments: { workspace: root, query: "browser writes approval" }
+    }
+  });
+  const result = response(messages, 22).result;
+  assert.equal(result.isError, true);
+  assert.equal(result.structuredContent.code, "MCP_DISCLOSURE_NOT_AUTHORIZED");
+  assert.equal(JSON.stringify(result).includes(workspace.consent.policyHash), false);
+  assert.equal(JSON.stringify(result).includes("Govern browser writes"), false);
+  server.close();
+
+  const identityMessages = [];
+  const identityServer = createMcpServer({
+    cwd: root,
+    queryPermit: {
+      workspaceId: `ws_${"0".repeat(32)}`,
+      policyHash: workspace.consent.policyHash,
+      maxChars: 4_000,
+      maxItems: 5
+    },
+    write: (message) => identityMessages.push(message)
+  });
+  await initialize(identityServer, identityMessages);
+  await identityServer.handle({
+    jsonrpc: "2.0",
+    id: 23,
+    method: "tools/call",
+    params: {
+      name: "context.query",
+      arguments: { workspace: root, query: "browser writes approval" }
+    }
+  });
+  const identityResult = response(identityMessages, 23).result;
+  assert.equal(identityResult.isError, true);
+  assert.equal(identityResult.structuredContent.code, "MCP_DISCLOSURE_NOT_AUTHORIZED");
+  assert.equal(JSON.stringify(identityResult).includes(workspace.config.workspaceId), false);
+  identityServer.close();
 });
 
 test("MCP status and doctor do not advance trust or mutate workspace state", async (t) => {

@@ -1,6 +1,6 @@
 # Qarinah
 
-> Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.
+> The shared, verifiable memory layer for teams deploying multiple AI agents.
 
 It records explicitly permitted project events and compiles bounded, cited context packs from the verified local record.
 
@@ -17,7 +17,7 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 
 ## Direct facts
 
-- Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.
+- Qarinah is the shared, verifiable memory layer for teams deploying multiple AI agents.
 - Qarinah supports reviewed Codex and Claude Code integrations that can use the same explicitly opted-in project record.
 - The published evaluator measured 98.71% less estimated repeated input context in its compared task set: 442,113 estimated input-context tokens became 5,682 while every required target was directly covered in the top five.
 - The 98.71% result is not a universal provider-billing, latency, or answer-quality guarantee. Qarinah improves provenance and inspectability but cannot guarantee a model answer is correct.
@@ -28,8 +28,9 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 
 - [CLI reference](https://qarinah.io/docs/cli/): Every command, option, stdin mode, exit code, and machine-readable output.
 - [JavaScript API reference](https://qarinah.io/docs/api/): Public exports, types, functions, and bounded programmatic workflows.
-- [Host integrations](https://qarinah.io/docs/integrations/): Codex, Claude Code, CLI, and read-only MCP integration guidance.
-- [MCP guide](https://qarinah.io/docs/mcp/): Configure the read-only MCP server for explicitly trusted workspace roots.
+- [Host integrations](https://qarinah.io/docs/integrations/): Codex, Claude Code, Cursor, CLI, and consent-gated MCP integration guidance.
+- [MCP guide](https://qarinah.io/docs/mcp/): Configure diagnostic-only or explicitly authorized, zero-write context retrieval.
+- [Team memory](https://qarinah.io/docs/team-memory/): Setup, dashboards, freshness, multi-repository packs, encrypted sync, evaluation, and causal receipts.
 - [Token-efficient context](https://qarinah.io/docs/token-efficient-context/): How Qarinah selects compact evidence without making the complete transcript the prompt.
 - [Task recipes](https://qarinah.io/docs/recipes/): Copyable workflows for refactors, debugging, migrations, research, releases, and handoffs.
 - [Architecture](https://qarinah.io/docs/architecture/): Append-only event record, deterministic derived state, typed graph, retrieval, and context-pack compilation.
