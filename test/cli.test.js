@@ -28,6 +28,18 @@ function run(args, cwd, options = {}) {
   });
 }
 
+test("init --if-needed is idempotent in either argument order", async (t) => {
+  const root = await temporaryDirectory(t);
+  const first = await run(["init", root, "--capture", "content", "--if-needed"], repositoryRoot);
+  assert.equal(first.code, 0, first.stderr);
+  const second = await run(["init", "--if-needed", root, "--capture", "content"], repositoryRoot);
+  assert.equal(second.code, 0, second.stderr);
+  assert.equal(JSON.parse(second.stdout).workspaceId, JSON.parse(first.stdout).workspaceId);
+  const mismatch = await run(["init", root, "--capture", "metadata", "--if-needed"], repositoryRoot);
+  assert.equal(mismatch.code, 1);
+  assert.equal(JSON.parse(mismatch.stderr).code, "CAPTURE_MODE_MISMATCH");
+});
+
 test("doctor exit codes and trust controls are automation-safe", async (t) => {
   const root = await temporaryDirectory(t);
   assert.equal((await run(["init", root], repositoryRoot)).code, 0);

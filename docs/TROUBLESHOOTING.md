@@ -443,6 +443,19 @@ On the destination machine:
 
 Never copy the source machine's trust permit as a shortcut.
 
+## Several local workers start at the same time
+
+Use one explicit project root and make initialization idempotent:
+
+```sh
+qarinah init . --capture content --if-needed
+qarinah setup . --codex --claude --cursor --capture content --allow-query
+```
+
+All workers under that root discover the same workspace ID. Qarinah serializes authoritative JSONL appends to preserve one hash chain; it does not hold a global lock while agents reason or while SQLite serves reads. SQLite uses WAL and can always be recreated with `qarinah build`.
+
+If setup reports `WORKSPACE_INITIALIZE_BUSY`, another process did not finish the short initialization window. Stop the failed process, verify the exact project path, and rerun setup. Do not delete the ledger or replace `config.json` to bypass the check.
+
 ## Clean verification for maintainers
 
 ```sh

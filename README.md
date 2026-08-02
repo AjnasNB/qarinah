@@ -44,6 +44,8 @@ npx qarinah setup . --codex --claude --cursor --capture content --allow-query
   Run the setup command once from a repository. It installs project-local integrations and consent-gated MCP retrieval for that exact workspace. Qarinah works as an independent local tool; Maqam is an optional governance integration for higher-authority workflows.
 </p>
 
+The setup command is idempotent and safe to start from parallel local workers. Nested workers discover the same authorized workspace, authoritative appends preserve one hash chain, and concurrent readers use the rebuildable SQLite WAL read model. For scripts that only need initialization, use `qarinah init . --capture content --if-needed`.
+
 <p align="center">
   <strong>98.71% fewer estimated repeated-project-context tokens - 77.81:1 compression.</strong><br>
   442,113 &rarr; 5,682 estimated input tokens.

@@ -191,7 +191,7 @@ export const MEMORY_ATTACHMENT_SCHEMA_VERSION: "qarinah.memory-attachment.v1";
 export const QARINAH_VERSION: "0.1.2";
 export const EVENT_KINDS: readonly QarinahEventKind[];
 export const RELATION_TYPES: readonly QarinahRelationType[];
-export function initializeWorkspace(target?: string, options?: { capture?: "metadata" | "content" }): Promise<QarinahWorkspace>;
+export function initializeWorkspace(target?: string, options?: { capture?: "metadata" | "content"; ifNeeded?: boolean }): Promise<QarinahWorkspace>;
 export function findWorkspaceRoot(start?: string): Promise<string | null>;
 export function loadWorkspace(start?: string, options?: { allowDisabled?: boolean; skipConsent?: boolean }): Promise<QarinahWorkspace>;
 export function setWorkspaceEnabled(start: string | undefined, enabled: boolean): Promise<QarinahConfig>;

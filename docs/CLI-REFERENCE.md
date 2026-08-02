@@ -49,7 +49,7 @@ All commands that omit a path use the current working directory. Workspace looku
 ## Command summary
 
 ```text
-qarinah init [path] [--capture metadata|content]
+qarinah init [path] [--capture metadata|content] [--if-needed]
 qarinah policy [path]
 qarinah trust [path] --capture metadata|content --policy-hash sha256:<digest>
 qarinah untrust
@@ -86,7 +86,7 @@ Prints the built-in usage summary. Any unknown command fails and includes the sa
 Initialize one exact project root.
 
 ```sh
-qarinah init [path] [--capture metadata|content]
+qarinah init [path] [--capture metadata|content] [--if-needed]
 ```
 
 | Argument or option | Default | Meaning |
@@ -94,6 +94,7 @@ qarinah init [path] [--capture metadata|content]
 | `path` | Current directory | Project root to initialize. |
 | `--capture metadata` | Default | Retain metadata fields but not content bodies exposed by adapters. |
 | `--capture content` | - | Permit bounded, redacted content capture from supported adapters. |
+| `--if-needed` | Off | Reuse an existing workspace instead of failing. Concurrent workers wait for the same initialization and receive the same workspace ID. |
 
 Example:
 

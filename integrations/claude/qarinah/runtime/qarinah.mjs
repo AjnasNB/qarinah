@@ -1215,11 +1215,43 @@ async function safeLstat(candidate, label, { allowMissing = false } = {}) {
 }
 async function ensureSafeDirectory(candidate, root, label) {
   const existing = await safeLstat(candidate, label, { allowMissing: true });
-  if (!existing) await mkdir2(candidate, { recursive: false, mode: 448 });
-  else if (!existing.isDirectory()) throw new QarinahError("WORKSPACE_INVALID", `${label} must be a directory.`);
+  if (!existing) {
+    try {
+      await mkdir2(candidate, { recursive: false, mode: 448 });
+    } catch (error) {
+      if (error?.code !== "EEXIST") throw error;
+    }
+  }
+  const current = await safeLstat(candidate, label);
+  if (!current.isDirectory()) throw new QarinahError("WORKSPACE_INVALID", `${label} must be a directory.`);
   const actual = await realpath2(candidate);
   if (!isWithin2(root, actual)) throw new QarinahError("PATH_OUTSIDE_WORKSPACE", `${label} resolves outside the workspace root.`);
   return actual;
+}
+async function acquireInitializationLock(qarinahDir) {
+  const locksDirectory = resolveWithin(qarinahDir, "locks");
+  await ensureSafeDirectory(locksDirectory, qarinahDir, ".qarinah/locks");
+  const lockPath = resolveWithin(locksDirectory, INITIALIZE_LOCK_NAME);
+  const startedAt = Date.now();
+  for (; ; ) {
+    try {
+      await mkdir2(lockPath, { mode: 448 });
+      return async () => rm2(lockPath, { recursive: true, force: true });
+    } catch (error) {
+      if (error?.code !== "EEXIST") throw error;
+      const metadata = await safeLstat(lockPath, ".qarinah/locks/initialize", { allowMissing: true });
+      if (metadata && !metadata.isDirectory()) {
+        throw new QarinahError("WORKSPACE_INVALID", ".qarinah/locks/initialize must be a directory.");
+      }
+      if (Date.now() - startedAt >= INITIALIZE_LOCK_TIMEOUT_MS) {
+        throw new QarinahError(
+          "WORKSPACE_INITIALIZE_BUSY",
+          `Another worker is still initializing the Context Ledger at ${qarinahDir}.`
+        );
+      }
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
+  }
 }
 async function atomicWriteFile(destination, contents, options = {}) {
   const directory = path2.dirname(destination);
@@ -1357,50 +1389,66 @@ async function initializeWorkspace(target = process.cwd(), options = {}) {
   const root = await realpath2(requestedRoot);
   const requestedQarinahDir = resolveWithin(root, ".qarinah");
   const qarinahDir = await ensureSafeDirectory(requestedQarinahDir, root, ".qarinah");
-  const configPath = resolveWithin(qarinahDir, "config.json");
-  const existingConfig = await safeLstat(configPath, ".qarinah/config.json", { allowMissing: true });
-  if (existingConfig) {
-    throw new QarinahError("WORKSPACE_EXISTS", `Context Ledger is already initialized at ${root}.`);
-  }
-  const capture = options.capture ?? "metadata";
-  if (!["metadata", "content"].includes(capture)) throw new QarinahError("CONFIG_INVALID", "capture must be metadata or content.");
-  for (const directory of STORAGE_DIRECTORIES) {
-    await ensureSafeDirectory(resolveWithin(qarinahDir, directory), qarinahDir, `.qarinah/${directory}`);
-  }
-  const eventPath = resolveWithin(qarinahDir, "events", "events.jsonl");
-  if (await safeLstat(eventPath, ".qarinah/events/events.jsonl", { allowMissing: true })) {
-    throw new QarinahError("WORKSPACE_PARTIAL", "Refusing to overwrite an existing event log without a workspace config.");
-  }
-  await safeLstat(resolveWithin(qarinahDir, ".gitignore"), ".qarinah/.gitignore", { allowMissing: true });
-  const config = {
-    schemaVersion: CONFIG_SCHEMA_VERSION,
-    workspaceId: `ws_${randomBytes2(16).toString("hex")}`,
-    enabled: true,
-    capture,
-    maxEventBytes: 256 * 1024,
-    maxLogBytes: 32 * 1024 * 1024,
-    contextMaxChars: 12e3,
-    retentionClass: "project",
-    createdAt: (/* @__PURE__ */ new Date()).toISOString()
-  };
-  await atomicWriteFile(configPath, `${JSON.stringify(config, null, 2)}
+  const release = await acquireInitializationLock(qarinahDir);
+  try {
+    const configPath = resolveWithin(qarinahDir, "config.json");
+    const existingConfig = await safeLstat(configPath, ".qarinah/config.json", { allowMissing: true });
+    if (existingConfig) {
+      if (options.ifNeeded !== true) {
+        throw new QarinahError("WORKSPACE_EXISTS", `Context Ledger is already initialized at ${root}.`);
+      }
+      const workspace = await loadWorkspace(root);
+      if (options.capture !== void 0 && workspace.config.capture !== options.capture) {
+        throw new QarinahError(
+          "CAPTURE_MODE_MISMATCH",
+          `The existing workspace uses '${workspace.config.capture}' capture, not '${options.capture}'.`
+        );
+      }
+      return workspace;
+    }
+    const capture = options.capture ?? "metadata";
+    if (!["metadata", "content"].includes(capture)) throw new QarinahError("CONFIG_INVALID", "capture must be metadata or content.");
+    for (const directory of STORAGE_DIRECTORIES) {
+      await ensureSafeDirectory(resolveWithin(qarinahDir, directory), qarinahDir, `.qarinah/${directory}`);
+    }
+    const eventPath = resolveWithin(qarinahDir, "events", "events.jsonl");
+    const existingEvent = await safeLstat(eventPath, ".qarinah/events/events.jsonl", { allowMissing: true });
+    if (existingEvent && (!existingEvent.isFile() || existingEvent.nlink !== 1 || existingEvent.size !== 0)) {
+      throw new QarinahError("WORKSPACE_PARTIAL", "Refusing to overwrite a non-empty or linked event log without a workspace config.");
+    }
+    await safeLstat(resolveWithin(qarinahDir, ".gitignore"), ".qarinah/.gitignore", { allowMissing: true });
+    const config = {
+      schemaVersion: CONFIG_SCHEMA_VERSION,
+      workspaceId: `ws_${randomBytes2(16).toString("hex")}`,
+      enabled: true,
+      capture,
+      maxEventBytes: 256 * 1024,
+      maxLogBytes: 32 * 1024 * 1024,
+      contextMaxChars: 12e3,
+      retentionClass: "project",
+      createdAt: (/* @__PURE__ */ new Date()).toISOString()
+    };
+    await atomicWriteFile(resolveWithin(qarinahDir, ".gitignore"), [
+      "events/",
+      "objects/",
+      "records/",
+      "graph/",
+      "index/",
+      "snapshots/",
+      "locks/",
+      "",
+      "!.gitignore",
+      "!config.json",
+      ""
+    ].join("\n"));
+    if (!existingEvent) await atomicWriteFile(eventPath, "");
+    await grantWorkspaceConsent(root, config, { eventCount: 0, headHash: null, logBytes: 0 });
+    await atomicWriteFile(configPath, `${JSON.stringify(config, null, 2)}
 `);
-  await atomicWriteFile(resolveWithin(qarinahDir, ".gitignore"), [
-    "events/",
-    "objects/",
-    "records/",
-    "graph/",
-    "index/",
-    "snapshots/",
-    "locks/",
-    "",
-    "!.gitignore",
-    "!config.json",
-    ""
-  ].join("\n"));
-  await atomicWriteFile(eventPath, "");
-  await grantWorkspaceConsent(root, config, { eventCount: 0, headHash: null, logBytes: 0 });
-  return loadWorkspace(root);
+    return loadWorkspace(root);
+  } finally {
+    await release();
+  }
 }
 async function findWorkspaceRoot(start = process.cwd()) {
   let current;
@@ -1500,7 +1548,7 @@ async function revokeWorkspaceTrust(start = process.cwd()) {
     trusted: false
   });
 }
-var CONFIG_SCHEMA_VERSION, CONFIG_KEYS, STORAGE_DIRECTORIES, MAX_CONFIG_BYTES;
+var CONFIG_SCHEMA_VERSION, CONFIG_KEYS, STORAGE_DIRECTORIES, MAX_CONFIG_BYTES, INITIALIZE_LOCK_NAME, INITIALIZE_LOCK_TIMEOUT_MS;
 var init_workspace = __esm({
   "src/workspace.js"() {
     init_canonical();
@@ -1520,6 +1568,8 @@ var init_workspace = __esm({
     ]);
     STORAGE_DIRECTORIES = Object.freeze(["events", "objects", "records", "graph", "index", "snapshots", "locks"]);
     MAX_CONFIG_BYTES = 64 * 1024;
+    INITIALIZE_LOCK_NAME = "initialize";
+    INITIALIZE_LOCK_TIMEOUT_MS = 15e3;
   }
 });
 
@@ -6900,7 +6950,10 @@ async function setupWorkspace(options = {}) {
     workspace = await loadWorkspace(target);
   } catch (error) {
     if (error?.code !== "WORKSPACE_NOT_INITIALIZED") throw error;
-    workspace = await initializeWorkspace(target, { capture: options.capture ?? "metadata" });
+    workspace = await initializeWorkspace(target, {
+      ...options.capture === void 0 ? {} : { capture: options.capture },
+      ifNeeded: true
+    });
   }
   if (options.allowQuery === true && !workspace.consent?.policyHash) {
     throw new QarinahError("MCP_DISCLOSURE_NOT_AUTHORIZED", "Workspace authorization is required before enabling context.query.");
@@ -7292,6 +7345,29 @@ function parseRelations(args) {
   }
   return relations;
 }
+function parseInitArgs(args) {
+  let target;
+  let capture;
+  let ifNeeded = false;
+  for (let index = 0; index < args.length; index += 1) {
+    const value = args[index];
+    if (value === "--if-needed") {
+      ifNeeded = true;
+      continue;
+    }
+    if (value === "--capture") {
+      if (capture !== void 0) throw new TypeError("init received --capture more than once.");
+      capture = args[index + 1];
+      if (capture === void 0 || capture.startsWith("--")) throw new TypeError("--capture requires a value.");
+      index += 1;
+      continue;
+    }
+    if (value.startsWith("--")) throw new TypeError(`init does not support ${value}.`);
+    if (target !== void 0) throw new TypeError("init accepts at most one workspace path.");
+    target = value;
+  }
+  return { target: target || process2.cwd(), capture, ifNeeded };
+}
 function strictValueOptions(args, command, allowedOptions) {
   const allowed = new Set(allowedOptions);
   const seen = /* @__PURE__ */ new Set();
@@ -7439,7 +7515,7 @@ function help() {
   return `Qarinah - evidence-linked context for AI agents
 
 Usage:
-  qarinah init [path] [--capture metadata|content]
+  qarinah init [path] [--capture metadata|content] [--if-needed]
   qarinah setup [path] [--codex] [--claude] [--cursor] [--capture metadata|content] [--allow-query]
   qarinah record --kind <kind> --title <title> [--body <text>] [--data-json <json>] [--relation type:target]
   qarinah record --stdin-json
@@ -7472,8 +7548,11 @@ async function run(argv) {
     return;
   }
   if (command === "init") {
-    const target = positionals(args)[0] || process2.cwd();
-    const workspace = await initializeWorkspace(target, { capture: option(args, "--capture", "metadata") });
+    const request = parseInitArgs(args);
+    const workspace = await initializeWorkspace(request.target, {
+      ...request.capture === void 0 ? {} : { capture: request.capture },
+      ifNeeded: request.ifNeeded
+    });
     process2.stdout.write(`${JSON.stringify({ ok: true, root: workspace.root, workspaceId: workspace.config.workspaceId, capture: workspace.config.capture }, null, 2)}
 `);
     return;
