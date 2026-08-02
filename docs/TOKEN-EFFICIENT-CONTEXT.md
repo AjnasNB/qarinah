@@ -1,6 +1,6 @@
 # Token-efficient context for coding agents
 
-Qarinah is the shared, verifiable memory layer for teams deploying multiple AI agents. It keeps permitted project events and explicit decisions in an evidence-linked record, then retrieves a small, cited context pack for the current task. The goal is to avoid replaying an entire retained project history when Codex, Claude Code, Cursor, a CLI workflow, or another reviewed host needs only a few relevant records.
+Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust. It keeps permitted project events and explicit decisions in an evidence-linked record, then retrieves a small, cited context pack for the current task. The goal is to avoid replaying an entire retained project history when Codex, Claude Code, Cursor, a CLI workflow, or another reviewed host needs only a few relevant records.
 
 Qarinah does not remove the current code, schema, logs, tests, or other task inputs a model still needs. It reduces repeated retained history in a reproducible benchmark, not every token in every model request.
 

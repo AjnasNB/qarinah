@@ -12,7 +12,7 @@ const doi = "https://doi.org/10.5281/zenodo.21547685";
 const zenodoPdf = "https://zenodo.org/records/21547685/files/Qarinah-Technical-White-Paper-v1.0.pdf?download=1";
 const releaseDate = "2026-07-26";
 const productVersion = "0.1.2";
-const productPositioning = "The shared, verifiable memory layer for teams deploying multiple AI agents.";
+const productPositioning = "Evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.";
 const answerEngineQuestions = [
   {
     name: "What is Qarinah?",
@@ -611,14 +611,19 @@ function homePage() {
       <section class="hero">
         <div class="shell hero-grid">
           <div class="hero-copy">
-            <p class="eyebrow">Cross-editor project memory for coding agents</p>
-            <h1>Your agents remember the project. You stop paying to replay it.</h1>
-            <p class="hero-lede"><strong>${productPositioning}</strong> It turns project decisions, code structure, tool outcomes, and evidence into a small cited memory pack for the task in front of you.</p>
+            <p class="eyebrow">Local project memory for coding agents</p>
+            <h1>Your coding agents remember the project.</h1>
+            <p class="hero-lede">Qarinah keeps decisions, code structure, tool outcomes, and source evidence in one local project memory. Every supported coding agent can request a small cited pack instead of replaying the entire history.</p>
             <div class="hero-actions">
-              <a class="btn btn-primary btn-large" href="/docs/getting-started/">Install Qarinah</a>
+              <a class="btn btn-primary btn-large" href="/docs/getting-started/">Remember this project</a>
               <a class="btn btn-outline btn-large" href="${github}">View source</a>
             </div>
-            ${commandBlock("npm install --save-dev qarinah", "Install")}
+            ${commandBlock("npx qarinah setup . --codex --claude --cursor --capture content --allow-query", "One-time project setup")}
+            <div class="host-shortcuts" aria-label="Qarinah host commands">
+              <span><strong>Codex</strong><code>$qarinah</code></span>
+              <span><strong>Claude Code</strong><code>/qarinah &lt;task&gt;</code></span>
+              <span><strong>Any terminal</strong><code>npx qarinah query "&lt;task&gt;"</code></span>
+            </div>
             <div class="hero-proof" aria-label="Benchmark summary">
               <div class="hero-proof-result">
                 <strong>98.71%</strong>
@@ -643,6 +648,43 @@ function homePage() {
       <section class="section shell">
         <div class="section-heading split-heading">
           <div>
+            <p class="eyebrow">One tool, three ways to use it</p>
+            <h2>Start alone. Share when the project grows.</h2>
+          </div>
+          <p>Qarinah is useful without Maqam, a hosted account, or a team plan. The same local record can later support collaboration or a governed agent stack without changing its source of truth.</p>
+        </div>
+        <div class="use-mode-grid">
+          <article class="use-mode-card">
+            <span>Personal</span>
+            <h3>One developer, many coding agents</h3>
+            <p>Initialize one repository and let Codex, Claude Code, Cursor, CLI tools, and compatible MCP clients query the same cited project memory.</p>
+            <a href="/docs/getting-started/">Set up one project</a>
+          </article>
+          <article class="use-mode-card">
+            <span>Portable</span>
+            <h3>Inspect memory on any screen</h3>
+            <p>Open the generated dashboard or export deterministic Markdown, JSON, graph, and OKF views for read-only review on desktop or mobile. No native mobile agent runtime is required.</p>
+            <a href="/docs/interoperability/">See portable formats</a>
+          </article>
+          <article class="use-mode-card">
+            <span>Teams</span>
+            <h3>Share memory without flattening authority</h3>
+            <p>Connect repositories with typed relationships, preserve their separate access boundaries, and exchange encrypted bundles with signed checkpoints and explicit membership.</p>
+            <a href="/docs/team-memory/">Open the team guide</a>
+          </article>
+          <article class="use-mode-card">
+            <span>Governed</span>
+            <h3>Add Maqam only when you need control</h3>
+            <p>Maqam can attach temporary memory scopes and govern disclosures for high-authority workflows. Qarinah remains an independent project-memory tool before and after that integration.</p>
+            <a href="/docs/temporal-authority/">Review authority scopes</a>
+          </article>
+        </div>
+      </section>
+
+      <section class="section section-alt">
+        <div class="shell">
+        <div class="section-heading split-heading">
+          <div>
             <p class="eyebrow">Why it exists</p>
             <h2>Long agent histories create an expensive choice.</h2>
           </div>
@@ -665,9 +707,10 @@ function homePage() {
             <p>The append-only JSONL record stays in the project. Graphs, indexes, Markdown, JSON, and OKF exports are deterministic views you can rebuild.</p>
           </article>
         </div>
+        </div>
       </section>
 
-      <section class="section section-alt">
+      <section class="section">
         <div class="shell workflow-grid">
           <div>
             <p class="eyebrow">How it works</p>
@@ -692,6 +735,7 @@ function homePage() {
         <div class="integration-list">
           <a href="/docs/integrations/"><span>Codex</span><strong>Lifecycle hooks and a Qarinah context skill</strong><i>Open guide</i></a>
           <a href="/docs/integrations/"><span>Claude Code</span><strong>Reviewed plugin runtime with project-specific opt-in</strong><i>Open guide</i></a>
+          <a href="/docs/integrations/"><span>Cursor</span><strong>Project MCP configuration and an always-on memory rule</strong><i>Open guide</i></a>
           <a href="/docs/mcp/"><span>MCP</span><strong>Diagnostics by default, cited context only after explicit workspace authorization</strong><i>Open guide</i></a>
           <a href="/docs/team-memory/"><span>Teams</span><strong>Dashboard, freshness, multi-repo packs, encrypted sync, evaluation, and causal receipts</strong><i>Open guide</i></a>
           <a href="/docs/interoperability/"><span>Open formats</span><strong>Markdown, JSON, typed graph, and Google OKF export</strong><i>Open guide</i></a>

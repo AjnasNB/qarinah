@@ -4,7 +4,7 @@ Do not publish these drafts until the gates in [../LAUNCH.md](../LAUNCH.md) are 
 
 ## Canonical descriptions
 
-**Tagline:** The shared, verifiable memory layer for teams deploying multiple AI agents.
+**Tagline:** Evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.
 
 **Proof tagline:** Nearly 99% less repeated project context. Every selected memory points back to its source.
 
@@ -12,11 +12,11 @@ Do not publish these drafts until the gates in [../LAUNCH.md](../LAUNCH.md) are 
 
 **Coding value line:** Less replay. More room for current code, tools, and cited project memory.
 
-**GitHub About:** The shared, verifiable memory layer for teams deploying multiple AI agents.
+**GitHub About:** Evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.
 
-**npm description:** The shared, verifiable memory layer for teams deploying multiple AI agents. 98.71% less estimated repeated context in the published benchmark.
+**npm description:** Evidence-linked project memory for coding agents, with 98.71% less estimated repeated context in its published benchmark.
 
-**Short:** Qarinah is local-first project memory for AI agents. It records permitted activity and explicit decisions in an evidence-linked ledger, then compiles a small cited pack for the next task.
+**Short:** Qarinah is independent, local-first project memory for coding agents. It records permitted activity and explicit decisions in an evidence-linked ledger, then compiles a small cited pack for the next task. Maqam is an optional governance integration, not a requirement.
 
 ## Show HN fact sheet - rewrite personally
 

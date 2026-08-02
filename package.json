@@ -1,7 +1,7 @@
 {
   "name": "qarinah",
   "version": "0.1.2",
-  "description": "The shared, verifiable memory layer for teams deploying multiple AI agents. Evidence-linked project memory with 98.71% less estimated repeated context in its published benchmark.",
+  "description": "Evidence-linked project memory for coding agents, with 98.71% less estimated repeated context in its published benchmark.",
   "license": "Apache-2.0",
   "author": "Ajnas NB",
   "mcpName": "io.github.AjnasNB/qarinah",

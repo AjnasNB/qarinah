@@ -1,6 +1,8 @@
 # Getting started
 
-Qarinah is the shared, verifiable memory layer for teams deploying multiple AI agents. It gives an agent a small, cited slice of project memory instead of replaying the full retained history. The record stays in the project and the generated graph, index, Markdown, JSON, and OKF views can be rebuilt from it.
+Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust. It works for one developer and one repository, across several supported coding agents, or as the memory layer in a larger team workflow. Maqam integration is optional.
+
+Qarinah gives an agent a small, cited slice of project memory instead of replaying the full retained history. The record stays in the project and the generated SQLite index, graph, Markdown, JSON, dashboard, and OKF views can be rebuilt from it.
 
 For the supported hosts, the quickest complete setup is:
 

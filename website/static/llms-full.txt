@@ -1,6 +1,6 @@
 # Qarinah: expanded machine-readable map
 
-> The shared, verifiable memory layer for teams deploying multiple AI agents.
+> Evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.
 
 It converts an explicitly permitted, append-only project event record into bounded, cited context packs selected for the current task.
 
@@ -48,7 +48,7 @@ This file is a convenience map for tools that choose to read it. It does not con
 
 ### What is Qarinah?
 
-Qarinah is the shared, verifiable memory layer for teams deploying multiple AI agents. It records explicitly permitted project events, builds deterministic graph and retrieval views, and compiles a small cited context pack for the current task.
+Qarinah is independent, evidence-linked project memory for coding agents. It records explicitly permitted project events, builds deterministic graph and retrieval views, and compiles a small cited context pack for the current task. Maqam is an optional governance integration, not a requirement.
 
 ### Does Qarinah reduce coding-agent context tokens?
 
