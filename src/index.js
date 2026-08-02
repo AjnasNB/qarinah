@@ -32,6 +32,13 @@ export { PROJECT_STRUCTURE_SCHEMA_VERSION, scanProjectStructure } from "./projec
 export { OKF_EXPORT_SCHEMA_VERSION, OKF_VERSION, exportOkf } from "./okf.js";
 export { rankContextEvents } from "./retrieval.js";
 export {
+  SQLITE_READ_MODEL_FILENAME,
+  SQLITE_READ_MODEL_SCHEMA_VERSION,
+  inspectSqliteReadModel,
+  querySqliteReadModel,
+  rebuildSqliteReadModel
+} from "./sqlite-read-model.js";
+export {
   PORTABLE_TOKEN_ESTIMATOR,
   createTokenBudget,
   estimateTokens,
@@ -55,6 +62,14 @@ export {
 export { createCausalReceipt } from "./receipts.js";
 export { buildMemoryDashboard, renderMemoryDashboard, writeMemoryDashboard } from "./dashboard.js";
 export { evaluateContextQuality } from "./evaluation.js";
+export {
+  MEMORY_ATTACHMENT_SCHEMA_VERSION,
+  createMemoryScopeAttachmentEvent,
+  createMemoryScopeRevocationEvent,
+  recordMemoryScopeAttachment,
+  resolveActiveMemoryScopes,
+  revokeMemoryScopeAttachment
+} from "./memory-attachments.js";
 export {
   MAQAM_CONTEXT_ADAPTER_SCHEMA_VERSION,
   MAQAM_CONTEXT_APPEND_TOOL,

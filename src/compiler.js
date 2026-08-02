@@ -4,6 +4,7 @@ import { QarinahError } from "./errors.js";
 import { loadIndex } from "./indexer.js";
 import { markdownDataBlock, markdownInline } from "./markdown.js";
 import { rankContextEvents } from "./retrieval.js";
+import { querySqliteReadModel } from "./sqlite-read-model.js";
 import {
   createTokenBudget,
   estimateTokens,
@@ -35,6 +36,9 @@ function itemFor(entry, excerpt) {
     excerpt,
     confidence: entry.event.confidence,
     ...(entry.event.authority ? { authority: entry.event.authority } : {}),
+    ...(entry.event.temporal ? { temporal: entry.event.temporal } : {}),
+    ...(entry.event.repository ? { repository: entry.event.repository } : {}),
+    ...(entry.event.disclosure ? { disclosure: entry.event.disclosure } : {}),
     reason: boundedReason(entry.reason),
     hash: entry.event.hash
   };
@@ -110,18 +114,45 @@ export async function compileContext(query = "", options = {}) {
   const maxChars = Math.min(requestedMaxChars, workspace.config.contextMaxChars);
   if (!Number.isSafeInteger(limit) || limit < 1 || limit > 1_000) throw new TypeError("limit must be an integer from 1 to 1000.");
   if (typeof query !== "string" || query.length > 4_096) throw new TypeError("query must be a string up to 4096 characters.");
+  let retrievalQuery = query;
+  let queryExpansion = null;
+  if (options.queryExpansion !== undefined && options.queryExpansion !== null) {
+    if (!options.queryExpansion || typeof options.queryExpansion !== "object"
+      || typeof options.queryExpansion.expand !== "function") {
+      throw new TypeError("queryExpansion.expand must be a function.");
+    }
+    const adapter = typeof options.queryExpansion.id === "string" && options.queryExpansion.id.trim()
+      ? options.queryExpansion.id.trim()
+      : "local-query-expansion";
+    const expanded = await options.queryExpansion.expand({ query });
+    if (!Array.isArray(expanded) || expanded.length > 16
+      || expanded.some((value) => typeof value !== "string" || value.trim() === "" || value.length > 256)) {
+      throw new TypeError("queryExpansion.expand must return at most 16 non-empty strings up to 256 characters.");
+    }
+    const terms = [...new Set(expanded.map((value) => value.trim()))].sort();
+    retrievalQuery = [query, ...terms].filter(Boolean).join(" ").slice(0, 4_096);
+    queryExpansion = { adapter, addedTermCount: terms.length };
+  }
   const tokenPlan = createTokenBudget(options, maxChars);
   const minimumCoverage = options.minimumCoverage ?? "any";
   if (!["any", "partial", "direct"].includes(minimumCoverage)) {
     throw new TypeError("minimumCoverage must be any, partial, or direct.");
   }
 
-  const retrieval = rankContextEvents(index, query, {
+  const sqliteCandidates = options.inMemory === true || retrievalQuery.trim() === ""
+    ? []
+    : (await querySqliteReadModel(workspace, retrievalQuery, {
+      headHash: index.headHash,
+      limit: Math.min(1_000, limit * 16)
+    })).candidates;
+  const retrieval = rankContextEvents(index, retrievalQuery, {
     limit,
     diversity: options.diversity,
     supersessionPolicy: options.supersessionPolicy,
     asOf: resolveQueryTime(options),
-    authorityScope: options.authorityScope
+    authorityScopes: options.authorityScopes ?? options.authorityScope,
+    repositoryIds: options.repositoryIds,
+    sqliteCandidates
   });
   const ranked = retrieval.ranked;
   const coverageAccepted = minimumCoverage === "any"
@@ -144,9 +175,12 @@ export async function compileContext(query = "", options = {}) {
     supersessionPolicy: retrieval.supersessionPolicy,
     asOf: retrieval.asOf,
     coverage: retrieval.coverage,
-    ...(retrieval.authorityScope === null ? {} : { authorityScope: retrieval.authorityScope })
+    ...(queryExpansion === null ? {} : { queryExpansion }),
+    ...(typeof options.authorityScope === "string" ? { authorityScope: options.authorityScope } : {}),
+    ...(retrieval.authorityScopes.length === 0 ? {} : { authorityScopes: retrieval.authorityScopes }),
+    ...(retrieval.repositoryIds.length === 0 ? {} : { repositoryIds: retrieval.repositoryIds })
   };
-  if (retrieval.filters.expired > 0 || retrieval.filters.future > 0) {
+  if (Object.values(retrieval.filters).some((count) => count > 0)) {
     retrievalSummary.filters = retrieval.filters;
   }
   if (relevantConflicts.length > 0) retrievalSummary.conflicts = relevantConflicts;

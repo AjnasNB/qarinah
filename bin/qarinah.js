@@ -89,10 +89,11 @@ const RECORD_STDIN_JSON_MAX_BYTES = 128 * 1024;
 const QUERY_STDIN_JSON_MAX_BYTES = 16 * 1024;
 const RECORD_STDIN_JSON_FIELDS = new Set([
   "kind", "title", "body", "data", "actor", "sessionId", "turnId", "confidence",
-  "relations", "sourceId", "retention"
+  "relations", "sourceId", "retention", "temporal", "repository", "freshness", "disclosure"
 ]);
 const QUERY_STDIN_JSON_FIELDS = new Set([
-  "query", "format", "limit", "maxChars", "maxTokens", "reserveTokens", "asOf", "minimumCoverage"
+  "query", "format", "limit", "maxChars", "maxTokens", "reserveTokens", "asOf", "minimumCoverage",
+  "authorityScopes", "repositoryIds"
 ]);
 
 async function readStdin(maximumBytes = 1_048_576) {
@@ -151,6 +152,10 @@ function stdinRecordInput(request) {
     data: Object.hasOwn(request, "data") ? request.data : {},
     confidence: Object.hasOwn(request, "confidence") ? request.confidence : "claimed",
     relations: Object.hasOwn(request, "relations") ? request.relations : [],
+    ...(Object.hasOwn(request, "temporal") ? { temporal: request.temporal } : {}),
+    ...(Object.hasOwn(request, "repository") ? { repository: request.repository } : {}),
+    ...(Object.hasOwn(request, "freshness") ? { freshness: request.freshness } : {}),
+    ...(Object.hasOwn(request, "disclosure") ? { disclosure: request.disclosure } : {}),
     provenance: { adapter: "qarinah-cli", sourceId: request.sourceId ?? null },
     retention: Object.hasOwn(request, "retention")
       ? request.retention
@@ -169,6 +174,14 @@ function stdinQueryInput(request) {
   if (!["any", "partial", "direct"].includes(minimumCoverage)) {
     throw new TypeError("minimumCoverage must be any, partial, or direct.");
   }
+  const selectors = (field) => {
+    if (!Object.hasOwn(request, field)) return undefined;
+    if (!Array.isArray(request[field]) || request[field].length > 64
+      || request[field].some((value) => typeof value !== "string" || value.length < 1 || value.length > 256)) {
+      throw new TypeError(`${field} must contain at most 64 non-empty strings.`);
+    }
+    return request[field];
+  };
   return {
     query,
     format,
@@ -177,7 +190,9 @@ function stdinQueryInput(request) {
     maxTokens: requestInteger(request, "maxTokens", 128, 1_000_000),
     reserveTokens: requestInteger(request, "reserveTokens", 0, 999_936),
     asOf: Object.hasOwn(request, "asOf") ? request.asOf : undefined,
-    minimumCoverage
+    minimumCoverage,
+    authorityScopes: selectors("authorityScopes"),
+    repositoryIds: selectors("repositoryIds")
   };
 }
 
@@ -191,7 +206,7 @@ Usage:
   qarinah record --stdin-json
   qarinah hook codex|claude
   qarinah mcp [--allow-query --workspace-id ws_<id> --policy-hash sha256:<digest>] [--max-chars n] [--max-items n]
-  qarinah build
+  qarinah build | rebuild
   qarinah scan [--max-files n] [--max-file-bytes n] [--max-total-bytes n] [--max-depth n]
   qarinah export okf [--output <path>]
   qarinah query [text] [--format json|markdown] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp] [--minimum-coverage any|partial|direct]
@@ -209,8 +224,8 @@ Usage:
 }
 
 async function run(argv) {
-  const nodeMajor = Number.parseInt(process.versions.node.split(".")[0], 10);
-  if (![22, 24, 26].includes(nodeMajor)) {
+  const [nodeMajor, nodeMinor] = process.versions.node.split(".").map(Number);
+  if (![22, 24, 26].includes(nodeMajor) || (nodeMajor === 22 && nodeMinor < 13)) {
     throw new TypeError(`Qarinah requires Node.js 22, 24, or 26; received ${process.versions.node}.`);
   }
   const [command = "help", ...args] = argv;
@@ -361,7 +376,7 @@ async function run(argv) {
     await runMcpServer({ queryPermit });
     return;
   }
-  if (command === "build") {
+  if (command === "build" || command === "rebuild") {
     process.stdout.write(`${JSON.stringify(await rebuildDerivedState(process.cwd()), null, 2)}\n`);
     return;
   }
@@ -426,7 +441,9 @@ async function run(argv) {
       maxTokens: input.maxTokens,
       reserveTokens: input.reserveTokens,
       asOf: input.asOf,
-      minimumCoverage: input.minimumCoverage
+      minimumCoverage: input.minimumCoverage,
+      authorityScopes: input.authorityScopes,
+      repositoryIds: input.repositoryIds
     });
     const format = input.format;
     if (format === "json") process.stdout.write(`${JSON.stringify(pack, null, 2)}\n`);

@@ -139,16 +139,46 @@ function graphScores(index, seedScores, eventsById) {
   return scores;
 }
 
-function authorityScores(index, candidateIds, scope, asOf) {
+function authorityScores(index, candidateIds, scopes, asOf) {
   const scores = new Map();
-  if (scope === undefined) return scores;
+  if (scopes.length === 0) return scores;
   for (const event of index.events) {
     if (!candidateIds.has(event.eventId)) continue;
     const authority = event.authority;
-    if (!authority || authority.scope !== scope || authority.assignedAt > asOf) continue;
+    if (!authority || !scopes.includes(authority.scope) || authority.assignedAt > asOf) continue;
     if (authority.expiresAt !== null && authority.expiresAt <= asOf) continue;
     if (authority.revokedAt !== null && authority.revokedAt <= asOf) continue;
     scores.set(event.eventId, 1 + authority.rank / 100);
+  }
+  return scores;
+}
+
+function normalizedSelectors(value, label) {
+  if (value === undefined) return [];
+  const list = typeof value === "string" ? [value] : value;
+  if (!Array.isArray(list) || list.length > 64
+    || list.some((entry) => typeof entry !== "string" || entry.length < 1 || entry.length > 256)) {
+    throw new TypeError(`${label} must contain at most 64 non-empty strings up to 256 characters.`);
+  }
+  if (new Set(list).size !== list.length) throw new TypeError(`${label} cannot contain duplicates.`);
+  return [...list].sort();
+}
+
+function permittedByDisclosure(event, scopes) {
+  const disclosure = event.disclosure;
+  if (!disclosure || disclosure.classification !== "restricted") return true;
+  return disclosure.scopes.some((scope) => scopes.includes(scope));
+}
+
+function permittedRepository(event, repositoryIds) {
+  return repositoryIds.length === 0 || event.repository === null || repositoryIds.includes(event.repository.id);
+}
+
+function sqliteScores(candidates, eligibleEventIds) {
+  const scores = new Map();
+  for (const candidate of candidates ?? []) {
+    if (!eligibleEventIds.has(candidate.eventId) || !Number.isSafeInteger(candidate.rank) || candidate.rank < 1) continue;
+    scores.set(candidate.eventId, 1 / candidate.rank);
   }
   return scores;
 }
@@ -194,7 +224,8 @@ function activeSupersessions(index, eventsById, asOf) {
   const supersededBy = new Map();
   for (const [source, relations] of Object.entries(index.adjacency || {})) {
     const sourceEvent = eventsById.get(source);
-    if (!sourceEvent || sourceEvent.timestamp > asOf) continue;
+    const effectiveFrom = sourceEvent?.temporal?.validFrom ?? sourceEvent?.timestamp;
+    if (!sourceEvent || effectiveFrom > asOf) continue;
     for (const relation of relations) {
       if (relation.type !== "supersedes" || !eventsById.has(relation.target)) continue;
       if (!supersededBy.has(relation.target)) supersededBy.set(relation.target, []);
@@ -291,7 +322,8 @@ export function rankContextEvents(index, query = "", options = {}) {
     options.asOf,
     "asOf"
   );
-  const authorityScope = options.authorityScope;
+  const authorityScopes = normalizedSelectors(options.authorityScopes ?? options.authorityScope, "authorityScopes");
+  const repositoryIds = normalizedSelectors(options.repositoryIds, "repositoryIds");
   if (!Number.isSafeInteger(limit) || limit < 1 || limit > 1_000) throw new TypeError("limit must be an integer from 1 to 1000.");
   if (typeof diversity !== "number" || !Number.isFinite(diversity) || diversity < 0 || diversity > 1) {
     throw new TypeError("diversity must be a number from 0 to 1.");
@@ -299,17 +331,27 @@ export function rankContextEvents(index, query = "", options = {}) {
   if (!["prefer-current", "include-history"].includes(supersessionPolicy)) {
     throw new TypeError("supersessionPolicy must be prefer-current or include-history.");
   }
-  if (authorityScope !== undefined && (typeof authorityScope !== "string" || authorityScope.length < 1 || authorityScope.length > 256)) {
-    throw new TypeError("authorityScope must be a non-empty string up to 256 characters.");
-  }
   const expiredEventIds = new Set(index.events
     .filter((event) => event.retention?.expiresAt !== null && event.retention?.expiresAt <= asOf)
     .map((event) => event.eventId));
   const futureEventIds = new Set(index.events
     .filter((event) => event.timestamp > asOf)
     .map((event) => event.eventId));
+  const notYetValidEventIds = new Set(index.events
+    .filter((event) => event.temporal?.validFrom !== undefined && event.temporal.validFrom > asOf)
+    .map((event) => event.eventId));
+  const staleEventIds = new Set(index.events
+    .filter((event) => event.temporal?.validUntil !== null && event.temporal?.validUntil !== undefined && event.temporal.validUntil <= asOf)
+    .map((event) => event.eventId));
+  const unauthorizedEventIds = new Set(index.events
+    .filter((event) => !permittedByDisclosure(event, authorityScopes) || !permittedRepository(event, repositoryIds))
+    .map((event) => event.eventId));
   const eventsById = new Map([...allEventsById].filter(([eventId]) => (
-    !expiredEventIds.has(eventId) && !futureEventIds.has(eventId)
+    !expiredEventIds.has(eventId)
+      && !futureEventIds.has(eventId)
+      && !notYetValidEventIds.has(eventId)
+      && !staleEventIds.has(eventId)
+      && !unauthorizedEventIds.has(eventId)
   )));
   const eligibleEventIds = new Set(eventsById.keys());
 
@@ -330,9 +372,16 @@ export function rankContextEvents(index, query = "", options = {}) {
       conflicts: conflictPairs(index, eventsById),
       exclusions,
       supersessionPolicy,
-      authorityScope: authorityScope ?? null,
+      authorityScopes,
+      repositoryIds,
       asOf,
-      filters: { expired: expiredEventIds.size, future: futureEventIds.size },
+      filters: {
+        expired: expiredEventIds.size,
+        future: futureEventIds.size,
+        notYetValid: notYetValidEventIds.size,
+        stale: staleEventIds.size,
+        unauthorized: unauthorizedEventIds.size
+      },
       coverage: queryCoverage(index, queryTerms, eligibleEventIds, new Map(), new Map())
     });
   }
@@ -340,10 +389,16 @@ export function rankContextEvents(index, query = "", options = {}) {
   const lexical = bm25Scores(index, queryTerms, eligibleEventIds);
   const fuzzy = fuzzyScores(index, query, eligibleEventIds);
   const coverage = queryCoverage(index, queryTerms, eligibleEventIds, lexical, fuzzy);
-  const seedScores = new Map([...lexical, ...fuzzy].map(([eventId]) => [eventId, (lexical.get(eventId) || 0) + (fuzzy.get(eventId) || 0)]));
+  const sqlite = sqliteScores(options.sqliteCandidates, eligibleEventIds);
+  const candidateIds = new Set([...lexical.keys(), ...fuzzy.keys(), ...sqlite.keys()]);
+  const seedScores = new Map([...candidateIds].map((eventId) => [
+    eventId,
+    (lexical.get(eventId) || 0) + (fuzzy.get(eventId) || 0) + (sqlite.get(eventId) || 0)
+  ]));
   const graph = graphScores(index, seedScores, eventsById);
-  const authority = authorityScores(index, new Set(seedScores.keys()), authorityScope, asOf);
+  const authority = authorityScores(index, candidateIds, authorityScopes, asOf);
   const lists = [
+    { name: "sqlite-fts5", weight: 1.05, entries: sortedScores(sqlite, eventsById) },
     { name: "bm25", weight: 1, entries: sortedScores(lexical, eventsById) },
     { name: "fuzzy", weight: 0.75, entries: sortedScores(fuzzy, eventsById) },
     { name: "graph", weight: 0.65, entries: sortedScores(graph, eventsById) },
@@ -363,9 +418,16 @@ export function rankContextEvents(index, query = "", options = {}) {
     conflicts: conflictPairs(index, eventsById),
     exclusions,
     supersessionPolicy,
-    authorityScope: authorityScope ?? null,
+    authorityScopes,
+    repositoryIds,
     asOf,
-    filters: { expired: expiredEventIds.size, future: futureEventIds.size },
+    filters: {
+      expired: expiredEventIds.size,
+      future: futureEventIds.size,
+      notYetValid: notYetValidEventIds.size,
+      stale: staleEventIds.size,
+      unauthorized: unauthorizedEventIds.size
+    },
     coverage
   });
 }

@@ -37,6 +37,14 @@ export function evaluateContextQuality(cases) {
     rejectedStale: 0,
     expectedConflicts: 0,
     detectedConflicts: 0,
+    expectedSuperseded: 0,
+    resolvedSuperseded: 0,
+    crossRepositoryAttempts: 0,
+    rejectedCrossRepository: 0,
+    expectedUnauthorized: 0,
+    rejectedUnauthorized: 0,
+    baselineContextTokens: 0,
+    contextTokensSupplied: 0,
     completedTasks: 0,
     repeatedMistakes: 0,
     avoidedRepeatedMistakes: 0,
@@ -57,13 +65,24 @@ export function evaluateContextQuality(cases) {
     const rejected = uniqueStrings(entry.rejectedStaleIds ?? [], `${id}.rejectedStaleIds`);
     const conflicts = uniqueStrings(entry.expectedConflictIds ?? [], `${id}.expectedConflictIds`);
     const detected = uniqueStrings(entry.detectedConflictIds ?? [], `${id}.detectedConflictIds`);
+    const superseded = uniqueStrings(entry.expectedSupersededIds ?? [], `${id}.expectedSupersededIds`);
+    const resolvedSuperseded = uniqueStrings(entry.resolvedSupersededIds ?? [], `${id}.resolvedSupersededIds`);
+    const crossRepository = uniqueStrings(entry.crossRepositoryAttemptIds ?? [], `${id}.crossRepositoryAttemptIds`);
+    const rejectedCrossRepository = uniqueStrings(entry.rejectedCrossRepositoryIds ?? [], `${id}.rejectedCrossRepositoryIds`);
+    const unauthorized = uniqueStrings(entry.expectedUnauthorizedIds ?? [], `${id}.expectedUnauthorizedIds`);
+    const rejectedUnauthorized = uniqueStrings(entry.rejectedUnauthorizedIds ?? [], `${id}.rejectedUnauthorizedIds`);
     const latencyMs = finiteNonNegative(entry.latencyMs ?? 0, `${id}.latencyMs`);
     const baselineCost = finiteNonNegative(entry.baselineCost ?? 0, `${id}.baselineCost`);
     const actualCost = finiteNonNegative(entry.actualCost ?? 0, `${id}.actualCost`);
+    const baselineContextTokens = finiteNonNegative(entry.baselineContextTokens ?? 0, `${id}.baselineContextTokens`);
+    const contextTokensSupplied = finiteNonNegative(entry.contextTokensSupplied ?? 0, `${id}.contextTokensSupplied`);
     const recalledCount = overlap(required, recalled);
     const validCitationCount = overlap(returned, valid);
     const rejectedStaleCount = overlap(stale, rejected);
     const detectedConflictCount = overlap(conflicts, detected);
+    const resolvedSupersededCount = overlap(superseded, resolvedSuperseded);
+    const rejectedCrossRepositoryCount = overlap(crossRepository, rejectedCrossRepository);
+    const rejectedUnauthorizedCount = overlap(unauthorized, rejectedUnauthorized);
     const repeatedMistakeExpected = entry.repeatedMistakeExpected === true;
     const repeatedMistakeAvoided = repeatedMistakeExpected && entry.repeatedMistakeAvoided === true;
     Object.assign(totals, {
@@ -75,6 +94,14 @@ export function evaluateContextQuality(cases) {
       rejectedStale: totals.rejectedStale + rejectedStaleCount,
       expectedConflicts: totals.expectedConflicts + conflicts.size,
       detectedConflicts: totals.detectedConflicts + detectedConflictCount,
+      expectedSuperseded: totals.expectedSuperseded + superseded.size,
+      resolvedSuperseded: totals.resolvedSuperseded + resolvedSupersededCount,
+      crossRepositoryAttempts: totals.crossRepositoryAttempts + crossRepository.size,
+      rejectedCrossRepository: totals.rejectedCrossRepository + rejectedCrossRepositoryCount,
+      expectedUnauthorized: totals.expectedUnauthorized + unauthorized.size,
+      rejectedUnauthorized: totals.rejectedUnauthorized + rejectedUnauthorizedCount,
+      baselineContextTokens: totals.baselineContextTokens + baselineContextTokens,
+      contextTokensSupplied: totals.contextTokensSupplied + contextTokensSupplied,
       completedTasks: totals.completedTasks + (entry.taskCompleted === true ? 1 : 0),
       repeatedMistakes: totals.repeatedMistakes + (repeatedMistakeExpected ? 1 : 0),
       avoidedRepeatedMistakes: totals.avoidedRepeatedMistakes + (repeatedMistakeAvoided ? 1 : 0),
@@ -88,11 +115,16 @@ export function evaluateContextQuality(cases) {
       citationAccuracy: ratio(validCitationCount, returned.size),
       staleContextRejection: ratio(rejectedStaleCount, stale.size),
       conflictDetection: ratio(detectedConflictCount, conflicts.size),
+      supersessionCorrectness: ratio(resolvedSupersededCount, superseded.size),
+      crossRepositoryIsolation: ratio(rejectedCrossRepositoryCount, crossRepository.size),
+      unauthorizedDisclosureRejection: ratio(rejectedUnauthorizedCount, unauthorized.size),
       taskCompleted: entry.taskCompleted === true,
       repeatedMistakeAvoided: repeatedMistakeExpected ? repeatedMistakeAvoided : null,
       latencyMs,
       baselineCost,
-      actualCost
+      actualCost,
+      baselineContextTokens,
+      contextTokensSupplied
     };
   });
   return deepFreezeJson({
@@ -103,10 +135,20 @@ export function evaluateContextQuality(cases) {
       citationAccuracy: ratio(totals.validCitations, totals.returnedCitations),
       staleContextRejection: ratio(totals.rejectedStale, totals.expectedStale),
       conflictDetection: ratio(totals.detectedConflicts, totals.expectedConflicts),
+      supersessionCorrectness: ratio(totals.resolvedSuperseded, totals.expectedSuperseded),
+      crossRepositoryIsolation: ratio(totals.rejectedCrossRepository, totals.crossRepositoryAttempts),
+      unauthorizedDisclosureRejection: ratio(totals.rejectedUnauthorized, totals.expectedUnauthorized),
+      contextTokensSupplied: totals.contextTokensSupplied,
+      contextTokenReduction: totals.baselineContextTokens === 0
+        ? null
+        : Math.round(((totals.baselineContextTokens - totals.contextTokensSupplied) / totals.baselineContextTokens) * 10_000) / 10_000,
       taskCompletionQuality: ratio(totals.completedTasks, cases.length),
       repeatedMistakePrevention: ratio(totals.avoidedRepeatedMistakes, totals.repeatedMistakes),
       meanLatencyMs: Math.round((totals.latencyMs / cases.length) * 100) / 100,
       costPerCompletedTask: totals.completedTasks === 0
+        ? null
+        : Math.round((totals.actualCost / totals.completedTasks) * 1_000_000) / 1_000_000,
+      netCostPerCompletedTask: totals.completedTasks === 0
         ? null
         : Math.round((totals.actualCost / totals.completedTasks) * 1_000_000) / 1_000_000,
       costReduction: totals.baselineCost === 0

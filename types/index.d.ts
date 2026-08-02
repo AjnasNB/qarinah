@@ -1,7 +1,8 @@
 export type QarinahEventKind =
   | "session.started" | "prompt.submitted" | "tool.requested" | "tool.completed"
   | "turn.completed" | "compaction.started" | "compaction.completed" | "artifact"
-  | "source" | "claim" | "decision" | "approval" | "summary";
+  | "source" | "claim" | "decision" | "approval" | "summary"
+  | "memory.scope.attached" | "memory.scope.revoked" | "context.pack.compiled";
 export type QarinahConfidence = "extracted" | "inferred" | "claimed" | "verified";
 export type QarinahRelationType =
   | "derived_from" | "produced" | "changed" | "supports" | "contradicts"
@@ -18,6 +19,16 @@ export interface QarinahAuthority {
   revokedAt: string | null;
   basis: string;
 }
+export interface QarinahTemporal { validFrom?: string; validUntil?: string | null }
+export interface QarinahRepository { id: string; branch?: string; commit?: string }
+export interface QarinahFreshness {
+  files?: Array<{ path: string; hash: `sha256:${string}` }>;
+  dependencies?: Array<{ name: string; version?: string; hash: `sha256:${string}` }>;
+}
+export interface QarinahDisclosure {
+  scopes: string[];
+  classification: "public" | "workspace" | "restricted";
+}
 export interface QarinahEventInput {
   eventId?: string;
   timestamp?: string;
@@ -30,14 +41,22 @@ export interface QarinahEventInput {
   data?: Record<string, unknown>;
   confidence?: QarinahConfidence;
   authority?: QarinahAuthority;
+  temporal?: QarinahTemporal;
+  repository?: QarinahRepository;
+  freshness?: QarinahFreshness;
+  disclosure?: QarinahDisclosure;
   relations?: QarinahRelation[];
   provenance?: { adapter?: string; sourceId?: string | null; contentHash?: string };
   retention?: { class?: "session" | "project" | "durable"; expiresAt?: string | null };
 }
-export interface QarinahEvent extends Required<Omit<QarinahEventInput, "provenance" | "retention" | "authority">> {
+export interface QarinahEvent extends Required<Omit<QarinahEventInput, "provenance" | "retention" | "authority" | "temporal" | "repository" | "freshness" | "disclosure">> {
   schemaVersion: "qarinah.event.v1";
   workspaceId: string;
   authority?: QarinahAuthority;
+  temporal?: QarinahTemporal;
+  repository?: QarinahRepository;
+  freshness?: QarinahFreshness;
+  disclosure?: QarinahDisclosure;
   provenance: { adapter: string; sourceId: string | null; contentHash: string };
   retention: { class: "session" | "project" | "durable"; expiresAt: string | null };
   previousHash: string | null;
@@ -84,7 +103,8 @@ export interface QarinahCapturePolicy {
 export interface QarinahWorkspace { root: string; qarinahDir: string; config: QarinahConfig; configPath: string; consent: QarinahConsent | null }
 export interface QarinahContextItem {
   eventId: string; kind: string; timestamp: string; title: string; excerpt: string;
-  confidence: QarinahConfidence; authority?: QarinahAuthority; reason: string; hash: string;
+  confidence: QarinahConfidence; authority?: QarinahAuthority; temporal?: QarinahTemporal;
+  repository?: QarinahRepository; disclosure?: QarinahDisclosure; reason: string; hash: string;
 }
 export interface QarinahTokenEstimator {
   id: string;
@@ -122,6 +142,10 @@ export interface QarinahContextPack {
     supersessionPolicy: "prefer-current" | "include-history";
     asOf: string;
     authorityScope?: string;
+    authorityScopes?: string[];
+    repositoryIds?: string[];
+    readModel?: "sqlite-fts5" | "verified-ledger-memory";
+    queryExpansion?: { adapter: string; addedTermCount: number };
     coverage: {
       method: "query-term-overlap-v1";
       status: "no-query" | "none" | "partial" | "direct";
@@ -131,7 +155,7 @@ export interface QarinahContextPack {
       directCandidateCount: number;
       warning?: string;
     };
-    filters?: { expired: number; future: number };
+    filters?: { expired: number; future: number; notYetValid: number; stale: number; unauthorized: number };
     conflicts?: Array<{ eventIds: [string, string] }>;
     exclusions?: Array<{ eventId: string; reason: "superseded"; by: string[] }>;
   };
@@ -161,6 +185,9 @@ export const CONFIG_SCHEMA_VERSION: "qarinah.config.v1";
 export const INDEX_SCHEMA_VERSION: "qarinah.index.v2";
 export const GRAPH_SCHEMA_VERSION: "qarinah.graph.v2";
 export const PROJECT_STRUCTURE_SCHEMA_VERSION: "qarinah.project-structure.v1";
+export const SQLITE_READ_MODEL_SCHEMA_VERSION: 1;
+export const SQLITE_READ_MODEL_FILENAME: "qarinah.db";
+export const MEMORY_ATTACHMENT_SCHEMA_VERSION: "qarinah.memory-attachment.v1";
 export const QARINAH_VERSION: "0.1.2";
 export const EVENT_KINDS: readonly QarinahEventKind[];
 export const RELATION_TYPES: readonly QarinahRelationType[];
@@ -178,7 +205,10 @@ export function inspectWorkspacePolicy(start?: string): Promise<QarinahCapturePo
 export function approveWorkspaceTrust(start: string | undefined, expectedCapture: "metadata" | "content", expectedPolicyHash: `sha256:${string}`): Promise<{ root: string; workspaceId: string; capture: "metadata" | "content"; policyHash: `sha256:${string}`; trusted: true; eventCount: number; headHash: string | null }>;
 export function readEvents(workspaceOrStart?: QarinahWorkspace | string, options?: { skipCheckpoint?: boolean; updateCheckpoint?: boolean }): Promise<QarinahEvent[]>;
 export function verifyStore(start?: string, options?: { updateCheckpoint?: boolean; includeRoot?: boolean }): Promise<{ ok: true; workspaceId: string; eventCount: number; headHash: string | null; capture: string; root?: string }>;
-export function rebuildDerivedState(start?: string): Promise<{ workspaceId: string; eventCount: number; headHash: string | null }>;
+export function rebuildDerivedState(start?: string): Promise<{ workspaceId: string; eventCount: number; headHash: string | null; readModel: Readonly<Record<string, unknown>> }>;
+export function rebuildSqliteReadModel(workspace: QarinahWorkspace, events: QarinahEvent[], derived: { index: unknown; graph: unknown }): Promise<Readonly<Record<string, unknown>>>;
+export function inspectSqliteReadModel(workspace: QarinahWorkspace): Promise<Readonly<Record<string, unknown>>>;
+export function querySqliteReadModel(workspace: QarinahWorkspace, query: string, options?: { headHash?: string | null; limit?: number }): Promise<Readonly<{ schemaVersion: number; candidates: Array<{ eventId: string; rank: number }> }>>;
 export function loadIndex(start?: string, options?: { rebuild?: boolean; updateCheckpoint?: boolean; inMemory?: boolean }): Promise<{ workspace: QarinahWorkspace; index: unknown }>;
 export function buildDerivedState(events: QarinahEvent[], workspaceId: string): { index: unknown; graph: unknown };
 export function tokenize(value: unknown): string[];
@@ -193,6 +223,9 @@ export function compileContext(query?: string, options?: {
   diversity?: number;
   supersessionPolicy?: "prefer-current" | "include-history";
   authorityScope?: string;
+  authorityScopes?: string[];
+  repositoryIds?: string[];
+  queryExpansion?: { id?: string; expand(input: { query: string }): string[] | Promise<string[]> };
   minimumCoverage?: "any" | "partial" | "direct";
   asOf?: string;
   clock?: () => Date;
@@ -265,7 +298,19 @@ export function rerankContextPack(
   semanticRerank?: { adapter: string; candidateCount: number; scoredCount: number; authority: "rerank-only" };
 }>;
 export function compileFederatedContext(query: string, options: {
-  workspaces: Array<{ cwd: string; authority: string; maxChars?: number; limit?: number }>;
+  workspaces: Array<{
+    cwd: string;
+    authority: string;
+    repositoryId?: string;
+    authorityScopes?: string[];
+    maxChars?: number;
+    limit?: number;
+  }>;
+  relationships?: Array<{
+    from: string;
+    to: string;
+    type: "depends_on" | "documents" | "deploys" | "shares_contract" | "owned_by" | "references";
+  }>;
   maxChars?: number;
   limit?: number;
   minimumCoverage?: "any" | "partial" | "direct";
@@ -275,7 +320,8 @@ export function compileFederatedContext(query: string, options: {
   schemaVersion: "qarinah.federated-context.v1";
   query: string;
   authorityBoundary: "separate-packs";
-  workspaces: Array<{ authority: string; workspaceId: string; pack: QarinahContextPack }>;
+  workspaces: Array<{ authority: string; repositoryId: string; workspaceId: string; pack: QarinahContextPack }>;
+  repositoryGraph: Array<{ from: string; to: string; type: string }>;
   manifestHash: string;
 }>>;
 export interface QarinahFreshnessReport {
@@ -283,8 +329,8 @@ export interface QarinahFreshnessReport {
   workspaceId: string;
   status: "unavailable" | "current" | "stale";
   snapshotEventId: string | null;
-  snapshotHash?: string;
-  counts: { current: number; changed: number; missing: number; unsafe: number };
+  snapshotHash?: string | null;
+  counts: { current: number; changed: number; missing: number; unsafe: number; unverified: number };
   files: Array<{
     path: string;
     status: "current" | "changed" | "missing" | "unsafe";
@@ -292,8 +338,55 @@ export interface QarinahFreshnessReport {
     observedHash?: string | null;
     reason?: string;
   }>;
+  dependencies: Array<{
+    name: string;
+    version?: string | null;
+    status: "current" | "changed" | "missing" | "unverified";
+    expectedHash: string;
+    observedHash: string | null;
+    eventId: string;
+  }>;
+  staleEventIds: string[];
 }
-export function inspectMemoryFreshness(options?: { cwd?: string; paths?: string[] }): Promise<Readonly<QarinahFreshnessReport>>;
+export function inspectMemoryFreshness(options?: {
+  cwd?: string;
+  paths?: string[];
+  dependencyResolver?: (input: { name: string; version?: string | null; repository?: QarinahRepository | null }) =>
+    string | null | Promise<string | null>;
+}): Promise<Readonly<QarinahFreshnessReport>>;
+
+export interface QarinahMemoryAttachment {
+  schemaVersion: "qarinah.memory-attachment.v1";
+  attachmentId: string;
+  agentId: string;
+  runId: string | null;
+  scopes: string[];
+  repositories: string[];
+  attachedAt: string;
+  expiresAt: string | null;
+  revokedAt: string | null;
+  assignedBy: string;
+}
+export function createMemoryScopeAttachmentEvent(input: Omit<QarinahMemoryAttachment, "schemaVersion" | "attachmentId" | "revokedAt"> & { attachmentId?: string; revokedAt?: null }): QarinahEventInput;
+export function createMemoryScopeRevocationEvent(input: Omit<QarinahMemoryAttachment, "schemaVersion" | "revokedAt"> & { revokedAt?: string }): QarinahEventInput;
+export function recordMemoryScopeAttachment(input: Parameters<typeof createMemoryScopeAttachmentEvent>[0], options?: { cwd?: string }): Promise<QarinahEvent>;
+export function revokeMemoryScopeAttachment(input: Parameters<typeof createMemoryScopeRevocationEvent>[0], options?: { cwd?: string }): Promise<QarinahEvent>;
+export function resolveActiveMemoryScopes(options: {
+  cwd?: string;
+  agentId: string;
+  runId?: string | null;
+  asOf?: string;
+  required?: boolean;
+}): Promise<Readonly<{
+  schemaVersion: "qarinah.memory-attachment.v1";
+  workspaceId: string;
+  agentId: string;
+  runId: string | null;
+  asOf: string;
+  attachmentIds: string[];
+  scopes: string[];
+  repositories: string[];
+}>>;
 export interface QarinahTeamManifest {
   schemaVersion: "qarinah.team-manifest.v1";
   workspaceId: string;
@@ -377,6 +470,14 @@ export interface QarinahContextEvaluationCase {
   rejectedStaleIds?: string[];
   expectedConflictIds?: string[];
   detectedConflictIds?: string[];
+  expectedSupersededIds?: string[];
+  resolvedSupersededIds?: string[];
+  crossRepositoryAttemptIds?: string[];
+  rejectedCrossRepositoryIds?: string[];
+  expectedUnauthorizedIds?: string[];
+  rejectedUnauthorizedIds?: string[];
+  baselineContextTokens?: number;
+  contextTokensSupplied?: number;
   taskCompleted?: boolean;
   repeatedMistakeExpected?: boolean;
   repeatedMistakeAvoided?: boolean;
@@ -392,10 +493,16 @@ export function evaluateContextQuality(cases: QarinahContextEvaluationCase[]): R
     citationAccuracy: number | null;
     staleContextRejection: number | null;
     conflictDetection: number | null;
+    supersessionCorrectness: number | null;
+    crossRepositoryIsolation: number | null;
+    unauthorizedDisclosureRejection: number | null;
+    contextTokensSupplied: number;
+    contextTokenReduction: number | null;
     taskCompletionQuality: number;
     repeatedMistakePrevention: number | null;
     meanLatencyMs: number;
     costPerCompletedTask: number | null;
+    netCostPerCompletedTask: number | null;
     costReduction: number | null;
   }>;
   totals: Readonly<Record<string, number>>;
@@ -416,6 +523,9 @@ export function rankContextEvents(index: unknown, query: string | undefined, opt
   diversity?: number;
   supersessionPolicy?: "prefer-current" | "include-history";
   authorityScope?: string;
+  authorityScopes?: string[];
+  repositoryIds?: string[];
+  sqliteCandidates?: Array<{ eventId: string; rank: number }>;
   asOf: string;
 }): Readonly<Record<string, unknown>>;
 export function captureCodexHook(input: Record<string, unknown>, options?: { cwd?: string }): Promise<{ captured: boolean; reason?: string; eventId?: string; hash?: string }>;
@@ -450,6 +560,7 @@ export interface MaqamContextToolDescriptor {
 }
 export interface MaqamAdapterExecutionContext {
   readonly runId?: string;
+  readonly agentId?: string;
   readonly toolName?: string;
   readonly limits?: Readonly<Record<string, unknown>> | null;
   readonly goal?: Readonly<{ budget?: Readonly<Record<string, unknown>> | null }> | null;
@@ -507,6 +618,11 @@ export interface MaqamContextRegistrationOptions<TGateway extends MaqamGuardedTo
   cwd?: string;
   maxChars?: number;
   maxItems?: number;
+  requireMemoryAttachment?: boolean;
+  resolveMemoryAttachment?(input: { runId: string | null; agentId: string | null; toolName: "context.query" }):
+    | { attachmentIds?: string[]; scopes?: string[]; repositories?: string[] }
+    | null
+    | Promise<{ attachmentIds?: string[]; scopes?: string[]; repositories?: string[] } | null>;
 }
 export interface MaqamContextRegistration {
   readonly schemaVersion: "qarinah.maqam-context-registration.v1";

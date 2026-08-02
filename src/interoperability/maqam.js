@@ -38,7 +38,9 @@ export const MAQAM_CONTEXT_APPEND_TOOL = deepFreeze({
   approvalRequired: true
 });
 
-const REGISTRATION_KEYS = Object.freeze(["gateway", "cwd", "maxChars", "maxItems"]);
+const REGISTRATION_KEYS = Object.freeze([
+  "gateway", "cwd", "maxChars", "maxItems", "resolveMemoryAttachment", "requireMemoryAttachment"
+]);
 
 const APPEND_APPROVAL_ACTIONS = Object.freeze([
   `tool:${MAQAM_CONTEXT_APPEND_TOOL.name}`,
@@ -75,7 +77,35 @@ function registrationOptions(value) {
   if (!Number.isSafeInteger(maxItems) || maxItems < 1 || maxItems > 1_000) {
     throw new TypeError("Maqam registration options.maxItems must be an integer from 1 to 1000.");
   }
+  if (result.resolveMemoryAttachment !== undefined && typeof result.resolveMemoryAttachment !== "function") {
+    throw new TypeError("Maqam registration options.resolveMemoryAttachment must be a function.");
+  }
+  if (result.requireMemoryAttachment !== undefined && typeof result.requireMemoryAttachment !== "boolean") {
+    throw new TypeError("Maqam registration options.requireMemoryAttachment must be a boolean.");
+  }
+  if (result.requireMemoryAttachment === true && result.resolveMemoryAttachment === undefined) {
+    throw new TypeError("requireMemoryAttachment requires a host-owned resolveMemoryAttachment function.");
+  }
   return { ...result, maxChars, maxItems };
+}
+
+function normalizedHostAttachment(value) {
+  if (value === undefined || value === null) return null;
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new QarinahError("MAQAM_MEMORY_ATTACHMENT_INVALID", "Maqam returned an invalid memory attachment.");
+  }
+  const list = (candidate, label) => {
+    if (!Array.isArray(candidate) || candidate.length > 64
+      || candidate.some((entry) => typeof entry !== "string" || entry.trim() === "" || entry.length > 256)) {
+      throw new QarinahError("MAQAM_MEMORY_ATTACHMENT_INVALID", `${label} is invalid.`);
+    }
+    return [...new Set(candidate)].sort();
+  };
+  return deepFreeze({
+    attachmentIds: list(value.attachmentIds ?? [], "memory attachment IDs"),
+    scopes: list(value.scopes ?? [], "memory attachment scopes"),
+    repositories: list(value.repositories ?? [], "memory attachment repositories")
+  });
 }
 
 function contextLimit(context, key) {
@@ -136,7 +166,8 @@ function assertExactApproval(receipt) {
 
 const EVENT_INPUT_KEYS = Object.freeze([
   "eventId", "timestamp", "sessionId", "turnId", "kind", "actor", "title", "body", "data",
-  "confidence", "relations", "provenance", "retention"
+  "confidence", "authority", "temporal", "repository", "freshness", "disclosure",
+  "relations", "provenance", "retention"
 ]);
 
 function metadataEventInput(value, workspace) {
@@ -239,6 +270,18 @@ export function registerMaqamContextAdapters(input) {
     }
     const maxChars = effectivePositiveLimit(request.maxChars, options.maxChars, context, "maxContextChars", 512);
     const maxItems = effectivePositiveLimit(request.maxItems, options.maxItems, context, "maxContextItems", 1);
+    const memoryAttachment = normalizedHostAttachment(
+      options.resolveMemoryAttachment === undefined
+        ? null
+        : await options.resolveMemoryAttachment(deepFreeze({
+            runId: context.runId ?? null,
+            agentId: context.agentId ?? null,
+            toolName: MAQAM_CONTEXT_QUERY_TOOL.name
+          }))
+    );
+    if (options.requireMemoryAttachment === true && memoryAttachment === null) {
+      throw new QarinahError("MAQAM_MEMORY_ATTACHMENT_REQUIRED", "Maqam did not attach an authorized memory scope to this run.");
+    }
     const pack = await compileContext(request.query ?? "", {
       cwd: locator.start,
       maxChars,
@@ -246,7 +289,9 @@ export function registerMaqamContextAdapters(input) {
       rebuild: false,
       updateCheckpoint: false,
       inMemory: true,
-      minimumCoverage: request.minimumCoverage
+      minimumCoverage: request.minimumCoverage,
+      authorityScopes: memoryAttachment?.scopes,
+      repositoryIds: memoryAttachment?.repositories
     });
     const items = pack.items.length > 0
       ? pack.items.map((item) => ({
@@ -263,7 +308,12 @@ export function registerMaqamContextAdapters(input) {
           confidence: 1
         }];
     const evidence = addEvidence(addBatch, items);
-    return deepFreeze({ schemaVersion: "qarinah.maqam-context-query-result.v1", pack, evidence });
+    return deepFreeze({
+      schemaVersion: "qarinah.maqam-context-query-result.v1",
+      pack,
+      evidence,
+      memoryAttachment
+    });
   }, MAQAM_CONTEXT_QUERY_TOOL);
 
   const appendFactory = (verifier) => attachGovernance(async (rawInput = {}, context = {}) => {

@@ -44,7 +44,10 @@
         "claim",
         "decision",
         "approval",
-        "summary"
+        "summary",
+        "memory.scope.attached",
+        "memory.scope.revoked",
+        "context.pack.compiled"
       ]
     },
     "actor": {
@@ -60,6 +63,62 @@
     "body": { "type": "string", "maxLength": 65536 },
     "data": { "type": "object", "maxProperties": 128 },
     "confidence": { "enum": ["extracted", "inferred", "claimed", "verified"] },
+    "temporal": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "validFrom": { "type": "string", "format": "date-time", "maxLength": 24 },
+        "validUntil": { "type": ["string", "null"], "format": "date-time", "maxLength": 24 }
+      },
+      "minProperties": 1
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "branch": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "commit": { "type": "string", "minLength": 7, "maxLength": 128 }
+      }
+    },
+    "freshness": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "files": {
+          "type": "array", "maxItems": 256,
+          "items": {
+            "type": "object", "additionalProperties": false, "required": ["path", "hash"],
+            "properties": {
+              "path": { "type": "string", "minLength": 1, "maxLength": 1024 },
+              "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+            }
+          }
+        },
+        "dependencies": {
+          "type": "array", "maxItems": 256,
+          "items": {
+            "type": "object", "additionalProperties": false, "required": ["name", "hash"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1, "maxLength": 256 },
+              "version": { "type": "string", "minLength": 1, "maxLength": 128 },
+              "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+            }
+          }
+        }
+      },
+      "minProperties": 1
+    },
+    "disclosure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scopes", "classification"],
+      "properties": {
+        "scopes": { "type": "array", "maxItems": 64, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 256 } },
+        "classification": { "enum": ["public", "workspace", "restricted"] }
+      }
+    },
     "authority": {
       "type": "object",
       "additionalProperties": false,

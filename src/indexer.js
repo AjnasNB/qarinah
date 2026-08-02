@@ -3,6 +3,11 @@ import { canonicalStringify, deepFreezeJson, sha256 } from "./canonical.js";
 import { QarinahError } from "./errors.js";
 import { markdownDataBlock, markdownInline } from "./markdown.js";
 import { readEvents } from "./store.js";
+import {
+  SQLITE_READ_MODEL_SCHEMA_VERSION,
+  inspectSqliteReadModel,
+  rebuildSqliteReadModel
+} from "./sqlite-read-model.js";
 import { atomicWriteFile, loadWorkspace, openSecureReadFile, secureStoragePath } from "./workspace.js";
 
 export const INDEX_SCHEMA_VERSION = "qarinah.index.v2";
@@ -155,6 +160,10 @@ function eventProjection(event) {
     data: event.data,
     confidence: event.confidence,
     authority: event.authority ?? null,
+    temporal: event.temporal ?? null,
+    repository: event.repository ?? null,
+    freshness: event.freshness ?? null,
+    disclosure: event.disclosure ?? null,
     relations: event.relations,
     provenance: event.provenance,
     retention: event.retention,
@@ -328,10 +337,12 @@ export async function rebuildDerivedState(start = process.cwd()) {
     markdownPath,
     markdownFor(events, workspace.config.workspaceId, derived.index.headHash)
   );
+  const readModel = await rebuildSqliteReadModel(workspace, events, derived);
   return Object.freeze({
     workspaceId: workspace.config.workspaceId,
     eventCount: events.length,
-    headHash: derived.index.headHash
+    headHash: derived.index.headHash,
+    readModel
   });
 }
 
@@ -412,8 +423,21 @@ export async function loadIndex(start = process.cwd(), options = {}) {
     if (error?.code !== "ENOENT") throw error;
     persistedViewsCurrent = false;
   }
+  try {
+    const readModel = await inspectSqliteReadModel(workspace);
+    persistedViewsCurrent = persistedViewsCurrent
+      && readModel.schemaVersion === SQLITE_READ_MODEL_SCHEMA_VERSION
+      && readModel.workspaceId === workspace.config.workspaceId
+      && readModel.eventCount === events.length
+      && readModel.headHash === expected.index.headHash;
+  } catch (error) {
+    if (error?.code !== "ENOENT" && error?.code !== "SQLITE_READ_MODEL_STALE") {
+      if (!rebuild) throw error;
+    }
+    persistedViewsCurrent = false;
+  }
   if (!persistedViewsCurrent) {
-    if (!rebuild) throw new QarinahError("INDEX_STALE", "Persisted index, graph, or Markdown does not exactly match the verified event log.");
+    if (!rebuild) throw new QarinahError("INDEX_STALE", "Persisted index, graph, Markdown, or SQLite read model does not exactly match the verified event log.");
     await rebuildDerivedState(workspace.root);
   }
   return Object.freeze({ workspace, index: expected.index });
