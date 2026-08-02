@@ -1,14 +1,15 @@
 # Qarinah
 
-> The shared, verifiable memory layer for teams deploying multiple AI agents.
+> The evidence-linked cross-agent context engine for software projects.
 
-It records explicitly permitted project events and compiles bounded, cited context packs from the verified local record.
+Qarinah lets Codex, Claude Code, Cursor, and other coding agents continue the same project using a shared, cited record of decisions, outcomes, code relationships, and current evidence.
 
 This file is a convenience map for tools that choose to read it. It is not a ranking signal or a substitute for the canonical documentation.
 
 ## Start here
 
 - [Homepage](https://qarinah.io/): Product overview, benchmark summary, and primary navigation.
+- [Verified cross-agent handoffs](https://qarinah.io/docs/cross-agent-handoffs/): Switch coding agents and continue a real task with compact, cited project context.
 - [Direct answers](https://qarinah.io/docs/faq/): Concise answers about Qarinah, context reduction, cost boundaries, Codex, Claude Code, privacy, and open-source licensing.
 - [Getting started](https://qarinah.io/docs/getting-started/): Install Qarinah, opt in one workspace, connect a supported host, and compile a cited context pack.
 - [Documentation index](https://qarinah.io/docs/): Documentation by task.
@@ -17,7 +18,8 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 
 ## Direct facts
 
-- Qarinah is the shared, verifiable memory layer for teams deploying multiple AI agents.
+- Qarinah is a universal context engine for software projects and an independent local tool; Maqam is an optional governance integration.
+- Qarinah's primary workflow is verified handoffs between coding agents.
 - Qarinah supports reviewed Codex and Claude Code integrations that can use the same explicitly opted-in project record.
 - The published evaluator measured 98.71% less estimated repeated input context in its compared task set: 442,113 estimated input-context tokens became 5,682 while every required target was directly covered in the top five.
 - The 98.71% result is not a universal provider-billing, latency, or answer-quality guarantee. Qarinah improves provenance and inspectability but cannot guarantee a model answer is correct.

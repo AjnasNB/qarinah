@@ -2,9 +2,21 @@
 
 ## What is Qarinah?
 
-Qarinah is the shared, verifiable memory layer for teams deploying multiple AI agents. It records permitted host events and explicit project decisions in an append-only hash chain, builds deterministic graph and retrieval views, and compiles a small cited context pack for the current task.
+Qarinah is the evidence-linked cross-agent context engine for software projects. It lets Codex, Claude Code, Cursor, and other supported coding agents continue the same project using a shared, cited record of decisions, outcomes, code relationships, and current evidence.
 
-It is also useful to describe Qarinah as a context compiler for coding agents: it selects bounded, complete records from retained project memory before a host constructs the next model request.
+It is also a universal context engine for software projects: it selects bounded, complete records from retained project memory before a host constructs the next model request.
+
+Qarinah works as an independent local tool for one developer and one repository. Team memory, encrypted exchange, and optional Maqam-governed disclosure build on that same project-owned record; they are not required for the personal workflow.
+
+## How do I switch coding agents without starting over?
+
+Initialize Qarinah once in the project, record permitted outcomes through a supported adapter or explicit command, then ask the next agent for a verified handoff. Qarinah returns a compact cited context pack with stale, conflicting, and superseded decisions marked. The complete workflow is documented in the [cross-agent handoff guide](CROSS-AGENT-HANDOFFS.md).
+
+## Can I inspect Qarinah memory on a phone or tablet?
+
+Yes, as a read-only portable view. Qarinah can generate a self-contained static dashboard and deterministic Markdown, JSON, graph, and OKF exports that can be opened on a mobile browser after you transfer or host the artifact through a channel you control.
+
+Qarinah does not currently claim a native mobile capture runtime or silently sync project memory to a hosted service. Project writes, trust, and agent integrations remain tied to an explicitly initialized workspace.
 
 ## What problem does Qarinah solve?
 

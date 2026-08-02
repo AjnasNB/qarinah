@@ -1,6 +1,6 @@
 # Shared and verifiable team memory
 
-Qarinah is **the shared, verifiable memory layer for teams deploying multiple AI agents**. Its source of truth is an explicitly authorized, append-only project record. Every compiled memory item carries an event ID and content hash so a person or agent can follow it back to evidence.
+Qarinah is **the evidence-linked cross-agent context engine for software projects**. Its source of truth is an explicitly authorized, append-only project record. Every compiled memory item carries an event ID and content hash so a person or agent can follow it back to evidence.
 
 This release adds the local and protocol foundations for consent-gated retrieval, multi-host setup, freshness checks, multi-repository memory, team synchronization, task-specific packs, evaluation, dashboards, and end-to-end causal receipts. It does not silently upload a project or create a hosted team account.
 

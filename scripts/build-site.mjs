@@ -10,13 +10,18 @@ const siteOrigin = "https://qarinah.io";
 const npmPackage = "https://www.npmjs.com/package/qarinah";
 const doi = "https://doi.org/10.5281/zenodo.21547685";
 const zenodoPdf = "https://zenodo.org/records/21547685/files/Qarinah-Technical-White-Paper-v1.0.pdf?download=1";
-const releaseDate = "2026-07-26";
+const releaseDate = "2026-08-02";
 const productVersion = "0.1.2";
-const productPositioning = "The shared, verifiable memory layer for teams deploying multiple AI agents.";
+const productPositioning = "The evidence-linked cross-agent context engine for software projects.";
+const productExplanation = "Qarinah lets Codex, Claude Code, Cursor, and other coding agents continue the same project using a shared, cited record of decisions, outcomes, code relationships, and current evidence.";
 const answerEngineQuestions = [
   {
     name: "What is Qarinah?",
-    text: `${productPositioning} It records explicitly permitted project events, builds deterministic graph and retrieval views, and compiles a small cited context pack for the current task.`
+    text: `${productPositioning} ${productExplanation}`
+  },
+  {
+    name: "How do I switch coding agents without starting over?",
+    text: "Initialize Qarinah once in the project, let supported adapters record permitted decisions and outcomes, then ask the next agent for a verified handoff. Qarinah returns a compact cited context pack with stale, conflicting, and superseded decisions marked."
   },
   {
     name: "Does Qarinah reduce coding-agent context tokens?",
@@ -49,6 +54,14 @@ const answerEngineQuestions = [
 ];
 
 const docPages = [
+  {
+    route: "docs/cross-agent-handoffs",
+    source: "docs/CROSS-AGENT-HANDOFFS.md",
+    title: "Switch coding agents without starting over",
+    description: "Complete a verified handoff across Codex, Claude Code, Cursor, and other supported coding agents without replaying the project history.",
+    section: "Start",
+    aliases: ["agent handoff", "switch coding agents", "cross agent context", "universal context engine", "shared coding context"]
+  },
   {
     route: "docs/getting-started",
     source: "docs/GETTING-STARTED.md",
@@ -400,7 +413,7 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
         name: "Qarinah",
         description,
         applicationCategory: "DeveloperApplication",
-        applicationSubCategory: "Coding agent project memory and context management",
+        applicationSubCategory: "Cross-agent context engine for software projects",
         operatingSystem: "Windows, macOS, Linux",
         softwareVersion: productVersion,
         softwareRequirements: "Node.js 22, 24, or 26",
@@ -412,6 +425,7 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
         codeRepository: github,
         releaseNotes: `${github}/releases/tag/v${productVersion}`,
         featureList: [
+          "Verified handoffs between coding agents",
           "Local append-only project memory",
           "Evidence-linked cited context packs",
           "Typed project and provenance graph",
@@ -496,17 +510,27 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
       }
     );
   } else if (kind === "howto") {
+    const handoffSteps = canonical === "/docs/cross-agent-handoffs/"
+      ? [
+          { "@type": "HowToStep", name: "Begin a real task", text: "Work in one supported coding agent." },
+          { "@type": "HowToStep", name: "Record permitted outcomes", text: "Keep decisions, changes, evidence, and tool outcomes in the project-owned Qarinah record." },
+          { "@type": "HowToStep", name: "Switch agents", text: "Open the same project in another supported coding agent." },
+          { "@type": "HowToStep", name: "Ask for the handoff", text: "Query Qarinah for the task that needs to continue." },
+          { "@type": "HowToStep", name: "Receive cited context", text: "Use the compact pack with stale, conflicting, and superseded decisions marked." },
+          { "@type": "HowToStep", name: "Finish the task", text: "Continue without replaying the complete project history." }
+        ]
+      : [
+          { "@type": "HowToStep", name: "Install Qarinah", text: "Install the qarinah npm package in the project." },
+          { "@type": "HowToStep", name: "Initialize the workspace", text: "Run qarinah init for the exact project root." },
+          { "@type": "HowToStep", name: "Compile a cited pack", text: "Record or capture permitted evidence, build the derived views, and query a bounded pack." }
+        ];
     graph.push({
       "@type": "HowTo",
       name: title,
       description,
       url,
       totalTime: "PT5M",
-      step: [
-        { "@type": "HowToStep", name: "Install Qarinah", text: "Install the qarinah npm package in the project." },
-        { "@type": "HowToStep", name: "Initialize the workspace", text: "Run qarinah init for the exact project root." },
-        { "@type": "HowToStep", name: "Compile a cited pack", text: "Record or capture permitted evidence, build the derived views, and query a bounded pack." }
-      ]
+      step: handoffSteps
     });
   } else if (kind === "faq") {
     graph.push({
@@ -546,8 +570,8 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
 }
 
 function layout({ title, description, body, active = "", canonical = "/", kind = "doc" }) {
-  const fullTitle = title === "Qarinah"
-    ? "Qarinah - Local Project Memory and Context Compiler for Coding Agents"
+  const fullTitle = canonical === "/"
+    ? "Qarinah - Switch coding agents without starting over"
     : `${title} - Qarinah`;
   const url = `${siteOrigin}${canonical}`;
   const ogType = kind === "home" || kind === "search" ? "website" : "article";
@@ -574,12 +598,12 @@ function layout({ title, description, body, active = "", canonical = "/", kind =
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1280">
   <meta property="og:image:height" content="640">
-  <meta property="og:image:alt" content="Qarinah local project memory for coding agents - less context, more proof.">
+  <meta property="og:image:alt" content="Qarinah - switch coding agents without starting over.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${fullTitle}">
   <meta name="twitter:description" content="${description}">
   <meta name="twitter:image" content="${siteOrigin}/assets/qarinah-social-preview.png">
-  <meta name="twitter:image:alt" content="Qarinah local project memory for coding agents - less context, more proof.">
+  <meta name="twitter:image:alt" content="Qarinah - switch coding agents without starting over.">
   <link rel="icon" href="/assets/qarinah-mark.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/primer.css">
   <link rel="stylesheet" href="/site.css">
@@ -602,7 +626,7 @@ function commandBlock(command, label = "Terminal") {
 
 function homePage() {
   return layout({
-    title: "Qarinah",
+    title: "Qarinah - Cross-Agent Context Engine",
     description: productPositioning,
     active: "home",
     canonical: "/",
@@ -611,14 +635,19 @@ function homePage() {
       <section class="hero">
         <div class="shell hero-grid">
           <div class="hero-copy">
-            <p class="eyebrow">Cross-editor project memory for coding agents</p>
-            <h1>Your agents remember the project. You stop paying to replay it.</h1>
-            <p class="hero-lede"><strong>${productPositioning}</strong> It turns project decisions, code structure, tool outcomes, and evidence into a small cited memory pack for the task in front of you.</p>
+            <p class="eyebrow">${productPositioning}</p>
+            <h1>Switch coding agents without starting over.</h1>
+            <p class="hero-lede">${productExplanation} One universal context layer for every agent working on your software.</p>
             <div class="hero-actions">
-              <a class="btn btn-primary btn-large" href="/docs/getting-started/">Install Qarinah</a>
-              <a class="btn btn-outline btn-large" href="${github}">View source</a>
+              <a class="btn btn-primary btn-large" href="/docs/getting-started/">Set up one project</a>
+              <a class="btn btn-outline btn-large" href="/docs/cross-agent-handoffs/">See the handoff</a>
             </div>
-            ${commandBlock("npm install --save-dev qarinah", "Install")}
+            ${commandBlock("npx qarinah setup . --codex --claude --cursor --capture content --allow-query", "One-time project setup")}
+            <div class="host-shortcuts" aria-label="Qarinah host commands">
+              <span><strong>Codex</strong><code>$qarinah</code></span>
+              <span><strong>Claude Code</strong><code>/qarinah &lt;task&gt;</code></span>
+              <span><strong>Any terminal</strong><code>npx qarinah query "&lt;task&gt;"</code></span>
+            </div>
             <div class="hero-proof" aria-label="Benchmark summary">
               <div class="hero-proof-result">
                 <strong>98.71%</strong>
@@ -643,6 +672,43 @@ function homePage() {
       <section class="section shell">
         <div class="section-heading split-heading">
           <div>
+            <p class="eyebrow">One tool, three ways to use it</p>
+            <h2>Start alone. Share when the project grows.</h2>
+          </div>
+          <p>Qarinah is useful without Maqam, a hosted account, or a team plan. The same local record can later support collaboration or a governed agent stack without changing its source of truth.</p>
+        </div>
+        <div class="use-mode-grid">
+          <article class="use-mode-card">
+            <span>Personal</span>
+            <h3>One developer, many coding agents</h3>
+            <p>Initialize one repository and let Codex, Claude Code, Cursor, CLI tools, and compatible MCP clients query the same cited project memory.</p>
+            <a href="/docs/getting-started/">Set up one project</a>
+          </article>
+          <article class="use-mode-card">
+            <span>Portable</span>
+            <h3>Inspect memory on any screen</h3>
+            <p>Open the generated dashboard or export deterministic Markdown, JSON, graph, and OKF views for read-only review on desktop or mobile. No native mobile agent runtime is required.</p>
+            <a href="/docs/interoperability/">See portable formats</a>
+          </article>
+          <article class="use-mode-card">
+            <span>Teams</span>
+            <h3>Share memory without flattening authority</h3>
+            <p>Connect repositories with typed relationships, preserve their separate access boundaries, and exchange encrypted bundles with signed checkpoints and explicit membership.</p>
+            <a href="/docs/team-memory/">Open the team guide</a>
+          </article>
+          <article class="use-mode-card">
+            <span>Governed</span>
+            <h3>Add Maqam only when you need control</h3>
+            <p>Maqam can attach temporary memory scopes and govern disclosures for high-authority workflows. Qarinah remains an independent project-memory tool before and after that integration.</p>
+            <a href="/docs/temporal-authority/">Review authority scopes</a>
+          </article>
+        </div>
+      </section>
+
+      <section class="section section-alt">
+        <div class="shell">
+        <div class="section-heading split-heading">
+          <div>
             <p class="eyebrow">Why it exists</p>
             <h2>Long agent histories create an expensive choice.</h2>
           </div>
@@ -665,18 +731,24 @@ function homePage() {
             <p>The append-only JSONL record stays in the project. Graphs, indexes, Markdown, JSON, and OKF exports are deterministic views you can rebuild.</p>
           </article>
         </div>
+        </div>
       </section>
 
-      <section class="section section-alt">
+      <section class="section">
         <div class="shell workflow-grid">
           <div>
-            <p class="eyebrow">How it works</p>
-            <h2>Record once. Compile only what the next task needs.</h2>
+            <p class="eyebrow">Verified handoffs between coding agents</p>
+            <h2>Start in one agent. Finish in another.</h2>
+            <p class="workflow-intro">The project keeps the shared record. Each agent receives only the cited context needed for the task in front of it.</p>
             <ol class="steps">
-              <li><span>1</span><div><strong>Capture permitted events</strong><p>Codex, Claude Code, CLIs, crawlers, workflows, and project files enter through explicit adapters.</p></div></li>
-              <li><span>2</span><div><strong>Build verifiable memory</strong><p>Qarinah writes a hash-chained record and derives the typed graph, hybrid index, and human-readable views.</p></div></li>
-              <li><span>3</span><div><strong>Compile a cited pack</strong><p>The retriever respects evidence coverage, authority, conflicts, supersession, time, retention, and the requested token budget.</p></div></li>
+              <li><span>1</span><div><strong>Begin a real task</strong><p>Work in Codex, Claude Code, Cursor, or another supported coding agent.</p></div></li>
+              <li><span>2</span><div><strong>Record the outcome</strong><p>Keep permitted decisions, changes, evidence, and tool results in the project-owned ledger.</p></div></li>
+              <li><span>3</span><div><strong>Switch agents</strong><p>Open the same project in another supported host without copying the old chat.</p></div></li>
+              <li><span>4</span><div><strong>Ask for the handoff</strong><p>Query Qarinah for the task that needs to continue.</p></div></li>
+              <li><span>5</span><div><strong>Receive cited context</strong><p>Get a compact pack with stale, conflicting, and superseded decisions marked.</p></div></li>
+              <li><span>6</span><div><strong>Finish the task</strong><p>Continue with current evidence instead of replaying the complete project history.</p></div></li>
             </ol>
+            <a class="text-link workflow-link" href="/docs/cross-agent-handoffs/">Open the complete handoff guide</a>
           </div>
           <div class="architecture-frame">
             <img src="/assets/qarinah-flow.svg" alt="Qarinah architecture from permitted project activity to a small cited context pack.">
@@ -692,6 +764,7 @@ function homePage() {
         <div class="integration-list">
           <a href="/docs/integrations/"><span>Codex</span><strong>Lifecycle hooks and a Qarinah context skill</strong><i>Open guide</i></a>
           <a href="/docs/integrations/"><span>Claude Code</span><strong>Reviewed plugin runtime with project-specific opt-in</strong><i>Open guide</i></a>
+          <a href="/docs/integrations/"><span>Cursor</span><strong>Project MCP configuration and an always-on memory rule</strong><i>Open guide</i></a>
           <a href="/docs/mcp/"><span>MCP</span><strong>Diagnostics by default, cited context only after explicit workspace authorization</strong><i>Open guide</i></a>
           <a href="/docs/team-memory/"><span>Teams</span><strong>Dashboard, freshness, multi-repo packs, encrypted sync, evaluation, and causal receipts</strong><i>Open guide</i></a>
           <a href="/docs/interoperability/"><span>Open formats</span><strong>Markdown, JSON, typed graph, and Google OKF export</strong><i>Open guide</i></a>
@@ -711,7 +784,7 @@ function homePage() {
             <article class="feature-card">
               <span class="feature-index">01</span>
               <h3>What is Qarinah?</h3>
-              <p>Local, evidence-linked project memory that compiles a small cited context pack for the current coding task.</p>
+              <p>The evidence-linked cross-agent context engine for software projects.</p>
             </article>
             <article class="feature-card">
               <span class="feature-index">02</span>
@@ -731,8 +804,8 @@ function homePage() {
       <section class="section final-cta">
         <div class="shell final-cta-inner">
           <div>
-            <p class="eyebrow">Start with one project</p>
-            <h2>Give the next agent the proof, not the whole transcript.</h2>
+            <p class="eyebrow">One universal context layer</p>
+            <h2>Switch agents. Keep the decisions, outcomes, and proof.</h2>
           </div>
           <div>
             <a class="btn btn-primary btn-large" href="/docs/getting-started/">Start in five minutes</a>
@@ -905,7 +978,7 @@ async function markdownPage(page) {
         ? "benchmark"
         : page.route === "docs/faq"
           ? "faq"
-        : page.route === "docs/getting-started"
+        : page.route === "docs/getting-started" || page.route === "docs/cross-agent-handoffs"
           ? "howto"
           : page.route === "docs/api" || page.route === "docs/cli" || page.route === "docs/mcp"
             ? "api"

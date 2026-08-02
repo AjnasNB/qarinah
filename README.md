@@ -4,8 +4,12 @@
 
 <h1 align="center">Qarinah</h1>
 
-<p align="center"><em>Less context. More proof.</em></p>
-<p align="center"><strong>The shared, verifiable memory layer for teams deploying multiple AI agents.</strong></p>
+<p align="center"><em>Switch coding agents without starting over.</em></p>
+<p align="center"><strong>The evidence-linked cross-agent context engine for software projects.</strong></p>
+
+<p align="center">
+  Qarinah lets Codex, Claude Code, Cursor, and other coding agents continue the same project using a shared, cited record of decisions, outcomes, code relationships, and current evidence.
+</p>
 
 <p align="center">
   <a href="https://qarinah.io"><strong>Website</strong></a>&nbsp;&middot;&nbsp;
@@ -23,11 +27,10 @@
 </p>
 
 <p align="center">
-  <strong>Install once in a repository. Use its cited memory in every supported session for that project.</strong>
+  <strong>Verified handoffs between coding agents.</strong>
 </p>
 
 ```sh
-npm install --save-dev qarinah
 npx qarinah setup . --codex --claude --cursor --capture content --allow-query
 ```
 
@@ -38,7 +41,7 @@ npx qarinah setup . --codex --claude --cursor --capture content --allow-query
 </p>
 
 <p align="center">
-  Setup installs project-local skills, lifecycle hooks, and consent-gated MCP retrieval. New chats opened in that repository can discover the same cited memory without replaying the complete retained history.
+  Run the setup command once from a repository. It installs project-local integrations and consent-gated MCP retrieval for that exact workspace. Qarinah works as an independent local tool; Maqam is an optional governance integration for higher-authority workflows.
 </p>
 
 <p align="center">
@@ -49,9 +52,29 @@ npx qarinah setup . --codex --claude --cursor --capture content --allow-query
 
 ---
 
-<p align="center"><strong>Less replay. More room for current code, tools, and cited project memory.</strong></p>
+## Use Qarinah your way
 
-Qarinah achieved 98.71% fewer estimated repeated-project-context tokens in its published software-task benchmark. We found no directly comparable public benchmark measuring the same project-history replay baseline. That is 98.71% lower input-context cost at the same token rate. The result measures estimated input context, not provider billing, output tokens, latency, or universal task quality.
+| Setup | What Qarinah gives you |
+| --- | --- |
+| Personal project | One local cited memory shared by Codex, Claude Code, Cursor, CLI tools, and compatible MCP clients |
+| Portable review | Rebuildable Markdown, JSON, graph, OKF, and a static dashboard that can be inspected on desktop or mobile |
+| Team workspace | Multi-repository relationships, freshness, encrypted bundles, signed checkpoints, membership, and separate authority boundaries |
+| Governed workflow | Optional Maqam memory scopes and disclosure controls without making Maqam a requirement |
+
+Qarinah achieved 98.71% fewer estimated repeated-project-context tokens in its published software-task benchmark. We found no directly comparable public benchmark measuring the same project-history replay baseline. The result measures estimated input context, not provider billing, output tokens, latency, or universal task quality.
+
+98.71% lower input-context cost at the same token rate.
+
+## One complete workflow
+
+1. Begin a real task in one coding agent.
+2. Record permitted decisions, changes, evidence, and tool outcomes.
+3. Switch to another supported agent.
+4. Ask Qarinah for the relevant handoff.
+5. Receive a compact cited pack with stale, conflicting, and superseded decisions marked.
+6. Finish the task without replaying the complete project history.
+
+Qarinah is a universal context engine for software projects, built on local-first temporal memory, an authoritative event ledger, SQLite and FTS retrieval, typed relationships, freshness checks, and compact cited context packs. Read the [verified cross-agent handoff guide](docs/CROSS-AGENT-HANDOFFS.md).
 
 ## What appears in your repository
 
@@ -106,7 +129,7 @@ npx qarinah query "release provenance" \
   --format markdown
 ```
 
-Start with the [five-minute guide](docs/GETTING-STARTED.md), then use the [team-memory guide](docs/TEAM-MEMORY.md), [CLI reference](docs/CLI-REFERENCE.md), [JavaScript API reference](docs/API-REFERENCE.md), [MCP guide](docs/MCP-GUIDE.md), [task recipes](docs/RECIPES.md), or [troubleshooting guide](docs/TROUBLESHOOTING.md).
+Start with the [five-minute guide](docs/GETTING-STARTED.md), then use the [cross-agent handoff guide](docs/CROSS-AGENT-HANDOFFS.md), [team-memory guide](docs/TEAM-MEMORY.md), [CLI reference](docs/CLI-REFERENCE.md), [JavaScript API reference](docs/API-REFERENCE.md), [MCP guide](docs/MCP-GUIDE.md), [task recipes](docs/RECIPES.md), or [troubleshooting guide](docs/TROUBLESHOOTING.md).
 
 Your project already contains the decisions and evidence behind its changes. Qarinah lets the next agent query that record and receive a bounded, cited pack selected for the current task. The same local memory can support Codex, Claude Code, CLI workflows, and compatible MCP clients instead of locking project context to one editor.
 
