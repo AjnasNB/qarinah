@@ -55,7 +55,7 @@ test("temporal, disclosure, repository, and host attachment boundaries fail clos
     actor: { type: "human", id: "owner" },
     body: "Release key rotation decision.",
     confidence: "verified",
-    temporal: { validFrom: "2026-08-01T00:00:00.000Z" },
+    temporal: { validFrom: "2099-08-01T00:00:00.000Z" },
     provenance: { adapter: "test", sourceId: "authority-test" }
   };
   const frontend = await appendEvent({
@@ -77,13 +77,13 @@ test("temporal, disclosure, repository, and host attachment boundaries fail clos
     runId: "run-1",
     scopes: ["engineering.frontend"],
     repositories: ["frontend"],
-    attachedAt: "2026-08-02T00:00:00.000Z",
-    expiresAt: "2026-08-03T00:00:00.000Z",
+    attachedAt: "2099-08-02T00:00:00.000Z",
+    expiresAt: "2099-08-03T00:00:00.000Z",
     assignedBy: "maqam.policy"
   }, { cwd: root });
   await rebuildDerivedState(root);
   const attachment = await resolveActiveMemoryScopes({
-    cwd: root, agentId: "agent-a", runId: "run-1", asOf: "2026-08-02T12:00:00.000Z", required: true
+    cwd: root, agentId: "agent-a", runId: "run-1", asOf: "2099-08-02T12:00:00.000Z", required: true
   });
   const pack = await compileContext("release key", {
     cwd: root,
@@ -100,13 +100,13 @@ test("temporal, disclosure, repository, and host attachment boundaries fail clos
     runId: "run-1",
     scopes: ["engineering.frontend"],
     repositories: ["frontend"],
-    attachedAt: "2026-08-02T00:00:00.000Z",
-    expiresAt: "2026-08-03T00:00:00.000Z",
-    revokedAt: "2026-08-02T13:00:00.000Z",
+    attachedAt: "2099-08-02T00:00:00.000Z",
+    expiresAt: "2099-08-03T00:00:00.000Z",
+    revokedAt: "2099-08-02T13:00:00.000Z",
     assignedBy: "maqam.policy"
   }, { cwd: root });
   await assert.rejects(
-    resolveActiveMemoryScopes({ cwd: root, agentId: "agent-a", runId: "run-1", asOf: "2026-08-02T14:00:00.000Z", required: true }),
+    resolveActiveMemoryScopes({ cwd: root, agentId: "agent-a", runId: "run-1", asOf: "2099-08-02T14:00:00.000Z", required: true }),
     (error) => error.code === "MEMORY_ATTACHMENT_REQUIRED"
   );
 });
