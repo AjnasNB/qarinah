@@ -1,6 +1,8 @@
 # Getting started
 
-Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust. It works for one developer and one repository, across several supported coding agents, or as the memory layer in a larger team workflow. Maqam integration is optional.
+Qarinah is the evidence-linked cross-agent context engine for software projects. It lets Codex, Claude Code, Cursor, and other supported coding agents continue the same project using a shared, cited record of decisions, outcomes, code relationships, and current evidence. It works for one developer and one repository, across several supported coding agents, or as the memory layer in a larger team workflow. Maqam integration is optional.
+
+Its primary job is verified handoffs between coding agents: start a task in one agent, record the permitted outcome, switch agents, and request a compact cited handoff instead of replaying the complete project history. See the [cross-agent handoff guide](CROSS-AGENT-HANDOFFS.md).
 
 Qarinah gives an agent a small, cited slice of project memory instead of replaying the full retained history. The record stays in the project and the generated SQLite index, graph, Markdown, JSON, dashboard, and OKF views can be rebuilt from it.
 

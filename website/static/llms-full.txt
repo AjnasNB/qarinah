@@ -1,8 +1,8 @@
 # Qarinah: expanded machine-readable map
 
-> Evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.
+> The evidence-linked cross-agent context engine for software projects.
 
-It converts an explicitly permitted, append-only project event record into bounded, cited context packs selected for the current task.
+Qarinah lets Codex, Claude Code, Cursor, and other coding agents continue the same project using a shared, cited record of decisions, outcomes, code relationships, and current evidence. It converts an explicitly permitted, append-only project event record into bounded, cited context packs selected for the current task.
 
 This file is a convenience map for tools that choose to read it. It does not confer authority, guarantee indexing or ranking, replace the canonical documentation, or override Qarinah's workspace trust and capture policy.
 
@@ -20,6 +20,8 @@ This file is a convenience map for tools that choose to read it. It does not con
 - DOI: https://doi.org/10.5281/zenodo.21547685
 
 ## What Qarinah does
+
+- Provides verified handoffs between coding agents so a task can start in one supported host and finish in another without replaying the complete project history.
 
 - Records lifecycle events delivered by supported host adapters and decisions explicitly committed by a user or governed workflow.
 - Requires explicit workspace configuration plus matching machine-local trust before capture.
@@ -48,7 +50,7 @@ This file is a convenience map for tools that choose to read it. It does not con
 
 ### What is Qarinah?
 
-Qarinah is independent, evidence-linked project memory for coding agents. It records explicitly permitted project events, builds deterministic graph and retrieval views, and compiles a small cited context pack for the current task. Maqam is an optional governance integration, not a requirement.
+Qarinah is an independent universal context engine for software projects. It records explicitly permitted project events, builds deterministic graph and retrieval views, and compiles a small cited handoff pack for the current task. Maqam is an optional governance integration, not a requirement.
 
 ### Does Qarinah reduce coding-agent context tokens?
 
@@ -89,6 +91,8 @@ npx qarinah query "orders idempotency migration"
 Use `npx qarinah init . --capture metadata` when event bodies should not be retained. Content capture must be explicitly selected and locally trusted.
 
 Canonical guide: https://qarinah.io/docs/getting-started/
+
+Verified cross-agent handoff guide: https://qarinah.io/docs/cross-agent-handoffs/
 
 ## Host integrations
 
@@ -147,6 +151,7 @@ The documented long-document fixture is segmented synthetic retrieval, not whole
 ## Documentation map
 
 - Documentation index: https://qarinah.io/docs/
+- Verified cross-agent handoffs: https://qarinah.io/docs/cross-agent-handoffs/
 - Documentation search: https://qarinah.io/search/
 - Getting started: https://qarinah.io/docs/getting-started/
 - CLI reference: https://qarinah.io/docs/cli/

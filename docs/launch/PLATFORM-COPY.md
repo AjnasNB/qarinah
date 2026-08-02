@@ -4,7 +4,11 @@ Do not publish these drafts until the gates in [../LAUNCH.md](../LAUNCH.md) are 
 
 ## Canonical descriptions
 
-**Tagline:** Evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.
+**Headline:** Switch coding agents without starting over.
+
+**Category:** The evidence-linked cross-agent context engine for software projects.
+
+**Tagline:** Verified handoffs between coding agents.
 
 **Proof tagline:** Nearly 99% less repeated project context. Every selected memory points back to its source.
 
@@ -12,11 +16,11 @@ Do not publish these drafts until the gates in [../LAUNCH.md](../LAUNCH.md) are 
 
 **Coding value line:** Less replay. More room for current code, tools, and cited project memory.
 
-**GitHub About:** Evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.
+**GitHub About:** Universal context engine for software projects with verified, cited handoffs between coding agents.
 
-**npm description:** Evidence-linked project memory for coding agents, with 98.71% less estimated repeated context in its published benchmark.
+**npm description:** Cross-agent context engine with verified handoffs and 98.71% less estimated repeated context in its published benchmark.
 
-**Short:** Qarinah is independent, local-first project memory for coding agents. It records permitted activity and explicit decisions in an evidence-linked ledger, then compiles a small cited pack for the next task. Maqam is an optional governance integration, not a requirement.
+**Short:** Qarinah is a universal context engine for software projects. It records permitted activity and explicit decisions in an evidence-linked ledger, then compiles a small cited handoff for the next agent. Maqam is an optional governance integration, not a requirement.
 
 ## Show HN fact sheet - rewrite personally
 
@@ -40,7 +44,7 @@ Possible factual title to rewrite:
 
 **Tagline:** Use your biggest coding model with compact, cited project memory
 
-**Description (under 260 characters):** Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust. Works locally with Codex, Claude Code, CLI, and compatible MCP clients. No Qarinah API key.
+**Description (under 260 characters):** Switch coding agents without starting over. Qarinah is the evidence-linked cross-agent context engine for software projects. Works locally with Codex, Claude Code, Cursor, CLI, and compatible MCP clients.
 
 **Topics:** Developer Tools, Artificial Intelligence, Open Source, Productivity
 

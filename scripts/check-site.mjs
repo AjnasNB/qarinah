@@ -7,6 +7,7 @@ const output = path.join(root, "site-dist");
 const required = [
   "index.html",
   "docs/index.html",
+  "docs/cross-agent-handoffs/index.html",
   "docs/getting-started/index.html",
   "docs/cli/index.html",
   "docs/api/index.html",
@@ -210,6 +211,12 @@ if (!home.includes("<strong>98.71%</strong>") || !home.includes("the evaluated f
 }
 if (!home.includes("What coding agents and developers need to know.") || !home.includes('href="/docs/faq/"')) {
   errors.push("Homepage is missing the direct answer-engine surface.");
+}
+if (!home.includes("Switch coding agents without starting over.") || !home.includes('href="/docs/cross-agent-handoffs/"')) {
+  errors.push("Homepage is missing the verified cross-agent handoff workflow.");
+}
+if (!home.includes("The evidence-linked cross-agent context engine for software projects.") || !home.includes("One universal context layer for every agent working on your software.")) {
+  errors.push("Homepage is missing the cross-agent category or long-term vision.");
 }
 if (!faq.includes('"@type":"FAQPage"') || !faq.includes('"mainEntity"')) {
   errors.push("FAQ is missing answer-oriented structured data.");

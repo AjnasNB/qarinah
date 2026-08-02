@@ -554,6 +554,13 @@ a {
   align-items: center;
 }
 
+.workflow-intro {
+  max-width: 620px;
+  margin: 24px 0 0;
+  color: var(--q-muted);
+  font-size: 18px;
+}
+
 .steps {
   margin: 48px 0 0;
   padding: 0;
@@ -582,6 +589,13 @@ a {
 .steps p {
   margin: 5px 0 0;
   color: var(--q-muted);
+}
+
+.workflow-link {
+  display: inline-block;
+  margin-top: 28px;
+  color: var(--q-accent);
+  font-weight: 700;
 }
 
 .architecture-frame {

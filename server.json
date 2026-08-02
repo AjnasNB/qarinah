@@ -1,7 +1,7 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
   "name": "io.github.AjnasNB/qarinah",
-  "description": "Evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.",
+  "description": "Cross-agent context engine with verified handoffs and 98.71% less estimated repeated context in its published benchmark.",
   "repository": {
     "url": "https://github.com/AjnasNB/qarinah",
     "source": "github"

@@ -6,7 +6,7 @@ Qarinah 0.1.0 is the first stable open-source release. Publish only the exact ar
 
 > Stop replaying entire agent histories.
 
-Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust. It turns permitted project activity and explicit decisions into small, cited context packs. It used 98.71% less estimated context than full-history replay while keeping every required target in the top five with direct evidence coverage. The estimate is `ceil(characters / 4)`, not provider billing or a universal cost claim.
+Switch coding agents without starting over. Qarinah is the evidence-linked cross-agent context engine for software projects. It turns permitted project activity and explicit decisions into small, cited handoff packs. It used 98.71% less estimated context than full-history replay while keeping every required target in the top five with direct evidence coverage. The estimate is `ceil(characters / 4)`, not provider billing or a universal cost claim.
 
 The complete channel copy, media assignments, and claims gate are in [`docs/launch/`](launch/README.md).
 
