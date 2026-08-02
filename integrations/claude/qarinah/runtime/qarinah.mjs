@@ -2967,10 +2967,14 @@ init_workspace();
 import { randomBytes as randomBytes3 } from "node:crypto";
 import { rm as rm4, rename as rename4 } from "node:fs/promises";
 import path3 from "node:path";
-import { DatabaseSync } from "node:sqlite";
 import { pathToFileURL } from "node:url";
 var SQLITE_READ_MODEL_SCHEMA_VERSION = 1;
 var SQLITE_READ_MODEL_FILENAME = "qarinah.db";
+var databaseSyncPromise;
+function loadDatabaseSync() {
+  databaseSyncPromise ??= import("node:sqlite").then(({ DatabaseSync }) => DatabaseSync);
+  return databaseSyncPromise;
+}
 var SCHEMA = `
   PRAGMA foreign_keys = ON;
   PRAGMA trusted_schema = OFF;
@@ -3282,6 +3286,7 @@ async function replaceDatabase(temporary, destination) {
   }
 }
 async function rebuildSqliteReadModel(workspace, events, derived) {
+  const DatabaseSync = await loadDatabaseSync();
   const destination = await secureStoragePath(workspace, ["index", SQLITE_READ_MODEL_FILENAME], {
     type: "file",
     allowMissing: true
@@ -3344,6 +3349,7 @@ function immutableDatabaseUrl(databasePath) {
 async function querySqliteReadModel(workspace, query, options = {}) {
   const source = ftsQuery(query);
   if (!source) return deepFreezeJson({ schemaVersion: SQLITE_READ_MODEL_SCHEMA_VERSION, candidates: [] });
+  const DatabaseSync = await loadDatabaseSync();
   const databasePath = await secureStoragePath(workspace, ["index", SQLITE_READ_MODEL_FILENAME], { type: "file" });
   const database = new DatabaseSync(immutableDatabaseUrl(databasePath), {
     readOnly: true,
@@ -3370,6 +3376,7 @@ async function querySqliteReadModel(workspace, query, options = {}) {
   }
 }
 async function inspectSqliteReadModel(workspace) {
+  const DatabaseSync = await loadDatabaseSync();
   const databasePath = await secureStoragePath(workspace, ["index", SQLITE_READ_MODEL_FILENAME], { type: "file" });
   const database = new DatabaseSync(immutableDatabaseUrl(databasePath), {
     readOnly: true,

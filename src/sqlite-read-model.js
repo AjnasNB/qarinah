@@ -1,7 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { rm, rename } from "node:fs/promises";
 import path from "node:path";
-import { DatabaseSync } from "node:sqlite";
 import { pathToFileURL } from "node:url";
 import { canonicalStringify, deepFreezeJson } from "./canonical.js";
 import { QarinahError } from "./errors.js";
@@ -9,6 +8,13 @@ import { secureStoragePath } from "./workspace.js";
 
 export const SQLITE_READ_MODEL_SCHEMA_VERSION = 1;
 export const SQLITE_READ_MODEL_FILENAME = "qarinah.db";
+
+let databaseSyncPromise;
+
+function loadDatabaseSync() {
+  databaseSyncPromise ??= import("node:sqlite").then(({ DatabaseSync }) => DatabaseSync);
+  return databaseSyncPromise;
+}
 
 const SCHEMA = `
   PRAGMA foreign_keys = ON;
@@ -313,6 +319,7 @@ async function replaceDatabase(temporary, destination) {
 }
 
 export async function rebuildSqliteReadModel(workspace, events, derived) {
+  const DatabaseSync = await loadDatabaseSync();
   const destination = await secureStoragePath(workspace, ["index", SQLITE_READ_MODEL_FILENAME], {
     type: "file",
     allowMissing: true
@@ -379,6 +386,7 @@ function immutableDatabaseUrl(databasePath) {
 export async function querySqliteReadModel(workspace, query, options = {}) {
   const source = ftsQuery(query);
   if (!source) return deepFreezeJson({ schemaVersion: SQLITE_READ_MODEL_SCHEMA_VERSION, candidates: [] });
+  const DatabaseSync = await loadDatabaseSync();
   const databasePath = await secureStoragePath(workspace, ["index", SQLITE_READ_MODEL_FILENAME], { type: "file" });
   const database = new DatabaseSync(immutableDatabaseUrl(databasePath), {
     readOnly: true,
@@ -408,6 +416,7 @@ export async function querySqliteReadModel(workspace, query, options = {}) {
 }
 
 export async function inspectSqliteReadModel(workspace) {
+  const DatabaseSync = await loadDatabaseSync();
   const databasePath = await secureStoragePath(workspace, ["index", SQLITE_READ_MODEL_FILENAME], { type: "file" });
   const database = new DatabaseSync(immutableDatabaseUrl(databasePath), {
     readOnly: true,
