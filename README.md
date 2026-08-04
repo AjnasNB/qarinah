@@ -57,7 +57,7 @@ npx qarinah setup . --codex --claude --cursor --capture content --allow-query
 | Setup | What Qarinah gives you |
 | --- | --- |
 | Personal project | One local cited memory shared by Codex, Claude Code, Cursor, CLI tools, and compatible MCP clients |
-| Portable review | Rebuildable Markdown, JSON, graph, OKF, and a static dashboard that can be inspected on desktop or mobile |
+| Portable review | Rebuildable Markdown, JSON, graph, OKF, and a local static dashboard for inspecting project memory on desktop or mobile |
 | Team workspace | Multi-repository relationships, freshness, encrypted bundles, signed checkpoints, membership, and separate authority boundaries |
 | Governed workflow | Optional Maqam memory scopes and disclosure controls without making Maqam a requirement |
 
@@ -85,7 +85,7 @@ Qarinah is a universal context engine for software projects, built on local-firs
 ├── index/index.json          # deterministic lexical retrieval index
 ├── CONTEXT.md                # rebuildable human-readable view
 ├── okf/                      # portable Open Knowledge Format export
-└── dashboard/                # decisions, conflicts, freshness, and savings
+└── dashboard/index.html     # decisions, conflicts, citations, activity, files, and measured savings
 
 .codex/skills/qarinah/        # invoke with $qarinah
 .claude/skills/qarinah/       # invoke with /qarinah <task>
@@ -99,6 +99,7 @@ The JSONL chain remains authoritative. Graph, index, Markdown, dashboard, and OK
   <a href="https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.0.pdf">Publication PDF</a>&nbsp;&middot;&nbsp;
   <a href="https://doi.org/10.5281/zenodo.21547685">Zenodo record</a>&nbsp;&middot;&nbsp;
   <a href="docs/ARCHITECTURE.md">Architecture</a>&nbsp;&middot;&nbsp;
+  <a href="docs/DASHBOARD.md">Dashboard</a>&nbsp;&middot;&nbsp;
   <a href="docs/BENCHMARKS.md">Benchmarks</a>&nbsp;&middot;&nbsp;
   <a href="docs/SECURITY.md">Security</a>&nbsp;&middot;&nbsp;
   <a href="docs/ECOSYSTEM-LAUNCH.md">Launch plan</a>
@@ -129,7 +130,7 @@ npx qarinah query "release provenance" \
   --format markdown
 ```
 
-Start with the [five-minute guide](docs/GETTING-STARTED.md), then use the [cross-agent handoff guide](docs/CROSS-AGENT-HANDOFFS.md), [team-memory guide](docs/TEAM-MEMORY.md), [CLI reference](docs/CLI-REFERENCE.md), [JavaScript API reference](docs/API-REFERENCE.md), [MCP guide](docs/MCP-GUIDE.md), [task recipes](docs/RECIPES.md), or [troubleshooting guide](docs/TROUBLESHOOTING.md).
+Start with the [five-minute guide](docs/GETTING-STARTED.md), then use the [cross-agent handoff guide](docs/CROSS-AGENT-HANDOFFS.md), [dashboard guide](docs/DASHBOARD.md), [team-memory guide](docs/TEAM-MEMORY.md), [CLI reference](docs/CLI-REFERENCE.md), [JavaScript API reference](docs/API-REFERENCE.md), [MCP guide](docs/MCP-GUIDE.md), [task recipes](docs/RECIPES.md), or [troubleshooting guide](docs/TROUBLESHOOTING.md).
 
 Your project already contains the decisions and evidence behind its changes. Qarinah lets the next agent query that record and receive a bounded, cited pack selected for the current task. The same local memory can support Codex, Claude Code, CLI workflows, and compatible MCP clients instead of locking project context to one editor.
 
@@ -225,6 +226,35 @@ The public package now includes:
 - causal receipts connecting Cockroach evidence, Qarinah memory, Maqam policy, execution, and observed results.
 
 See [Shared and verifiable team memory](docs/TEAM-MEMORY.md) for commands, APIs, and security boundaries.
+
+## Inspect project memory in the local dashboard
+
+Generate a read-only HTML snapshot from the verified local ledger:
+
+```sh
+npx qarinah build
+npx qarinah scan
+npx qarinah dashboard
+```
+
+Open `.qarinah/dashboard/index.html` in a browser. The dashboard shows:
+
+- current and explicitly superseded decisions;
+- explicit conflicts requiring attention;
+- source-linked events and their evidence identifiers;
+- the latest 100 permitted activity events;
+- paths, languages, and content hashes from the latest project scan; and
+- an optional measured baseline-versus-delivered context comparison.
+
+To include a context comparison for a real run, supply both estimates:
+
+```sh
+npx qarinah dashboard --baseline-tokens 12000 --delivered-tokens 1500
+```
+
+Those numbers are supplied by the caller; the dashboard does not infer provider billing or manufacture a savings result. It is a static, rebuildable view with no remote scripts or analytics. The hash-chained JSONL ledger remains authoritative, and the separate `qarinah freshness` command checks whether cited files have changed.
+
+Read the complete [local memory dashboard guide](docs/DASHBOARD.md) for every panel, data lineage, CLI and JavaScript APIs, population recipes, privacy guidance, and troubleshooting.
 
 ## Five-minute proof
 

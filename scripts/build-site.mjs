@@ -48,6 +48,10 @@ const answerEngineQuestions = [
     text: "No hosted Qarinah memory service is required. The authoritative append-only record and deterministic derived views stay in the project unless the user explicitly exports or moves them."
   },
   {
+    name: "Does Qarinah have a local memory dashboard?",
+    text: "Yes. The qarinah dashboard command generates a local, read-only HTML view of current and superseded decisions, explicit conflicts, citations, recent permitted activity, affected files, and an optional caller-measured context comparison. It is derived from the authoritative ledger and does not grant agent access or execute tools."
+  },
+  {
     name: "Is Qarinah open source?",
     text: "Yes. Qarinah is available under the Apache License 2.0, with its source, benchmark fixtures, machine-readable results, security model, integrations, and technical paper published for review."
   }
@@ -109,6 +113,14 @@ const docPages = [
     description: "Set up shared, verifiable multi-agent memory, dashboards, freshness, federation, encrypted sync, evaluation, and causal receipts.",
     section: "Connect",
     aliases: ["team memory", "dashboard", "freshness", "multi repo", "encrypted sync", "context query", "task packs"]
+  },
+  {
+    route: "docs/dashboard",
+    source: "docs/DASHBOARD.md",
+    title: "Local memory dashboard",
+    description: "Generate and interpret Qarinah's local dashboard for decisions, supersession, conflicts, citations, permitted activity, affected files, and measured context savings.",
+    section: "Operate",
+    aliases: ["memory dashboard", "project dashboard", "decision dashboard", "context savings", "agent activity", "affected files"]
   },
   {
     route: "docs/sqlite-read-model",

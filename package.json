@@ -72,6 +72,7 @@
     "docs/LICENSE-STRATEGY.md",
     "docs/MIGRATIONS.md",
     "docs/TEAM-MEMORY.md",
+    "docs/DASHBOARD.md",
     "docs/SQLITE-READ-MODEL.md",
     "docs/TEMPORAL-AUTHORITY.md",
     "bench/fixtures/software-task-scenarios.mjs",

@@ -113,6 +113,7 @@ Canonical guide: https://qarinah.io/docs/integrations/
 - Complete CLI reference: https://qarinah.io/docs/cli/
 - Complete JavaScript API reference: https://qarinah.io/docs/api/
 - MCP setup and diagnostics: https://qarinah.io/docs/mcp/
+- Local memory dashboard: https://qarinah.io/docs/dashboard/
 - Shared team memory: https://qarinah.io/docs/team-memory/
 
 ## Task-oriented use
@@ -158,6 +159,7 @@ The documented long-document fixture is segmented synthetic retrieval, not whole
 - JavaScript API reference: https://qarinah.io/docs/api/
 - Codex, Claude Code, CLI, and MCP integrations: https://qarinah.io/docs/integrations/
 - MCP guide: https://qarinah.io/docs/mcp/
+- Local memory dashboard: https://qarinah.io/docs/dashboard/
 - Shared team memory: https://qarinah.io/docs/team-memory/
 - Token-efficient context: https://qarinah.io/docs/token-efficient-context/
 - Task recipes: https://qarinah.io/docs/recipes/

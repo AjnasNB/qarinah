@@ -586,15 +586,44 @@ npx qarinah mcp --allow-query --policy-hash sha256:<digest> --max-chars 12000 --
 
 This adds the zero-write `context.query` tool. Ledger writes remain unavailable. See [MCP guide](MCP-GUIDE.md).
 
-## Team-memory commands
+## `dashboard`
+
+Generate a self-contained, read-only HTML view from the verified workspace ledger:
+
+```sh
+npx qarinah dashboard \
+  [--output <workspace-relative-html-path>] \
+  [--baseline-tokens <non-negative-integer> \
+   --delivered-tokens <non-negative-integer>]
+```
+
+The default output is `.qarinah/dashboard/index.html`. The command prints JSON containing the resolved output path, totals, and context-savings state.
+
+Rules:
+
+- the command accepts options only;
+- `--output` must resolve inside the initialized workspace;
+- baseline and delivered estimates must be supplied together;
+- token estimates must be non-negative integers no greater than `1,000,000,000`;
+- without estimates, context savings is reported as `not-measured`; and
+- the generated file is a static derived view, not a writer or hosted control plane.
+
+```sh
+npx qarinah build
+npx qarinah scan
+npx qarinah dashboard --baseline-tokens 12000 --delivered-tokens 1500
+```
+
+The dashboard contains current and superseded decisions, explicit conflicts, source-linked events, the latest 100 permitted activity events, affected files from the latest scan, workspace capture mode, and the optional measured comparison. See the [local memory dashboard guide](DASHBOARD.md) for field semantics, population recipes, JavaScript usage, privacy guidance, and troubleshooting.
+
+## Other team-memory commands
 
 ```sh
 npx qarinah task-pack debugging "checkout timeout"
 npx qarinah freshness
-npx qarinah dashboard --baseline-tokens 100000 --delivered-tokens 5000
 ```
 
-See [Shared and verifiable team memory](TEAM-MEMORY.md) for all seven task profiles, freshness states, dashboard fields, multi-repository retrieval, semantic adapters, encrypted team bundles, evaluation, and causal receipts.
+See [Shared and verifiable team memory](TEAM-MEMORY.md) for all seven task profiles, freshness states, multi-repository retrieval, semantic adapters, encrypted team bundles, evaluation, and causal receipts.
 
 ## Common errors
 

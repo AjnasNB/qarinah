@@ -70,6 +70,8 @@ The dashboard shows:
 
 The generated file is `.qarinah/dashboard/index.html`. It contains no remote scripts or analytics.
 
+The dashboard is a rebuildable snapshot, not a live control plane. Current and superseded decisions come from explicit `supersedes` relations, conflicts come from explicit `contradicts` relations, the activity view contains the latest 100 permitted ledger events, and affected files come from the latest `qarinah scan`. Context savings remains unmeasured unless both estimates are supplied by the caller. See the [local memory dashboard guide](DASHBOARD.md) for every panel, CLI and JavaScript APIs, population recipes, privacy guidance, and troubleshooting.
+
 ## Memory freshness
 
 Run:
