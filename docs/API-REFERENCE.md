@@ -672,6 +672,33 @@ The server always exposes zero-write `context_status` and `context_doctor`. A ma
 
 ## Team-memory platform APIs
 
+### Local memory dashboard
+
+```ts
+function buildMemoryDashboard(options?: {
+  cwd?: string;
+  baselineTokens?: number;
+  deliveredTokens?: number;
+  clock?: () => Date;
+}): Promise<Readonly<QarinahMemoryDashboard>>;
+
+function renderMemoryDashboard(data: QarinahMemoryDashboard): string;
+
+function writeMemoryDashboard(options?: {
+  cwd?: string;
+  output?: string;
+  baselineTokens?: number;
+  deliveredTokens?: number;
+  clock?: () => Date;
+}): Promise<Readonly<{ output: string; data: QarinahMemoryDashboard }>>;
+```
+
+`buildMemoryDashboard` verifies the local ledger and returns a frozen `qarinah.memory-dashboard.v1` view without writing a file. `renderMemoryDashboard` turns a compatible view into self-contained HTML. `writeMemoryDashboard` writes that HTML atomically to `.qarinah/dashboard/index.html` by default.
+
+The view contains workspace and capture metadata, totals, current and superseded decisions, explicit conflicts, source-linked events, the latest 100 permitted activity events, affected files from the latest project-structure scan, and optional caller-supplied context measurements. Both token estimates must be supplied together. The functions do not infer provider billing, run a live server, or modify the authoritative ledger.
+
+See the [local memory dashboard guide](DASHBOARD.md) for the complete interface, data lineage, examples, and sharing boundary.
+
 The root package also exports:
 
 ```text
