@@ -957,7 +957,7 @@ function validateTrust(value, root, config) {
 async function canonicalRealRoot(root) {
   return realpath(path.resolve(root));
 }
-async function readBoundedMachineJson(candidate, maximumBytes, label) {
+async function readBoundedMachineJsonOnce(candidate, maximumBytes, label) {
   const flags = constants.O_RDONLY | (Number.isInteger(constants.O_NOFOLLOW) ? constants.O_NOFOLLOW : 0);
   const handle = await open(candidate, flags);
   try {
@@ -967,7 +967,7 @@ async function readBoundedMachineJson(candidate, maximumBytes, label) {
       throw new QarinahError("TRUST_INVALID", `${label} must be a singly linked regular file.`);
     }
     if (opened.dev !== named.dev || opened.ino !== named.ino) {
-      throw new QarinahError("TRUST_INVALID", `${label} changed while it was being opened.`);
+      throw new MachineJsonReadRaceError();
     }
     if (opened.size > BigInt(maximumBytes)) {
       throw new QarinahError("TRUST_INVALID", `${label} exceeds its size limit.`);
@@ -985,6 +985,20 @@ async function readBoundedMachineJson(candidate, maximumBytes, label) {
   } finally {
     await handle.close();
   }
+}
+async function readBoundedMachineJson(candidate, maximumBytes, label) {
+  for (let attempt = 0; attempt < MACHINE_JSON_READ_ATTEMPTS; attempt += 1) {
+    try {
+      return await readBoundedMachineJsonOnce(candidate, maximumBytes, label);
+    } catch (error) {
+      if (!(error instanceof MachineJsonReadRaceError)) throw error;
+      if (attempt === MACHINE_JSON_READ_ATTEMPTS - 1) {
+        throw new QarinahError("TRUST_INVALID", `${label} kept changing while it was being opened.`);
+      }
+      await delay(2 + attempt);
+    }
+  }
+  throw new QarinahError("TRUST_INVALID", `${label} could not be read safely.`);
 }
 async function readTrustFile(root) {
   const candidate = trustPath(root);
@@ -1155,7 +1169,7 @@ async function revokeWorkspaceConsent(root) {
   await rm(trustPath(actualRoot), { force: true });
   return Object.freeze(record2);
 }
-var TRUST_SCHEMA_VERSION, CAPTURE_POLICY_SCHEMA_VERSION, LEGACY_TRUST_SCHEMA_VERSION, REVOCATION_SCHEMA_VERSION, HASH_PATTERN2, WORKSPACE_ID_PATTERN2, MAX_TRUST_BYTES, POLICY_FIELDS;
+var TRUST_SCHEMA_VERSION, CAPTURE_POLICY_SCHEMA_VERSION, LEGACY_TRUST_SCHEMA_VERSION, REVOCATION_SCHEMA_VERSION, HASH_PATTERN2, WORKSPACE_ID_PATTERN2, MAX_TRUST_BYTES, MACHINE_JSON_READ_ATTEMPTS, POLICY_FIELDS, MachineJsonReadRaceError;
 var init_consent = __esm({
   "src/consent.js"() {
     init_canonical();
@@ -1167,6 +1181,7 @@ var init_consent = __esm({
     HASH_PATTERN2 = /^sha256:[0-9a-f]{64}$/;
     WORKSPACE_ID_PATTERN2 = /^ws_[0-9a-f]{32}$/;
     MAX_TRUST_BYTES = 32 * 1024;
+    MACHINE_JSON_READ_ATTEMPTS = 20;
     POLICY_FIELDS = Object.freeze([
       "enabled",
       "capture",
@@ -1175,6 +1190,8 @@ var init_consent = __esm({
       "contextMaxChars",
       "retentionClass"
     ]);
+    MachineJsonReadRaceError = class extends Error {
+    };
   }
 });
 
