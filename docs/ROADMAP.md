@@ -2,7 +2,7 @@
 
 ## Implemented platform foundation
 
-Qarinah 0.1.2 includes consent-gated MCP retrieval, one-command Codex/Claude/Cursor setup, a local memory dashboard, freshness checks, seven task packs, separate-authority multi-repository retrieval, optional reranking adapters, encrypted team bundles, role manifests, signed checkpoints, expanded quality evaluation, and causal receipts across Cockroach, Qarinah, Maqam, execution, and observation.
+Qarinah 0.1.3 includes consent-gated MCP retrieval, one-command Codex/Claude/Cursor setup, a local memory dashboard, freshness checks, seven task packs, separate-authority multi-repository retrieval, optional reranking adapters, encrypted team bundles, role manifests, signed checkpoints, expanded quality evaluation, and causal receipts across Cockroach, Qarinah, Maqam, execution, and observation.
 
 The encrypted sync surface is a public self-hostable protocol foundation. A managed cross-device service, identity-provider federation, durable hosted transport, and organization administration remain future service work.
 

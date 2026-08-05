@@ -380,7 +380,11 @@ export function createMcpServer(options = {}) {
           minimumEvidence,
           temporalBoundary,
           asOf: input.asOf,
-          rebuild: false,
+          // Lifecycle hooks can append SessionStart/UserPromptSubmit immediately
+          // before a fresh agent asks for context. Compile the verified ledger
+          // in memory so the zero-write MCP read neither rejects that legitimate
+          // head nor repairs/mutates disposable derived files.
+          inMemory: true,
           updateCheckpoint: false
         });
         return textResult(pack);

@@ -148,7 +148,7 @@ try {
   ], temporaryDirectory);
   assert.equal(installed.code, 0, installed.stderr);
   const installedPackage = JSON.parse(await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "package.json"), "utf8"));
-  assert.equal(installedPackage.version, "0.1.2");
+  assert.equal(installedPackage.version, "0.1.3");
   assert.equal(installedPackage.dependencies["cockroach-browser"], undefined);
   assert.equal(installedPackage.optionalDependencies?.["cockroach-browser"], undefined);
   assert.equal(installedPackage.peerDependencies?.["cockroach-browser"], undefined);

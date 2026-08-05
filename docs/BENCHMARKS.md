@@ -110,6 +110,14 @@ Keep these direct details beside the number:
 
 > 240 retained records; identical current-task sources on both sides; full-history replay versus cited Qarinah packs; `ceil(characters / 4)` token estimate; no provider-billing measurement.
 
+## Cross-session continuation and evidence-linked summarization
+
+Qarinah 0.1.3 adds a deterministic 42-record, two-session continuation fixture. A fresh logical session retrieves an inferred handoff summary at rank 3 after lifecycle capture deliberately makes the persisted read model stale. All three source event IDs and hashes remain embedded in the selected summary, one raw source is also selected, the query leaves derived state byte-for-byte unchanged, and `doctor` passes. The cited pack uses 1,039 portable estimated tokens versus 9,489 for the full ledger, an 89.05% estimated reduction.
+
+A separate authenticated Codex CLI smoke uses two distinct ephemeral sessions with native resume disabled. Session A diagnoses a failing fixture without editing; Session B must query Qarinah first, cite a retrieved event ID and hash, implement the fix, and pass the acceptance tests. The checked receipt retains hashes and normalized usage fields, not raw transcripts or local paths.
+
+This is continuation-product evidence, not a controlled model-quality claim. See [the complete method and limitations](CROSS-SESSION-CONTINUATION-BENCHMARK.md), the [deterministic result](../bench/results/continuation-context-0.1.3.json), and the [provider-backed smoke receipt](../bench/results/codex-cross-session-continuation-0.1.3.json).
+
 ## Claims Qarinah does not make
 
 - exact token or cost savings without a provider-specific tokenizer and usage receipt;

@@ -26,21 +26,21 @@ The host plugin and the project ledger have different scopes:
 Install the version-pinned stable release for personal use across projects:
 
 ```powershell
-codex plugin marketplace add AjnasNB/qarinah --ref v0.1.2
+codex plugin marketplace add AjnasNB/qarinah --ref v0.1.3
 codex plugin add qarinah@qarinah
 
-claude plugin marketplace add AjnasNB/qarinah@v0.1.2 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.1.3 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 
 Claude Code also supports repository-shared `project` scope and gitignored per-user `local` scope:
 
 ```powershell
-claude plugin marketplace add AjnasNB/qarinah@v0.1.2 --scope project
+claude plugin marketplace add AjnasNB/qarinah@v0.1.3 --scope project
 claude plugin install qarinah@qarinah --scope project
 
 # Or keep the enablement personal to this repository.
-claude plugin marketplace add AjnasNB/qarinah@v0.1.2 --scope local
+claude plugin marketplace add AjnasNB/qarinah@v0.1.3 --scope local
 claude plugin install qarinah@qarinah --scope local
 ```
 
@@ -125,10 +125,10 @@ claude plugin install qarinah@qarinah --scope local
 The version-pinned install flow is:
 
 ```powershell
-codex plugin marketplace add AjnasNB/qarinah --ref v0.1.2
+codex plugin marketplace add AjnasNB/qarinah --ref v0.1.3
 codex plugin add qarinah@qarinah
 
-claude plugin marketplace add AjnasNB/qarinah@v0.1.2
+claude plugin marketplace add AjnasNB/qarinah@v0.1.3
 claude plugin install qarinah@qarinah
 ```
 

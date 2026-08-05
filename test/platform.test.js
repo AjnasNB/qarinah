@@ -48,6 +48,7 @@ test("one-command setup configures Codex, Claude, Cursor, hooks, skills, and con
   assert.match(codexConfig, /context\.query/);
   assert.match(codexConfig, /workspace-id/);
   assert.match(codexConfig, /policy-hash/);
+  assert.match(codexConfig, /default_tools_approval_mode = "writes"/);
   const claudeMcp = JSON.parse(await readFile(path.join(root, ".mcp.json"), "utf8"));
   assert.equal(claudeMcp.mcpServers.qarinah.type, "stdio");
   assert.ok(claudeMcp.mcpServers.qarinah.args.includes("--allow-query"));

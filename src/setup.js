@@ -173,7 +173,10 @@ async function configureCodex(workspace, options) {
     `args = [${args.map(tomlString).join(", ")}]`,
     `cwd = ${tomlString(workspace.root)}`,
     `enabled_tools = [${enabledTools.map(tomlString).join(", ")}]`,
-    'default_tools_approval_mode = "prompt"',
+    // Qarinah currently exposes only accurately annotated read-only MCP tools.
+    // Non-interactive Codex runs may use those without an impossible prompt,
+    // while any future write-capable tool still requires approval.
+    'default_tools_approval_mode = "writes"',
     MANAGED_TOML_END
   ].join("\n");
   const pattern = new RegExp(`${MANAGED_TOML_START}[\\s\\S]*?${MANAGED_TOML_END}`, "m");

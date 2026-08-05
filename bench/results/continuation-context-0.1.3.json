@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "qarinah.continuation-context-eval-result.v1",
+  "packageVersion": "0.1.3",
+  "fixture": {
+    "description": "Deterministic two-session fixture with an inferred handoff summary linked to extracted prompt, verified test outcome, and completed-turn evidence, followed by lifecycle events that deliberately stale persisted derived state.",
+    "tokenEstimator": "portable ceil(characters / 4)",
+    "providerBillingMeasurement": false
+  },
+  "expected": {
+    "records": 42,
+    "sourceEventCount": 3,
+    "summaryRank": 3,
+    "summaryConfidence": "inferred",
+    "summarySelected": true,
+    "sourceIdsPreserved": true,
+    "sourceHashesPreserved": true,
+    "sourceEventsSelected": 1,
+    "distinctSessionIds": 2,
+    "stalePersistedHeadDetected": true,
+    "staleReadRecoveredInMemory": true,
+    "persistedDerivedStateUnchanged": true,
+    "citationsValid": true,
+    "coverage": "partial",
+    "evidenceState": "DIRECTLY_SUPPORTED",
+    "rankingProfile": "admission-first-v2",
+    "temporalBoundary": "strict-before",
+    "rawHistoryTokens": 9489,
+    "packTokens": 1039,
+    "estimatedTokenReduction": 0.890505,
+    "doctorOk": true
+  },
+  "claim": "A fresh session recovered a compact evidence-linked handoff from the verified ledger after lifecycle capture advanced the head; every summary source ID and hash remained inspectable and the zero-write read left persisted derived state unchanged.",
+  "limitations": [
+    "This deterministic fixture measures retrieval and evidence linkage, not provider task quality.",
+    "The summary is inferred and remains subordinate to its cited source events.",
+    "The portable token estimate is not a provider bill."
+  ]
+}
