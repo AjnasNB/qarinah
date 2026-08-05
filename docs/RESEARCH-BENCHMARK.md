@@ -196,6 +196,8 @@ The research backlog is now evidence-driven:
 
 The final protocol is frozen at tag `research-protocol-v1`. Its deterministic Verified-minus-Lite manifest contains 387 eligible retrieval tasks across 12 repositories and a frozen 40-task agent sample. It excludes 93 tasks already present in the Lite development corpus and 20 tasks without chronologically prior same-repository development memory. The source is the 500-row SWE-bench Verified test artifact at revision `c104f840cc67f8b6eec6f759ebc8b2693d585d4a`, SHA-256 `a45b1fe4e2f0c8390b2b2938ac83e92ed5979000856808f3679c07812e9e6dcd`. The manifest records `resultsObserved: false`; no final Qarinah retrieval or model result has been run.
 
+The local readiness audit passes the complete release gate on Windows x64 with Node 24.15.0, Codex CLI 0.144.6, Claude Code 2.1.118, and Docker 29.3.1. The Codex and Claude packaged runtimes are byte-identical and pass MCP smoke. The repository declares a nine-cell Ubuntu/macOS/Windows by Node 22/24/26 CI matrix, but that remote matrix has not been triggered because this branch is private local work. Provider models, budget, dense and summary baselines, human review, and the official Docker gold smoke remain hard blockers.
+
 The next phase must not begin until the following are fixed and recorded:
 
 - model/provider identifiers and immutable model revisions where available;
@@ -228,6 +230,7 @@ Until then, Qarinah must not claim improved SWE-bench resolve rate, provider-tok
 - Separate review-admin manifest: [`bench/research/relevance-audit-admin-v0.3.json`](../bench/research/relevance-audit-admin-v0.3.json)
 - Frozen final protocol receipt: [`bench/final/protocol-v1.json`](../bench/final/protocol-v1.json)
 - Frozen final task manifest: [`bench/final/final-task-manifest-v1.json`](../bench/final/final-task-manifest-v1.json)
+- Local execution-readiness receipt: [`bench/final/execution-readiness-v1.json`](../bench/final/execution-readiness-v1.json)
 
 The evaluator fails if the pinned corpus, deterministic metrics, temporal leakage count, or governance results drift from the committed evidence. Runtime latency is retained as an observation and excluded from deterministic equality checks.
 
