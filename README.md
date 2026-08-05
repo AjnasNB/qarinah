@@ -390,8 +390,9 @@ The returned pack selects complete cited records from the verified event chain. 
 - **Cockroach Browser emits** cited browser-outcome metadata under host-owned authority.
 - **Qarinah remembers** decisions, evidence, provenance, and outcomes.
 - **ProductLoop orchestrates** workflows across those explicit boundaries.
+- **ProductLoop Workbench presents** durable local runs, exact approval records, evidence, and cited Qarinah event references to one operator.
 
-These are composable packages, not one silently merged runtime. Qarinah also works without the other packages. Its Cockroach Browser adapter is a passive, metadata-only sink: it cannot launch a browser, inspect a session, approve an action, or grant origin access. See the [interoperability contract](docs/INTEROPERABILITY.md#cockroach-browser-cited-metadata-outcomes).
+These are composable packages, not one silently merged runtime. Qarinah also works without the other packages. Workbench stores Qarinah event IDs and hashes as references; it does not gain context-disclosure or append authority. Qarinah's Cockroach Browser adapter is a passive, metadata-only sink: it cannot launch a browser, inspect a session, approve an action, or grant origin access. See the [interoperability contract](docs/INTEROPERABILITY.md#cockroach-browser-cited-metadata-outcomes).
 
 ## Security model
 
