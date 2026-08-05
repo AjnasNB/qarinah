@@ -40,7 +40,9 @@ for (const task of corpus.tasks) {
 }
 
 assert.equal(result.schemaVersion, "qarinah.research-retrieval-eval-result.v1");
-assert.equal(result.packageVersion, packageJson.version);
+// Exploratory v0.1 is a frozen historical artifact. A later package release
+// must not relabel the version that produced the observed result.
+assert.equal(result.packageVersion, "0.1.2");
 assert.equal(result.executionScope.providerModelCalls, 0);
 assert.equal(result.executionScope.providerReportedTokens, false);
 assert.equal(result.executionScope.sweBenchDockerTaskExecution, false);
