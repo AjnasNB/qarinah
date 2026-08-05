@@ -79,6 +79,14 @@ const CONTEXT_QUERY_TOOL = Object.freeze({
         type: "string",
         enum: ["any", "partial", "direct"]
       },
+      minimumEvidence: {
+        type: "string",
+        enum: ["any", "partial", "direct"]
+      },
+      temporalBoundary: {
+        type: "string",
+        enum: ["inclusive", "strict-before"]
+      },
       asOf: {
         type: "string",
         format: "date-time"
@@ -323,7 +331,7 @@ export function createMcpServer(options = {}) {
           throw new QarinahError("MCP_DISCLOSURE_NOT_AUTHORIZED", "The MCP server was not started with a disclosure permit.");
         }
         const input = validateToolInput(rawArguments, [
-          "workspace", "query", "maxChars", "limit", "minimumCoverage", "asOf"
+          "workspace", "query", "maxChars", "limit", "minimumCoverage", "minimumEvidence", "temporalBoundary", "asOf"
         ]);
         if (typeof input.workspace !== "string" || input.workspace.trim() === "") {
           throw new TypeError("context.query requires an absolute workspace selector.");
@@ -353,6 +361,14 @@ export function createMcpServer(options = {}) {
         if (!["any", "partial", "direct"].includes(minimumCoverage)) {
           throw new TypeError("minimumCoverage must be any, partial, or direct.");
         }
+        const minimumEvidence = input.minimumEvidence ?? "any";
+        if (!["any", "partial", "direct"].includes(minimumEvidence)) {
+          throw new TypeError("minimumEvidence must be any, partial, or direct.");
+        }
+        const temporalBoundary = input.temporalBoundary ?? "inclusive";
+        if (!["inclusive", "strict-before"].includes(temporalBoundary)) {
+          throw new TypeError("temporalBoundary must be inclusive or strict-before.");
+        }
         if (input.asOf !== undefined && (typeof input.asOf !== "string" || !Number.isFinite(Date.parse(input.asOf)))) {
           throw new TypeError("asOf must be a valid timestamp.");
         }
@@ -361,6 +377,8 @@ export function createMcpServer(options = {}) {
           maxChars,
           limit,
           minimumCoverage,
+          minimumEvidence,
+          temporalBoundary,
           asOf: input.asOf,
           rebuild: false,
           updateCheckpoint: false

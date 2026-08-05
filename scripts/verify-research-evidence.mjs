@@ -85,8 +85,8 @@ for (const property of [
 ]) assert.equal(adversarial[property], true, `${property} must remain true.`);
 
 for (const fragment of [
-  "Research draft; not peer-reviewed and not preregistered",
-  "Plain BM25 outperforms the current Qarinah hybrid ranking",
+  "Research draft; exploratory v0.1 frozen, development v0.2 completed, not peer-reviewed and not preregistered",
+  "Plain BM25 outperforms the original Qarinah balanced hybrid ranking",
   "0.687 versus 0.518",
   "971 future citations",
   "42.44%",
@@ -97,7 +97,7 @@ for (const fragment of [
 for (const repository of corpus.repositories) {
   assert.ok(research.includes(`https://github.com/${repository.repository}`), `Research report must cite ${repository.repository}.`);
 }
-assert.ok(benchmarks.includes("BM25 outperforms the current Qarinah hybrid ranker"));
+assert.ok(benchmarks.includes("BM25 outperforms the original balanced-v1 Qarinah ranker"));
 assert.ok(packageJson.files.includes("docs/RESEARCH-BENCHMARK.md"));
 assert.equal(packageJson.scripts["prepare:research"], "node scripts/prepare-research-benchmark.mjs");
 assert.equal(packageJson.scripts["evaluate:research-retrieval"], "node scripts/evaluate-research-retrieval.mjs");

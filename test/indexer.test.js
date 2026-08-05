@@ -185,9 +185,11 @@ test("coverage reports missing evidence and callers can fail closed", async (t) 
   const missing = await compileContext("qzvxjklp nonexistent-memory-subject", {
     cwd: root,
     maxChars: 8_000,
+    includeEvidenceSufficiency: true,
     asOf: "2026-07-20T00:00:00.000Z"
   });
   assert.equal(missing.retrieval.coverage.status, "none");
+  assert.equal(missing.retrieval.evidenceSufficiency.state, "INSUFFICIENT_EVIDENCE");
   assert.equal(missing.items.length, 0);
   assert.match(missing.retrieval.coverage.warning, /No durable event/);
 
@@ -201,13 +203,25 @@ test("coverage reports missing evidence and callers can fail closed", async (t) 
     (error) => error.code === "CONTEXT_COVERAGE_TOO_LOW"
   );
 
+  await assert.rejects(
+    () => compileContext("qzvxjklp nonexistent-memory-subject", {
+      cwd: root,
+      maxChars: 8_000,
+      minimumEvidence: "partial",
+      asOf: "2026-07-20T00:00:00.000Z"
+    }),
+    (error) => error.code === "CONTEXT_EVIDENCE_INSUFFICIENT"
+  );
+
   const direct = await compileContext("release approval policy", {
     cwd: root,
     maxChars: 8_000,
     minimumCoverage: "direct",
+    includeEvidenceSufficiency: true,
     asOf: "2026-07-20T00:00:00.000Z"
   });
   assert.equal(direct.retrieval.coverage.status, "direct");
+  assert.equal(direct.retrieval.evidenceSufficiency.state, "DIRECTLY_SUPPORTED");
 });
 
 test("hybrid retrieval combines fuzzy text, graph relations, and deterministic diversity", async (t) => {
@@ -235,11 +249,26 @@ test("hybrid retrieval combines fuzzy text, graph relations, and deterministic d
   const first = await compileContext("postgress authentcation", options);
   const second = await compileContext("postgress authentcation", options);
   assert.deepEqual(first, second);
-  assert.equal(first.retrieval.strategy, "hybrid-local-v1");
+  assert.equal(first.retrieval.strategy, "admission-first-hybrid-v2");
+  assert.equal(first.retrieval.rankingProfile, "admission-first-v2");
+  assert.equal(first.retrieval.evidenceSufficiency, undefined);
   assert.ok(first.items.some((item) => item.eventId === source.eventId));
   assert.ok(first.items.some((item) => item.eventId === decision.eventId));
   assert.equal(first.items.some((item) => item.title === "Unrelated deployment note"), false);
   assert.match(first.items[0].reason, /hybrid rank/);
+
+  const legacy = await compileContext("postgress authentcation", {
+    ...options,
+    rankingProfile: "balanced-v1"
+  });
+  assert.equal(legacy.retrieval.strategy, "hybrid-local-v1");
+  assert.equal(legacy.retrieval.rankingProfile, undefined);
+
+  const assessed = await compileContext("postgress authentcation", {
+    ...options,
+    includeEvidenceSufficiency: true
+  });
+  assert.match(assessed.retrieval.evidenceSufficiency.state, /SUPPORTED|INSUFFICIENT_EVIDENCE/u);
 });
 
 test("supersession is explicit and contradictions remain visible", async (t) => {

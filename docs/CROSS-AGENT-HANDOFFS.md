@@ -4,6 +4,8 @@ Qarinah is the evidence-linked cross-agent context engine for software projects.
 
 The primary job is simple: **verified handoffs between coding agents**.
 
+For a reproducible Claude-to-Codex or Codex-to-Claude recording, use the [cross-agent video protocol](CROSS-AGENT-VIDEO-PROTOCOL.md). It freezes versions, preserves a machine-readable run record, and separates a demonstration from research evidence.
+
 ## The complete handoff loop
 
 1. Begin a real software task in one coding agent.
@@ -84,6 +86,8 @@ Qarinah uses local-first temporal project memory built from:
 - authority and repository-boundary scoring;
 - compact cited context packs with hard output budgets;
 - optional local embeddings and rerankers that never replace citations.
+
+The default `admission-first-v2` ranking profile filters repository, time, retention, disclosure, and supersession boundaries before ranking, preserves admissible BM25 order as its first stage, and uses fuzzy and graph evidence only to fill or support that candidate set. `strict-before` queries can exclude evidence recorded at the exact checkpoint. Evidence-sufficiency diagnostics are experimental until calibrated on independently reviewed relevance labels.
 
 This makes Qarinah a universal context engine for software projects while keeping each workspace, repository, and source authority explicit.
 

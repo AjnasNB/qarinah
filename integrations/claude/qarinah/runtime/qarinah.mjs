@@ -3832,6 +3832,7 @@ init_errors();
 // src/retrieval.js
 init_boundary();
 var RRF_K = 60;
+var RANKING_PROFILES = /* @__PURE__ */ new Set(["balanced-v1", "admission-first-v2"]);
 var RELATION_WEIGHTS = Object.freeze({
   contradicts: 1,
   supersedes: 0.95,
@@ -4005,6 +4006,32 @@ function reciprocalRankFusion(lists, eventsById) {
     components: (components.get(eventId) || []).sort((left, right) => left.name.localeCompare(right.name))
   }));
 }
+function lexicalCascadeFusion(lists, eventsById) {
+  const ranksByName = new Map(lists.map((entry) => [entry.name, rankMap(entry.entries)]));
+  const candidates = new Set(lists.flatMap((entry) => entry.entries.map(([eventId]) => eventId)));
+  const rankFor = (eventId, names) => {
+    const ranks = names.map((name) => ranksByName.get(name)?.get(eventId)).filter(Number.isSafeInteger);
+    return ranks.length === 0 ? null : Math.min(...ranks);
+  };
+  return [...candidates].map((eventId) => {
+    const authorityRank = rankFor(eventId, ["authority"]);
+    const primaryRank = rankFor(eventId, ["sqlite-fts5", "bm25"]);
+    const fuzzyRank = rankFor(eventId, ["fuzzy"]);
+    const graphRank = rankFor(eventId, ["graph"]);
+    const tier = authorityRank !== null && primaryRank !== null ? 0 : primaryRank !== null ? 1 : fuzzyRank !== null ? 2 : 3;
+    const rank = tier === 0 ? authorityRank : primaryRank ?? fuzzyRank ?? graphRank ?? Number.MAX_SAFE_INTEGER;
+    const components = lists.flatMap(({ name }) => {
+      const componentRank = ranksByName.get(name)?.get(eventId);
+      return componentRank === void 0 ? [] : [{ name, rank: componentRank }];
+    }).sort((left, right) => left.name.localeCompare(right.name));
+    return {
+      event: eventsById.get(eventId),
+      score: rounded(1 / (1 + tier * 1e3 + rank)),
+      components,
+      cascade: { tier, rank, authorityRank, primaryRank, fuzzyRank, graphRank }
+    };
+  }).sort((left, right) => left.cascade.tier - right.cascade.tier || left.cascade.rank - right.cascade.rank || (left.cascade.primaryRank ?? Number.MAX_SAFE_INTEGER) - (right.cascade.primaryRank ?? Number.MAX_SAFE_INTEGER) || right.event.timestamp.localeCompare(left.event.timestamp) || left.event.eventId.localeCompare(right.event.eventId)).map(({ cascade: _cascade, ...entry }) => entry);
+}
 function conflictPairs(index, eventsById) {
   const pairs = /* @__PURE__ */ new Map();
   for (const [source, relations] of Object.entries(index.adjacency || {})) {
@@ -4036,6 +4063,13 @@ function diversitySimilarity(left, right) {
   return jaccard(new Set(left.event.terms || []), new Set(right.event.terms || []));
 }
 function diversify(entries, limit, lambda) {
+  if (lambda === 1) {
+    const maximumScore2 = entries[0]?.score || 1;
+    return entries.slice(0, limit).map((entry) => ({
+      ...entry,
+      diversityScore: rounded(entry.score / maximumScore2)
+    }));
+  }
   const available = [...entries];
   const selected3 = [];
   const maximumScore = available[0]?.score || 1;
@@ -4059,6 +4093,73 @@ function diversify(entries, limit, lambda) {
 function reasonFor(entry) {
   const components = entry.components.map(({ name, rank }) => `${name}#${rank}`).join(", ");
   return `hybrid rank ${components}; diversified=${entry.diversityScore}`;
+}
+function queryCodeEntities(query) {
+  const values = [];
+  for (const match of String(query).matchAll(/`([^`]{1,256})`|(?:[\p{L}\p{N}_.-]+\/)+[\p{L}\p{N}_.-]+|\b[\p{L}_][\p{L}\p{N}_]*(?:\.[\p{L}_][\p{L}\p{N}_]*)+\b/gu)) {
+    values.push(match[1] ?? match[0]);
+  }
+  return tokenize(values.join(" ")).slice(0, 64);
+}
+function evidenceSufficiency(index, query, queryTerms, eligibleEventIds, lexical, fuzzy) {
+  if (queryTerms.length === 0) {
+    return Object.freeze({
+      method: "evidence-sufficiency-v1",
+      state: "INSUFFICIENT_EVIDENCE",
+      score: 0,
+      directThreshold: 0.62,
+      partialThreshold: 0.32,
+      supportingCandidateCount: 0,
+      codeEntityCount: 0,
+      matchedCodeEntityCount: 0,
+      codeEntityCoverage: 0,
+      reasonCodes: Object.freeze(["NO_QUERY"])
+    });
+  }
+  const codeEntities = queryCodeEntities(query);
+  let bestExactTermRatio = 0;
+  let bestMatchedCodeEntities = 0;
+  let bestConfidence = 0;
+  let supportingCandidateCount = 0;
+  for (const event of index.events) {
+    if (!eligibleEventIds.has(event.eventId)) continue;
+    const matchedTerms = queryTerms.filter((term) => (event.termFrequencies?.[term] || 0) > 0).length;
+    const termRatio = matchedTerms / queryTerms.length;
+    const matchedEntities = codeEntities.filter((term) => (event.termFrequencies?.[term] || 0) > 0).length;
+    if (termRatio >= 0.2 || matchedEntities > 0) supportingCandidateCount += 1;
+    if (termRatio > bestExactTermRatio || termRatio === bestExactTermRatio && matchedEntities > bestMatchedCodeEntities) {
+      bestExactTermRatio = termRatio;
+      bestMatchedCodeEntities = matchedEntities;
+      bestConfidence = { verified: 1, claimed: 0.8, extracted: 0.7, inferred: 0.5 }[event.confidence] ?? 0.5;
+    }
+  }
+  const codeEntityCoverage = codeEntities.length === 0 ? 0 : bestMatchedCodeEntities / codeEntities.length;
+  const independence = Math.min(1, supportingCandidateCount / 2);
+  const score = codeEntities.length === 0 ? 0.65 * bestExactTermRatio + 0.15 * independence + 0.2 * bestConfidence : 0.45 * bestExactTermRatio + 0.3 * codeEntityCoverage + 0.1 * independence + 0.15 * bestConfidence;
+  const normalizedScore = rounded(score);
+  const directCandidateCount = (/* @__PURE__ */ new Set([...lexical.keys(), ...fuzzy.keys()])).size;
+  const state = normalizedScore >= 0.62 && (bestExactTermRatio >= 0.55 || codeEntityCoverage >= 0.75) ? "DIRECTLY_SUPPORTED" : normalizedScore >= 0.32 && directCandidateCount > 0 ? "PARTIALLY_SUPPORTED" : "INSUFFICIENT_EVIDENCE";
+  const reasonCodes = [
+    ...directCandidateCount === 0 ? ["NO_DIRECT_CANDIDATE"] : [],
+    ...bestExactTermRatio < 0.2 ? ["LOW_TERM_COVERAGE"] : [],
+    ...codeEntities.length > 0 && codeEntityCoverage === 0 ? ["NO_CODE_ENTITY_MATCH"] : [],
+    ...supportingCandidateCount < 2 ? ["SINGLE_OR_NO_SUPPORT"] : [],
+    ...state === "DIRECTLY_SUPPORTED" ? ["DIRECT_THRESHOLD_MET"] : [],
+    ...state === "PARTIALLY_SUPPORTED" ? ["PARTIAL_THRESHOLD_MET"] : [],
+    ...state === "INSUFFICIENT_EVIDENCE" ? ["INSUFFICIENT_THRESHOLD"] : []
+  ];
+  return Object.freeze({
+    method: "evidence-sufficiency-v1",
+    state,
+    score: normalizedScore,
+    directThreshold: 0.62,
+    partialThreshold: 0.32,
+    supportingCandidateCount,
+    codeEntityCount: codeEntities.length,
+    matchedCodeEntityCount: bestMatchedCodeEntities,
+    codeEntityCoverage: rounded(codeEntityCoverage),
+    reasonCodes: Object.freeze(reasonCodes)
+  });
 }
 function queryCoverage(index, queryTerms, eligibleEventIds, lexical, fuzzy) {
   if (queryTerms.length === 0) {
@@ -4094,7 +4195,19 @@ function rankContextEvents(index, query = "", options = {}) {
   const allEventsById = new Map(index.events.map((event) => [event.eventId, event]));
   const queryTerms = tokenize(query);
   const limit = options.limit ?? 20;
-  const diversity = options.diversity ?? 0.82;
+  const rankingProfile = options.rankingProfile ?? "admission-first-v2";
+  if (!RANKING_PROFILES.has(rankingProfile)) {
+    throw new TypeError("rankingProfile must be balanced-v1 or admission-first-v2.");
+  }
+  const diversity = options.diversity ?? (rankingProfile === "admission-first-v2" ? 1 : 0.82);
+  const includeFuzzy = options.includeFuzzy ?? true;
+  const includeGraph = options.includeGraph ?? true;
+  const temporalBoundary = options.temporalBoundary ?? "inclusive";
+  if (typeof includeFuzzy !== "boolean") throw new TypeError("includeFuzzy must be a boolean.");
+  if (typeof includeGraph !== "boolean") throw new TypeError("includeGraph must be a boolean.");
+  if (!["inclusive", "strict-before"].includes(temporalBoundary)) {
+    throw new TypeError("temporalBoundary must be inclusive or strict-before.");
+  }
   const supersessionPolicy = options.supersessionPolicy ?? "prefer-current";
   if (options.asOf === void 0) {
     throw new TypeError("asOf is required so retrieval remains time-explicit and deterministic.");
@@ -4113,7 +4226,7 @@ function rankContextEvents(index, query = "", options = {}) {
     throw new TypeError("supersessionPolicy must be prefer-current or include-history.");
   }
   const expiredEventIds = new Set(index.events.filter((event) => event.retention?.expiresAt !== null && event.retention?.expiresAt <= asOf).map((event) => event.eventId));
-  const futureEventIds = new Set(index.events.filter((event) => event.timestamp > asOf).map((event) => event.eventId));
+  const futureEventIds = new Set(index.events.filter((event) => temporalBoundary === "strict-before" ? event.timestamp >= asOf : event.timestamp > asOf).map((event) => event.eventId));
   const notYetValidEventIds = new Set(index.events.filter((event) => event.temporal?.validFrom !== void 0 && event.temporal.validFrom > asOf).map((event) => event.eventId));
   const staleEventIds = new Set(index.events.filter((event) => event.temporal?.validUntil !== null && event.temporal?.validUntil !== void 0 && event.temporal.validUntil <= asOf).map((event) => event.eventId));
   const unauthorizedEventIds = new Set(index.events.filter((event) => !permittedByDisclosure(event, authorityScopes) || !permittedRepository(event, repositoryIds)).map((event) => event.eventId));
@@ -4129,7 +4242,9 @@ function rankContextEvents(index, query = "", options = {}) {
       return false;
     });
     return Object.freeze({
-      strategy: "hybrid-local-v1",
+      strategy: rankingProfile === "admission-first-v2" ? "admission-first-hybrid-v2" : "hybrid-local-v1",
+      rankingProfile,
+      temporalBoundary,
       ranked: diversify(eligible2, limit, diversity).map((entry) => ({ ...entry, reason: reasonFor(entry) })),
       conflicts: conflictPairs(index, eventsById),
       exclusions: exclusions2,
@@ -4144,19 +4259,21 @@ function rankContextEvents(index, query = "", options = {}) {
         stale: staleEventIds.size,
         unauthorized: unauthorizedEventIds.size
       },
-      coverage: queryCoverage(index, queryTerms, eligibleEventIds, /* @__PURE__ */ new Map(), /* @__PURE__ */ new Map())
+      coverage: queryCoverage(index, queryTerms, eligibleEventIds, /* @__PURE__ */ new Map(), /* @__PURE__ */ new Map()),
+      evidenceSufficiency: evidenceSufficiency(index, query, queryTerms, eligibleEventIds, /* @__PURE__ */ new Map(), /* @__PURE__ */ new Map())
     });
   }
   const lexical = bm25Scores(index, queryTerms, eligibleEventIds);
-  const fuzzy = fuzzyScores(index, query, eligibleEventIds);
+  const fuzzy = includeFuzzy ? fuzzyScores(index, query, eligibleEventIds) : /* @__PURE__ */ new Map();
   const coverage = queryCoverage(index, queryTerms, eligibleEventIds, lexical, fuzzy);
+  const sufficiency = evidenceSufficiency(index, query, queryTerms, eligibleEventIds, lexical, fuzzy);
   const sqlite = sqliteScores(options.sqliteCandidates, eligibleEventIds);
   const candidateIds = /* @__PURE__ */ new Set([...lexical.keys(), ...fuzzy.keys(), ...sqlite.keys()]);
   const seedScores = new Map([...candidateIds].map((eventId) => [
     eventId,
     (lexical.get(eventId) || 0) + (fuzzy.get(eventId) || 0) + (sqlite.get(eventId) || 0)
   ]));
-  const graph = graphScores(index, seedScores, eventsById);
+  const graph = includeGraph ? graphScores(index, seedScores, eventsById) : /* @__PURE__ */ new Map();
   const authority = authorityScores(index, candidateIds, authorityScopes, asOf);
   const lists = [
     { name: "sqlite-fts5", weight: 1.05, entries: sortedScores(sqlite, eventsById) },
@@ -4165,7 +4282,7 @@ function rankContextEvents(index, query = "", options = {}) {
     { name: "graph", weight: 0.65, entries: sortedScores(graph, eventsById) },
     { name: "authority", weight: 1.25, entries: sortedScores(authority, eventsById) }
   ].filter((entry) => entry.entries.length > 0);
-  const fused = reciprocalRankFusion(lists, eventsById);
+  const fused = rankingProfile === "admission-first-v2" ? lexicalCascadeFusion(lists, eventsById) : reciprocalRankFusion(lists, eventsById);
   const supersededBy = activeSupersessions(index, eventsById, asOf);
   const exclusions = [];
   const eligible = fused.filter((entry) => {
@@ -4174,7 +4291,9 @@ function rankContextEvents(index, query = "", options = {}) {
     return false;
   });
   return Object.freeze({
-    strategy: "hybrid-local-v1",
+    strategy: rankingProfile === "admission-first-v2" ? "admission-first-hybrid-v2" : "hybrid-local-v1",
+    rankingProfile,
+    temporalBoundary,
     ranked: diversify(eligible, limit, diversity).map((entry) => ({ ...entry, reason: reasonFor(entry) })),
     conflicts: conflictPairs(index, eventsById),
     exclusions,
@@ -4189,7 +4308,8 @@ function rankContextEvents(index, query = "", options = {}) {
       stale: staleEventIds.size,
       unauthorized: unauthorizedEventIds.size
     },
-    coverage
+    coverage,
+    evidenceSufficiency: sufficiency
   });
 }
 
@@ -4453,6 +4573,10 @@ async function compileContext(query = "", options = {}) {
   if (!["any", "partial", "direct"].includes(minimumCoverage)) {
     throw new TypeError("minimumCoverage must be any, partial, or direct.");
   }
+  const minimumEvidence = options.minimumEvidence ?? "any";
+  if (!["any", "partial", "direct"].includes(minimumEvidence)) {
+    throw new TypeError("minimumEvidence must be any, partial, or direct.");
+  }
   const sqliteCandidates = options.inMemory === true || retrievalQuery.trim() === "" ? [] : (await querySqliteReadModel(workspace, retrievalQuery, {
     headHash: index.headHash,
     limit: Math.min(1e3, limit * 16)
@@ -4460,6 +4584,10 @@ async function compileContext(query = "", options = {}) {
   const retrieval = rankContextEvents(index, retrievalQuery, {
     limit,
     diversity: options.diversity,
+    rankingProfile: options.rankingProfile,
+    includeFuzzy: options.includeFuzzy,
+    includeGraph: options.includeGraph,
+    temporalBoundary: options.temporalBoundary,
     supersessionPolicy: options.supersessionPolicy,
     asOf: resolveQueryTime(options),
     authorityScopes: options.authorityScopes ?? options.authorityScope,
@@ -4475,6 +4603,14 @@ async function compileContext(query = "", options = {}) {
       { minimumCoverage, coverage: retrieval.coverage }
     );
   }
+  const evidenceAccepted = minimumEvidence === "any" || minimumEvidence === "partial" && ["PARTIALLY_SUPPORTED", "DIRECTLY_SUPPORTED"].includes(retrieval.evidenceSufficiency.state) || minimumEvidence === "direct" && retrieval.evidenceSufficiency.state === "DIRECTLY_SUPPORTED";
+  if (!evidenceAccepted) {
+    throw new QarinahError(
+      "CONTEXT_EVIDENCE_INSUFFICIENT",
+      `Evidence sufficiency '${retrieval.evidenceSufficiency.state}' does not satisfy minimumEvidence '${minimumEvidence}'.`,
+      { minimumEvidence, evidenceSufficiency: retrieval.evidenceSufficiency }
+    );
+  }
   const candidateIds = new Set(ranked.map((entry) => entry.event.eventId));
   const relevantConflicts = retrieval.conflicts.filter((conflict) => conflict.eventIds.some((eventId) => candidateIds.has(eventId))).slice(0, Math.min(100, limit * 2));
   const items = [];
@@ -4483,6 +4619,11 @@ async function compileContext(query = "", options = {}) {
     supersessionPolicy: retrieval.supersessionPolicy,
     asOf: retrieval.asOf,
     coverage: retrieval.coverage,
+    ...retrieval.rankingProfile === "admission-first-v2" ? {
+      rankingProfile: retrieval.rankingProfile,
+      temporalBoundary: retrieval.temporalBoundary,
+      ...options.includeEvidenceSufficiency === true || minimumEvidence !== "any" ? { evidenceSufficiency: retrieval.evidenceSufficiency } : {}
+    } : {},
     ...queryExpansion === null ? {} : { queryExpansion },
     ...typeof options.authorityScope === "string" ? { authorityScope: options.authorityScope } : {},
     ...retrieval.authorityScopes.length === 0 ? {} : { authorityScopes: retrieval.authorityScopes },
@@ -4567,6 +4708,7 @@ function renderContextPackMarkdown(pack) {
     `- Retrieval: \`${pack.retrieval.strategy}\``,
     `- Supersession: \`${pack.retrieval.supersessionPolicy}\``,
     `- Evidence coverage: \`${pack.retrieval.coverage.status}\` (${pack.retrieval.coverage.bestExactTermCount}/${pack.retrieval.coverage.queryTermCount} exact query terms in the best event)`,
+    ...pack.retrieval.evidenceSufficiency ? [`- Evidence sufficiency: \`${pack.retrieval.evidenceSufficiency.state}\` (score ${pack.retrieval.evidenceSufficiency.score})`] : [],
     ...pack.retrieval.coverage.warning ? [`- Coverage warning: ${markdownInline(pack.retrieval.coverage.warning)}`] : [],
     `- Unresolved conflicts: ${pack.retrieval.conflicts?.length || 0}`,
     `- Truncated: ${pack.truncated ? "yes" : "no"}`,
@@ -6256,6 +6398,14 @@ var CONTEXT_QUERY_TOOL = Object.freeze({
         type: "string",
         enum: ["any", "partial", "direct"]
       },
+      minimumEvidence: {
+        type: "string",
+        enum: ["any", "partial", "direct"]
+      },
+      temporalBoundary: {
+        type: "string",
+        enum: ["inclusive", "strict-before"]
+      },
       asOf: {
         type: "string",
         format: "date-time"
@@ -6487,6 +6637,8 @@ function createMcpServer(options = {}) {
           "maxChars",
           "limit",
           "minimumCoverage",
+          "minimumEvidence",
+          "temporalBoundary",
           "asOf"
         ]);
         if (typeof input.workspace !== "string" || input.workspace.trim() === "") {
@@ -6514,6 +6666,14 @@ function createMcpServer(options = {}) {
         if (!["any", "partial", "direct"].includes(minimumCoverage)) {
           throw new TypeError("minimumCoverage must be any, partial, or direct.");
         }
+        const minimumEvidence = input.minimumEvidence ?? "any";
+        if (!["any", "partial", "direct"].includes(minimumEvidence)) {
+          throw new TypeError("minimumEvidence must be any, partial, or direct.");
+        }
+        const temporalBoundary = input.temporalBoundary ?? "inclusive";
+        if (!["inclusive", "strict-before"].includes(temporalBoundary)) {
+          throw new TypeError("temporalBoundary must be inclusive or strict-before.");
+        }
         if (input.asOf !== void 0 && (typeof input.asOf !== "string" || !Number.isFinite(Date.parse(input.asOf)))) {
           throw new TypeError("asOf must be a valid timestamp.");
         }
@@ -6522,6 +6682,8 @@ function createMcpServer(options = {}) {
           maxChars,
           limit,
           minimumCoverage,
+          minimumEvidence,
+          temporalBoundary,
           asOf: input.asOf,
           rebuild: false,
           updateCheckpoint: false
@@ -7340,6 +7502,10 @@ var QUERY_STDIN_JSON_FIELDS = /* @__PURE__ */ new Set([
   "reserveTokens",
   "asOf",
   "minimumCoverage",
+  "minimumEvidence",
+  "rankingProfile",
+  "temporalBoundary",
+  "includeEvidenceSufficiency",
   "authorityScopes",
   "repositoryIds"
 ]);
@@ -7415,6 +7581,22 @@ function stdinQueryInput(request) {
   if (!["any", "partial", "direct"].includes(minimumCoverage)) {
     throw new TypeError("minimumCoverage must be any, partial, or direct.");
   }
+  const minimumEvidence = Object.hasOwn(request, "minimumEvidence") ? request.minimumEvidence : "any";
+  if (!["any", "partial", "direct"].includes(minimumEvidence)) {
+    throw new TypeError("minimumEvidence must be any, partial, or direct.");
+  }
+  const rankingProfile = Object.hasOwn(request, "rankingProfile") ? request.rankingProfile : "admission-first-v2";
+  if (!["balanced-v1", "admission-first-v2"].includes(rankingProfile)) {
+    throw new TypeError("rankingProfile must be balanced-v1 or admission-first-v2.");
+  }
+  const temporalBoundary = Object.hasOwn(request, "temporalBoundary") ? request.temporalBoundary : "inclusive";
+  if (!["inclusive", "strict-before"].includes(temporalBoundary)) {
+    throw new TypeError("temporalBoundary must be inclusive or strict-before.");
+  }
+  const includeEvidenceSufficiency = Object.hasOwn(request, "includeEvidenceSufficiency") ? request.includeEvidenceSufficiency : false;
+  if (typeof includeEvidenceSufficiency !== "boolean") {
+    throw new TypeError("includeEvidenceSufficiency must be a boolean.");
+  }
   const selectors = (field) => {
     if (!Object.hasOwn(request, field)) return void 0;
     if (!Array.isArray(request[field]) || request[field].length > 64 || request[field].some((value) => typeof value !== "string" || value.length < 1 || value.length > 256)) {
@@ -7431,6 +7613,10 @@ function stdinQueryInput(request) {
     reserveTokens: requestInteger(request, "reserveTokens", 0, 999936),
     asOf: Object.hasOwn(request, "asOf") ? request.asOf : void 0,
     minimumCoverage,
+    minimumEvidence,
+    rankingProfile,
+    temporalBoundary,
+    includeEvidenceSufficiency,
     authorityScopes: selectors("authorityScopes"),
     repositoryIds: selectors("repositoryIds")
   };
@@ -7448,7 +7634,7 @@ Usage:
   qarinah build | rebuild
   qarinah scan [--max-files n] [--max-file-bytes n] [--max-total-bytes n] [--max-depth n]
   qarinah export okf [--output <path>]
-  qarinah query [text] [--format json|markdown] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp] [--minimum-coverage any|partial|direct]
+  qarinah query [text] [--format json|markdown] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp] [--minimum-coverage any|partial|direct] [--minimum-evidence any|partial|direct]
   qarinah query --stdin-json
   qarinah task-pack debugging|code-review|feature-implementation|database-migration|incident-response|release-preparation|security-review [query]
   qarinah freshness
@@ -7673,7 +7859,10 @@ async function run(argv) {
       maxTokens: integerOption(args, "--max-tokens", void 0),
       reserveTokens: integerOption(args, "--reserve-tokens", void 0),
       asOf: option(args, "--as-of", void 0),
-      minimumCoverage: option(args, "--minimum-coverage", "any")
+      minimumCoverage: option(args, "--minimum-coverage", "any"),
+      minimumEvidence: option(args, "--minimum-evidence", "any"),
+      rankingProfile: option(args, "--ranking-profile", "admission-first-v2"),
+      temporalBoundary: option(args, "--temporal-boundary", "inclusive")
     } : stdinQueryInput(request);
     const pack = await compileContext(input.query, {
       cwd: process2.cwd(),
@@ -7683,6 +7872,10 @@ async function run(argv) {
       reserveTokens: input.reserveTokens,
       asOf: input.asOf,
       minimumCoverage: input.minimumCoverage,
+      minimumEvidence: input.minimumEvidence,
+      rankingProfile: input.rankingProfile,
+      temporalBoundary: input.temporalBoundary,
+      includeEvidenceSufficiency: input.includeEvidenceSufficiency,
       authorityScopes: input.authorityScopes,
       repositoryIds: input.repositoryIds
     });

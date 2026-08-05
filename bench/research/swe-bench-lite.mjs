@@ -6,6 +6,8 @@ export const DATASET_CONFIG = "default";
 export const DATASET_SPLIT = "test";
 export const CORPUS_SCHEMA_VERSION = "qarinah.research-corpus.swe-bench-lite.v1";
 export const PROTOCOL_VERSION = "qarinah.cross-agent-memory-study.v1";
+export const DEVELOPMENT_CORPUS_SCHEMA_VERSION = "qarinah.research-corpus.swe-bench-lite-development.v2";
+export const DATASET_TEST_ARTIFACT = "data/test-00000-of-00001.parquet";
 
 export const EXPECTED_REPOSITORY_COUNTS = Object.freeze({
   "astropy/astropy": 6,
@@ -58,6 +60,15 @@ async function getJson(url, label) {
   return response.json();
 }
 
+async function getBytes(url, label) {
+  const response = await fetch(url, {
+    headers: { "user-agent": "qarinah-research-benchmark/2" },
+    signal: AbortSignal.timeout(60_000)
+  });
+  if (!response.ok) throw new Error(`${label} failed with HTTP ${response.status}.`);
+  return Buffer.from(await response.arrayBuffer());
+}
+
 export async function fetchDatasetMetadata() {
   const url = `https://huggingface.co/api/datasets/${DATASET_ID}/revision/${DATASET_REVISION}`;
   const metadata = await getJson(url, "Pinned Hugging Face dataset metadata request");
@@ -90,6 +101,17 @@ export async function fetchDatasetRows() {
   return rows;
 }
 
+export async function fetchDatasetArtifactMetadata() {
+  const url = `https://huggingface.co/datasets/${DATASET_ID}/resolve/${DATASET_REVISION}/${DATASET_TEST_ARTIFACT}`;
+  const bytes = await getBytes(url, "Pinned SWE-bench Lite test artifact request");
+  return {
+    path: DATASET_TEST_ARTIFACT,
+    url,
+    bytes: bytes.byteLength,
+    sha256: sha256(bytes)
+  };
+}
+
 function parseJsonList(value, label) {
   const parsed = JSON.parse(value);
   if (!Array.isArray(parsed) || parsed.some((entry) => typeof entry !== "string")) {
@@ -103,6 +125,36 @@ export function changedFiles(diff) {
   const pattern = /^diff --git a\/(.+?) b\/(.+)\r?$/gmu;
   for (const match of String(diff).matchAll(pattern)) paths.add(match[2]);
   return [...paths].sort();
+}
+
+const SYMBOL_STOP_WORDS = new Set([
+  "and", "async", "await", "class", "const", "def", "else", "except", "false", "finally", "for",
+  "from", "function", "if", "import", "lambda", "none", "null", "return", "self", "static", "super",
+  "this", "true", "try", "while", "with", "yield"
+]);
+
+export function changedSymbols(diff) {
+  const symbols = new Set();
+  const candidates = [];
+  for (const match of String(diff).matchAll(/^@@[^@]*@@\s*(.*)$/gmu)) candidates.push(match[1]);
+  for (const match of String(diff).matchAll(/^[+-](?![+-])\s*(?:async\s+)?(?:def|class|function)\s+([A-Za-z_][A-Za-z0-9_]*)/gmu)) {
+    symbols.add(match[1].toLowerCase());
+  }
+  for (const candidate of candidates) {
+    for (const match of candidate.matchAll(/(?:def|class|function)\s+([A-Za-z_][A-Za-z0-9_]*)|\b([A-Za-z_][A-Za-z0-9_]*)\s*\(/gu)) {
+      const symbol = (match[1] ?? match[2]).toLowerCase();
+      if (symbol.length >= 3 && !SYMBOL_STOP_WORDS.has(symbol)) symbols.add(symbol);
+    }
+  }
+  return [...symbols].sort().slice(0, 128);
+}
+
+export function moduleScopes(files) {
+  return [...new Set(files.map((file) => {
+    const segments = file.split("/").filter(Boolean);
+    if (segments.length <= 1) return ".";
+    return segments.slice(0, Math.min(2, segments.length - 1)).join("/");
+  }))].sort();
 }
 
 export function issueUrl(row) {
@@ -264,4 +316,68 @@ export function buildCorpus(rows, metadata) {
 export async function loadPinnedDataset() {
   const [metadata, rows] = await Promise.all([fetchDatasetMetadata(), fetchDatasetRows()]);
   return { metadata, rows, corpus: buildCorpus(rows, metadata) };
+}
+
+export function buildDevelopmentCorpus(rows, metadata, sourceArtifact) {
+  const exploratory = buildCorpus(rows, metadata);
+  const tasks = exploratory.tasks.map((task) => {
+    const row = rows.find((candidate) => candidate.instance_id === task.instanceId);
+    const symbols = changedSymbols(row.patch);
+    return {
+      ...task,
+      changedSymbols: symbols,
+      moduleScopes: moduleScopes(task.patchFiles)
+    };
+  });
+  const observedRepositories = [...new Set(tasks.map((task) => task.repository))].sort();
+  const contentDigest = sha256(JSON.stringify({ repositories: exploratory.repositories, tasks }));
+  return {
+    ...exploratory,
+    schemaVersion: DEVELOPMENT_CORPUS_SCHEMA_VERSION,
+    protocolVersion: "qarinah.cross-agent-memory-study.development-v2",
+    generatedFrom: {
+      ...exploratory.generatedFrom,
+      sourceArtifact,
+      officialLitePage: "https://www.swebench.com/lite.html"
+    },
+    splitPolicy: {
+      ...exploratory.splitPolicy,
+      evaluationSetting: "online-prequential",
+      exploratoryReuse: true,
+      exploratoryReuseWarning: "The 240 held-out tasks were inspected in v0.1 and are development data for v0.2. They are not an untouched confirmatory test set."
+    },
+    repositoryCountAudit: {
+      canonicalization: "exact lowercase owner/repository values from the pinned test rows",
+      officialPageDeclaredCount: 11,
+      pinnedRevisionObservedCount: observedRepositories.length,
+      discrepancy: observedRepositories.length !== 11,
+      observedRepositories,
+      conclusion: "Preserve the revision-level observation and report the official-page discrepancy; do not coerce or alias repository identities."
+    },
+    relevanceOracle: {
+      type: "deterministic graded structural oracle",
+      grade2Direct: "shared production patch file or extracted changed symbol",
+      grade1Supporting: "shared two-level production module scope without a direct match",
+      grade0Irrelevant: "no structural match under this oracle",
+      evaluatorOnlyTargetGold: true,
+      humanValidated: false,
+      limitation: "Structural labels are development proxies and do not replace blinded human relevance judgments."
+    },
+    contentDigest,
+    tasks
+  };
+}
+
+export async function loadPinnedDevelopmentDataset() {
+  const [metadata, rows, sourceArtifact] = await Promise.all([
+    fetchDatasetMetadata(),
+    fetchDatasetRows(),
+    fetchDatasetArtifactMetadata()
+  ]);
+  return {
+    metadata,
+    rows,
+    sourceArtifact,
+    corpus: buildDevelopmentCorpus(rows, metadata, sourceArtifact)
+  };
 }

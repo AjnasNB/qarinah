@@ -92,6 +92,7 @@ try {
       maxTokens: 1_000,
       reserveTokens: 150,
       limit: 8,
+      rankingProfile: "balanced-v1",
       inMemory: true,
       asOf: "2026-07-20T00:00:00.000Z"
     });
@@ -104,6 +105,7 @@ try {
     cwd: root,
     maxChars: 5_000,
     limit: 10,
+    rankingProfile: "balanced-v1",
     inMemory: true,
     asOf: "2026-07-20T00:00:00.000Z"
   });

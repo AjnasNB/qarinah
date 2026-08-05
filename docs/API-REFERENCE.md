@@ -423,6 +423,10 @@ function rankContextEvents(
   options: {
     limit?: number;
     diversity?: number;
+    rankingProfile?: "balanced-v1" | "admission-first-v2";
+    includeFuzzy?: boolean;
+    includeGraph?: boolean;
+    temporalBoundary?: "inclusive" | "strict-before";
     supersessionPolicy?: "prefer-current" | "include-history";
     authorityScope?: string;
     authorityScopes?: string[];
@@ -432,7 +436,7 @@ function rankContextEvents(
 ): Readonly<Record<string, unknown>>;
 ```
 
-Runs local hybrid ranking with exact terms, BM25, character-trigram tolerance, graph evidence, reciprocal-rank fusion, diversity, time, authority, conflict, retention, and supersession handling. Most callers should use `compileContext`, which also applies coverage and output budgets.
+Runs local hybrid ranking after repository, time, retention, disclosure, and supersession admission. The default `admission-first-v2` profile preserves BM25 order for admissible lexical candidates, then fills from typo-tolerant and graph evidence; authority may promote an otherwise matched record. `balanced-v1` preserves the original reciprocal-rank-fusion and diversity behavior for reproducibility. `includeFuzzy` and `includeGraph` support explicit ablations. `temporalBoundary: "strict-before"` excludes records whose timestamp equals the query checkpoint; the default inclusive mode preserves normal as-of semantics. Every v2 result includes deterministic evidence-sufficiency diagnostics and rejection reasons. Most callers should use `compileContext`, which also applies evidence gates and output budgets.
 
 ## Context compilation
 
@@ -450,6 +454,11 @@ function compileContext(
     reservations?: QarinahTokenReservation[];
     limit?: number;
     diversity?: number;
+    rankingProfile?: "balanced-v1" | "admission-first-v2";
+    includeFuzzy?: boolean;
+    includeGraph?: boolean;
+    temporalBoundary?: "inclusive" | "strict-before";
+    includeEvidenceSufficiency?: boolean;
     supersessionPolicy?: "prefer-current" | "include-history";
     authorityScope?: string;
     authorityScopes?: string[];
@@ -459,6 +468,7 @@ function compileContext(
       expand(input: { query: string }): string[] | Promise<string[]>;
     };
     minimumCoverage?: "any" | "partial" | "direct";
+    minimumEvidence?: "any" | "partial" | "direct";
     asOf?: string;
     clock?: () => Date;
     rebuild?: boolean;

@@ -6,16 +6,16 @@
 **Protocol version:** 1.0  
 **Implementation:** Qarinah 0.1.2  
 **Date:** August 2026  
-**Status:** Research draft; not peer-reviewed and not preregistered  
+**Status:** Research draft; exploratory v0.1 frozen, development v0.2 completed, not peer-reviewed and not preregistered
 **Artifact license:** Apache License 2.0; upstream repositories and benchmark data retain their own terms
 
 ## Abstract
 
 This research track studies whether evidence-linked, time-explicit project memory can reduce the history supplied to coding agents without reducing engineering-task success. The first reproducible phase uses the official public SWE-bench Lite test split: 300 tasks from 12 real repositories. Each repository is ordered by task creation time, its earliest 20% is used as memory-building history, and its remaining tasks are held out from that history. This produces 60 warm-up and 240 held-out tasks.
 
-The completed phase evaluates retrieval and governance, not patch generation. Only 79 of the 240 held-out tasks have a prior task that overlaps a gold production-file path, so retrieval effectiveness is reported on those 79 tasks and coverage behavior is reported on all 240. Plain BM25 outperforms the current Qarinah hybrid ranking on this oracle: Recall@10 is 0.687 versus 0.518, and mean reciprocal rank is 0.430 versus 0.320. The current lexical coverage gate accepts all 161 tasks for which the file-overlap oracle identifies no prior supporting task. Removing time controls produces 971 future citations, or 42.44% of citations in that ablation. Separately, 72 constructed boundary records across all 12 repositories verify rejection of future, expired, stale, restricted, wrong-repository, and superseded evidence with zero forbidden records returned.
+Exploratory v0.1 evaluates retrieval and governance, not patch generation. Only 79 of the 240 held-out tasks have a prior task that overlaps a gold production-file path, so retrieval effectiveness is reported on those 79 tasks and coverage behavior is reported on all 240. Plain BM25 outperforms the original Qarinah balanced hybrid ranking on this oracle: Recall@10 is 0.687 versus 0.518, and mean reciprocal rank is 0.430 versus 0.320. The lexical coverage gate accepts all 161 tasks for which the file-overlap oracle identifies no positive prior record; those tasks are not proven semantically unsupported. Removing time controls produces 971 future citations, or 42.44% of citations in that ablation. Separately, 72 constructed boundary records across all 12 repositories verify rejection of future, expired, stale, restricted, wrong-repository, and superseded evidence with zero forbidden records returned.
 
-These preliminary results reject any present claim that Qarinah retrieval is superior to a lexical baseline. They identify temporal filtering as necessary and semantic evidence coverage as the main retrieval research problem. Provider-reported tokens, SWE-bench resolve rate, patch quality, model portability, cost, and human review remain unmeasured.
+Exploratory v0.1 is frozen at Git tag `research-benchmark-exploratory-v0.1`. Development v0.2 changes Qarinah to admission-first lexical ranking and evaluates a deterministic graded structural oracle in both static and online/prequential settings. Qarinah v2 now matches admitted BM25 exactly on ranking while retaining governance controls and improves over the original balanced-v1 profile. Its graph stage adds no measured ranking value in this corpus, and its experimental evidence-sufficiency score remains poorly calibrated. Provider-reported tokens, SWE-bench resolve rate, patch quality, model portability, cost, and human review remain unmeasured.
 
 ## 1. Research questions
 
@@ -49,6 +49,10 @@ Within each repository, tasks are sorted by `created_at`, then `instance_id`. Th
 | **Total** |  | **300** | **60** | **240** |
 
 The license column records what the GitHub repository API returned on 2026-08-05; it is not legal advice. Missing and `NOASSERTION` values are not inferred. The committed corpus is metadata-only. It contains upstream identifiers, commit hashes, timestamps, changed paths, test counts, source links, and SHA-256 digests, but no issue text or patches.
+
+### Repository-count audit
+
+The [official SWE-bench Lite page](https://www.swebench.com/lite.html) says the 300 tasks cover 11 repositories. The pinned Hugging Face revision used here contains 12 distinct lowercase `owner/repository` values, exactly matching the table above, with no aliases or case variants. The study preserves both facts and flags the discrepancy instead of coercing the data. The pinned test Parquet is 1,119,540 bytes with SHA-256 `7a21f37b8bc179c7db5beeb14e88ac538ba283455c776e6b2535bbfb6e3551b4`.
 
 ### Public-test contamination limitation
 
@@ -91,7 +95,7 @@ Paired differences between Qarinah and BM25 use 10,000 deterministic bootstrap r
 
 The memory categories are informed by [LongMemEval](https://github.com/xiaowu0162/LongMemEval) and its [ICLR paper](https://openreview.net/pdf?id=pZiyCaVuti): information extraction, multi-session reasoning, knowledge updates, temporal reasoning, and abstention. Qarinah's software-engineering study adds repository isolation, provenance, supersession, and disclosure authority.
 
-## 6. Preliminary results
+## 6. Frozen exploratory-v0.1 results
 
 Command:
 
@@ -118,8 +122,8 @@ Qarinah minus BM25 has a paired mean Recall@10 difference of -0.169 with a 95% b
 
 ### Coverage and temporal findings
 
-- 79 held-out tasks have at least one relevant prior task under the file-overlap oracle; 161 do not.
-- The current lexical coverage gate accepts all 240 queries, including all 161 oracle-unsupported tasks. Removing the gate adds no acceptances. Lexical overlap is therefore not an adequate semantic evidence-coverage test for this corpus.
+- 79 held-out tasks have at least one positive prior task under the file-overlap oracle; 161 have no positive record under that oracle.
+- The lexical coverage gate accepts all 240 queries, including all 161 no-positive-under-file-overlap tasks. Removing the gate adds no acceptances. Lexical overlap is therefore not an adequate semantic evidence-coverage test for this corpus; this does not prove the 161 tasks are semantically unsupported.
 - The no-temporal ablation returns 971 future citations out of 2,288 citations, a 42.44% future-citation rate. Its higher Recall@10 is contaminated and must not be interpreted as a better valid system.
 - Graph-only retrieval can link a path entity in 45 of 240 queries. Its high abstention rate makes it a narrow diagnostic baseline, not a general retriever.
 - Every returned citation ID resolves to a stored event. File-overlap citation precision is 4.30% for Qarinah and 4.35% for BM25 when all returned citations are counted.
@@ -132,11 +136,42 @@ For each of the 12 repositories, the evaluator constructs six forbidden records:
 
 On Node 24.15.0, Windows x64, the committed run observed Qarinah retrieval at 13.23 ms median and 49.69 ms p95, excluding index construction and network fetch. BM25 was 0.19 ms median and 0.63 ms p95. These values describe one machine and are not cross-platform performance claims.
 
-## 7. What the pilot changes
+## 7. Development-v0.2 results after inspection
+
+These tasks were inspected in v0.1, so v0.2 is development evidence and is not eligible for a confirmatory claim. Its corpus adds a deterministic graded structural oracle:
+
+- grade 2, direct: shared production patch file or extracted changed symbol;
+- grade 1, supporting: shared two-level production module scope without a direct match; and
+- grade 0: no structural match under this oracle.
+
+These grades are evaluator-only for the target task and have not received blinded human validation.
+
+The study now reports both static memory, where every held-out task sees only the original warm-up prefix, and online/prequential memory, where earlier completed tasks become available to later tasks.
+
+| Setting and method | Positive tasks | Recall@10 | MRR | nDCG@10 |
+| --- | ---: | ---: | ---: | ---: |
+| Static admitted BM25 | 191 | 0.763 | 0.703 | 0.643 |
+| Static balanced-v1 | 191 | 0.724 | 0.644 | 0.604 |
+| Static Qarinah admission-first-v2 | 191 | 0.763 | 0.703 | 0.643 |
+| Online admitted BM25 | 209 | 0.538 | 0.696 | 0.558 |
+| Online balanced-v1 | 209 | 0.473 | 0.601 | 0.508 |
+| Online Qarinah admission-first-v2 | 209 | 0.538 | 0.696 | 0.558 |
+
+Admission-first-v2 exactly matches admitted BM25 ranking under the shared legal candidate set. This is intentional: Qarinah uses the strong lexical baseline as its first stage, then contributes admission, provenance, time, authority, conflict, supersession, and budgeting. It does not claim to invent a better lexical algorithm.
+
+Against balanced-v1 in the online setting, the mean Recall@10 difference is +0.0649 with a 12-repository clustered-bootstrap 95% interval of [-0.0150, 0.1025]. The mean reciprocal-rank difference is +0.0949 with interval [0.0572, 0.1115]. The recall interval crosses zero; the MRR interval does not. The graph ablation is identical to full v2 on this dataset, so graph ranking adds no measured benefit here.
+
+At fixed pack budgets, online Qarinah-v2 Recall@10 rises from 0.182 at 512 tokens to 0.243 at 1,000, 0.359 at 2,000, 0.490 at 4,000, and 0.531 at 8,000. These are portable serialized-record estimates, not provider tokens or task-success results.
+
+The experimental evidence-sufficiency score is not ready as a fail-closed semantic gate. In the online setting it has ROC-AUC 0.538, 10-bin calibration error 0.388, and a 90.32% false-acceptance rate among tasks with no positive record under the structural oracle. The API exposes the three states and reason codes for evaluation, but the default minimum evidence remains `any`.
+
+The v2 no-temporal ablation returns 1,083 future items out of 2,288, a 47.33% item-level violation rate, and affects all 240 queries. This separates item-level from query-level leakage and reinforces that the higher-leakage ranking must not be treated as a valid system result.
+
+## 8. What the pilot changes
 
 The research backlog is now evidence-driven:
 
-1. Replace query-term coverage with calibrated evidence sufficiency and unsupported-task abstention.
+1. Calibrate evidence sufficiency and no-positive-task abstention using independently reviewed labels; do not claim the current gate is solved.
 2. Test rank-fusion and diversity ablations because they currently reduce file-overlap recall relative to BM25.
 3. Expand the relevance oracle with blinded human judgments instead of treating path overlap as complete semantic truth.
 4. Add a real embedding baseline and a fixed-model running-summary baseline.
@@ -144,7 +179,7 @@ The research backlog is now evidence-driven:
 6. Run the official Docker evaluator with identical model, tools, and sampling settings across context conditions.
 7. Replicate across at least two coding agents and two model providers.
 
-## 8. Confirmatory execution gate
+## 9. Confirmatory execution gate
 
 The next phase must not begin until the following are fixed and recorded:
 
@@ -160,16 +195,20 @@ The next phase must not begin until the following are fixed and recorded:
 
 Until then, Qarinah must not claim improved SWE-bench resolve rate, provider-token reduction, total-cost reduction, model portability, or superior code quality from this study.
 
-## 9. Reproducibility artifacts
+## 10. Reproducibility artifacts
 
 - Corpus builder: [`scripts/prepare-research-benchmark.mjs`](../scripts/prepare-research-benchmark.mjs)
 - Dataset and split contract: [`bench/research/swe-bench-lite.mjs`](../bench/research/swe-bench-lite.mjs)
 - Metadata-only corpus: [`bench/research/swe-bench-lite-v1.json`](../bench/research/swe-bench-lite-v1.json)
 - Retrieval evaluator: [`scripts/evaluate-research-retrieval.mjs`](../scripts/evaluate-research-retrieval.mjs)
 - Machine-readable result: [`bench/results/research-retrieval-0.1.2.json`](../bench/results/research-retrieval-0.1.2.json)
+- Frozen exploratory tag: `research-benchmark-exploratory-v0.1`
+- Development-v0.2 corpus: [`bench/research/swe-bench-lite-development-v0.2.json`](../bench/research/swe-bench-lite-development-v0.2.json)
+- Development-v0.2 evaluator: [`scripts/evaluate-research-retrieval-v0.2.mjs`](../scripts/evaluate-research-retrieval-v0.2.mjs)
+- Development-v0.2 result: [`bench/results/research-retrieval-development-v0.2.json`](../bench/results/research-retrieval-development-v0.2.json)
 
 The evaluator fails if the pinned corpus, deterministic metrics, temporal leakage count, or governance results drift from the committed evidence. Runtime latency is retained as an observation and excluded from deterministic equality checks.
 
-## 10. Publication path
+## 11. Publication path
 
 The current artifact is suitable as a transparent research draft and replication package, not as a peer-reviewed result. A software-engineering framing fits ICSE, FSE, ASE, MSR, SANER, TOSEM, or TSE after the confirmatory task-success phase. A long-context-memory framing may fit an ACL, EMNLP, or ICLR workshop after real summary/vector baselines and cross-model replication are complete.

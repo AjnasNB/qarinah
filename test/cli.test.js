@@ -143,10 +143,22 @@ test("JSON stdin keeps model-controlled record and query text out of shell synta
 
   assert.equal((await run(["build"], root)).code, 0);
   const queried = await run(["query", "--stdin-json"], root, {
-    input: JSON.stringify({ query: attack, format: "json", limit: 5, maxChars: 12_000 })
+    input: JSON.stringify({
+      query: attack,
+      format: "json",
+      limit: 5,
+      maxChars: 12_000,
+      minimumEvidence: "direct",
+      rankingProfile: "admission-first-v2",
+      temporalBoundary: "strict-before",
+      includeEvidenceSufficiency: true
+    })
   });
   assert.equal(queried.code, 0, queried.stderr);
-  assert.equal(JSON.parse(queried.stdout).query, attack);
+  const pack = JSON.parse(queried.stdout);
+  assert.equal(pack.query, attack);
+  assert.equal(pack.retrieval.strategy, "admission-first-hybrid-v2");
+  assert.equal(pack.retrieval.evidenceSufficiency.state, "DIRECTLY_SUPPORTED");
   await assert.rejects(() => access(marker), (error) => error.code === "ENOENT");
 });
 

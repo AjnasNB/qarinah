@@ -50,6 +50,7 @@
     "docs/ARCHITECTURE.md",
     "docs/GETTING-STARTED.md",
     "docs/CROSS-AGENT-HANDOFFS.md",
+    "docs/CROSS-AGENT-VIDEO-PROTOCOL.md",
     "docs/architecture.mmd",
     "docs/WHITEPAPER.md",
     "docs/BENCHMARKS.md",
@@ -84,6 +85,9 @@
     "scripts/prepare-research-benchmark.mjs",
     "scripts/evaluate-research-retrieval.mjs",
     "scripts/verify-research-evidence.mjs",
+    "scripts/prepare-research-benchmark-v0.2.mjs",
+    "scripts/evaluate-research-retrieval-v0.2.mjs",
+    "scripts/verify-research-development-evidence.mjs",
     "LICENSE",
     "NOTICE",
     "THIRD_PARTY_NOTICES.md",
@@ -116,9 +120,10 @@
     "prepublishOnly": "npm run check",
     "test": "node scripts/run-tests.mjs",
     "typecheck": "node scripts/typecheck-consumer.mjs",
-    "check": "npm run check:plugins && npm run check:docs && npm run build:site && npm run check:site && npm run mcp:smoke && npm test && npm run typecheck && npm run check:benchmark-evidence && npm run check:research-evidence && npm run benchmark && npm run evaluate:context && npm run evaluate:software-tasks && npm run evaluate:long-document && npm pack --dry-run --ignore-scripts",
+    "check": "npm run check:plugins && npm run check:docs && npm run build:site && npm run check:site && npm run mcp:smoke && npm test && npm run typecheck && npm run check:benchmark-evidence && npm run check:research-evidence && npm run check:research-development-evidence && npm run benchmark && npm run evaluate:context && npm run evaluate:software-tasks && npm run evaluate:long-document && npm pack --dry-run --ignore-scripts",
     "check:benchmark-evidence": "node scripts/verify-benchmark-evidence.mjs",
     "check:research-evidence": "node scripts/verify-research-evidence.mjs",
+    "check:research-development-evidence": "node scripts/verify-research-development-evidence.mjs",
     "benchmark": "node scripts/benchmark.mjs",
     "evaluate:context": "node scripts/evaluate-context.mjs",
     "evaluate:software-tasks": "node scripts/evaluate-software-tasks.mjs",
@@ -126,7 +131,11 @@
     "prepare:research": "node scripts/prepare-research-benchmark.mjs",
     "prepare:research:write": "node scripts/prepare-research-benchmark.mjs --write",
     "evaluate:research-retrieval": "node scripts/evaluate-research-retrieval.mjs",
-    "evaluate:research-retrieval:write": "node scripts/evaluate-research-retrieval.mjs --write"
+    "evaluate:research-retrieval:write": "node scripts/evaluate-research-retrieval.mjs --write",
+    "prepare:research:v0.2": "node scripts/prepare-research-benchmark-v0.2.mjs",
+    "prepare:research:v0.2:write": "node scripts/prepare-research-benchmark-v0.2.mjs --write",
+    "evaluate:research-retrieval:v0.2": "node scripts/evaluate-research-retrieval-v0.2.mjs",
+    "evaluate:research-retrieval:v0.2:write": "node scripts/evaluate-research-retrieval-v0.2.mjs --write"
   },
   "engines": {
     "node": "^22.13.0 || ^24.0.0 || ^26.0.0"

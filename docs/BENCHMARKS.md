@@ -123,9 +123,11 @@ Keep these direct details beside the number:
 
 The research track now pins the official public SWE-bench Lite test split at 300 tasks from 12 repositories and applies a chronological 60-task warm-up / 240-task held-out split. The completed zero-model phase evaluates retrieval, temporal leakage, repository isolation, disclosure filtering, retention, and supersession.
 
-The result is deliberately not a new marketing headline. On the 79 held-out tasks with a prior production-file-overlap target, BM25 outperforms the current Qarinah hybrid ranker: Recall@10 is 0.687 versus 0.518, and MRR is 0.430 versus 0.320. The no-temporal ablation returns 971 future citations, and the current lexical coverage gate accepts all 161 tasks that the file-overlap oracle marks unsupported. A separate 72-record governance suite returns zero forbidden records.
+The frozen exploratory-v0.1 result is deliberately not a marketing headline. On the 79 held-out tasks with a prior production-file-overlap target, BM25 outperforms the original balanced-v1 Qarinah ranker: Recall@10 is 0.687 versus 0.518, and MRR is 0.430 versus 0.320. The no-temporal ablation returns 971 future citations, and the lexical coverage gate accepts all 161 tasks with no positive record under the file-overlap oracle. A separate 72-record governance suite returns zero forbidden records.
 
-See the complete [research protocol, limitations, repository citations, and results](RESEARCH-BENCHMARK.md). The committed evidence is [`bench/results/research-retrieval-0.1.2.json`](../bench/results/research-retrieval-0.1.2.json).
+Development v0.2 is explicitly tuned after inspecting v0.1 and is not confirmatory. It records the official-page 11-repository declaration alongside the 12 repository identifiers in the pinned dataset revision, adds a raw Parquet SHA-256, graded structural labels, static and online/prequential settings, fixed 512-8,000-token budgets, item/query leakage, calibration metrics, and repository-clustered bootstrap intervals. Admission-first Qarinah v2 exactly matches admitted BM25 ranking and improves online MRR over balanced-v1 from 0.601 to 0.696. Graph adds no measured ranking value, and the experimental evidence gate still has a 90.32% false-acceptance rate among tasks with no positive record under the structural oracle.
+
+See the complete [research protocol, limitations, repository citations, and results](RESEARCH-BENCHMARK.md). The committed artifacts preserve both [`exploratory v0.1`](../bench/results/research-retrieval-0.1.2.json) and [`development v0.2`](../bench/results/research-retrieval-development-v0.2.json).
 
 ## Next benchmark gate
 

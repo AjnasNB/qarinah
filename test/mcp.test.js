@@ -147,7 +147,9 @@ test("MCP exposes bounded cited retrieval only with an exact workspace disclosur
         query: "Govern browser writes",
         maxChars: 4_000,
         limit: 3,
-        minimumCoverage: "any"
+        minimumCoverage: "any",
+        minimumEvidence: "partial",
+        temporalBoundary: "strict-before"
       }
     }
   });
@@ -157,6 +159,9 @@ test("MCP exposes bounded cited retrieval only with an exact workspace disclosur
   assert.equal(result.structuredContent.workspaceId, workspace.config.workspaceId);
   assert.equal(result.structuredContent.items[0].title, "Govern browser writes");
   assert.equal(result.structuredContent.budget.maxChars, 4_000);
+  assert.ok(["PARTIALLY_SUPPORTED", "DIRECTLY_SUPPORTED"].includes(
+    result.structuredContent.retrieval.evidenceSufficiency.state
+  ));
   assert.ok(result.structuredContent.budget.usedChars <= 4_000);
   assert.equal(JSON.stringify(result).includes(root), false);
   assert.deepEqual(await snapshotTree(path.join(root, ".qarinah")), beforeWorkspace);

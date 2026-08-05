@@ -74,10 +74,14 @@ npx qarinah query "release provenance" \
 
 The pack includes complete selected records, event IDs, hashes, a retrieval manifest, and deterministic evidence-coverage diagnostics. `minimum-coverage direct` rejects a result unless one selected record contains every normalized query term.
 
+The default `admission-first-v2` profile first removes records that are out of repository, time, retention, disclosure, or supersession scope, then preserves BM25 order for the remaining lexical candidates. Typo-tolerant and graph matches may fill gaps, but cannot reintroduce rejected records. Research checkpoints should use `--temporal-boundary strict-before` so a record created at the task timestamp cannot leak into that task's query.
+
+An additional experimental evidence-sufficiency diagnostic can be requested with `--minimum-evidence partial` or `--minimum-evidence direct`. Treat it as a conservative workflow signal, not proof that the retrieved context is semantically sufficient: the v0.2 development benchmark found that its current score is not yet calibrated well enough for an academic claim.
+
 For agent callers, use JSON stdin:
 
 ```sh
-printf '%s' '{"query":"release provenance","format":"json","minimumCoverage":"direct","maxChars":8000}' \
+printf '%s' '{"query":"release provenance","format":"json","minimumCoverage":"direct","minimumEvidence":"partial","temporalBoundary":"strict-before","includeEvidenceSufficiency":true,"maxChars":8000}' \
   | npx qarinah query --stdin-json
 ```
 

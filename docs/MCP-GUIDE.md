@@ -246,6 +246,27 @@ If the event store verifies but derived state is unavailable:
 
 The tool does not repair this condition. Review it locally and run `npx qarinah build` if the authoritative chain is valid.
 
+## Tool: `context.query`
+
+Compiles a bounded, cited context pack without writing to the workspace. This tool is listed only when the server has the exact disclosure permit described below.
+
+```json
+{
+  "workspace": "D:\\projects\\shop",
+  "query": "release provenance",
+  "limit": 10,
+  "maxChars": 8000,
+  "minimumCoverage": "direct",
+  "minimumEvidence": "partial",
+  "temporalBoundary": "strict-before",
+  "asOf": "2026-08-05T07:30:00.000Z"
+}
+```
+
+Retrieval uses the `admission-first-v2` profile: repository, time, retention, disclosure, and supersession admission happens before ranking; admissible lexical candidates retain BM25 order, and fuzzy or graph evidence may only fill gaps. `temporalBoundary: "strict-before"` excludes evidence at the exact `asOf` timestamp and is recommended for prequential research evaluation. The default `inclusive` boundary is appropriate for normal as-of queries.
+
+`minimumEvidence` accepts `any`, `partial`, or `direct`. A stricter value returns `CONTEXT_EVIDENCE_INSUFFICIENT` when the deterministic evidence diagnostic does not meet the requested level. This diagnostic is experimental and is not a semantic guarantee: the v0.2 development evaluation found poor calibration on no-positive tasks, so callers must inspect the cited records and reason codes instead of treating acceptance as proof.
+
 ## Tool result errors
 
 Expected operational failures are returned as MCP tool results with:
@@ -266,6 +287,8 @@ INDEX_STALE
 INDEX_INVALID
 EVENT_LOG_MISSING
 MCP_TOOL_NOT_FOUND
+CONTEXT_COVERAGE_TOO_LOW
+CONTEXT_EVIDENCE_INSUFFICIENT
 ```
 
 Other internal errors are reduced to a stable code and the generic message:
