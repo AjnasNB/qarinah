@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "qarinah.provider-pilot-authorization.v1",
+  "status": "prepared-not-authorized",
+  "reasonNotAuthorized": [
+    "Two independent blinded relevance label sets are still pending.",
+    "The requested provider model identifiers must be resolved in the actual Codex and Claude runtimes immediately before execution.",
+    "No provider-backed pilot run or spend was performed while creating this file."
+  ],
+  "protocolCommit": "3e05fa30f3007fd67a6b5aba2613f14dcb896fd7",
+  "protocolSha256": "sha256:93cc40c5c2a632024ff0a30077d122218d231cdd05f5121f9788d900b975b64e",
+  "finalManifestCommit": "b20bb87e6d0ab39aed7df00605d38d24deb9da36",
+  "systemCommit": "bf4eb0f",
+  "models": {
+    "codex": {
+      "requestedId": "gpt-5.3-codex",
+      "identifierStatus": "user-specified-unverified-in-provider-runtime",
+      "reasoningEffort": "high",
+      "cliVersion": "0.144.6"
+    },
+    "claude": {
+      "requestedId": "claude-sonnet-5",
+      "identifierStatus": "user-specified-unverified-in-provider-runtime",
+      "effort": "high",
+      "cliVersion": "2.1.118"
+    }
+  },
+  "conditions": [
+    "no_handoff",
+    "git_handoff",
+    "summary_handoff",
+    "qarinah_handoff"
+  ],
+  "pilotTasks": [
+    {
+      "instanceId": "astropy__astropy-7746",
+      "repository": "astropy/astropy",
+      "sourcePopulation": "SWE-bench Lite development-v0.2"
+    },
+    {
+      "instanceId": "django__django-12113",
+      "repository": "django/django",
+      "sourcePopulation": "SWE-bench Lite development-v0.2"
+    },
+    {
+      "instanceId": "matplotlib__matplotlib-23476",
+      "repository": "matplotlib/matplotlib",
+      "sourcePopulation": "SWE-bench Lite development-v0.2"
+    },
+    {
+      "instanceId": "mwaskom__seaborn-3010",
+      "repository": "mwaskom/seaborn",
+      "sourcePopulation": "SWE-bench Lite development-v0.2"
+    }
+  ],
+  "budgetUsd": {
+    "pilotHardCap": 100,
+    "perRunEmergencyStop": 5,
+    "finalPrimaryCapProposal": 600,
+    "contingencyReserveProposal": 150
+  },
+  "requirements": {
+    "freshAgentBSession": true,
+    "identicalRepositorySnapshot": true,
+    "randomizedConditionOrder": true,
+    "providerUsageCapture": true,
+    "nativeSessionResumeDisabled": true,
+    "summaryAndQarinahMaximumTokenBudgetEqual": true,
+    "independentReviewerLabelsCompleteBeforePilot": true
+  },
+  "pilotExecutionAuthorized": false,
+  "finalEvaluationAuthorized": false,
+  "resultsObserved": false,
+  "preparedAt": "2026-08-05",
+  "contentDigest": "sha256:3063df37021a6ff6b5bc738d818e07ef3ed42a930890f8932658d643777178ef"
+}

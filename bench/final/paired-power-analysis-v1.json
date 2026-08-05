@@ -1,0 +1,180 @@
+{
+  "schemaVersion": "qarinah.paired-power-analysis.v1",
+  "status": "pre-outcome-design-analysis",
+  "pairedTasks": 40,
+  "alphaTwoSided": 0.05,
+  "primaryBinaryComparison": "paired SWE-bench resolved outcome",
+  "method": "Exact two-sided McNemar rejection probability, marginalized over the binomial number of discordant pairs. Effect is P(Qarinah-only resolution) minus P(baseline-only resolution).",
+  "assumptions": {
+    "independentTaskPairs": true,
+    "noFinalOutcomesInspected": true,
+    "discordanceRatesExplored": [
+      0.1,
+      0.2,
+      0.3,
+      0.4
+    ],
+    "effectGridIncrement": 0.005,
+    "confidenceIntervalWidthNote": "The reported 95% half-width is a normal approximation for the paired difference and is descriptive, not the exact McNemar interval."
+  },
+  "scenarios": [
+    {
+      "discordanceRate": 0.1,
+      "netResolutionDifference": 0.05,
+      "qarinahOnlyProbability": 0.075,
+      "baselineOnlyProbability": 0.025,
+      "exactMcNemarPower": 0.033734,
+      "approximatePairedDifferenceCi95HalfWidth": 0.096767
+    },
+    {
+      "discordanceRate": 0.1,
+      "netResolutionDifference": 0.1,
+      "qarinahOnlyProbability": 0.1,
+      "baselineOnlyProbability": 0,
+      "exactMcNemarPower": 0.206273,
+      "approximatePairedDifferenceCi95HalfWidth": 0.092971
+    },
+    {
+      "discordanceRate": 0.2,
+      "netResolutionDifference": 0.05,
+      "qarinahOnlyProbability": 0.125,
+      "baselineOnlyProbability": 0.075,
+      "exactMcNemarPower": 0.049356,
+      "approximatePairedDifferenceCi95HalfWidth": 0.137724
+    },
+    {
+      "discordanceRate": 0.2,
+      "netResolutionDifference": 0.1,
+      "qarinahOnlyProbability": 0.15,
+      "baselineOnlyProbability": 0.05,
+      "exactMcNemarPower": 0.172427,
+      "approximatePairedDifferenceCi95HalfWidth": 0.135084
+    },
+    {
+      "discordanceRate": 0.2,
+      "netResolutionDifference": 0.15,
+      "qarinahOnlyProbability": 0.175,
+      "baselineOnlyProbability": 0.025,
+      "exactMcNemarPower": 0.446772,
+      "approximatePairedDifferenceCi95HalfWidth": 0.130565
+    },
+    {
+      "discordanceRate": 0.2,
+      "netResolutionDifference": 0.2,
+      "qarinahOnlyProbability": 0.2,
+      "baselineOnlyProbability": 0,
+      "exactMcNemarPower": 0.838671,
+      "approximatePairedDifferenceCi95HalfWidth": 0.123961
+    },
+    {
+      "discordanceRate": 0.3,
+      "netResolutionDifference": 0.05,
+      "qarinahOnlyProbability": 0.175,
+      "baselineOnlyProbability": 0.125,
+      "exactMcNemarPower": 0.048227,
+      "approximatePairedDifferenceCi95HalfWidth": 0.169032
+    },
+    {
+      "discordanceRate": 0.3,
+      "netResolutionDifference": 0.1,
+      "qarinahOnlyProbability": 0.2,
+      "baselineOnlyProbability": 0.1,
+      "exactMcNemarPower": 0.133607,
+      "approximatePairedDifferenceCi95HalfWidth": 0.166888
+    },
+    {
+      "discordanceRate": 0.3,
+      "netResolutionDifference": 0.15,
+      "qarinahOnlyProbability": 0.225,
+      "baselineOnlyProbability": 0.075,
+      "exactMcNemarPower": 0.307416,
+      "approximatePairedDifferenceCi95HalfWidth": 0.163252
+    },
+    {
+      "discordanceRate": 0.3,
+      "netResolutionDifference": 0.2,
+      "qarinahOnlyProbability": 0.25,
+      "baselineOnlyProbability": 0.05,
+      "exactMcNemarPower": 0.567379,
+      "approximatePairedDifferenceCi95HalfWidth": 0.15802
+    },
+    {
+      "discordanceRate": 0.3,
+      "netResolutionDifference": 0.25,
+      "qarinahOnlyProbability": 0.275,
+      "baselineOnlyProbability": 0.025,
+      "exactMcNemarPower": 0.838264,
+      "approximatePairedDifferenceCi95HalfWidth": 0.151028
+    },
+    {
+      "discordanceRate": 0.4,
+      "netResolutionDifference": 0.05,
+      "qarinahOnlyProbability": 0.225,
+      "baselineOnlyProbability": 0.175,
+      "exactMcNemarPower": 0.048317,
+      "approximatePairedDifferenceCi95HalfWidth": 0.195387
+    },
+    {
+      "discordanceRate": 0.4,
+      "netResolutionDifference": 0.1,
+      "qarinahOnlyProbability": 0.25,
+      "baselineOnlyProbability": 0.15,
+      "exactMcNemarPower": 0.115369,
+      "approximatePairedDifferenceCi95HalfWidth": 0.193534
+    },
+    {
+      "discordanceRate": 0.4,
+      "netResolutionDifference": 0.15,
+      "qarinahOnlyProbability": 0.275,
+      "baselineOnlyProbability": 0.125,
+      "exactMcNemarPower": 0.245077,
+      "approximatePairedDifferenceCi95HalfWidth": 0.190408
+    },
+    {
+      "discordanceRate": 0.4,
+      "netResolutionDifference": 0.2,
+      "qarinahOnlyProbability": 0.3,
+      "baselineOnlyProbability": 0.1,
+      "exactMcNemarPower": 0.439723,
+      "approximatePairedDifferenceCi95HalfWidth": 0.185942
+    },
+    {
+      "discordanceRate": 0.4,
+      "netResolutionDifference": 0.25,
+      "qarinahOnlyProbability": 0.325,
+      "baselineOnlyProbability": 0.075,
+      "exactMcNemarPower": 0.667089,
+      "approximatePairedDifferenceCi95HalfWidth": 0.180037
+    }
+  ],
+  "minimumDetectableEffects": [
+    {
+      "discordanceRate": 0.1,
+      "targetPower": 0.8,
+      "smallestGridEffect": null,
+      "achievedPower": null
+    },
+    {
+      "discordanceRate": 0.2,
+      "targetPower": 0.8,
+      "smallestGridEffect": 0.2,
+      "achievedPower": 0.838671
+    },
+    {
+      "discordanceRate": 0.3,
+      "targetPower": 0.8,
+      "smallestGridEffect": 0.245,
+      "achievedPower": 0.814372
+    },
+    {
+      "discordanceRate": 0.4,
+      "targetPower": 0.8,
+      "smallestGridEffect": 0.285,
+      "achievedPower": 0.811585
+    }
+  ],
+  "conclusion": "Forty paired tasks have adequate power only for large net binary-resolution effects under the explored discordance rates. Treat SWE-bench resolution as a secondary outcome unless the true effect is large; the main study can instead center portable handoff, context use, repeated work, citations, and invalid-evidence exposure.",
+  "decisionRule": "Do not add tasks after final outcomes are observed. Any sample-size change requires a pre-unblinding protocol amendment.",
+  "generatedAt": "2026-08-05",
+  "contentDigest": "sha256:056695e630715ba143eb79cdfcf3ebb15fa8b1ecaf43d8ab330ffc4b9fcb1927"
+}

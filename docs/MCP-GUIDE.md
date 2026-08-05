@@ -265,7 +265,7 @@ Compiles a bounded, cited context pack without writing to the workspace. This to
 
 Retrieval uses the `admission-first-v2` profile: repository, time, retention, disclosure, and supersession admission happens before ranking; admissible lexical candidates retain BM25 order, and fuzzy or graph evidence may only fill gaps. `temporalBoundary: "strict-before"` excludes evidence at the exact `asOf` timestamp and is recommended for prequential research evaluation. The default `inclusive` boundary is appropriate for normal as-of queries.
 
-`minimumEvidence` accepts `any`, `partial`, or `direct`. A stricter value returns `CONTEXT_EVIDENCE_INSUFFICIENT` when the deterministic evidence diagnostic does not meet the requested level. In `evidence-sufficiency-v2`, only `DIRECTLY_SUPPORTED` produces `ACCEPT_DIRECT`; partial and insufficient evidence both produce `ABSTAIN`. The conservative 0.65 threshold records zero direct false acceptance on the structural development oracle, but this is not a semantic guarantee and acceptance coverage is only 3.33-5.00%. Callers must still inspect cited records and reason codes.
+`minimumEvidence` accepts `any`, `partial`, or `direct`. A stricter value returns `CONTEXT_EVIDENCE_INSUFFICIENT` when the deterministic evidence diagnostic does not meet the requested level. In `evidence-sufficiency-v2`, only `DIRECTLY_SUPPORTED` produces `ACCEPT_DIRECT`; partial and insufficient evidence both produce `ABSTAIN`. The frozen development run observed zero direct false accepts at the conservative 0.65 operating point, but exact 95% upper bounds remain 7.25% static and 11.22% online and acceptance coverage is only 3.33%-5.00%. Callers must still inspect cited records and reason codes.
 
 ## Tool result errors
 

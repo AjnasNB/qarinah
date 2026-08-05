@@ -15,7 +15,7 @@
   "claimBoundary": {
     "confirmatory": false,
     "humanValidatedRelevance": false,
-    "zeroFalseAcceptanceMeaning": "Zero direct false acceptances on the deterministic structural development oracle only; this is not a universal semantic guarantee.",
+    "observedFalseAcceptanceMeaning": "At the frozen conservative operating point, zero direct false accepts were observed against the deterministic structural development oracle. Exact intervals remain non-zero above; this is not a universal semantic guarantee.",
     "tradeoff": "The conservative rule intentionally sacrifices acceptance coverage and recall to maximize precision."
   },
   "settings": {
@@ -45,7 +45,23 @@
         "acceptedF1": 0.080402,
         "falseAcceptanceRate": 0,
         "correctAbstentionRate": 1,
-        "acceptanceCoverage": 0.033333
+        "acceptanceCoverage": 0.033333,
+        "confidenceIntervals95": {
+          "acceptedPrecision": {
+            "method": "Clopper-Pearson exact two-sided",
+            "successes": 8,
+            "trials": 8,
+            "lower": 0.630583,
+            "upper": 1
+          },
+          "falseAcceptanceRate": {
+            "method": "Clopper-Pearson exact two-sided",
+            "successes": 0,
+            "trials": 49,
+            "lower": 0,
+            "upper": 0.072519
+          }
+        }
       },
       "scoreQuality": {
         "rocAuc": 0.605994,
@@ -82,7 +98,23 @@
               "acceptedF1": 0.081218,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.034043
+              "acceptanceCoverage": 0.034043,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 8,
+                  "trials": 8,
+                  "lower": 0.630583,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 46,
+                  "lower": 0,
+                  "upper": 0.077062
+                }
+              }
             },
             "heldOut": {
               "threshold": 0.65,
@@ -100,7 +132,17 @@
               "acceptedF1": null,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 3,
+                  "lower": 0,
+                  "upper": 0.707598
+                }
+              }
             }
           },
           {
@@ -123,7 +165,23 @@
               "acceptedF1": 0.091743,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.033557
+              "acceptanceCoverage": 0.033557,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 5,
+                  "trials": 5,
+                  "lower": 0.478176,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 45,
+                  "lower": 0,
+                  "upper": 0.078705
+                }
+              }
             },
             "heldOut": {
               "threshold": 0.65,
@@ -141,7 +199,23 @@
               "acceptedF1": 0.066667,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.032967
+              "acceptanceCoverage": 0.032967,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 3,
+                  "trials": 3,
+                  "lower": 0.292402,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 4,
+                  "lower": 0,
+                  "upper": 0.602365
+                }
+              }
             }
           },
           {
@@ -164,7 +238,23 @@
               "acceptedF1": 0.088398,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.036036
+              "acceptanceCoverage": 0.036036,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 8,
+                  "trials": 8,
+                  "lower": 0.630583,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 49,
+                  "lower": 0,
+                  "upper": 0.072519
+                }
+              }
             },
             "heldOut": {
               "threshold": 0.65,
@@ -182,7 +272,11 @@
               "acceptedF1": null,
               "falseAcceptanceRate": null,
               "correctAbstentionRate": null,
-              "acceptanceCoverage": 0
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": null
+              }
             }
           },
           {
@@ -205,7 +299,23 @@
               "acceptedF1": 0.080808,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.033755
+              "acceptanceCoverage": 0.033755,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 8,
+                  "trials": 8,
+                  "lower": 0.630583,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 47,
+                  "lower": 0,
+                  "upper": 0.075486
+                }
+              }
             },
             "heldOut": {
               "threshold": 0.65,
@@ -223,7 +333,17 @@
               "acceptedF1": null,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 2,
+                  "lower": 0,
+                  "upper": 0.841886
+                }
+              }
             }
           },
           {
@@ -246,7 +366,23 @@
               "acceptedF1": 0.081218,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.033613
+              "acceptanceCoverage": 0.033613,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 8,
+                  "trials": 8,
+                  "lower": 0.630583,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 49,
+                  "lower": 0,
+                  "upper": 0.072519
+                }
+              }
             },
             "heldOut": {
               "threshold": 0.65,
@@ -264,7 +400,11 @@
               "acceptedF1": null,
               "falseAcceptanceRate": null,
               "correctAbstentionRate": null,
-              "acceptanceCoverage": 0
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": null
+              }
             }
           },
           {
@@ -287,7 +427,23 @@
               "acceptedF1": 0.082474,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.034043
+              "acceptanceCoverage": 0.034043,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 8,
+                  "trials": 8,
+                  "lower": 0.630583,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 49,
+                  "lower": 0,
+                  "upper": 0.072519
+                }
+              }
             },
             "heldOut": {
               "threshold": 0.65,
@@ -305,7 +461,11 @@
               "acceptedF1": null,
               "falseAcceptanceRate": null,
               "correctAbstentionRate": null,
-              "acceptanceCoverage": 0
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": null
+              }
             }
           },
           {
@@ -328,7 +488,23 @@
               "acceptedF1": 0.082051,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.033898
+              "acceptanceCoverage": 0.033898,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 8,
+                  "trials": 8,
+                  "lower": 0.630583,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 49,
+                  "lower": 0,
+                  "upper": 0.072519
+                }
+              }
             },
             "heldOut": {
               "threshold": 0.65,
@@ -346,7 +522,11 @@
               "acceptedF1": null,
               "falseAcceptanceRate": null,
               "correctAbstentionRate": null,
-              "acceptanceCoverage": 0
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": null
+              }
             }
           },
           {
@@ -369,7 +549,23 @@
               "acceptedF1": 0.080402,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.034043
+              "acceptanceCoverage": 0.034043,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 8,
+                  "trials": 8,
+                  "lower": 0.630583,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 44,
+                  "lower": 0,
+                  "upper": 0.08042
+                }
+              }
             },
             "heldOut": {
               "threshold": 0.65,
@@ -387,7 +583,17 @@
               "acceptedF1": null,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 5,
+                  "lower": 0,
+                  "upper": 0.521824
+                }
+              }
             }
           },
           {
@@ -410,7 +616,23 @@
               "acceptedF1": 0.086486,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.035398
+              "acceptanceCoverage": 0.035398,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 8,
+                  "trials": 8,
+                  "lower": 0.630583,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 49,
+                  "lower": 0,
+                  "upper": 0.072519
+                }
+              }
             },
             "heldOut": {
               "threshold": 0.65,
@@ -428,7 +650,11 @@
               "acceptedF1": null,
               "falseAcceptanceRate": null,
               "correctAbstentionRate": null,
-              "acceptanceCoverage": 0
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": null
+              }
             }
           },
           {
@@ -451,7 +677,23 @@
               "acceptedF1": 0.084211,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.036036
+              "acceptanceCoverage": 0.036036,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 8,
+                  "trials": 8,
+                  "lower": 0.630583,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 40,
+                  "lower": 0,
+                  "upper": 0.088097
+                }
+              }
             },
             "heldOut": {
               "threshold": 0.65,
@@ -469,7 +711,17 @@
               "acceptedF1": null,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 9,
+                  "lower": 0,
+                  "upper": 0.336267
+                }
+              }
             }
           },
           {
@@ -492,7 +744,23 @@
               "acceptedF1": 0.042781,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.017621
+              "acceptanceCoverage": 0.017621,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 4,
+                  "trials": 4,
+                  "lower": 0.397635,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 44,
+                  "lower": 0,
+                  "upper": 0.08042
+                }
+              }
             },
             "heldOut": {
               "threshold": 0.65,
@@ -510,7 +778,23 @@
               "acceptedF1": 0.666667,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.307692
+              "acceptanceCoverage": 0.307692,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 4,
+                  "trials": 4,
+                  "lower": 0.397635,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 5,
+                  "lower": 0,
+                  "upper": 0.521824
+                }
+              }
             }
           },
           {
@@ -533,7 +817,23 @@
               "acceptedF1": 0.089172,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.039326
+              "acceptanceCoverage": 0.039326,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 7,
+                  "trials": 7,
+                  "lower": 0.590384,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 28,
+                  "lower": 0,
+                  "upper": 0.123436
+                }
+              }
             },
             "heldOut": {
               "threshold": 0.65,
@@ -551,7 +851,23 @@
               "acceptedF1": 0.047619,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.016129
+              "acceptanceCoverage": 0.016129,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 1,
+                  "trials": 1,
+                  "lower": 0.025,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 21,
+                  "lower": 0,
+                  "upper": 0.161098
+                }
+              }
             }
           }
         ],
@@ -568,7 +884,23 @@
           "acceptedPrecision": 1,
           "acceptedRecall": 0.041885,
           "falseAcceptanceRate": 0,
-          "correctAbstentionRate": 1
+          "correctAbstentionRate": 1,
+          "confidenceIntervals95": {
+            "acceptedPrecision": {
+              "method": "Clopper-Pearson exact two-sided",
+              "successes": 8,
+              "trials": 8,
+              "lower": 0.630583,
+              "upper": 1
+            },
+            "falseAcceptanceRate": {
+              "method": "Clopper-Pearson exact two-sided",
+              "successes": 0,
+              "trials": 49,
+              "lower": 0,
+              "upper": 0.072519
+            }
+          }
         }
       },
       "taskDecisions": [
@@ -2520,7 +2852,23 @@
         "acceptedF1": 0.108597,
         "falseAcceptanceRate": 0,
         "correctAbstentionRate": 1,
-        "acceptanceCoverage": 0.05
+        "acceptanceCoverage": 0.05,
+        "confidenceIntervals95": {
+          "acceptedPrecision": {
+            "method": "Clopper-Pearson exact two-sided",
+            "successes": 12,
+            "trials": 12,
+            "lower": 0.735352,
+            "upper": 1
+          },
+          "falseAcceptanceRate": {
+            "method": "Clopper-Pearson exact two-sided",
+            "successes": 0,
+            "trials": 31,
+            "lower": 0,
+            "upper": 0.112189
+          }
+        }
       },
       "scoreQuality": {
         "rocAuc": 0.537892,
@@ -2557,7 +2905,23 @@
               "acceptedF1": 0.109589,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.051064
+              "acceptanceCoverage": 0.051064,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 12,
+                  "trials": 12,
+                  "lower": 0.735352,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 28,
+                  "lower": 0,
+                  "upper": 0.123436
+                }
+              }
             },
             "heldOut": {
               "threshold": 0.65,
@@ -2575,7 +2939,17 @@
               "acceptedF1": null,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 3,
+                  "lower": 0,
+                  "upper": 0.707598
+                }
+              }
             }
           },
           {
@@ -2598,7 +2972,23 @@
               "acceptedF1": 0.124031,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.053691
+              "acceptanceCoverage": 0.053691,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 8,
+                  "trials": 8,
+                  "lower": 0.630583,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 28,
+                  "lower": 0,
+                  "upper": 0.123436
+                }
+              }
             },
             "heldOut": {
               "threshold": 0.65,
@@ -2616,7 +3006,23 @@
               "acceptedF1": 0.086957,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.043956
+              "acceptanceCoverage": 0.043956,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 4,
+                  "trials": 4,
+                  "lower": 0.397635,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 3,
+                  "lower": 0,
+                  "upper": 0.707598
+                }
+              }
             }
           },
           {
@@ -2639,7 +3045,23 @@
               "acceptedF1": 0.108911,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.04955
+              "acceptanceCoverage": 0.04955,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 11,
+                  "trials": 11,
+                  "lower": 0.715086,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 31,
+                  "lower": 0,
+                  "upper": 0.112189
+                }
+              }
             },
             "heldOut": {
               "threshold": 0.65,
@@ -2657,7 +3079,17 @@
               "acceptedF1": 0.105263,
               "falseAcceptanceRate": null,
               "correctAbstentionRate": null,
-              "acceptanceCoverage": 0.055556
+              "acceptanceCoverage": 0.055556,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 1,
+                  "trials": 1,
+                  "lower": 0.025,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": null
+              }
             }
           },
           {
@@ -2680,7 +3112,23 @@
               "acceptedF1": 0.109091,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.050633
+              "acceptanceCoverage": 0.050633,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 12,
+                  "trials": 12,
+                  "lower": 0.735352,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 29,
+                  "lower": 0,
+                  "upper": 0.119445
+                }
+              }
             },
             "heldOut": {
               "threshold": 0.65,
@@ -2698,7 +3146,17 @@
               "acceptedF1": null,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 2,
+                  "lower": 0,
+                  "upper": 0.841886
+                }
+              }
             }
           },
           {
@@ -2721,7 +3179,23 @@
               "acceptedF1": 0.109589,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.05042
+              "acceptanceCoverage": 0.05042,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 12,
+                  "trials": 12,
+                  "lower": 0.735352,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 31,
+                  "lower": 0,
+                  "upper": 0.112189
+                }
+              }
             },
             "heldOut": {
               "threshold": 0.65,
@@ -2739,7 +3213,11 @@
               "acceptedF1": null,
               "falseAcceptanceRate": null,
               "correctAbstentionRate": null,
-              "acceptanceCoverage": 0
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": null
+              }
             }
           },
           {
@@ -2762,7 +3240,23 @@
               "acceptedF1": 0.111111,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.051064
+              "acceptanceCoverage": 0.051064,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 12,
+                  "trials": 12,
+                  "lower": 0.735352,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 31,
+                  "lower": 0,
+                  "upper": 0.112189
+                }
+              }
             },
             "heldOut": {
               "threshold": 0.65,
@@ -2780,7 +3274,11 @@
               "acceptedF1": null,
               "falseAcceptanceRate": null,
               "correctAbstentionRate": null,
-              "acceptanceCoverage": 0
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": null
+              }
             }
           },
           {
@@ -2803,7 +3301,23 @@
               "acceptedF1": 0.110599,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.050847
+              "acceptanceCoverage": 0.050847,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 12,
+                  "trials": 12,
+                  "lower": 0.735352,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 31,
+                  "lower": 0,
+                  "upper": 0.112189
+                }
+              }
             },
             "heldOut": {
               "threshold": 0.65,
@@ -2821,7 +3335,11 @@
               "acceptedF1": null,
               "falseAcceptanceRate": null,
               "correctAbstentionRate": null,
-              "acceptanceCoverage": 0
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": null
+              }
             }
           },
           {
@@ -2844,7 +3362,23 @@
               "acceptedF1": 0.109589,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.051064
+              "acceptanceCoverage": 0.051064,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 12,
+                  "trials": 12,
+                  "lower": 0.735352,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 28,
+                  "lower": 0,
+                  "upper": 0.123436
+                }
+              }
             },
             "heldOut": {
               "threshold": 0.65,
@@ -2862,7 +3396,17 @@
               "acceptedF1": null,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 3,
+                  "lower": 0,
+                  "upper": 0.707598
+                }
+              }
             }
           },
           {
@@ -2885,7 +3429,23 @@
               "acceptedF1": 0.115942,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.053097
+              "acceptanceCoverage": 0.053097,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 12,
+                  "trials": 12,
+                  "lower": 0.735352,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 31,
+                  "lower": 0,
+                  "upper": 0.112189
+                }
+              }
             },
             "heldOut": {
               "threshold": 0.65,
@@ -2903,7 +3463,11 @@
               "acceptedF1": null,
               "falseAcceptanceRate": null,
               "correctAbstentionRate": null,
-              "acceptanceCoverage": 0
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": null
+              }
             }
           },
           {
@@ -2926,7 +3490,23 @@
               "acceptedF1": 0.104265,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.04955
+              "acceptanceCoverage": 0.04955,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 11,
+                  "trials": 11,
+                  "lower": 0.715086,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 22,
+                  "lower": 0,
+                  "upper": 0.154373
+                }
+              }
             },
             "heldOut": {
               "threshold": 0.65,
@@ -2944,7 +3524,23 @@
               "acceptedF1": 0.2,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.055556
+              "acceptanceCoverage": 0.055556,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 1,
+                  "trials": 1,
+                  "lower": 0.025,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 9,
+                  "lower": 0,
+                  "upper": 0.336267
+                }
+              }
             }
           },
           {
@@ -2967,7 +3563,23 @@
               "acceptedF1": 0.067961,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.030837
+              "acceptanceCoverage": 0.030837,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 7,
+                  "trials": 7,
+                  "lower": 0.590384,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 28,
+                  "lower": 0,
+                  "upper": 0.123436
+                }
+              }
             },
             "heldOut": {
               "threshold": 0.65,
@@ -2985,7 +3597,23 @@
               "acceptedF1": 0.666667,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.384615
+              "acceptanceCoverage": 0.384615,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 5,
+                  "trials": 5,
+                  "lower": 0.478176,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 3,
+                  "lower": 0,
+                  "upper": 0.707598
+                }
+              }
             }
           },
           {
@@ -3008,7 +3636,23 @@
               "acceptedF1": 0.13253,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.061798
+              "acceptanceCoverage": 0.061798,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 11,
+                  "trials": 11,
+                  "lower": 0.715086,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 23,
+                  "lower": 0,
+                  "upper": 0.148185
+                }
+              }
             },
             "heldOut": {
               "threshold": 0.65,
@@ -3026,7 +3670,23 @@
               "acceptedF1": 0.036364,
               "falseAcceptanceRate": 0,
               "correctAbstentionRate": 1,
-              "acceptanceCoverage": 0.016129
+              "acceptanceCoverage": 0.016129,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 1,
+                  "trials": 1,
+                  "lower": 0.025,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 8,
+                  "lower": 0,
+                  "upper": 0.369417
+                }
+              }
             }
           }
         ],
@@ -3043,7 +3703,23 @@
           "acceptedPrecision": 1,
           "acceptedRecall": 0.057416,
           "falseAcceptanceRate": 0,
-          "correctAbstentionRate": 1
+          "correctAbstentionRate": 1,
+          "confidenceIntervals95": {
+            "acceptedPrecision": {
+              "method": "Clopper-Pearson exact two-sided",
+              "successes": 12,
+              "trials": 12,
+              "lower": 0.735352,
+              "upper": 1
+            },
+            "falseAcceptanceRate": {
+              "method": "Clopper-Pearson exact two-sided",
+              "successes": 0,
+              "trials": 31,
+              "lower": 0,
+              "upper": 0.112189
+            }
+          }
         }
       },
       "taskDecisions": [

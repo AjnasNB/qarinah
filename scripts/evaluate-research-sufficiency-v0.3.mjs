@@ -23,6 +23,26 @@ function sha256(value) {
   return `sha256:${createHash("sha256").update(value).digest("hex")}`;
 }
 
+function exactEdgeInterval95(successes, trials) {
+  if (trials === 0) return null;
+  const alpha = 0.05;
+  if (successes === 0) return {
+    method: "Clopper-Pearson exact two-sided",
+    successes,
+    trials,
+    lower: 0,
+    upper: rounded(1 - ((alpha / 2) ** (1 / trials)))
+  };
+  if (successes === trials) return {
+    method: "Clopper-Pearson exact two-sided",
+    successes,
+    trials,
+    lower: rounded((alpha / 2) ** (1 / trials)),
+    upper: 1
+  };
+  throw new RangeError("This evaluator records exact edge intervals only for observed zero/all-success development outcomes.");
+}
+
 function classification(score) {
   if (score >= DIRECT_THRESHOLD) return { state: "DIRECTLY_SUPPORTED", decision: "ACCEPT_DIRECT" };
   if (score >= PARTIAL_THRESHOLD) return { state: "PARTIALLY_SUPPORTED", decision: "ABSTAIN" };
@@ -93,7 +113,11 @@ function decisionMetrics(rows, threshold = DIRECT_THRESHOLD) {
       : rounded((2 * precision * recall) / (precision + recall)),
     falseAcceptanceRate: negatives.length === 0 ? null : rounded(falsePositive / negatives.length),
     correctAbstentionRate: negatives.length === 0 ? null : rounded(trueNegative / negatives.length),
-    acceptanceCoverage: rounded(accepted.length / rows.length)
+    acceptanceCoverage: rounded(accepted.length / rows.length),
+    confidenceIntervals95: {
+      acceptedPrecision: accepted.length === 0 ? null : exactEdgeInterval95(truePositive, accepted.length),
+      falseAcceptanceRate: negatives.length === 0 ? null : exactEdgeInterval95(falsePositive, negatives.length)
+    }
   };
 }
 
@@ -145,7 +169,15 @@ function leaveOneRepositoryOut(rows) {
         : rounded(heldOutTotals.falsePositive / heldOutTotals.noPositiveUnderStructuralOracle),
       correctAbstentionRate: heldOutTotals.noPositiveUnderStructuralOracle === 0
         ? null
-        : rounded(heldOutTotals.trueNegative / heldOutTotals.noPositiveUnderStructuralOracle)
+        : rounded(heldOutTotals.trueNegative / heldOutTotals.noPositiveUnderStructuralOracle),
+      confidenceIntervals95: {
+        acceptedPrecision: heldOutTotals.acceptedDirect === 0
+          ? null
+          : exactEdgeInterval95(heldOutTotals.truePositive, heldOutTotals.acceptedDirect),
+        falseAcceptanceRate: heldOutTotals.noPositiveUnderStructuralOracle === 0
+          ? null
+          : exactEdgeInterval95(heldOutTotals.falsePositive, heldOutTotals.noPositiveUnderStructuralOracle)
+      }
     }
   };
 }
@@ -197,7 +229,7 @@ const artifact = {
   claimBoundary: {
     confirmatory: false,
     humanValidatedRelevance: false,
-    zeroFalseAcceptanceMeaning: "Zero direct false acceptances on the deterministic structural development oracle only; this is not a universal semantic guarantee.",
+    observedFalseAcceptanceMeaning: "At the frozen conservative operating point, zero direct false accepts were observed against the deterministic structural development oracle. Exact intervals remain non-zero above; this is not a universal semantic guarantee.",
     tradeoff: "The conservative rule intentionally sacrifices acceptance coverage and recall to maximize precision."
   },
   settings

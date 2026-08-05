@@ -53,6 +53,10 @@ for (const settingName of ["static", "onlinePrequential"]) {
   assert.equal(setting.directDecision.acceptedPrecision, 1);
   assert.equal(setting.directDecision.correctAbstentionRate, 1);
   assert.ok(setting.directDecision.acceptedRecall > 0 && setting.directDecision.acceptedRecall < 0.1);
+  assert.equal(setting.directDecision.confidenceIntervals95.acceptedPrecision.upper, 1);
+  assert.equal(setting.directDecision.confidenceIntervals95.falseAcceptanceRate.lower, 0);
+  assert.ok(setting.directDecision.confidenceIntervals95.acceptedPrecision.lower < 1);
+  assert.ok(setting.directDecision.confidenceIntervals95.falseAcceptanceRate.upper > 0);
   assert.equal(setting.leaveOneRepositoryOut.aggregate.falsePositive, 0);
   assert.equal(setting.leaveOneRepositoryOut.aggregate.falseAcceptanceRate, 0);
   assert.equal(setting.leaveOneRepositoryOut.aggregate.acceptedPrecision, 1);
@@ -76,7 +80,11 @@ assert.ok(evidenceSchema.required.includes("decision"));
 
 for (const fragment of [
   "upstream prose/data inconsistency",
-  "zero direct false acceptances",
+  "observed zero direct false accepts",
+  "63.06%-100%",
+  "73.54%-100%",
+  "0%-7.25%",
+  "0%-11.22%",
   "3.33% acceptance coverage",
   "5.00% acceptance coverage",
   "not a universal semantic guarantee",
