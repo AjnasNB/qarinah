@@ -1,0 +1,279 @@
+{
+  "schema_version": "qarinah.swe-bench-lite-repository-manifest.v0.2",
+  "dataset_name": "princeton-nlp/SWE-bench_Lite",
+  "dataset_revision": "6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2",
+  "dataset_last_modified": "2025-03-03T05:29:31.000Z",
+  "dataset_url": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite",
+  "official_lite_page": "https://www.swebench.com/lite.html",
+  "declared_splits_at_revision": {
+    "dev": 23,
+    "test": 300
+  },
+  "splits_loaded": [
+    "test"
+  ],
+  "development_split_combined": false,
+  "filtering": "none",
+  "row_count_before_filtering": 300,
+  "row_count_after_filtering": 300,
+  "exact_repo_identifiers": [
+    "astropy/astropy",
+    "django/django",
+    "matplotlib/matplotlib",
+    "mwaskom/seaborn",
+    "pallets/flask",
+    "psf/requests",
+    "pydata/xarray",
+    "pylint-dev/pylint",
+    "pytest-dev/pytest",
+    "scikit-learn/scikit-learn",
+    "sphinx-doc/sphinx",
+    "sympy/sympy"
+  ],
+  "normalized_projects": [
+    "astropy/astropy",
+    "django/django",
+    "matplotlib/matplotlib",
+    "mwaskom/seaborn",
+    "pallets/flask",
+    "psf/requests",
+    "pydata/xarray",
+    "pylint-dev/pylint",
+    "pytest-dev/pytest",
+    "scikit-learn/scikit-learn",
+    "sphinx-doc/sphinx",
+    "sympy/sympy"
+  ],
+  "identifier_to_project_mapping": {
+    "astropy/astropy": "astropy/astropy",
+    "django/django": "django/django",
+    "matplotlib/matplotlib": "matplotlib/matplotlib",
+    "mwaskom/seaborn": "mwaskom/seaborn",
+    "pallets/flask": "pallets/flask",
+    "psf/requests": "psf/requests",
+    "pydata/xarray": "pydata/xarray",
+    "pylint-dev/pylint": "pylint-dev/pylint",
+    "pytest-dev/pytest": "pytest-dev/pytest",
+    "scikit-learn/scikit-learn": "scikit-learn/scikit-learn",
+    "sphinx-doc/sphinx": "sphinx-doc/sphinx",
+    "sympy/sympy": "sympy/sympy"
+  },
+  "duplicate_instance_ids": [],
+  "source_file_hashes": {
+    "data/test-00000-of-00001.parquet": "sha256:7a21f37b8bc179c7db5beeb14e88ac538ba283455c776e6b2535bbfb6e3551b4"
+  },
+  "source_file_sizes": {
+    "data/test-00000-of-00001.parquet": 1119540
+  },
+  "repositories": [
+    {
+      "exact_dataset_identifier": "astropy/astropy",
+      "normalized_project": "astropy/astropy",
+      "task_count": 6,
+      "first_date": "2017-12-07T00:01:14.000Z",
+      "last_date": "2023-06-27T19:48:18.000Z"
+    },
+    {
+      "exact_dataset_identifier": "django/django",
+      "normalized_project": "django/django",
+      "task_count": 114,
+      "first_date": "2019-01-30T13:13:20.000Z",
+      "last_date": "2023-07-17T20:28:41.000Z"
+    },
+    {
+      "exact_dataset_identifier": "matplotlib/matplotlib",
+      "normalized_project": "matplotlib/matplotlib",
+      "task_count": 23,
+      "first_date": "2020-11-01T23:18:42.000Z",
+      "last_date": "2023-05-31T21:36:23.000Z"
+    },
+    {
+      "exact_dataset_identifier": "mwaskom/seaborn",
+      "normalized_project": "mwaskom/seaborn",
+      "task_count": 4,
+      "first_date": "2022-06-11T18:21:32.000Z",
+      "last_date": "2023-06-27T23:17:29.000Z"
+    },
+    {
+      "exact_dataset_identifier": "pallets/flask",
+      "normalized_project": "pallets/flask",
+      "task_count": 3,
+      "first_date": "2021-05-13T21:32:41.000Z",
+      "last_date": "2023-04-14T16:36:54.000Z"
+    },
+    {
+      "exact_dataset_identifier": "psf/requests",
+      "normalized_project": "psf/requests",
+      "task_count": 6,
+      "first_date": "2012-09-20T15:48:00.000Z",
+      "last_date": "2016-06-24T13:31:31.000Z"
+    },
+    {
+      "exact_dataset_identifier": "pydata/xarray",
+      "normalized_project": "pydata/xarray",
+      "task_count": 5,
+      "first_date": "2019-10-01T21:15:54.000Z",
+      "last_date": "2021-04-08T09:19:30.000Z"
+    },
+    {
+      "exact_dataset_identifier": "pylint-dev/pylint",
+      "normalized_project": "pylint-dev/pylint",
+      "task_count": 6,
+      "first_date": "2022-03-04T00:01:54.000Z",
+      "last_date": "2022-12-27T18:20:50.000Z"
+    },
+    {
+      "exact_dataset_identifier": "pytest-dev/pytest",
+      "normalized_project": "pytest-dev/pytest",
+      "task_count": 17,
+      "first_date": "2019-04-13T16:17:45.000Z",
+      "last_date": "2023-06-29T00:04:33.000Z"
+    },
+    {
+      "exact_dataset_identifier": "scikit-learn/scikit-learn",
+      "normalized_project": "scikit-learn/scikit-learn",
+      "task_count": 23,
+      "first_date": "2017-12-12T22:07:47.000Z",
+      "last_date": "2023-03-02T20:38:47.000Z"
+    },
+    {
+      "exact_dataset_identifier": "sphinx-doc/sphinx",
+      "normalized_project": "sphinx-doc/sphinx",
+      "task_count": 16,
+      "first_date": "2020-05-17T14:09:10.000Z",
+      "last_date": "2023-05-28T19:15:07.000Z"
+    },
+    {
+      "exact_dataset_identifier": "sympy/sympy",
+      "normalized_project": "sympy/sympy",
+      "task_count": 77,
+      "first_date": "2016-07-15T21:40:49.000Z",
+      "last_date": "2023-03-13T14:24:25.000Z"
+    }
+  ],
+  "historical_revision_audit": [
+    {
+      "revision": "113d798e3a89754d543d96a4e85276f4ec106c6f",
+      "row_count": 300,
+      "repository_count": 12,
+      "exact_repo_identifiers": [
+        "astropy/astropy",
+        "django/django",
+        "matplotlib/matplotlib",
+        "mwaskom/seaborn",
+        "pallets/flask",
+        "psf/requests",
+        "pydata/xarray",
+        "pylint-dev/pylint",
+        "pytest-dev/pytest",
+        "scikit-learn/scikit-learn",
+        "sphinx-doc/sphinx",
+        "sympy/sympy"
+      ]
+    },
+    {
+      "revision": "f1b73e051bba17cdf77ee227693d28ea867a54dc",
+      "row_count": 300,
+      "repository_count": 12,
+      "exact_repo_identifiers": [
+        "astropy/astropy",
+        "django/django",
+        "matplotlib/matplotlib",
+        "mwaskom/seaborn",
+        "pallets/flask",
+        "psf/requests",
+        "pydata/xarray",
+        "pylint-dev/pylint",
+        "pytest-dev/pytest",
+        "scikit-learn/scikit-learn",
+        "sphinx-doc/sphinx",
+        "sympy/sympy"
+      ]
+    },
+    {
+      "revision": "81ad348adcaf3368691f4db2907f8fc97a8f7526",
+      "row_count": 300,
+      "repository_count": 12,
+      "exact_repo_identifiers": [
+        "astropy/astropy",
+        "django/django",
+        "matplotlib/matplotlib",
+        "mwaskom/seaborn",
+        "pallets/flask",
+        "psf/requests",
+        "pydata/xarray",
+        "pylint-dev/pylint",
+        "pytest-dev/pytest",
+        "scikit-learn/scikit-learn",
+        "sphinx-doc/sphinx",
+        "sympy/sympy"
+      ]
+    },
+    {
+      "revision": "f49195c4d34e588bdfb74a7e0d3afc356f620bbc",
+      "row_count": 300,
+      "repository_count": 12,
+      "exact_repo_identifiers": [
+        "astropy/astropy",
+        "django/django",
+        "matplotlib/matplotlib",
+        "mwaskom/seaborn",
+        "pallets/flask",
+        "psf/requests",
+        "pydata/xarray",
+        "pylint-dev/pylint",
+        "pytest-dev/pytest",
+        "scikit-learn/scikit-learn",
+        "sphinx-doc/sphinx",
+        "sympy/sympy"
+      ]
+    },
+    {
+      "revision": "6324ee9342a02ac3f9fd8d04cbf25009fab384b8",
+      "row_count": 300,
+      "repository_count": 12,
+      "exact_repo_identifiers": [
+        "astropy/astropy",
+        "django/django",
+        "matplotlib/matplotlib",
+        "mwaskom/seaborn",
+        "pallets/flask",
+        "psf/requests",
+        "pydata/xarray",
+        "pylint-dev/pylint",
+        "pytest-dev/pytest",
+        "scikit-learn/scikit-learn",
+        "sphinx-doc/sphinx",
+        "sympy/sympy"
+      ]
+    },
+    {
+      "revision": "6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2",
+      "row_count": 300,
+      "repository_count": 12,
+      "exact_repo_identifiers": [
+        "astropy/astropy",
+        "django/django",
+        "matplotlib/matplotlib",
+        "mwaskom/seaborn",
+        "pallets/flask",
+        "psf/requests",
+        "pydata/xarray",
+        "pylint-dev/pylint",
+        "pytest-dev/pytest",
+        "scikit-learn/scikit-learn",
+        "sphinx-doc/sphinx",
+        "sympy/sympy"
+      ]
+    }
+  ],
+  "official_count_resolution": {
+    "official_page_declared_test_repositories": 11,
+    "pinned_test_artifact_exact_identifiers": 12,
+    "pinned_test_artifact_normalized_projects": 12,
+    "aliases_or_case_variants_found": false,
+    "duplicate_instance_ids_found": 0,
+    "conclusion": "The test split alone contains 300 unique instances from 12 distinct normalized projects. No development rows, aliases, case variants, or duplicate instance IDs explain the difference. The official prose count of 11 is inconsistent with the official revision-level test artifact, so this study uses and reports the artifact count of 12."
+  },
+  "content_sha256": "sha256:1659fbffbbb9f3f41824267d92ad0de94df32895165203efe9fc98fcae426776"
+}

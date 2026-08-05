@@ -98,20 +98,24 @@
         "evidenceSufficiency": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["method", "state", "score", "directThreshold", "partialThreshold", "supportingCandidateCount", "codeEntityCount", "matchedCodeEntityCount", "codeEntityCoverage", "reasonCodes"],
-          "properties": {
-            "method": { "const": "evidence-sufficiency-v1" },
-            "state": { "enum": ["DIRECTLY_SUPPORTED", "PARTIALLY_SUPPORTED", "INSUFFICIENT_EVIDENCE"] },
-            "score": { "type": "number", "minimum": 0, "maximum": 1 },
-            "directThreshold": { "type": "number", "minimum": 0, "maximum": 1 },
-            "partialThreshold": { "type": "number", "minimum": 0, "maximum": 1 },
+            "required": ["method", "state", "decision", "score", "directThreshold", "partialThreshold", "bestExactTermRatio", "topLexicalScore", "lexicalScoreMargin", "supportingCandidateCount", "codeEntityCount", "matchedCodeEntityCount", "codeEntityCoverage", "reasonCodes"],
+            "properties": {
+              "method": { "const": "evidence-sufficiency-v2" },
+              "state": { "enum": ["DIRECTLY_SUPPORTED", "PARTIALLY_SUPPORTED", "INSUFFICIENT_EVIDENCE"] },
+              "decision": { "enum": ["ACCEPT_DIRECT", "ABSTAIN"] },
+              "score": { "type": "number", "minimum": 0, "maximum": 1 },
+              "directThreshold": { "type": "number", "minimum": 0, "maximum": 1 },
+              "partialThreshold": { "type": "number", "minimum": 0, "maximum": 1 },
+              "bestExactTermRatio": { "type": "number", "minimum": 0, "maximum": 1 },
+              "topLexicalScore": { "type": "number", "minimum": 0 },
+              "lexicalScoreMargin": { "type": "number", "minimum": 0, "maximum": 1 },
             "supportingCandidateCount": { "type": "integer", "minimum": 0 },
             "codeEntityCount": { "type": "integer", "minimum": 0, "maximum": 64 },
             "matchedCodeEntityCount": { "type": "integer", "minimum": 0, "maximum": 64 },
             "codeEntityCoverage": { "type": "number", "minimum": 0, "maximum": 1 },
             "reasonCodes": {
               "type": "array",
-              "maxItems": 8,
+                "maxItems": 10,
               "uniqueItems": true,
               "items": { "type": "string", "minLength": 1, "maxLength": 64 }
             }

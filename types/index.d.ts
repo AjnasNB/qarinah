@@ -158,11 +158,15 @@ export interface QarinahContextPack {
       warning?: string;
     };
     evidenceSufficiency?: {
-      method: "evidence-sufficiency-v1";
+      method: "evidence-sufficiency-v2";
       state: "DIRECTLY_SUPPORTED" | "PARTIALLY_SUPPORTED" | "INSUFFICIENT_EVIDENCE";
+      decision: "ACCEPT_DIRECT" | "ABSTAIN";
       score: number;
       directThreshold: number;
       partialThreshold: number;
+      bestExactTermRatio: number;
+      topLexicalScore: number;
+      lexicalScoreMargin: number;
       supportingCandidateCount: number;
       codeEntityCount: number;
       matchedCodeEntityCount: number;

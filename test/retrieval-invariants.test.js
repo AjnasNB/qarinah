@@ -56,6 +56,31 @@ test("strict-before temporal admission excludes evidence at the exact query time
   assert.ok(inclusive.ranked.some((entry) => entry.event.eventId === equal.eventId));
 });
 
+test("evidence-sufficiency v2 accepts only conservative direct evidence and abstains on partial matches", () => {
+  const record = input(8, {
+    timestamp: "2026-01-01T00:00:00.000Z",
+    title: "alpha beta gamma",
+    body: "delta epsilon"
+  });
+  const index = buildDerivedState(events([record]), WORKSPACE_ID).index;
+  const direct = rankContextEvents(index, "alpha beta gamma", {
+    asOf: "2026-01-10T00:00:00.000Z",
+    repositoryIds: ["owner/repository-a"]
+  });
+  assert.equal(direct.evidenceSufficiency.method, "evidence-sufficiency-v2");
+  assert.equal(direct.evidenceSufficiency.state, "DIRECTLY_SUPPORTED");
+  assert.equal(direct.evidenceSufficiency.decision, "ACCEPT_DIRECT");
+  assert.ok(direct.evidenceSufficiency.score >= direct.evidenceSufficiency.directThreshold);
+
+  const partial = rankContextEvents(index, "alpha beta gamma zeta eta theta iota kappa", {
+    asOf: "2026-01-10T00:00:00.000Z",
+    repositoryIds: ["owner/repository-a"]
+  });
+  assert.equal(partial.evidenceSufficiency.state, "PARTIALLY_SUPPORTED");
+  assert.equal(partial.evidenceSufficiency.decision, "ABSTAIN");
+  assert.ok(partial.evidenceSufficiency.score < partial.evidenceSufficiency.directThreshold);
+});
+
 test("poisoned restricted, stale, expired, future, and cross-repository records cannot re-enter through graph ranking", () => {
   const restrictedId = eventId(11);
   const candidates = [

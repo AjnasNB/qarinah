@@ -162,10 +162,33 @@ test("MCP exposes bounded cited retrieval only with an exact workspace disclosur
   assert.ok(["PARTIALLY_SUPPORTED", "DIRECTLY_SUPPORTED"].includes(
     result.structuredContent.retrieval.evidenceSufficiency.state
   ));
+  assert.equal(result.structuredContent.retrieval.evidenceSufficiency.method, "evidence-sufficiency-v2");
+  assert.equal(
+    result.structuredContent.retrieval.evidenceSufficiency.decision,
+    result.structuredContent.retrieval.evidenceSufficiency.state === "DIRECTLY_SUPPORTED" ? "ACCEPT_DIRECT" : "ABSTAIN"
+  );
   assert.ok(result.structuredContent.budget.usedChars <= 4_000);
   assert.equal(JSON.stringify(result).includes(root), false);
   assert.deepEqual(await snapshotTree(path.join(root, ".qarinah")), beforeWorkspace);
   assert.deepEqual(await snapshotFile(trust), beforeTrust);
+
+  await server.handle({
+    jsonrpc: "2.0",
+    id: 211,
+    method: "tools/call",
+    params: {
+      name: "context.query",
+      arguments: {
+        workspace: root,
+        query: "qzvxjklp nonexistent-memory-subject",
+        minimumCoverage: "any",
+        minimumEvidence: "direct"
+      }
+    }
+  });
+  const abstained = response(messages, 211).result;
+  assert.equal(abstained.isError, true);
+  assert.equal(abstained.structuredContent.code, "CONTEXT_EVIDENCE_INSUFFICIENT");
   server.close();
 });
 

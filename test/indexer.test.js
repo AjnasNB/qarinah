@@ -189,7 +189,9 @@ test("coverage reports missing evidence and callers can fail closed", async (t) 
     asOf: "2026-07-20T00:00:00.000Z"
   });
   assert.equal(missing.retrieval.coverage.status, "none");
+  assert.equal(missing.retrieval.evidenceSufficiency.method, "evidence-sufficiency-v2");
   assert.equal(missing.retrieval.evidenceSufficiency.state, "INSUFFICIENT_EVIDENCE");
+  assert.equal(missing.retrieval.evidenceSufficiency.decision, "ABSTAIN");
   assert.equal(missing.items.length, 0);
   assert.match(missing.retrieval.coverage.warning, /No durable event/);
 
@@ -222,6 +224,8 @@ test("coverage reports missing evidence and callers can fail closed", async (t) 
   });
   assert.equal(direct.retrieval.coverage.status, "direct");
   assert.equal(direct.retrieval.evidenceSufficiency.state, "DIRECTLY_SUPPORTED");
+  assert.equal(direct.retrieval.evidenceSufficiency.decision, "ACCEPT_DIRECT");
+  assert.equal(direct.retrieval.evidenceSufficiency.directThreshold, 0.65);
 });
 
 test("hybrid retrieval combines fuzzy text, graph relations, and deterministic diversity", async (t) => {

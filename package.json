@@ -88,6 +88,10 @@
     "scripts/prepare-research-benchmark-v0.2.mjs",
     "scripts/evaluate-research-retrieval-v0.2.mjs",
     "scripts/verify-research-development-evidence.mjs",
+    "scripts/prepare-repository-manifest-v0.2.mjs",
+    "scripts/prepare-relevance-audit-v0.3.mjs",
+    "scripts/evaluate-research-sufficiency-v0.3.mjs",
+    "scripts/verify-research-sufficiency-v0.3.mjs",
     "LICENSE",
     "NOTICE",
     "THIRD_PARTY_NOTICES.md",
@@ -120,10 +124,11 @@
     "prepublishOnly": "npm run check",
     "test": "node scripts/run-tests.mjs",
     "typecheck": "node scripts/typecheck-consumer.mjs",
-    "check": "npm run check:plugins && npm run check:docs && npm run build:site && npm run check:site && npm run mcp:smoke && npm test && npm run typecheck && npm run check:benchmark-evidence && npm run check:research-evidence && npm run check:research-development-evidence && npm run benchmark && npm run evaluate:context && npm run evaluate:software-tasks && npm run evaluate:long-document && npm pack --dry-run --ignore-scripts",
+    "check": "npm run check:plugins && npm run check:docs && npm run build:site && npm run check:site && npm run mcp:smoke && npm test && npm run typecheck && npm run check:benchmark-evidence && npm run check:research-evidence && npm run check:research-development-evidence && npm run check:research-sufficiency && npm run benchmark && npm run evaluate:context && npm run evaluate:software-tasks && npm run evaluate:long-document && npm pack --dry-run --ignore-scripts",
     "check:benchmark-evidence": "node scripts/verify-benchmark-evidence.mjs",
     "check:research-evidence": "node scripts/verify-research-evidence.mjs",
     "check:research-development-evidence": "node scripts/verify-research-development-evidence.mjs",
+    "check:research-sufficiency": "node scripts/verify-research-sufficiency-v0.3.mjs",
     "benchmark": "node scripts/benchmark.mjs",
     "evaluate:context": "node scripts/evaluate-context.mjs",
     "evaluate:software-tasks": "node scripts/evaluate-software-tasks.mjs",
@@ -135,7 +140,13 @@
     "prepare:research:v0.2": "node scripts/prepare-research-benchmark-v0.2.mjs",
     "prepare:research:v0.2:write": "node scripts/prepare-research-benchmark-v0.2.mjs --write",
     "evaluate:research-retrieval:v0.2": "node scripts/evaluate-research-retrieval-v0.2.mjs",
-    "evaluate:research-retrieval:v0.2:write": "node scripts/evaluate-research-retrieval-v0.2.mjs --write"
+    "evaluate:research-retrieval:v0.2:write": "node scripts/evaluate-research-retrieval-v0.2.mjs --write",
+    "prepare:research-repositories:v0.2": "node scripts/prepare-repository-manifest-v0.2.mjs",
+    "prepare:research-repositories:v0.2:write": "node scripts/prepare-repository-manifest-v0.2.mjs --write",
+    "prepare:research-audit:v0.3": "node scripts/prepare-relevance-audit-v0.3.mjs",
+    "prepare:research-audit:v0.3:write": "node scripts/prepare-relevance-audit-v0.3.mjs --write",
+    "evaluate:research-sufficiency:v0.3": "node scripts/evaluate-research-sufficiency-v0.3.mjs",
+    "evaluate:research-sufficiency:v0.3:write": "node scripts/evaluate-research-sufficiency-v0.3.mjs --write"
   },
   "engines": {
     "node": "^22.13.0 || ^24.0.0 || ^26.0.0"

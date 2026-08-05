@@ -437,7 +437,7 @@ Defaults:
 | `--reserve-tokens` | When token planning is enabled, 10% capped at 2,048 | 0 through `maxTokens - 64`. |
 | `--as-of` | Current UTC time | Retrieval time boundary. |
 | `--minimum-coverage` | `any` | `partial` rejects no-evidence packs; `direct` requires one event containing all normalized query terms. |
-| `--minimum-evidence` | `any` | `partial` accepts partial or direct evidence sufficiency; `direct` accepts only directly supported evidence. |
+| `--minimum-evidence` | `any` | `partial` allows an informational partial pack; `direct` requires the conservative `ACCEPT_DIRECT` decision. Partial evidence remains an abstention for sufficiency claims. |
 | `--ranking-profile` | `admission-first-v2` | Preserves admissible BM25 order before fuzzy and graph fill. `balanced-v1` reproduces the original RRF profile. |
 | `--temporal-boundary` | `inclusive` | `strict-before` excludes evidence recorded at the exact query timestamp. |
 
@@ -461,6 +461,8 @@ JSON output includes:
 - complete cited items;
 - truncation state;
 - a deterministic manifest hash.
+
+When evidence diagnostics are requested, `evidence-sufficiency-v2` returns a three-state assessment plus a separate decision. `DIRECTLY_SUPPORTED` maps to `ACCEPT_DIRECT`; `PARTIALLY_SUPPORTED` and `INSUFFICIENT_EVIDENCE` map to `ABSTAIN`. The direct threshold was selected on development data and does not prove semantic correctness on unseen queries.
 
 The portable fallback token estimate is `ceil(characters / 4)` and is marked inexact. It is not a provider billing receipt.
 

@@ -8,6 +8,14 @@ export const CORPUS_SCHEMA_VERSION = "qarinah.research-corpus.swe-bench-lite.v1"
 export const PROTOCOL_VERSION = "qarinah.cross-agent-memory-study.v1";
 export const DEVELOPMENT_CORPUS_SCHEMA_VERSION = "qarinah.research-corpus.swe-bench-lite-development.v2";
 export const DATASET_TEST_ARTIFACT = "data/test-00000-of-00001.parquet";
+export const DATASET_HISTORY_REVISIONS = Object.freeze([
+  "113d798e3a89754d543d96a4e85276f4ec106c6f",
+  "f1b73e051bba17cdf77ee227693d28ea867a54dc",
+  "81ad348adcaf3368691f4db2907f8fc97a8f7526",
+  "f49195c4d34e588bdfb74a7e0d3afc356f620bbc",
+  "6324ee9342a02ac3f9fd8d04cbf25009fab384b8",
+  DATASET_REVISION
+]);
 
 export const EXPECTED_REPOSITORY_COUNTS = Object.freeze({
   "astropy/astropy": 6,
@@ -78,7 +86,8 @@ export async function fetchDatasetMetadata() {
   return metadata;
 }
 
-export async function fetchDatasetRows() {
+export async function fetchDatasetRowsAtRevision(revision = DATASET_REVISION) {
+  if (!/^[a-f0-9]{40}$/u.test(revision)) throw new TypeError("Dataset revision must be a 40-character Git commit hash.");
   const rows = [];
   const pageSize = 100;
   let total = null;
@@ -89,7 +98,7 @@ export async function fetchDatasetRows() {
       split: DATASET_SPLIT,
       offset,
       length: pageSize,
-      revision: DATASET_REVISION
+      revision
     });
     const page = await getJson(url, `Dataset row request at offset ${offset}`);
     total = page.num_rows_total;
@@ -99,6 +108,10 @@ export async function fetchDatasetRows() {
   }
   if (rows.length !== total) throw new Error(`Expected ${total} rows, received ${rows.length}.`);
   return rows;
+}
+
+export async function fetchDatasetRows() {
+  return fetchDatasetRowsAtRevision(DATASET_REVISION);
 }
 
 export async function fetchDatasetArtifactMetadata() {
@@ -368,6 +381,73 @@ export function buildDevelopmentCorpus(rows, metadata, sourceArtifact) {
   };
 }
 
+function normalizedProjectIdentifier(identifier) {
+  return identifier.trim().toLowerCase().replace(/\.git$/u, "").replace(/\/+$/u, "");
+}
+
+export function buildRepositoryManifest(rows, metadata, sourceArtifact, historicalRows = new Map()) {
+  if (rows.length !== 300) throw new Error(`Pinned SWE-bench Lite test split must contain 300 rows; received ${rows.length}.`);
+  const duplicateInstanceIds = [...new Set(rows
+    .map((row) => row.instance_id)
+    .filter((instanceId, index, all) => all.indexOf(instanceId) !== index))].sort();
+  const exactRepositories = [...new Set(rows.map((row) => row.repo))].sort();
+  const identifierToProject = Object.fromEntries(exactRepositories.map((repository) => [
+    repository,
+    normalizedProjectIdentifier(repository)
+  ]));
+  const normalizedProjects = [...new Set(Object.values(identifierToProject))].sort();
+  const repositories = exactRepositories.map((repository) => {
+    const repositoryRows = rows.filter((row) => row.repo === repository);
+    const dates = repositoryRows.map((row) => new Date(row.created_at).toISOString()).sort();
+    return {
+      exact_dataset_identifier: repository,
+      normalized_project: identifierToProject[repository],
+      task_count: repositoryRows.length,
+      first_date: dates[0],
+      last_date: dates.at(-1)
+    };
+  });
+  const historicalRevisionAudit = [...historicalRows].map(([revision, revisionRows]) => ({
+    revision,
+    row_count: revisionRows.length,
+    repository_count: new Set(revisionRows.map((row) => row.repo)).size,
+    exact_repo_identifiers: [...new Set(revisionRows.map((row) => row.repo))].sort()
+  }));
+  const manifest = {
+    schema_version: "qarinah.swe-bench-lite-repository-manifest.v0.2",
+    dataset_name: DATASET_ID,
+    dataset_revision: DATASET_REVISION,
+    dataset_last_modified: metadata.lastModified,
+    dataset_url: `https://huggingface.co/datasets/${DATASET_ID}`,
+    official_lite_page: "https://www.swebench.com/lite.html",
+    declared_splits_at_revision: Object.fromEntries(
+      (metadata.cardData?.dataset_info?.splits ?? []).map((split) => [split.name, split.num_examples])
+    ),
+    splits_loaded: [DATASET_SPLIT],
+    development_split_combined: false,
+    filtering: "none",
+    row_count_before_filtering: rows.length,
+    row_count_after_filtering: rows.length,
+    exact_repo_identifiers: exactRepositories,
+    normalized_projects: normalizedProjects,
+    identifier_to_project_mapping: identifierToProject,
+    duplicate_instance_ids: duplicateInstanceIds,
+    source_file_hashes: { [sourceArtifact.path]: sourceArtifact.sha256 },
+    source_file_sizes: { [sourceArtifact.path]: sourceArtifact.bytes },
+    repositories,
+    historical_revision_audit: historicalRevisionAudit,
+    official_count_resolution: {
+      official_page_declared_test_repositories: 11,
+      pinned_test_artifact_exact_identifiers: exactRepositories.length,
+      pinned_test_artifact_normalized_projects: normalizedProjects.length,
+      aliases_or_case_variants_found: exactRepositories.length !== normalizedProjects.length,
+      duplicate_instance_ids_found: duplicateInstanceIds.length,
+      conclusion: "The test split alone contains 300 unique instances from 12 distinct normalized projects. No development rows, aliases, case variants, or duplicate instance IDs explain the difference. The official prose count of 11 is inconsistent with the official revision-level test artifact, so this study uses and reports the artifact count of 12."
+    }
+  };
+  return { ...manifest, content_sha256: sha256(JSON.stringify(manifest)) };
+}
+
 export async function loadPinnedDevelopmentDataset() {
   const [metadata, rows, sourceArtifact] = await Promise.all([
     fetchDatasetMetadata(),
@@ -379,5 +459,20 @@ export async function loadPinnedDevelopmentDataset() {
     rows,
     sourceArtifact,
     corpus: buildDevelopmentCorpus(rows, metadata, sourceArtifact)
+  };
+}
+
+export async function loadRepositoryManifestAudit() {
+  const [metadata, rows, sourceArtifact, historicalEntries] = await Promise.all([
+    fetchDatasetMetadata(),
+    fetchDatasetRows(),
+    fetchDatasetArtifactMetadata(),
+    Promise.all(DATASET_HISTORY_REVISIONS.map(async (revision) => [revision, await fetchDatasetRowsAtRevision(revision)]))
+  ]);
+  return {
+    metadata,
+    rows,
+    sourceArtifact,
+    manifest: buildRepositoryManifest(rows, metadata, sourceArtifact, new Map(historicalEntries))
   };
 }

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "qarinah.research-offline-backup.v1",
+  "bundleFilename": "qarinah-research-development-v0.2.bundle",
+  "bundleLocation": "workspace-parent-offline-only",
+  "bundleBytes": 3426715,
+  "bundleSha256": "sha256:909794b4528c48c17bf69fdd3a2d1bfaac2d2c973dc40086e58dd6c7563e5a71",
+  "commit": "bd566ac5ba7b302653b994fd0622d516fa74bbb8",
+  "tag": "research-retrieval-development-v0.2",
+  "tagObject": "26f112988d9624896fa2667948463688e3229d29",
+  "createdAt": "2026-08-05T13:55:55.5852814Z",
+  "bundleVerified": true,
+  "remotePublished": false
+}

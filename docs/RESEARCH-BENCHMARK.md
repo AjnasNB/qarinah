@@ -6,7 +6,7 @@
 **Protocol version:** 1.0  
 **Implementation:** Qarinah 0.1.2  
 **Date:** August 2026  
-**Status:** Research draft; exploratory v0.1 frozen, development v0.2 completed, not peer-reviewed and not preregistered
+**Status:** Research draft; exploratory v0.1 frozen, development v0.2 preserved, conservative gate v0.3 completed, not peer-reviewed and not preregistered
 **Artifact license:** Apache License 2.0; upstream repositories and benchmark data retain their own terms
 
 ## Abstract
@@ -15,7 +15,7 @@ This research track studies whether evidence-linked, time-explicit project memor
 
 Exploratory v0.1 evaluates retrieval and governance, not patch generation. Only 79 of the 240 held-out tasks have a prior task that overlaps a gold production-file path, so retrieval effectiveness is reported on those 79 tasks and coverage behavior is reported on all 240. Plain BM25 outperforms the original Qarinah balanced hybrid ranking on this oracle: Recall@10 is 0.687 versus 0.518, and mean reciprocal rank is 0.430 versus 0.320. The lexical coverage gate accepts all 161 tasks for which the file-overlap oracle identifies no positive prior record; those tasks are not proven semantically unsupported. Removing time controls produces 971 future citations, or 42.44% of citations in that ablation. Separately, 72 constructed boundary records across all 12 repositories verify rejection of future, expired, stale, restricted, wrong-repository, and superseded evidence with zero forbidden records returned.
 
-Exploratory v0.1 is frozen at Git tag `research-benchmark-exploratory-v0.1`. Development v0.2 changes Qarinah to admission-first lexical ranking and evaluates a deterministic graded structural oracle in both static and online/prequential settings. Qarinah v2 now matches admitted BM25 exactly on ranking while retaining governance controls and improves over the original balanced-v1 profile. Its graph stage adds no measured ranking value in this corpus, and its experimental evidence-sufficiency score remains poorly calibrated. Provider-reported tokens, SWE-bench resolve rate, patch quality, model portability, cost, and human review remain unmeasured.
+Exploratory v0.1 is frozen at Git tag `research-benchmark-exploratory-v0.1`. Development v0.2 changes Qarinah to admission-first lexical ranking and evaluates a deterministic graded structural oracle in both static and online/prequential settings. Qarinah v2 now matches admitted BM25 exactly on ranking while retaining governance controls and improves over the original balanced-v1 profile. Its graph stage adds no measured ranking value in this corpus. Development v0.3 changes the evidence decision to a conservative direct-only acceptance rule: partial evidence is exposed as an abstention, not accepted as sufficient. This removes direct false acceptances under the development structural oracle at the cost of accepting only 3.33% of static queries and 5.00% of online queries. The underlying score remains poorly calibrated and human relevance review is still pending. Provider-reported tokens, SWE-bench resolve rate, patch quality, model portability, cost, and human review remain unmeasured.
 
 ## 1. Research questions
 
@@ -52,7 +52,7 @@ The license column records what the GitHub repository API returned on 2026-08-05
 
 ### Repository-count audit
 
-The [official SWE-bench Lite page](https://www.swebench.com/lite.html) says the 300 tasks cover 11 repositories. The pinned Hugging Face revision used here contains 12 distinct lowercase `owner/repository` values, exactly matching the table above, with no aliases or case variants. The study preserves both facts and flags the discrepancy instead of coercing the data. The pinned test Parquet is 1,119,540 bytes with SHA-256 `7a21f37b8bc179c7db5beeb14e88ac538ba283455c776e6b2535bbfb6e3551b4`.
+The [official SWE-bench Lite page](https://www.swebench.com/lite.html) says the 300 tasks cover 11 repositories. The generated [`repository-manifest-v0.2.json`](../bench/research/repository-manifest-v0.2.json) resolves the discrepancy at the artifact level: only the 300-row `test` split was loaded; the 23-row development split was not combined; all 300 instance IDs are unique; the 12 exact identifiers normalize to 12 distinct projects; and there are no aliases or case variants. All six available official dataset revisions, from the initial data upload through the pinned revision, contain the same 12 test repositories. The official count of 11 is therefore an upstream prose/data inconsistency, and this study uses the revision-level artifact count of 12. The pinned test Parquet is 1,119,540 bytes with SHA-256 `7a21f37b8bc179c7db5beeb14e88ac538ba283455c776e6b2535bbfb6e3551b4`.
 
 ### Public-test contamination limitation
 
@@ -167,11 +167,24 @@ The experimental evidence-sufficiency score is not ready as a fail-closed semant
 
 The v2 no-temporal ablation returns 1,083 future items out of 2,288, a 47.33% item-level violation rate, and affects all 240 queries. This separates item-level from query-level leakage and reinforces that the higher-leakage ranking must not be treated as a valid system result.
 
+### Conservative evidence decision v0.3
+
+Development v0.3 preserves the v0.2 score as a diagnostic but changes the decision boundary. A score of at least 0.65 returns `DIRECTLY_SUPPORTED` with decision `ACCEPT_DIRECT`; `PARTIALLY_SUPPORTED` always returns `ABSTAIN`. This distinction fixes the earlier mistake of counting partial evidence as a successful sufficiency decision.
+
+| Setting | No-positive tasks | Direct accepts | True accepts | False accepts | Direct precision | Direct recall | Acceptance coverage |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Static | 49 | 8 | 8 | 0 | 100% | 4.19% | 3.33% |
+| Online/prequential | 31 | 12 | 12 | 0 | 100% | 5.74% | 5.00% |
+
+The same zero direct false acceptances occur under leave-one-repository-out threshold validation. This result means zero false acceptance under the deterministic structural development oracle only; it is not a universal semantic guarantee. The intentionally conservative threshold has 3.33% acceptance coverage in the static setting and 5.00% acceptance coverage online, while the raw score still has online ROC-AUC 0.538, Brier score 0.269, and calibration error 0.388.
+
+The structural oracle itself remains unvalidated. A blinded audit artifact contains the complete census of all 49 static no-positive cases, with Qarinah scores, decisions, target gold patches, and target gold paths hidden. It is awaiting two independent human reviewers; reviewer agreement, Cohen's kappa, disagreements, and adjudicated labels must not be reported until real reviewers complete them.
+
 ## 8. What the pilot changes
 
 The research backlog is now evidence-driven:
 
-1. Calibrate evidence sufficiency and no-positive-task abstention using independently reviewed labels; do not claim the current gate is solved.
+1. Complete the blinded two-reviewer relevance audit and recalibrate against adjudicated labels; do not treat zero structural-oracle false acceptance as semantic perfection.
 2. Test rank-fusion and diversity ablations because they currently reduce file-overlap recall relative to BM25.
 3. Expand the relevance oracle with blinded human judgments instead of treating path overlap as complete semantic truth.
 4. Add a real embedding baseline and a fixed-model running-summary baseline.
@@ -206,6 +219,11 @@ Until then, Qarinah must not claim improved SWE-bench resolve rate, provider-tok
 - Development-v0.2 corpus: [`bench/research/swe-bench-lite-development-v0.2.json`](../bench/research/swe-bench-lite-development-v0.2.json)
 - Development-v0.2 evaluator: [`scripts/evaluate-research-retrieval-v0.2.mjs`](../scripts/evaluate-research-retrieval-v0.2.mjs)
 - Development-v0.2 result: [`bench/results/research-retrieval-development-v0.2.json`](../bench/results/research-retrieval-development-v0.2.json)
+- Repository-count resolution: [`bench/research/repository-manifest-v0.2.json`](../bench/research/repository-manifest-v0.2.json)
+- Offline-backup receipt: [`bench/research/development-backup-v0.2.json`](../bench/research/development-backup-v0.2.json)
+- Conservative sufficiency result: [`bench/results/research-sufficiency-development-v0.3.json`](../bench/results/research-sufficiency-development-v0.3.json)
+- Blinded relevance-review artifact: [`bench/research/relevance-audit-review-v0.3.json`](../bench/research/relevance-audit-review-v0.3.json)
+- Separate review-admin manifest: [`bench/research/relevance-audit-admin-v0.3.json`](../bench/research/relevance-audit-admin-v0.3.json)
 
 The evaluator fails if the pinned corpus, deterministic metrics, temporal leakage count, or governance results drift from the committed evidence. Runtime latency is retained as an observation and excluded from deterministic equality checks.
 

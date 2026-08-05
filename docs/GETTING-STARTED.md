@@ -76,7 +76,7 @@ The pack includes complete selected records, event IDs, hashes, a retrieval mani
 
 The default `admission-first-v2` profile first removes records that are out of repository, time, retention, disclosure, or supersession scope, then preserves BM25 order for the remaining lexical candidates. Typo-tolerant and graph matches may fill gaps, but cannot reintroduce rejected records. Research checkpoints should use `--temporal-boundary strict-before` so a record created at the task timestamp cannot leak into that task's query.
 
-An additional experimental evidence-sufficiency diagnostic can be requested with `--minimum-evidence partial` or `--minimum-evidence direct`. Treat it as a conservative workflow signal, not proof that the retrieved context is semantically sufficient: the v0.2 development benchmark found that its current score is not yet calibrated well enough for an academic claim.
+An additional experimental evidence-sufficiency diagnostic can be requested with `--minimum-evidence partial` or `--minimum-evidence direct`. In v2, partial evidence is an abstention; only the conservative direct state is accepted. The direct threshold has zero false acceptance under the current structural development oracle but very low coverage, so treat it as a workflow signal rather than proof that the retrieved context is semantically sufficient.
 
 For agent callers, use JSON stdin:
 

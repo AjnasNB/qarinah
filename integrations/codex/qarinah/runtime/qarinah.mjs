@@ -4104,11 +4104,15 @@ function queryCodeEntities(query) {
 function evidenceSufficiency(index, query, queryTerms, eligibleEventIds, lexical, fuzzy) {
   if (queryTerms.length === 0) {
     return Object.freeze({
-      method: "evidence-sufficiency-v1",
+      method: "evidence-sufficiency-v2",
       state: "INSUFFICIENT_EVIDENCE",
+      decision: "ABSTAIN",
       score: 0,
-      directThreshold: 0.62,
-      partialThreshold: 0.32,
+      directThreshold: 0.65,
+      partialThreshold: 0.4,
+      bestExactTermRatio: 0,
+      topLexicalScore: 0,
+      lexicalScoreMargin: 0,
       supportingCandidateCount: 0,
       codeEntityCount: 0,
       matchedCodeEntityCount: 0,
@@ -4138,22 +4142,32 @@ function evidenceSufficiency(index, query, queryTerms, eligibleEventIds, lexical
   const score = codeEntities.length === 0 ? 0.65 * bestExactTermRatio + 0.15 * independence + 0.2 * bestConfidence : 0.45 * bestExactTermRatio + 0.3 * codeEntityCoverage + 0.1 * independence + 0.15 * bestConfidence;
   const normalizedScore = rounded(score);
   const directCandidateCount = (/* @__PURE__ */ new Set([...lexical.keys(), ...fuzzy.keys()])).size;
-  const state = normalizedScore >= 0.62 && (bestExactTermRatio >= 0.55 || codeEntityCoverage >= 0.75) ? "DIRECTLY_SUPPORTED" : normalizedScore >= 0.32 && directCandidateCount > 0 ? "PARTIALLY_SUPPORTED" : "INSUFFICIENT_EVIDENCE";
+  const lexicalScores = [...lexical.values()].sort((left, right) => right - left);
+  const topLexicalScore = lexicalScores[0] ?? 0;
+  const secondLexicalScore = lexicalScores[1] ?? 0;
+  const lexicalScoreMargin = topLexicalScore === 0 ? 0 : (topLexicalScore - secondLexicalScore) / topLexicalScore;
+  const state = normalizedScore >= 0.65 ? "DIRECTLY_SUPPORTED" : normalizedScore >= 0.4 && directCandidateCount > 0 ? "PARTIALLY_SUPPORTED" : "INSUFFICIENT_EVIDENCE";
+  const decision = state === "DIRECTLY_SUPPORTED" ? "ACCEPT_DIRECT" : "ABSTAIN";
   const reasonCodes = [
     ...directCandidateCount === 0 ? ["NO_DIRECT_CANDIDATE"] : [],
     ...bestExactTermRatio < 0.2 ? ["LOW_TERM_COVERAGE"] : [],
     ...codeEntities.length > 0 && codeEntityCoverage === 0 ? ["NO_CODE_ENTITY_MATCH"] : [],
     ...supportingCandidateCount < 2 ? ["SINGLE_OR_NO_SUPPORT"] : [],
-    ...state === "DIRECTLY_SUPPORTED" ? ["DIRECT_THRESHOLD_MET"] : [],
-    ...state === "PARTIALLY_SUPPORTED" ? ["PARTIAL_THRESHOLD_MET"] : [],
-    ...state === "INSUFFICIENT_EVIDENCE" ? ["INSUFFICIENT_THRESHOLD"] : []
+    ...state === "DIRECTLY_SUPPORTED" ? ["CONSERVATIVE_DIRECT_THRESHOLD_MET"] : [],
+    ...state === "PARTIALLY_SUPPORTED" ? ["PARTIAL_EVIDENCE_ONLY"] : [],
+    ...state === "INSUFFICIENT_EVIDENCE" ? ["INSUFFICIENT_THRESHOLD"] : [],
+    ...decision === "ABSTAIN" ? ["ABSTAIN"] : []
   ];
   return Object.freeze({
-    method: "evidence-sufficiency-v1",
+    method: "evidence-sufficiency-v2",
     state,
+    decision,
     score: normalizedScore,
-    directThreshold: 0.62,
-    partialThreshold: 0.32,
+    directThreshold: 0.65,
+    partialThreshold: 0.4,
+    bestExactTermRatio: rounded(bestExactTermRatio),
+    topLexicalScore: rounded(topLexicalScore),
+    lexicalScoreMargin: rounded(lexicalScoreMargin),
     supportingCandidateCount,
     codeEntityCount: codeEntities.length,
     matchedCodeEntityCount: bestMatchedCodeEntities,
