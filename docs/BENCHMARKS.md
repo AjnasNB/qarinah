@@ -119,8 +119,14 @@ Keep these direct details beside the number:
 - capture of host activity that the host does not expose;
 - secret-free retention in arbitrary content-mode tool output.
 
+## Real-repository research benchmark
+
+The research track now pins the official public SWE-bench Lite test split at 300 tasks from 12 repositories and applies a chronological 60-task warm-up / 240-task held-out split. The completed zero-model phase evaluates retrieval, temporal leakage, repository isolation, disclosure filtering, retention, and supersession.
+
+The result is deliberately not a new marketing headline. On the 79 held-out tasks with a prior production-file-overlap target, BM25 outperforms the current Qarinah hybrid ranker: Recall@10 is 0.687 versus 0.518, and MRR is 0.430 versus 0.320. The no-temporal ablation returns 971 future citations, and the current lexical coverage gate accepts all 161 tasks that the file-overlap oracle marks unsupported. A separate 72-record governance suite returns zero forbidden records.
+
+See the complete [research protocol, limitations, repository citations, and results](RESEARCH-BENCHMARK.md). The committed evidence is [`bench/results/research-retrieval-0.1.2.json`](../bench/results/research-retrieval-0.1.2.json).
+
 ## Next benchmark gate
 
-## Next benchmark expansion
-
-Expand to at least 100 held-out positive and negative queries covering exact lookup, paraphrase, typos, conflicts, supersession, time, authority, unsupported questions, and project-file impact. Separately run at least 20 task-paired Codex and Claude evaluations using the providers' reported input-token fields, identical models and tools, task-success checks, unsupported-answer review, latency, and cost. Publish raw fixtures, ablations, command lines, environment, package version, commit, and machine-readable results.
+Run the same 240 held-out tasks through the official SWE-bench Docker evaluator with a fixed coding-agent model and tool policy. Add actual provider usage receipts, a real embedding baseline, a fixed-model summary baseline, task success, incorrect-change analysis, latency, total cost, and blinded human review. The confirmatory phase requires credentials, Docker, a declared budget, and an immutable preregistration; none of those outcomes are claimed by the present retrieval study.

@@ -15,6 +15,7 @@
   <a href="https://qarinah.io"><strong>Website</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://qarinah.io/docs/"><strong>Documentation</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://qarinah.io/paper/"><strong>White paper</strong></a>&nbsp;&middot;&nbsp;
+  <a href="docs/RESEARCH-BENCHMARK.md"><strong>Research benchmark</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://doi.org/10.5281/zenodo.21547685"><strong>DOI</strong></a>
 </p>
 
@@ -101,6 +102,7 @@ The JSONL chain remains authoritative. Graph, index, Markdown, dashboard, and OK
   <a href="docs/ARCHITECTURE.md">Architecture</a>&nbsp;&middot;&nbsp;
   <a href="docs/DASHBOARD.md">Dashboard</a>&nbsp;&middot;&nbsp;
   <a href="docs/BENCHMARKS.md">Benchmarks</a>&nbsp;&middot;&nbsp;
+  <a href="docs/RESEARCH-BENCHMARK.md">Research protocol</a>&nbsp;&middot;&nbsp;
   <a href="docs/SECURITY.md">Security</a>&nbsp;&middot;&nbsp;
   <a href="docs/ECOSYSTEM-LAUNCH.md">Launch plan</a>
 </p>
@@ -431,6 +433,8 @@ npm run evaluate:software-tasks
 npm run evaluate:long-document
 npm run evaluate:context
 npm run benchmark
+npm run prepare:research
+npm run evaluate:research-retrieval
 ```
 
 | Software task | Full history + current sources | Qarinah + same sources | Reduction |
@@ -446,6 +450,8 @@ npm run benchmark
 The software-task evaluator keeps the required current source snippets on both sides and replaces only accumulated-history replay. Its estimates use `ceil(characters / 4)`; they are not provider usage receipts. The release also successfully verifies exact retrieval, typo tolerance, graph evidence, conflict visibility, and supersession. See [BENCHMARKS.md](docs/BENCHMARKS.md) for the committed sources, machine-readable results, commands, and arithmetic.
 
 The long-document evaluator adds a fixed 600-token ceiling over a deterministic 34,751-estimated-token handbook fixture. All 16 exact and typo-tolerant lookups return the cited answer-bearing section at rank 1, with an average pack of 534 estimated tokens and a worst-case estimated reduction of 98.4%; four unsupported questions fail closed when the caller requires direct evidence coverage. This is a segmented synthetic retrieval fixture - not whole-book summarization, native PDF ingestion, or provider-billed token usage.
+
+The separate [real-repository research track](docs/RESEARCH-BENCHMARK.md) pins 300 public SWE-bench Lite tasks from 12 repositories into a chronological 60-task warm-up / 240-task held-out split. Its preliminary retrieval result is a useful negative finding: on the 79 tasks with prior file-overlap evidence, BM25 beats the current Qarinah hybrid ranker (Recall@10 0.687 versus 0.518). The run also exposes 971 future citations when temporal controls are removed and verifies zero forbidden returns across 72 future, stale, expired, restricted, wrong-repository, and superseded boundary records. This phase does not measure coding-agent task success or provider usage.
 
 ## License and ownership
 
