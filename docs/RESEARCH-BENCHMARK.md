@@ -194,6 +194,8 @@ The research backlog is now evidence-driven:
 
 ## 9. Confirmatory execution gate
 
+The final protocol is frozen at tag `research-protocol-v1`. Its deterministic Verified-minus-Lite manifest contains 387 eligible retrieval tasks across 12 repositories and a frozen 40-task agent sample. It excludes 93 tasks already present in the Lite development corpus and 20 tasks without chronologically prior same-repository development memory. The source is the 500-row SWE-bench Verified test artifact at revision `c104f840cc67f8b6eec6f759ebc8b2693d585d4a`, SHA-256 `a45b1fe4e2f0c8390b2b2938ac83e92ed5979000856808f3679c07812e9e6dcd`. The manifest records `resultsObserved: false`; no final Qarinah retrieval or model result has been run.
+
 The next phase must not begin until the following are fixed and recorded:
 
 - model/provider identifiers and immutable model revisions where available;
@@ -224,6 +226,8 @@ Until then, Qarinah must not claim improved SWE-bench resolve rate, provider-tok
 - Conservative sufficiency result: [`bench/results/research-sufficiency-development-v0.3.json`](../bench/results/research-sufficiency-development-v0.3.json)
 - Blinded relevance-review artifact: [`bench/research/relevance-audit-review-v0.3.json`](../bench/research/relevance-audit-review-v0.3.json)
 - Separate review-admin manifest: [`bench/research/relevance-audit-admin-v0.3.json`](../bench/research/relevance-audit-admin-v0.3.json)
+- Frozen final protocol receipt: [`bench/final/protocol-v1.json`](../bench/final/protocol-v1.json)
+- Frozen final task manifest: [`bench/final/final-task-manifest-v1.json`](../bench/final/final-task-manifest-v1.json)
 
 The evaluator fails if the pinned corpus, deterministic metrics, temporal leakage count, or governance results drift from the committed evidence. Runtime latency is retained as an observation and excluded from deterministic equality checks.
 

@@ -133,4 +133,4 @@ See the complete [research protocol, limitations, repository citations, and resu
 
 ## Next benchmark gate
 
-Run the same 240 held-out tasks through the official SWE-bench Docker evaluator with a fixed coding-agent model and tool policy. Add actual provider usage receipts, a real embedding baseline, a fixed-model summary baseline, task success, incorrect-change analysis, latency, total cost, and blinded human review. The confirmatory phase requires credentials, Docker, a declared budget, and an immutable preregistration; none of those outcomes are claimed by the present retrieval study.
+Protocol v1 and a Verified-minus-Lite task manifest are now frozen before final results. The manifest contains 387 eligible retrieval tasks and a deterministic 40-task coding-agent sample. Execution still requires exact model/runtime manifests, credentials, Docker, a declared budget, dense and fixed-model summary baselines, provider usage receipts, and two independent human reviewers. None of those final outcomes are claimed by the present retrieval study.
