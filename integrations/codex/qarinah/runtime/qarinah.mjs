@@ -2971,8 +2971,22 @@ import { pathToFileURL } from "node:url";
 var SQLITE_READ_MODEL_SCHEMA_VERSION = 1;
 var SQLITE_READ_MODEL_FILENAME = "qarinah.db";
 var databaseSyncPromise;
+async function importSqliteWithoutExperimentalWarning() {
+  const originalEmitWarning = process.emitWarning;
+  function filteredEmitWarning(warning, ...details) {
+    const type = typeof details[0] === "string" ? details[0] : details[0]?.type;
+    if (type === "ExperimentalWarning" && String(warning).startsWith("SQLite is an experimental feature")) return;
+    return Reflect.apply(originalEmitWarning, process, [warning, ...details]);
+  }
+  process.emitWarning = filteredEmitWarning;
+  try {
+    return await import("node:sqlite");
+  } finally {
+    if (process.emitWarning === filteredEmitWarning) process.emitWarning = originalEmitWarning;
+  }
+}
 function loadDatabaseSync() {
-  databaseSyncPromise ??= import("node:sqlite").then(({ DatabaseSync }) => DatabaseSync);
+  databaseSyncPromise ??= importSqliteWithoutExperimentalWarning().then(({ DatabaseSync }) => DatabaseSync);
   return databaseSyncPromise;
 }
 var SCHEMA = `
@@ -4096,8 +4110,30 @@ function reasonFor(entry) {
 }
 function queryCodeEntities(query) {
   const values = [];
-  for (const match of String(query).matchAll(/`([^`]{1,256})`|(?:[\p{L}\p{N}_.-]+\/)+[\p{L}\p{N}_.-]+|\b[\p{L}_][\p{L}\p{N}_]*(?:\.[\p{L}_][\p{L}\p{N}_]*)+\b/gu)) {
-    values.push(match[1] ?? match[0]);
+  const source = String(query).slice(0, 8192);
+  let cursor = 0;
+  while (cursor < source.length) {
+    const opening = source.indexOf("`", cursor);
+    if (opening === -1) break;
+    const closing = source.indexOf("`", opening + 1);
+    if (closing === -1) break;
+    const quoted = source.slice(opening + 1, closing);
+    if (quoted.length > 0 && quoted.length <= 256) values.push(quoted);
+    cursor = closing + 1;
+  }
+  const pathSegment = /^[\p{L}\p{N}_.-]{1,256}$/u;
+  const identifierSegment = /^[\p{L}_][\p{L}\p{N}_]{0,255}$/u;
+  for (const candidate of source.split(/[^\p{L}\p{N}_./-]+/u)) {
+    if (candidate.length === 0 || candidate.length > 1024) continue;
+    if (candidate.includes("/")) {
+      const segments = candidate.split("/");
+      if (segments.length > 1 && segments.every((segment) => pathSegment.test(segment))) values.push(candidate);
+      continue;
+    }
+    if (candidate.includes(".")) {
+      const segments = candidate.split(".");
+      if (segments.length > 1 && segments.every((segment) => identifierSegment.test(segment))) values.push(candidate);
+    }
   }
   return tokenize(values.join(" ")).slice(0, 64);
 }

@@ -319,8 +319,30 @@ function reasonFor(entry) {
 
 function queryCodeEntities(query) {
   const values = [];
-  for (const match of String(query).matchAll(/`([^`]{1,256})`|(?:[\p{L}\p{N}_.-]+\/)+[\p{L}\p{N}_.-]+|\b[\p{L}_][\p{L}\p{N}_]*(?:\.[\p{L}_][\p{L}\p{N}_]*)+\b/gu)) {
-    values.push(match[1] ?? match[0]);
+  const source = String(query).slice(0, 8_192);
+  let cursor = 0;
+  while (cursor < source.length) {
+    const opening = source.indexOf("`", cursor);
+    if (opening === -1) break;
+    const closing = source.indexOf("`", opening + 1);
+    if (closing === -1) break;
+    const quoted = source.slice(opening + 1, closing);
+    if (quoted.length > 0 && quoted.length <= 256) values.push(quoted);
+    cursor = closing + 1;
+  }
+  const pathSegment = /^[\p{L}\p{N}_.-]{1,256}$/u;
+  const identifierSegment = /^[\p{L}_][\p{L}\p{N}_]{0,255}$/u;
+  for (const candidate of source.split(/[^\p{L}\p{N}_./-]+/u)) {
+    if (candidate.length === 0 || candidate.length > 1_024) continue;
+    if (candidate.includes("/")) {
+      const segments = candidate.split("/");
+      if (segments.length > 1 && segments.every((segment) => pathSegment.test(segment))) values.push(candidate);
+      continue;
+    }
+    if (candidate.includes(".")) {
+      const segments = candidate.split(".");
+      if (segments.length > 1 && segments.every((segment) => identifierSegment.test(segment))) values.push(candidate);
+    }
   }
   return tokenize(values.join(" ")).slice(0, 64);
 }

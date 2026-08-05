@@ -81,6 +81,21 @@ test("evidence-sufficiency v2 accepts only conservative direct evidence and abst
   assert.ok(partial.evidenceSufficiency.score < partial.evidenceSufficiency.directThreshold);
 });
 
+test("code-entity extraction remains bounded for adversarial punctuation runs", () => {
+  const record = input(9, {
+    timestamp: "2026-01-01T00:00:00.000Z",
+    title: "src/release.ts ReleaseController.publish",
+    body: "Publish through the cited release controller."
+  });
+  const index = buildDerivedState(events([record]), WORKSPACE_ID).index;
+  const result = rankContextEvents(index, `src/release.ts ReleaseController.publish ${"-".repeat(100_000)}`, {
+    asOf: "2026-01-10T00:00:00.000Z",
+    repositoryIds: ["owner/repository-a"]
+  });
+  assert.ok(result.evidenceSufficiency.codeEntityCount > 0);
+  assert.ok(result.evidenceSufficiency.codeEntityCount <= 64);
+});
+
 test("poisoned restricted, stale, expired, future, and cross-repository records cannot re-enter through graph ranking", () => {
   const restrictedId = eventId(11);
   const candidates = [

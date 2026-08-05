@@ -155,6 +155,7 @@ test("JSON stdin keeps model-controlled record and query text out of shell synta
     })
   });
   assert.equal(queried.code, 0, queried.stderr);
+  assert.equal(queried.stderr, "", "Successful JSON output must not be accompanied by runtime warnings.");
   const pack = JSON.parse(queried.stdout);
   assert.equal(pack.query, attack);
   assert.equal(pack.retrieval.strategy, "admission-first-hybrid-v2");

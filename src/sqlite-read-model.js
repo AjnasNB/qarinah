@@ -11,8 +11,23 @@ export const SQLITE_READ_MODEL_FILENAME = "qarinah.db";
 
 let databaseSyncPromise;
 
+async function importSqliteWithoutExperimentalWarning() {
+  const originalEmitWarning = process.emitWarning;
+  function filteredEmitWarning(warning, ...details) {
+    const type = typeof details[0] === "string" ? details[0] : details[0]?.type;
+    if (type === "ExperimentalWarning" && String(warning).startsWith("SQLite is an experimental feature")) return;
+    return Reflect.apply(originalEmitWarning, process, [warning, ...details]);
+  }
+  process.emitWarning = filteredEmitWarning;
+  try {
+    return await import("node:sqlite");
+  } finally {
+    if (process.emitWarning === filteredEmitWarning) process.emitWarning = originalEmitWarning;
+  }
+}
+
 function loadDatabaseSync() {
-  databaseSyncPromise ??= import("node:sqlite").then(({ DatabaseSync }) => DatabaseSync);
+  databaseSyncPromise ??= importSqliteWithoutExperimentalWarning().then(({ DatabaseSync }) => DatabaseSync);
   return databaseSyncPromise;
 }
 
