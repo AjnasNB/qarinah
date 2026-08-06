@@ -18,6 +18,8 @@ The initial schema includes:
 - `agent_disclosures` and `sync_outbox`; and
 - the FTS5 `events_fts` search table.
 
+Project references are relationally unique by source, relationship type, target, and source event. When one file contains the same relationship more than once, the graph stores one semantic edge with `occurrenceCount` and an `occurrences` array containing every observed specifier, span, confidence, and extractor. This keeps SQLite rebuilds deterministic without dropping the individual observations preserved in the authoritative project-structure event.
+
 ## Commands
 
 ```sh

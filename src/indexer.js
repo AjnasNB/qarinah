@@ -196,6 +196,28 @@ function closeRelationTargets(nodes, edges) {
   }
 }
 
+function coalesceGraphEdges(edges) {
+  const grouped = new Map();
+  for (const edge of edges) {
+    const sourceEventId = edge.sourceEventId ?? edge.source ?? null;
+    const identity = canonicalStringify([edge.source, edge.type, edge.target, sourceEventId]);
+    const { source, type, target, sourceEventId: _sourceEventId, ...observation } = edge;
+    const existing = grouped.get(identity);
+    if (existing) {
+      existing.occurrences.push(observation);
+      continue;
+    }
+    grouped.set(identity, { edge, occurrences: [observation] });
+  }
+  return [...grouped.values()].map(({ edge, occurrences }) => occurrences.length === 1
+    ? edge
+    : {
+        ...edge,
+        occurrenceCount: occurrences.length,
+        occurrences
+      });
+}
+
 export function buildDerivedState(events, workspaceId) {
   const projections = events.map(eventProjection);
   const postings = Object.create(null);
@@ -233,7 +255,8 @@ export function buildDerivedState(events, workspaceId) {
     adjacency[id].sort((left, right) => `${left.type}\0${left.target}`.localeCompare(`${right.type}\0${right.target}`));
   }
   nodes.sort((left, right) => left.id.localeCompare(right.id));
-  edges.sort((left, right) => `${left.source}\0${left.type}\0${left.target}`.localeCompare(`${right.source}\0${right.type}\0${right.target}`));
+  const coalescedEdges = coalesceGraphEdges(edges);
+  coalescedEdges.sort((left, right) => `${left.source}\0${left.type}\0${left.target}`.localeCompare(`${right.source}\0${right.type}\0${right.target}`));
 
   const headHash = events.at(-1)?.hash ?? null;
   const averageDocumentLength = projections.length === 0
@@ -258,7 +281,7 @@ export function buildDerivedState(events, workspaceId) {
       headHash,
       projectStructure,
       nodes,
-      edges
+      edges: coalescedEdges
     }
   });
 }

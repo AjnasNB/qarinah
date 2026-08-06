@@ -5,6 +5,8 @@ import test from "node:test";
 import {
   compileContext,
   initializeWorkspace,
+  inspectSqliteReadModel,
+  loadWorkspace,
   readEvents,
   rebuildDerivedState,
   scanProjectStructure
@@ -83,6 +85,33 @@ test("project structure scan detects changes, renames, and deletions by path and
   }]);
   const events = await readEvents(root);
   assert.deepEqual(events[1].relations, [{ type: "supersedes", target: first.eventId }]);
+});
+
+test("project graph coalesces repeated reference edges while preserving every observation", async (t) => {
+  const root = await temporaryDirectory(t);
+  await initializeWorkspace(root);
+  await mkdir(path.join(root, "src"), { recursive: true });
+  await writeFile(path.join(root, "src", "a.js"), "import './b.js';\nimport './b.js';\n", "utf8");
+  await writeFile(path.join(root, "src", "b.js"), "export const b = 1;\n", "utf8");
+
+  const result = await scanProjectStructure({ cwd: root });
+  assert.equal(result.captured, true);
+  await rebuildDerivedState(root);
+
+  const graph = JSON.parse(await readFile(path.join(root, ".qarinah", "graph", "graph.json"), "utf8"));
+  const sourceNode = graph.nodes.find((node) => node.path === "src/a.js");
+  const targetNode = graph.nodes.find((node) => node.path === "src/b.js");
+  const imports = graph.edges.filter((edge) => (
+    edge.source === sourceNode.id && edge.type === "imports" && edge.target === targetNode.id
+  ));
+  assert.equal(imports.length, 1);
+  assert.equal(imports[0].occurrenceCount, 2);
+  assert.equal(imports[0].occurrences.length, 2);
+  assert.deepEqual(imports[0].occurrences.map((occurrence) => occurrence.span.line), [1, 2]);
+
+  const readModel = await inspectSqliteReadModel(await loadWorkspace(root));
+  assert.equal(readModel.eventCount, 1);
+  assert.equal(readModel.headHash, result.hash);
 });
 
 test("project structure scan skips linked paths and bounds oversized files", async (t) => {
