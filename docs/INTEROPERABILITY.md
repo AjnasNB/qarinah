@@ -129,6 +129,19 @@ await runtime.run({
 
 ProductLoop `RuntimeEvent` has no schema-version field. Context Ledger pins this structural boundary to the inspected `ajnas-runtime@0.2.1` contract and validates receipts instead of inventing a version supplied by upstream. A future upstream versioned schema would make compatibility negotiation stronger.
 
+## ProductLoop Workbench: cited memory references
+
+The `productloop-workbench@0.1.0` source candidate can display a Qarinah memory link containing an event ID, event hash, relationship, and bounded operator-facing summary. That record is a reference only. Workbench does not receive a Qarinah workspace object, disclosure capability, append capability, machine-trust record, context pack, or retained event body merely because it stores the identifiers.
+
+The integration direction remains explicit:
+
+1. a trusted host performs a Qarinah query or append under the workspace's current consent and disclosure rules;
+2. the host selects the event ID and hash that support a Workbench run;
+3. Workbench stores the opaque evidence link beside its local run; and
+4. a later disclosure still requires Qarinah to reload and verify the exact workspace and current machine-local policy.
+
+Workbench therefore cannot turn a memory reference into silent capture, cross-project retrieval, or write authority. Its separately defined team-control-plane adapter also grants no Qarinah permission. Any future hosted synchronization of memory links must treat them as potentially sensitive project metadata and must not upload event bodies or context packs without a separate reviewed capability and user action.
+
 ## Google Open Knowledge Format: derived interchange
 
 `exportOkf()` and `qarinah export okf` materialize the verified event chain as a [Google Open Knowledge Format 0.1 Draft](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) bundle. The root `index.md` declares `okf_version: "0.1"`; `log.md` is grouped by event date newest-first; and each event becomes one `events/<event-id>.md` concept with required `type` frontmatter. Qarinah-specific extension keys preserve the event ID, content and chain hashes, actor, confidence, optional authority, typed relations, provenance, retention, and bounded HTTP(S) citation metadata. Known event relation targets are also emitted as bundle-relative Markdown links.
@@ -139,6 +152,6 @@ OKF standardizes portable Markdown structure, not storage, serving, querying, sc
 
 ## Migration and package-count note
 
-The `exportOkf()` API and `qarinah export okf` command are additive in Qarinah `0.1.0-alpha.2`; the exporter itself does not require an event-schema migration. Existing workspaces need no OKF migration: the directory is produced only when explicitly requested and can be deleted and reproduced. Qarinah remains a separate optional package. It is not added to ProductLoop's fixed workspace/package namespace list, release manifest, or umbrella dependency set. If ProductLoop later exposes it as a namespace, its package-count assertions, clean-consumer matrix, release manifest, lockfile, documentation, and coordinated versioning must be changed together in ProductLoop itself.
+The `exportOkf()` API and `qarinah export okf` command are additive in Qarinah `0.1.0-alpha.2`; the exporter itself does not require an event-schema migration. Existing workspaces need no OKF migration: the directory is produced only when explicitly requested and can be deleted and reproduced. Qarinah remains a separate optional package. ProductLoop's Workbench package lists it only as an optional peer and can operate without it; Qarinah is still not added to the `productloop-os` umbrella dependency or namespace set. ProductLoop's package-count assertions, clean-consumer matrix, release manifest, lockfile, documentation, and coordinated versioning include Workbench itself. If the umbrella later exposes Qarinah as a namespace, those surfaces must be changed together again in ProductLoop itself.
 
 All interoperability entry points that accept a structural `workspace` object use only its root as a locator and reload configuration, consent, real paths, and checkpoint state themselves. A caller-supplied object is not treated as proof of trust. Qarinah and adjacent ledgers are still separate systems: their writes are not an atomic cross-ledger transaction.
