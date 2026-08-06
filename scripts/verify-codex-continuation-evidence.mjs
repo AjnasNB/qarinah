@@ -6,7 +6,7 @@ import { continuationImplementationManifest } from "./continuation-evidence-lib.
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
-const artifactPath = path.join(root, "bench", "results", "codex-cross-session-continuation-0.1.3.json");
+const artifactPath = path.join(root, "bench", "results", `codex-cross-session-continuation-${packageJson.version}.json`);
 const artifact = JSON.parse(await readFile(artifactPath, "utf8"));
 const sha256 = /^sha256:[0-9a-f]{64}$/u;
 const eventId = /^evt_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u;

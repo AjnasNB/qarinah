@@ -11,7 +11,7 @@ const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url))
 const packageJson = JSON.parse(await readFile(path.join(repositoryRoot, "package.json"), "utf8"));
 const qarinahBin = path.join(repositoryRoot, "bin", "qarinah.js");
 const sentinel = "SWITCH-HANDOFF-7F3A";
-const outputPath = path.join(repositoryRoot, "bench", "results", "codex-cross-session-continuation-0.1.3.json");
+const outputPath = path.join(repositoryRoot, "bench", "results", `codex-cross-session-continuation-${packageJson.version}.json`);
 const shouldWrite = process.argv.includes("--write");
 const shouldKeep = process.argv.includes("--keep");
 

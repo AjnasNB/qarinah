@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "qarinah.codex-cross-session-continuation.v1",
+  "packageVersion": "0.1.4",
+  "classification": "provider-backed-product-smoke-not-controlled-research",
+  "recordedAt": "2026-08-06T09:13:23.157Z",
+  "qarinahCommit": "ecaca78b6a8d71a4380c7f5378900c90d16eb185",
+  "implementation": {
+    "algorithm": "sha256-path-lf-content-v1",
+    "fileCount": 77,
+    "digest": "sha256:30ce1ad0264f70dff9047cd16478068c23d47be9bd22dc0cc7d42c6575521962"
+  },
+  "environment": {
+    "node": "v24.15.0",
+    "platform": "win32-x64",
+    "codexCli": "codex-cli 0.144.6"
+  },
+  "isolation": {
+    "ephemeralSessions": true,
+    "nativeResumeUsed": false,
+    "distinctThreadIds": true,
+    "agentAThreadIdHash": "sha256:2a39ecf4a68f58011b07f68176445ab81a6089e7b3db41f4232fce524926235b",
+    "agentBThreadIdHash": "sha256:7d06b46fd29c530a9731a0106932b21e1797666d5ef69897b25e62653bc55431"
+  },
+  "handoff": {
+    "marker": "SWITCH-HANDOFF-7F3A",
+    "summaryEventId": "evt_684eb214-9d2b-44e1-9518-27ffe5974c98",
+    "summaryEventHash": "sha256:7f3e89f799fcb03abaa923d94988ca35abf84640f3dfd37eb307480223f37a9d",
+    "sourceEvents": [
+      {
+        "eventId": "evt_043030af-f7b0-4287-8adb-b7d92e106dd3",
+        "hash": "sha256:8907d1de73e00d043f26b358cfc4b15f48d36866dda241b740b34a662400a6ca",
+        "kind": "prompt.submitted"
+      },
+      {
+        "eventId": "evt_bcd56c68-8fb5-4929-8b7b-efe034911088",
+        "hash": "sha256:0505364e24d51defe69205117c981cca65972896bc0ac2545968ecac7140f849",
+        "kind": "tool.completed"
+      },
+      {
+        "eventId": "evt_4c3b8cbf-cdf1-43e1-867e-8e828abc5364",
+        "hash": "sha256:9bf249d8147f94cac4e2370403f4086871d07354b7ba2a4fe28033fe88759c00",
+        "kind": "turn.completed"
+      }
+    ],
+    "summaryRelationsVerified": true,
+    "packManifestHash": "sha256:779c6875ef256478a198a2bed3bc78d8226bd05f9f95602fb1dee7b53ebb31b0",
+    "packItemCount": 2,
+    "packUsedTokens": 1345,
+    "packMaxTokens": 1500,
+    "packCoverage": "partial",
+    "rankingProfile": "admission-first-v2",
+    "temporalBoundary": "strict-before",
+    "contextQueryObservedInAgentB": true,
+    "agentBCitedEventId": true,
+    "agentBCitedEventHash": true
+  },
+  "usage": {
+    "agentA": {
+      "inputTokens": 91327,
+      "cachedInputTokens": 77568,
+      "outputTokens": 1019
+    },
+    "agentB": {
+      "inputTokens": 222298,
+      "cachedInputTokens": 201216,
+      "outputTokens": 1479
+    },
+    "source": "codex-cli-jsonl"
+  },
+  "outcome": {
+    "baselineTestsFailed": true,
+    "agentASourceUnchanged": true,
+    "acceptanceTestsPassed": true,
+    "immutableGuardPresent": true,
+    "doctorOk": true,
+    "finalEventCount": 32
+  },
+  "receipts": {
+    "agentAJsonlSha256": "sha256:49b782dc97c0d71b2550a3740dee977af40afdee18c8c82688f28aeb35f8f609",
+    "agentBJsonlSha256": "sha256:8d15879d2585558494cbf89d12de2cf5ecf228e45ecc8f5c3c9bdb6b87160d13",
+    "agentAFinalSha256": "sha256:5f353799e49337c3265a18cfe5e5cf372d5c9ae96064e3193626e64ae2794bc2",
+    "agentBFinalSha256": "sha256:6d64563430c1520bffc76f1dc6034a7ca1b7d8d1a055c7684bb7914e4606a3d4",
+    "fixtureSourceSha256": "sha256:03d1fd4500deac0a13fd10a5601a9d6cd3478fa7924382fd360e5d29709ae518"
+  },
+  "limitations": [
+    "This is one provider-backed product smoke test, not a randomized or controlled research result.",
+    "The fixture is synthetic and small.",
+    "Provider token counts are recorded only when the Codex CLI exposes them.",
+    "The run demonstrates Codex-to-Codex session switching; it does not replace the planned Claude-to-Codex and Codex-to-Claude study."
+  ]
+}

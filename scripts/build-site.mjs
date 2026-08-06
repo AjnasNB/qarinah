@@ -10,8 +10,9 @@ const siteOrigin = "https://qarinah.io";
 const npmPackage = "https://www.npmjs.com/package/qarinah";
 const doi = "https://doi.org/10.5281/zenodo.21547685";
 const zenodoPdf = "https://zenodo.org/records/21547685/files/Qarinah-Technical-White-Paper-v1.0.pdf?download=1";
-const releaseDate = "2026-08-02";
-const productVersion = "0.1.2";
+const releaseDate = "2026-08-06";
+const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
+const productVersion = packageJson.version;
 const productPositioning = "The evidence-linked cross-agent context engine for software projects.";
 const productExplanation = "Qarinah lets Codex, Claude Code, Cursor, and other coding agents continue the same project using a shared, cited record of decisions, outcomes, code relationships, and current evidence.";
 const answerEngineQuestions = [

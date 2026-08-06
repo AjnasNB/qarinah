@@ -16,7 +16,7 @@ import {
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const packageJson = JSON.parse(await readFile(path.join(repositoryRoot, "package.json"), "utf8"));
-const resultPath = path.join(repositoryRoot, "bench", "results", "continuation-context-0.1.3.json");
+const resultPath = path.join(repositoryRoot, "bench", "results", `continuation-context-${packageJson.version}.json`);
 const writeResult = process.argv.includes("--write");
 const root = await mkdtemp(path.join(os.tmpdir(), "qarinah-continuation-context-"));
 process.env.QARINAH_STATE_DIR = path.join(root, ".machine-state");
