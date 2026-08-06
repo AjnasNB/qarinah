@@ -15,6 +15,7 @@
   <a href="https://qarinah.io"><strong>Website</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://qarinah.io/docs/"><strong>Documentation</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://qarinah.io/paper/"><strong>White paper</strong></a>&nbsp;&middot;&nbsp;
+  <a href="docs/RESEARCH-BENCHMARK.md"><strong>Research benchmark</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://doi.org/10.5281/zenodo.21547685"><strong>DOI</strong></a>
 </p>
 
@@ -101,6 +102,7 @@ The JSONL chain remains authoritative. Graph, index, Markdown, dashboard, and OK
   <a href="docs/ARCHITECTURE.md">Architecture</a>&nbsp;&middot;&nbsp;
   <a href="docs/DASHBOARD.md">Dashboard</a>&nbsp;&middot;&nbsp;
   <a href="docs/BENCHMARKS.md">Benchmarks</a>&nbsp;&middot;&nbsp;
+  <a href="docs/RESEARCH-BENCHMARK.md">Research protocol</a>&nbsp;&middot;&nbsp;
   <a href="docs/SECURITY.md">Security</a>&nbsp;&middot;&nbsp;
   <a href="docs/ECOSYSTEM-LAUNCH.md">Launch plan</a>
 </p>
@@ -351,15 +353,15 @@ The repository also runs `npm run mcp:smoke` against the exact bundled Codex and
 
 ### Install once, initialize each project
 
-Install the reviewed `v0.1.2` plugin once in each host:
+Install the reviewed `v0.1.3` plugin once in each host:
 
 ```sh
 # Codex: personal installation, available to opted-in projects.
-codex plugin marketplace add AjnasNB/qarinah --ref v0.1.2
+codex plugin marketplace add AjnasNB/qarinah --ref v0.1.3
 codex plugin add qarinah@qarinah
 
 # Claude Code: personal installation across projects.
-claude plugin marketplace add AjnasNB/qarinah@v0.1.2 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.1.3 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 
@@ -430,7 +432,10 @@ Run:
 npm run evaluate:software-tasks
 npm run evaluate:long-document
 npm run evaluate:context
+npm run evaluate:continuation
 npm run benchmark
+npm run prepare:research
+npm run evaluate:research-retrieval
 ```
 
 | Software task | Full history + current sources | Qarinah + same sources | Reduction |
@@ -446,6 +451,10 @@ npm run benchmark
 The software-task evaluator keeps the required current source snippets on both sides and replaces only accumulated-history replay. Its estimates use `ceil(characters / 4)`; they are not provider usage receipts. The release also successfully verifies exact retrieval, typo tolerance, graph evidence, conflict visibility, and supersession. See [BENCHMARKS.md](docs/BENCHMARKS.md) for the committed sources, machine-readable results, commands, and arithmetic.
 
 The long-document evaluator adds a fixed 600-token ceiling over a deterministic 34,751-estimated-token handbook fixture. All 16 exact and typo-tolerant lookups return the cited answer-bearing section at rank 1, with an average pack of 534 estimated tokens and a worst-case estimated reduction of 98.4%; four unsupported questions fail closed when the caller requires direct evidence coverage. This is a segmented synthetic retrieval fixture - not whole-book summarization, native PDF ingestion, or provider-billed token usage.
+
+The [cross-session continuation benchmark](docs/CROSS-SESSION-CONTINUATION-BENCHMARK.md) adds a 42-record two-session fixture for context summarization, evidence links, and fresh-session retrieval. Its 1,039-token cited pack is 89.05% smaller than the 9,489-token full-ledger estimate, preserves all three summary source IDs and hashes, and leaves deliberately stale derived state unchanged. A separate provider-backed Codex-to-Codex smoke uses distinct ephemeral sessions with native resume disabled, requires the second session to query Qarinah and cite its evidence, and verifies the resulting patch with tests. The provider smoke is product evidence, not a controlled research result.
+
+The separate [real-repository research track](docs/RESEARCH-BENCHMARK.md) pins 300 public SWE-bench Lite tasks into a chronological 60-task warm-up / 240-task development split. Frozen exploratory v0.1 found that BM25 beat the original balanced Qarinah ranker. Admission-first v2 now preserves admitted BM25 ranking while retaining repository, temporal, retention, disclosure, conflict, supersession, provenance, and budget controls; online MRR improves from 0.601 to 0.696 against balanced-v1 under the graded structural development oracle. Graph ranking adds no measured value here. At the conservative v0.3 operating point, the run observed 0/49 static and 0/31 online direct false accepts by abstaining aggressively; exact 95% upper bounds remain 7.25% and 11.22%, and coverage is only 3.33%-5.00%. The [latest development result](docs/RESEARCH-DEVELOPMENT-RESULTS-v0.3.md) also freezes 387 positive tasks, 20 abstention controls, a contamination audit, and a pre-outcome 40-pair power check. This phase does not measure coding-agent task success or provider usage.
 
 ## License and ownership
 

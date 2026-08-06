@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "qarinah.final-experiment-protocol-receipt.v1",
+  "protocolPath": "docs/FINAL-EXPERIMENT-PROTOCOL-v1.md",
+  "protocolSha256": "sha256:93cc40c5c2a632024ff0a30077d122218d231cdd05f5121f9788d900b975b64e",
+  "amendmentsPath": "docs/PROTOCOL-AMENDMENTS.md",
+  "amendmentsSha256AtFreeze": "sha256:d9d8a3a5e489c5eb7c006af974e2565ba3b222252cf8b47fa7a05a8ace4eed2f",
+  "implementationParentCommit": "fd8887c99aaf4e2bff58d2764bd59b39d2456c4c",
+  "intendedTag": "research-protocol-v1",
+  "frozenAt": "2026-08-05T14:10:07.8948276Z",
+  "taskManifestCreatedAtFreeze": false,
+  "resultsObservedAtFreeze": false,
+  "providerExecutionAuthorized": false,
+  "remotePublished": false
+}

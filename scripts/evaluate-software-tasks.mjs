@@ -101,6 +101,7 @@ try {
       maxTokens: 1_500,
       reserveTokens: 200,
       limit: 8,
+      rankingProfile: "balanced-v1",
       minimumCoverage: "direct",
       inMemory: true,
       asOf: "2026-07-20T00:00:00.000Z"

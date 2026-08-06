@@ -180,6 +180,7 @@ try {
         maxTokens: fixedMaxTokens,
         reserveTokens: 0,
         limit: 1,
+        rankingProfile: "balanced-v1",
         minimumCoverage,
         inMemory: true,
         asOf: "2026-07-20T00:00:00.000Z"
@@ -217,6 +218,7 @@ try {
         maxTokens: fixedMaxTokens,
         reserveTokens: 0,
         limit: 1,
+        rankingProfile: "balanced-v1",
         minimumCoverage: "direct",
         inMemory: true,
         asOf: "2026-07-20T00:00:00.000Z"

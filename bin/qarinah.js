@@ -93,6 +93,7 @@ const RECORD_STDIN_JSON_FIELDS = new Set([
 ]);
 const QUERY_STDIN_JSON_FIELDS = new Set([
   "query", "format", "limit", "maxChars", "maxTokens", "reserveTokens", "asOf", "minimumCoverage",
+  "minimumEvidence", "rankingProfile", "temporalBoundary", "includeEvidenceSufficiency",
   "authorityScopes", "repositoryIds"
 ]);
 
@@ -174,6 +175,24 @@ function stdinQueryInput(request) {
   if (!["any", "partial", "direct"].includes(minimumCoverage)) {
     throw new TypeError("minimumCoverage must be any, partial, or direct.");
   }
+  const minimumEvidence = Object.hasOwn(request, "minimumEvidence") ? request.minimumEvidence : "any";
+  if (!["any", "partial", "direct"].includes(minimumEvidence)) {
+    throw new TypeError("minimumEvidence must be any, partial, or direct.");
+  }
+  const rankingProfile = Object.hasOwn(request, "rankingProfile") ? request.rankingProfile : "admission-first-v2";
+  if (!["balanced-v1", "admission-first-v2"].includes(rankingProfile)) {
+    throw new TypeError("rankingProfile must be balanced-v1 or admission-first-v2.");
+  }
+  const temporalBoundary = Object.hasOwn(request, "temporalBoundary") ? request.temporalBoundary : "inclusive";
+  if (!["inclusive", "strict-before"].includes(temporalBoundary)) {
+    throw new TypeError("temporalBoundary must be inclusive or strict-before.");
+  }
+  const includeEvidenceSufficiency = Object.hasOwn(request, "includeEvidenceSufficiency")
+    ? request.includeEvidenceSufficiency
+    : false;
+  if (typeof includeEvidenceSufficiency !== "boolean") {
+    throw new TypeError("includeEvidenceSufficiency must be a boolean.");
+  }
   const selectors = (field) => {
     if (!Object.hasOwn(request, field)) return undefined;
     if (!Array.isArray(request[field]) || request[field].length > 64
@@ -191,6 +210,10 @@ function stdinQueryInput(request) {
     reserveTokens: requestInteger(request, "reserveTokens", 0, 999_936),
     asOf: Object.hasOwn(request, "asOf") ? request.asOf : undefined,
     minimumCoverage,
+    minimumEvidence,
+    rankingProfile,
+    temporalBoundary,
+    includeEvidenceSufficiency,
     authorityScopes: selectors("authorityScopes"),
     repositoryIds: selectors("repositoryIds")
   };
@@ -209,7 +232,7 @@ Usage:
   qarinah build | rebuild
   qarinah scan [--max-files n] [--max-file-bytes n] [--max-total-bytes n] [--max-depth n]
   qarinah export okf [--output <path>]
-  qarinah query [text] [--format json|markdown] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp] [--minimum-coverage any|partial|direct]
+  qarinah query [text] [--format json|markdown] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp] [--minimum-coverage any|partial|direct] [--minimum-evidence any|partial|direct]
   qarinah query --stdin-json
   qarinah task-pack debugging|code-review|feature-implementation|database-migration|incident-response|release-preparation|security-review [query]
   qarinah freshness
@@ -431,7 +454,10 @@ async function run(argv) {
           maxTokens: integerOption(args, "--max-tokens", undefined),
           reserveTokens: integerOption(args, "--reserve-tokens", undefined),
           asOf: option(args, "--as-of", undefined),
-          minimumCoverage: option(args, "--minimum-coverage", "any")
+          minimumCoverage: option(args, "--minimum-coverage", "any"),
+          minimumEvidence: option(args, "--minimum-evidence", "any"),
+          rankingProfile: option(args, "--ranking-profile", "admission-first-v2"),
+          temporalBoundary: option(args, "--temporal-boundary", "inclusive")
         }
       : stdinQueryInput(request);
     const pack = await compileContext(input.query, {
@@ -442,6 +468,10 @@ async function run(argv) {
       reserveTokens: input.reserveTokens,
       asOf: input.asOf,
       minimumCoverage: input.minimumCoverage,
+      minimumEvidence: input.minimumEvidence,
+      rankingProfile: input.rankingProfile,
+      temporalBoundary: input.temporalBoundary,
+      includeEvidenceSufficiency: input.includeEvidenceSufficiency,
       authorityScopes: input.authorityScopes,
       repositoryIds: input.repositoryIds
     });

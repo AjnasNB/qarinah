@@ -138,7 +138,9 @@ export interface QarinahContextPack {
     reservationPolicyHash?: string;
   };
   retrieval: {
-    strategy: "hybrid-local-v1";
+    strategy: "hybrid-local-v1" | "admission-first-hybrid-v2";
+    rankingProfile?: "balanced-v1" | "admission-first-v2";
+    temporalBoundary?: "inclusive" | "strict-before";
     supersessionPolicy: "prefer-current" | "include-history";
     asOf: string;
     authorityScope?: string;
@@ -154,6 +156,22 @@ export interface QarinahContextPack {
       bestExactTermRatio: number;
       directCandidateCount: number;
       warning?: string;
+    };
+    evidenceSufficiency?: {
+      method: "evidence-sufficiency-v2";
+      state: "DIRECTLY_SUPPORTED" | "PARTIALLY_SUPPORTED" | "INSUFFICIENT_EVIDENCE";
+      decision: "ACCEPT_DIRECT" | "ABSTAIN";
+      score: number;
+      directThreshold: number;
+      partialThreshold: number;
+      bestExactTermRatio: number;
+      topLexicalScore: number;
+      lexicalScoreMargin: number;
+      supportingCandidateCount: number;
+      codeEntityCount: number;
+      matchedCodeEntityCount: number;
+      codeEntityCoverage: number;
+      reasonCodes: string[];
     };
     filters?: { expired: number; future: number; notYetValid: number; stale: number; unauthorized: number };
     conflicts?: Array<{ eventIds: [string, string] }>;
@@ -221,12 +239,18 @@ export function compileContext(query?: string, options?: {
   reservations?: QarinahTokenReservation[];
   limit?: number;
   diversity?: number;
+  rankingProfile?: "balanced-v1" | "admission-first-v2";
+  includeFuzzy?: boolean;
+  includeGraph?: boolean;
+  temporalBoundary?: "inclusive" | "strict-before";
+  includeEvidenceSufficiency?: boolean;
   supersessionPolicy?: "prefer-current" | "include-history";
   authorityScope?: string;
   authorityScopes?: string[];
   repositoryIds?: string[];
   queryExpansion?: { id?: string; expand(input: { query: string }): string[] | Promise<string[]> };
   minimumCoverage?: "any" | "partial" | "direct";
+  minimumEvidence?: "any" | "partial" | "direct";
   asOf?: string;
   clock?: () => Date;
   rebuild?: boolean;
@@ -521,6 +545,10 @@ export function setupWorkspace(options?: {
 export function rankContextEvents(index: unknown, query: string | undefined, options: {
   limit?: number;
   diversity?: number;
+  rankingProfile?: "balanced-v1" | "admission-first-v2";
+  includeFuzzy?: boolean;
+  includeGraph?: boolean;
+  temporalBoundary?: "inclusive" | "strict-before";
   supersessionPolicy?: "prefer-current" | "include-history";
   authorityScope?: string;
   authorityScopes?: string[];

@@ -1,0 +1,307 @@
+{
+  "schemaVersion": "qarinah.relevance-audit-admin.v0.3",
+  "status": "sampling-and-blinding-manifest",
+  "reviewArtifactSha256": "sha256:0fc157c9cdac62732319edd7bb60c5add9f2ff0ad0eb7ea490a8d6112d1c9926",
+  "requestedSampleAdjustment": "The requested 50-case sample is impossible under this oracle because only 49 static no-positive tasks exist; all 49 are included instead.",
+  "strata": {
+    "highScore": 20,
+    "mediumScore": 19,
+    "lowScore": 10
+  },
+  "cases": [
+    {
+      "auditId": "audit_3f2399463a9b56923d62",
+      "instanceId": "django__django-15388",
+      "stratum": "high-score",
+      "developmentScore": 0.64403
+    },
+    {
+      "auditId": "audit_b128e77e77bf9e9b5cca",
+      "instanceId": "sympy__sympy-21055",
+      "stratum": "high-score",
+      "developmentScore": 0.617021
+    },
+    {
+      "auditId": "audit_0df29c2dcdfd188c8efa",
+      "instanceId": "django__django-12184",
+      "stratum": "high-score",
+      "developmentScore": 0.593478
+    },
+    {
+      "auditId": "audit_a4a8316a249154fc33f8",
+      "instanceId": "scikit-learn__scikit-learn-14983",
+      "stratum": "high-score",
+      "developmentScore": 0.528196
+    },
+    {
+      "auditId": "audit_2bd0b6c20076bddcf1f5",
+      "instanceId": "sympy__sympy-18189",
+      "stratum": "high-score",
+      "developmentScore": 0.522727
+    },
+    {
+      "auditId": "audit_3ef5e39ba69a26b12079",
+      "instanceId": "scikit-learn__scikit-learn-14894",
+      "stratum": "high-score",
+      "developmentScore": 0.506967
+    },
+    {
+      "auditId": "audit_15d52bd13889aa8fc4ed",
+      "instanceId": "sympy__sympy-15678",
+      "stratum": "high-score",
+      "developmentScore": 0.506522
+    },
+    {
+      "auditId": "audit_f33a574e7d940f827137",
+      "instanceId": "scikit-learn__scikit-learn-13241",
+      "stratum": "high-score",
+      "developmentScore": 0.502273
+    },
+    {
+      "auditId": "audit_68850092df86101cef3e",
+      "instanceId": "scikit-learn__scikit-learn-15535",
+      "stratum": "high-score",
+      "developmentScore": 0.479202
+    },
+    {
+      "auditId": "audit_b97350e93d4647400172",
+      "instanceId": "sphinx-doc__sphinx-8627",
+      "stratum": "high-score",
+      "developmentScore": 0.478407
+    },
+    {
+      "auditId": "audit_380513b38c68bc2b3bcb",
+      "instanceId": "sympy__sympy-18199",
+      "stratum": "high-score",
+      "developmentScore": 0.468421
+    },
+    {
+      "auditId": "audit_48b6cf33446728579cad",
+      "instanceId": "sympy__sympy-15346",
+      "stratum": "high-score",
+      "developmentScore": 0.4625
+    },
+    {
+      "auditId": "audit_b1df0cdc0d63b2340093",
+      "instanceId": "django__django-16873",
+      "stratum": "high-score",
+      "developmentScore": 0.459725
+    },
+    {
+      "auditId": "audit_4718072a6816ee8e38b0",
+      "instanceId": "pylint-dev__pylint-7993",
+      "stratum": "high-score",
+      "developmentScore": 0.453321
+    },
+    {
+      "auditId": "audit_20dc7413ca66da89125b",
+      "instanceId": "sympy__sympy-18835",
+      "stratum": "high-score",
+      "developmentScore": 0.444298
+    },
+    {
+      "auditId": "audit_dee05f62876ac1566e3e",
+      "instanceId": "sphinx-doc__sphinx-11445",
+      "stratum": "high-score",
+      "developmentScore": 0.440826
+    },
+    {
+      "auditId": "audit_c0923d7239a7e733602d",
+      "instanceId": "sympy__sympy-24213",
+      "stratum": "high-score",
+      "developmentScore": 0.440696
+    },
+    {
+      "auditId": "audit_405592390508eab92cdc",
+      "instanceId": "sympy__sympy-17139",
+      "stratum": "high-score",
+      "developmentScore": 0.421429
+    },
+    {
+      "auditId": "audit_6549fd27c9e7cd7f90f6",
+      "instanceId": "sympy__sympy-24102",
+      "stratum": "high-score",
+      "developmentScore": 0.413636
+    },
+    {
+      "auditId": "audit_3e594ee7b928ea09d3c6",
+      "instanceId": "pylint-dev__pylint-6506",
+      "stratum": "high-score",
+      "developmentScore": 0.409354
+    },
+    {
+      "auditId": "audit_f4059b0e7c7457a1ecf5",
+      "instanceId": "scikit-learn__scikit-learn-13439",
+      "stratum": "medium-score",
+      "developmentScore": 0.405603
+    },
+    {
+      "auditId": "audit_b172926c8e389221f230",
+      "instanceId": "sympy__sympy-22005",
+      "stratum": "medium-score",
+      "developmentScore": 0.404839
+    },
+    {
+      "auditId": "audit_82a4697867334d4fad00",
+      "instanceId": "sympy__sympy-24909",
+      "stratum": "medium-score",
+      "developmentScore": 0.402417
+    },
+    {
+      "auditId": "audit_d7d69e79f0dcef43ee51",
+      "instanceId": "scikit-learn__scikit-learn-13496",
+      "stratum": "medium-score",
+      "developmentScore": 0.401596
+    },
+    {
+      "auditId": "audit_2c1b8ae6ec336cd4a40f",
+      "instanceId": "sympy__sympy-20154",
+      "stratum": "medium-score",
+      "developmentScore": 0.4
+    },
+    {
+      "auditId": "audit_6a14c44b6f8a0219b539",
+      "instanceId": "sympy__sympy-17655",
+      "stratum": "medium-score",
+      "developmentScore": 0.383516
+    },
+    {
+      "auditId": "audit_6ee77b8cb1062a3cf3e9",
+      "instanceId": "sympy__sympy-15011",
+      "stratum": "medium-score",
+      "developmentScore": 0.382805
+    },
+    {
+      "auditId": "audit_0a25cdabf83685bcdae1",
+      "instanceId": "sympy__sympy-23262",
+      "stratum": "medium-score",
+      "developmentScore": 0.382308
+    },
+    {
+      "auditId": "audit_f955babe90a9dadd7f2e",
+      "instanceId": "scikit-learn__scikit-learn-15512",
+      "stratum": "medium-score",
+      "developmentScore": 0.38125
+    },
+    {
+      "auditId": "audit_5d3c7622d56a289d1bc5",
+      "instanceId": "pylint-dev__pylint-7228",
+      "stratum": "medium-score",
+      "developmentScore": 0.38012
+    },
+    {
+      "auditId": "audit_32103f27064eb33bf2ff",
+      "instanceId": "scikit-learn__scikit-learn-25570",
+      "stratum": "medium-score",
+      "developmentScore": 0.369379
+    },
+    {
+      "auditId": "audit_b0bc499a3ee4f29f48e4",
+      "instanceId": "sympy__sympy-22840",
+      "stratum": "medium-score",
+      "developmentScore": 0.369094
+    },
+    {
+      "auditId": "audit_a52d062711de8b06241d",
+      "instanceId": "sphinx-doc__sphinx-8474",
+      "stratum": "medium-score",
+      "developmentScore": 0.3625
+    },
+    {
+      "auditId": "audit_7a879255b97fa9dcd64b",
+      "instanceId": "sphinx-doc__sphinx-8506",
+      "stratum": "medium-score",
+      "developmentScore": 0.359191
+    },
+    {
+      "auditId": "audit_91fa27b2dea9b8c2ea94",
+      "instanceId": "sympy__sympy-20049",
+      "stratum": "medium-score",
+      "developmentScore": 0.35873
+    },
+    {
+      "auditId": "audit_78612ebd88140d46016f",
+      "instanceId": "pylint-dev__pylint-7114",
+      "stratum": "medium-score",
+      "developmentScore": 0.350331
+    },
+    {
+      "auditId": "audit_4ae4e9d243f9c3e8d9cf",
+      "instanceId": "sympy__sympy-24152",
+      "stratum": "medium-score",
+      "developmentScore": 0.34875
+    },
+    {
+      "auditId": "audit_b027d6e26dad0d6bf399",
+      "instanceId": "sympy__sympy-24066",
+      "stratum": "medium-score",
+      "developmentScore": 0.346176
+    },
+    {
+      "auditId": "audit_77be7a894cd5acce6b83",
+      "instanceId": "sympy__sympy-16792",
+      "stratum": "medium-score",
+      "developmentScore": 0.322636
+    },
+    {
+      "auditId": "audit_0020fef96ec69288401a",
+      "instanceId": "scikit-learn__scikit-learn-13497",
+      "stratum": "low-score",
+      "developmentScore": 0.308
+    },
+    {
+      "auditId": "audit_0c2a848a53496e7b96e3",
+      "instanceId": "mwaskom__seaborn-3190",
+      "stratum": "low-score",
+      "developmentScore": 0.300749
+    },
+    {
+      "auditId": "audit_ce3b9bc2902ffd974581",
+      "instanceId": "astropy__astropy-7746",
+      "stratum": "low-score",
+      "developmentScore": 0.294548
+    },
+    {
+      "auditId": "audit_ade3d42379ab920e89e8",
+      "instanceId": "pylint-dev__pylint-7080",
+      "stratum": "low-score",
+      "developmentScore": 0.289307
+    },
+    {
+      "auditId": "audit_01b76e36d316128d5f4e",
+      "instanceId": "astropy__astropy-12907",
+      "stratum": "low-score",
+      "developmentScore": 0.271898
+    },
+    {
+      "auditId": "audit_8c66d14f4f227674765e",
+      "instanceId": "mwaskom__seaborn-3010",
+      "stratum": "low-score",
+      "developmentScore": 0.250461
+    },
+    {
+      "auditId": "audit_758746a9758822a00708",
+      "instanceId": "astropy__astropy-14995",
+      "stratum": "low-score",
+      "developmentScore": 0.241709
+    },
+    {
+      "auditId": "audit_3beb92e0f3e470225794",
+      "instanceId": "django__django-13768",
+      "stratum": "low-score",
+      "developmentScore": 0.219828
+    },
+    {
+      "auditId": "audit_6a061dd88a32f1fe6782",
+      "instanceId": "sphinx-doc__sphinx-8273",
+      "stratum": "low-score",
+      "developmentScore": 0.202326
+    },
+    {
+      "auditId": "audit_d000f67c450c08859904",
+      "instanceId": "sympy__sympy-20442",
+      "stratum": "low-score",
+      "developmentScore": 0.196875
+    }
+  ]
+}

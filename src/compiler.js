@@ -138,6 +138,10 @@ export async function compileContext(query = "", options = {}) {
   if (!["any", "partial", "direct"].includes(minimumCoverage)) {
     throw new TypeError("minimumCoverage must be any, partial, or direct.");
   }
+  const minimumEvidence = options.minimumEvidence ?? "any";
+  if (!["any", "partial", "direct"].includes(minimumEvidence)) {
+    throw new TypeError("minimumEvidence must be any, partial, or direct.");
+  }
 
   const sqliteCandidates = options.inMemory === true || retrievalQuery.trim() === ""
     ? []
@@ -148,6 +152,10 @@ export async function compileContext(query = "", options = {}) {
   const retrieval = rankContextEvents(index, retrievalQuery, {
     limit,
     diversity: options.diversity,
+    rankingProfile: options.rankingProfile,
+    includeFuzzy: options.includeFuzzy,
+    includeGraph: options.includeGraph,
+    temporalBoundary: options.temporalBoundary,
     supersessionPolicy: options.supersessionPolicy,
     asOf: resolveQueryTime(options),
     authorityScopes: options.authorityScopes ?? options.authorityScope,
@@ -165,6 +173,16 @@ export async function compileContext(query = "", options = {}) {
       { minimumCoverage, coverage: retrieval.coverage }
     );
   }
+  const evidenceAccepted = minimumEvidence === "any"
+    || (minimumEvidence === "partial" && ["PARTIALLY_SUPPORTED", "DIRECTLY_SUPPORTED"].includes(retrieval.evidenceSufficiency.state))
+    || (minimumEvidence === "direct" && retrieval.evidenceSufficiency.state === "DIRECTLY_SUPPORTED");
+  if (!evidenceAccepted) {
+    throw new QarinahError(
+      "CONTEXT_EVIDENCE_INSUFFICIENT",
+      `Evidence sufficiency '${retrieval.evidenceSufficiency.state}' does not satisfy minimumEvidence '${minimumEvidence}'.`,
+      { minimumEvidence, evidenceSufficiency: retrieval.evidenceSufficiency }
+    );
+  }
   const candidateIds = new Set(ranked.map((entry) => entry.event.eventId));
   const relevantConflicts = retrieval.conflicts
     .filter((conflict) => conflict.eventIds.some((eventId) => candidateIds.has(eventId)))
@@ -175,6 +193,15 @@ export async function compileContext(query = "", options = {}) {
     supersessionPolicy: retrieval.supersessionPolicy,
     asOf: retrieval.asOf,
     coverage: retrieval.coverage,
+    ...(retrieval.rankingProfile === "admission-first-v2"
+      ? {
+        rankingProfile: retrieval.rankingProfile,
+        temporalBoundary: retrieval.temporalBoundary,
+        ...((options.includeEvidenceSufficiency === true || minimumEvidence !== "any")
+          ? { evidenceSufficiency: retrieval.evidenceSufficiency }
+          : {})
+      }
+      : {}),
     ...(queryExpansion === null ? {} : { queryExpansion }),
     ...(typeof options.authorityScope === "string" ? { authorityScope: options.authorityScope } : {}),
     ...(retrieval.authorityScopes.length === 0 ? {} : { authorityScopes: retrieval.authorityScopes }),
@@ -271,6 +298,9 @@ export function renderContextPackMarkdown(pack) {
     `- Retrieval: \`${pack.retrieval.strategy}\``,
     `- Supersession: \`${pack.retrieval.supersessionPolicy}\``,
     `- Evidence coverage: \`${pack.retrieval.coverage.status}\` (${pack.retrieval.coverage.bestExactTermCount}/${pack.retrieval.coverage.queryTermCount} exact query terms in the best event)`,
+    ...(pack.retrieval.evidenceSufficiency
+      ? [`- Evidence sufficiency: \`${pack.retrieval.evidenceSufficiency.state}\` (score ${pack.retrieval.evidenceSufficiency.score})`]
+      : []),
     ...(pack.retrieval.coverage.warning ? [`- Coverage warning: ${markdownInline(pack.retrieval.coverage.warning)}`] : []),
     `- Unresolved conflicts: ${pack.retrieval.conflicts?.length || 0}`,
     `- Truncated: ${pack.truncated ? "yes" : "no"}`,

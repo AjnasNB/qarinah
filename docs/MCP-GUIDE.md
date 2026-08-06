@@ -1,6 +1,6 @@
 # MCP guide
 
-Qarinah 0.1.2 includes a native, zero-write Model Context Protocol server. It always provides local ledger status and integrity diagnostics. It provides `context.query` only after the user creates an explicit permit bound to the exact workspace, current consent-policy hash, and response ceilings.
+Qarinah 0.1.3 includes a native, zero-write Model Context Protocol server. It always provides local ledger status and integrity diagnostics. It provides `context.query` only after the user creates an explicit permit bound to the exact workspace, current consent-policy hash, and response ceilings.
 
 That narrow boundary is intentional:
 
@@ -15,7 +15,7 @@ That narrow boundary is intentional:
 | --- | --- |
 | MCP name | `io.github.AjnasNB/qarinah` |
 | npm package | `qarinah` |
-| Version | `0.1.2` |
+| Version | `0.1.3` |
 | Transport | `stdio` |
 | CLI entry | `npx qarinah mcp` |
 | Default tools | `context_status`, `context_doctor` |
@@ -246,6 +246,27 @@ If the event store verifies but derived state is unavailable:
 
 The tool does not repair this condition. Review it locally and run `npx qarinah build` if the authoritative chain is valid.
 
+## Tool: `context.query`
+
+Compiles a bounded, cited context pack without writing to the workspace. This tool is listed only when the server has the exact disclosure permit described below.
+
+```json
+{
+  "workspace": "D:\\projects\\shop",
+  "query": "release provenance",
+  "limit": 10,
+  "maxChars": 8000,
+  "minimumCoverage": "direct",
+  "minimumEvidence": "partial",
+  "temporalBoundary": "strict-before",
+  "asOf": "2026-08-05T07:30:00.000Z"
+}
+```
+
+Retrieval uses the `admission-first-v2` profile: repository, time, retention, disclosure, and supersession admission happens before ranking; admissible lexical candidates retain BM25 order, and fuzzy or graph evidence may only fill gaps. `temporalBoundary: "strict-before"` excludes evidence at the exact `asOf` timestamp and is recommended for prequential research evaluation. The default `inclusive` boundary is appropriate for normal as-of queries.
+
+`minimumEvidence` accepts `any`, `partial`, or `direct`. A stricter value returns `CONTEXT_EVIDENCE_INSUFFICIENT` when the deterministic evidence diagnostic does not meet the requested level. In `evidence-sufficiency-v2`, only `DIRECTLY_SUPPORTED` produces `ACCEPT_DIRECT`; partial and insufficient evidence both produce `ABSTAIN`. The frozen development run observed zero direct false accepts at the conservative 0.65 operating point, but exact 95% upper bounds remain 7.25% static and 11.22% online and acceptance coverage is only 3.33%-5.00%. Callers must still inspect cited records and reason codes.
+
 ## Tool result errors
 
 Expected operational failures are returned as MCP tool results with:
@@ -266,6 +287,8 @@ INDEX_STALE
 INDEX_INVALID
 EVENT_LOG_MISSING
 MCP_TOOL_NOT_FOUND
+CONTEXT_COVERAGE_TOO_LOW
+CONTEXT_EVIDENCE_INSUFFICIENT
 ```
 
 Other internal errors are reduced to a stable code and the generic message:

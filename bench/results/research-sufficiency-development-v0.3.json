@@ -1,0 +1,5649 @@
+{
+  "schemaVersion": "qarinah.research-sufficiency-development-result.v0.3",
+  "status": "development-threshold-calibration-not-confirmatory",
+  "sourceArtifact": {
+    "path": "bench/results/research-retrieval-development-v0.2.json",
+    "sha256": "sha256:bfe8015811ffbecd5e3c00eb9f4a1e104478605cd605442a1ec96d67582e4b3f"
+  },
+  "productionRule": {
+    "method": "evidence-sufficiency-v2",
+    "directThreshold": 0.65,
+    "partialThreshold": 0.4,
+    "directDecision": "Only DIRECTLY_SUPPORTED produces ACCEPT_DIRECT; partial evidence always abstains.",
+    "thresholdSelection": "Interpretable fixed rule selected on already-inspected development data."
+  },
+  "claimBoundary": {
+    "confirmatory": false,
+    "humanValidatedRelevance": false,
+    "observedFalseAcceptanceMeaning": "At the frozen conservative operating point, zero direct false accepts were observed against the deterministic structural development oracle. Exact intervals remain non-zero above; this is not a universal semantic guarantee.",
+    "tradeoff": "The conservative rule intentionally sacrifices acceptance coverage and recall to maximize precision."
+  },
+  "settings": {
+    "static": {
+      "thresholds": {
+        "direct": 0.65,
+        "partial": 0.4
+      },
+      "stateCounts": {
+        "DIRECTLY_SUPPORTED": 8,
+        "PARTIALLY_SUPPORTED": 139,
+        "INSUFFICIENT_EVIDENCE": 93
+      },
+      "directDecision": {
+        "threshold": 0.65,
+        "tasks": 240,
+        "positives": 191,
+        "noPositiveUnderStructuralOracle": 49,
+        "acceptedDirect": 8,
+        "abstained": 232,
+        "truePositive": 8,
+        "falsePositive": 0,
+        "trueNegative": 49,
+        "falseNegative": 183,
+        "acceptedPrecision": 1,
+        "acceptedRecall": 0.041885,
+        "acceptedF1": 0.080402,
+        "falseAcceptanceRate": 0,
+        "correctAbstentionRate": 1,
+        "acceptanceCoverage": 0.033333,
+        "confidenceIntervals95": {
+          "acceptedPrecision": {
+            "method": "Clopper-Pearson exact two-sided",
+            "successes": 8,
+            "trials": 8,
+            "lower": 0.630583,
+            "upper": 1
+          },
+          "falseAcceptanceRate": {
+            "method": "Clopper-Pearson exact two-sided",
+            "successes": 0,
+            "trials": 49,
+            "lower": 0,
+            "upper": 0.072519
+          }
+        }
+      },
+      "scoreQuality": {
+        "rocAuc": 0.605994,
+        "prAucAveragePrecision": 0.85483,
+        "brierScore": 0.295336,
+        "expectedCalibrationError10Bin": 0.366784
+      },
+      "leaveOneRepositoryOut": {
+        "method": "leave-one-repository-out threshold validation",
+        "thresholdGrid": [
+          0.65,
+          0.7,
+          0.75,
+          0.8
+        ],
+        "folds": [
+          {
+            "heldOutRepository": "astropy/astropy",
+            "selectedThreshold": 0.65,
+            "selectionRule": "maximize training true positives subject to zero training false positives; tie-break to lower threshold",
+            "training": {
+              "threshold": 0.65,
+              "tasks": 235,
+              "positives": 189,
+              "noPositiveUnderStructuralOracle": 46,
+              "acceptedDirect": 8,
+              "abstained": 227,
+              "truePositive": 8,
+              "falsePositive": 0,
+              "trueNegative": 46,
+              "falseNegative": 181,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.042328,
+              "acceptedF1": 0.081218,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.034043,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 8,
+                  "trials": 8,
+                  "lower": 0.630583,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 46,
+                  "lower": 0,
+                  "upper": 0.077062
+                }
+              }
+            },
+            "heldOut": {
+              "threshold": 0.65,
+              "tasks": 5,
+              "positives": 2,
+              "noPositiveUnderStructuralOracle": 3,
+              "acceptedDirect": 0,
+              "abstained": 5,
+              "truePositive": 0,
+              "falsePositive": 0,
+              "trueNegative": 3,
+              "falseNegative": 2,
+              "acceptedPrecision": null,
+              "acceptedRecall": 0,
+              "acceptedF1": null,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 3,
+                  "lower": 0,
+                  "upper": 0.707598
+                }
+              }
+            }
+          },
+          {
+            "heldOutRepository": "django/django",
+            "selectedThreshold": 0.65,
+            "selectionRule": "maximize training true positives subject to zero training false positives; tie-break to lower threshold",
+            "training": {
+              "threshold": 0.65,
+              "tasks": 149,
+              "positives": 104,
+              "noPositiveUnderStructuralOracle": 45,
+              "acceptedDirect": 5,
+              "abstained": 144,
+              "truePositive": 5,
+              "falsePositive": 0,
+              "trueNegative": 45,
+              "falseNegative": 99,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.048077,
+              "acceptedF1": 0.091743,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.033557,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 5,
+                  "trials": 5,
+                  "lower": 0.478176,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 45,
+                  "lower": 0,
+                  "upper": 0.078705
+                }
+              }
+            },
+            "heldOut": {
+              "threshold": 0.65,
+              "tasks": 91,
+              "positives": 87,
+              "noPositiveUnderStructuralOracle": 4,
+              "acceptedDirect": 3,
+              "abstained": 88,
+              "truePositive": 3,
+              "falsePositive": 0,
+              "trueNegative": 4,
+              "falseNegative": 84,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.034483,
+              "acceptedF1": 0.066667,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.032967,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 3,
+                  "trials": 3,
+                  "lower": 0.292402,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 4,
+                  "lower": 0,
+                  "upper": 0.602365
+                }
+              }
+            }
+          },
+          {
+            "heldOutRepository": "matplotlib/matplotlib",
+            "selectedThreshold": 0.65,
+            "selectionRule": "maximize training true positives subject to zero training false positives; tie-break to lower threshold",
+            "training": {
+              "threshold": 0.65,
+              "tasks": 222,
+              "positives": 173,
+              "noPositiveUnderStructuralOracle": 49,
+              "acceptedDirect": 8,
+              "abstained": 214,
+              "truePositive": 8,
+              "falsePositive": 0,
+              "trueNegative": 49,
+              "falseNegative": 165,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.046243,
+              "acceptedF1": 0.088398,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.036036,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 8,
+                  "trials": 8,
+                  "lower": 0.630583,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 49,
+                  "lower": 0,
+                  "upper": 0.072519
+                }
+              }
+            },
+            "heldOut": {
+              "threshold": 0.65,
+              "tasks": 18,
+              "positives": 18,
+              "noPositiveUnderStructuralOracle": 0,
+              "acceptedDirect": 0,
+              "abstained": 18,
+              "truePositive": 0,
+              "falsePositive": 0,
+              "trueNegative": 0,
+              "falseNegative": 18,
+              "acceptedPrecision": null,
+              "acceptedRecall": 0,
+              "acceptedF1": null,
+              "falseAcceptanceRate": null,
+              "correctAbstentionRate": null,
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": null
+              }
+            }
+          },
+          {
+            "heldOutRepository": "mwaskom/seaborn",
+            "selectedThreshold": 0.65,
+            "selectionRule": "maximize training true positives subject to zero training false positives; tie-break to lower threshold",
+            "training": {
+              "threshold": 0.65,
+              "tasks": 237,
+              "positives": 190,
+              "noPositiveUnderStructuralOracle": 47,
+              "acceptedDirect": 8,
+              "abstained": 229,
+              "truePositive": 8,
+              "falsePositive": 0,
+              "trueNegative": 47,
+              "falseNegative": 182,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.042105,
+              "acceptedF1": 0.080808,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.033755,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 8,
+                  "trials": 8,
+                  "lower": 0.630583,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 47,
+                  "lower": 0,
+                  "upper": 0.075486
+                }
+              }
+            },
+            "heldOut": {
+              "threshold": 0.65,
+              "tasks": 3,
+              "positives": 1,
+              "noPositiveUnderStructuralOracle": 2,
+              "acceptedDirect": 0,
+              "abstained": 3,
+              "truePositive": 0,
+              "falsePositive": 0,
+              "trueNegative": 2,
+              "falseNegative": 1,
+              "acceptedPrecision": null,
+              "acceptedRecall": 0,
+              "acceptedF1": null,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 2,
+                  "lower": 0,
+                  "upper": 0.841886
+                }
+              }
+            }
+          },
+          {
+            "heldOutRepository": "pallets/flask",
+            "selectedThreshold": 0.65,
+            "selectionRule": "maximize training true positives subject to zero training false positives; tie-break to lower threshold",
+            "training": {
+              "threshold": 0.65,
+              "tasks": 238,
+              "positives": 189,
+              "noPositiveUnderStructuralOracle": 49,
+              "acceptedDirect": 8,
+              "abstained": 230,
+              "truePositive": 8,
+              "falsePositive": 0,
+              "trueNegative": 49,
+              "falseNegative": 181,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.042328,
+              "acceptedF1": 0.081218,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.033613,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 8,
+                  "trials": 8,
+                  "lower": 0.630583,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 49,
+                  "lower": 0,
+                  "upper": 0.072519
+                }
+              }
+            },
+            "heldOut": {
+              "threshold": 0.65,
+              "tasks": 2,
+              "positives": 2,
+              "noPositiveUnderStructuralOracle": 0,
+              "acceptedDirect": 0,
+              "abstained": 2,
+              "truePositive": 0,
+              "falsePositive": 0,
+              "trueNegative": 0,
+              "falseNegative": 2,
+              "acceptedPrecision": null,
+              "acceptedRecall": 0,
+              "acceptedF1": null,
+              "falseAcceptanceRate": null,
+              "correctAbstentionRate": null,
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": null
+              }
+            }
+          },
+          {
+            "heldOutRepository": "psf/requests",
+            "selectedThreshold": 0.65,
+            "selectionRule": "maximize training true positives subject to zero training false positives; tie-break to lower threshold",
+            "training": {
+              "threshold": 0.65,
+              "tasks": 235,
+              "positives": 186,
+              "noPositiveUnderStructuralOracle": 49,
+              "acceptedDirect": 8,
+              "abstained": 227,
+              "truePositive": 8,
+              "falsePositive": 0,
+              "trueNegative": 49,
+              "falseNegative": 178,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.043011,
+              "acceptedF1": 0.082474,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.034043,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 8,
+                  "trials": 8,
+                  "lower": 0.630583,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 49,
+                  "lower": 0,
+                  "upper": 0.072519
+                }
+              }
+            },
+            "heldOut": {
+              "threshold": 0.65,
+              "tasks": 5,
+              "positives": 5,
+              "noPositiveUnderStructuralOracle": 0,
+              "acceptedDirect": 0,
+              "abstained": 5,
+              "truePositive": 0,
+              "falsePositive": 0,
+              "trueNegative": 0,
+              "falseNegative": 5,
+              "acceptedPrecision": null,
+              "acceptedRecall": 0,
+              "acceptedF1": null,
+              "falseAcceptanceRate": null,
+              "correctAbstentionRate": null,
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": null
+              }
+            }
+          },
+          {
+            "heldOutRepository": "pydata/xarray",
+            "selectedThreshold": 0.65,
+            "selectionRule": "maximize training true positives subject to zero training false positives; tie-break to lower threshold",
+            "training": {
+              "threshold": 0.65,
+              "tasks": 236,
+              "positives": 187,
+              "noPositiveUnderStructuralOracle": 49,
+              "acceptedDirect": 8,
+              "abstained": 228,
+              "truePositive": 8,
+              "falsePositive": 0,
+              "trueNegative": 49,
+              "falseNegative": 179,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.042781,
+              "acceptedF1": 0.082051,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.033898,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 8,
+                  "trials": 8,
+                  "lower": 0.630583,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 49,
+                  "lower": 0,
+                  "upper": 0.072519
+                }
+              }
+            },
+            "heldOut": {
+              "threshold": 0.65,
+              "tasks": 4,
+              "positives": 4,
+              "noPositiveUnderStructuralOracle": 0,
+              "acceptedDirect": 0,
+              "abstained": 4,
+              "truePositive": 0,
+              "falsePositive": 0,
+              "trueNegative": 0,
+              "falseNegative": 4,
+              "acceptedPrecision": null,
+              "acceptedRecall": 0,
+              "acceptedF1": null,
+              "falseAcceptanceRate": null,
+              "correctAbstentionRate": null,
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": null
+              }
+            }
+          },
+          {
+            "heldOutRepository": "pylint-dev/pylint",
+            "selectedThreshold": 0.65,
+            "selectionRule": "maximize training true positives subject to zero training false positives; tie-break to lower threshold",
+            "training": {
+              "threshold": 0.65,
+              "tasks": 235,
+              "positives": 191,
+              "noPositiveUnderStructuralOracle": 44,
+              "acceptedDirect": 8,
+              "abstained": 227,
+              "truePositive": 8,
+              "falsePositive": 0,
+              "trueNegative": 44,
+              "falseNegative": 183,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.041885,
+              "acceptedF1": 0.080402,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.034043,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 8,
+                  "trials": 8,
+                  "lower": 0.630583,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 44,
+                  "lower": 0,
+                  "upper": 0.08042
+                }
+              }
+            },
+            "heldOut": {
+              "threshold": 0.65,
+              "tasks": 5,
+              "positives": 0,
+              "noPositiveUnderStructuralOracle": 5,
+              "acceptedDirect": 0,
+              "abstained": 5,
+              "truePositive": 0,
+              "falsePositive": 0,
+              "trueNegative": 5,
+              "falseNegative": 0,
+              "acceptedPrecision": null,
+              "acceptedRecall": null,
+              "acceptedF1": null,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 5,
+                  "lower": 0,
+                  "upper": 0.521824
+                }
+              }
+            }
+          },
+          {
+            "heldOutRepository": "pytest-dev/pytest",
+            "selectedThreshold": 0.65,
+            "selectionRule": "maximize training true positives subject to zero training false positives; tie-break to lower threshold",
+            "training": {
+              "threshold": 0.65,
+              "tasks": 226,
+              "positives": 177,
+              "noPositiveUnderStructuralOracle": 49,
+              "acceptedDirect": 8,
+              "abstained": 218,
+              "truePositive": 8,
+              "falsePositive": 0,
+              "trueNegative": 49,
+              "falseNegative": 169,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.045198,
+              "acceptedF1": 0.086486,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.035398,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 8,
+                  "trials": 8,
+                  "lower": 0.630583,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 49,
+                  "lower": 0,
+                  "upper": 0.072519
+                }
+              }
+            },
+            "heldOut": {
+              "threshold": 0.65,
+              "tasks": 14,
+              "positives": 14,
+              "noPositiveUnderStructuralOracle": 0,
+              "acceptedDirect": 0,
+              "abstained": 14,
+              "truePositive": 0,
+              "falsePositive": 0,
+              "trueNegative": 0,
+              "falseNegative": 14,
+              "acceptedPrecision": null,
+              "acceptedRecall": 0,
+              "acceptedF1": null,
+              "falseAcceptanceRate": null,
+              "correctAbstentionRate": null,
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": null
+              }
+            }
+          },
+          {
+            "heldOutRepository": "scikit-learn/scikit-learn",
+            "selectedThreshold": 0.65,
+            "selectionRule": "maximize training true positives subject to zero training false positives; tie-break to lower threshold",
+            "training": {
+              "threshold": 0.65,
+              "tasks": 222,
+              "positives": 182,
+              "noPositiveUnderStructuralOracle": 40,
+              "acceptedDirect": 8,
+              "abstained": 214,
+              "truePositive": 8,
+              "falsePositive": 0,
+              "trueNegative": 40,
+              "falseNegative": 174,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.043956,
+              "acceptedF1": 0.084211,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.036036,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 8,
+                  "trials": 8,
+                  "lower": 0.630583,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 40,
+                  "lower": 0,
+                  "upper": 0.088097
+                }
+              }
+            },
+            "heldOut": {
+              "threshold": 0.65,
+              "tasks": 18,
+              "positives": 9,
+              "noPositiveUnderStructuralOracle": 9,
+              "acceptedDirect": 0,
+              "abstained": 18,
+              "truePositive": 0,
+              "falsePositive": 0,
+              "trueNegative": 9,
+              "falseNegative": 9,
+              "acceptedPrecision": null,
+              "acceptedRecall": 0,
+              "acceptedF1": null,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 9,
+                  "lower": 0,
+                  "upper": 0.336267
+                }
+              }
+            }
+          },
+          {
+            "heldOutRepository": "sphinx-doc/sphinx",
+            "selectedThreshold": 0.65,
+            "selectionRule": "maximize training true positives subject to zero training false positives; tie-break to lower threshold",
+            "training": {
+              "threshold": 0.65,
+              "tasks": 227,
+              "positives": 183,
+              "noPositiveUnderStructuralOracle": 44,
+              "acceptedDirect": 4,
+              "abstained": 223,
+              "truePositive": 4,
+              "falsePositive": 0,
+              "trueNegative": 44,
+              "falseNegative": 179,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.021858,
+              "acceptedF1": 0.042781,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.017621,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 4,
+                  "trials": 4,
+                  "lower": 0.397635,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 44,
+                  "lower": 0,
+                  "upper": 0.08042
+                }
+              }
+            },
+            "heldOut": {
+              "threshold": 0.65,
+              "tasks": 13,
+              "positives": 8,
+              "noPositiveUnderStructuralOracle": 5,
+              "acceptedDirect": 4,
+              "abstained": 9,
+              "truePositive": 4,
+              "falsePositive": 0,
+              "trueNegative": 5,
+              "falseNegative": 4,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.5,
+              "acceptedF1": 0.666667,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.307692,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 4,
+                  "trials": 4,
+                  "lower": 0.397635,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 5,
+                  "lower": 0,
+                  "upper": 0.521824
+                }
+              }
+            }
+          },
+          {
+            "heldOutRepository": "sympy/sympy",
+            "selectedThreshold": 0.65,
+            "selectionRule": "maximize training true positives subject to zero training false positives; tie-break to lower threshold",
+            "training": {
+              "threshold": 0.65,
+              "tasks": 178,
+              "positives": 150,
+              "noPositiveUnderStructuralOracle": 28,
+              "acceptedDirect": 7,
+              "abstained": 171,
+              "truePositive": 7,
+              "falsePositive": 0,
+              "trueNegative": 28,
+              "falseNegative": 143,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.046667,
+              "acceptedF1": 0.089172,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.039326,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 7,
+                  "trials": 7,
+                  "lower": 0.590384,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 28,
+                  "lower": 0,
+                  "upper": 0.123436
+                }
+              }
+            },
+            "heldOut": {
+              "threshold": 0.65,
+              "tasks": 62,
+              "positives": 41,
+              "noPositiveUnderStructuralOracle": 21,
+              "acceptedDirect": 1,
+              "abstained": 61,
+              "truePositive": 1,
+              "falsePositive": 0,
+              "trueNegative": 21,
+              "falseNegative": 40,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.02439,
+              "acceptedF1": 0.047619,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.016129,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 1,
+                  "trials": 1,
+                  "lower": 0.025,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 21,
+                  "lower": 0,
+                  "upper": 0.161098
+                }
+              }
+            }
+          }
+        ],
+        "aggregate": {
+          "tasks": 240,
+          "positives": 191,
+          "noPositiveUnderStructuralOracle": 49,
+          "acceptedDirect": 8,
+          "abstained": 232,
+          "truePositive": 8,
+          "falsePositive": 0,
+          "trueNegative": 49,
+          "falseNegative": 183,
+          "acceptedPrecision": 1,
+          "acceptedRecall": 0.041885,
+          "falseAcceptanceRate": 0,
+          "correctAbstentionRate": 1,
+          "confidenceIntervals95": {
+            "acceptedPrecision": {
+              "method": "Clopper-Pearson exact two-sided",
+              "successes": 8,
+              "trials": 8,
+              "lower": 0.630583,
+              "upper": 1
+            },
+            "falseAcceptanceRate": {
+              "method": "Clopper-Pearson exact two-sided",
+              "successes": 0,
+              "trials": 49,
+              "lower": 0,
+              "upper": 0.072519
+            }
+          }
+        }
+      },
+      "taskDecisions": [
+        {
+          "repository": "astropy/astropy",
+          "instanceId": "astropy__astropy-7746",
+          "positive": false,
+          "score": 0.294548,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "astropy/astropy",
+          "instanceId": "astropy__astropy-12907",
+          "positive": false,
+          "score": 0.271898,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "astropy/astropy",
+          "instanceId": "astropy__astropy-14182",
+          "positive": true,
+          "score": 0.267978,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "astropy/astropy",
+          "instanceId": "astropy__astropy-14365",
+          "positive": true,
+          "score": 0.284239,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "astropy/astropy",
+          "instanceId": "astropy__astropy-14995",
+          "positive": false,
+          "score": 0.241709,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12113",
+          "positive": true,
+          "score": 0.368052,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12125",
+          "positive": true,
+          "score": 0.501481,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12184",
+          "positive": false,
+          "score": 0.593478,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12284",
+          "positive": true,
+          "score": 0.589706,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12286",
+          "positive": true,
+          "score": 0.453571,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12308",
+          "positive": true,
+          "score": 0.451429,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12453",
+          "positive": true,
+          "score": 0.374653,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12470",
+          "positive": true,
+          "score": 0.5875,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12497",
+          "positive": true,
+          "score": 0.487879,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12589",
+          "positive": true,
+          "score": 0.448293,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12700",
+          "positive": true,
+          "score": 0.419298,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12708",
+          "positive": true,
+          "score": 0.515385,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12747",
+          "positive": true,
+          "score": 0.3865,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12856",
+          "positive": true,
+          "score": 0.52375,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12908",
+          "positive": true,
+          "score": 0.4425,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12915",
+          "positive": true,
+          "score": 0.566384,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12983",
+          "positive": true,
+          "score": 0.528571,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13028",
+          "positive": true,
+          "score": 0.420094,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13033",
+          "positive": true,
+          "score": 0.429664,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13158",
+          "positive": true,
+          "score": 0.405769,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13220",
+          "positive": true,
+          "score": 0.454582,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13230",
+          "positive": true,
+          "score": 0.355,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13265",
+          "positive": true,
+          "score": 0.494878,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13315",
+          "positive": true,
+          "score": 0.45,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13321",
+          "positive": true,
+          "score": 0.390716,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13401",
+          "positive": true,
+          "score": 0.420714,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13447",
+          "positive": true,
+          "score": 0.4375,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13448",
+          "positive": true,
+          "score": 0.472852,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13551",
+          "positive": true,
+          "score": 0.22,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13590",
+          "positive": true,
+          "score": 0.605469,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13658",
+          "positive": true,
+          "score": 0.577778,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13660",
+          "positive": true,
+          "score": 0.622693,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13710",
+          "positive": true,
+          "score": 0.425893,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13757",
+          "positive": true,
+          "score": 0.402045,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13768",
+          "positive": false,
+          "score": 0.219828,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13925",
+          "positive": true,
+          "score": 0.375246,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13933",
+          "positive": true,
+          "score": 0.509836,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13964",
+          "positive": true,
+          "score": 0.387143,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14016",
+          "positive": true,
+          "score": 0.696939,
+          "state": "DIRECTLY_SUPPORTED",
+          "decision": "ACCEPT_DIRECT"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14017",
+          "positive": true,
+          "score": 0.520833,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14155",
+          "positive": true,
+          "score": 0.41,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14238",
+          "positive": true,
+          "score": 0.503507,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14382",
+          "positive": true,
+          "score": 0.614214,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14411",
+          "positive": true,
+          "score": 0.55,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14534",
+          "positive": true,
+          "score": 0.346667,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14580",
+          "positive": true,
+          "score": 0.469154,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14608",
+          "positive": true,
+          "score": 0.219231,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14667",
+          "positive": true,
+          "score": 0.43,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14672",
+          "positive": true,
+          "score": 0.50436,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14730",
+          "positive": true,
+          "score": 0.2975,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14752",
+          "positive": true,
+          "score": 0.347034,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14787",
+          "positive": true,
+          "score": 0.355882,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14855",
+          "positive": true,
+          "score": 0.419231,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14915",
+          "positive": true,
+          "score": 0.421429,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14997",
+          "positive": true,
+          "score": 0.392656,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14999",
+          "positive": true,
+          "score": 0.411842,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15061",
+          "positive": true,
+          "score": 0.524138,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15202",
+          "positive": true,
+          "score": 0.493357,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15213",
+          "positive": true,
+          "score": 0.503846,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15252",
+          "positive": true,
+          "score": 0.45079,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15320",
+          "positive": true,
+          "score": 0.537023,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15347",
+          "positive": true,
+          "score": 0.424982,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15388",
+          "positive": false,
+          "score": 0.64403,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15400",
+          "positive": true,
+          "score": 0.4075,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15498",
+          "positive": true,
+          "score": 0.523333,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15695",
+          "positive": true,
+          "score": 0.436029,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15738",
+          "positive": true,
+          "score": 0.502955,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15781",
+          "positive": true,
+          "score": 0.653846,
+          "state": "DIRECTLY_SUPPORTED",
+          "decision": "ACCEPT_DIRECT"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15789",
+          "positive": true,
+          "score": 0.553409,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15790",
+          "positive": true,
+          "score": 0.395161,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15814",
+          "positive": true,
+          "score": 0.50145,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15819",
+          "positive": true,
+          "score": 0.337805,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15851",
+          "positive": true,
+          "score": 0.671875,
+          "state": "DIRECTLY_SUPPORTED",
+          "decision": "ACCEPT_DIRECT"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15902",
+          "positive": true,
+          "score": 0.375,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15996",
+          "positive": true,
+          "score": 0.489858,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16041",
+          "positive": true,
+          "score": 0.389286,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16046",
+          "positive": true,
+          "score": 0.535,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16139",
+          "positive": true,
+          "score": 0.37469,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16229",
+          "positive": true,
+          "score": 0.4425,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16255",
+          "positive": true,
+          "score": 0.537357,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16379",
+          "positive": true,
+          "score": 0.519808,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16400",
+          "positive": true,
+          "score": 0.388,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16408",
+          "positive": true,
+          "score": 0.55,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16527",
+          "positive": true,
+          "score": 0.5,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16595",
+          "positive": true,
+          "score": 0.523462,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16816",
+          "positive": true,
+          "score": 0.39189,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16820",
+          "positive": true,
+          "score": 0.34375,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16873",
+          "positive": false,
+          "score": 0.459725,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16910",
+          "positive": true,
+          "score": 0.470862,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-17051",
+          "positive": true,
+          "score": 0.454268,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-17087",
+          "positive": true,
+          "score": 0.503928,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-23476",
+          "positive": true,
+          "score": 0.489441,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-23562",
+          "positive": true,
+          "score": 0.449474,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-23563",
+          "positive": true,
+          "score": 0.468503,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-23913",
+          "positive": true,
+          "score": 0.425893,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-23964",
+          "positive": true,
+          "score": 0.456857,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-23987",
+          "positive": true,
+          "score": 0.575017,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-24149",
+          "positive": true,
+          "score": 0.49641,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-24265",
+          "positive": true,
+          "score": 0.542081,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-24334",
+          "positive": true,
+          "score": 0.413399,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-24970",
+          "positive": true,
+          "score": 0.582278,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-25079",
+          "positive": true,
+          "score": 0.530303,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-25311",
+          "positive": true,
+          "score": 0.640179,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-25332",
+          "positive": true,
+          "score": 0.563147,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-25433",
+          "positive": true,
+          "score": 0.614205,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-25442",
+          "positive": true,
+          "score": 0.559091,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-25498",
+          "positive": true,
+          "score": 0.567544,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-26011",
+          "positive": true,
+          "score": 0.418609,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-26020",
+          "positive": true,
+          "score": 0.37921,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "mwaskom/seaborn",
+          "instanceId": "mwaskom__seaborn-3010",
+          "positive": false,
+          "score": 0.250461,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "mwaskom/seaborn",
+          "instanceId": "mwaskom__seaborn-3190",
+          "positive": false,
+          "score": 0.300749,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "mwaskom/seaborn",
+          "instanceId": "mwaskom__seaborn-3407",
+          "positive": true,
+          "score": 0.315814,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pallets/flask",
+          "instanceId": "pallets__flask-4992",
+          "positive": true,
+          "score": 0.267484,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pallets/flask",
+          "instanceId": "pallets__flask-5063",
+          "positive": true,
+          "score": 0.20625,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "psf/requests",
+          "instanceId": "psf__requests-1963",
+          "positive": true,
+          "score": 0.297222,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "psf/requests",
+          "instanceId": "psf__requests-2148",
+          "positive": true,
+          "score": 0.254575,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "psf/requests",
+          "instanceId": "psf__requests-2317",
+          "positive": true,
+          "score": 0.405714,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "psf/requests",
+          "instanceId": "psf__requests-2674",
+          "positive": true,
+          "score": 0.347297,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "psf/requests",
+          "instanceId": "psf__requests-3362",
+          "positive": true,
+          "score": 0.197872,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pydata/xarray",
+          "instanceId": "pydata__xarray-4094",
+          "positive": true,
+          "score": 0.175403,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pydata/xarray",
+          "instanceId": "pydata__xarray-4248",
+          "positive": true,
+          "score": 0.311418,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pydata/xarray",
+          "instanceId": "pydata__xarray-4493",
+          "positive": true,
+          "score": 0.245,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pydata/xarray",
+          "instanceId": "pydata__xarray-5131",
+          "positive": true,
+          "score": 0.247403,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pylint-dev/pylint",
+          "instanceId": "pylint-dev__pylint-6506",
+          "positive": false,
+          "score": 0.409354,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pylint-dev/pylint",
+          "instanceId": "pylint-dev__pylint-7080",
+          "positive": false,
+          "score": 0.289307,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pylint-dev/pylint",
+          "instanceId": "pylint-dev__pylint-7114",
+          "positive": false,
+          "score": 0.350331,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pylint-dev/pylint",
+          "instanceId": "pylint-dev__pylint-7228",
+          "positive": false,
+          "score": 0.38012,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pylint-dev/pylint",
+          "instanceId": "pylint-dev__pylint-7993",
+          "positive": false,
+          "score": 0.453321,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-5413",
+          "positive": true,
+          "score": 0.404464,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-5495",
+          "positive": true,
+          "score": 0.395055,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-5692",
+          "positive": true,
+          "score": 0.376355,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-6116",
+          "positive": true,
+          "score": 0.214286,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-7168",
+          "positive": true,
+          "score": 0.323942,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-7220",
+          "positive": true,
+          "score": 0.413361,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-7373",
+          "positive": true,
+          "score": 0.372648,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-7432",
+          "positive": true,
+          "score": 0.408597,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-7490",
+          "positive": true,
+          "score": 0.331041,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-8365",
+          "positive": true,
+          "score": 0.32513,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-8906",
+          "positive": true,
+          "score": 0.3513,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-9359",
+          "positive": true,
+          "score": 0.47929,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-11143",
+          "positive": true,
+          "score": 0.34581,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-11148",
+          "positive": true,
+          "score": 0.330969,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-12471",
+          "positive": true,
+          "score": 0.468896,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-13142",
+          "positive": true,
+          "score": 0.467739,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-13241",
+          "positive": false,
+          "score": 0.502273,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-13439",
+          "positive": false,
+          "score": 0.405603,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-13496",
+          "positive": false,
+          "score": 0.401596,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-13497",
+          "positive": false,
+          "score": 0.308,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-13584",
+          "positive": true,
+          "score": 0.540645,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-13779",
+          "positive": true,
+          "score": 0.517033,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-14087",
+          "positive": true,
+          "score": 0.51209,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-14092",
+          "positive": true,
+          "score": 0.346568,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-14894",
+          "positive": false,
+          "score": 0.506967,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-14983",
+          "positive": false,
+          "score": 0.528196,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-15512",
+          "positive": false,
+          "score": 0.38125,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-15535",
+          "positive": false,
+          "score": 0.479202,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-25500",
+          "positive": true,
+          "score": 0.409375,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-25570",
+          "positive": false,
+          "score": 0.369379,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-25638",
+          "positive": true,
+          "score": 0.397692,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-25747",
+          "positive": true,
+          "score": 0.352689,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-8273",
+          "positive": false,
+          "score": 0.202326,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-8282",
+          "positive": true,
+          "score": 0.660924,
+          "state": "DIRECTLY_SUPPORTED",
+          "decision": "ACCEPT_DIRECT"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-8435",
+          "positive": true,
+          "score": 0.697194,
+          "state": "DIRECTLY_SUPPORTED",
+          "decision": "ACCEPT_DIRECT"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-8474",
+          "positive": false,
+          "score": 0.3625,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-8506",
+          "positive": false,
+          "score": 0.359191,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-8595",
+          "positive": true,
+          "score": 0.703113,
+          "state": "DIRECTLY_SUPPORTED",
+          "decision": "ACCEPT_DIRECT"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-8627",
+          "positive": false,
+          "score": 0.478407,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-8713",
+          "positive": true,
+          "score": 0.406993,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-8721",
+          "positive": true,
+          "score": 0.694079,
+          "state": "DIRECTLY_SUPPORTED",
+          "decision": "ACCEPT_DIRECT"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-8801",
+          "positive": true,
+          "score": 0.604233,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-10325",
+          "positive": true,
+          "score": 0.283333,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-10451",
+          "positive": true,
+          "score": 0.460714,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-11445",
+          "positive": false,
+          "score": 0.440826,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-13647",
+          "positive": true,
+          "score": 0.310811,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-13773",
+          "positive": true,
+          "score": 0.457046,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-13895",
+          "positive": true,
+          "score": 0.71875,
+          "state": "DIRECTLY_SUPPORTED",
+          "decision": "ACCEPT_DIRECT"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-13915",
+          "positive": true,
+          "score": 0.553571,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-13971",
+          "positive": true,
+          "score": 0.405242,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-14024",
+          "positive": true,
+          "score": 0.41875,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-14308",
+          "positive": true,
+          "score": 0.536071,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-14317",
+          "positive": true,
+          "score": 0.475,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-14396",
+          "positive": true,
+          "score": 0.345603,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-14774",
+          "positive": true,
+          "score": 0.394737,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-14817",
+          "positive": true,
+          "score": 0.367708,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-15011",
+          "positive": false,
+          "score": 0.382805,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-15308",
+          "positive": true,
+          "score": 0.420301,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-15345",
+          "positive": true,
+          "score": 0.499248,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-15346",
+          "positive": false,
+          "score": 0.4625,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-15609",
+          "positive": true,
+          "score": 0.403922,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-15678",
+          "positive": false,
+          "score": 0.506522,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-16106",
+          "positive": true,
+          "score": 0.35254,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-16281",
+          "positive": true,
+          "score": 0.291538,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-16503",
+          "positive": true,
+          "score": 0.446429,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-16792",
+          "positive": false,
+          "score": 0.322636,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-16988",
+          "positive": true,
+          "score": 0.372069,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-17022",
+          "positive": true,
+          "score": 0.417472,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-17139",
+          "positive": false,
+          "score": 0.421429,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-17630",
+          "positive": true,
+          "score": 0.395455,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-17655",
+          "positive": false,
+          "score": 0.383516,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-18057",
+          "positive": true,
+          "score": 0.348588,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-18087",
+          "positive": true,
+          "score": 0.286667,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-18189",
+          "positive": false,
+          "score": 0.522727,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-18199",
+          "positive": false,
+          "score": 0.468421,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-18532",
+          "positive": true,
+          "score": 0.458,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-18621",
+          "positive": true,
+          "score": 0.464342,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-18698",
+          "positive": true,
+          "score": 0.321053,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-18835",
+          "positive": false,
+          "score": 0.444298,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-19007",
+          "positive": true,
+          "score": 0.53875,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-19254",
+          "positive": true,
+          "score": 0.321631,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-19487",
+          "positive": true,
+          "score": 0.357143,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-20049",
+          "positive": false,
+          "score": 0.35873,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-20154",
+          "positive": false,
+          "score": 0.4,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-20212",
+          "positive": true,
+          "score": 0.327143,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-20322",
+          "positive": true,
+          "score": 0.426773,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-20442",
+          "positive": false,
+          "score": 0.196875,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-20590",
+          "positive": true,
+          "score": 0.343818,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-20639",
+          "positive": true,
+          "score": 0.429724,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-21055",
+          "positive": false,
+          "score": 0.617021,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-21171",
+          "positive": true,
+          "score": 0.342197,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-21379",
+          "positive": true,
+          "score": 0.348413,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-21612",
+          "positive": true,
+          "score": 0.4825,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-21614",
+          "positive": true,
+          "score": 0.430882,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-21627",
+          "positive": true,
+          "score": 0.336667,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-21847",
+          "positive": true,
+          "score": 0.349093,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-22005",
+          "positive": false,
+          "score": 0.404839,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-22714",
+          "positive": true,
+          "score": 0.435779,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-22840",
+          "positive": false,
+          "score": 0.369094,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-23117",
+          "positive": true,
+          "score": 0.43085,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-23191",
+          "positive": true,
+          "score": 0.418357,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-23262",
+          "positive": false,
+          "score": 0.382308,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-24066",
+          "positive": false,
+          "score": 0.346176,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-24102",
+          "positive": false,
+          "score": 0.413636,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-24152",
+          "positive": false,
+          "score": 0.34875,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-24213",
+          "positive": false,
+          "score": 0.440696,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-24909",
+          "positive": false,
+          "score": 0.402417,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        }
+      ]
+    },
+    "onlinePrequential": {
+      "thresholds": {
+        "direct": 0.65,
+        "partial": 0.4
+      },
+      "stateCounts": {
+        "DIRECTLY_SUPPORTED": 12,
+        "PARTIALLY_SUPPORTED": 181,
+        "INSUFFICIENT_EVIDENCE": 47
+      },
+      "directDecision": {
+        "threshold": 0.65,
+        "tasks": 240,
+        "positives": 209,
+        "noPositiveUnderStructuralOracle": 31,
+        "acceptedDirect": 12,
+        "abstained": 228,
+        "truePositive": 12,
+        "falsePositive": 0,
+        "trueNegative": 31,
+        "falseNegative": 197,
+        "acceptedPrecision": 1,
+        "acceptedRecall": 0.057416,
+        "acceptedF1": 0.108597,
+        "falseAcceptanceRate": 0,
+        "correctAbstentionRate": 1,
+        "acceptanceCoverage": 0.05,
+        "confidenceIntervals95": {
+          "acceptedPrecision": {
+            "method": "Clopper-Pearson exact two-sided",
+            "successes": 12,
+            "trials": 12,
+            "lower": 0.735352,
+            "upper": 1
+          },
+          "falseAcceptanceRate": {
+            "method": "Clopper-Pearson exact two-sided",
+            "successes": 0,
+            "trials": 31,
+            "lower": 0,
+            "upper": 0.112189
+          }
+        }
+      },
+      "scoreQuality": {
+        "rocAuc": 0.537892,
+        "prAucAveragePrecision": 0.885638,
+        "brierScore": 0.269041,
+        "expectedCalibrationError10Bin": 0.387859
+      },
+      "leaveOneRepositoryOut": {
+        "method": "leave-one-repository-out threshold validation",
+        "thresholdGrid": [
+          0.65,
+          0.7,
+          0.75,
+          0.8
+        ],
+        "folds": [
+          {
+            "heldOutRepository": "astropy/astropy",
+            "selectedThreshold": 0.65,
+            "selectionRule": "maximize training true positives subject to zero training false positives; tie-break to lower threshold",
+            "training": {
+              "threshold": 0.65,
+              "tasks": 235,
+              "positives": 207,
+              "noPositiveUnderStructuralOracle": 28,
+              "acceptedDirect": 12,
+              "abstained": 223,
+              "truePositive": 12,
+              "falsePositive": 0,
+              "trueNegative": 28,
+              "falseNegative": 195,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.057971,
+              "acceptedF1": 0.109589,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.051064,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 12,
+                  "trials": 12,
+                  "lower": 0.735352,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 28,
+                  "lower": 0,
+                  "upper": 0.123436
+                }
+              }
+            },
+            "heldOut": {
+              "threshold": 0.65,
+              "tasks": 5,
+              "positives": 2,
+              "noPositiveUnderStructuralOracle": 3,
+              "acceptedDirect": 0,
+              "abstained": 5,
+              "truePositive": 0,
+              "falsePositive": 0,
+              "trueNegative": 3,
+              "falseNegative": 2,
+              "acceptedPrecision": null,
+              "acceptedRecall": 0,
+              "acceptedF1": null,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 3,
+                  "lower": 0,
+                  "upper": 0.707598
+                }
+              }
+            }
+          },
+          {
+            "heldOutRepository": "django/django",
+            "selectedThreshold": 0.65,
+            "selectionRule": "maximize training true positives subject to zero training false positives; tie-break to lower threshold",
+            "training": {
+              "threshold": 0.65,
+              "tasks": 149,
+              "positives": 121,
+              "noPositiveUnderStructuralOracle": 28,
+              "acceptedDirect": 8,
+              "abstained": 141,
+              "truePositive": 8,
+              "falsePositive": 0,
+              "trueNegative": 28,
+              "falseNegative": 113,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.066116,
+              "acceptedF1": 0.124031,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.053691,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 8,
+                  "trials": 8,
+                  "lower": 0.630583,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 28,
+                  "lower": 0,
+                  "upper": 0.123436
+                }
+              }
+            },
+            "heldOut": {
+              "threshold": 0.65,
+              "tasks": 91,
+              "positives": 88,
+              "noPositiveUnderStructuralOracle": 3,
+              "acceptedDirect": 4,
+              "abstained": 87,
+              "truePositive": 4,
+              "falsePositive": 0,
+              "trueNegative": 3,
+              "falseNegative": 84,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.045455,
+              "acceptedF1": 0.086957,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.043956,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 4,
+                  "trials": 4,
+                  "lower": 0.397635,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 3,
+                  "lower": 0,
+                  "upper": 0.707598
+                }
+              }
+            }
+          },
+          {
+            "heldOutRepository": "matplotlib/matplotlib",
+            "selectedThreshold": 0.65,
+            "selectionRule": "maximize training true positives subject to zero training false positives; tie-break to lower threshold",
+            "training": {
+              "threshold": 0.65,
+              "tasks": 222,
+              "positives": 191,
+              "noPositiveUnderStructuralOracle": 31,
+              "acceptedDirect": 11,
+              "abstained": 211,
+              "truePositive": 11,
+              "falsePositive": 0,
+              "trueNegative": 31,
+              "falseNegative": 180,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.057592,
+              "acceptedF1": 0.108911,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.04955,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 11,
+                  "trials": 11,
+                  "lower": 0.715086,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 31,
+                  "lower": 0,
+                  "upper": 0.112189
+                }
+              }
+            },
+            "heldOut": {
+              "threshold": 0.65,
+              "tasks": 18,
+              "positives": 18,
+              "noPositiveUnderStructuralOracle": 0,
+              "acceptedDirect": 1,
+              "abstained": 17,
+              "truePositive": 1,
+              "falsePositive": 0,
+              "trueNegative": 0,
+              "falseNegative": 17,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.055556,
+              "acceptedF1": 0.105263,
+              "falseAcceptanceRate": null,
+              "correctAbstentionRate": null,
+              "acceptanceCoverage": 0.055556,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 1,
+                  "trials": 1,
+                  "lower": 0.025,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": null
+              }
+            }
+          },
+          {
+            "heldOutRepository": "mwaskom/seaborn",
+            "selectedThreshold": 0.65,
+            "selectionRule": "maximize training true positives subject to zero training false positives; tie-break to lower threshold",
+            "training": {
+              "threshold": 0.65,
+              "tasks": 237,
+              "positives": 208,
+              "noPositiveUnderStructuralOracle": 29,
+              "acceptedDirect": 12,
+              "abstained": 225,
+              "truePositive": 12,
+              "falsePositive": 0,
+              "trueNegative": 29,
+              "falseNegative": 196,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.057692,
+              "acceptedF1": 0.109091,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.050633,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 12,
+                  "trials": 12,
+                  "lower": 0.735352,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 29,
+                  "lower": 0,
+                  "upper": 0.119445
+                }
+              }
+            },
+            "heldOut": {
+              "threshold": 0.65,
+              "tasks": 3,
+              "positives": 1,
+              "noPositiveUnderStructuralOracle": 2,
+              "acceptedDirect": 0,
+              "abstained": 3,
+              "truePositive": 0,
+              "falsePositive": 0,
+              "trueNegative": 2,
+              "falseNegative": 1,
+              "acceptedPrecision": null,
+              "acceptedRecall": 0,
+              "acceptedF1": null,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 2,
+                  "lower": 0,
+                  "upper": 0.841886
+                }
+              }
+            }
+          },
+          {
+            "heldOutRepository": "pallets/flask",
+            "selectedThreshold": 0.65,
+            "selectionRule": "maximize training true positives subject to zero training false positives; tie-break to lower threshold",
+            "training": {
+              "threshold": 0.65,
+              "tasks": 238,
+              "positives": 207,
+              "noPositiveUnderStructuralOracle": 31,
+              "acceptedDirect": 12,
+              "abstained": 226,
+              "truePositive": 12,
+              "falsePositive": 0,
+              "trueNegative": 31,
+              "falseNegative": 195,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.057971,
+              "acceptedF1": 0.109589,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.05042,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 12,
+                  "trials": 12,
+                  "lower": 0.735352,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 31,
+                  "lower": 0,
+                  "upper": 0.112189
+                }
+              }
+            },
+            "heldOut": {
+              "threshold": 0.65,
+              "tasks": 2,
+              "positives": 2,
+              "noPositiveUnderStructuralOracle": 0,
+              "acceptedDirect": 0,
+              "abstained": 2,
+              "truePositive": 0,
+              "falsePositive": 0,
+              "trueNegative": 0,
+              "falseNegative": 2,
+              "acceptedPrecision": null,
+              "acceptedRecall": 0,
+              "acceptedF1": null,
+              "falseAcceptanceRate": null,
+              "correctAbstentionRate": null,
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": null
+              }
+            }
+          },
+          {
+            "heldOutRepository": "psf/requests",
+            "selectedThreshold": 0.65,
+            "selectionRule": "maximize training true positives subject to zero training false positives; tie-break to lower threshold",
+            "training": {
+              "threshold": 0.65,
+              "tasks": 235,
+              "positives": 204,
+              "noPositiveUnderStructuralOracle": 31,
+              "acceptedDirect": 12,
+              "abstained": 223,
+              "truePositive": 12,
+              "falsePositive": 0,
+              "trueNegative": 31,
+              "falseNegative": 192,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.058824,
+              "acceptedF1": 0.111111,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.051064,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 12,
+                  "trials": 12,
+                  "lower": 0.735352,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 31,
+                  "lower": 0,
+                  "upper": 0.112189
+                }
+              }
+            },
+            "heldOut": {
+              "threshold": 0.65,
+              "tasks": 5,
+              "positives": 5,
+              "noPositiveUnderStructuralOracle": 0,
+              "acceptedDirect": 0,
+              "abstained": 5,
+              "truePositive": 0,
+              "falsePositive": 0,
+              "trueNegative": 0,
+              "falseNegative": 5,
+              "acceptedPrecision": null,
+              "acceptedRecall": 0,
+              "acceptedF1": null,
+              "falseAcceptanceRate": null,
+              "correctAbstentionRate": null,
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": null
+              }
+            }
+          },
+          {
+            "heldOutRepository": "pydata/xarray",
+            "selectedThreshold": 0.65,
+            "selectionRule": "maximize training true positives subject to zero training false positives; tie-break to lower threshold",
+            "training": {
+              "threshold": 0.65,
+              "tasks": 236,
+              "positives": 205,
+              "noPositiveUnderStructuralOracle": 31,
+              "acceptedDirect": 12,
+              "abstained": 224,
+              "truePositive": 12,
+              "falsePositive": 0,
+              "trueNegative": 31,
+              "falseNegative": 193,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.058537,
+              "acceptedF1": 0.110599,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.050847,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 12,
+                  "trials": 12,
+                  "lower": 0.735352,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 31,
+                  "lower": 0,
+                  "upper": 0.112189
+                }
+              }
+            },
+            "heldOut": {
+              "threshold": 0.65,
+              "tasks": 4,
+              "positives": 4,
+              "noPositiveUnderStructuralOracle": 0,
+              "acceptedDirect": 0,
+              "abstained": 4,
+              "truePositive": 0,
+              "falsePositive": 0,
+              "trueNegative": 0,
+              "falseNegative": 4,
+              "acceptedPrecision": null,
+              "acceptedRecall": 0,
+              "acceptedF1": null,
+              "falseAcceptanceRate": null,
+              "correctAbstentionRate": null,
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": null
+              }
+            }
+          },
+          {
+            "heldOutRepository": "pylint-dev/pylint",
+            "selectedThreshold": 0.65,
+            "selectionRule": "maximize training true positives subject to zero training false positives; tie-break to lower threshold",
+            "training": {
+              "threshold": 0.65,
+              "tasks": 235,
+              "positives": 207,
+              "noPositiveUnderStructuralOracle": 28,
+              "acceptedDirect": 12,
+              "abstained": 223,
+              "truePositive": 12,
+              "falsePositive": 0,
+              "trueNegative": 28,
+              "falseNegative": 195,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.057971,
+              "acceptedF1": 0.109589,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.051064,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 12,
+                  "trials": 12,
+                  "lower": 0.735352,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 28,
+                  "lower": 0,
+                  "upper": 0.123436
+                }
+              }
+            },
+            "heldOut": {
+              "threshold": 0.65,
+              "tasks": 5,
+              "positives": 2,
+              "noPositiveUnderStructuralOracle": 3,
+              "acceptedDirect": 0,
+              "abstained": 5,
+              "truePositive": 0,
+              "falsePositive": 0,
+              "trueNegative": 3,
+              "falseNegative": 2,
+              "acceptedPrecision": null,
+              "acceptedRecall": 0,
+              "acceptedF1": null,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 3,
+                  "lower": 0,
+                  "upper": 0.707598
+                }
+              }
+            }
+          },
+          {
+            "heldOutRepository": "pytest-dev/pytest",
+            "selectedThreshold": 0.65,
+            "selectionRule": "maximize training true positives subject to zero training false positives; tie-break to lower threshold",
+            "training": {
+              "threshold": 0.65,
+              "tasks": 226,
+              "positives": 195,
+              "noPositiveUnderStructuralOracle": 31,
+              "acceptedDirect": 12,
+              "abstained": 214,
+              "truePositive": 12,
+              "falsePositive": 0,
+              "trueNegative": 31,
+              "falseNegative": 183,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.061538,
+              "acceptedF1": 0.115942,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.053097,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 12,
+                  "trials": 12,
+                  "lower": 0.735352,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 31,
+                  "lower": 0,
+                  "upper": 0.112189
+                }
+              }
+            },
+            "heldOut": {
+              "threshold": 0.65,
+              "tasks": 14,
+              "positives": 14,
+              "noPositiveUnderStructuralOracle": 0,
+              "acceptedDirect": 0,
+              "abstained": 14,
+              "truePositive": 0,
+              "falsePositive": 0,
+              "trueNegative": 0,
+              "falseNegative": 14,
+              "acceptedPrecision": null,
+              "acceptedRecall": 0,
+              "acceptedF1": null,
+              "falseAcceptanceRate": null,
+              "correctAbstentionRate": null,
+              "acceptanceCoverage": 0,
+              "confidenceIntervals95": {
+                "acceptedPrecision": null,
+                "falseAcceptanceRate": null
+              }
+            }
+          },
+          {
+            "heldOutRepository": "scikit-learn/scikit-learn",
+            "selectedThreshold": 0.65,
+            "selectionRule": "maximize training true positives subject to zero training false positives; tie-break to lower threshold",
+            "training": {
+              "threshold": 0.65,
+              "tasks": 222,
+              "positives": 200,
+              "noPositiveUnderStructuralOracle": 22,
+              "acceptedDirect": 11,
+              "abstained": 211,
+              "truePositive": 11,
+              "falsePositive": 0,
+              "trueNegative": 22,
+              "falseNegative": 189,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.055,
+              "acceptedF1": 0.104265,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.04955,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 11,
+                  "trials": 11,
+                  "lower": 0.715086,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 22,
+                  "lower": 0,
+                  "upper": 0.154373
+                }
+              }
+            },
+            "heldOut": {
+              "threshold": 0.65,
+              "tasks": 18,
+              "positives": 9,
+              "noPositiveUnderStructuralOracle": 9,
+              "acceptedDirect": 1,
+              "abstained": 17,
+              "truePositive": 1,
+              "falsePositive": 0,
+              "trueNegative": 9,
+              "falseNegative": 8,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.111111,
+              "acceptedF1": 0.2,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.055556,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 1,
+                  "trials": 1,
+                  "lower": 0.025,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 9,
+                  "lower": 0,
+                  "upper": 0.336267
+                }
+              }
+            }
+          },
+          {
+            "heldOutRepository": "sphinx-doc/sphinx",
+            "selectedThreshold": 0.65,
+            "selectionRule": "maximize training true positives subject to zero training false positives; tie-break to lower threshold",
+            "training": {
+              "threshold": 0.65,
+              "tasks": 227,
+              "positives": 199,
+              "noPositiveUnderStructuralOracle": 28,
+              "acceptedDirect": 7,
+              "abstained": 220,
+              "truePositive": 7,
+              "falsePositive": 0,
+              "trueNegative": 28,
+              "falseNegative": 192,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.035176,
+              "acceptedF1": 0.067961,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.030837,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 7,
+                  "trials": 7,
+                  "lower": 0.590384,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 28,
+                  "lower": 0,
+                  "upper": 0.123436
+                }
+              }
+            },
+            "heldOut": {
+              "threshold": 0.65,
+              "tasks": 13,
+              "positives": 10,
+              "noPositiveUnderStructuralOracle": 3,
+              "acceptedDirect": 5,
+              "abstained": 8,
+              "truePositive": 5,
+              "falsePositive": 0,
+              "trueNegative": 3,
+              "falseNegative": 5,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.5,
+              "acceptedF1": 0.666667,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.384615,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 5,
+                  "trials": 5,
+                  "lower": 0.478176,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 3,
+                  "lower": 0,
+                  "upper": 0.707598
+                }
+              }
+            }
+          },
+          {
+            "heldOutRepository": "sympy/sympy",
+            "selectedThreshold": 0.65,
+            "selectionRule": "maximize training true positives subject to zero training false positives; tie-break to lower threshold",
+            "training": {
+              "threshold": 0.65,
+              "tasks": 178,
+              "positives": 155,
+              "noPositiveUnderStructuralOracle": 23,
+              "acceptedDirect": 11,
+              "abstained": 167,
+              "truePositive": 11,
+              "falsePositive": 0,
+              "trueNegative": 23,
+              "falseNegative": 144,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.070968,
+              "acceptedF1": 0.13253,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.061798,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 11,
+                  "trials": 11,
+                  "lower": 0.715086,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 23,
+                  "lower": 0,
+                  "upper": 0.148185
+                }
+              }
+            },
+            "heldOut": {
+              "threshold": 0.65,
+              "tasks": 62,
+              "positives": 54,
+              "noPositiveUnderStructuralOracle": 8,
+              "acceptedDirect": 1,
+              "abstained": 61,
+              "truePositive": 1,
+              "falsePositive": 0,
+              "trueNegative": 8,
+              "falseNegative": 53,
+              "acceptedPrecision": 1,
+              "acceptedRecall": 0.018519,
+              "acceptedF1": 0.036364,
+              "falseAcceptanceRate": 0,
+              "correctAbstentionRate": 1,
+              "acceptanceCoverage": 0.016129,
+              "confidenceIntervals95": {
+                "acceptedPrecision": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 1,
+                  "trials": 1,
+                  "lower": 0.025,
+                  "upper": 1
+                },
+                "falseAcceptanceRate": {
+                  "method": "Clopper-Pearson exact two-sided",
+                  "successes": 0,
+                  "trials": 8,
+                  "lower": 0,
+                  "upper": 0.369417
+                }
+              }
+            }
+          }
+        ],
+        "aggregate": {
+          "tasks": 240,
+          "positives": 209,
+          "noPositiveUnderStructuralOracle": 31,
+          "acceptedDirect": 12,
+          "abstained": 228,
+          "truePositive": 12,
+          "falsePositive": 0,
+          "trueNegative": 31,
+          "falseNegative": 197,
+          "acceptedPrecision": 1,
+          "acceptedRecall": 0.057416,
+          "falseAcceptanceRate": 0,
+          "correctAbstentionRate": 1,
+          "confidenceIntervals95": {
+            "acceptedPrecision": {
+              "method": "Clopper-Pearson exact two-sided",
+              "successes": 12,
+              "trials": 12,
+              "lower": 0.735352,
+              "upper": 1
+            },
+            "falseAcceptanceRate": {
+              "method": "Clopper-Pearson exact two-sided",
+              "successes": 0,
+              "trials": 31,
+              "lower": 0,
+              "upper": 0.112189
+            }
+          }
+        }
+      },
+      "taskDecisions": [
+        {
+          "repository": "astropy/astropy",
+          "instanceId": "astropy__astropy-7746",
+          "positive": false,
+          "score": 0.294548,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "astropy/astropy",
+          "instanceId": "astropy__astropy-12907",
+          "positive": false,
+          "score": 0.377726,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "astropy/astropy",
+          "instanceId": "astropy__astropy-14182",
+          "positive": true,
+          "score": 0.371204,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "astropy/astropy",
+          "instanceId": "astropy__astropy-14365",
+          "positive": true,
+          "score": 0.488043,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "astropy/astropy",
+          "instanceId": "astropy__astropy-14995",
+          "positive": false,
+          "score": 0.439796,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12113",
+          "positive": true,
+          "score": 0.368052,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12125",
+          "positive": true,
+          "score": 0.501481,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12184",
+          "positive": false,
+          "score": 0.593478,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12284",
+          "positive": true,
+          "score": 0.589706,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12286",
+          "positive": true,
+          "score": 0.453571,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12308",
+          "positive": true,
+          "score": 0.537143,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12453",
+          "positive": true,
+          "score": 0.374653,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12470",
+          "positive": true,
+          "score": 0.5875,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12497",
+          "positive": true,
+          "score": 0.497727,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12589",
+          "positive": true,
+          "score": 0.448293,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12700",
+          "positive": true,
+          "score": 0.419298,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12708",
+          "positive": true,
+          "score": 0.515385,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12747",
+          "positive": true,
+          "score": 0.358,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12856",
+          "positive": true,
+          "score": 0.535,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12908",
+          "positive": true,
+          "score": 0.4425,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12915",
+          "positive": true,
+          "score": 0.566384,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-12983",
+          "positive": true,
+          "score": 0.528571,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13028",
+          "positive": true,
+          "score": 0.451642,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13033",
+          "positive": true,
+          "score": 0.429664,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13158",
+          "positive": true,
+          "score": 0.503846,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13220",
+          "positive": true,
+          "score": 0.454582,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13230",
+          "positive": true,
+          "score": 0.355,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13265",
+          "positive": true,
+          "score": 0.492399,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13315",
+          "positive": true,
+          "score": 0.525,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13321",
+          "positive": true,
+          "score": 0.414927,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13401",
+          "positive": true,
+          "score": 0.559286,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13447",
+          "positive": true,
+          "score": 0.5125,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13448",
+          "positive": true,
+          "score": 0.494199,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13551",
+          "positive": true,
+          "score": 0.22,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13590",
+          "positive": true,
+          "score": 0.619531,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13658",
+          "positive": true,
+          "score": 0.577778,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13660",
+          "positive": true,
+          "score": 0.622693,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13710",
+          "positive": true,
+          "score": 0.524107,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13757",
+          "positive": true,
+          "score": 0.451818,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13768",
+          "positive": false,
+          "score": 0.402586,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13925",
+          "positive": true,
+          "score": 0.380049,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13933",
+          "positive": true,
+          "score": 0.509836,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-13964",
+          "positive": true,
+          "score": 0.511429,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14016",
+          "positive": true,
+          "score": 0.696939,
+          "state": "DIRECTLY_SUPPORTED",
+          "decision": "ACCEPT_DIRECT"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14017",
+          "positive": true,
+          "score": 0.575,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14155",
+          "positive": true,
+          "score": 0.41,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14238",
+          "positive": true,
+          "score": 0.503507,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14382",
+          "positive": true,
+          "score": 0.614214,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14411",
+          "positive": true,
+          "score": 0.55,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14534",
+          "positive": true,
+          "score": 0.38,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14580",
+          "positive": true,
+          "score": 0.519779,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14608",
+          "positive": true,
+          "score": 0.376923,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14667",
+          "positive": true,
+          "score": 0.58,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14672",
+          "positive": true,
+          "score": 0.511178,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14730",
+          "positive": true,
+          "score": 0.5775,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14752",
+          "positive": true,
+          "score": 0.406414,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14787",
+          "positive": true,
+          "score": 0.391176,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14855",
+          "positive": true,
+          "score": 0.528205,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14915",
+          "positive": true,
+          "score": 0.485714,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14997",
+          "positive": true,
+          "score": 0.541371,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-14999",
+          "positive": true,
+          "score": 0.555263,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15061",
+          "positive": true,
+          "score": 0.57069,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15202",
+          "positive": true,
+          "score": 0.493357,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15213",
+          "positive": true,
+          "score": 0.688462,
+          "state": "DIRECTLY_SUPPORTED",
+          "decision": "ACCEPT_DIRECT"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15252",
+          "positive": true,
+          "score": 0.617376,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15320",
+          "positive": true,
+          "score": 0.558798,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15347",
+          "positive": true,
+          "score": 0.453473,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15388",
+          "positive": false,
+          "score": 0.64403,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15400",
+          "positive": true,
+          "score": 0.4075,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15498",
+          "positive": true,
+          "score": 0.523333,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15695",
+          "positive": true,
+          "score": 0.505882,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15738",
+          "positive": true,
+          "score": 0.502955,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15781",
+          "positive": true,
+          "score": 0.526923,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15789",
+          "positive": true,
+          "score": 0.553409,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15790",
+          "positive": true,
+          "score": 0.395161,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15814",
+          "positive": true,
+          "score": 0.562184,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15819",
+          "positive": true,
+          "score": 0.531707,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15851",
+          "positive": true,
+          "score": 0.671875,
+          "state": "DIRECTLY_SUPPORTED",
+          "decision": "ACCEPT_DIRECT"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15902",
+          "positive": true,
+          "score": 0.375,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-15996",
+          "positive": true,
+          "score": 0.489858,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16041",
+          "positive": true,
+          "score": 0.43956,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16046",
+          "positive": true,
+          "score": 0.535,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16139",
+          "positive": true,
+          "score": 0.491191,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16229",
+          "positive": true,
+          "score": 0.487391,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16255",
+          "positive": true,
+          "score": 0.673643,
+          "state": "DIRECTLY_SUPPORTED",
+          "decision": "ACCEPT_DIRECT"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16379",
+          "positive": true,
+          "score": 0.519808,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16400",
+          "positive": true,
+          "score": 0.441308,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16408",
+          "positive": true,
+          "score": 0.55,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16527",
+          "positive": true,
+          "score": 0.6,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16595",
+          "positive": true,
+          "score": 0.542747,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16816",
+          "positive": true,
+          "score": 0.490217,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16820",
+          "positive": true,
+          "score": 0.5625,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16873",
+          "positive": true,
+          "score": 0.459725,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-16910",
+          "positive": true,
+          "score": 0.593966,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-17051",
+          "positive": true,
+          "score": 0.454268,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "django/django",
+          "instanceId": "django__django-17087",
+          "positive": true,
+          "score": 0.501571,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-23476",
+          "positive": true,
+          "score": 0.489441,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-23562",
+          "positive": true,
+          "score": 0.500813,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-23563",
+          "positive": true,
+          "score": 0.462006,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-23913",
+          "positive": true,
+          "score": 0.425893,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-23964",
+          "positive": true,
+          "score": 0.538286,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-23987",
+          "positive": true,
+          "score": 0.575017,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-24149",
+          "positive": true,
+          "score": 0.510256,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-24265",
+          "positive": true,
+          "score": 0.57236,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-24334",
+          "positive": true,
+          "score": 0.413399,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-24970",
+          "positive": true,
+          "score": 0.59735,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-25079",
+          "positive": true,
+          "score": 0.61251,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-25311",
+          "positive": true,
+          "score": 0.598214,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-25332",
+          "positive": true,
+          "score": 0.745176,
+          "state": "DIRECTLY_SUPPORTED",
+          "decision": "ACCEPT_DIRECT"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-25433",
+          "positive": true,
+          "score": 0.614205,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-25442",
+          "positive": true,
+          "score": 0.614091,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-25498",
+          "positive": true,
+          "score": 0.645906,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-26011",
+          "positive": true,
+          "score": 0.444549,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "matplotlib/matplotlib",
+          "instanceId": "matplotlib__matplotlib-26020",
+          "positive": true,
+          "score": 0.431062,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "mwaskom/seaborn",
+          "instanceId": "mwaskom__seaborn-3010",
+          "positive": false,
+          "score": 0.250461,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "mwaskom/seaborn",
+          "instanceId": "mwaskom__seaborn-3190",
+          "positive": false,
+          "score": 0.605991,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "mwaskom/seaborn",
+          "instanceId": "mwaskom__seaborn-3407",
+          "positive": true,
+          "score": 0.396434,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pallets/flask",
+          "instanceId": "pallets__flask-4992",
+          "positive": true,
+          "score": 0.267484,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pallets/flask",
+          "instanceId": "pallets__flask-5063",
+          "positive": true,
+          "score": 0.30875,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "psf/requests",
+          "instanceId": "psf__requests-1963",
+          "positive": true,
+          "score": 0.297222,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "psf/requests",
+          "instanceId": "psf__requests-2148",
+          "positive": true,
+          "score": 0.304575,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "psf/requests",
+          "instanceId": "psf__requests-2317",
+          "positive": true,
+          "score": 0.455714,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "psf/requests",
+          "instanceId": "psf__requests-2674",
+          "positive": true,
+          "score": 0.559459,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "psf/requests",
+          "instanceId": "psf__requests-3362",
+          "positive": true,
+          "score": 0.423985,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pydata/xarray",
+          "instanceId": "pydata__xarray-4094",
+          "positive": true,
+          "score": 0.175403,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pydata/xarray",
+          "instanceId": "pydata__xarray-4248",
+          "positive": true,
+          "score": 0.435697,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pydata/xarray",
+          "instanceId": "pydata__xarray-4493",
+          "positive": true,
+          "score": 0.565625,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pydata/xarray",
+          "instanceId": "pydata__xarray-5131",
+          "positive": true,
+          "score": 0.383766,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pylint-dev/pylint",
+          "instanceId": "pylint-dev__pylint-6506",
+          "positive": false,
+          "score": 0.409354,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pylint-dev/pylint",
+          "instanceId": "pylint-dev__pylint-7080",
+          "positive": false,
+          "score": 0.350392,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pylint-dev/pylint",
+          "instanceId": "pylint-dev__pylint-7114",
+          "positive": true,
+          "score": 0.485478,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pylint-dev/pylint",
+          "instanceId": "pylint-dev__pylint-7228",
+          "positive": true,
+          "score": 0.510805,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pylint-dev/pylint",
+          "instanceId": "pylint-dev__pylint-7993",
+          "positive": false,
+          "score": 0.54203,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-5413",
+          "positive": true,
+          "score": 0.404464,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-5495",
+          "positive": true,
+          "score": 0.395055,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-5692",
+          "positive": true,
+          "score": 0.376355,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-6116",
+          "positive": true,
+          "score": 0.214286,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-7168",
+          "positive": true,
+          "score": 0.323942,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-7220",
+          "positive": true,
+          "score": 0.428237,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-7373",
+          "positive": true,
+          "score": 0.387282,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-7432",
+          "positive": true,
+          "score": 0.573756,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-7490",
+          "positive": true,
+          "score": 0.381794,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-8365",
+          "positive": true,
+          "score": 0.381374,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-8906",
+          "positive": true,
+          "score": 0.428098,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-9359",
+          "positive": true,
+          "score": 0.561123,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-11143",
+          "positive": true,
+          "score": 0.39081,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "pytest-dev/pytest",
+          "instanceId": "pytest-dev__pytest-11148",
+          "positive": true,
+          "score": 0.390324,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-12471",
+          "positive": true,
+          "score": 0.468896,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-13142",
+          "positive": true,
+          "score": 0.559332,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-13241",
+          "positive": false,
+          "score": 0.522727,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-13439",
+          "positive": false,
+          "score": 0.518534,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-13496",
+          "positive": false,
+          "score": 0.425133,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-13497",
+          "positive": false,
+          "score": 0.412,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-13584",
+          "positive": true,
+          "score": 0.540645,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-13779",
+          "positive": true,
+          "score": 0.517033,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-14087",
+          "positive": true,
+          "score": 0.569736,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-14092",
+          "positive": true,
+          "score": 0.378863,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-14894",
+          "positive": false,
+          "score": 0.640369,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-14983",
+          "positive": false,
+          "score": 0.635269,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-15512",
+          "positive": false,
+          "score": 0.471875,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-15535",
+          "positive": false,
+          "score": 0.543761,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-25500",
+          "positive": true,
+          "score": 0.46625,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-25570",
+          "positive": false,
+          "score": 0.600649,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-25638",
+          "positive": true,
+          "score": 0.488702,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "scikit-learn/scikit-learn",
+          "instanceId": "scikit-learn__scikit-learn-25747",
+          "positive": true,
+          "score": 0.660211,
+          "state": "DIRECTLY_SUPPORTED",
+          "decision": "ACCEPT_DIRECT"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-8273",
+          "positive": false,
+          "score": 0.202326,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-8282",
+          "positive": true,
+          "score": 0.660924,
+          "state": "DIRECTLY_SUPPORTED",
+          "decision": "ACCEPT_DIRECT"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-8435",
+          "positive": true,
+          "score": 0.737245,
+          "state": "DIRECTLY_SUPPORTED",
+          "decision": "ACCEPT_DIRECT"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-8474",
+          "positive": false,
+          "score": 0.3625,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-8506",
+          "positive": true,
+          "score": 0.359191,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-8595",
+          "positive": true,
+          "score": 0.772925,
+          "state": "DIRECTLY_SUPPORTED",
+          "decision": "ACCEPT_DIRECT"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-8627",
+          "positive": false,
+          "score": 0.468352,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-8713",
+          "positive": true,
+          "score": 0.403751,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-8721",
+          "positive": true,
+          "score": 0.694079,
+          "state": "DIRECTLY_SUPPORTED",
+          "decision": "ACCEPT_DIRECT"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-8801",
+          "positive": true,
+          "score": 0.682838,
+          "state": "DIRECTLY_SUPPORTED",
+          "decision": "ACCEPT_DIRECT"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-10325",
+          "positive": true,
+          "score": 0.316667,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-10451",
+          "positive": true,
+          "score": 0.442857,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sphinx-doc/sphinx",
+          "instanceId": "sphinx-doc__sphinx-11445",
+          "positive": true,
+          "score": 0.444954,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-13647",
+          "positive": true,
+          "score": 0.310811,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-13773",
+          "positive": true,
+          "score": 0.457046,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-13895",
+          "positive": true,
+          "score": 0.71875,
+          "state": "DIRECTLY_SUPPORTED",
+          "decision": "ACCEPT_DIRECT"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-13915",
+          "positive": true,
+          "score": 0.553571,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-13971",
+          "positive": true,
+          "score": 0.408065,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-14024",
+          "positive": true,
+          "score": 0.41875,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-14308",
+          "positive": true,
+          "score": 0.536071,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-14317",
+          "positive": true,
+          "score": 0.55,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-14396",
+          "positive": true,
+          "score": 0.345603,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-14774",
+          "positive": true,
+          "score": 0.49693,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-14817",
+          "positive": true,
+          "score": 0.367708,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-15011",
+          "positive": false,
+          "score": 0.441707,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-15308",
+          "positive": true,
+          "score": 0.494737,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-15345",
+          "positive": true,
+          "score": 0.499248,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-15346",
+          "positive": false,
+          "score": 0.4625,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-15609",
+          "positive": true,
+          "score": 0.453922,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-15678",
+          "positive": false,
+          "score": 0.506522,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-16106",
+          "positive": true,
+          "score": 0.419519,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-16281",
+          "positive": true,
+          "score": 0.344904,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-16503",
+          "positive": true,
+          "score": 0.608333,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-16792",
+          "positive": true,
+          "score": 0.385896,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-16988",
+          "positive": true,
+          "score": 0.432069,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-17022",
+          "positive": true,
+          "score": 0.485936,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-17139",
+          "positive": true,
+          "score": 0.472143,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-17630",
+          "positive": true,
+          "score": 0.409091,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-17655",
+          "positive": true,
+          "score": 0.453571,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-18057",
+          "positive": true,
+          "score": 0.529734,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-18087",
+          "positive": true,
+          "score": 0.405,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-18189",
+          "positive": false,
+          "score": 0.522727,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-18199",
+          "positive": false,
+          "score": 0.515789,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-18532",
+          "positive": true,
+          "score": 0.598,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-18621",
+          "positive": true,
+          "score": 0.603553,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-18698",
+          "positive": true,
+          "score": 0.434962,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-18835",
+          "positive": true,
+          "score": 0.500439,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-19007",
+          "positive": true,
+          "score": 0.625,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-19254",
+          "positive": true,
+          "score": 0.34078,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-19487",
+          "positive": true,
+          "score": 0.398571,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-20049",
+          "positive": false,
+          "score": 0.452625,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-20154",
+          "positive": true,
+          "score": 0.64,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-20212",
+          "positive": true,
+          "score": 0.365714,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-20322",
+          "positive": true,
+          "score": 0.517048,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-20442",
+          "positive": true,
+          "score": 0.275,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-20590",
+          "positive": true,
+          "score": 0.429182,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-20639",
+          "positive": true,
+          "score": 0.401382,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-21055",
+          "positive": false,
+          "score": 0.33617,
+          "state": "INSUFFICIENT_EVIDENCE",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-21171",
+          "positive": true,
+          "score": 0.427197,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-21379",
+          "positive": true,
+          "score": 0.443664,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-21612",
+          "positive": true,
+          "score": 0.4825,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-21614",
+          "positive": true,
+          "score": 0.455882,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-21627",
+          "positive": true,
+          "score": 0.443333,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-21847",
+          "positive": true,
+          "score": 0.43539,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-22005",
+          "positive": true,
+          "score": 0.441129,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-22714",
+          "positive": true,
+          "score": 0.540195,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-22840",
+          "positive": true,
+          "score": 0.448867,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-23117",
+          "positive": true,
+          "score": 0.528623,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-23191",
+          "positive": true,
+          "score": 0.418357,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-23262",
+          "positive": true,
+          "score": 0.490769,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-24066",
+          "positive": true,
+          "score": 0.402647,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-24102",
+          "positive": false,
+          "score": 0.495455,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-24152",
+          "positive": true,
+          "score": 0.415,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-24213",
+          "positive": true,
+          "score": 0.618607,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        },
+        {
+          "repository": "sympy/sympy",
+          "instanceId": "sympy__sympy-24909",
+          "positive": true,
+          "score": 0.457519,
+          "state": "PARTIALLY_SUPPORTED",
+          "decision": "ABSTAIN"
+        }
+      ]
+    }
+  }
+}

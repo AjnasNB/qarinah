@@ -417,7 +417,10 @@ qarinah query [text] \
   [--max-tokens <integer>] \
   [--reserve-tokens <integer>] \
   [--as-of <timestamp>] \
-  [--minimum-coverage any|partial|direct]
+  [--minimum-coverage any|partial|direct] \
+  [--minimum-evidence any|partial|direct] \
+  [--ranking-profile balanced-v1|admission-first-v2] \
+  [--temporal-boundary inclusive|strict-before]
 ```
 
 `context` accepts the same inputs.
@@ -434,6 +437,9 @@ Defaults:
 | `--reserve-tokens` | When token planning is enabled, 10% capped at 2,048 | 0 through `maxTokens - 64`. |
 | `--as-of` | Current UTC time | Retrieval time boundary. |
 | `--minimum-coverage` | `any` | `partial` rejects no-evidence packs; `direct` requires one event containing all normalized query terms. |
+| `--minimum-evidence` | `any` | `partial` allows an informational partial pack; `direct` requires the conservative `ACCEPT_DIRECT` decision. Partial evidence remains an abstention for sufficiency claims. |
+| `--ranking-profile` | `admission-first-v2` | Preserves admissible BM25 order before fuzzy and graph fill. `balanced-v1` reproduces the original RRF profile. |
+| `--temporal-boundary` | `inclusive` | `strict-before` excludes evidence recorded at the exact query timestamp. |
 
 Example:
 
@@ -456,6 +462,8 @@ JSON output includes:
 - truncation state;
 - a deterministic manifest hash.
 
+When evidence diagnostics are requested, `evidence-sufficiency-v2` returns a three-state assessment plus a separate decision. `DIRECTLY_SUPPORTED` maps to `ACCEPT_DIRECT`; `PARTIALLY_SUPPORTED` and `INSUFFICIENT_EVIDENCE` map to `ABSTAIN`. The direct threshold was selected on development data and does not prove semantic correctness on unseen queries.
+
 The portable fallback token estimate is `ceil(characters / 4)` and is marked inexact. It is not a provider billing receipt.
 
 ### Strict JSON stdin form
@@ -467,7 +475,11 @@ printf '%s' '{
   "limit": 10,
   "maxTokens": 1500,
   "reserveTokens": 200,
-  "minimumCoverage": "direct"
+  "minimumCoverage": "direct",
+  "minimumEvidence": "partial",
+  "rankingProfile": "admission-first-v2",
+  "temporalBoundary": "strict-before",
+  "includeEvidenceSufficiency": true
 }' | npx qarinah query --stdin-json
 ```
 
@@ -482,6 +494,10 @@ maxTokens
 reserveTokens
 asOf
 minimumCoverage
+minimumEvidence
+rankingProfile
+temporalBoundary
+includeEvidenceSufficiency
 ```
 
 Rules:
@@ -635,6 +651,7 @@ See [Shared and verifiable team memory](TEAM-MEMORY.md) for all seven task profi
 | `TRUST_REVIEW_REQUIRED` / `CAPTURE_NOT_APPROVED` | Portable policy and machine approval differ. | Review the new policy and approve its exact digest. |
 | `INDEX_STALE` / `INDEX_INVALID` | Derived state does not match the verified log. | Run `doctor`; if the log is valid, run `build`. |
 | `CONTEXT_COVERAGE_TOO_LOW` | The retrieved evidence did not meet the requested coverage. | Refine the query or intentionally lower `minimumCoverage`. |
+| `CONTEXT_EVIDENCE_INSUFFICIENT` | The evidence-sufficiency assessment did not meet the requested gate. | Refine the query, inspect the reason codes, or intentionally lower `minimumEvidence`. |
 | `CONTEXT_BUDGET_TOO_SMALL` | Required pack framing cannot fit. | Increase the character/token budget or reduce reserved headroom. |
 | `PROJECT_SCAN_LIMIT` | The scan exceeded a configured bound. | Narrow the workspace or review and raise the relevant limit. |
 | `STORE_BUSY` | Another writer holds the renewable append lock. | Wait for that operation; investigate only if it does not clear. |

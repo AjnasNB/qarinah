@@ -1,0 +1,481 @@
+{
+  "schemaVersion": "qarinah.final-abstention-controls.v1",
+  "status": "frozen-before-qarinah-or-model-evaluation",
+  "protocol": {
+    "tag": "research-protocol-v1",
+    "amendment": "A001",
+    "amendmentDocument": "docs/PROTOCOL-AMENDMENTS.md",
+    "intendedAmendmentTag": "research-protocol-amendment-001"
+  },
+  "generatedFrom": {
+    "datasetId": "princeton-nlp/SWE-bench_Verified",
+    "datasetRevision": "c104f840cc67f8b6eec6f759ebc8b2693d585d4a",
+    "config": "default",
+    "split": "test",
+    "finalTaskManifestDigest": "sha256:26f1449acb454f2d6b46196f40c5604a6aa9acec21562af7ae1a6a1fdd86fdbb"
+  },
+  "population": {
+    "inclusionRule": "NO_PRIOR_SAME_REPOSITORY_DEVELOPMENT_MEMORY",
+    "count": 20,
+    "allowedMetrics": [
+      "false acceptance",
+      "correct abstention",
+      "hallucinated-evidence rate",
+      "unnecessary context supplied"
+    ],
+    "excludedMetrics": [
+      "positive-evidence retrieval recall",
+      "coding-handoff utility",
+      "SWE-bench resolution improvement"
+    ]
+  },
+  "artifactPolicy": {
+    "upstreamProblemTextRedistributed": false,
+    "upstreamPatchesRedistributed": false,
+    "targetGoldAvailableToRetrieverOrAgent": false
+  },
+  "resultsObserved": false,
+  "tasks": [
+    {
+      "repository": "django/django",
+      "instanceId": "django__django-10097",
+      "baseCommit": "b9cf764be62e77b4777b3a75ec256f6209a57671",
+      "createdAt": "2018-06-26T23:30:51.000Z",
+      "version": "2.2",
+      "difficulty": "<15 min fix",
+      "priorDevelopmentMemoryCount": 0,
+      "failToPassCount": 438,
+      "passToPassCount": 1432,
+      "evaluatorOnlyHashes": {
+        "problemStatement": "sha256:2288319e7e72693551b8454b5c63f165f23dfb32bc6579ad03602d3cd311bdaa",
+        "goldPatch": "sha256:6a3f90e1cd4c886a22787c9388683d57ce177ad4fbb2144dc51db8b6bb0edab4",
+        "goldTestPatch": "sha256:e438d278c9964432bb2d514cd48dcb6a1537a3707dea39c60c384ac98078ae1a"
+      },
+      "sources": {
+        "dataset": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified/resolve/c104f840cc67f8b6eec6f759ebc8b2693d585d4a/data/test-00000-of-00001.parquet",
+        "repository": "https://github.com/django/django",
+        "issue": "https://github.com/django/django/issues/10097",
+        "baseCommit": "https://github.com/django/django/commit/b9cf764be62e77b4777b3a75ec256f6209a57671"
+      }
+    },
+    {
+      "repository": "django/django",
+      "instanceId": "django__django-10554",
+      "baseCommit": "14d026cccb144c6877294ba4cd4e03ebf0842498",
+      "createdAt": "2018-10-24T14:24:45.000Z",
+      "version": "3.0",
+      "difficulty": "1-4 hours",
+      "priorDevelopmentMemoryCount": 0,
+      "failToPassCount": 2,
+      "passToPassCount": 23,
+      "evaluatorOnlyHashes": {
+        "problemStatement": "sha256:2f72fa6137f1d53983cff629a05e06c42a2ad477ea4557746c4688cbd6aeb724",
+        "goldPatch": "sha256:98523eeb6147f2d4be05885f8e4f49a8505b3368c2e1ec4ecd39ea9fc880105d",
+        "goldTestPatch": "sha256:bdea7d62eb6235551316d487dd221468aa85be398d436546e512c31cbc9521aa"
+      },
+      "sources": {
+        "dataset": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified/resolve/c104f840cc67f8b6eec6f759ebc8b2693d585d4a/data/test-00000-of-00001.parquet",
+        "repository": "https://github.com/django/django",
+        "issue": "https://github.com/django/django/issues/10554",
+        "baseCommit": "https://github.com/django/django/commit/14d026cccb144c6877294ba4cd4e03ebf0842498"
+      }
+    },
+    {
+      "repository": "django/django",
+      "instanceId": "django__django-10880",
+      "baseCommit": "838e432e3e5519c5383d12018e6c78f8ec7833c1",
+      "createdAt": "2019-01-21T00:22:36.000Z",
+      "version": "3.0",
+      "difficulty": "<15 min fix",
+      "priorDevelopmentMemoryCount": 0,
+      "failToPassCount": 1,
+      "passToPassCount": 55,
+      "evaluatorOnlyHashes": {
+        "problemStatement": "sha256:d554ba8ef84e2e4dc22c291d413e4cb58070d5d730dae3aca383a4cdb77c20b2",
+        "goldPatch": "sha256:368159ac79ebf4e6772a128199ec8d64b4e5db571d99bce2d0dec42733974e31",
+        "goldTestPatch": "sha256:70cc58aeadaae6a3355bf4c47c493d359096e1bbadc0aab91c9ba7dbeef9e50a"
+      },
+      "sources": {
+        "dataset": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified/resolve/c104f840cc67f8b6eec6f759ebc8b2693d585d4a/data/test-00000-of-00001.parquet",
+        "repository": "https://github.com/django/django",
+        "issue": "https://github.com/django/django/issues/10880",
+        "baseCommit": "https://github.com/django/django/commit/838e432e3e5519c5383d12018e6c78f8ec7833c1"
+      }
+    },
+    {
+      "repository": "django/django",
+      "instanceId": "django__django-7530",
+      "baseCommit": "f8fab6f90233c7114d642dfe01a4e6d4cb14ee7d",
+      "createdAt": "2016-11-08T17:27:19.000Z",
+      "version": "1.11",
+      "difficulty": "15 min - 1 hour",
+      "priorDevelopmentMemoryCount": 0,
+      "failToPassCount": 1,
+      "passToPassCount": 59,
+      "evaluatorOnlyHashes": {
+        "problemStatement": "sha256:660d95fad484d129e2943cf8276d081cfceb02bada155f6ddf2e5e1ce4af5d39",
+        "goldPatch": "sha256:0db3b098b00197f8cd6165912e2d60150ae4213338e605188990c00bb52a4029",
+        "goldTestPatch": "sha256:219369b7b0af514fac6bb6243693eec9b14be6288b09b248d043f7119a400402"
+      },
+      "sources": {
+        "dataset": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified/resolve/c104f840cc67f8b6eec6f759ebc8b2693d585d4a/data/test-00000-of-00001.parquet",
+        "repository": "https://github.com/django/django",
+        "issue": "https://github.com/django/django/issues/7530",
+        "baseCommit": "https://github.com/django/django/commit/f8fab6f90233c7114d642dfe01a4e6d4cb14ee7d"
+      }
+    },
+    {
+      "repository": "django/django",
+      "instanceId": "django__django-9296",
+      "baseCommit": "84322a29ce9b0940335f8ab3d60e55192bef1e50",
+      "createdAt": "2017-10-27T11:10:04.000Z",
+      "version": "3.1",
+      "difficulty": "<15 min fix",
+      "priorDevelopmentMemoryCount": 0,
+      "failToPassCount": 1,
+      "passToPassCount": 20,
+      "evaluatorOnlyHashes": {
+        "problemStatement": "sha256:1dad6e4ae15cb47af74a688dc59b6a40fa55b6ec0086f587e16c784c78acfc23",
+        "goldPatch": "sha256:be213288199654414a8b698521d76569f74071bc6853998c7d08fecc0cad828e",
+        "goldTestPatch": "sha256:54c5936041126d691c99e2f934e1a253a4400314752e82739c9c71b7d29023c7"
+      },
+      "sources": {
+        "dataset": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified/resolve/c104f840cc67f8b6eec6f759ebc8b2693d585d4a/data/test-00000-of-00001.parquet",
+        "repository": "https://github.com/django/django",
+        "issue": "https://github.com/django/django/issues/9296",
+        "baseCommit": "https://github.com/django/django/commit/84322a29ce9b0940335f8ab3d60e55192bef1e50"
+      }
+    },
+    {
+      "repository": "matplotlib/matplotlib",
+      "instanceId": "matplotlib__matplotlib-13989",
+      "baseCommit": "a3e2897bfaf9eaac1d6649da535c4e721c89fa69",
+      "createdAt": "2019-04-19T01:47:57.000Z",
+      "version": "3.0",
+      "difficulty": "<15 min fix",
+      "priorDevelopmentMemoryCount": 0,
+      "failToPassCount": 1,
+      "passToPassCount": 411,
+      "evaluatorOnlyHashes": {
+        "problemStatement": "sha256:13d52a70d283b3677d5258aadda203f99ac501d0073989215713092077f6e3ff",
+        "goldPatch": "sha256:5dad24f240b3dcf838594bdf137e8a3c056882444366d6443359111016acbcad",
+        "goldTestPatch": "sha256:3ed13e10840a5cd2d323d926946ea81fad7bb8d6611e877cadab7a282fbc20d0"
+      },
+      "sources": {
+        "dataset": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified/resolve/c104f840cc67f8b6eec6f759ebc8b2693d585d4a/data/test-00000-of-00001.parquet",
+        "repository": "https://github.com/matplotlib/matplotlib",
+        "issue": "https://github.com/matplotlib/matplotlib/issues/13989",
+        "baseCommit": "https://github.com/matplotlib/matplotlib/commit/a3e2897bfaf9eaac1d6649da535c4e721c89fa69"
+      }
+    },
+    {
+      "repository": "matplotlib/matplotlib",
+      "instanceId": "matplotlib__matplotlib-14623",
+      "baseCommit": "d65c9ca20ddf81ef91199e6d819f9d3506ef477c",
+      "createdAt": "2019-06-25T14:01:17.000Z",
+      "version": "3.1",
+      "difficulty": "15 min - 1 hour",
+      "priorDevelopmentMemoryCount": 0,
+      "failToPassCount": 1,
+      "passToPassCount": 400,
+      "evaluatorOnlyHashes": {
+        "problemStatement": "sha256:464f0388f374a7b9d35c4376287b032364fc63e51dfb872fbd0806154dbbc152",
+        "goldPatch": "sha256:bf6c58aeace23b251199ff653b448e26c5b916eabbe9f7972cd16fbb81bfbf03",
+        "goldTestPatch": "sha256:bbc0b0e3377ca3e7c22237c63e5f38b53164e2a39fcbd8ab43b0d72ca9a67ea4"
+      },
+      "sources": {
+        "dataset": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified/resolve/c104f840cc67f8b6eec6f759ebc8b2693d585d4a/data/test-00000-of-00001.parquet",
+        "repository": "https://github.com/matplotlib/matplotlib",
+        "issue": "https://github.com/matplotlib/matplotlib/issues/14623",
+        "baseCommit": "https://github.com/matplotlib/matplotlib/commit/d65c9ca20ddf81ef91199e6d819f9d3506ef477c"
+      }
+    },
+    {
+      "repository": "pydata/xarray",
+      "instanceId": "pydata__xarray-2905",
+      "baseCommit": "7c4e2ac83f7b4306296ff9b7b51aaf016e5ad614",
+      "createdAt": "2019-04-17T21:52:37.000Z",
+      "version": "0.12",
+      "difficulty": "15 min - 1 hour",
+      "priorDevelopmentMemoryCount": 0,
+      "failToPassCount": 1,
+      "passToPassCount": 364,
+      "evaluatorOnlyHashes": {
+        "problemStatement": "sha256:0d3a9b692fc42e67214ed21e669b85cd5c6a222b3a4abc2055d93915876b6be8",
+        "goldPatch": "sha256:4bf05606ff37d427b5d1eff27a61b41489785d022c234933fbc8879cad5fd762",
+        "goldTestPatch": "sha256:49945ef0c157e31201d3d14768dfa052381edb5915a91e5662b65a37b1683c7a"
+      },
+      "sources": {
+        "dataset": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified/resolve/c104f840cc67f8b6eec6f759ebc8b2693d585d4a/data/test-00000-of-00001.parquet",
+        "repository": "https://github.com/pydata/xarray",
+        "issue": "https://github.com/pydata/xarray/issues/2905",
+        "baseCommit": "https://github.com/pydata/xarray/commit/7c4e2ac83f7b4306296ff9b7b51aaf016e5ad614"
+      }
+    },
+    {
+      "repository": "pydata/xarray",
+      "instanceId": "pydata__xarray-3095",
+      "baseCommit": "1757dffac2fa493d7b9a074b84cf8c830a706688",
+      "createdAt": "2019-07-11T13:16:16.000Z",
+      "version": "0.12",
+      "difficulty": "15 min - 1 hour",
+      "priorDevelopmentMemoryCount": 0,
+      "failToPassCount": 1,
+      "passToPassCount": 253,
+      "evaluatorOnlyHashes": {
+        "problemStatement": "sha256:3d8f2d8422b56bd5980ec478be1413ef87805484446fc15dbd482342a59abb25",
+        "goldPatch": "sha256:15ee0073513dfa4723e55f92c67f7ca66c9651a6d627c08c06e7bada6bcd7525",
+        "goldTestPatch": "sha256:74e9567e31b72197c929b56e94c92b21f8fb62f9b8008bee43aba3ac81d33134"
+      },
+      "sources": {
+        "dataset": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified/resolve/c104f840cc67f8b6eec6f759ebc8b2693d585d4a/data/test-00000-of-00001.parquet",
+        "repository": "https://github.com/pydata/xarray",
+        "issue": "https://github.com/pydata/xarray/issues/3095",
+        "baseCommit": "https://github.com/pydata/xarray/commit/1757dffac2fa493d7b9a074b84cf8c830a706688"
+      }
+    },
+    {
+      "repository": "pydata/xarray",
+      "instanceId": "pydata__xarray-3151",
+      "baseCommit": "118f4d996e7711c9aced916e6049af9f28d5ec66",
+      "createdAt": "2019-07-20T12:31:14.000Z",
+      "version": "0.12",
+      "difficulty": "15 min - 1 hour",
+      "priorDevelopmentMemoryCount": 0,
+      "failToPassCount": 1,
+      "passToPassCount": 66,
+      "evaluatorOnlyHashes": {
+        "problemStatement": "sha256:abcd2e1b10d6d979b0510ec1a37372c9909c15bc786d4b7bb9027facb727d597",
+        "goldPatch": "sha256:011d7ae2930bcd82fcdb753fc555a4077b2a3053d5c677d91412f54f9b4d1833",
+        "goldTestPatch": "sha256:a6ae21c8fb025592ca0705c5d955873d8ed8a967e407a2ab9b60bdd92a5ef29e"
+      },
+      "sources": {
+        "dataset": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified/resolve/c104f840cc67f8b6eec6f759ebc8b2693d585d4a/data/test-00000-of-00001.parquet",
+        "repository": "https://github.com/pydata/xarray",
+        "issue": "https://github.com/pydata/xarray/issues/3151",
+        "baseCommit": "https://github.com/pydata/xarray/commit/118f4d996e7711c9aced916e6049af9f28d5ec66"
+      }
+    },
+    {
+      "repository": "pydata/xarray",
+      "instanceId": "pydata__xarray-3305",
+      "baseCommit": "69c7e01e5167a3137c285cb50d1978252bb8bcbf",
+      "createdAt": "2019-09-12T19:27:14.000Z",
+      "version": "0.12",
+      "difficulty": "15 min - 1 hour",
+      "priorDevelopmentMemoryCount": 0,
+      "failToPassCount": 1,
+      "passToPassCount": 653,
+      "evaluatorOnlyHashes": {
+        "problemStatement": "sha256:21a3e64aad08beb73b01c601fffd82ad2f9086802463ce389ca5b50f7c271883",
+        "goldPatch": "sha256:6e02fe879c0a070e2ded9b70e7f88a12551beb6b3e46a5a57bd4dbb0118c2266",
+        "goldTestPatch": "sha256:5405369ddaae064c134b6182243156746ad866da4e900cd5358ad4d4efe6cc52"
+      },
+      "sources": {
+        "dataset": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified/resolve/c104f840cc67f8b6eec6f759ebc8b2693d585d4a/data/test-00000-of-00001.parquet",
+        "repository": "https://github.com/pydata/xarray",
+        "issue": "https://github.com/pydata/xarray/issues/3305",
+        "baseCommit": "https://github.com/pydata/xarray/commit/69c7e01e5167a3137c285cb50d1978252bb8bcbf"
+      }
+    },
+    {
+      "repository": "pylint-dev/pylint",
+      "instanceId": "pylint-dev__pylint-4551",
+      "baseCommit": "99589b08de8c5a2c6cc61e13a37420a868c80599",
+      "createdAt": "2021-06-07T15:14:31.000Z",
+      "version": "2.9",
+      "difficulty": "1-4 hours",
+      "priorDevelopmentMemoryCount": 0,
+      "failToPassCount": 10,
+      "passToPassCount": 0,
+      "evaluatorOnlyHashes": {
+        "problemStatement": "sha256:28e19b9ac4f2a25215824cc162bb26d6ef73d661478746cd0cfc2e0432fadb18",
+        "goldPatch": "sha256:06a5ae87f8794dff30b6733c4427cf46fed7ae67c545449b3168977be5cf215c",
+        "goldTestPatch": "sha256:ccdbb6351dd77464ac7429d8a43de3fc42088c03aed9618e5ba77bc8178fec87"
+      },
+      "sources": {
+        "dataset": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified/resolve/c104f840cc67f8b6eec6f759ebc8b2693d585d4a/data/test-00000-of-00001.parquet",
+        "repository": "https://github.com/pylint-dev/pylint",
+        "issue": "https://github.com/pylint-dev/pylint/issues/4551",
+        "baseCommit": "https://github.com/pylint-dev/pylint/commit/99589b08de8c5a2c6cc61e13a37420a868c80599"
+      }
+    },
+    {
+      "repository": "pylint-dev/pylint",
+      "instanceId": "pylint-dev__pylint-4604",
+      "baseCommit": "1e55ae64624d28c5fe8b63ad7979880ee2e6ef3f",
+      "createdAt": "2021-06-22T10:44:14.000Z",
+      "version": "2.9",
+      "difficulty": "15 min - 1 hour",
+      "priorDevelopmentMemoryCount": 0,
+      "failToPassCount": 21,
+      "passToPassCount": 0,
+      "evaluatorOnlyHashes": {
+        "problemStatement": "sha256:0072c898db86e2500d95b0b95f0929f23f8a733dc9b0eb4a0d170189049a8dbb",
+        "goldPatch": "sha256:b50bd937b95d0b58008208d4e7cd122bb869602d0c84319bbae3ebf0f024887c",
+        "goldTestPatch": "sha256:1d84ca139e0defdacbc56094a916a83dff514c77fbc446a0d015dbd260c264bb"
+      },
+      "sources": {
+        "dataset": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified/resolve/c104f840cc67f8b6eec6f759ebc8b2693d585d4a/data/test-00000-of-00001.parquet",
+        "repository": "https://github.com/pylint-dev/pylint",
+        "issue": "https://github.com/pylint-dev/pylint/issues/4604",
+        "baseCommit": "https://github.com/pylint-dev/pylint/commit/1e55ae64624d28c5fe8b63ad7979880ee2e6ef3f"
+      }
+    },
+    {
+      "repository": "pylint-dev/pylint",
+      "instanceId": "pylint-dev__pylint-4661",
+      "baseCommit": "1d1619ef913b99b06647d2030bddff4800abdf63",
+      "createdAt": "2021-07-03T00:57:06.000Z",
+      "version": "2.10",
+      "difficulty": "15 min - 1 hour",
+      "priorDevelopmentMemoryCount": 0,
+      "failToPassCount": 1,
+      "passToPassCount": 0,
+      "evaluatorOnlyHashes": {
+        "problemStatement": "sha256:9888ff5d07c438e865ef06f4e23337fdf555c438756ab3d74e75abea222cb932",
+        "goldPatch": "sha256:43b3e2e849942d287987af5f42b532695dac6e68625778d6d29981cb0dcb3b59",
+        "goldTestPatch": "sha256:ee7c4ca17fff72e7af07a9876cf1aa07552ae49099831b42f5d429c3132dcaaf"
+      },
+      "sources": {
+        "dataset": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified/resolve/c104f840cc67f8b6eec6f759ebc8b2693d585d4a/data/test-00000-of-00001.parquet",
+        "repository": "https://github.com/pylint-dev/pylint",
+        "issue": "https://github.com/pylint-dev/pylint/issues/4661",
+        "baseCommit": "https://github.com/pylint-dev/pylint/commit/1d1619ef913b99b06647d2030bddff4800abdf63"
+      }
+    },
+    {
+      "repository": "pylint-dev/pylint",
+      "instanceId": "pylint-dev__pylint-4970",
+      "baseCommit": "40cc2ffd7887959157aaf469e09585ec2be7f528",
+      "createdAt": "2021-09-05T19:44:07.000Z",
+      "version": "2.10",
+      "difficulty": "<15 min fix",
+      "priorDevelopmentMemoryCount": 0,
+      "failToPassCount": 1,
+      "passToPassCount": 17,
+      "evaluatorOnlyHashes": {
+        "problemStatement": "sha256:194295749557b085970e22cc0886d8d0d772e77521bf3b3af55f43f90a3d65ee",
+        "goldPatch": "sha256:7eb3a09727133387bf81fa3a1596746a2dcca2c0c9eba95caaa69b65d619dccd",
+        "goldTestPatch": "sha256:c3c6cf31d76aa8769731b35f87511ff007dddb47a2349f8d4e5da3355ff9cf7b"
+      },
+      "sources": {
+        "dataset": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified/resolve/c104f840cc67f8b6eec6f759ebc8b2693d585d4a/data/test-00000-of-00001.parquet",
+        "repository": "https://github.com/pylint-dev/pylint",
+        "issue": "https://github.com/pylint-dev/pylint/issues/4970",
+        "baseCommit": "https://github.com/pylint-dev/pylint/commit/40cc2ffd7887959157aaf469e09585ec2be7f528"
+      }
+    },
+    {
+      "repository": "scikit-learn/scikit-learn",
+      "instanceId": "scikit-learn__scikit-learn-9288",
+      "baseCommit": "3eacf948e0f95ef957862568d87ce082f378e186",
+      "createdAt": "2017-07-06T11:03:14.000Z",
+      "version": "0.22",
+      "difficulty": "15 min - 1 hour",
+      "priorDevelopmentMemoryCount": 0,
+      "failToPassCount": 1,
+      "passToPassCount": 123,
+      "evaluatorOnlyHashes": {
+        "problemStatement": "sha256:4c6be4c6f8f699371300fb64162cb969da421307c54fc0743c0f78ae90c09b2b",
+        "goldPatch": "sha256:0063c03e4ca196c867ee776c7508768dd6131077ddcb0136d10260b653a2af28",
+        "goldTestPatch": "sha256:62af0e443c4676420d47060be8d8c6e112f617eb57643bb261321aaa90d134fa"
+      },
+      "sources": {
+        "dataset": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified/resolve/c104f840cc67f8b6eec6f759ebc8b2693d585d4a/data/test-00000-of-00001.parquet",
+        "repository": "https://github.com/scikit-learn/scikit-learn",
+        "issue": "https://github.com/scikit-learn/scikit-learn/issues/9288",
+        "baseCommit": "https://github.com/scikit-learn/scikit-learn/commit/3eacf948e0f95ef957862568d87ce082f378e186"
+      }
+    },
+    {
+      "repository": "sphinx-doc/sphinx",
+      "instanceId": "sphinx-doc__sphinx-7440",
+      "baseCommit": "9bb204dcabe6ba0fc422bf4a45ad0c79c680d90b",
+      "createdAt": "2020-04-08T13:46:43.000Z",
+      "version": "3.0",
+      "difficulty": "<15 min fix",
+      "priorDevelopmentMemoryCount": 0,
+      "failToPassCount": 1,
+      "passToPassCount": 12,
+      "evaluatorOnlyHashes": {
+        "problemStatement": "sha256:d9558af32ba6cbcd6cb5c430f514ed0eebb29d72289dc90fcee26062ca9ff073",
+        "goldPatch": "sha256:b5ab77d37fb636b574c8e08f13495ee2d02e82c06a2b94dc92d3f3480593beb5",
+        "goldTestPatch": "sha256:6dbf83d82b931d827fc87f0263cb08ff6b22aff7afb7591e5f32b3bf09f81be1"
+      },
+      "sources": {
+        "dataset": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified/resolve/c104f840cc67f8b6eec6f759ebc8b2693d585d4a/data/test-00000-of-00001.parquet",
+        "repository": "https://github.com/sphinx-doc/sphinx",
+        "issue": "https://github.com/sphinx-doc/sphinx/issues/7440",
+        "baseCommit": "https://github.com/sphinx-doc/sphinx/commit/9bb204dcabe6ba0fc422bf4a45ad0c79c680d90b"
+      }
+    },
+    {
+      "repository": "sphinx-doc/sphinx",
+      "instanceId": "sphinx-doc__sphinx-7454",
+      "baseCommit": "aca3f825f2e4a8817190f3c885a242a285aa0dba",
+      "createdAt": "2020-04-09T17:08:30.000Z",
+      "version": "3.0",
+      "difficulty": "<15 min fix",
+      "priorDevelopmentMemoryCount": 0,
+      "failToPassCount": 1,
+      "passToPassCount": 27,
+      "evaluatorOnlyHashes": {
+        "problemStatement": "sha256:a93b807ebfda03f2b54e0acea6736e85b625421a0f992d4330a5fa283e127438",
+        "goldPatch": "sha256:64c14fd0407961972d0efeb9635587c1b050f7c2da3e86f3ce3a50e4a23c383e",
+        "goldTestPatch": "sha256:b8745900c44362aee705ebd130656cb71a02cb01d42e7d29c16bdada02a9fe6e"
+      },
+      "sources": {
+        "dataset": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified/resolve/c104f840cc67f8b6eec6f759ebc8b2693d585d4a/data/test-00000-of-00001.parquet",
+        "repository": "https://github.com/sphinx-doc/sphinx",
+        "issue": "https://github.com/sphinx-doc/sphinx/issues/7454",
+        "baseCommit": "https://github.com/sphinx-doc/sphinx/commit/aca3f825f2e4a8817190f3c885a242a285aa0dba"
+      }
+    },
+    {
+      "repository": "sphinx-doc/sphinx",
+      "instanceId": "sphinx-doc__sphinx-7462",
+      "baseCommit": "b3e26a6c851133b82b50f4b68b53692076574d13",
+      "createdAt": "2020-04-12T04:10:05.000Z",
+      "version": "3.1",
+      "difficulty": "<15 min fix",
+      "priorDevelopmentMemoryCount": 0,
+      "failToPassCount": 2,
+      "passToPassCount": 49,
+      "evaluatorOnlyHashes": {
+        "problemStatement": "sha256:8b7f970ed7e3c847eb7675a3564030771ff64e2f479027f3bb628d7d7c925acc",
+        "goldPatch": "sha256:13cebe1d1a9993e2bbb9707a9c85bf4e98fab0563d8305e446147266f7274fae",
+        "goldTestPatch": "sha256:1745f2e0dfab31c3d3e871d528b1847969758b3aa457a5aa0145b50f647d29e1"
+      },
+      "sources": {
+        "dataset": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified/resolve/c104f840cc67f8b6eec6f759ebc8b2693d585d4a/data/test-00000-of-00001.parquet",
+        "repository": "https://github.com/sphinx-doc/sphinx",
+        "issue": "https://github.com/sphinx-doc/sphinx/issues/7462",
+        "baseCommit": "https://github.com/sphinx-doc/sphinx/commit/b3e26a6c851133b82b50f4b68b53692076574d13"
+      }
+    },
+    {
+      "repository": "sphinx-doc/sphinx",
+      "instanceId": "sphinx-doc__sphinx-7590",
+      "baseCommit": "2e506c5ab457cba743bb47eb5b8c8eb9dd51d23d",
+      "createdAt": "2020-05-01T18:29:11.000Z",
+      "version": "3.1",
+      "difficulty": ">4 hours",
+      "priorDevelopmentMemoryCount": 0,
+      "failToPassCount": 1,
+      "passToPassCount": 24,
+      "evaluatorOnlyHashes": {
+        "problemStatement": "sha256:23b9b88e30541f1109b04492ccf35a93a15fdeecb2b736bf22be5a2a6173f84e",
+        "goldPatch": "sha256:23c3b2333c3512be7350376c631bbbb079684b7ce1563c5a30ddf665c0f1ec7a",
+        "goldTestPatch": "sha256:77ee427a569addb63364093290096af046dffd77fa65fcc6f60197db7021d8da"
+      },
+      "sources": {
+        "dataset": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified/resolve/c104f840cc67f8b6eec6f759ebc8b2693d585d4a/data/test-00000-of-00001.parquet",
+        "repository": "https://github.com/sphinx-doc/sphinx",
+        "issue": "https://github.com/sphinx-doc/sphinx/issues/7590",
+        "baseCommit": "https://github.com/sphinx-doc/sphinx/commit/2e506c5ab457cba743bb47eb5b8c8eb9dd51d23d"
+      }
+    }
+  ],
+  "contentDigest": "sha256:03d45e72959401d5efb771c5d1263008d2508d872ee25ddde8cd02bc71ca8ae1"
+}

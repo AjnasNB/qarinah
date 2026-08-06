@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "qarinah.final-execution-readiness.v1",
+  "auditedAt": "2026-08-05T14:16:56.4690783Z",
+  "sourceCommit": "b20bb87e6d0ab39aed7df00605d38d24deb9da36",
+  "protocolTag": "research-protocol-v1",
+  "manifestTag": "research-final-manifest-v1",
+  "environment": {
+    "operatingSystem": "Microsoft Windows 10.0.26200",
+    "platform": "win32",
+    "architecture": "x64",
+    "cpuLogicalCount": 16,
+    "memoryBytes": 16557887488,
+    "node": "24.15.0",
+    "npm": "11.18.0",
+    "git": "2.45.2.windows.1",
+    "python": "3.10.0",
+    "codexCli": "0.144.6",
+    "claudeCode": "2.1.118",
+    "dockerClient": "29.3.1",
+    "dockerServer": "29.3.1",
+    "dockerDesktop": "4.68.0 (223695)",
+    "dockerServerPlatform": "linux/amd64"
+  },
+  "packagedRuntimes": {
+    "codexSha256": "sha256:36f03659d4ede1bd194b4616af117756ea7a50f48d702c96a3c5437b3d1fad8e",
+    "claudeSha256": "sha256:36f03659d4ede1bd194b4616af117756ea7a50f48d702c96a3c5437b3d1fad8e",
+    "byteIdentical": true,
+    "mcpSmokePassed": true
+  },
+  "localValidation": {
+    "windowsNode24FullReleaseGatePassed": true,
+    "testsPassed": 136,
+    "codexPackagedRuntimePassed": true,
+    "claudePackagedRuntimePassed": true,
+    "cliPassed": true,
+    "coreApiPassed": true,
+    "mcpPassed": true
+  },
+  "declaredButNotExecutedLocally": {
+    "ciMatrix": {
+      "operatingSystems": ["ubuntu-latest", "macos-latest", "windows-latest"],
+      "nodeMajors": [22, 24, 26],
+      "source": ".github/workflows/ci.yml"
+    },
+    "reason": "No remote workflow was triggered because publication and GitHub pushes are explicitly withheld."
+  },
+  "executionBlockers": [
+    "Exact provider model IDs and immutable revisions are not frozen.",
+    "Provider credentials and monetary/token budget are not authorized.",
+    "Dense embedding baseline specification is not frozen.",
+    "Fixed-model summary baseline specification is not frozen.",
+    "Two independent human relevance reviewers have not completed the blinded audit.",
+    "Official SWE-bench Docker gold-patch smoke evaluation has not been run for this protocol.",
+    "The live demo repository has not opted into Qarinah capture."
+  ],
+  "finalEvaluationAuthorized": false,
+  "finalResultsObserved": false,
+  "remotePublished": false
+}

@@ -4,6 +4,10 @@ Qarinah is the evidence-linked cross-agent context engine for software projects.
 
 The primary job is simple: **verified handoffs between coding agents**.
 
+For a reproducible Claude-to-Codex or Codex-to-Claude recording, use the [cross-agent video protocol](CROSS-AGENT-VIDEO-PROTOCOL.md). It freezes versions, preserves a machine-readable run record, and separates a demonstration from research evidence.
+
+The release also includes a deterministic two-session continuation benchmark and an authenticated Codex-to-Codex product smoke with native resume disabled. See [the method, receipts, and limitations](CROSS-SESSION-CONTINUATION-BENCHMARK.md).
+
 ## The complete handoff loop
 
 1. Begin a real software task in one coding agent.
@@ -85,6 +89,8 @@ Qarinah uses local-first temporal project memory built from:
 - compact cited context packs with hard output budgets;
 - optional local embeddings and rerankers that never replace citations.
 
+The default `admission-first-v2` ranking profile filters repository, time, retention, disclosure, and supersession boundaries before ranking, preserves admissible BM25 order as its first stage, and uses fuzzy and graph evidence only to fill or support that candidate set. `strict-before` queries can exclude evidence recorded at the exact checkpoint. Evidence-sufficiency diagnostics are experimental until calibrated on independently reviewed relevance labels.
+
 This makes Qarinah a universal context engine for software projects while keeping each workspace, repository, and source authority explicit.
 
 ## Published proof
@@ -92,6 +98,8 @@ This makes Qarinah a universal context engine for software projects while keepin
 Qarinah's published evaluator measured 442,113 estimated input-context tokens for full-history replay and 5,682 for the same current sources plus Qarinah packs. That is **98.71% less estimated repeated project context**, with every required target directly covered in the top five for the evaluated tasks.
 
 The result measures the compared repeated input-context slice. Read the [methodology and machine-readable evidence](BENCHMARKS.md) before applying it to a different workload or total provider bill.
+
+The separate 42-record continuation fixture retrieves an evidence-linked handoff in 1,039 estimated tokens versus 9,489 for full-ledger replay (89.05% less), preserves all three source IDs and hashes, and verifies that a fresh-session read does not mutate stale derived files. An authenticated two-session Codex smoke additionally verifies actual continuation and test completion on a synthetic fixture; it remains product evidence rather than a controlled research result.
 
 ## Long-term direction
 

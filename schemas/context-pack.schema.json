@@ -63,7 +63,9 @@
       "additionalProperties": false,
       "required": ["strategy", "supersessionPolicy", "asOf", "coverage"],
       "properties": {
-        "strategy": { "const": "hybrid-local-v1" },
+        "strategy": { "enum": ["hybrid-local-v1", "admission-first-hybrid-v2"] },
+        "rankingProfile": { "enum": ["balanced-v1", "admission-first-v2"] },
+        "temporalBoundary": { "enum": ["inclusive", "strict-before"] },
         "supersessionPolicy": { "enum": ["prefer-current", "include-history"] },
         "asOf": { "type": "string", "format": "date-time", "maxLength": 24 },
         "authorityScope": { "type": "string", "minLength": 1, "maxLength": 256 },
@@ -91,6 +93,32 @@
             "bestExactTermRatio": { "type": "number", "minimum": 0, "maximum": 1 },
             "directCandidateCount": { "type": "integer", "minimum": 0 },
             "warning": { "type": "string", "minLength": 1, "maxLength": 512 }
+          }
+        },
+        "evidenceSufficiency": {
+          "type": "object",
+          "additionalProperties": false,
+            "required": ["method", "state", "decision", "score", "directThreshold", "partialThreshold", "bestExactTermRatio", "topLexicalScore", "lexicalScoreMargin", "supportingCandidateCount", "codeEntityCount", "matchedCodeEntityCount", "codeEntityCoverage", "reasonCodes"],
+            "properties": {
+              "method": { "const": "evidence-sufficiency-v2" },
+              "state": { "enum": ["DIRECTLY_SUPPORTED", "PARTIALLY_SUPPORTED", "INSUFFICIENT_EVIDENCE"] },
+              "decision": { "enum": ["ACCEPT_DIRECT", "ABSTAIN"] },
+              "score": { "type": "number", "minimum": 0, "maximum": 1 },
+              "directThreshold": { "type": "number", "minimum": 0, "maximum": 1 },
+              "partialThreshold": { "type": "number", "minimum": 0, "maximum": 1 },
+              "bestExactTermRatio": { "type": "number", "minimum": 0, "maximum": 1 },
+              "topLexicalScore": { "type": "number", "minimum": 0 },
+              "lexicalScoreMargin": { "type": "number", "minimum": 0, "maximum": 1 },
+            "supportingCandidateCount": { "type": "integer", "minimum": 0 },
+            "codeEntityCount": { "type": "integer", "minimum": 0, "maximum": 64 },
+            "matchedCodeEntityCount": { "type": "integer", "minimum": 0, "maximum": 64 },
+            "codeEntityCoverage": { "type": "number", "minimum": 0, "maximum": 1 },
+            "reasonCodes": {
+              "type": "array",
+                "maxItems": 10,
+              "uniqueItems": true,
+              "items": { "type": "string", "minLength": 1, "maxLength": 64 }
+            }
           }
         },
         "filters": {

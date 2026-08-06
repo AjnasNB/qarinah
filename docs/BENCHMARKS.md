@@ -110,6 +110,14 @@ Keep these direct details beside the number:
 
 > 240 retained records; identical current-task sources on both sides; full-history replay versus cited Qarinah packs; `ceil(characters / 4)` token estimate; no provider-billing measurement.
 
+## Cross-session continuation and evidence-linked summarization
+
+Qarinah 0.1.3 adds a deterministic 42-record, two-session continuation fixture. A fresh logical session retrieves an inferred handoff summary at rank 3 after lifecycle capture deliberately makes the persisted read model stale. All three source event IDs and hashes remain embedded in the selected summary, one raw source is also selected, the query leaves derived state byte-for-byte unchanged, and `doctor` passes. The cited pack uses 1,039 portable estimated tokens versus 9,489 for the full ledger, an 89.05% estimated reduction.
+
+A separate authenticated Codex CLI smoke uses two distinct ephemeral sessions with native resume disabled. Session A diagnoses a failing fixture without editing; Session B must query Qarinah first, cite a retrieved event ID and hash, implement the fix, and pass the acceptance tests. The checked receipt retains hashes and normalized usage fields, not raw transcripts or local paths.
+
+This is continuation-product evidence, not a controlled model-quality claim. See [the complete method and limitations](CROSS-SESSION-CONTINUATION-BENCHMARK.md), the [deterministic result](../bench/results/continuation-context-0.1.3.json), and the [provider-backed smoke receipt](../bench/results/codex-cross-session-continuation-0.1.3.json).
+
 ## Claims Qarinah does not make
 
 - exact token or cost savings without a provider-specific tokenizer and usage receipt;
@@ -119,8 +127,18 @@ Keep these direct details beside the number:
 - capture of host activity that the host does not expose;
 - secret-free retention in arbitrary content-mode tool output.
 
+## Real-repository research benchmark
+
+The research track now pins the official public SWE-bench Lite test split at 300 tasks from 12 repositories and applies a chronological 60-task warm-up / 240-task held-out split. The completed zero-model phase evaluates retrieval, temporal leakage, repository isolation, disclosure filtering, retention, and supersession.
+
+The frozen exploratory-v0.1 result is deliberately not a marketing headline. On the 79 held-out tasks with a prior production-file-overlap target, BM25 outperforms the original balanced-v1 Qarinah ranker: Recall@10 is 0.687 versus 0.518, and MRR is 0.430 versus 0.320. The no-temporal ablation returns 971 future citations, and the lexical coverage gate accepts all 161 tasks with no positive record under the file-overlap oracle. A separate 72-record governance suite returns zero forbidden records.
+
+Development v0.2 is explicitly tuned after inspecting v0.1 and is not confirmatory. It resolves the official-page 11-repository statement against the 12-project revision artifact, adds a raw Parquet SHA-256, graded structural labels, static and online/prequential settings, fixed 512-8,000-token budgets, item/query leakage, calibration metrics, and repository-clustered bootstrap intervals. Admission-first Qarinah v2 exactly matches admitted BM25 ranking and improves online MRR over balanced-v1 from 0.601 to 0.696. Graph adds no measured ranking value. The original v0.2 interpretation counted partial evidence as accepted and produced a 90.32% false-acceptance rate among online tasks with no positive record under the structural oracle.
+
+The conservative development-v0.3 gate accepts only direct evidence at the calibrated 0.65 threshold and treats partial evidence as abstention. At the frozen operating point it observed 0/49 direct false accepts in static evaluation and 0/31 online, including the leave-one-repository-out aggregation. Static direct precision is 8/8 with a 63.06%-100% exact 95% interval; online it is 12/12 with a 73.54%-100% interval. The false-acceptance intervals are 0%-7.25% and 0%-11.22%, respectively. Acceptance coverage is intentionally low at 3.33% static and 5.00% online. These are development structural-oracle results, not a universal semantic guarantee; a blinded 49-case relevance census is awaiting two independent human reviewers.
+
+See the complete [research protocol, limitations, repository citations, and results](RESEARCH-BENCHMARK.md). The committed artifacts preserve [`exploratory v0.1`](../bench/results/research-retrieval-0.1.2.json), [`development retrieval v0.2`](../bench/results/research-retrieval-development-v0.2.json), and [`conservative sufficiency v0.3`](../bench/results/research-sufficiency-development-v0.3.json).
+
 ## Next benchmark gate
 
-## Next benchmark expansion
-
-Expand to at least 100 held-out positive and negative queries covering exact lookup, paraphrase, typos, conflicts, supersession, time, authority, unsupported questions, and project-file impact. Separately run at least 20 task-paired Codex and Claude evaluations using the providers' reported input-token fields, identical models and tools, task-success checks, unsupported-answer review, latency, and cost. Publish raw fixtures, ablations, command lines, environment, package version, commit, and machine-readable results.
+Protocol v1 and a Verified-minus-Lite task manifest are frozen before final results. The positive population contains 387 retrieval tasks and a deterministic 40-task coding-agent sample. Amendment A001 separately freezes 20 no-prior-memory tasks for abstention-only evaluation. A 407-task contamination audit found no exact ID, issue, patch, test-patch, normalized-statement, or near-duplicate overlap with Lite development data; five same-base-commit pairs are disclosed. A pre-outcome exact McNemar power analysis shows that 40 pairs can reliably detect only large resolution effects under the explored assumptions. Execution still requires independently completed labels, verified model/runtime identifiers, credentials, frozen baselines, provider usage receipts, and a successful pilot. None of those final outcomes are claimed by the present retrieval study.

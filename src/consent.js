@@ -13,6 +13,7 @@ const REVOCATION_SCHEMA_VERSION = "qarinah.revocation.v1";
 const HASH_PATTERN = /^sha256:[0-9a-f]{64}$/;
 const WORKSPACE_ID_PATTERN = /^ws_[0-9a-f]{32}$/;
 const MAX_TRUST_BYTES = 32 * 1024;
+const MACHINE_JSON_READ_ATTEMPTS = 20;
 const POLICY_FIELDS = Object.freeze([
   "enabled",
   "capture",
@@ -249,7 +250,9 @@ async function canonicalRealRoot(root) {
   return realpath(path.resolve(root));
 }
 
-async function readBoundedMachineJson(candidate, maximumBytes, label) {
+class MachineJsonReadRaceError extends Error {}
+
+async function readBoundedMachineJsonOnce(candidate, maximumBytes, label) {
   const flags = constants.O_RDONLY | (Number.isInteger(constants.O_NOFOLLOW) ? constants.O_NOFOLLOW : 0);
   const handle = await open(candidate, flags);
   try {
@@ -260,7 +263,7 @@ async function readBoundedMachineJson(candidate, maximumBytes, label) {
       throw new QarinahError("TRUST_INVALID", `${label} must be a singly linked regular file.`);
     }
     if (opened.dev !== named.dev || opened.ino !== named.ino) {
-      throw new QarinahError("TRUST_INVALID", `${label} changed while it was being opened.`);
+      throw new MachineJsonReadRaceError();
     }
     if (opened.size > BigInt(maximumBytes)) {
       throw new QarinahError("TRUST_INVALID", `${label} exceeds its size limit.`);
@@ -278,6 +281,25 @@ async function readBoundedMachineJson(candidate, maximumBytes, label) {
   } finally {
     await handle.close();
   }
+}
+
+async function readBoundedMachineJson(candidate, maximumBytes, label) {
+  for (let attempt = 0; attempt < MACHINE_JSON_READ_ATTEMPTS; attempt += 1) {
+    try {
+      return await readBoundedMachineJsonOnce(candidate, maximumBytes, label);
+    } catch (error) {
+      if (!(error instanceof MachineJsonReadRaceError)) throw error;
+      if (attempt === MACHINE_JSON_READ_ATTEMPTS - 1) {
+        throw new QarinahError("TRUST_INVALID", `${label} kept changing while it was being opened.`);
+      }
+      // A checkpoint update atomically replaces the trust record. A reader may
+      // therefore open the prior inode immediately before the rename. Retry the
+      // complete no-follow, inode, link-count, realpath, size, and JSON checks;
+      // no bytes from the raced file are accepted.
+      await delay(2 + attempt);
+    }
+  }
+  throw new QarinahError("TRUST_INVALID", `${label} could not be read safely.`);
 }
 
 async function readTrustFile(root) {

@@ -147,7 +147,9 @@ test("MCP exposes bounded cited retrieval only with an exact workspace disclosur
         query: "Govern browser writes",
         maxChars: 4_000,
         limit: 3,
-        minimumCoverage: "any"
+        minimumCoverage: "any",
+        minimumEvidence: "partial",
+        temporalBoundary: "strict-before"
       }
     }
   });
@@ -157,8 +159,80 @@ test("MCP exposes bounded cited retrieval only with an exact workspace disclosur
   assert.equal(result.structuredContent.workspaceId, workspace.config.workspaceId);
   assert.equal(result.structuredContent.items[0].title, "Govern browser writes");
   assert.equal(result.structuredContent.budget.maxChars, 4_000);
+  assert.ok(["PARTIALLY_SUPPORTED", "DIRECTLY_SUPPORTED"].includes(
+    result.structuredContent.retrieval.evidenceSufficiency.state
+  ));
+  assert.equal(result.structuredContent.retrieval.evidenceSufficiency.method, "evidence-sufficiency-v2");
+  assert.equal(
+    result.structuredContent.retrieval.evidenceSufficiency.decision,
+    result.structuredContent.retrieval.evidenceSufficiency.state === "DIRECTLY_SUPPORTED" ? "ACCEPT_DIRECT" : "ABSTAIN"
+  );
   assert.ok(result.structuredContent.budget.usedChars <= 4_000);
   assert.equal(JSON.stringify(result).includes(root), false);
+  assert.deepEqual(await snapshotTree(path.join(root, ".qarinah")), beforeWorkspace);
+  assert.deepEqual(await snapshotFile(trust), beforeTrust);
+
+  await server.handle({
+    jsonrpc: "2.0",
+    id: 211,
+    method: "tools/call",
+    params: {
+      name: "context.query",
+      arguments: {
+        workspace: root,
+        query: "qzvxjklp nonexistent-memory-subject",
+        minimumCoverage: "any",
+        minimumEvidence: "direct"
+      }
+    }
+  });
+  const abstained = response(messages, 211).result;
+  assert.equal(abstained.isError, true);
+  assert.equal(abstained.structuredContent.code, "CONTEXT_EVIDENCE_INSUFFICIENT");
+  server.close();
+});
+
+test("MCP query reads a verified in-memory view when lifecycle capture makes derived files stale", async (t) => {
+  const root = await temporaryDirectory(t);
+  const workspace = await initializeWorkspace(root, { capture: "content" });
+  await appendEvent(eventInput(), { workspace });
+  await rebuildDerivedState(root);
+  const latest = await appendEvent({
+    ...eventInput(),
+    title: "Continue immutable release handoff",
+    body: "Reject a mutable artifact even when its current digest matches."
+  }, { workspace });
+  const trust = await trustPath(root);
+  const beforeWorkspace = await snapshotTree(path.join(root, ".qarinah"));
+  const beforeTrust = await snapshotFile(trust);
+  const messages = [];
+  const server = createMcpServer({
+    cwd: root,
+    queryPermit: {
+      workspaceId: workspace.config.workspaceId,
+      policyHash: workspace.consent.policyHash,
+      maxChars: 4_000,
+      maxItems: 5
+    },
+    write: (message) => messages.push(message)
+  });
+  await initialize(server, messages);
+  await server.handle({
+    jsonrpc: "2.0",
+    id: 212,
+    method: "tools/call",
+    params: {
+      name: "context.query",
+      arguments: {
+        workspace: root,
+        query: "continue immutable release handoff",
+        minimumCoverage: "partial"
+      }
+    }
+  });
+  const result = response(messages, 212).result;
+  assert.equal(result.isError, undefined, JSON.stringify(result));
+  assert.equal(result.structuredContent.items[0].eventId, latest.eventId);
   assert.deepEqual(await snapshotTree(path.join(root, ".qarinah")), beforeWorkspace);
   assert.deepEqual(await snapshotFile(trust), beforeTrust);
   server.close();

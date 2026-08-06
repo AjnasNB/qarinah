@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "qarinah.final-protocol-amendment-receipt.v1",
+  "amendmentId": "A001",
+  "amendmentPath": "docs/PROTOCOL-AMENDMENTS.md",
+  "amendmentSha256": "sha256:8124e59d2731648c36c605f9140907ec8c35321113d1c2f6c6c7c87c6777a3bb",
+  "baseProtocol": {
+    "tag": "research-protocol-v1",
+    "commit": "3e05fa30f3007fd67a6b5aba2613f14dcb896fd7",
+    "sha256": "sha256:93cc40c5c2a632024ff0a30077d122218d231cdd05f5121f9788d900b975b64e"
+  },
+  "finalManifest": {
+    "tag": "research-final-manifest-v1",
+    "commit": "b20bb87e6d0ab39aed7df00605d38d24deb9da36"
+  },
+  "evidence": {
+    "abstentionControlsDigest": "sha256:03d45e72959401d5efb771c5d1263008d2508d872ee25ddde8cd02bc71ca8ae1",
+    "contaminationAuditDigest": "sha256:829492ae831e512eae6072698fdf93d9e3b7ac87ea56c4496f8f5043cb7b0e0b",
+    "pairedPowerAnalysisDigest": "sha256:056695e630715ba143eb79cdfcf3ebb15fa8b1ecaf43d8ab330ffc4b9fcb1927",
+    "pilotGuardrailDigest": "sha256:3063df37021a6ff6b5bc738d818e07ef3ed42a930890f8932658d643777178ef"
+  },
+  "intendedTag": "research-protocol-amendment-001",
+  "addedBeforeFinalResults": true,
+  "finalQarinahResultsObservedBefore": false,
+  "providerResultsObservedBefore": false,
+  "remotePublishedAtCreation": false,
+  "createdAt": "2026-08-05",
+  "contentDigest": "sha256:77f4fc183cf622c5c7c248eef3b3c10082de0c5adfe44f3227e76093c39fb04a"
+}

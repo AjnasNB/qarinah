@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "qarinah.final-contamination-audit.v1",
+  "status": "complete-before-final-evaluation",
+  "populations": {
+    "developmentTasks": 300,
+    "finalRetrievalTasks": 387,
+    "finalAbstentionControls": 20,
+    "auditedFinalTasks": 407
+  },
+  "methods": {
+    "exact": "Compare exact instance IDs, derived issue URLs, repository-qualified base commits, SHA-256 patch/test-patch hashes, and normalized problem-statement hashes.",
+    "nearDuplicate": "Five-token shingle Jaccard similarity after NFKC/lowercase normalization and URL, commit, and number placeholders; candidate threshold >= 0.85.",
+    "temporal": "Count same-repository development records at or after each target timestamp; the frozen strict-before policy rejects every such record."
+  },
+  "exact_instance_overlap": 0,
+  "issue_url_overlap": 0,
+  "pull_request_url_overlap": null,
+  "pull_request_url_note": "The pinned dataset schema does not expose pull-request URLs.",
+  "gold_commit_overlap": null,
+  "gold_commit_note": "The pinned dataset schema exposes base_commit and gold patches, not a gold commit identifier.",
+  "base_commit_overlap": {
+    "count": 5,
+    "uniqueValues": 5,
+    "samplePairs": [
+      {
+        "finalInstanceId": "django__django-15499",
+        "developmentInstanceId": "django__django-15498",
+        "value": "django/django:d90e34c61b27fba2527834806639eebbcfab9631"
+      },
+      {
+        "finalInstanceId": "sphinx-doc__sphinx-8475",
+        "developmentInstanceId": "sphinx-doc__sphinx-8474",
+        "value": "sphinx-doc/sphinx:3ea1ec84cc610f7a9f4f6b354e264565254923ff"
+      },
+      {
+        "finalInstanceId": "sympy__sympy-13798",
+        "developmentInstanceId": "sympy__sympy-13773",
+        "value": "sympy/sympy:7121bdf1facdd90d05b6994b4c2e5b2865a4638a"
+      },
+      {
+        "finalInstanceId": "sympy__sympy-13974",
+        "developmentInstanceId": "sympy__sympy-13971",
+        "value": "sympy/sympy:84c125972ad535b2dfb245f8d311d347b45e5b8a"
+      },
+      {
+        "finalInstanceId": "sympy__sympy-19495",
+        "developmentInstanceId": "sympy__sympy-19487",
+        "value": "sympy/sympy:25fbcce5b1a4c7e3956e6062930f4a44ce95a632"
+      }
+    ]
+  },
+  "patch_hash_overlap": {
+    "count": 0,
+    "uniqueValues": 0,
+    "samplePairs": []
+  },
+  "test_patch_hash_overlap": {
+    "count": 0,
+    "uniqueValues": 0,
+    "samplePairs": []
+  },
+  "normalized_problem_statement_hash_overlap": {
+    "count": 0,
+    "uniqueValues": 0,
+    "samplePairs": []
+  },
+  "near_duplicate_candidates": [],
+  "manually_adjudicated_candidates": [],
+  "future_resolution_audit": {
+    "sameRepositoryRecordsAtOrAfterTarget": 13640,
+    "admittedByFrozenStrictBeforePolicy": 0,
+    "exactTargetResolutionEmbeddedByIssueUrlOrPatchHash": 0,
+    "interpretation": "Future same-repository records exist in the source corpus but are excluded before ranking. Exact issue/patch matches are reported separately."
+  },
+  "finalResultsObservedBeforeAudit": false,
+  "generatedAt": "2026-08-05",
+  "contentDigest": "sha256:829492ae831e512eae6072698fdf93d9e3b7ac87ea56c4496f8f5043cb7b0e0b"
+}
