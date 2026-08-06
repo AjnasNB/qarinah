@@ -27,7 +27,12 @@ export {
   rebuildDerivedState,
   tokenize
 } from "./indexer.js";
-export { compileContext, renderContextPackMarkdown } from "./compiler.js";
+export {
+  HANDOFF_CAPSULE_SCHEMA_VERSION,
+  compileContext,
+  createContextHandoffCapsule,
+  renderContextPackMarkdown
+} from "./compiler.js";
 export { PROJECT_STRUCTURE_SCHEMA_VERSION, scanProjectStructure } from "./project-structure.js";
 export { OKF_EXPORT_SCHEMA_VERSION, OKF_VERSION, exportOkf } from "./okf.js";
 export { rankContextEvents } from "./retrieval.js";

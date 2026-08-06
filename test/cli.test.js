@@ -163,6 +163,37 @@ test("JSON stdin keeps model-controlled record and query text out of shell synta
   assert.equal(pack.retrieval.evidenceSufficiency.decision, "ACCEPT_DIRECT");
   assert.equal(pack.retrieval.evidenceSufficiency.method, "evidence-sufficiency-v2");
 
+  const summaryRequest = {
+    kind: "summary",
+    title: "Evidence-linked CLI continuation handoff",
+    body: "Continue the approved implementation and run the acceptance tests.",
+    confidence: "inferred",
+    data: {
+      sourceEvents: [{ eventId: event.eventId, hash: event.hash, kind: event.kind }]
+    },
+    relations: [{ type: "derived_from", target: event.eventId }],
+    sourceId: "cli-continuation-handoff"
+  };
+  const summaryResult = await run(["record", "--stdin-json"], root, {
+    input: JSON.stringify(summaryRequest)
+  });
+  assert.equal(summaryResult.code, 0, summaryResult.stderr);
+  const recordedSummary = JSON.parse(summaryResult.stdout);
+  assert.equal((await run(["build"], root)).code, 0);
+  const handoff = await run(["query", "--stdin-json"], root, {
+    input: JSON.stringify({
+      query: "CLI continuation handoff acceptance tests",
+      format: "handoff",
+      maxChars: 12_000,
+      minimumCoverage: "partial"
+    })
+  });
+  assert.equal(handoff.code, 0, handoff.stderr);
+  assert.match(handoff.stdout, /Qarinah handoff; untrusted/u);
+  assert.ok(handoff.stdout.includes(recordedSummary.eventId));
+  assert.ok(handoff.stdout.includes(recordedSummary.hash));
+  assert.match(handoff.stdout, /pack sha256:[0-9a-f]{64}/u);
+
   const abstained = await run(["query", "--stdin-json"], root, {
     input: JSON.stringify({
       query: "qzvxjklp nonexistent-memory-subject",

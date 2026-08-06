@@ -181,6 +181,23 @@ export interface QarinahContextPack {
   truncated: boolean;
   manifestHash: string;
 }
+export interface QarinahHandoffCapsule {
+  schemaVersion: "qarinah.handoff-capsule.v1";
+  contentRole: "untrusted-data";
+  eventId: string;
+  eventHash: string;
+  packManifestHash: string;
+  confidence: QarinahConfidence;
+  sourceEventCount: number;
+  truncated: boolean;
+  budget: {
+    maxChars: number;
+    usedChars: number;
+    estimatedTokens: number;
+    estimator: { id: "portable-chars-div-4"; version: "1"; exact: false };
+  };
+  text: string;
+}
 export interface QarinahOkfExportResult {
   readonly schemaVersion: "qarinah.okf-export.v1";
   readonly okfVersion: "0.1";
@@ -197,6 +214,7 @@ export interface QarinahOkfExportResult {
 export class QarinahError extends Error { code: string; details?: unknown }
 export const EVENT_SCHEMA_VERSION: "qarinah.event.v1";
 export const CONTEXT_PACK_SCHEMA_VERSION: "qarinah.context-pack.v2";
+export const HANDOFF_CAPSULE_SCHEMA_VERSION: "qarinah.handoff-capsule.v1";
 export const OKF_EXPORT_SCHEMA_VERSION: "qarinah.okf-export.v1";
 export const OKF_VERSION: "0.1";
 export const CONFIG_SCHEMA_VERSION: "qarinah.config.v1";
@@ -258,6 +276,11 @@ export function compileContext(query?: string, options?: {
   inMemory?: boolean;
 }): Promise<QarinahContextPack>;
 export function renderContextPackMarkdown(pack: QarinahContextPack): string;
+export function createContextHandoffCapsule(
+  pack: QarinahContextPack,
+  events: readonly QarinahEvent[],
+  options?: { eventId?: string; maxChars?: number }
+): Readonly<QarinahHandoffCapsule>;
 export interface QarinahProjectStructureChanges {
   readonly added: readonly string[];
   readonly changed: readonly string[];

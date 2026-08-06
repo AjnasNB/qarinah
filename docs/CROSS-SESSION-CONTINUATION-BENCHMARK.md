@@ -25,12 +25,14 @@ After the persisted read model is built, the fixture appends Session B lifecycle
 | Source IDs and hashes preserved | 3 / 3 |
 | Raw source records selected in the compact pack | 1 / 3 |
 | Full ledger estimate | 9,489 tokens |
-| Cited pack estimate | 1,039 tokens |
-| Estimated reduction | 89.05% |
+| Complete cited audit-pack estimate | 1,039 tokens |
+| Complete audit-pack reduction | 89.05% |
+| Model-facing handoff capsule | 119 tokens |
+| Handoff-capsule reduction | 98.75% |
 | Persisted read model changed by query | No |
 | Integrity check | Passed |
 
-The selected summary is marked `inferred`; its sources retain their original confidence. Only one raw source record needs to occupy the compact pack because all three source citations remain in the summary for on-demand inspection. The result reports partial lexical coverage and `DIRECTLY_SUPPORTED` evidence sufficiency; these are different diagnostics and neither claims that a model's eventual patch is correct. Token values use `ceil(characters / 4)` and are not provider billing data.
+The selected summary is marked `inferred`; its sources retain their original confidence. Only one raw source record needs to occupy the complete pack because all three source citations remain in the summary for on-demand inspection. The capsule is an additional bounded projection for model injection: it retains the untrusted-data label, summary event ID/hash, and complete-pack manifest hash while leaving the three raw source IDs/hashes in the auditable pack. The result reports partial lexical coverage and `DIRECTLY_SUPPORTED` evidence sufficiency; these are different diagnostics and neither claims that a model's eventual patch is correct. Token values use `ceil(characters / 4)` and are not provider billing data.
 
 The evaluator and committed expected result are [`scripts/evaluate-continuation-context.mjs`](../scripts/evaluate-continuation-context.mjs) and [`bench/results/continuation-context-0.1.3.json`](../bench/results/continuation-context-0.1.3.json).
 
@@ -58,6 +60,7 @@ The committed receipt is [`bench/results/codex-cross-session-continuation-0.1.3.
 ## Product fixes exercised by the benchmark
 
 - Consent-gated `context.query` now reads a verified in-memory view of the authoritative ledger. Fresh lifecycle capture can advance the event head immediately before retrieval without forcing the read-only MCP call to repair or mutate derived state.
+- `context.query` and the CLI can return a `handoff` format that injects a bounded summary pointer while retaining the complete manifest-addressed audit pack for inspection.
 - Generated Codex setup uses `default_tools_approval_mode = "writes"`. Qarinah's allowlisted MCP tools are read-only, so a noninteractive run can call them; a future write-capable tool would still require approval.
 - The Codex and Claude plugin runtimes are regenerated from the same reviewed source and remain byte-checked by the normal release gate.
 
@@ -65,5 +68,6 @@ The committed receipt is [`bench/results/codex-cross-session-continuation-0.1.3.
 
 - The deterministic fixture measures context retrieval, summarization provenance, boundedness, and read freshness—not software-task success.
 - The provider run is one synthetic product smoke, not a randomized baseline comparison or SWE-bench patch-resolution result.
+- The 98.75% capsule result measures its compact model-facing text. It does not claim that every MCP client excludes structured metadata from provider token accounting.
 - A successful Codex-to-Codex switch does not establish Claude-to-Codex or Codex-to-Claude performance. Those directions remain in the recorded cross-agent protocol.
 - Provider usage is reported only when present in Codex CLI JSONL and must not be generalized to another model, repository, or workload.

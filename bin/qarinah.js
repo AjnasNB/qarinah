@@ -8,12 +8,14 @@ import {
   captureCodexHook,
   compileContext,
   compileTaskMemoryPack,
+  createContextHandoffCapsule,
   exportOkf,
   initializeWorkspace,
   inspectMemoryFreshness,
   inspectWorkspacePolicy,
   loadIndex,
   loadWorkspace,
+  readEvents,
   rebuildDerivedState,
   renderContextPackMarkdown,
   revokeWorkspaceTrust,
@@ -170,7 +172,7 @@ function stdinQueryInput(request) {
     throw new TypeError("query must be a string up to 4096 characters.");
   }
   const format = Object.hasOwn(request, "format") ? request.format : "json";
-  if (!["json", "markdown"].includes(format)) throw new TypeError("format must be json or markdown.");
+  if (!["json", "markdown", "handoff"].includes(format)) throw new TypeError("format must be json, markdown, or handoff.");
   const minimumCoverage = Object.hasOwn(request, "minimumCoverage") ? request.minimumCoverage : "any";
   if (!["any", "partial", "direct"].includes(minimumCoverage)) {
     throw new TypeError("minimumCoverage must be any, partial, or direct.");
@@ -232,7 +234,7 @@ Usage:
   qarinah build | rebuild
   qarinah scan [--max-files n] [--max-file-bytes n] [--max-total-bytes n] [--max-depth n]
   qarinah export okf [--output <path>]
-  qarinah query [text] [--format json|markdown] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp] [--minimum-coverage any|partial|direct] [--minimum-evidence any|partial|direct]
+  qarinah query [text] [--format json|markdown|handoff] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp] [--minimum-coverage any|partial|direct] [--minimum-evidence any|partial|direct]
   qarinah query --stdin-json
   qarinah task-pack debugging|code-review|feature-implementation|database-migration|incident-response|release-preparation|security-review [query]
   qarinah freshness
@@ -478,7 +480,10 @@ async function run(argv) {
     const format = input.format;
     if (format === "json") process.stdout.write(`${JSON.stringify(pack, null, 2)}\n`);
     else if (format === "markdown") process.stdout.write(renderContextPackMarkdown(pack));
-    else throw new TypeError("--format must be json or markdown.");
+    else if (format === "handoff") {
+      const events = await readEvents(process.cwd());
+      process.stdout.write(createContextHandoffCapsule(pack, events).text);
+    } else throw new TypeError("--format must be json, markdown, or handoff.");
     return;
   }
   if (command === "task-pack") {

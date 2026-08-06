@@ -1,10 +1,10 @@
 import { realpath } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { compileContext } from "../compiler.js";
+import { compileContext, createContextHandoffCapsule } from "../compiler.js";
 import { QarinahError } from "../errors.js";
 import { loadIndex } from "../indexer.js";
-import { verifyStore } from "../store.js";
+import { readEvents, verifyStore } from "../store.js";
 import { QARINAH_VERSION } from "../version.js";
 import { loadWorkspace } from "../workspace.js";
 
@@ -83,6 +83,11 @@ const CONTEXT_QUERY_TOOL = Object.freeze({
         type: "string",
         enum: ["any", "partial", "direct"]
       },
+      format: {
+        type: "string",
+        enum: ["pack", "handoff"],
+        description: "Return the complete audit pack or a compact evidence-linked summary pointer for model injection."
+      },
       temporalBoundary: {
         type: "string",
         enum: ["inclusive", "strict-before"]
@@ -118,6 +123,9 @@ function safeError(error) {
     INDEX_INVALID: "Derived Context Ledger state is invalid.",
     EVENT_LOG_MISSING: "The Context Ledger event log is missing.",
     MCP_DISCLOSURE_NOT_AUTHORIZED: "Context disclosure is not authorized for this MCP server and workspace.",
+    CONTEXT_HANDOFF_NOT_FOUND: "No evidence-linked summary handoff is available in the selected context.",
+    CONTEXT_CAPSULE_BUDGET_TOO_SMALL: "The handoff capsule budget is too small for its evidence pointers.",
+    CONTEXT_CAPSULE_BUDGET_EXCEEDED: "The handoff capsule exceeded its approved budget.",
     MCP_TOOL_NOT_FOUND: "The requested Context Ledger MCP tool is not available."
   };
   return {
@@ -331,7 +339,7 @@ export function createMcpServer(options = {}) {
           throw new QarinahError("MCP_DISCLOSURE_NOT_AUTHORIZED", "The MCP server was not started with a disclosure permit.");
         }
         const input = validateToolInput(rawArguments, [
-          "workspace", "query", "maxChars", "limit", "minimumCoverage", "minimumEvidence", "temporalBoundary", "asOf"
+          "workspace", "query", "maxChars", "limit", "minimumCoverage", "minimumEvidence", "format", "temporalBoundary", "asOf"
         ]);
         if (typeof input.workspace !== "string" || input.workspace.trim() === "") {
           throw new TypeError("context.query requires an absolute workspace selector.");
@@ -365,6 +373,8 @@ export function createMcpServer(options = {}) {
         if (!["any", "partial", "direct"].includes(minimumEvidence)) {
           throw new TypeError("minimumEvidence must be any, partial, or direct.");
         }
+        const format = input.format ?? "pack";
+        if (!["pack", "handoff"].includes(format)) throw new TypeError("format must be pack or handoff.");
         const temporalBoundary = input.temporalBoundary ?? "inclusive";
         if (!["inclusive", "strict-before"].includes(temporalBoundary)) {
           throw new TypeError("temporalBoundary must be inclusive or strict-before.");
@@ -387,6 +397,10 @@ export function createMcpServer(options = {}) {
           inMemory: true,
           updateCheckpoint: false
         });
+        if (format === "handoff") {
+          const capsule = createContextHandoffCapsule(pack, await readEvents(workspace));
+          return textResult(capsule.text, capsule);
+        }
         return textResult(pack);
       }
       throw new QarinahError("MCP_TOOL_NOT_FOUND", `Unknown Context Ledger MCP tool '${name}'.`);

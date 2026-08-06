@@ -6,6 +6,7 @@ Qarinah is an ESM package. The public implementation is exported from `qarinah`;
 import {
   appendEvent,
   compileContext,
+  createContextHandoffCapsule,
   initializeWorkspace,
   renderContextPackMarkdown
 } from "qarinah";
@@ -514,6 +515,18 @@ const pack = await compileContext("checkout idempotency", {
 - deterministic manifest hash
 
 The JSON Schema is exported as `qarinah/schemas/context-pack.json`.
+
+### `createContextHandoffCapsule(pack, events, options?)`
+
+```ts
+function createContextHandoffCapsule(
+  pack: QarinahContextPack,
+  events: readonly QarinahEvent[],
+  options?: { eventId?: string; maxChars?: number }
+): QarinahHandoffCapsule;
+```
+
+Creates a 320-4,096-character model-facing projection of a selected evidence-linked summary; the default ceiling is 512 characters. The function verifies the pack manifest, stored summary hash, workspace identity, `derived_from` source relations, and that every source ID/hash remains present in the complete pack before producing the capsule. The capsule cites the selected summary event and complete-pack manifest rather than duplicating all raw source citations. Its schema is exported as `qarinah/schemas/handoff-capsule.json`.
 
 ### `renderContextPackMarkdown(pack)`
 

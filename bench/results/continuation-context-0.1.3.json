@@ -27,12 +27,20 @@
     "rawHistoryTokens": 9489,
     "packTokens": 1039,
     "estimatedTokenReduction": 0.890505,
+    "capsuleTokens": 119,
+    "capsuleEstimatedTokenReduction": 0.987459,
+    "capsuleSummaryEventLinked": true,
+    "capsuleManifestLinked": true,
+    "capsuleSourceLinksAuditable": true,
+    "capsuleUntrustedBoundary": true,
+    "capsuleTruncated": false,
     "doctorOk": true
   },
-  "claim": "A fresh session recovered a compact evidence-linked handoff from the verified ledger after lifecycle capture advanced the head; every summary source ID and hash remained inspectable and the zero-write read left persisted derived state unchanged.",
+  "claim": "A fresh session recovered a compact evidence-linked handoff from the verified ledger after lifecycle capture advanced the head. The complete audit pack retained every summary source ID and hash; its model-facing handoff capsule retained the selected summary event ID/hash and pack manifest pointer while the zero-write read left persisted derived state unchanged.",
   "limitations": [
     "This deterministic fixture measures retrieval and evidence linkage, not provider task quality.",
     "The summary is inferred and remains subordinate to its cited source events.",
+    "The compact handoff capsule points to the complete audited pack and selected summary instead of embedding every raw source citation in the model-facing text.",
     "The portable token estimate is not a provider bill."
   ]
 }

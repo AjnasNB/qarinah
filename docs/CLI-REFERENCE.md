@@ -411,7 +411,7 @@ Compile a bounded, cited `qarinah.context-pack.v2`.
 
 ```sh
 qarinah query [text] \
-  [--format json|markdown] \
+  [--format json|markdown|handoff] \
   [--limit <integer>] \
   [--max-chars <integer>] \
   [--max-tokens <integer>] \
@@ -430,7 +430,7 @@ Defaults:
 | Option | Default | Verified range or behavior |
 | --- | --- | --- |
 | `text` | Empty query | Positional words are joined with spaces; maximum 4,096 characters. |
-| `--format` | `json` | `json` or `markdown`. |
+| `--format` | `json` | `json`, `markdown`, or a compact evidence-linked `handoff` capsule. |
 | `--limit` | `20` | 1 to 1,000 through JSON stdin; core API enforces the same range. |
 | `--max-chars` | Workspace `contextMaxChars` | 512 to 1,000,000, capped by workspace policy. |
 | `--max-tokens` | Token planning disabled unless a token option is supplied | 128 to 1,000,000. |
@@ -465,6 +465,8 @@ JSON output includes:
 When evidence diagnostics are requested, `evidence-sufficiency-v2` returns a three-state assessment plus a separate decision. `DIRECTLY_SUPPORTED` maps to `ACCEPT_DIRECT`; `PARTIALLY_SUPPORTED` and `INSUFFICIENT_EVIDENCE` map to `ABSTAIN`. The direct threshold was selected on development data and does not prove semantic correctness on unseen queries.
 
 The portable fallback token estimate is `ceil(characters / 4)` and is marked inexact. It is not a provider billing receipt.
+
+`--format handoff` requires an evidence-linked summary among the selected pack items. It returns at most 512 characters containing the untrusted-data boundary, bounded summary title/body, selected summary event ID/hash, full-pack manifest hash, confidence, and source count. The complete pack retains the source event IDs and hashes for audit; the capsule does not duplicate them into model-facing text.
 
 ### Strict JSON stdin form
 
