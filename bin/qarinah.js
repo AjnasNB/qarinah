@@ -64,6 +64,30 @@ function parseRelations(args) {
   return relations;
 }
 
+function parseInitArgs(args) {
+  let target;
+  let capture;
+  let ifNeeded = false;
+  for (let index = 0; index < args.length; index += 1) {
+    const value = args[index];
+    if (value === "--if-needed") {
+      ifNeeded = true;
+      continue;
+    }
+    if (value === "--capture") {
+      if (capture !== undefined) throw new TypeError("init received --capture more than once.");
+      capture = args[index + 1];
+      if (capture === undefined || capture.startsWith("--")) throw new TypeError("--capture requires a value.");
+      index += 1;
+      continue;
+    }
+    if (value.startsWith("--")) throw new TypeError(`init does not support ${value}.`);
+    if (target !== undefined) throw new TypeError("init accepts at most one workspace path.");
+    target = value;
+  }
+  return { target: target || process.cwd(), capture, ifNeeded };
+}
+
 function strictValueOptions(args, command, allowedOptions) {
   const allowed = new Set(allowedOptions);
   const seen = new Set();
@@ -223,7 +247,7 @@ function help() {
   return `Qarinah - evidence-linked context for AI agents
 
 Usage:
-  qarinah init [path] [--capture metadata|content]
+  qarinah init [path] [--capture metadata|content] [--if-needed]
   qarinah setup [path] [--codex] [--claude] [--cursor] [--capture metadata|content] [--allow-query]
   qarinah record --kind <kind> --title <title> [--body <text>] [--data-json <json>] [--relation type:target]
   qarinah record --stdin-json
@@ -257,8 +281,11 @@ async function run(argv) {
     return;
   }
   if (command === "init") {
-    const target = positionals(args)[0] || process.cwd();
-    const workspace = await initializeWorkspace(target, { capture: option(args, "--capture", "metadata") });
+    const request = parseInitArgs(args);
+    const workspace = await initializeWorkspace(request.target, {
+      ...(request.capture === undefined ? {} : { capture: request.capture }),
+      ifNeeded: request.ifNeeded
+    });
     process.stdout.write(`${JSON.stringify({ ok: true, root: workspace.root, workspaceId: workspace.config.workspaceId, capture: workspace.config.capture }, null, 2)}\n`);
     return;
   }

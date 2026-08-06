@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { generateKeyPairSync, randomBytes } from "node:crypto";
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, realpath, writeFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import {
@@ -63,6 +63,32 @@ test("one-command setup configures Codex, Claude, Cursor, hooks, skills, and con
   const repeated = await setupWorkspace({ cwd: root, codex: true, claude: true, cursor: true, allowQuery: true });
   assert.equal(repeated.ok, true);
   assert.equal((await readFile(path.join(root, ".codex", "config.toml"), "utf8")).match(/qarinah:managed:start/g).length, 1);
+});
+
+test("parallel workers initialize once and descendants reuse the same ledger", async (t) => {
+  const root = await temporaryDirectory(t);
+  const nested = path.join(root, "packages", "worker-b");
+  await import("node:fs/promises").then(({ mkdir }) => mkdir(nested, { recursive: true }));
+  const workspaces = await Promise.all(Array.from({ length: 12 }, () => initializeWorkspace(root, {
+    capture: "content",
+    ifNeeded: true
+  })));
+  assert.equal(new Set(workspaces.map(({ config }) => config.workspaceId)).size, 1);
+  const nestedWorkspace = await import("../src/workspace.js").then(({ loadWorkspace }) => loadWorkspace(nested));
+  assert.equal(nestedWorkspace.root, await realpath(root));
+  assert.equal(nestedWorkspace.config.workspaceId, workspaces[0].config.workspaceId);
+  const recorded = await appendEvent(eventInput({
+    title: "Agent A selected the release pipeline",
+    body: "Agent B must run the verified package check before publishing.",
+    provenance: { adapter: "agent-a", sourceId: "decision:release-pipeline" }
+  }), { cwd: root });
+  await rebuildDerivedState(root);
+  const pack = await import("../src/index.js").then(({ compileContext }) => compileContext("release pipeline", { cwd: nested }));
+  assert.equal(pack.items[0].eventId, recorded.eventId);
+  assert.equal(pack.items[0].hash, recorded.hash);
+  const sqlite = await import("../src/index.js").then(({ inspectSqliteReadModel }) => inspectSqliteReadModel(nestedWorkspace));
+  assert.equal(sqlite.journalMode, "wal");
+  assert.equal(sqlite.eventCount, 1);
 });
 
 test("freshness detects changed and missing cited project files", async (t) => {

@@ -257,7 +257,10 @@ export async function setupWorkspace(options = {}) {
     workspace = await loadWorkspace(target);
   } catch (error) {
     if (error?.code !== "WORKSPACE_NOT_INITIALIZED") throw error;
-    workspace = await initializeWorkspace(target, { capture: options.capture ?? "metadata" });
+    workspace = await initializeWorkspace(target, {
+      ...(options.capture === undefined ? {} : { capture: options.capture }),
+      ifNeeded: true
+    });
   }
   if (options.allowQuery === true && !workspace.consent?.policyHash) {
     throw new QarinahError("MCP_DISCLOSURE_NOT_AUTHORIZED", "Workspace authorization is required before enabling context.query.");

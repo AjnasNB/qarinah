@@ -29,6 +29,14 @@ npx qarinah setup . --codex --claude --cursor --capture content --allow-query
 
 The setup initializes the local workspace, installs the reviewed project integrations, configures consent-gated MCP retrieval, and runs the first health check.
 
+Setup is idempotent and parallel-worker-safe. If several agents start setup together, one creates the workspace and the others reuse its workspace ID. Ledger appends are not lock-free: the short authoritative JSONL append is serialized so two workers cannot fork the hash chain. SQLite WAL, FTS5, graph, JSON, and Markdown are rebuildable read projections and do not replace the ledger.
+
+Every process launched inside the initialized project tree discovers the same nearest `.qarinah/config.json`. Initialize the shared project root, not each nested package:
+
+```sh
+qarinah init . --capture content --if-needed
+```
+
 ## Record the handoff evidence
 
 Supported host adapters can record permitted lifecycle events and tool outcomes. A developer or governed workflow can explicitly record a durable decision:
@@ -61,6 +69,26 @@ Claude Code: /qarinah continue the provenance-bound release
 Cursor:      use the project MCP configuration and Qarinah rule
 Any CLI:     npx qarinah query "continue the provenance-bound release"
 ```
+
+### Reproduce the Agent A to Agent B pipeline
+
+From the project root, let Agent A record the reviewed handoff and rebuild the disposable read model:
+
+```sh
+printf '%s' '{"kind":"decision","title":"Release pipeline","body":"Run the verified package check before publishing.","actor":{"type":"agent","id":"agent-a"},"sourceId":"decision:release-pipeline"}' \
+  | qarinah record --stdin-json
+qarinah build
+```
+
+Then open a second terminal or agent anywhere beneath the same project root:
+
+```sh
+qarinah status
+printf '%s' '{"query":"continue the release pipeline","format":"markdown","minimumCoverage":"direct","maxTokens":1500}' \
+  | qarinah query --stdin-json
+```
+
+Both hosts must report the same `workspaceId`. The returned item must carry the Agent A event ID and hash. `qarinah doctor` verifies the chain and `qarinah build` can recreate `.qarinah/index/qarinah.db` after that database is deleted.
 
 ## What the next agent receives
 

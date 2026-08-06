@@ -1,5 +1,11 @@
 # Migrations
 
+## Parallel-worker initialization
+
+`initializeWorkspace()` now accepts `ifNeeded: true`, and the CLI exposes the equivalent `qarinah init [path] --if-needed`. The operation is idempotent: simultaneous workers converge on one workspace identity instead of racing to overwrite configuration. If a caller specifies `capture`, it must match an existing workspace's capture mode.
+
+Existing workspaces and event ledgers need no migration. The authoritative JSONL append remains briefly serialized so concurrent processes preserve one verifiable hash chain; derived SQLite reads continue in WAL mode. Run `qarinah build` to rebuild the disposable read model, then `qarinah doctor` to verify the ledger, projections, and local consent.
+
 ## Cockroach Browser metadata-outcome boundary
 
 The `cockroach.browser-memory.v1` receiving API is additive and does not change `qarinah.event.v1` or existing workspaces. No ledger migration or rebuild is required. New consumers may pass a passive `createCockroachBrowserMemorySink()` to the public Cockroach Browser Qarinah recorder.
