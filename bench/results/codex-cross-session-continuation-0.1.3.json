@@ -2,12 +2,12 @@
   "schemaVersion": "qarinah.codex-cross-session-continuation.v1",
   "packageVersion": "0.1.3",
   "classification": "provider-backed-product-smoke-not-controlled-research",
-  "recordedAt": "2026-08-06T07:41:41.968Z",
-  "qarinahCommit": "0301a4fea372ec3eab2ab68ff2a51409f9949ed5",
+  "recordedAt": "2026-08-06T08:33:09.895Z",
+  "qarinahCommit": "a641b714131c45d9a8773f1709f47c600bcdbcc7",
   "implementation": {
     "algorithm": "sha256-path-lf-content-v1",
-    "fileCount": 76,
-    "digest": "sha256:6f3b7f1f1abf1b3b77fcab0c4d99b91a18c058b7c383a4a918006a2a3034dea5"
+    "fileCount": 77,
+    "digest": "sha256:f43cd814be78ea614411e6b237edf10b50d1fd666827d5017e06678a754c8f9e"
   },
   "environment": {
     "node": "v24.15.0",
@@ -18,34 +18,34 @@
     "ephemeralSessions": true,
     "nativeResumeUsed": false,
     "distinctThreadIds": true,
-    "agentAThreadIdHash": "sha256:74754c56dc6130c75b778c22e3f3fe4410707d2958222d1bbde89d0d99e49ab9",
-    "agentBThreadIdHash": "sha256:d57a74c7293b5702b3bb654899c5bf3721830d9b1f507b0156a6cf68a28b52f0"
+    "agentAThreadIdHash": "sha256:e0800ba771ce7697f5ff87aa86ce9d18b0ad2a15dfe9ee01c6bc0ff422cec258",
+    "agentBThreadIdHash": "sha256:5f398ad6648be60460e1744b03db6e5d11772d93f83019d339bae7061355607b"
   },
   "handoff": {
     "marker": "SWITCH-HANDOFF-7F3A",
-    "summaryEventId": "evt_0549fbe1-2c55-4ab3-9db7-f6005a0d315c",
-    "summaryEventHash": "sha256:8259a151291406753f97d125424a0c6dc29c388c318cfd282f68f09157256b2d",
+    "summaryEventId": "evt_21c61816-b48a-4180-8be4-36719953c2f2",
+    "summaryEventHash": "sha256:6dc2f59e02390ca87881b7b5e9984bf5848184c36117cbf4c2c09d2902736766",
     "sourceEvents": [
       {
-        "eventId": "evt_30c3e988-504e-4704-8618-5a17e73fdc92",
-        "hash": "sha256:68da6376dcf3a59e6d05886075ed41731f1317f3530c1f4a802f0781871c31e9",
+        "eventId": "evt_5747f292-00d3-4a36-8971-2727cc06eac5",
+        "hash": "sha256:37655361af42209143f88d08fa9932977080fc964aa11854d3aa8a5e0e53c067",
         "kind": "prompt.submitted"
       },
       {
-        "eventId": "evt_a77ee283-838d-433d-89f0-f2b0dcdebe3e",
-        "hash": "sha256:fa458cb4fb57785767a7f1a40805e54284e8ee855b1734be88b8dc9eb3cdba85",
+        "eventId": "evt_4af44879-4e6a-4a64-8be2-16a82bd5dcca",
+        "hash": "sha256:53c90b09ee3565e9e045b71686caae971e1cee8190e1fc943da7355d20cb1e2c",
         "kind": "tool.completed"
       },
       {
-        "eventId": "evt_14ad36ad-d1b7-48d5-8807-a66e01c829a9",
-        "hash": "sha256:0f35aa27501d87db3cc0c5312d9a6adf02f06585ff289351d6b5c4e6d7505c67",
+        "eventId": "evt_5bc62c4c-50e1-49cf-8912-145dae79dec2",
+        "hash": "sha256:7200ca74eb53ca7470350ddcc7de4df10141ff64175dcc7f88c5a734efcb0045",
         "kind": "turn.completed"
       }
     ],
     "summaryRelationsVerified": true,
-    "packManifestHash": "sha256:144fcea3cae787ed379f51926db0404429709e9d61a343acb3ac5e0d794590f2",
+    "packManifestHash": "sha256:678ca29d5a8b8136d2e0979c069feb5debaff6aa637f70a5bb8fabb3d0343693",
     "packItemCount": 2,
-    "packUsedTokens": 1350,
+    "packUsedTokens": 1342,
     "packMaxTokens": 1500,
     "packCoverage": "partial",
     "rankingProfile": "admission-first-v2",
@@ -56,14 +56,14 @@
   },
   "usage": {
     "agentA": {
-      "inputTokens": 109822,
-      "cachedInputTokens": 95744,
-      "outputTokens": 1194
+      "inputTokens": 129602,
+      "cachedInputTokens": 114944,
+      "outputTokens": 1470
     },
     "agentB": {
-      "inputTokens": 193744,
-      "cachedInputTokens": 169728,
-      "outputTokens": 1755
+      "inputTokens": 349101,
+      "cachedInputTokens": 313344,
+      "outputTokens": 2478
     },
     "source": "codex-cli-jsonl"
   },
@@ -73,14 +73,14 @@
     "acceptanceTestsPassed": true,
     "immutableGuardPresent": true,
     "doctorOk": true,
-    "finalEventCount": 30
+    "finalEventCount": 59
   },
   "receipts": {
-    "agentAJsonlSha256": "sha256:332e55933d228fb270e79a5dbbc8ab2798295cbd6702d8e22426c9e1b7b3822b",
-    "agentBJsonlSha256": "sha256:e4ecaa1f688c28f6ccfc56f3a54105be1f854369fb2b99844d260720aff34dd7",
-    "agentAFinalSha256": "sha256:067338452153d278edb428d4507462b9133e562a77f7bae9fe482c8ba1eb8fae",
-    "agentBFinalSha256": "sha256:417afc3d74d372f08879a25acdc0bc8d4db726c52686bcc652c43963df601562",
-    "fixtureSourceSha256": "sha256:fc6a26e95fd4f8fc9016cb47c64102bcf2480e4d66c0509ac2ca75de9ca33fe0"
+    "agentAJsonlSha256": "sha256:38191e74eb25bc8491650cde3fceab2efd1b4ac60aaefd8e64475484fa41f50b",
+    "agentBJsonlSha256": "sha256:5bbc995831da0083bb31836e6bed2448a5e4df5f8de9b4c5d6e217953b9c1303",
+    "agentAFinalSha256": "sha256:43ee334530c2433416e1168b16f9930089abc3ca90788e32be82ddb9421f2bde",
+    "agentBFinalSha256": "sha256:994fb9dbd44ccc939c0715c5ab4623391d6cf7b055d4d3bc2b8fc6492b9df439",
+    "fixtureSourceSha256": "sha256:37412fe6ea191957dd422cf0d32016c5ebbe5f58d7e426d5edc6b2ac6cc6e803"
   },
   "limitations": [
     "This is one provider-backed product smoke test, not a randomized or controlled research result.",
