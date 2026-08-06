@@ -1,11 +1,9 @@
 import assert from "node:assert/strict";
-import { execFile } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { promisify } from "node:util";
+import { continuationImplementationManifest } from "./continuation-evidence-lib.mjs";
 
-const execFileAsync = promisify(execFile);
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 const artifactPath = path.join(root, "bench", "results", "codex-cross-session-continuation-0.1.3.json");
@@ -20,6 +18,7 @@ assert.equal(artifact.classification, "provider-backed-product-smoke-not-control
 assert.match(artifact.recordedAt, /^\d{4}-\d{2}-\d{2}T/u);
 assert.ok(Number.isFinite(Date.parse(artifact.recordedAt)));
 assert.match(artifact.qarinahCommit, commit);
+assert.deepEqual(artifact.implementation, await continuationImplementationManifest(root));
 
 assert.match(artifact.environment.node, /^v(?:22|24|26)\./u);
 assert.match(artifact.environment.platform, /^(?:win32|linux|darwin)-(?:x64|arm64)$/u);
@@ -87,14 +86,12 @@ assert.doesNotMatch(serialized, /[A-Za-z]:\\/u, "Evidence must not expose an abs
 assert.doesNotMatch(serialized, /\/(?:tmp|home|Users)\//u, "Evidence must not expose a local absolute path.");
 assert.doesNotMatch(serialized, /(?:sk-|ghp_|github_pat_|npm_)[A-Za-z0-9_-]{12,}/u, "Evidence must not contain a credential-like value.");
 
-await execFileAsync("git", ["cat-file", "-e", `${artifact.qarinahCommit}^{commit}`], { cwd: root, windowsHide: true });
-await execFileAsync("git", ["merge-base", "--is-ancestor", artifact.qarinahCommit, "HEAD"], { cwd: root, windowsHide: true });
-
 process.stdout.write(`${JSON.stringify({
   schemaVersion: "qarinah.codex-cross-session-continuation-verification.v1",
   artifact: path.relative(root, artifactPath).replaceAll("\\", "/"),
   packageVersion: artifact.packageVersion,
   qarinahCommit: artifact.qarinahCommit,
+  implementationDigest: artifact.implementation.digest,
   evidenceLinked: true,
   distinctFreshSessions: true,
   outcomeVerified: true,

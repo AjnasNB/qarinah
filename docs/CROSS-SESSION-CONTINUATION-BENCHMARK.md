@@ -53,7 +53,7 @@ The runner creates a disposable Git repository with one failing immutable-releas
 6. requires the final answer to cite a retrieved event ID and hash;
 7. verifies the minimal fix, all acceptance tests, ledger integrity, distinct thread IDs, and zero transcript/path/credential leakage in the committed receipt.
 
-The committed receipt is [`bench/results/codex-cross-session-continuation-0.1.3.json`](../bench/results/codex-cross-session-continuation-0.1.3.json). It stores hashes and normalized usage fields, not raw provider transcripts or local paths. The verifier rejects a wrong package version, missing citations, reused session, failed test, failed doctor result, malformed receipt, credential-like value, or an unresolvable source commit.
+The committed receipt is [`bench/results/codex-cross-session-continuation-0.1.3.json`](../bench/results/codex-cross-session-continuation-0.1.3.json). It stores hashes and normalized usage fields, not raw provider transcripts or local paths. The verifier rejects a wrong package version, changed implementation manifest, missing citations, reused session, failed test, failed doctor result, malformed receipt, or credential-like value. The implementation manifest hashes the normalized contents and paths of the shipped CLI, runtime, schemas, types, and Codex/Claude plugins, so it remains verifiable after a squash merge without relying on local Git history.
 
 ## Product fixes exercised by the benchmark
 
@@ -67,4 +67,3 @@ The committed receipt is [`bench/results/codex-cross-session-continuation-0.1.3.
 - The provider run is one synthetic product smoke, not a randomized baseline comparison or SWE-bench patch-resolution result.
 - A successful Codex-to-Codex switch does not establish Claude-to-Codex or Codex-to-Claude performance. Those directions remain in the recorded cross-agent protocol.
 - Provider usage is reported only when present in Codex CLI JSONL and must not be generalized to another model, repository, or workload.
-

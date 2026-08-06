@@ -5,6 +5,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { continuationImplementationManifest } from "./continuation-evidence-lib.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const packageJson = JSON.parse(await readFile(path.join(repositoryRoot, "package.json"), "utf8"));
@@ -267,6 +268,7 @@ try {
     classification: "provider-backed-product-smoke-not-controlled-research",
     recordedAt: new Date().toISOString(),
     qarinahCommit: (await run("git", ["rev-parse", "HEAD"], { cwd: repositoryRoot, env: environment })).stdout.trim(),
+    implementation: await continuationImplementationManifest(repositoryRoot),
     environment: {
       node: process.version,
       platform: `${process.platform}-${process.arch}`,

@@ -110,6 +110,7 @@
     "scripts/evaluate-paired-power-v1.mjs",
     "scripts/verify-paired-power-v1.mjs",
     "scripts/evaluate-continuation-context.mjs",
+    "scripts/continuation-evidence-lib.mjs",
     "scripts/run-codex-continuation-smoke.mjs",
     "scripts/verify-codex-continuation-evidence.mjs",
     "scripts/prepare-pilot-authorization-v1.mjs",
