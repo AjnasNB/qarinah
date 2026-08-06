@@ -6,6 +6,7 @@ import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const packageJson = JSON.parse(await readFile(path.join(repositoryRoot, "package.json"), "utf8"));
 const temporaryDirectory = await mkdtemp(path.join(os.tmpdir(), "qarinah-consumer-"));
 const npmCli = process.env.npm_execpath;
 if (!npmCli) throw new Error("npm_execpath is required for the clean-consumer test.");
@@ -148,7 +149,7 @@ try {
   ], temporaryDirectory);
   assert.equal(installed.code, 0, installed.stderr);
   const installedPackage = JSON.parse(await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "package.json"), "utf8"));
-  assert.equal(installedPackage.version, "0.1.3");
+  assert.equal(installedPackage.version, packageJson.version);
   assert.equal(installedPackage.dependencies["cockroach-browser"], undefined);
   assert.equal(installedPackage.optionalDependencies?.["cockroach-browser"], undefined);
   assert.equal(installedPackage.peerDependencies?.["cockroach-browser"], undefined);

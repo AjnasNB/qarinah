@@ -5,6 +5,11 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relativePath) => readFile(path.join(root, relativePath), "utf8");
+const packageJson = JSON.parse(await read("package.json"));
+const serverManifest = JSON.parse(await read("server.json"));
+const runtimeVersion = await read("src/version.js");
+const typeDeclarations = await read("types/index.d.ts");
+const llmsFullSource = await read("website/static/llms-full.txt");
 const architecture = (await read("docs/architecture.mmd")).trim();
 const architectureSvg = await read("assets/architecture/qarinah-flow.svg");
 const architectureDigest = createHash("sha256").update(`${architecture}\n`, "utf8").digest("hex");
@@ -22,6 +27,20 @@ const expectedWhitePaperDigest = createHash("sha256")
   .update("\0", "utf8")
   .update(whitePaperBuilder, "utf8")
   .digest("hex");
+
+const escapedVersion = packageJson.version.replaceAll(".", "\\.");
+if (!new RegExp(`QARINAH_VERSION\\s*=\\s*["']${escapedVersion}["']`, "u").test(runtimeVersion)) {
+  throw new Error("src/version.js must match package.json.");
+}
+if (!new RegExp(`QARINAH_VERSION:\\s*["']${escapedVersion}["']`, "u").test(typeDeclarations)) {
+  throw new Error("types/index.d.ts must match package.json.");
+}
+if (serverManifest.version !== packageJson.version || serverManifest.packages?.[0]?.version !== packageJson.version) {
+  throw new Error("server.json package and server versions must match package.json.");
+}
+if (!llmsFullSource.includes(`Current documented release: \`${packageJson.version}\``)) {
+  throw new Error("website/static/llms-full.txt must match package.json.");
+}
 
 if (!/^flowchart T[BD]\b/u.test(architecture)) {
   throw new Error("docs/architecture.mmd must contain the canonical top-to-bottom Mermaid flowchart.");
