@@ -21,6 +21,8 @@ That narrow boundary is intentional:
 | Default tools | `context_status`, `context_doctor` |
 | Permitted tool | `context.query` |
 
+Authorized `context.query` calls accept `format: "pack"` (default) or `format: "handoff"`. The handoff representation is a bounded model-facing summary pointer linked to the selected event and complete pack manifest. It does not weaken disclosure permits or replace the auditable pack.
+
 The registry declaration is stored in the repository's `server.json`. The npm package also publishes `mcpName: "io.github.AjnasNB/qarinah"`.
 
 ## Requirements

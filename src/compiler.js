@@ -1,8 +1,8 @@
 import { canonicalStringify, deepFreezeJson } from "./canonical.js";
-import { CONTEXT_PACK_SCHEMA_VERSION, createManifestHash } from "./contracts.js";
+import { CONTEXT_PACK_SCHEMA_VERSION, createManifestHash, validateStoredEvent } from "./contracts.js";
 import { QarinahError } from "./errors.js";
 import { loadIndex } from "./indexer.js";
-import { markdownDataBlock, markdownInline } from "./markdown.js";
+import { markdownDataBlock, markdownInline, markdownSafeText } from "./markdown.js";
 import { rankContextEvents } from "./retrieval.js";
 import { querySqliteReadModel } from "./sqlite-read-model.js";
 import {
@@ -11,6 +11,11 @@ import {
   reservationUsage,
   tokenBudgetMetadata
 } from "./token-budget.js";
+
+export const HANDOFF_CAPSULE_SCHEMA_VERSION = "qarinah.handoff-capsule.v1";
+
+const EVENT_ID_PATTERN = /^evt_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u;
+const HASH_PATTERN = /^sha256:[0-9a-f]{64}$/u;
 
 function compactData(data, maximum = 1_200) {
   const json = canonicalStringify(data);
@@ -25,6 +30,114 @@ function excerptFor(event, maximum = 2_000) {
 
 function boundedReason(value) {
   return value.length <= 512 ? value : `${value.slice(0, 509)}...`;
+}
+
+function capsuleInline(value) {
+  return markdownSafeText(value).replace(/\n+/gu, " ").trim();
+}
+
+function truncateCapsuleText(value, maximum) {
+  if (value.length <= maximum) return value;
+  if (maximum <= 0) return "";
+  if (maximum <= 3) return ".".repeat(maximum);
+  return `${value.slice(0, maximum - 3)}...`;
+}
+
+function validateContextPackManifest(pack) {
+  if (!pack || typeof pack !== "object" || Array.isArray(pack)) {
+    throw new TypeError("pack must be a Qarinah context pack.");
+  }
+  const { manifestHash, ...withoutHash } = pack;
+  if (!HASH_PATTERN.test(manifestHash) || createManifestHash(withoutHash) !== manifestHash) {
+    throw new TypeError("Context-pack manifest hash does not match its canonical contents.");
+  }
+  if (pack.contentRole !== "untrusted-data" || !Array.isArray(pack.items)) {
+    throw new TypeError("Context pack is missing its untrusted-data boundary or cited items.");
+  }
+}
+
+export function createContextHandoffCapsule(pack, events, options = {}) {
+  validateContextPackManifest(pack);
+  if (!Array.isArray(events)) throw new TypeError("events must be an array of stored Qarinah events.");
+  if (!options || typeof options !== "object" || Array.isArray(options)) {
+    throw new TypeError("handoff capsule options must be a record.");
+  }
+  const unknown = Object.keys(options).filter((key) => !["eventId", "maxChars"].includes(key));
+  if (unknown.length > 0) throw new TypeError(`handoff capsule options contain unknown field(s): ${unknown.join(", ")}.`);
+  const maxChars = options.maxChars ?? 512;
+  if (!Number.isSafeInteger(maxChars) || maxChars < 320 || maxChars > 4_096) {
+    throw new TypeError("handoff capsule maxChars must be an integer from 320 to 4096.");
+  }
+  if (options.eventId !== undefined && !EVENT_ID_PATTERN.test(options.eventId)) {
+    throw new TypeError("handoff capsule eventId is invalid.");
+  }
+
+  const item = options.eventId === undefined
+    ? pack.items.find((candidate) => candidate.kind === "summary")
+    : pack.items.find((candidate) => candidate.eventId === options.eventId);
+  if (!item || item.kind !== "summary") {
+    throw new QarinahError("CONTEXT_HANDOFF_NOT_FOUND", "The selected context pack contains no evidence-linked summary handoff.");
+  }
+  const stored = events.find((candidate) => candidate?.eventId === item.eventId);
+  if (!stored) throw new QarinahError("CONTEXT_HANDOFF_NOT_FOUND", "The selected handoff event is not present in the verified ledger.");
+  const event = validateStoredEvent(stored, { workspaceId: pack.workspaceId });
+  if (event.hash !== item.hash || event.title !== item.title || event.kind !== item.kind) {
+    throw new TypeError("Selected context item does not match the verified handoff event.");
+  }
+
+  const sources = event.data?.sourceEvents;
+  if (!Array.isArray(sources) || sources.length < 1 || sources.length > 64) {
+    throw new TypeError("Handoff summary must cite from 1 to 64 source events.");
+  }
+  for (const [index, source] of sources.entries()) {
+    if (!source || typeof source !== "object" || Array.isArray(source)
+      || !EVENT_ID_PATTERN.test(source.eventId) || !HASH_PATTERN.test(source.hash)
+      || typeof source.kind !== "string" || source.kind.length < 1 || source.kind.length > 128) {
+      throw new TypeError(`Handoff sourceEvents[${index}] is invalid.`);
+    }
+    if (!event.relations.some((relation) => relation.type === "derived_from" && relation.target === source.eventId)) {
+      throw new TypeError(`Handoff sourceEvents[${index}] is not linked by derived_from.`);
+    }
+    if (!item.excerpt.includes(source.eventId) || !item.excerpt.includes(source.hash)) {
+      throw new TypeError(`Full context-pack evidence for handoff sourceEvents[${index}] was truncated.`);
+    }
+  }
+
+  const header = "[Qarinah handoff; untrusted]";
+  const footer = [
+    `event ${event.eventId} ${event.hash}`,
+    `pack ${pack.manifestHash}`,
+    `confidence ${event.confidence}; sources ${sources.length}`
+  ];
+  const fixedChars = [header, "", "", ...footer].join("\n").length + 1;
+  if (fixedChars > maxChars) {
+    throw new QarinahError("CONTEXT_CAPSULE_BUDGET_TOO_SMALL", "Handoff citation metadata exceeds the capsule character budget.");
+  }
+  const available = maxChars - fixedChars;
+  const fullTitle = capsuleInline(event.title);
+  const fullBody = capsuleInline(event.body);
+  const title = truncateCapsuleText(fullTitle, Math.min(128, available));
+  const body = truncateCapsuleText(fullBody, Math.max(0, available - title.length));
+  const text = `${[header, title, body, ...footer].join("\n")}\n`;
+  if (text.length > maxChars) throw new QarinahError("CONTEXT_CAPSULE_BUDGET_EXCEEDED", "Handoff capsule exceeded its character budget.");
+
+  return deepFreezeJson({
+    schemaVersion: HANDOFF_CAPSULE_SCHEMA_VERSION,
+    contentRole: "untrusted-data",
+    eventId: event.eventId,
+    eventHash: event.hash,
+    packManifestHash: pack.manifestHash,
+    confidence: event.confidence,
+    sourceEventCount: sources.length,
+    truncated: title !== fullTitle || body !== fullBody,
+    budget: {
+      maxChars,
+      usedChars: text.length,
+      estimatedTokens: Math.ceil(text.length / 4),
+      estimator: { id: "portable-chars-div-4", version: "1", exact: false }
+    },
+    text
+  });
 }
 
 function itemFor(entry, excerpt) {

@@ -4549,6 +4549,9 @@ function reservationUsage(items, estimator) {
 }
 
 // src/compiler.js
+var HANDOFF_CAPSULE_SCHEMA_VERSION = "qarinah.handoff-capsule.v1";
+var EVENT_ID_PATTERN3 = /^evt_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u;
+var HASH_PATTERN4 = /^sha256:[0-9a-f]{64}$/u;
 function compactData(data, maximum = 1200) {
   const json = canonicalStringify(data);
   return json === "{}" ? "" : json.length <= maximum ? json : `${json.slice(0, maximum - 3)}...`;
@@ -4560,6 +4563,103 @@ function excerptFor(event, maximum = 2e3) {
 }
 function boundedReason(value) {
   return value.length <= 512 ? value : `${value.slice(0, 509)}...`;
+}
+function capsuleInline(value) {
+  return markdownSafeText(value).replace(/\n+/gu, " ").trim();
+}
+function truncateCapsuleText(value, maximum) {
+  if (value.length <= maximum) return value;
+  if (maximum <= 0) return "";
+  if (maximum <= 3) return ".".repeat(maximum);
+  return `${value.slice(0, maximum - 3)}...`;
+}
+function validateContextPackManifest(pack) {
+  if (!pack || typeof pack !== "object" || Array.isArray(pack)) {
+    throw new TypeError("pack must be a Qarinah context pack.");
+  }
+  const { manifestHash, ...withoutHash } = pack;
+  if (!HASH_PATTERN4.test(manifestHash) || createManifestHash(withoutHash) !== manifestHash) {
+    throw new TypeError("Context-pack manifest hash does not match its canonical contents.");
+  }
+  if (pack.contentRole !== "untrusted-data" || !Array.isArray(pack.items)) {
+    throw new TypeError("Context pack is missing its untrusted-data boundary or cited items.");
+  }
+}
+function createContextHandoffCapsule(pack, events, options = {}) {
+  validateContextPackManifest(pack);
+  if (!Array.isArray(events)) throw new TypeError("events must be an array of stored Qarinah events.");
+  if (!options || typeof options !== "object" || Array.isArray(options)) {
+    throw new TypeError("handoff capsule options must be a record.");
+  }
+  const unknown = Object.keys(options).filter((key) => !["eventId", "maxChars"].includes(key));
+  if (unknown.length > 0) throw new TypeError(`handoff capsule options contain unknown field(s): ${unknown.join(", ")}.`);
+  const maxChars = options.maxChars ?? 512;
+  if (!Number.isSafeInteger(maxChars) || maxChars < 320 || maxChars > 4096) {
+    throw new TypeError("handoff capsule maxChars must be an integer from 320 to 4096.");
+  }
+  if (options.eventId !== void 0 && !EVENT_ID_PATTERN3.test(options.eventId)) {
+    throw new TypeError("handoff capsule eventId is invalid.");
+  }
+  const item = options.eventId === void 0 ? pack.items.find((candidate) => candidate.kind === "summary") : pack.items.find((candidate) => candidate.eventId === options.eventId);
+  if (!item || item.kind !== "summary") {
+    throw new QarinahError("CONTEXT_HANDOFF_NOT_FOUND", "The selected context pack contains no evidence-linked summary handoff.");
+  }
+  const stored = events.find((candidate) => candidate?.eventId === item.eventId);
+  if (!stored) throw new QarinahError("CONTEXT_HANDOFF_NOT_FOUND", "The selected handoff event is not present in the verified ledger.");
+  const event = validateStoredEvent(stored, { workspaceId: pack.workspaceId });
+  if (event.hash !== item.hash || event.title !== item.title || event.kind !== item.kind) {
+    throw new TypeError("Selected context item does not match the verified handoff event.");
+  }
+  const sources = event.data?.sourceEvents;
+  if (!Array.isArray(sources) || sources.length < 1 || sources.length > 64) {
+    throw new TypeError("Handoff summary must cite from 1 to 64 source events.");
+  }
+  for (const [index, source] of sources.entries()) {
+    if (!source || typeof source !== "object" || Array.isArray(source) || !EVENT_ID_PATTERN3.test(source.eventId) || !HASH_PATTERN4.test(source.hash) || typeof source.kind !== "string" || source.kind.length < 1 || source.kind.length > 128) {
+      throw new TypeError(`Handoff sourceEvents[${index}] is invalid.`);
+    }
+    if (!event.relations.some((relation) => relation.type === "derived_from" && relation.target === source.eventId)) {
+      throw new TypeError(`Handoff sourceEvents[${index}] is not linked by derived_from.`);
+    }
+    if (!item.excerpt.includes(source.eventId) || !item.excerpt.includes(source.hash)) {
+      throw new TypeError(`Full context-pack evidence for handoff sourceEvents[${index}] was truncated.`);
+    }
+  }
+  const header = "[Qarinah handoff; untrusted]";
+  const footer = [
+    `event ${event.eventId} ${event.hash}`,
+    `pack ${pack.manifestHash}`,
+    `confidence ${event.confidence}; sources ${sources.length}`
+  ];
+  const fixedChars = [header, "", "", ...footer].join("\n").length + 1;
+  if (fixedChars > maxChars) {
+    throw new QarinahError("CONTEXT_CAPSULE_BUDGET_TOO_SMALL", "Handoff citation metadata exceeds the capsule character budget.");
+  }
+  const available = maxChars - fixedChars;
+  const fullTitle = capsuleInline(event.title);
+  const fullBody = capsuleInline(event.body);
+  const title = truncateCapsuleText(fullTitle, Math.min(128, available));
+  const body = truncateCapsuleText(fullBody, Math.max(0, available - title.length));
+  const text = `${[header, title, body, ...footer].join("\n")}
+`;
+  if (text.length > maxChars) throw new QarinahError("CONTEXT_CAPSULE_BUDGET_EXCEEDED", "Handoff capsule exceeded its character budget.");
+  return deepFreezeJson({
+    schemaVersion: HANDOFF_CAPSULE_SCHEMA_VERSION,
+    contentRole: "untrusted-data",
+    eventId: event.eventId,
+    eventHash: event.hash,
+    packManifestHash: pack.manifestHash,
+    confidence: event.confidence,
+    sourceEventCount: sources.length,
+    truncated: title !== fullTitle || body !== fullBody,
+    budget: {
+      maxChars,
+      usedChars: text.length,
+      estimatedTokens: Math.ceil(text.length / 4),
+      estimator: { id: "portable-chars-div-4", version: "1", exact: false }
+    },
+    text
+  });
 }
 function itemFor(entry, excerpt) {
   return {
@@ -5269,7 +5369,7 @@ var DEFAULT_OUTPUT_SEGMENTS = Object.freeze([".qarinah", "records", "okf"]);
 var EVENT_FILE_PATTERN = /^evt_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.md$/;
 var EXPORT_MARKER = ".qarinah-okf-export.json";
 var EVENT_SOURCE = ".qarinah/events/events.jsonl";
-var HASH_PATTERN4 = /^sha256:[0-9a-f]{64}$/;
+var HASH_PATTERN5 = /^sha256:[0-9a-f]{64}$/;
 var MAX_EVENTS2 = 1e5;
 var ROOT_FILES = Object.freeze([EXPORT_MARKER, "events", "index.md", "log.md"]);
 function compareText(left, right) {
@@ -5608,7 +5708,7 @@ function validateMarker(value, workspaceId, eventFileCount) {
     "source",
     "workspaceId"
   ];
-  if (!value || typeof value !== "object" || Array.isArray(value) || Object.keys(value).sort(compareText).join("\0") !== keys.sort(compareText).join("\0") || value.schemaVersion !== OKF_EXPORT_SCHEMA_VERSION || value.okfVersion !== OKF_VERSION || value.derived !== true || value.source !== EVENT_SOURCE || value.workspaceId !== workspaceId || !Number.isSafeInteger(value.eventCount) || value.eventCount !== eventFileCount || value.eventCount < 0 || value.eventCount > MAX_EVENTS2 || !Number.isSafeInteger(value.fileCount) || value.fileCount !== value.eventCount + 3 || value.headHash !== null && !HASH_PATTERN4.test(value.headHash) || !HASH_PATTERN4.test(value.bundleHash)) {
+  if (!value || typeof value !== "object" || Array.isArray(value) || Object.keys(value).sort(compareText).join("\0") !== keys.sort(compareText).join("\0") || value.schemaVersion !== OKF_EXPORT_SCHEMA_VERSION || value.okfVersion !== OKF_VERSION || value.derived !== true || value.source !== EVENT_SOURCE || value.workspaceId !== workspaceId || !Number.isSafeInteger(value.eventCount) || value.eventCount !== eventFileCount || value.eventCount < 0 || value.eventCount > MAX_EVENTS2 || !Number.isSafeInteger(value.fileCount) || value.fileCount !== value.eventCount + 3 || value.headHash !== null && !HASH_PATTERN5.test(value.headHash) || !HASH_PATTERN5.test(value.bundleHash)) {
     throw new QarinahError("OKF_OUTPUT_NOT_OWNED", "Existing output is not a valid Qarinah-owned OKF export.");
   }
 }
@@ -6489,6 +6589,11 @@ var CONTEXT_QUERY_TOOL = Object.freeze({
         type: "string",
         enum: ["any", "partial", "direct"]
       },
+      format: {
+        type: "string",
+        enum: ["pack", "handoff"],
+        description: "Return the complete audit pack or a compact evidence-linked summary pointer for model injection."
+      },
       temporalBoundary: {
         type: "string",
         enum: ["inclusive", "strict-before"]
@@ -6521,6 +6626,9 @@ function safeError(error) {
     INDEX_INVALID: "Derived Context Ledger state is invalid.",
     EVENT_LOG_MISSING: "The Context Ledger event log is missing.",
     MCP_DISCLOSURE_NOT_AUTHORIZED: "Context disclosure is not authorized for this MCP server and workspace.",
+    CONTEXT_HANDOFF_NOT_FOUND: "No evidence-linked summary handoff is available in the selected context.",
+    CONTEXT_CAPSULE_BUDGET_TOO_SMALL: "The handoff capsule budget is too small for its evidence pointers.",
+    CONTEXT_CAPSULE_BUDGET_EXCEEDED: "The handoff capsule exceeded its approved budget.",
     MCP_TOOL_NOT_FOUND: "The requested Context Ledger MCP tool is not available."
   };
   return {
@@ -6725,6 +6833,7 @@ function createMcpServer(options = {}) {
           "limit",
           "minimumCoverage",
           "minimumEvidence",
+          "format",
           "temporalBoundary",
           "asOf"
         ]);
@@ -6757,6 +6866,8 @@ function createMcpServer(options = {}) {
         if (!["any", "partial", "direct"].includes(minimumEvidence)) {
           throw new TypeError("minimumEvidence must be any, partial, or direct.");
         }
+        const format = input.format ?? "pack";
+        if (!["pack", "handoff"].includes(format)) throw new TypeError("format must be pack or handoff.");
         const temporalBoundary = input.temporalBoundary ?? "inclusive";
         if (!["inclusive", "strict-before"].includes(temporalBoundary)) {
           throw new TypeError("temporalBoundary must be inclusive or strict-before.");
@@ -6779,6 +6890,10 @@ function createMcpServer(options = {}) {
           inMemory: true,
           updateCheckpoint: false
         });
+        if (format === "handoff") {
+          const capsule = createContextHandoffCapsule(pack, await readEvents(workspace));
+          return textResult(capsule.text, capsule);
+        }
         return textResult(pack);
       }
       throw new QarinahError("MCP_TOOL_NOT_FOUND", `Unknown Context Ledger MCP tool '${name}'.`);
@@ -7670,7 +7785,7 @@ function stdinQueryInput(request) {
     throw new TypeError("query must be a string up to 4096 characters.");
   }
   const format = Object.hasOwn(request, "format") ? request.format : "json";
-  if (!["json", "markdown"].includes(format)) throw new TypeError("format must be json or markdown.");
+  if (!["json", "markdown", "handoff"].includes(format)) throw new TypeError("format must be json, markdown, or handoff.");
   const minimumCoverage = Object.hasOwn(request, "minimumCoverage") ? request.minimumCoverage : "any";
   if (!["any", "partial", "direct"].includes(minimumCoverage)) {
     throw new TypeError("minimumCoverage must be any, partial, or direct.");
@@ -7728,7 +7843,7 @@ Usage:
   qarinah build | rebuild
   qarinah scan [--max-files n] [--max-file-bytes n] [--max-total-bytes n] [--max-depth n]
   qarinah export okf [--output <path>]
-  qarinah query [text] [--format json|markdown] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp] [--minimum-coverage any|partial|direct] [--minimum-evidence any|partial|direct]
+  qarinah query [text] [--format json|markdown|handoff] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp] [--minimum-coverage any|partial|direct] [--minimum-evidence any|partial|direct]
   qarinah query --stdin-json
   qarinah task-pack debugging|code-review|feature-implementation|database-migration|incident-response|release-preparation|security-review [query]
   qarinah freshness
@@ -7977,7 +8092,10 @@ async function run(argv) {
     if (format === "json") process2.stdout.write(`${JSON.stringify(pack, null, 2)}
 `);
     else if (format === "markdown") process2.stdout.write(renderContextPackMarkdown(pack));
-    else throw new TypeError("--format must be json or markdown.");
+    else if (format === "handoff") {
+      const events = await readEvents(process2.cwd());
+      process2.stdout.write(createContextHandoffCapsule(pack, events).text);
+    } else throw new TypeError("--format must be json, markdown, or handoff.");
     return;
   }
   if (command === "task-pack") {

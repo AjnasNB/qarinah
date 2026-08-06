@@ -5,6 +5,7 @@ import test from "node:test";
 import {
   appendEvent,
   compileContext,
+  createContextHandoffCapsule,
   initializeWorkspace as initializeBaseWorkspace,
   loadIndex,
   rebuildDerivedState,
@@ -144,6 +145,58 @@ test("Markdown rendering normalizes line separators and visibly escapes terminal
   assert.match(packMarkdown, /    # escaped CR/);
   assert.match(packMarkdown, /    # escaped LS/);
   assert.match(packMarkdown, /    # escaped PS/);
+});
+
+test("handoff capsule keeps compact model text linked to the complete audited pack", async (t) => {
+  const root = await temporaryDirectory(t);
+  const workspace = await initializeWorkspace(root);
+  const source = await appendEvent(eventInput({
+    kind: "turn.completed",
+    timestamp: "2026-07-19T12:00:00.000Z",
+    title: "Diagnosis completed",
+    body: "Reject mutable release artifacts before comparing digests."
+  }), { workspace });
+  const summary = await appendEvent(eventInput({
+    kind: "summary",
+    timestamp: "2026-07-19T12:01:00.000Z",
+    title: "Continuation handoff\r# forged heading\u001b[31m",
+    body: "Implement the immutable-artifact guard, then run npm test.",
+    confidence: "inferred",
+    data: {
+      sourceEvents: [{ eventId: source.eventId, hash: source.hash, kind: source.kind }]
+    },
+    relations: [{ type: "derived_from", target: source.eventId }]
+  }), { workspace });
+  await rebuildDerivedState(root);
+  const pack = await compileContext("continuation handoff immutable artifact", {
+    cwd: root,
+    maxChars: 8_000,
+    limit: 8,
+    asOf: "2026-07-20T00:00:00.000Z"
+  });
+  const capsule = createContextHandoffCapsule(pack, [source, summary]);
+
+  assert.equal(capsule.eventId, summary.eventId);
+  assert.equal(capsule.eventHash, summary.hash);
+  assert.equal(capsule.packManifestHash, pack.manifestHash);
+  assert.equal(capsule.sourceEventCount, 1);
+  assert.ok(capsule.budget.usedChars <= 512);
+  assert.equal(capsule.budget.estimatedTokens, Math.ceil(capsule.text.length / 4));
+  assert.match(capsule.text, /Qarinah handoff; untrusted/u);
+  assert.ok(capsule.text.includes(summary.eventId));
+  assert.ok(capsule.text.includes(summary.hash));
+  assert.ok(capsule.text.includes(pack.manifestHash));
+  assert.equal(capsule.text.includes(source.eventId), false);
+  assert.equal(capsule.text.includes(source.hash), false);
+  assert.doesNotMatch(capsule.text, /[\r\u001b]/u);
+  assert.match(capsule.text, /\\u001b/u);
+
+  const poisoned = JSON.parse(JSON.stringify(pack));
+  poisoned.query = "changed after hashing";
+  assert.throws(
+    () => createContextHandoffCapsule(poisoned, [source, summary]),
+    /manifest hash does not match/u
+  );
 });
 
 test("context compiler is cited, reproducible, and budget bounded", async (t) => {

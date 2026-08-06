@@ -31,6 +31,7 @@
     },
     "./schemas/event.json": "./schemas/event.schema.json",
     "./schemas/context-pack.json": "./schemas/context-pack.schema.json",
+    "./schemas/handoff-capsule.json": "./schemas/handoff-capsule.schema.json",
     "./schemas/project-structure.json": "./schemas/project-structure.schema.json",
     "./schemas/okf-export.json": "./schemas/okf-export.schema.json",
     "./schemas/maqam-context-adapter.json": "./schemas/maqam-context-adapter.schema.json",

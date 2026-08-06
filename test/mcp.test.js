@@ -114,7 +114,18 @@ test("MCP exposes only accurately annotated zero-write diagnostic tools", async 
 test("MCP exposes bounded cited retrieval only with an exact workspace disclosure permit", async (t) => {
   const root = await temporaryDirectory(t);
   const workspace = await initializeWorkspace(root, { capture: "content" });
-  await appendEvent(eventInput(), { workspace });
+  const source = await appendEvent(eventInput(), { workspace });
+  const summary = await appendEvent({
+    ...eventInput(),
+    kind: "summary",
+    title: "Evidence-linked browser governance handoff",
+    body: "Continue the governed browser implementation from the approved decision.",
+    confidence: "inferred",
+    data: {
+      sourceEvents: [{ eventId: source.eventId, hash: source.hash, kind: source.kind }]
+    },
+    relations: [{ type: "derived_from", target: source.eventId }]
+  }, { workspace });
   await rebuildDerivedState(root);
   const trust = await trustPath(root);
   const beforeWorkspace = await snapshotTree(path.join(root, ".qarinah"));
@@ -169,6 +180,31 @@ test("MCP exposes bounded cited retrieval only with an exact workspace disclosur
   );
   assert.ok(result.structuredContent.budget.usedChars <= 4_000);
   assert.equal(JSON.stringify(result).includes(root), false);
+  assert.deepEqual(await snapshotTree(path.join(root, ".qarinah")), beforeWorkspace);
+  assert.deepEqual(await snapshotFile(trust), beforeTrust);
+
+  await server.handle({
+    jsonrpc: "2.0",
+    id: 210,
+    method: "tools/call",
+    params: {
+      name: "context.query",
+      arguments: {
+        workspace: root,
+        query: "browser governance handoff approved decision",
+        maxChars: 4_000,
+        minimumCoverage: "partial",
+        format: "handoff"
+      }
+    }
+  });
+  const handoff = response(messages, 210).result;
+  assert.equal(handoff.isError, undefined, JSON.stringify(handoff));
+  assert.equal(handoff.structuredContent.schemaVersion, "qarinah.handoff-capsule.v1");
+  assert.equal(handoff.structuredContent.eventId, summary.eventId);
+  assert.equal(handoff.structuredContent.eventHash, summary.hash);
+  assert.ok(handoff.structuredContent.budget.estimatedTokens <= 128);
+  assert.match(handoff.content[0].text, /Qarinah handoff; untrusted/u);
   assert.deepEqual(await snapshotTree(path.join(root, ".qarinah")), beforeWorkspace);
   assert.deepEqual(await snapshotFile(trust), beforeTrust);
 

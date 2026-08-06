@@ -99,7 +99,7 @@ Qarinah's published evaluator measured 442,113 estimated input-context tokens fo
 
 The result measures the compared repeated input-context slice. Read the [methodology and machine-readable evidence](BENCHMARKS.md) before applying it to a different workload or total provider bill.
 
-The separate 42-record continuation fixture retrieves an evidence-linked handoff in 1,039 estimated tokens versus 9,489 for full-ledger replay (89.05% less), preserves all three source IDs and hashes, and verifies that a fresh-session read does not mutate stale derived files. An authenticated two-session Codex smoke additionally verifies actual continuation and test completion on a synthetic fixture; it remains product evidence rather than a controlled research result.
+The separate 42-record continuation fixture retrieves an evidence-linked handoff in a 1,039-token complete audit pack versus 9,489 for full-ledger replay (89.05% less), preserves all three source IDs and hashes, and verifies that a fresh-session read does not mutate stale derived files. Its additional 119-token model-facing capsule retains the summary event ID/hash and full-pack manifest pointer, reaching 98.75% reduction against the same history while the complete pack remains available for audit. An authenticated two-session Codex smoke additionally verifies actual continuation and test completion on a synthetic fixture; it remains product evidence rather than a controlled research result.
 
 ## Long-term direction
 

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qarinah.io/schemas/handoff-capsule.schema.json",
+  "title": "Qarinah handoff capsule",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "contentRole",
+    "eventId",
+    "eventHash",
+    "packManifestHash",
+    "confidence",
+    "sourceEventCount",
+    "truncated",
+    "budget",
+    "text"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "qarinah.handoff-capsule.v1" },
+    "contentRole": { "const": "untrusted-data" },
+    "eventId": { "type": "string", "pattern": "^evt_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+    "eventHash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "packManifestHash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "confidence": { "enum": ["extracted", "inferred", "claimed", "verified"] },
+    "sourceEventCount": { "type": "integer", "minimum": 1, "maximum": 64 },
+    "truncated": { "type": "boolean" },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxChars", "usedChars", "estimatedTokens", "estimator"],
+      "properties": {
+        "maxChars": { "type": "integer", "minimum": 320, "maximum": 4096 },
+        "usedChars": { "type": "integer", "minimum": 1, "maximum": 4096 },
+        "estimatedTokens": { "type": "integer", "minimum": 1, "maximum": 1024 },
+        "estimator": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "version", "exact"],
+          "properties": {
+            "id": { "const": "portable-chars-div-4" },
+            "version": { "const": "1" },
+            "exact": { "const": false }
+          }
+        }
+      }
+    },
+    "text": { "type": "string", "minLength": 1, "maxLength": 4096 }
+  }
+}

@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import {
   appendEvent,
   compileContext,
+  createContextHandoffCapsule,
   initializeWorkspace,
   loadIndex,
   rebuildDerivedState,
@@ -149,6 +150,8 @@ try {
   const rawHistory = await readFile(path.join(workspace.qarinahDir, "events", "events.jsonl"), "utf8");
   const rawHistoryTokens = Math.ceil(rawHistory.length / 4);
   const packTokens = pack.budget.usedTokens;
+  const capsule = createContextHandoffCapsule(pack, [summary]);
+  const capsuleTokens = capsule.budget.estimatedTokens;
   const result = {
     records: 42,
     sourceEventCount: sourceEvents.length,
@@ -170,6 +173,13 @@ try {
     rawHistoryTokens,
     packTokens,
     estimatedTokenReduction: Math.round((1 - packTokens / rawHistoryTokens) * 1_000_000) / 1_000_000,
+    capsuleTokens,
+    capsuleEstimatedTokenReduction: Math.round((1 - capsuleTokens / rawHistoryTokens) * 1_000_000) / 1_000_000,
+    capsuleSummaryEventLinked: capsule.eventId === summary.eventId && capsule.eventHash === summary.hash,
+    capsuleManifestLinked: capsule.packManifestHash === pack.manifestHash,
+    capsuleSourceLinksAuditable: sourceIdsPreserved && sourceHashesPreserved,
+    capsuleUntrustedBoundary: capsule.contentRole === "untrusted-data" && capsule.text.includes("untrusted"),
+    capsuleTruncated: capsule.truncated,
     doctorOk: (await verifyStore(root, { updateCheckpoint: false, includeRoot: false })).ok
   };
   assert.equal(result.summarySelected, true);
@@ -186,6 +196,11 @@ try {
   assert.equal(result.rankingProfile, "admission-first-v2");
   assert.equal(result.temporalBoundary, "strict-before");
   assert.ok(result.estimatedTokenReduction > 0.5);
+  assert.ok(result.capsuleEstimatedTokenReduction >= 0.987);
+  assert.equal(result.capsuleSummaryEventLinked, true);
+  assert.equal(result.capsuleManifestLinked, true);
+  assert.equal(result.capsuleSourceLinksAuditable, true);
+  assert.equal(result.capsuleUntrustedBoundary, true);
   assert.equal(result.doctorOk, true);
 
   const artifact = {
@@ -197,10 +212,11 @@ try {
       providerBillingMeasurement: false
     },
     expected: result,
-    claim: "A fresh session recovered a compact evidence-linked handoff from the verified ledger after lifecycle capture advanced the head; every summary source ID and hash remained inspectable and the zero-write read left persisted derived state unchanged.",
+    claim: "A fresh session recovered a compact evidence-linked handoff from the verified ledger after lifecycle capture advanced the head. The complete audit pack retained every summary source ID and hash; its model-facing handoff capsule retained the selected summary event ID/hash and pack manifest pointer while the zero-write read left persisted derived state unchanged.",
     limitations: [
       "This deterministic fixture measures retrieval and evidence linkage, not provider task quality.",
       "The summary is inferred and remains subordinate to its cited source events.",
+      "The compact handoff capsule points to the complete audited pack and selected summary instead of embedding every raw source citation in the model-facing text.",
       "The portable token estimate is not a provider bill."
     ]
   };
