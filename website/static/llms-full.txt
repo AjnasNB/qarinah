@@ -10,14 +10,14 @@ This file is a convenience map for tools that choose to read it. It does not con
 
 - Name: Qarinah
 - Package: `qarinah`
-- Current documented release: `0.1.4`
+- Current documented release: `0.1.5`
 - Website: https://qarinah.io/
 - npm: https://www.npmjs.com/package/qarinah
 - Source: https://github.com/AjnasNB/qarinah
 - Issues: https://github.com/AjnasNB/qarinah/issues
 - Discussions: https://github.com/AjnasNB/qarinah/discussions
 - License: Apache-2.0
-- DOI: https://doi.org/10.5281/zenodo.21547685
+- DOI: https://doi.org/10.5281/zenodo.21547684
 
 ## What Qarinah does
 
@@ -171,8 +171,8 @@ The documented long-document fixture is segmented synthetic retrieval, not whole
 - Frequently asked questions: https://qarinah.io/docs/faq/
 - Migration guide: https://qarinah.io/docs/migrations/
 - Technical white paper: https://qarinah.io/paper/
-- Publication PDF: https://qarinah.io/paper/Qarinah-Technical-White-Paper-v1.0.pdf
-- DOI record: https://doi.org/10.5281/zenodo.21547685
+- Publication PDF: https://qarinah.io/paper/Qarinah-Technical-White-Paper-v1.1.pdf
+- DOI record: https://doi.org/10.5281/zenodo.21547684
 
 ## Repository resources
 

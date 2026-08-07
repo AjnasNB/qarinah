@@ -1,6 +1,6 @@
 # Evidence-linked cross-session continuation
 
-Qarinah 0.1.3 adds a release-gated continuation benchmark and a provider-backed Codex product smoke test. Together they verify that a new coding-agent session can recover a compact handoff, inspect its source evidence, and continue work without native chat resume.
+Qarinah 0.1.5 ships a release-gated continuation benchmark and a provider-backed Codex product smoke test. Together they verify that a new coding-agent session can recover a compact handoff, inspect its source evidence, and continue work without native chat resume.
 
 These are product-readiness checks. The deterministic fixture is reproducible locally; the provider run is one authenticated smoke test. Neither is a substitute for the frozen multi-repository confirmatory study.
 
@@ -34,7 +34,7 @@ After the persisted read model is built, the fixture appends Session B lifecycle
 
 The selected summary is marked `inferred`; its sources retain their original confidence. Only one raw source record needs to occupy the complete pack because all three source citations remain in the summary for on-demand inspection. The capsule is an additional bounded projection for model injection: it retains the untrusted-data label, summary event ID/hash, and complete-pack manifest hash while leaving the three raw source IDs/hashes in the auditable pack. The result reports partial lexical coverage and `DIRECTLY_SUPPORTED` evidence sufficiency; these are different diagnostics and neither claims that a model's eventual patch is correct. Token values use `ceil(characters / 4)` and are not provider billing data.
 
-The evaluator and committed expected result are [`scripts/evaluate-continuation-context.mjs`](../scripts/evaluate-continuation-context.mjs) and [`bench/results/continuation-context-0.1.3.json`](../bench/results/continuation-context-0.1.3.json).
+The evaluator and committed expected result are [`scripts/evaluate-continuation-context.mjs`](../scripts/evaluate-continuation-context.mjs) and [`bench/results/continuation-context-0.1.5.json`](../bench/results/continuation-context-0.1.5.json).
 
 ## Fresh Codex-to-Codex product smoke
 
@@ -55,7 +55,7 @@ The runner creates a disposable Git repository with one failing immutable-releas
 6. requires the final answer to cite a retrieved event ID and hash;
 7. verifies the minimal fix, all acceptance tests, ledger integrity, distinct thread IDs, and zero transcript/path/credential leakage in the committed receipt.
 
-The committed receipt is [`bench/results/codex-cross-session-continuation-0.1.3.json`](../bench/results/codex-cross-session-continuation-0.1.3.json). It stores hashes and normalized usage fields, not raw provider transcripts or local paths. The verifier rejects a wrong package version, changed implementation manifest, missing citations, reused session, failed test, failed doctor result, malformed receipt, or credential-like value. The implementation manifest hashes the normalized contents and paths of the shipped CLI, runtime, schemas, types, and Codex/Claude plugins, so it remains verifiable after a squash merge without relying on local Git history.
+The committed receipt is [`bench/results/codex-cross-session-continuation-0.1.5.json`](../bench/results/codex-cross-session-continuation-0.1.5.json). It stores hashes and normalized usage fields, not raw provider transcripts or local paths. The verifier rejects a wrong package version, changed implementation manifest, missing citations, reused session, failed test, failed doctor result, malformed receipt, or credential-like value. The implementation manifest hashes the normalized contents and paths of the shipped CLI, runtime, schemas, types, and Codex/Claude plugins, so it remains verifiable after a squash merge without relying on local Git history.
 
 ## Product fixes exercised by the benchmark
 

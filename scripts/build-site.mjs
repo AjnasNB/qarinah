@@ -8,8 +8,8 @@ const output = path.join(root, "site-dist");
 const github = "https://github.com/AjnasNB/qarinah";
 const siteOrigin = "https://qarinah.io";
 const npmPackage = "https://www.npmjs.com/package/qarinah";
-const doi = "https://doi.org/10.5281/zenodo.21547685";
-const zenodoPdf = "https://zenodo.org/records/21547685/files/Qarinah-Technical-White-Paper-v1.0.pdf?download=1";
+const doi = "https://doi.org/10.5281/zenodo.21547684";
+const zenodoPdf = "/paper/Qarinah-Technical-White-Paper-v1.1.pdf";
 const releaseDate = "2026-08-07";
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 const productVersion = packageJson.version;
@@ -167,9 +167,9 @@ const docPages = [
     route: "docs/benchmarks",
     source: "docs/BENCHMARKS.md",
     title: "Context reduction benchmarks",
-    description: "Reproduce Qarinah's 98.71% estimated repeated-context reduction and inspect the committed evidence.",
+    description: "Reproduce Qarinah's 98.71% estimated repeated-context reduction and its 40/50/100-file retrieval and projection-integrity regression.",
     section: "Verify",
-    aliases: ["token benchmark", "context compression", "cost comparison", "machine readable result"]
+    aliases: ["token benchmark", "context compression", "cost comparison", "machine readable result", "multi file benchmark", "sqlite graph markdown"]
   },
   {
     route: "docs/security",
@@ -245,7 +245,7 @@ await cp(path.join(root, "node_modules", "@primer", "css", "dist", "primer.css")
 await cp(path.join(root, "assets", "brand", "qarinah-mark.svg"), path.join(output, "assets", "qarinah-mark.svg"));
 await cp(path.join(root, "assets", "architecture", "qarinah-flow.svg"), path.join(output, "assets", "qarinah-flow.svg"));
 await cp(path.join(root, "assets", "launch", "qarinah-social-preview.png"), path.join(output, "assets", "qarinah-social-preview.png"));
-await cp(path.join(root, "output", "pdf", "Qarinah-Technical-White-Paper-v1.0.pdf"), path.join(output, "paper", "Qarinah-Technical-White-Paper-v1.0.pdf"));
+await cp(path.join(root, "output", "pdf", "Qarinah-Technical-White-Paper-v1.1.pdf"), path.join(output, "paper", "Qarinah-Technical-White-Paper-v1.1.pdf"));
 
 marked.setOptions({
   gfm: true,
@@ -281,10 +281,10 @@ function rewriteMarkdownLinks(markdown, source) {
       target = "/docs/";
     } else if (resolved.startsWith("assets/")) {
       target = `/${resolved}`;
-    } else if (resolved.endsWith("Qarinah-Technical-White-Paper-v1.0.pdf")) {
+    } else if (resolved.endsWith("Qarinah-Technical-White-Paper-v1.1.pdf")) {
       target = source === "docs/WHITEPAPER.md"
         ? zenodoPdf
-        : "/paper/Qarinah-Technical-White-Paper-v1.0.pdf";
+        : "/paper/Qarinah-Technical-White-Paper-v1.1.pdf";
     } else {
       target = `${github}/blob/main/${resolved}`;
     }
@@ -303,7 +303,7 @@ function rewriteMarkdownAssets(markdown) {
 function rewritePublicationLink(markdown, source) {
   if (source !== "docs/WHITEPAPER.md") return markdown;
   return markdown.replace(
-    "https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.0.pdf",
+    "https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.1.pdf",
     zenodoPdf
   );
 }
@@ -645,6 +645,33 @@ function homePage() {
     canonical: "/",
     kind: "home",
     body: `
+      <section class="benchmark-ribbon" aria-labelledby="benchmark-ribbon-title">
+        <div class="shell">
+          <div class="benchmark-ribbon-heading">
+            <p class="eyebrow">Reproducible release benchmarks</p>
+            <h2 id="benchmark-ribbon-title">Three outputs. Three exact measurements.</h2>
+          </div>
+          <div class="benchmark-ribbon-grid">
+            <article>
+              <strong>98.7148%</strong>
+              <span>Six-task repeated-context reduction</span>
+              <small>442,113 -&gt; 5,682 estimated tokens</small>
+            </article>
+            <article>
+              <strong>98.75%</strong>
+              <span>Model-facing continuation capsule</span>
+              <small>9,489 -&gt; 119 estimated tokens</small>
+            </article>
+            <article>
+              <strong>89.05%</strong>
+              <span>Complete cited continuation pack</span>
+              <small>9,489 -&gt; 1,039 estimated tokens</small>
+            </article>
+          </div>
+          <p class="benchmark-ribbon-note">The two continuation results use the same 42-record history but measure different outputs: a minimal handoff capsule and its complete evidence-rich audit pack. A separate scale regression passed 380/380 file-specific queries across 40-, 50-, and 100-file projects, plus SQLite, graph, Markdown, conflict, supersession, repair, and abstention controls. Portable <code>ceil(characters / 4)</code> estimates; not provider billing receipts. <a href="/docs/benchmarks/">Method, artifacts, and limits</a>.</p>
+        </div>
+      </section>
+
       <section class="hero">
         <div class="shell hero-grid">
           <div class="hero-copy">
@@ -977,7 +1004,7 @@ async function markdownPage(page) {
         ? "answers"
         : "docs";
   const publicationLink = page.route === "paper"
-    ? '<a href="https://doi.org/10.5281/zenodo.21547685">Cite on Zenodo</a>'
+    ? '<a href="https://doi.org/10.5281/zenodo.21547684">Cite on Zenodo</a>'
     : "";
 
   return layout({

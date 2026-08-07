@@ -1,17 +1,17 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
   "name": "io.github.AjnasNB/qarinah",
-  "description": "Cross-agent context engine with verified handoffs and 98.71% less estimated repeated context in its published benchmark.",
+  "description": "Evidence-linked project memory for coding agents with verified handoffs and a reproducible 98.71% estimated repeated-context reduction.",
   "repository": {
     "url": "https://github.com/AjnasNB/qarinah",
     "source": "github"
   },
-  "version": "0.1.4",
+  "version": "0.1.5",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "qarinah",
-      "version": "0.1.4",
+      "version": "0.1.5",
       "transport": {
         "type": "stdio"
       }

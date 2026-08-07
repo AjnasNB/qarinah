@@ -26,7 +26,7 @@ const required = [
   "search/index.html",
   "search-index.json",
   "paper/index.html",
-  "paper/Qarinah-Technical-White-Paper-v1.0.pdf",
+  "paper/Qarinah-Technical-White-Paper-v1.1.pdf",
   "assets/qarinah-mark.svg",
   "assets/qarinah-flow.svg",
   "assets/qarinah-social-preview.png",
@@ -198,7 +198,7 @@ for (const canonicalResource of [
   "https://qarinah.io/docs/faq/",
   "https://www.npmjs.com/package/qarinah",
   "https://github.com/AjnasNB/qarinah",
-  "https://doi.org/10.5281/zenodo.21547685"
+  "https://doi.org/10.5281/zenodo.21547684"
 ]) {
   if (!llms.includes(canonicalResource)) errors.push(`llms.txt is missing ${canonicalResource}`);
 }
@@ -208,6 +208,9 @@ const paper = await readFile(path.join(output, "paper", "index.html"), "utf8");
 const faq = await readFile(path.join(output, "docs", "faq", "index.html"), "utf8");
 if (!home.includes("<strong>98.71%</strong>") || !home.includes("the evaluated full-history input was 77.81 times larger")) {
   errors.push("Homepage is missing the plain-language benchmark proof.");
+}
+for (const benchmarkProof of ["98.7148%", "98.75%", "89.05%", "Three outputs. Three exact measurements."]) {
+  if (!home.includes(benchmarkProof)) errors.push(`Homepage benchmark ribbon is missing ${benchmarkProof}`);
 }
 if (!home.includes("What coding agents and developers need to know.") || !home.includes('href="/docs/faq/"')) {
   errors.push("Homepage is missing the direct answer-engine surface.");
@@ -224,8 +227,8 @@ if (!faq.includes('"@type":"FAQPage"') || !faq.includes('"mainEntity"')) {
 if (!paper.includes('src="/assets/qarinah-flow.svg"')) {
   errors.push("Paper architecture image is not bound to the deployed asset.");
 }
-if (!paper.includes("https://zenodo.org/records/21547685/files/Qarinah-Technical-White-Paper-v1.0.pdf?download=1")) {
-  errors.push("Paper download does not point to the permanent Zenodo record.");
+if (!paper.includes("/paper/Qarinah-Technical-White-Paper-v1.1.pdf")) {
+  errors.push("Paper download does not point to the versioned website PDF.");
 }
 if (!paper.includes("View on GitHub") || paper.includes("Edit on GitHub")) {
   errors.push("Paper source action must read View on GitHub.");

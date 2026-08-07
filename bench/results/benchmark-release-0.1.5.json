@@ -1,0 +1,165 @@
+{
+  "schemaVersion": "qarinah.benchmark-release.v1",
+  "packageVersion": "0.1.5",
+  "paperVersion": "1.1",
+  "releasedAt": "2026-08-07",
+  "portableTokenEstimator": {
+    "method": "ceil(characters / 4)",
+    "exactProviderTokenizer": false,
+    "providerBillingMeasurement": false
+  },
+  "headlineContextResults": [
+    {
+      "id": "six-task-repeated-context",
+      "baselineEstimatedTokens": 442113,
+      "qarinahEstimatedTokens": 5682,
+      "exactReduction": 0.987148,
+      "displayReduction": "98.7148%",
+      "coverage": "Every required target directly covered in the top five.",
+      "artifact": {
+        "path": "bench/results/software-task-context-0.1.0.json",
+        "sha256": "sha256:92ab5041c609caf226729724555bd9b70c0a52cf2e2418370c228ea6a9452594"
+      }
+    },
+    {
+      "id": "two-session-model-facing-capsule",
+      "baselineEstimatedTokens": 9489,
+      "qarinahEstimatedTokens": 119,
+      "exactReduction": 0.987459,
+      "displayReduction": "98.75%",
+      "coverage": "Summary event ID/hash and complete audit-pack manifest pointer retained.",
+      "artifact": {
+        "path": "bench/results/continuation-context-0.1.5.json",
+        "sha256": "sha256:82e0410c06042fe9bc709dce95235f1f13edc6c637014ff563a8ba2b567f33f5"
+      }
+    },
+    {
+      "id": "two-session-complete-audit-pack",
+      "baselineEstimatedTokens": 9489,
+      "qarinahEstimatedTokens": 1039,
+      "exactReduction": 0.890505,
+      "displayReduction": "89.05%",
+      "coverage": "All three summary-source event IDs/hashes plus a selected raw source retained.",
+      "artifact": {
+        "path": "bench/results/continuation-context-0.1.5.json",
+        "sha256": "sha256:82e0410c06042fe9bc709dce95235f1f13edc6c637014ff563a8ba2b567f33f5"
+      }
+    }
+  ],
+  "realRepositoryDevelopmentStudy": {
+    "status": "development-after-exploratory-inspection-not-confirmatory",
+    "providerModelCalls": 0,
+    "officialPatchResolutionExecuted": false,
+    "dataset": {
+      "name": "princeton-nlp/SWE-bench_Lite",
+      "revision": "6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2",
+      "rawTestParquetSha256": "sha256:7a21f37b8bc179c7db5beeb14e88ac538ba283455c776e6b2535bbfb6e3551b4",
+      "tasks": 300,
+      "exactRepositoryIdentifiers": 12,
+      "warmupTasks": 60,
+      "heldoutQueries": 240
+    },
+    "onlinePrequential": {
+      "scorableQueries": 209,
+      "qarinahV2RecallAt10": 0.538341,
+      "qarinahV2MeanReciprocalRank": 0.695595,
+      "balancedV1MeanReciprocalRank": 0.600665,
+      "pairedMrrDifference": 0.09493,
+      "repositoryClusteredBootstrap95": [0.057183, 0.111456],
+      "graphRankingImprovement": 0
+    },
+    "conservativeEvidenceGate": {
+      "static": {
+        "acceptedDirect": 8,
+        "queries": 240,
+        "observedFalseAccepts": 0,
+        "structuralOracleNegativeQueries": 49,
+        "acceptanceCoverage": 0.033333,
+        "falseAcceptanceRateExact95Upper": 0.072519
+      },
+      "onlinePrequential": {
+        "acceptedDirect": 12,
+        "queries": 240,
+        "observedFalseAccepts": 0,
+        "structuralOracleNegativeQueries": 31,
+        "acceptanceCoverage": 0.05,
+        "falseAcceptanceRateExact95Upper": 0.112189
+      },
+      "humanValidatedRelevance": false
+    },
+    "artifacts": [
+      {
+        "path": "bench/results/research-retrieval-development-v0.2.json",
+        "sha256": "sha256:bfe8015811ffbecd5e3c00eb9f4a1e104478605cd605442a1ec96d67582e4b3f"
+      },
+      {
+        "path": "bench/results/research-sufficiency-development-v0.3.json",
+        "sha256": "sha256:fda449d36c6de2d2aea3d5cb8b69ceac2c57dfcb1c0b63161208a6ec1fc28986"
+      }
+    ]
+  },
+  "providerBackedProductSmoke": {
+    "classification": "one-provider-backed-product-smoke-not-controlled-research",
+    "artifact": {
+      "path": "bench/results/codex-cross-session-continuation-0.1.5.json",
+      "sha256": "sha256:c6ebb38626550d1cb9293a42f7dda292eb55558865d53c735b7996414752783f"
+    },
+    "distinctSessions": true,
+    "nativeResumeUsed": false,
+    "queriedQarinahBeforeContinuation": true,
+    "acceptanceTestsPassed": true
+  },
+  "frozenConfirmatoryProtocol": {
+    "status": "protocol-frozen-results-unobserved",
+    "sourceDataset": "princeton-nlp/SWE-bench_Verified",
+    "sourceTasks": 500,
+    "eligibleRetrievalTasks": 387,
+    "pairedAgentTasks": 40,
+    "abstentionControls": 20,
+    "officialContainerEvaluationPlanned": true,
+    "providerUsageReceiptsRequired": true,
+    "resultsObserved": false,
+    "artifacts": [
+      {
+        "path": "bench/final/final-task-manifest-v1.json",
+        "sha256": "sha256:eca1e32961cea6979a6c488cf5c7af19b2247923934059986f2e087d07016e54"
+      },
+      {
+        "path": "bench/final/final-abstention-controls-v1.json",
+        "sha256": "sha256:367730f076d5d41aa7ef516aba57c04ff677fc172d97e247ff9fb3b896585990"
+      },
+      {
+        "path": "bench/final/contamination-audit-v1.json",
+        "sha256": "sha256:d4692b9b88147e9ef75708ad2815f02285ba91abeb5bc4f01f567d303ddc26bf"
+      }
+    ]
+  },
+  "citations": [
+    {
+      "id": "swe-bench-iclr-2024",
+      "url": "https://openreview.net/forum?id=VTF8yNQM66"
+    },
+    {
+      "id": "swe-bench-lite-pinned-dataset",
+      "url": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite"
+    },
+    {
+      "id": "bm25-okapi-trec-3",
+      "url": "https://doi.org/10.6028/NIST.SP.500-225.routing-city"
+    },
+    {
+      "id": "longmemeval-iclr-2025",
+      "url": "https://proceedings.iclr.cc/paper_files/paper/2025/file/d813d324dbf0598bbdc9c8e79740ed01-Paper-Conference.pdf"
+    },
+    {
+      "id": "swe-bench-verified",
+      "url": "https://www.swebench.com/verified.html"
+    }
+  ],
+  "claimBoundary": [
+    "The three headline percentages are portable estimated context-volume reductions, not provider billing reductions.",
+    "The real-repository results evaluate retrieval and evidence admission, not generated-patch resolution.",
+    "The 40-task provider-backed confirmatory protocol has no observed outcome in this release.",
+    "No result is a universal guarantee across repositories, models, languages, or tasks."
+  ]
+}

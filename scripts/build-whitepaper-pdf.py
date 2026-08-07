@@ -39,8 +39,8 @@ from reportlab.platypus.tableofcontents import TableOfContents
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "docs" / "WHITEPAPER.md"
-OUTPUT = ROOT / "output" / "pdf" / "Qarinah-Technical-White-Paper-v1.0.pdf"
-OUTPUT_DIGEST = ROOT / "output" / "pdf" / "Qarinah-Technical-White-Paper-v1.0.source.sha256"
+OUTPUT = ROOT / "output" / "pdf" / "Qarinah-Technical-White-Paper-v1.1.pdf"
+OUTPUT_DIGEST = ROOT / "output" / "pdf" / "Qarinah-Technical-White-Paper-v1.1.source.sha256"
 REPOSITORY_BLOB = "https://github.com/AjnasNB/qarinah/blob/main/"
 
 PAGE_WIDTH, PAGE_HEIGHT = A4
@@ -269,7 +269,7 @@ class WhitePaperDocTemplate(BaseDocTemplate):
         canvas.line(BODY_LEFT, 13 * mm, PAGE_WIDTH - BODY_RIGHT, 13 * mm)
         canvas.setFillColor(MUTED)
         canvas.setFont(BODY_FONT, 7.2)
-        canvas.drawString(BODY_LEFT, 8 * mm, "Ajnas NB - Technical white paper v1.0")
+        canvas.drawString(BODY_LEFT, 8 * mm, "Ajnas NB - Technical white paper v1.1")
         canvas.drawRightString(PAGE_WIDTH - BODY_RIGHT, 8 * mm, str(doc.page - 1))
         canvas.restoreState()
 
@@ -735,14 +735,15 @@ def cover_story():
         Spacer(1, 10 * mm),
         HRFlowable(width="100%", thickness=1.1, color=GREEN, spaceAfter=5 * mm),
         Paragraph(
-            "<b>Ajnas NB</b><br/>Paper version 1.0 - July 2026<br/>"
-            "Qarinah 0.1.0 stable open-source release<br/>Apache License 2.0",
+            "<b>Ajnas NB</b><br/>Paper version 1.1 - August 2026<br/>"
+            "Qarinah 0.1.5 stable open-source release<br/>Apache License 2.0",
             STYLES["cover-meta"],
         ),
         Spacer(1, 6 * mm),
         Paragraph(
             "<b>Status:</b> Implementation-backed technical white paper. "
-            "The paper documents Qarinah 0.1.0 and has not undergone independent peer review.",
+            "All measured claims identify their benchmark, denominator, estimator, and limits; "
+            "independent validation is not claimed.",
             STYLES["cover-meta"],
         ),
         NextPageTemplate("Body"),
