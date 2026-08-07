@@ -184,9 +184,8 @@ def build():
     doc = WhitePaperV13DocTemplate(str(OUTPUT))
     doc.multiBuild(story)
     source_digest = source_set_digest()
-    SOURCE_DIGEST.write_text(
-        f"{source_digest}  {SOURCE_LABEL}\n",
-        encoding="ascii",
+    SOURCE_DIGEST.write_bytes(
+        f"{source_digest}  {SOURCE_LABEL}\n".encode("ascii")
     )
     build_metadata = {
         "schemaVersion": "qarinah.white-paper-build.v1",
@@ -209,14 +208,12 @@ def build():
             "fonts": font_metadata(),
         },
     }
-    BUILD_METADATA.write_text(
-        json.dumps(build_metadata, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
+    BUILD_METADATA.write_bytes(
+        (json.dumps(build_metadata, indent=2, sort_keys=True) + "\n").encode("utf-8")
     )
     pdf_digest = hashlib.sha256(OUTPUT.read_bytes()).hexdigest()
-    PDF_DIGEST.write_text(
-        f"{pdf_digest}  output/pdf/Qarinah-Technical-White-Paper-v1.3.pdf\n",
-        encoding="ascii",
+    PDF_DIGEST.write_bytes(
+        f"{pdf_digest}  output/pdf/Qarinah-Technical-White-Paper-v1.3.pdf\n".encode("ascii")
     )
     print(OUTPUT)
 

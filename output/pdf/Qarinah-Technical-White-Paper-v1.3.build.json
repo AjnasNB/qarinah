@@ -1,5 +1,5 @@
 {
-  "combinedSourceSha256": "sha256:f12b901d8409e6ffe68a1f9aebd8d58968d7dee248ac9f6fe1e93f268209ab82",
+  "combinedSourceSha256": "sha256:1d058bd27537a2b716667decea0b50d4f521f500bafadec34275d41f6c323393",
   "generator": {
     "command": "python scripts/build-whitepaper-pdf-v1.3.py",
     "fonts": [
@@ -47,7 +47,7 @@
     },
     {
       "path": "scripts/build-whitepaper-pdf-v1.3.py",
-      "sha256": "sha256:f659d02aa1dbffae269a745d6917a426c77e33f0d86e18bb42a077a1037258ee"
+      "sha256": "sha256:b49f12e2670ae1db0470179acc7e202c1dc907130168d29da25f3fd12d648354"
     }
   ]
 }

@@ -15,11 +15,11 @@
     "path": "output/pdf/Qarinah-Technical-White-Paper-v1.3.pdf",
     "sha256": "sha256:4b0c87adc03504dafa9817e3cf6c0fc78c02f7dd2c8d9951e94ae9d722f8ec20",
     "sourceReceiptPath": "output/pdf/Qarinah-Technical-White-Paper-v1.3.source.sha256",
-    "sourceReceiptSha256": "sha256:9bb16836c87beb3b47d667577160fffab5a8092a9682ae9a379909ec180fd885",
+    "sourceReceiptSha256": "sha256:58d707332648318aa52d815223dd536a1da0e6edf70f1cf9ab1519e7abee054f",
     "pdfReceiptPath": "output/pdf/Qarinah-Technical-White-Paper-v1.3.pdf.sha256",
-    "pdfReceiptSha256": "sha256:5afbd34142936d4d93b52b703690e60e5a88482da69d70f3c019bbdac526cfad",
+    "pdfReceiptSha256": "sha256:4de46c9cbb669f55effbfff5d4d0bdbe95780e566b12f92d6f8714dd80380708",
     "buildMetadataPath": "output/pdf/Qarinah-Technical-White-Paper-v1.3.build.json",
-    "buildMetadataSha256": "sha256:a9b306c9e2461f585d8f5fbd615aa209eb19e8a0926490318f2d7fc4ee4e29bf"
+    "buildMetadataSha256": "sha256:2a7315698579918826eb8931ceda5ae2040ecc1ce3e08f0142ab356b12b08ef0"
   },
   "portableTokenEstimator": {
     "method": "ceil(characters / 4)",
