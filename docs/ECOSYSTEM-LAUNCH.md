@@ -34,9 +34,9 @@ Never describe a local candidate as published until the registry, tag, and publi
 
 ### Brand line
 
-> **Qarinah is the evidence-linked cross-agent context engine for software projects.**
+> **Qarinah is evidence-linked project memory that stays with your code.**
 
-This is the canonical Qarinah category line for GitHub, npm, the website, launch pages, and social profiles. **Switch coding agents without starting over.** is the product headline.
+This is the canonical Qarinah category line for GitHub, npm, the website, launch pages, and social profiles. **Your project remembers, even when your coding agent changes.** is the product headline. **Switch agents. Keep the decisions, outcomes, and proof.** is the supporting line.
 
 ### Current proof line
 

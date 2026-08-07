@@ -1,12 +1,12 @@
 # Qarinah launch runbook
 
-Qarinah 0.1.0 is the first stable open-source release. Publish only the exact artifact produced from the reviewed release commit, then verify the public package, tag, provenance, website, and plugin installs against that identity.
+Qarinah 0.1.0 was the first stable open-source release. For every later release, publish only the exact artifact produced from the reviewed release commit, then verify the public package, tag, provenance, website, and plugin installs against that identity.
 
 ## Launch message
 
-> Stop replaying entire agent histories.
+> Your project remembers, even when your coding agent changes.
 
-Switch coding agents without starting over. Qarinah is the evidence-linked cross-agent context engine for software projects. It turns permitted project activity and explicit decisions into small, cited handoff packs. It used 98.71% less estimated context than full-history replay while keeping every required target in the top five with direct evidence coverage. The estimate is `ceil(characters / 4)`, not provider billing or a universal cost claim.
+Switch agents. Keep the decisions, outcomes, and proof. Qarinah keeps one compact, cited project memory beside your code. Its published six-task benchmark used 98.71% less estimated context than full-history replay while keeping every required target in the top five with direct evidence coverage. The estimate is `ceil(characters / 4)`, not provider billing or a universal cost claim.
 
 The complete channel copy, media assignments, and claims gate are in [`docs/launch/`](launch/README.md).
 
@@ -50,7 +50,8 @@ The complete channel copy, media assignments, and claims gate are in [`docs/laun
 
 Use:
 
-- "Stop replaying entire agent histories."
+- "Your project remembers, even when your coding agent changes."
+- "Switch agents. Keep the decisions, outcomes, and proof."
 - "Qarinah - less context. More proof."
 - "Small cited context packs instead of entire transcripts."
 - "Local-first and no Qarinah API key."

@@ -1,14 +1,14 @@
-# Qarinah 0.1.0 launch kit
+# Qarinah public launch kit
 
-Last verified: 2026-07-22.
+Last verified: 2026-08-07.
 
-This kit is prepared but blocked from publication until every gate in [../LAUNCH.md](../LAUNCH.md) is complete. Qarinah is currently a private repository and is not available from the public npm registry.
+Qarinah is public on GitHub, npm, and qarinah.io. Use this kit for reviewed launch copy and keep every benchmark qualification beside the result. Future package or website changes still follow the gates in [../LAUNCH.md](../LAUNCH.md).
 
 ## The one-line story
 
-> Stop replaying entire agent histories.
+> Your project remembers, even when your coding agent changes.
 
-Qarinah is the evidence-linked cross-agent context engine for software projects. It keeps permitted project activity and explicit decisions in a local evidence-linked record, then returns only the small cited pack a later agent needs for a verified handoff.
+Switch agents. Keep the decisions, outcomes, and proof. Qarinah keeps permitted project activity and explicit decisions in a local evidence-linked record, then returns only the small cited pack a later agent needs for a verified handoff.
 
 ## Proof line
 

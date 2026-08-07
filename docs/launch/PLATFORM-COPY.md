@@ -4,11 +4,11 @@ Do not publish these drafts until the gates in [../LAUNCH.md](../LAUNCH.md) are 
 
 ## Canonical descriptions
 
-**Headline:** Switch coding agents without starting over.
+**Headline:** Your project remembers, even when your coding agent changes.
 
-**Category:** The evidence-linked cross-agent context engine for software projects.
+**Category:** Evidence-linked project memory that stays with your code.
 
-**Tagline:** Verified handoffs between coding agents.
+**Tagline:** Switch agents. Keep the decisions, outcomes, and proof.
 
 **Proof tagline:** Nearly 99% less repeated project context. Every selected memory points back to its source.
 
@@ -16,9 +16,9 @@ Do not publish these drafts until the gates in [../LAUNCH.md](../LAUNCH.md) are 
 
 **Coding value line:** Less replay. More room for current code, tools, and cited project memory.
 
-**GitHub About:** Universal context engine for software projects with verified, cited handoffs between coding agents.
+**GitHub About:** Your project remembers across Codex, Claude Code, Cursor, and compatible tools - with compact, cited handoffs.
 
-**npm description:** Cross-agent context engine with verified handoffs and 98.71% less estimated repeated context in its published benchmark.
+**npm description:** Project memory that follows your code across agents, with cited handoffs and 98.71% less estimated repeated context in its published benchmark.
 
 **Short:** Qarinah is a universal context engine for software projects. It records permitted activity and explicit decisions in an evidence-linked ledger, then compiles a small cited handoff for the next agent. Maqam is an optional governance integration, not a requirement.
 
@@ -42,9 +42,9 @@ Possible factual title to rewrite:
 
 **Name:** Qarinah
 
-**Tagline:** Use your biggest coding model with compact, cited project memory
+**Tagline:** Your project remembers when your coding agent changes
 
-**Description (under 260 characters):** Switch coding agents without starting over. Qarinah is the evidence-linked cross-agent context engine for software projects. Works locally with Codex, Claude Code, Cursor, CLI, and compatible MCP clients.
+**Description (under 260 characters):** Switch agents without restarting the story. Qarinah keeps compact, cited project memory beside your code for Codex, Claude Code, Cursor, CLI, and compatible MCP clients.
 
 **Topics:** Developer Tools, Artificial Intelligence, Open Source, Productivity
 
@@ -100,6 +100,6 @@ I would value a reproducible missing-evidence case or a critique of the consent,
 
 ## YouTube
 
-**Title:** Stop replaying agent histories | Qarinah in 60 seconds
+**Title:** Your project remembers | Qarinah in 60 seconds
 
 **Description:** Qarinah records permitted project activity and explicit decisions in a local evidence-linked ledger, then compiles a small cited context pack for the next agent task. This demo shows opt-in, one decision, project scan, deterministic build, direct-evidence retrieval, and doctor verification. Benchmark method and limitations: [ADD PUBLIC URL AFTER RELEASE]

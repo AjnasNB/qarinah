@@ -1,14 +1,13 @@
 <p align="center">
-  <img src="assets/brand/qarinah-mark.svg" width="112" alt="Qarinah logo">
+  <img src="assets/launch/qarinah-social-preview.svg" width="100%" alt="Qarinah - your project remembers across coding agents">
 </p>
 
 <h1 align="center">Qarinah</h1>
 
-<p align="center"><em>Switch coding agents without starting over.</em></p>
-<p align="center"><strong>The evidence-linked cross-agent context engine for software projects.</strong></p>
+<p align="center"><em>Switch agents. Keep the decisions, outcomes, and proof.</em></p>
 
 <p align="center">
-  Qarinah lets Codex, Claude Code, Cursor, and other coding agents continue the same project using a shared, cited record of decisions, outcomes, code relationships, and current evidence.
+  Qarinah keeps one compact, cited project memory beside your code, so Codex, Claude Code, Cursor, and compatible tools can continue from verified context instead of starting from zero.
 </p>
 
 <p align="center">
@@ -28,7 +27,9 @@
 </p>
 
 <p align="center">
-  <strong>Verified handoffs between coding agents.</strong>
+  <strong>98.71% less estimated repeated context in the published six-task benchmark.</strong><br>
+  442,113 &rarr; 5,682 estimated input-context tokens, with every required target directly covered in the top five.
+  <a href="docs/BENCHMARKS.md">Inspect the method and limits.</a>
 </p>
 
 ```sh
@@ -43,12 +44,6 @@ npx qarinah setup . --codex --claude --cursor --capture content --allow-query
 
 <p align="center">
   Run the setup command once from a repository. It installs project-local integrations and consent-gated MCP retrieval for that exact workspace. Qarinah works as an independent local tool; Maqam is an optional governance integration for higher-authority workflows.
-</p>
-
-<p align="center">
-  <strong>98.71% fewer estimated repeated-project-context tokens - 77.81:1 compression.</strong><br>
-  442,113 &rarr; 5,682 estimated input tokens.
-  <a href="docs/BENCHMARKS.md">Reproduce the published benchmark.</a>
 </p>
 
 ---

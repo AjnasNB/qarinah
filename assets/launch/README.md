@@ -4,7 +4,7 @@ The SVG files are the editable source of truth. Matching PNG files are exact-siz
 
 | Asset | Size | Use |
 | --- | ---: | --- |
-| `qarinah-social-preview` | 1280 x 640 | GitHub, Open Graph, X, LinkedIn |
+| `qarinah-social-preview` | 1280 x 640 | GitHub README hero, Open Graph, X, LinkedIn |
 | `qarinah-product-hunt-thumbnail` | 240 x 240 | Product Hunt thumbnail |
 | `qarinah-product-hunt-01-proof` | 1270 x 760 | Benchmark proof |
 | `qarinah-product-hunt-02-retrieval` | 1270 x 760 | Retrieval and citation explanation |

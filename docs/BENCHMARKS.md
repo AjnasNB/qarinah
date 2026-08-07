@@ -2,6 +2,20 @@
 
 Qarinah reports context-volume and retrieval-regression measurements. It does not convert character estimates into claims about provider billing, model reasoning, answer correctness, latency on every machine, or total application cost.
 
+## Publication and evidence map
+
+Verified on 2026-08-07:
+
+| Evidence | What it establishes | GitHub | npm 0.1.4 | qarinah.io | Zenodo paper v1.0 |
+| --- | --- | --- | --- | --- | --- |
+| Six-task software fixture | Estimated repeated-context volume and direct top-five coverage | Published | Published | Published | Published |
+| Long-document fixture | Fixed-budget retrieval, supported-answer preservation, and unsupported-control rejection | Published | Published | Published | Published |
+| Cross-session continuation fixture | Evidence-linked summary retrieval, a complete audit pack, and a compact model-facing capsule | Published | Published | Published | Not included; it postdates paper v1.0 |
+| SWE-bench Lite development study | Retrieval ranking, temporal leakage, repository isolation, and a conservative development gate on real repositories | Published | Published | Published | Not included; it postdates paper v1.0 |
+| SWE-bench Verified confirmatory study | Provider usage, patch resolution, cost, and human-rated quality | Protocol only | Protocol only | Protocol only | No final result; the study has not run |
+
+The SWE-bench work follows the official public dataset and evaluation framing, but the completed phase is a retrieval study rather than an official patch-resolution score. The frozen 40-task provider-backed study remains unexecuted, so Qarinah does not claim improved SWE-bench resolve rate or provider-native token savings.
+
 ## Software-task context benchmark
 
 Command:
