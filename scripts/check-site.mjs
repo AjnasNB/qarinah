@@ -26,7 +26,7 @@ const required = [
   "search/index.html",
   "search-index.json",
   "paper/index.html",
-  "paper/Qarinah-Technical-White-Paper-v1.1.pdf",
+  "paper/Qarinah-Technical-White-Paper-v1.2.pdf",
   "assets/qarinah-mark.svg",
   "assets/qarinah-flow.svg",
   "assets/qarinah-social-preview.png",
@@ -227,7 +227,7 @@ if (!faq.includes('"@type":"FAQPage"') || !faq.includes('"mainEntity"')) {
 if (!paper.includes('src="/assets/qarinah-flow.svg"')) {
   errors.push("Paper architecture image is not bound to the deployed asset.");
 }
-if (!paper.includes("/paper/Qarinah-Technical-White-Paper-v1.1.pdf")) {
+if (!paper.includes("/paper/Qarinah-Technical-White-Paper-v1.2.pdf")) {
   errors.push("Paper download does not point to the versioned website PDF.");
 }
 if (!paper.includes("View on GitHub") || paper.includes("Edit on GitHub")) {

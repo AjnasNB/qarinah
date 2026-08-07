@@ -12,6 +12,7 @@ const packageJson = await readJson("package.json");
 const release = await readJson("bench/results/benchmark-release-0.1.5.json");
 const software = await readJson("bench/results/software-task-context-0.1.0.json");
 const continuation = await readJson("bench/results/continuation-context-0.1.5.json");
+const multifile = await readJson("bench/results/multifile-context-0.1.5.json");
 const smoke = await readJson("bench/results/codex-cross-session-continuation-0.1.5.json");
 const retrieval = await readJson("bench/results/research-retrieval-development-v0.2.json");
 const sufficiency = await readJson("bench/results/research-sufficiency-development-v0.3.json");
@@ -22,7 +23,7 @@ const contamination = await readJson("bench/final/contamination-audit-v1.json");
 assert.equal(release.schemaVersion, "qarinah.benchmark-release.v1");
 assert.equal(release.packageVersion, packageJson.version);
 assert.equal(release.packageVersion, "0.1.5");
-assert.equal(release.paperVersion, "1.1");
+assert.equal(release.paperVersion, "1.2");
 assert.deepEqual(release.portableTokenEstimator, {
   method: "ceil(characters / 4)",
   exactProviderTokenizer: false,
@@ -65,6 +66,24 @@ assert.equal(auditPack.exactReduction, continuation.expected.estimatedTokenReduc
 assert.equal(auditPack.displayReduction, "89.05%");
 assert.equal(continuation.expected.sourceIdsPreserved, true);
 assert.equal(continuation.expected.sourceHashesPreserved, true);
+
+assert.equal(release.multiFileProjectStudy.totalFiles, multifile.fixture.totalFiles);
+assert.equal(release.multiFileProjectStudy.positiveQueriesPassed, multifile.fixture.totalPositiveQueries);
+assert.equal(release.multiFileProjectStudy.unsupportedQueriesCorrectlyRejected, multifile.fixture.totalUnsupportedQueries);
+assert.equal(release.multiFileProjectStudy.allScalesPassed, multifile.expected.allScalesPassed);
+assert.deepEqual(
+  release.multiFileProjectStudy.scales.map(({ fileCount, positiveQueriesPassed, minimumEstimatedReduction }) => ({
+    fileCount,
+    positiveQueriesPassed,
+    minimumEstimatedReduction
+  })),
+  multifile.expected.scales.map((scale) => ({
+    fileCount: scale.fileCount,
+    positiveQueriesPassed: scale.exactQueries + scale.typoTolerantQueries,
+    minimumEstimatedReduction: scale.minimumEstimatedReduction
+  }))
+);
+assert.equal(await sha256(release.multiFileProjectStudy.artifact.path), release.multiFileProjectStudy.artifact.sha256);
 
 assert.equal(smoke.packageVersion, packageJson.version);
 assert.equal(smoke.classification, "provider-backed-product-smoke-not-controlled-research");

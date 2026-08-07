@@ -9,7 +9,7 @@ const github = "https://github.com/AjnasNB/qarinah";
 const siteOrigin = "https://qarinah.io";
 const npmPackage = "https://www.npmjs.com/package/qarinah";
 const doi = "https://doi.org/10.5281/zenodo.21547684";
-const zenodoPdf = "/paper/Qarinah-Technical-White-Paper-v1.1.pdf";
+const zenodoPdf = "/paper/Qarinah-Technical-White-Paper-v1.2.pdf";
 const releaseDate = "2026-08-07";
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 const productVersion = packageJson.version;
@@ -245,7 +245,7 @@ await cp(path.join(root, "node_modules", "@primer", "css", "dist", "primer.css")
 await cp(path.join(root, "assets", "brand", "qarinah-mark.svg"), path.join(output, "assets", "qarinah-mark.svg"));
 await cp(path.join(root, "assets", "architecture", "qarinah-flow.svg"), path.join(output, "assets", "qarinah-flow.svg"));
 await cp(path.join(root, "assets", "launch", "qarinah-social-preview.png"), path.join(output, "assets", "qarinah-social-preview.png"));
-await cp(path.join(root, "output", "pdf", "Qarinah-Technical-White-Paper-v1.1.pdf"), path.join(output, "paper", "Qarinah-Technical-White-Paper-v1.1.pdf"));
+await cp(path.join(root, "output", "pdf", "Qarinah-Technical-White-Paper-v1.2.pdf"), path.join(output, "paper", "Qarinah-Technical-White-Paper-v1.2.pdf"));
 
 marked.setOptions({
   gfm: true,
@@ -281,10 +281,10 @@ function rewriteMarkdownLinks(markdown, source) {
       target = "/docs/";
     } else if (resolved.startsWith("assets/")) {
       target = `/${resolved}`;
-    } else if (resolved.endsWith("Qarinah-Technical-White-Paper-v1.1.pdf")) {
+    } else if (resolved.endsWith("Qarinah-Technical-White-Paper-v1.2.pdf")) {
       target = source === "docs/WHITEPAPER.md"
         ? zenodoPdf
-        : "/paper/Qarinah-Technical-White-Paper-v1.1.pdf";
+        : "/paper/Qarinah-Technical-White-Paper-v1.2.pdf";
     } else {
       target = `${github}/blob/main/${resolved}`;
     }
@@ -303,7 +303,7 @@ function rewriteMarkdownAssets(markdown) {
 function rewritePublicationLink(markdown, source) {
   if (source !== "docs/WHITEPAPER.md") return markdown;
   return markdown.replace(
-    "https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.1.pdf",
+    "https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.2.pdf",
     zenodoPdf
   );
 }
