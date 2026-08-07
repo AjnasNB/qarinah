@@ -1,7 +1,7 @@
 {
   "schemaVersion": "qarinah.benchmark-release.v1",
   "packageVersion": "0.1.5",
-  "paperVersion": "1.1",
+  "paperVersion": "1.2",
   "releasedAt": "2026-08-07",
   "portableTokenEstimator": {
     "method": "ceil(characters / 4)",
@@ -46,6 +46,36 @@
       }
     }
   ],
+  "multiFileProjectStudy": {
+    "status": "deterministic-synthetic-local-retrieval-and-projection-integrity",
+    "totalFiles": 190,
+    "positiveQueriesPassed": 380,
+    "unsupportedQueriesCorrectlyRejected": 9,
+    "allScalesPassed": true,
+    "providerModelCalls": 0,
+    "providerBillingMeasurement": false,
+    "scales": [
+      {
+        "fileCount": 40,
+        "positiveQueriesPassed": 80,
+        "minimumEstimatedReduction": 0.934803
+      },
+      {
+        "fileCount": 50,
+        "positiveQueriesPassed": 100,
+        "minimumEstimatedReduction": 0.946948
+      },
+      {
+        "fileCount": 100,
+        "positiveQueriesPassed": 200,
+        "minimumEstimatedReduction": 0.971521
+      }
+    ],
+    "artifact": {
+      "path": "bench/results/multifile-context-0.1.5.json",
+      "sha256": "sha256:e5fe3294d02fd39fba4d3407aa039e800e0225bd054d279de3473dd269c1091a"
+    }
+  },
   "realRepositoryDevelopmentStudy": {
     "status": "development-after-exploratory-inspection-not-confirmatory",
     "providerModelCalls": 0,
@@ -158,6 +188,7 @@
   ],
   "claimBoundary": [
     "The three headline percentages are portable estimated context-volume reductions, not provider billing reductions.",
+    "The multi-file result is a deterministic synthetic local retrieval and projection-integrity regression, not provider task-completion evidence.",
     "The real-repository results evaluate retrieval and evidence admission, not generated-patch resolution.",
     "The 40-task provider-backed confirmatory protocol has no observed outcome in this release.",
     "No result is a universal guarantee across repositories, models, languages, or tasks."

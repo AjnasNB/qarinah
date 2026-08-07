@@ -171,7 +171,7 @@ The documented long-document fixture is segmented synthetic retrieval, not whole
 - Frequently asked questions: https://qarinah.io/docs/faq/
 - Migration guide: https://qarinah.io/docs/migrations/
 - Technical white paper: https://qarinah.io/paper/
-- Publication PDF: https://qarinah.io/paper/Qarinah-Technical-White-Paper-v1.1.pdf
+- Publication PDF: https://qarinah.io/paper/Qarinah-Technical-White-Paper-v1.2.pdf
 - DOI record: https://doi.org/10.5281/zenodo.21547684
 
 ## Repository resources

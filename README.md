@@ -103,7 +103,7 @@ The JSONL chain remains authoritative. Graph, index, Markdown, dashboard, and OK
 
 <p align="center">
   <a href="docs/WHITEPAPER.md">Technical paper</a>&nbsp;&middot;&nbsp;
-  <a href="https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.1.pdf">Publication PDF</a>&nbsp;&middot;&nbsp;
+  <a href="https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.2.pdf">Publication PDF</a>&nbsp;&middot;&nbsp;
   <a href="https://doi.org/10.5281/zenodo.21547684">Zenodo record</a>&nbsp;&middot;&nbsp;
   <a href="docs/ARCHITECTURE.md">Architecture</a>&nbsp;&middot;&nbsp;
   <a href="docs/DASHBOARD.md">Dashboard</a>&nbsp;&middot;&nbsp;

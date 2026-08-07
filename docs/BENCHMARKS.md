@@ -18,7 +18,7 @@ All three results use the portable estimator `ceil(characters / 4)`. The exact c
 
 Verified on 2026-08-07:
 
-| Evidence | What it establishes | GitHub | npm 0.1.5 | qarinah.io | Zenodo paper v1.1 |
+| Evidence | What it establishes | GitHub | npm 0.1.5 | qarinah.io | Zenodo paper v1.2 |
 | --- | --- | --- | --- | --- | --- |
 | Six-task software fixture | Estimated repeated-context volume and direct top-five coverage | Published | Published | Published | Published |
 | Long-document fixture | Fixed-budget retrieval, supported-answer preservation, and unsupported-control rejection | Published | Published | Published | Published |
