@@ -10,7 +10,7 @@ Developers and teams using Codex, Claude Code, command-line agents, and compatib
 
 ## Product Purpose
 
-Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust. It records permitted project events and explicit decisions, preserves their source identities in a verifiable ledger and graph, and compiles a small cited context pack for the current task. Success means less repeated context, visible provenance, portable project memory, and a clear failure when supporting evidence is absent.
+Your project remembers, even when the coding agent changes. Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust. It records permitted project events and explicit decisions, preserves their source identities in a verifiable ledger and graph, and compiles a small cited context pack for the current task. Success means less repeated context, visible provenance, portable project memory, and a clear failure when supporting evidence is absent.
 
 ## Brand Personality
 

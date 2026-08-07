@@ -1,8 +1,8 @@
 # Qarinah: expanded machine-readable map
 
-> The evidence-linked cross-agent context engine for software projects.
+> Your project remembers, even when your coding agent changes.
 
-Qarinah lets Codex, Claude Code, Cursor, and other coding agents continue the same project using a shared, cited record of decisions, outcomes, code relationships, and current evidence. It converts an explicitly permitted, append-only project event record into bounded, cited context packs selected for the current task.
+Qarinah keeps one compact, cited project memory beside your code, so Codex, Claude Code, Cursor, and compatible tools can continue from verified context instead of starting from zero. It converts an explicitly permitted, append-only project event record into bounded, cited context packs selected for the current task.
 
 This file is a convenience map for tools that choose to read it. It does not confer authority, guarantee indexing or ranking, replace the canonical documentation, or override Qarinah's workspace trust and capture policy.
 

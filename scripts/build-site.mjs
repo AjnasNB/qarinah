@@ -10,11 +10,11 @@ const siteOrigin = "https://qarinah.io";
 const npmPackage = "https://www.npmjs.com/package/qarinah";
 const doi = "https://doi.org/10.5281/zenodo.21547685";
 const zenodoPdf = "https://zenodo.org/records/21547685/files/Qarinah-Technical-White-Paper-v1.0.pdf?download=1";
-const releaseDate = "2026-08-06";
+const releaseDate = "2026-08-07";
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 const productVersion = packageJson.version;
-const productPositioning = "The evidence-linked cross-agent context engine for software projects.";
-const productExplanation = "Qarinah lets Codex, Claude Code, Cursor, and other coding agents continue the same project using a shared, cited record of decisions, outcomes, code relationships, and current evidence.";
+const productPositioning = "Evidence-linked project memory for coding agents.";
+const productExplanation = "Qarinah keeps one compact, cited project memory beside your code, so Codex, Claude Code, Cursor, and compatible tools can continue from verified context instead of starting from zero.";
 const answerEngineQuestions = [
   {
     name: "What is Qarinah?",
@@ -584,7 +584,7 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
 
 function layout({ title, description, body, active = "", canonical = "/", kind = "doc" }) {
   const fullTitle = canonical === "/"
-    ? "Qarinah - Switch coding agents without starting over"
+    ? "Qarinah - Your project remembers across coding agents"
     : `${title} - Qarinah`;
   const url = `${siteOrigin}${canonical}`;
   const ogType = kind === "home" || kind === "search" ? "website" : "article";
@@ -611,12 +611,12 @@ function layout({ title, description, body, active = "", canonical = "/", kind =
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1280">
   <meta property="og:image:height" content="640">
-  <meta property="og:image:alt" content="Qarinah - switch coding agents without starting over.">
+  <meta property="og:image:alt" content="Qarinah - your project remembers across coding agents.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${fullTitle}">
   <meta name="twitter:description" content="${description}">
   <meta name="twitter:image" content="${siteOrigin}/assets/qarinah-social-preview.png">
-  <meta name="twitter:image:alt" content="Qarinah - switch coding agents without starting over.">
+  <meta name="twitter:image:alt" content="Qarinah - your project remembers across coding agents.">
   <link rel="icon" href="/assets/qarinah-mark.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/primer.css">
   <link rel="stylesheet" href="/site.css">
@@ -649,8 +649,8 @@ function homePage() {
         <div class="shell hero-grid">
           <div class="hero-copy">
             <p class="eyebrow">${productPositioning}</p>
-            <h1>Switch coding agents without starting over.</h1>
-            <p class="hero-lede">${productExplanation} One universal context layer for every agent working on your software.</p>
+            <h1>Your project remembers&mdash;even when your coding agent changes.</h1>
+            <p class="hero-lede">${productExplanation}</p>
             <div class="hero-actions">
               <a class="btn btn-primary btn-large" href="/docs/getting-started/">Set up one project</a>
               <a class="btn btn-outline btn-large" href="/docs/cross-agent-handoffs/">See the handoff</a>
