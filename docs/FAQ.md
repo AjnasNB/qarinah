@@ -281,11 +281,12 @@ From a source checkout:
 ```sh
 npm run evaluate:software-tasks
 npm run evaluate:long-document
+npm run evaluate:multifile-context
 npm run evaluate:context
 npm run benchmark
 ```
 
-See [BENCHMARKS.md](BENCHMARKS.md), [software-task results](../bench/results/software-task-context-0.1.1.json), and [long-document results](../bench/results/long-document-context-0.1.1.json).
+See [BENCHMARKS.md](BENCHMARKS.md), [software-task results](../bench/results/software-task-context-0.1.1.json), [long-document results](../bench/results/long-document-context-0.1.1.json), and the [40/50/100-file project-context result](../bench/results/multifile-context-0.1.5.json).
 
 ## Where should I start?
 

@@ -167,9 +167,9 @@ const docPages = [
     route: "docs/benchmarks",
     source: "docs/BENCHMARKS.md",
     title: "Context reduction benchmarks",
-    description: "Reproduce Qarinah's 98.71% estimated repeated-context reduction and inspect the committed evidence.",
+    description: "Reproduce Qarinah's 98.71% estimated repeated-context reduction and its 40/50/100-file retrieval and projection-integrity regression.",
     section: "Verify",
-    aliases: ["token benchmark", "context compression", "cost comparison", "machine readable result"]
+    aliases: ["token benchmark", "context compression", "cost comparison", "machine readable result", "multi file benchmark", "sqlite graph markdown"]
   },
   {
     route: "docs/security",
@@ -668,7 +668,7 @@ function homePage() {
               <small>9,489 -&gt; 1,039 estimated tokens</small>
             </article>
           </div>
-          <p class="benchmark-ribbon-note">The two continuation results use the same 42-record history but measure different outputs: a minimal handoff capsule and its complete evidence-rich audit pack. Portable <code>ceil(characters / 4)</code> estimates; not provider billing receipts. <a href="/docs/benchmarks/">Method, artifacts, and limits</a>.</p>
+          <p class="benchmark-ribbon-note">The two continuation results use the same 42-record history but measure different outputs: a minimal handoff capsule and its complete evidence-rich audit pack. A separate scale regression passed 380/380 file-specific queries across 40-, 50-, and 100-file projects, plus SQLite, graph, Markdown, conflict, supersession, repair, and abstention controls. Portable <code>ceil(characters / 4)</code> estimates; not provider billing receipts. <a href="/docs/benchmarks/">Method, artifacts, and limits</a>.</p>
         </div>
       </section>
 

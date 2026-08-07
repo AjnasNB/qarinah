@@ -87,6 +87,43 @@ The evaluator constructs a deterministic 384-section synthetic operations handbo
 
 The result verifies targeted, evidence-linked retrieval from a large pre-segmented source under a fixed budget. The unsupported controls require `direct` evidence coverage; the benchmark does not claim that every unsupported query is rejected when callers permit partial lexical coverage. It also does not demonstrate whole-book summarization, native PDF ingestion, semantic answer quality, or a provider's exact token bill. The portable estimate is `ceil(characters / 4)`. The source generator, assertions, and machine-readable expected result are committed in [`scripts/evaluate-long-document.mjs`](../scripts/evaluate-long-document.mjs) and [`bench/results/long-document-context-0.1.0.json`](../bench/results/long-document-context-0.1.0.json).
 
+## Multi-file project context and projection-integrity benchmark
+
+Command:
+
+```sh
+npm ci
+npm run evaluate:multifile-context
+```
+
+This higher-difficulty regression creates separate deterministic 40-, 50-, and 100-file repositories. The 190 generated files are split across nested JavaScript modules and Markdown runbooks, and every file contains a resolved import or link. Each workspace also receives one unique answer-bearing memory record per file, heavily repeated distractor language, a graph-only linked decision, a superseded decision, a contradiction, deliberately stale graph and Markdown projections, and three unsupported direct-coverage queries.
+
+The evaluator queries every file twice rather than sampling only a few positions: once with its exact evidence label and once with a misspelled label. That produces **380 / 380 rank-1 positive results**, with every cited answer preserved.
+
+| Workspace | Positive queries at rank 1 | Exact queries accepted as direct | Typo queries correctly retrieved but conservatively abstained | Unsupported direct queries rejected | Largest pack | Worst-case estimated reduction vs ledger |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 40 files | 80 / 80 | 40 / 40 | 40 / 40 | 3 / 3 | 1,420 estimated tokens | 93.4803% |
+| 50 files | 100 / 100 | 50 / 50 | 50 / 50 | 3 / 3 | 1,421 estimated tokens | 94.6948% |
+| 100 files | 200 / 200 | 100 / 100 | 100 / 100 | 3 / 3 | 1,478 estimated tokens | 97.1521% |
+
+Every exact query used the persisted SQLite FTS candidate path. Every typo query used fuzzy retrieval and still ranked the correct cited record first, but the independent evidence-sufficiency gate returned `ABSTAIN` because the misspelled query had only partial exact coverage. This distinction is intentional: retrieval may offer relevant evidence for inspection without claiming that the evidence is directly sufficient.
+
+All three scales additionally verify:
+
+- SQLite event count and head identity against the verified ledger, required tables, and retrieval of the final file's evidence;
+- exactly one graph file node and one resolved import/link edge per generated file;
+- the first, middle, and final paths in generated `CONTEXT.md`;
+- a query-matched late path and its reference in the bounded project-structure excerpt;
+- recovery of a decision available only through an event-graph relationship;
+- current-decision preference, explicit supersession exclusion, and contradiction visibility;
+- identical target rank for selected persisted and in-memory reads;
+- detection and rebuilding of stale-but-valid graph and Markdown projections; and
+- nine unsupported direct-coverage controls rejected with `CONTEXT_COVERAGE_TOO_LOW`.
+
+“Fail closed” therefore does not mean that long-document or multi-file retrieval failed. It means Qarinah refused to label unsupported evidence as direct. In this benchmark, **9 / 9 unsupported controls were successful fail-closed behavior**.
+
+The fixture is synthetic so relevance and answers are completely auditable. It measures local retrieval, bounded evidence preservation, and projection integrity; it does not measure provider-reported tokens or coding-task completion. The context-volume values use portable `ceil(characters / 4)` estimates. See the [evaluator](../scripts/evaluate-multifile-context.mjs), [machine-readable result](../bench/results/multifile-context-0.1.5.json), and [artifact verifier](../scripts/verify-multifile-context.mjs).
+
 ## Retrieval-regression fixture
 
 Command:

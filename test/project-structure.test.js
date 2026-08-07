@@ -114,6 +114,45 @@ test("project graph coalesces repeated reference edges while preserving every ob
   assert.equal(readModel.headHash, result.hash);
 });
 
+test("large project-structure retrieval preserves the query-matched late path", async (t) => {
+  const root = await temporaryDirectory(t);
+  await initializeWorkspace(root, { capture: "content" });
+  await mkdir(path.join(root, "src"), { recursive: true });
+  await Promise.all(Array.from({ length: 100 }, (_, index) => {
+    const name = `module-${String(index).padStart(3, "0")}.js`;
+    const next = `module-${String((index + 1) % 100).padStart(3, "0")}.js`;
+    return writeFile(
+      path.join(root, "src", name),
+      `import './${next}';\nexport const module${index} = ${index};\n`,
+      "utf8"
+    );
+  }));
+
+  const scan = await scanProjectStructure({ cwd: root });
+  assert.equal(scan.fileCount, 100);
+  await rebuildDerivedState(root);
+  const persisted = await compileContext("src/module-099.js imports", {
+    cwd: root,
+    maxChars: 8_000,
+    limit: 3,
+    minimumCoverage: "partial"
+  });
+  assert.equal(persisted.items[0].eventId, scan.eventId);
+  assert.match(persisted.items[0].excerpt, /src\/module-099\.js/u);
+  assert.match(persisted.items[0].excerpt, /imports \.\/module-000\.js -> src\/module-000\.js/u);
+  assert.match(persisted.items[0].reason, /sqlite-fts5/u);
+
+  const inMemory = await compileContext("src/module-099.js imports", {
+    cwd: root,
+    maxChars: 8_000,
+    limit: 3,
+    minimumCoverage: "partial",
+    inMemory: true
+  });
+  assert.equal(inMemory.items[0].eventId, scan.eventId);
+  assert.match(inMemory.items[0].excerpt, /src\/module-099\.js/u);
+});
+
 test("project structure scan skips linked paths and bounds oversized files", async (t) => {
   const root = await temporaryDirectory(t);
   const outside = await temporaryDirectory(t);
