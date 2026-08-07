@@ -102,7 +102,7 @@
     "classification": "one-provider-backed-product-smoke-not-controlled-research",
     "artifact": {
       "path": "bench/results/codex-cross-session-continuation-0.1.5.json",
-      "sha256": "sha256:591ab1e7177c02151573a72c755e1438f81082c79870c4fa393070a45932fc78"
+      "sha256": "sha256:c6ebb38626550d1cb9293a42f7dda292eb55558865d53c735b7996414752783f"
     },
     "distinctSessions": true,
     "nativeResumeUsed": false,
