@@ -2,8 +2,8 @@
   "schemaVersion": "qarinah.codex-cross-session-continuation.v1",
   "packageVersion": "0.1.5",
   "classification": "provider-backed-product-smoke-not-controlled-research",
-  "recordedAt": "2026-08-07T12:29:19.852Z",
-  "qarinahCommit": "605bcf751afe96a55c50d9234d613ffd9535ea0c",
+  "recordedAt": "2026-08-07T12:36:57.266Z",
+  "qarinahCommit": "30f38995989d1c2e64aca02e2478d1fd2237d0cc",
   "implementation": {
     "algorithm": "sha256-path-lf-content-v1",
     "fileCount": 77,
@@ -18,32 +18,32 @@
     "ephemeralSessions": true,
     "nativeResumeUsed": false,
     "distinctThreadIds": true,
-    "agentAThreadIdHash": "sha256:24f49ed28d9682b642d85f046150b294ae44df10a795ffc052d99f10a2aab17c",
-    "agentBThreadIdHash": "sha256:365cdbb112b3c1114aa77c77f158f0f5507244191e9b530779bcbeea84076ec8"
+    "agentAThreadIdHash": "sha256:7ac126499a37eb9e9b994ee07cd367cd123babfef797f7003b50b2460b52f04b",
+    "agentBThreadIdHash": "sha256:da4426fe4108df9aa117bee989ee2f8cc6c6d08acb0e4153b477869bf9859118"
   },
   "handoff": {
     "marker": "SWITCH-HANDOFF-7F3A",
-    "summaryEventId": "evt_763af022-68c0-49b1-8029-64647d481a4c",
-    "summaryEventHash": "sha256:768a0fe2cb509c7c83dd0d919c5d0c812c10ca75ff9201921219d6f6d1fa7fc5",
+    "summaryEventId": "evt_30362f39-4c74-4c5e-9c3e-1ac056c092e3",
+    "summaryEventHash": "sha256:c3cdb40b48657fb86646be2cb56c6fd7d3e1f84e51e55a5c437ca56e990dde88",
     "sourceEvents": [
       {
-        "eventId": "evt_57321fe0-51f9-45fd-8c61-a0ac6372e4b3",
-        "hash": "sha256:a22e1a860b0ec8a5fef281551fa5f8d31eb37a23d6ddf0c809bd72bd5a59c0f8",
+        "eventId": "evt_350741f6-9776-404a-84c3-97ae21682ad5",
+        "hash": "sha256:226d02256a078721015095622c63d22a561ea585a63eb6e649f7fcd41b0dc973",
         "kind": "prompt.submitted"
       },
       {
-        "eventId": "evt_41f53a4f-001e-4703-89f1-535b6aacdae3",
-        "hash": "sha256:21c200bccd9a09ac85268baf41bc5a4247a51a4acfe95869cc9cd1ca7878914c",
+        "eventId": "evt_659d2170-6ad8-48ad-8870-65cc747a225f",
+        "hash": "sha256:a44d620336acfbe770307c4531a0ad16b041a80586506687fa7fcb9b52fc99f0",
         "kind": "tool.completed"
       },
       {
-        "eventId": "evt_7b86cb1d-8b8e-4052-8e39-2ea113dd20dc",
-        "hash": "sha256:b72f4bbcf0ba9f41ae0f4ea2fb07c11182201ed6719bd0e86fe6c299c275e239",
+        "eventId": "evt_c26e8466-7888-42d4-8b27-dbcc605c11a4",
+        "hash": "sha256:5f828701542aae9c068c6887d358d3aa564a4f20c9301ac412074c71726f29ef",
         "kind": "turn.completed"
       }
     ],
     "summaryRelationsVerified": true,
-    "packManifestHash": "sha256:f32149f3daabb70f77d4cf7fd2fe04cd2ba723d621208057025c5fde4629e254",
+    "packManifestHash": "sha256:3907396072279a9e7693193580823e4d928a593e9f65707f99ef75c039fc23f1",
     "packItemCount": 2,
     "packUsedTokens": 1350,
     "packMaxTokens": 1500,
@@ -56,14 +56,14 @@
   },
   "usage": {
     "agentA": {
-      "inputTokens": 110790,
+      "inputTokens": 109885,
       "cachedInputTokens": 96768,
-      "outputTokens": 1756
+      "outputTokens": 1181
     },
     "agentB": {
-      "inputTokens": 395005,
-      "cachedInputTokens": 349952,
-      "outputTokens": 2466
+      "inputTokens": 238675,
+      "cachedInputTokens": 194304,
+      "outputTokens": 1704
     },
     "source": "codex-cli-jsonl"
   },
@@ -76,10 +76,10 @@
     "finalEventCount": 45
   },
   "receipts": {
-    "agentAJsonlSha256": "sha256:6099579bc0b6ca69ea5e3f0d4ce4da624bf163edbb1d270e2a00eda6e96a8620",
-    "agentBJsonlSha256": "sha256:1e8284f6ec600b22748ba5276d23f4a3b1fe7de71a9d2abbe8caad115fae3bf9",
-    "agentAFinalSha256": "sha256:5a25fc3a4444ae2cadbae98d0cace09b02fd9e42d03c41c07539ad7e84b3894d",
-    "agentBFinalSha256": "sha256:15c8030524a2f884107e47ce25761e61eb30b4a346d8dece4252d49f3d70f667",
+    "agentAJsonlSha256": "sha256:c17c13c4d400cd146935fe897e45f15785f827045c3e95e2b5c2b9519c80f684",
+    "agentBJsonlSha256": "sha256:9ce52277e3411bde5943d8f5a4cacb4d284e7dc938e5fcde6eb6706f8fe8e417",
+    "agentAFinalSha256": "sha256:7ee56c5ae04eb6b3114c91863dec506c44e73b3e9489bfbb5e401ed588c98108",
+    "agentBFinalSha256": "sha256:7d923ed208df6a9e5e6e8c896134b8c8e288406325c652b9ff40749a62940676",
     "fixtureSourceSha256": "sha256:fc6a26e95fd4f8fc9016cb47c64102bcf2480e4d66c0509ac2ca75de9ca33fe0"
   },
   "limitations": [
