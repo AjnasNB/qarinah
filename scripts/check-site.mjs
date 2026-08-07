@@ -26,6 +26,7 @@ const required = [
   "search/index.html",
   "search-index.json",
   "paper/index.html",
+  "paper/Qarinah-Technical-White-Paper-v1.3.pdf",
   "paper/Qarinah-Technical-White-Paper-v1.2.pdf",
   "assets/qarinah-mark.svg",
   "assets/qarinah-flow.svg",
@@ -227,8 +228,16 @@ if (!faq.includes('"@type":"FAQPage"') || !faq.includes('"mainEntity"')) {
 if (!paper.includes('src="/assets/qarinah-flow.svg"')) {
   errors.push("Paper architecture image is not bound to the deployed asset.");
 }
-if (!paper.includes("/paper/Qarinah-Technical-White-Paper-v1.2.pdf")) {
+if (!paper.includes("/paper/Qarinah-Technical-White-Paper-v1.3.pdf")) {
   errors.push("Paper download does not point to the versioned website PDF.");
+}
+if (!paper.includes("https://doi.org/10.5281/zenodo.21843240")
+  || !paper.includes('"creativeWorkStatus":"Published"')
+  || !paper.includes(`"datePublished":"2026-08-08"`)) {
+  errors.push("Paper page must link and structurally bind the published Zenodo v1.3 DOI.");
+}
+if (/release[- ]candidate|activates on publication|not registered or published|DOI reserved/iu.test(paper)) {
+  errors.push("Paper page contains stale pre-publication lifecycle wording.");
 }
 if (!paper.includes("View on GitHub") || paper.includes("Edit on GitHub")) {
   errors.push("Paper source action must read View on GitHub.");

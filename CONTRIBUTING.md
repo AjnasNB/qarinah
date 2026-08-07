@@ -24,6 +24,16 @@ npm run check
 
 Run focused tests while iterating, then run `npm run check` before requesting review. A pull request is not release-ready until the full check passes from a clean install.
 
+### White-paper builds
+
+White-paper generation is a repository-maintainer workflow, not a public npm-package command. The Python builders and generated PDF are intentionally excluded from the npm tarball. From a complete source checkout with Python 3 and ReportLab installed, build the current paper directly:
+
+```sh
+python scripts/build-whitepaper-pdf-v1.3.py
+```
+
+The v1.3 source receipt binds `docs/WHITEPAPER.md`, the shared layout engine, and the version-specific wrapper. Its companion build metadata records the Python, ReportLab, platform, and font inputs used for that generated artifact. Never run the historical builder directly to replace a published PDF.
+
 ## Architecture invariants
 
 Qarinah's JSONL event log is the authoritative record. Graphs, indexes, Markdown views, OKF exports, and context packs must remain deterministic derivatives.

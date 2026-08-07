@@ -87,7 +87,7 @@ for (const property of [
 ]) assert.equal(adversarial[property], true, `${property} must remain true.`);
 
 for (const fragment of [
-  "Research draft; exploratory v0.1 frozen, development v0.2 preserved, conservative gate v0.3 completed, not peer-reviewed and not preregistered",
+  "Research draft; exploratory v0.1 frozen, development v0.2 and historical calibration v0.3 preserved, current production-bound development v0.4 completed, not peer-reviewed and not preregistered",
   "Plain BM25 outperforms the original Qarinah balanced hybrid ranking",
   "0.687 versus 0.518",
   "971 future citations",

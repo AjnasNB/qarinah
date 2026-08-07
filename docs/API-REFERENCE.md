@@ -18,7 +18,7 @@ import { captureClaudeHook } from "qarinah/claude";
 import { createMcpServer, runMcpServer } from "qarinah/mcp";
 ```
 
-The declarations shipped in `types/index.d.ts`, `types/codex.d.ts`, `types/claude.d.ts`, and `types/mcp.d.ts` are the exact compile-time contract for version 0.1.5. JSON Schemas are available through package exports such as `qarinah/schemas/event.json`.
+The declarations shipped in `types/index.d.ts`, `types/codex.d.ts`, `types/claude.d.ts`, and `types/mcp.d.ts` are the exact compile-time contract for version 0.1.6. JSON Schemas are available through package exports such as `qarinah/schemas/event.json`.
 
 ## Runtime boundary
 
@@ -61,9 +61,9 @@ Invalid JavaScript argument shapes generally throw `TypeError`. Storage, trust, 
 
 ## Version and contract constants
 
-| Export | Value in 0.1.5 |
+| Export | Value in 0.1.6 |
 | --- | --- |
-| `QARINAH_VERSION` | `"0.1.5"` |
+| `QARINAH_VERSION` | `"0.1.6"` |
 | `EVENT_SCHEMA_VERSION` | `"qarinah.event.v1"` |
 | `CONTEXT_PACK_SCHEMA_VERSION` | `"qarinah.context-pack.v2"` |
 | `CONFIG_SCHEMA_VERSION` | `"qarinah.config.v1"` |
@@ -437,7 +437,7 @@ function rankContextEvents(
 ): Readonly<Record<string, unknown>>;
 ```
 
-Runs local hybrid ranking after repository, time, retention, disclosure, and supersession admission. The default `admission-first-v2` profile preserves BM25 order for admissible lexical candidates, then fills from typo-tolerant and graph evidence; authority may promote an otherwise matched record. `balanced-v1` preserves the original reciprocal-rank-fusion and diversity behavior for reproducibility. `includeFuzzy` and `includeGraph` support explicit ablations. `temporalBoundary: "strict-before"` excludes records whose timestamp equals the query checkpoint; the default inclusive mode preserves normal as-of semantics. Every v2 result includes deterministic `evidence-sufficiency-v2` diagnostics. Only `DIRECTLY_SUPPORTED` produces `decision: "ACCEPT_DIRECT"`; both partial and insufficient evidence produce `decision: "ABSTAIN"`. At the 0.65 operating point the frozen development run observed zero direct false accepts, but exact 95% upper bounds remain 7.25% static and 11.22% online; this is not a universal semantic guarantee. Most callers should use `compileContext`, which also applies evidence gates and output budgets.
+Runs local hybrid ranking after repository, time, retention, disclosure, and supersession admission. The default `admission-first-v2` profile preserves BM25 order for admissible lexical candidates, then fills from typo-tolerant and graph evidence; authority may promote an otherwise matched record. `balanced-v1` preserves the original reciprocal-rank-fusion and diversity behavior for reproducibility. `includeFuzzy` and `includeGraph` support explicit ablations. `temporalBoundary: "strict-before"` excludes records whose timestamp equals the query checkpoint; the default inclusive mode preserves normal as-of semantics. Every v2 result includes deterministic `evidence-sufficiency-v2` diagnostics. Only `DIRECTLY_SUPPORTED` produces `decision: "ACCEPT_DIRECT"`; both partial and insufficient evidence produce `decision: "ABSTAIN"`. At the 0.65 operating point the production-bound development-v0.4 recomputation observed 10/10 static and 15/15 online direct accepts as structural-oracle positives, with zero observed direct false accepts among 49 and 31 oracle-negative cases. Exact 95% false-acceptance upper bounds remain 7.25% static and 11.22% online; this is not a universal semantic guarantee. Most callers should use `compileContext`, which also applies evidence gates and output budgets.
 
 ## Context compilation
 

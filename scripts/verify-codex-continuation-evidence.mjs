@@ -2,23 +2,49 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { continuationImplementationManifest } from "./continuation-evidence-lib.mjs";
+import {
+  continuationImplementationManifest,
+  continuationImplementationManifestAtCommit
+} from "./continuation-evidence-lib.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
-const artifactPath = path.join(root, "bench", "results", `codex-cross-session-continuation-${packageJson.version}.json`);
+const currentArtifactPath = path.join(root, "bench", "results", `codex-cross-session-continuation-${packageJson.version}.json`);
+const historicalArtifactPath = path.join(root, "bench", "results", "codex-cross-session-continuation-0.1.5.json");
+const currentReleaseReceiptPresent = await readFile(currentArtifactPath).then(() => true, (error) => {
+  if (error?.code === "ENOENT") return false;
+  throw error;
+});
+const artifactPath = currentReleaseReceiptPresent ? currentArtifactPath : historicalArtifactPath;
 const artifact = JSON.parse(await readFile(artifactPath, "utf8"));
 const sha256 = /^sha256:[0-9a-f]{64}$/u;
 const eventId = /^evt_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u;
 const commit = /^[0-9a-f]{40}$/u;
+const releaseCommit = "69d5b899ad0b211134b53a7a1d21de079d975fd0";
 
+assert.equal(packageJson.scripts["smoke:codex-continuation"], "node scripts/run-codex-continuation-smoke.mjs");
+assert.equal(packageJson.scripts["smoke:codex-continuation:record"], "node scripts/run-codex-continuation-smoke.mjs --write");
+assert.equal(packageJson.scripts["check:continuation-evidence"], "node scripts/verify-codex-continuation-evidence.mjs");
 assert.equal(artifact.schemaVersion, "qarinah.codex-cross-session-continuation.v1");
-assert.equal(artifact.packageVersion, packageJson.version);
+assert.equal(artifact.packageVersion, currentReleaseReceiptPresent ? packageJson.version : "0.1.5");
 assert.equal(artifact.classification, "provider-backed-product-smoke-not-controlled-research");
 assert.match(artifact.recordedAt, /^\d{4}-\d{2}-\d{2}T/u);
 assert.ok(Number.isFinite(Date.parse(artifact.recordedAt)));
 assert.match(artifact.qarinahCommit, commit);
-assert.deepEqual(artifact.implementation, await continuationImplementationManifest(root));
+const currentImplementation = await continuationImplementationManifest(root);
+const currentImplementationMatchesReceipt = currentImplementation.digest === artifact.implementation.digest
+  && currentImplementation.fileCount === artifact.implementation.fileCount;
+const releaseImplementation = currentReleaseReceiptPresent
+  ? currentImplementation
+  : await continuationImplementationManifestAtCommit(root, releaseCommit);
+assert.deepEqual(
+  artifact.implementation,
+  releaseImplementation,
+  currentReleaseReceiptPresent
+    ? "The current provider smoke receipt does not match current source."
+    : "The historical provider smoke receipt does not match the exact 0.1.5 release source."
+);
+if (currentReleaseReceiptPresent) assert.equal(currentImplementationMatchesReceipt, true);
 
 assert.match(artifact.environment.node, /^v(?:22|24|26)\./u);
 assert.match(artifact.environment.platform, /^(?:win32|linux|darwin)-(?:x64|arm64)$/u);
@@ -89,9 +115,16 @@ assert.doesNotMatch(serialized, /(?:sk-|ghp_|github_pat_|npm_)[A-Za-z0-9_-]{12,}
 process.stdout.write(`${JSON.stringify({
   schemaVersion: "qarinah.codex-cross-session-continuation-verification.v1",
   artifact: path.relative(root, artifactPath).replaceAll("\\", "/"),
-  packageVersion: artifact.packageVersion,
+  currentPackageVersion: packageJson.version,
+  receiptPackageVersion: artifact.packageVersion,
   qarinahCommit: artifact.qarinahCommit,
+  verifiedReleaseCommit: currentReleaseReceiptPresent ? null : releaseCommit,
   implementationDigest: artifact.implementation.digest,
+  currentReleaseReceiptPresent,
+  currentImplementationMatchesReceipt,
+  verificationScope: currentReleaseReceiptPresent
+    ? "current-source-and-recorded-provider-smoke"
+    : "historical-0.1.5-release-source-and-recorded-provider-smoke-only",
   evidenceLinked: true,
   distinctFreshSessions: true,
   outcomeVerified: true,

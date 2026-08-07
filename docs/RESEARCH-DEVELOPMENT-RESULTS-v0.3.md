@@ -2,6 +2,8 @@
 
 Status: development evidence package, not peer reviewed and not a final confirmatory result.
 
+Historical-version note: v0.3 applies a conservative 0.65 decision threshold to the frozen `evidence-sufficiency-v1` scores produced by development v0.2. It is preserved unchanged for research history and must not be described as a recomputation of the current production `evidence-sufficiency-v2` implementation. The production-bound recomputation is [development v0.4](RESEARCH-DEVELOPMENT-RESULTS-v0.4.md).
+
 ## What changed
 
 Qarinah now separates retrieval from evidence sufficiency:

@@ -1,6 +1,6 @@
 # Evidence-linked cross-session continuation
 
-Qarinah 0.1.5 ships a release-gated continuation benchmark and a provider-backed Codex product smoke test. Together they verify that a new coding-agent session can recover a compact handoff, inspect its source evidence, and continue work without native chat resume.
+Qarinah 0.1.6 ships a release-gated deterministic continuation benchmark. A separate provider-backed Codex product smoke was recorded for Qarinah 0.1.5 and remains explicitly historical until a fresh authenticated 0.1.6 run is performed. Together they show that a new coding-agent session can recover a compact handoff, inspect its source evidence, and continue work without native chat resume, but the historical provider result is not evidence for the 0.1.6 release.
 
 These are product-readiness checks. The deterministic fixture is reproducible locally; the provider run is one authenticated smoke test. Neither is a substitute for the frozen multi-repository confirmatory study.
 
@@ -34,14 +34,14 @@ After the persisted read model is built, the fixture appends Session B lifecycle
 
 The selected summary is marked `inferred`; its sources retain their original confidence. Only one raw source record needs to occupy the complete pack because all three source citations remain in the summary for on-demand inspection. The capsule is an additional bounded projection for model injection: it retains the untrusted-data label, summary event ID/hash, and complete-pack manifest hash while leaving the three raw source IDs/hashes in the auditable pack. The result reports partial lexical coverage and `DIRECTLY_SUPPORTED` evidence sufficiency; these are different diagnostics and neither claims that a model's eventual patch is correct. Token values use `ceil(characters / 4)` and are not provider billing data.
 
-The evaluator and committed expected result are [`scripts/evaluate-continuation-context.mjs`](../scripts/evaluate-continuation-context.mjs) and [`bench/results/continuation-context-0.1.5.json`](../bench/results/continuation-context-0.1.5.json).
+The evaluator and committed expected result are [`scripts/evaluate-continuation-context.mjs`](../scripts/evaluate-continuation-context.mjs) and [`bench/results/continuation-context-0.1.6.json`](../bench/results/continuation-context-0.1.6.json).
 
 ## Fresh Codex-to-Codex product smoke
 
 Run this separately from the deterministic release gate on a machine with an authenticated Codex CLI:
 
 ```sh
-npm run smoke:codex-continuation -- --write
+npm run smoke:codex-continuation:record
 npm run check:continuation-evidence
 ```
 
@@ -55,7 +55,7 @@ The runner creates a disposable Git repository with one failing immutable-releas
 6. requires the final answer to cite a retrieved event ID and hash;
 7. verifies the minimal fix, all acceptance tests, ledger integrity, distinct thread IDs, and zero transcript/path/credential leakage in the committed receipt.
 
-The committed receipt is [`bench/results/codex-cross-session-continuation-0.1.5.json`](../bench/results/codex-cross-session-continuation-0.1.5.json). It stores hashes and normalized usage fields, not raw provider transcripts or local paths. The verifier rejects a wrong package version, changed implementation manifest, missing citations, reused session, failed test, failed doctor result, malformed receipt, or credential-like value. The implementation manifest hashes the normalized contents and paths of the shipped CLI, runtime, schemas, types, and Codex/Claude plugins, so it remains verifiable after a squash merge without relying on local Git history.
+The historical receipt is [`bench/results/codex-cross-session-continuation-0.1.5.json`](../bench/results/codex-cross-session-continuation-0.1.5.json). It stores hashes and normalized usage fields, not raw provider transcripts or local paths. The verifier rejects changed recorded implementation evidence, missing citations, reused sessions, failed tests, failed doctor results, malformed receipts, or credential-like values. The implementation manifest hashes the normalized contents and paths of the shipped CLI, runtime, package metadata, schemas, types, and Codex/Claude plugins. `npm run check:continuation-evidence` verifies that receipt against exact Qarinah 0.1.5 release commit `69d5b899ad0b211134b53a7a1d21de079d975fd0` and reports `historical-0.1.5` scope instead of pretending the old provider run exercised 0.1.6. The check makes no provider call. A current receipt may be created only by actually running authenticated `npm run smoke:codex-continuation:record`; copying or synthesizing one is not valid evidence.
 
 ## Product fixes exercised by the benchmark
 

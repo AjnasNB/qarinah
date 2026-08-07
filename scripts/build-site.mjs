@@ -9,8 +9,11 @@ const github = "https://github.com/AjnasNB/qarinah";
 const siteOrigin = "https://qarinah.io";
 const npmPackage = "https://www.npmjs.com/package/qarinah";
 const doi = "https://doi.org/10.5281/zenodo.21547684";
-const zenodoPdf = "/paper/Qarinah-Technical-White-Paper-v1.2.pdf";
-const releaseDate = "2026-08-07";
+const versionDoi = "https://doi.org/10.5281/zenodo.21843240";
+const paperVersion = "1.3";
+const paperPdf = `/paper/Qarinah-Technical-White-Paper-v${paperVersion}.pdf`;
+const historicalPaperPdf = "/paper/Qarinah-Technical-White-Paper-v1.2.pdf";
+const releaseDate = "2026-08-08";
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 const productVersion = packageJson.version;
 const productPositioning = "Evidence-linked project memory for coding agents.";
@@ -245,7 +248,12 @@ await cp(path.join(root, "node_modules", "@primer", "css", "dist", "primer.css")
 await cp(path.join(root, "assets", "brand", "qarinah-mark.svg"), path.join(output, "assets", "qarinah-mark.svg"));
 await cp(path.join(root, "assets", "architecture", "qarinah-flow.svg"), path.join(output, "assets", "qarinah-flow.svg"));
 await cp(path.join(root, "assets", "launch", "qarinah-social-preview.png"), path.join(output, "assets", "qarinah-social-preview.png"));
-await cp(path.join(root, "output", "pdf", "Qarinah-Technical-White-Paper-v1.2.pdf"), path.join(output, "paper", "Qarinah-Technical-White-Paper-v1.2.pdf"));
+for (const filename of [
+  "Qarinah-Technical-White-Paper-v1.2.pdf",
+  `Qarinah-Technical-White-Paper-v${paperVersion}.pdf`
+]) {
+  await cp(path.join(root, "output", "pdf", filename), path.join(output, "paper", filename));
+}
 
 marked.setOptions({
   gfm: true,
@@ -281,10 +289,10 @@ function rewriteMarkdownLinks(markdown, source) {
       target = "/docs/";
     } else if (resolved.startsWith("assets/")) {
       target = `/${resolved}`;
+    } else if (resolved.endsWith(`Qarinah-Technical-White-Paper-v${paperVersion}.pdf`)) {
+      target = paperPdf;
     } else if (resolved.endsWith("Qarinah-Technical-White-Paper-v1.2.pdf")) {
-      target = source === "docs/WHITEPAPER.md"
-        ? zenodoPdf
-        : "/paper/Qarinah-Technical-White-Paper-v1.2.pdf";
+      target = historicalPaperPdf;
     } else {
       target = `${github}/blob/main/${resolved}`;
     }
@@ -303,8 +311,8 @@ function rewriteMarkdownAssets(markdown) {
 function rewritePublicationLink(markdown, source) {
   if (source !== "docs/WHITEPAPER.md") return markdown;
   return markdown.replace(
-    "https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.2.pdf",
-    zenodoPdf
+    `https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v${paperVersion}.pdf`,
+    paperPdf
   );
 }
 
@@ -479,10 +487,12 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
       description,
       url,
       inLanguage: "en",
-      datePublished: releaseDate,
+      dateCreated: releaseDate,
       dateModified: releaseDate,
-      version: "1.0",
-      identifier: doi,
+      datePublished: releaseDate,
+      version: paperVersion,
+      identifier: versionDoi,
+      creativeWorkStatus: "Published",
       license: "https://www.apache.org/licenses/LICENSE-2.0",
       author: { "@id": person["@id"] },
       contributor: {
@@ -491,9 +501,10 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
       },
       encoding: {
         "@type": "MediaObject",
-        contentUrl: zenodoPdf,
+        contentUrl: paperPdf,
         encodingFormat: "application/pdf"
       },
+      sameAs: [versionDoi, doi],
       isPartOf: { "@id": `${siteOrigin}/#website` }
     });
   } else if (kind === "benchmark") {
@@ -1004,7 +1015,7 @@ async function markdownPage(page) {
         ? "answers"
         : "docs";
   const publicationLink = page.route === "paper"
-    ? '<a href="https://doi.org/10.5281/zenodo.21547684">Cite on Zenodo</a>'
+    ? `<a href="${versionDoi}">Version DOI: 10.5281/zenodo.21843240</a>`
     : "";
 
   return layout({

@@ -43,11 +43,11 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 - [Troubleshooting](https://qarinah.io/docs/troubleshooting/): Diagnose trust, capture, rebuild, query, MCP, and host-integration failures.
 - [FAQ](https://qarinah.io/docs/faq/): Direct answers about storage, privacy, context reduction, hosts, and operating boundaries.
 - [Migration guide](https://qarinah.io/docs/migrations/): Upgrade persisted Qarinah workspaces safely.
-- [Technical white paper](https://qarinah.io/paper/): Implementation-backed paper version 1.2 for Qarinah 0.1.5.
+- [Technical white paper](https://qarinah.io/paper/): Implementation-backed paper version 1.3 for Qarinah 0.1.6; version DOI 10.5281/zenodo.21843240.
 
 ## Publication and support
 
-- [White-paper PDF](https://qarinah.io/paper/Qarinah-Technical-White-Paper-v1.2.pdf): Website copy of the publication.
+- [White-paper PDF](https://qarinah.io/paper/Qarinah-Technical-White-Paper-v1.3.pdf): Versioned website copy of white-paper v1.3.
 - [DOI record](https://doi.org/10.5281/zenodo.21547684): Persistent concept DOI resolving to the latest Zenodo version.
 - [Support](https://github.com/AjnasNB/qarinah/blob/main/SUPPORT.md): Usage questions, defects, feature requests, and private security-reporting guidance.
 - [Security policy](https://github.com/AjnasNB/qarinah/blob/main/SECURITY.md): Vulnerability-reporting policy.

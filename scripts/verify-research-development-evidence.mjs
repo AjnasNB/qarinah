@@ -1,17 +1,40 @@
 import assert from "node:assert/strict";
+import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
+import { promisify } from "node:util";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const corpus = JSON.parse(await readFile(path.join(root, "bench", "research", "swe-bench-lite-development-v0.2.json"), "utf8"));
-const result = JSON.parse(await readFile(path.join(root, "bench", "results", "research-retrieval-development-v0.2.json"), "utf8"));
+const resultBytes = await readFile(path.join(root, "bench", "results", "research-retrieval-development-v0.2.json"));
+const result = JSON.parse(resultBytes);
+const backup = JSON.parse(await readFile(path.join(root, "bench", "research", "development-backup-v0.2.json"), "utf8"));
+const evaluator = await readFile(path.join(root, "scripts", "evaluate-research-retrieval-v0.2.mjs"), "utf8");
 const research = await readFile(path.join(root, "docs", "RESEARCH-BENCHMARK.md"), "utf8");
 const handoff = await readFile(path.join(root, "docs", "CROSS-AGENT-VIDEO-PROTOCOL.md"), "utf8");
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 
 const digest = (value) => `sha256:${createHash("sha256").update(value).digest("hex")}`;
+const historicalCommit = "bd566ac5ba7b302653b994fd0622d516fa74bbb8";
+const historicalTag = "research-retrieval-development-v0.2";
+const run = promisify(execFile);
+
+assert.equal(digest(resultBytes), "sha256:bfe8015811ffbecd5e3c00eb9f4a1e104478605cd605442a1ec96d67582e4b3f");
+assert.equal(backup.commit, historicalCommit);
+assert.equal(backup.tag, historicalTag);
+assert.equal(backup.bundleSha256, "sha256:909794b4528c48c17bf69fdd3a2d1bfaac2d2c973dc40086e58dd6c7563e5a71");
+assert.equal(backup.bundleVerified, true);
+const resolvedHistoricalCommit = (await run("git", ["rev-parse", `${historicalTag}^{commit}`], { cwd: root })).stdout.trim();
+assert.equal(resolvedHistoricalCommit, historicalCommit);
+for (const fragment of [
+  historicalTag,
+  historicalCommit,
+  "must not be recomputed with the current production runtime",
+  "git worktree add ../qarinah-research-v0.2",
+  "evaluate:research-retrieval:v0.4"
+]) assert.ok(evaluator.includes(fragment), `Historical v0.2 evaluator guard is missing: ${fragment}`);
 
 assert.equal(corpus.schemaVersion, "qarinah.research-corpus.swe-bench-lite-development.v2");
 assert.equal(corpus.splitPolicy.exploratoryReuse, true);
@@ -100,5 +123,6 @@ for (const fragment of [
 
 assert.equal(packageJson.scripts["prepare:research:v0.2"], "node scripts/prepare-research-benchmark-v0.2.mjs");
 assert.equal(packageJson.scripts["evaluate:research-retrieval:v0.2"], "node scripts/evaluate-research-retrieval-v0.2.mjs");
+assert.equal(packageJson.scripts["evaluate:research-retrieval:v0.2:write"], undefined);
 
 process.stdout.write("Development-v0.2 corpus, retrieval results, claim boundaries, and video protocol are valid.\n");

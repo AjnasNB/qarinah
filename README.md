@@ -103,8 +103,8 @@ The JSONL chain remains authoritative. Graph, index, Markdown, dashboard, and OK
 
 <p align="center">
   <a href="docs/WHITEPAPER.md">Technical paper</a>&nbsp;&middot;&nbsp;
-  <a href="https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.2.pdf">Publication PDF</a>&nbsp;&middot;&nbsp;
-  <a href="https://doi.org/10.5281/zenodo.21547684">Zenodo record</a>&nbsp;&middot;&nbsp;
+  <a href="https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.3.pdf">White-paper v1.3 PDF</a>&nbsp;&middot;&nbsp;
+  <a href="https://doi.org/10.5281/zenodo.21843240">White-paper v1.3 DOI</a>&nbsp;&middot;&nbsp;
   <a href="docs/ARCHITECTURE.md">Architecture</a>&nbsp;&middot;&nbsp;
   <a href="docs/DASHBOARD.md">Dashboard</a>&nbsp;&middot;&nbsp;
   <a href="docs/BENCHMARKS.md">Benchmarks</a>&nbsp;&middot;&nbsp;
@@ -359,15 +359,15 @@ The repository also runs `npm run mcp:smoke` against the exact bundled Codex and
 
 ### Install once, initialize each project
 
-Install the reviewed `v0.1.5` plugin once in each host:
+Install the reviewed `v0.1.6` plugin once in each host after that release is published:
 
 ```sh
 # Codex: personal installation, available to opted-in projects.
-codex plugin marketplace add AjnasNB/qarinah --ref v0.1.5
+codex plugin marketplace add AjnasNB/qarinah --ref v0.1.6
 codex plugin add qarinah@qarinah
 
 # Claude Code: personal installation across projects.
-claude plugin marketplace add AjnasNB/qarinah@v0.1.5 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.1.6 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 
@@ -461,7 +461,7 @@ The long-document evaluator adds a fixed 600-token ceiling over a deterministic 
 
 The [cross-session continuation benchmark](docs/CROSS-SESSION-CONTINUATION-BENCHMARK.md) adds a 42-record two-session fixture for context summarization, evidence links, and fresh-session retrieval. Its complete 1,039-token cited audit pack is 89.05% smaller than the 9,489-token full-ledger estimate and preserves all three summary source IDs and hashes. A separate 119-token model-facing capsule points to that verified pack and the selected summary event, reaching 98.75% reduction on the same unchanged fixture without removing the audit trail. The read also leaves deliberately stale derived state unchanged. A separate provider-backed Codex-to-Codex smoke uses distinct ephemeral sessions with native resume disabled, requires the second session to query Qarinah and cite its evidence, and verifies the resulting patch with tests. The provider smoke is product evidence, not a controlled research result.
 
-The separate [real-repository research track](docs/RESEARCH-BENCHMARK.md) pins 300 public SWE-bench Lite tasks into a chronological 60-task warm-up / 240-task development split. Frozen exploratory v0.1 found that BM25 beat the original balanced Qarinah ranker. Admission-first v2 now preserves admitted BM25 ranking while retaining repository, temporal, retention, disclosure, conflict, supersession, provenance, and budget controls; online MRR improves from 0.601 to 0.696 against balanced-v1 under the graded structural development oracle. Graph ranking adds no measured value here. At the conservative v0.3 operating point, the run observed 0/49 static and 0/31 online direct false accepts by abstaining aggressively; exact 95% upper bounds remain 7.25% and 11.22%, and coverage is only 3.33%-5.00%. The [latest development result](docs/RESEARCH-DEVELOPMENT-RESULTS-v0.3.md) also freezes 387 positive tasks, 20 abstention controls, a contamination audit, and a pre-outcome 40-pair power check. This phase does not measure coding-agent task success or provider usage.
+The separate [real-repository research track](docs/RESEARCH-BENCHMARK.md) pins 300 public SWE-bench Lite tasks into a chronological 60-task warm-up / 240-task development split. Frozen exploratory v0.1 found that BM25 beat the original balanced Qarinah ranker. Admission-first v2 now preserves admitted BM25 ranking while retaining repository, temporal, retention, disclosure, conflict, supersession, provenance, and budget controls; online MRR improves from 0.601 to 0.696 against balanced-v1 under the graded structural development oracle. Graph ranking adds no measured value here. Historical v0.3 calibrated a conservative decision over frozen v0.2 scores. The [production-bound v0.4 recomputation](docs/RESEARCH-DEVELOPMENT-RESULTS-v0.4.md) uses current `evidence-sufficiency-v2`: it observed 10/10 static and 15/15 online direct accepts as structural-oracle positives, with 0/49 and 0/31 false accepts. Exact 95% false-acceptance upper bounds remain 7.25% and 11.22%, and coverage remains deliberately low at 4.17%-6.25%. The research package also freezes 387 positive tasks, 20 abstention controls, a contamination audit, and a pre-outcome 40-pair power check. This phase does not measure coding-agent task success or provider usage.
 
 ## License and ownership
 

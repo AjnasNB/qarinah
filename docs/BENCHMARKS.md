@@ -14,17 +14,19 @@ The 98.75% and 89.05% values are intentionally different. They use the same 42-r
 
 All three results use the portable estimator `ceil(characters / 4)`. The exact committed fractions are `1 - 5,682 / 442,113`, `1 - 119 / 9,489`, and `1 - 1,039 / 9,489`. These are deterministic context-volume measurements, not provider usage receipts.
 
-## Publication and evidence map
+The 0.1.6 release evidence is bound in [`bench/results/benchmark-release-0.1.6.json`](../bench/results/benchmark-release-0.1.6.json) and checked by [`scripts/verify-benchmark-release-0.1.6.mjs`](../scripts/verify-benchmark-release-0.1.6.mjs). The manifest is a timestamped pre-publication verification receipt for the exact source later distributed as Qarinah 0.1.6, the website, and white-paper v1.3 with version DOI [`10.5281/zenodo.21843240`](https://doi.org/10.5281/zenodo.21843240). Its lifecycle fields intentionally preserve the state at local verification rather than acting as a live publication-status endpoint. It classifies the only provider-backed continuation receipt as historical 0.1.5 evidence.
 
-Verified on 2026-08-07:
+## Release evidence map
 
-| Evidence | What it establishes | GitHub | npm 0.1.5 | qarinah.io | Zenodo paper v1.2 |
-| --- | --- | --- | --- | --- | --- |
-| Six-task software fixture | Estimated repeated-context volume and direct top-five coverage | Published | Published | Published | Published |
-| Long-document fixture | Fixed-budget retrieval, supported-answer preservation, and unsupported-control rejection | Published | Published | Published | Published |
-| Cross-session continuation fixture | Evidence-linked summary retrieval, a complete audit pack, and a compact model-facing capsule | Published | Published | Published | Published |
-| SWE-bench Lite development study | Retrieval ranking, temporal leakage, repository isolation, and a conservative development gate on real repositories | Published | Published | Published | Published |
-| SWE-bench Verified confirmatory study | Provider usage, patch resolution, cost, and human-rated quality | Protocol only | Protocol only | Protocol only | Protocol only; the study has not run |
+Qarinah 0.1.6, the generated host integrations, the website, and white-paper v1.3 are released from one reviewed source commit. The evidence below is included with that release:
+
+| Evidence | What it establishes | Release status |
+| --- | --- | --- |
+| Six-task software fixture | Estimated repeated-context volume and direct top-five coverage | Included in Qarinah 0.1.6 and paper v1.3 |
+| Long-document fixture | Fixed-budget retrieval, supported-answer preservation, and unsupported-control rejection | Included in Qarinah 0.1.6 and paper v1.3 |
+| Cross-session continuation fixture | Evidence-linked summary retrieval, a complete audit pack, and a compact model-facing capsule | Included in Qarinah 0.1.6 and paper v1.3 |
+| SWE-bench Lite development study | Retrieval ranking, temporal leakage, repository isolation, and the production-bound v0.4 gate on real repositories | Included in Qarinah 0.1.6 and paper v1.3 |
+| SWE-bench Verified confirmatory study | Provider usage, patch resolution, cost, and human-rated quality | Protocol only; the study has not run |
 
 The SWE-bench work follows the official public dataset and evaluation framing, but the completed phase is a retrieval study rather than an official patch-resolution score. The frozen 40-task provider-backed study remains unexecuted, so Qarinah does not claim improved SWE-bench resolve rate or provider-native token savings.
 
@@ -122,7 +124,7 @@ All three scales additionally verify:
 
 “Fail closed” therefore does not mean that long-document or multi-file retrieval failed. It means Qarinah refused to label unsupported evidence as direct. In this benchmark, **9 / 9 unsupported controls were successful fail-closed behavior**.
 
-The fixture is synthetic so relevance and answers are completely auditable. It measures local retrieval, bounded evidence preservation, and projection integrity; it does not measure provider-reported tokens or coding-task completion. The context-volume values use portable `ceil(characters / 4)` estimates. See the [evaluator](../scripts/evaluate-multifile-context.mjs), [machine-readable result](../bench/results/multifile-context-0.1.5.json), and [artifact verifier](../scripts/verify-multifile-context.mjs).
+The fixture is synthetic so relevance and answers are completely auditable. It measures local retrieval, bounded evidence preservation, and projection integrity; it does not measure provider-reported tokens or coding-task completion. The context-volume values use portable `ceil(characters / 4)` estimates. See the [evaluator](../scripts/evaluate-multifile-context.mjs), [machine-readable result](../bench/results/multifile-context-0.1.6.json), and [artifact verifier](../scripts/verify-multifile-context.mjs).
 
 ## Retrieval-regression fixture
 
@@ -175,11 +177,11 @@ Keep these direct details beside the number:
 
 ## Cross-session continuation and evidence-linked summarization
 
-Qarinah 0.1.5 ships a deterministic 42-record, two-session continuation fixture. A fresh logical session retrieves an inferred handoff summary at rank 3 after lifecycle capture deliberately makes the persisted read model stale. All three source event IDs and hashes remain embedded in the selected full pack, one raw source is also selected, the query leaves derived state byte-for-byte unchanged, and `doctor` passes. The complete cited audit pack uses 1,039 portable estimated tokens versus 9,489 for the full ledger, an 89.0505% estimated reduction. A separate 119-token model-facing handoff capsule points to that exact pack manifest and the selected summary event ID/hash, yielding a 98.7459% estimated reduction against the same unchanged history. The capsule is a compact projection, not a replacement for the complete evidence pack.
+Qarinah 0.1.6 ships a deterministic 42-record, two-session continuation fixture. A fresh logical session retrieves an inferred handoff summary at rank 3 after lifecycle capture deliberately makes the persisted read model stale. All three source event IDs and hashes remain embedded in the selected full pack, one raw source is also selected, the query leaves derived state byte-for-byte unchanged, and `doctor` passes. The complete cited audit pack uses 1,039 portable estimated tokens versus 9,489 for the full ledger, an 89.0505% estimated reduction. A separate 119-token model-facing handoff capsule points to that exact pack manifest and the selected summary event ID/hash, yielding a 98.7459% estimated reduction against the same unchanged history. The capsule is a compact projection, not a replacement for the complete evidence pack.
 
 A separate authenticated Codex CLI smoke uses two distinct ephemeral sessions with native resume disabled. Session A diagnoses a failing fixture without editing; Session B must query Qarinah first, cite a retrieved event ID and hash, implement the fix, and pass the acceptance tests. The checked receipt retains hashes and normalized usage fields, not raw transcripts or local paths.
 
-This is continuation-product evidence, not a controlled model-quality claim. See [the complete method and limitations](CROSS-SESSION-CONTINUATION-BENCHMARK.md), the [deterministic result](../bench/results/continuation-context-0.1.5.json), and the [provider-backed smoke receipt](../bench/results/codex-cross-session-continuation-0.1.5.json).
+This is continuation-product evidence, not a controlled model-quality claim. See [the complete method and limitations](CROSS-SESSION-CONTINUATION-BENCHMARK.md), the [0.1.6 deterministic result](../bench/results/continuation-context-0.1.6.json), and the explicitly historical [0.1.5 provider-backed smoke receipt](../bench/results/codex-cross-session-continuation-0.1.5.json). No provider-backed 0.1.6 continuation receipt is claimed.
 
 ## Claims Qarinah does not make
 
@@ -196,11 +198,13 @@ The research track follows the task framing introduced by Jimenez et al. in [SWE
 
 The frozen exploratory-v0.1 result is deliberately not a marketing headline. On the 79 held-out tasks with a prior production-file-overlap target, BM25 outperforms the original balanced-v1 Qarinah ranker: Recall@10 is 0.687 versus 0.518, and MRR is 0.430 versus 0.320. The no-temporal ablation returns 971 future citations, and the lexical coverage gate accepts all 161 tasks with no positive record under the file-overlap oracle. A separate 72-record governance suite returns zero forbidden records.
 
-Development v0.2 is explicitly tuned after inspecting v0.1 and is not confirmatory. It resolves the official-page 11-repository statement against the 12-project revision artifact, adds a raw Parquet SHA-256, graded structural labels, static and online/prequential settings, fixed 512-8,000-token budgets, item/query leakage, calibration metrics, and repository-clustered bootstrap intervals. Admission-first Qarinah v2 exactly matches admitted BM25 ranking and improves online MRR over balanced-v1 from 0.601 to 0.696. Graph adds no measured ranking value. The original v0.2 interpretation counted partial evidence as accepted and produced a 90.32% false-acceptance rate among online tasks with no positive record under the structural oracle.
+Development v0.2 is explicitly tuned after inspecting v0.1 and is not confirmatory. It resolves the official-page 11-repository statement against the 12-project revision artifact, adds a raw Parquet SHA-256, graded structural labels, static and online/prequential settings, fixed 512-8,000-token budgets, item/query leakage, calibration metrics, and repository-clustered bootstrap intervals. Admission-first Qarinah v2 exactly matches admitted BM25 ranking and improves online MRR over balanced-v1 from 0.601 to 0.696. Graph adds no measured ranking value. The frozen v0.2 artifact was produced by `evidence-sufficiency-v1`; its original interpretation counted partial evidence as accepted and produced a 90.32% false-acceptance rate among online tasks with no positive record under the structural oracle. Reproduction is bound to tag `research-retrieval-development-v0.2` at commit `bd566ac5ba7b302653b994fd0622d516fa74bbb8`, not mutable current source.
 
-The conservative development-v0.3 gate accepts only direct evidence at the calibrated 0.65 threshold and treats partial evidence as abstention. At the frozen operating point it observed 0/49 direct false accepts in static evaluation and 0/31 online, including the leave-one-repository-out aggregation. Static direct precision is 8/8 with a 63.06%-100% exact 95% interval; online it is 12/12 with a 73.54%-100% interval. The false-acceptance intervals are 0%-7.25% and 0%-11.22%, respectively. Acceptance coverage is intentionally low at 3.33% static and 5.00% online. These are development structural-oracle results, not a universal semantic guarantee; a blinded 49-case relevance census is awaiting two independent human reviewers.
+Historical development v0.3 applies a conservative 0.65 direct threshold to those frozen v0.2 scores and treats partial evidence as abstention. It observed 8/8 static and 12/12 online accepted positives with 0/49 and 0/31 structural-oracle false accepts. Because the score source is v0.2, v0.3 is preserved as historical threshold calibration rather than described as current-product recomputation.
 
-See the complete [research protocol, limitations, repository citations, and results](RESEARCH-BENCHMARK.md). The committed artifacts preserve [`exploratory v0.1`](../bench/results/research-retrieval-0.1.2.json), [`development retrieval v0.2`](../bench/results/research-retrieval-development-v0.2.json), and [`conservative sufficiency v0.3`](../bench/results/research-sufficiency-development-v0.3.json).
+Development v0.4 recomputes the same inspected corpus with the current production `evidence-sufficiency-v2` implementation and binds the artifact to per-file source hashes. It accepts 10/240 static and 15/240 online queries as direct, all structural-oracle positives, while observing 0/49 and 0/31 direct false accepts. Direct precision is 10/10 with a 69.15%-100% exact 95% interval and 15/15 with a 78.20%-100% interval. False-acceptance intervals remain 0%-7.25% and 0%-11.22%; coverage remains deliberately low at 4.17% and 6.25%. These are development structural-oracle results, not a universal semantic guarantee; a blinded 49-case relevance census is awaiting two independent human reviewers.
+
+See the complete [research protocol, limitations, repository citations, and results](RESEARCH-BENCHMARK.md). The committed artifacts preserve [`exploratory v0.1`](../bench/results/research-retrieval-0.1.2.json), [`historical development retrieval v0.2`](../bench/results/research-retrieval-development-v0.2.json), [`historical threshold calibration v0.3`](../bench/results/research-sufficiency-development-v0.3.json), and the [current production-bound development v0.4 recomputation](../bench/results/research-retrieval-development-v0.4.json).
 
 ## Next benchmark gate
 

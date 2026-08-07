@@ -674,7 +674,7 @@ def parse_markdown(source: str):
                 ListFlowable(
                     items,
                     bulletType="1" if ordered else "bullet",
-                    start="1",
+                    start="1" if ordered else "-",
                     leftIndent=7 * mm,
                     bulletFontName=BODY_FONT,
                     bulletFontSize=8.5,
