@@ -1,6 +1,6 @@
 # MCP guide
 
-Qarinah 0.1.4 includes a native, zero-write Model Context Protocol server. It always provides local ledger status and integrity diagnostics. It provides `context.query` only after the user creates an explicit permit bound to the exact workspace, current consent-policy hash, and response ceilings.
+Qarinah 0.1.5 includes a native, zero-write Model Context Protocol server. It always provides local ledger status and integrity diagnostics. It provides `context.query` only after the user creates an explicit permit bound to the exact workspace, current consent-policy hash, and response ceilings.
 
 That narrow boundary is intentional:
 
@@ -15,7 +15,7 @@ That narrow boundary is intentional:
 | --- | --- |
 | MCP name | `io.github.AjnasNB/qarinah` |
 | npm package | `qarinah` |
-| Version | `0.1.4` |
+| Version | `0.1.5` |
 | Transport | `stdio` |
 | CLI entry | `npx qarinah mcp` |
 | Default tools | `context_status`, `context_doctor` |

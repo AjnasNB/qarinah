@@ -17,10 +17,10 @@ const committedDigest = (await read("assets/architecture/qarinah-flow.source.sha
 const whitePaperSource = await read("docs/WHITEPAPER.md");
 const whitePaperBuilder = await read("scripts/build-whitepaper-pdf.py");
 const whitePaperPdf = await readFile(
-  path.join(root, "output", "pdf", "Qarinah-Technical-White-Paper-v1.0.pdf")
+  path.join(root, "output", "pdf", "Qarinah-Technical-White-Paper-v1.1.pdf")
 );
 const whitePaperPdfDigest = (
-  await read("output/pdf/Qarinah-Technical-White-Paper-v1.0.source.sha256")
+  await read("output/pdf/Qarinah-Technical-White-Paper-v1.1.source.sha256")
 ).trim();
 const expectedWhitePaperDigest = createHash("sha256")
   .update(whitePaperSource, "utf8")
@@ -69,7 +69,7 @@ if (
 }
 for (const relativePath of ["README.md", "docs/WHITEPAPER.md"]) {
   const markdown = await read(relativePath);
-  if (!markdown.includes("output/pdf/Qarinah-Technical-White-Paper-v1.0.pdf")) {
+  if (!markdown.includes("output/pdf/Qarinah-Technical-White-Paper-v1.1.pdf")) {
     throw new Error(`${relativePath} does not link to the publication PDF.`);
   }
 }

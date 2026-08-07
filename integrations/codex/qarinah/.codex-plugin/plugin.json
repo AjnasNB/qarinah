@@ -1,6 +1,6 @@
 {
   "name": "qarinah",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.",
   "author": {
     "name": "Ajnas NB",

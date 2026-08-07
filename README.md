@@ -2,6 +2,15 @@
   <img src="assets/launch/qarinah-social-preview.svg" width="100%" alt="Qarinah - your project remembers across coding agents">
 </p>
 
+## Reproducible benchmark results
+
+| **98.7148%** | **98.75%** | **89.05%** |
+| :---: | :---: | :---: |
+| Six-task repeated-context reduction | Model-facing continuation capsule | Complete evidence-rich continuation pack |
+| 442,113 -> 5,682 estimated tokens | 9,489 -> 119 estimated tokens | 9,489 -> 1,039 estimated tokens |
+
+The continuation percentages use the same 42-record, two-session history but measure two different outputs: the 119-token capsule is the smallest model-facing handoff, while the 1,039-token pack preserves the complete cited audit surface. All three measurements use the reproducible portable estimator `ceil(characters / 4)`; they are not provider billing receipts. [Inspect the fixtures, exact arithmetic, and claim boundaries.](docs/BENCHMARKS.md)
+
 <h1 align="center">Qarinah</h1>
 
 <p align="center"><em>Switch agents. Keep the decisions, outcomes, and proof.</em></p>
@@ -15,7 +24,7 @@
   <a href="https://qarinah.io/docs/"><strong>Documentation</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://qarinah.io/paper/"><strong>White paper</strong></a>&nbsp;&middot;&nbsp;
   <a href="docs/RESEARCH-BENCHMARK.md"><strong>Research benchmark</strong></a>&nbsp;&middot;&nbsp;
-  <a href="https://doi.org/10.5281/zenodo.21547685"><strong>DOI</strong></a>
+  <a href="https://doi.org/10.5281/zenodo.21547684"><strong>DOI</strong></a>
 </p>
 
 <p align="center">
@@ -92,8 +101,8 @@ The JSONL chain remains authoritative. Graph, index, Markdown, dashboard, and OK
 
 <p align="center">
   <a href="docs/WHITEPAPER.md">Technical paper</a>&nbsp;&middot;&nbsp;
-  <a href="https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.0.pdf">Publication PDF</a>&nbsp;&middot;&nbsp;
-  <a href="https://doi.org/10.5281/zenodo.21547685">Zenodo record</a>&nbsp;&middot;&nbsp;
+  <a href="https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.1.pdf">Publication PDF</a>&nbsp;&middot;&nbsp;
+  <a href="https://doi.org/10.5281/zenodo.21547684">Zenodo record</a>&nbsp;&middot;&nbsp;
   <a href="docs/ARCHITECTURE.md">Architecture</a>&nbsp;&middot;&nbsp;
   <a href="docs/DASHBOARD.md">Dashboard</a>&nbsp;&middot;&nbsp;
   <a href="docs/BENCHMARKS.md">Benchmarks</a>&nbsp;&middot;&nbsp;
@@ -348,15 +357,15 @@ The repository also runs `npm run mcp:smoke` against the exact bundled Codex and
 
 ### Install once, initialize each project
 
-Install the reviewed `v0.1.4` plugin once in each host:
+Install the reviewed `v0.1.5` plugin once in each host:
 
 ```sh
 # Codex: personal installation, available to opted-in projects.
-codex plugin marketplace add AjnasNB/qarinah --ref v0.1.4
+codex plugin marketplace add AjnasNB/qarinah --ref v0.1.5
 codex plugin add qarinah@qarinah
 
 # Claude Code: personal installation across projects.
-claude plugin marketplace add AjnasNB/qarinah@v0.1.4 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.1.5 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 

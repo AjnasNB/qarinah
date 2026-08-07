@@ -43,12 +43,12 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 - [Troubleshooting](https://qarinah.io/docs/troubleshooting/): Diagnose trust, capture, rebuild, query, MCP, and host-integration failures.
 - [FAQ](https://qarinah.io/docs/faq/): Direct answers about storage, privacy, context reduction, hosts, and operating boundaries.
 - [Migration guide](https://qarinah.io/docs/migrations/): Upgrade persisted Qarinah workspaces safely.
-- [Technical white paper](https://qarinah.io/paper/): Implementation-backed paper for Qarinah 0.1.0.
+- [Technical white paper](https://qarinah.io/paper/): Implementation-backed paper version 1.1 for Qarinah 0.1.5.
 
 ## Publication and support
 
-- [White-paper PDF](https://qarinah.io/paper/Qarinah-Technical-White-Paper-v1.0.pdf): Website copy of the publication.
-- [DOI record](https://doi.org/10.5281/zenodo.21547685): Persistent Zenodo record.
+- [White-paper PDF](https://qarinah.io/paper/Qarinah-Technical-White-Paper-v1.1.pdf): Website copy of the publication.
+- [DOI record](https://doi.org/10.5281/zenodo.21547684): Persistent concept DOI resolving to the latest Zenodo version.
 - [Support](https://github.com/AjnasNB/qarinah/blob/main/SUPPORT.md): Usage questions, defects, feature requests, and private security-reporting guidance.
 - [Security policy](https://github.com/AjnasNB/qarinah/blob/main/SECURITY.md): Vulnerability-reporting policy.
 - [License](https://github.com/AjnasNB/qarinah/blob/main/LICENSE): Apache License 2.0.

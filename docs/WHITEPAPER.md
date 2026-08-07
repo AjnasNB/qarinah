@@ -3,13 +3,13 @@
 ## An evidence-linked project-memory compiler for coding agents
 
 **Author:** Ajnas NB<br>
-**Paper version:** 1.0<br>
-**Implementation:** Qarinah `0.1.0` stable open-source release<br>
-**Date:** July 2026<br>
+**Paper version:** 1.1<br>
+**Implementation:** Qarinah `0.1.5` stable open-source release<br>
+**Date:** August 2026<br>
 **License:** Apache License 2.0<br>
-**Status:** Implementation-backed technical white paper for Qarinah 0.1.0. The paper has not undergone independent peer review.
+**Status:** Implementation-backed technical white paper for Qarinah 0.1.5. This version is not peer-reviewed. All measured claims identify their benchmark, denominator, estimator, and limits.
 
-[Download the publication PDF](https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.0.pdf)
+[Download the publication PDF](https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.1.pdf)
 
 > Qarinah turns permitted agent activity, project structure, decisions, approvals, and source evidence into a local, verifiable record. When a later task needs context, Qarinah compiles a small cited pack instead of replaying the complete project history.
 
@@ -25,7 +25,11 @@ Qarinah treats project memory as a compilation problem rather than a transcript-
 
 The implementation is local-first, model-agnostic, and explicit about capture. A repository configuration does not grant consent by itself. Capture also requires machine-local trust for the repository's real path, and metadata-only capture is the default. Content capture is a separate reviewed choice. Derived files are disposable and can be rebuilt from the verified event chain.
 
-The committed software-task evaluation compares full-history replay with Qarinah packs while keeping the same current-task source material on both sides. Across 240 retained records and six software scenarios, the measured context falls from 442,113 to 5,682 estimated input-context tokens, a 98.71% reduction and a 77.81:1 compression ratio. Every required target ranks in the top five with direct evidence coverage, and no model-written summaries are used. A separate fixed-budget long-document evaluation preserves all 16 supported answers at rank one, rejects all four unsupported controls, and achieves at least 98.4% estimated context reduction. These are reproducible context-volume and retrieval results, not universal claims about provider billing, task quality, latency, or coding speed.
+The committed software-task evaluation compares full-history replay with Qarinah packs while keeping the same current-task source material on both sides. Across 240 retained records and six software scenarios, the measured context falls from 442,113 to 5,682 estimated input-context tokens: a 98.7148% reduction and a 77.81:1 compression ratio. Every required target ranks in the top five with direct evidence coverage, and no model-written summaries are used. A separate 42-record, two-session continuation fixture measures two outputs against the same 9,489-token history: a 119-token model-facing capsule (98.7459% reduction) and a 1,039-token complete cited audit pack (89.0505% reduction). The capsule retains the selected summary identity and audit-pack manifest pointer; the larger pack retains all summary-source identities and hashes.
+
+A development-stage real-repository study uses the official public SWE-bench Lite task artifact and the software-issue framing introduced by Jimenez et al. [1]. It orders each repository chronologically, uses 60 early tasks to build memory, and evaluates 240 later queries. Admission-first Qarinah v2 matches admitted BM25 ranking, while its temporal and authority filters prevent the future and forbidden evidence admitted by ablations. Online mean reciprocal rank improves from 0.6007 for the earlier balanced profile to 0.6956 for v2; the repository-clustered 95% interval for the paired difference is [0.0572, 0.1115]. Graph expansion adds no ranking improvement in this corpus. A conservative development gate observes zero direct false accepts under the structural oracle but accepts only 3.33% of static and 5.00% of online queries, so it is not presented as a universal semantic guarantee.
+
+These are reproducible context-volume, continuation, and retrieval results. They are not provider billing receipts or an official SWE-bench patch-resolution score. A frozen 40-task SWE-bench Verified paired protocol defines the next provider-backed experiment, but its outcomes remain unobserved in this release.
 
 This paper describes the problem, system model, architecture, trust boundary, retrieval method, integrations, evaluation, limitations, and release criteria of the current implementation.
 
@@ -597,7 +601,28 @@ The evaluator asserts:
 - token arithmetic matches the committed character counts; and
 - the machine-readable result remains unchanged unless the evidence is deliberately updated.
 
-### 14.3 Long-document benchmark
+### 14.3 Cross-session continuation benchmark
+
+The continuation evaluator creates 42 records across two logical sessions. Session A contributes an extracted task prompt, a verified failing-test outcome, and a completed-turn diagnosis. An explicitly inferred handoff summary links to all three source event IDs and hashes. Thirty-six unrelated records provide retrieval noise. After the persisted read model is deliberately made stale, Session B performs a zero-write query against the authoritative ledger.
+
+The evaluator serializes two outputs against the same complete 9,489-token history:
+
+- a complete cited audit pack containing the summary, all three source identities and hashes, and one selected raw source; and
+- a model-facing capsule containing the summary identity and complete-pack manifest pointer.
+
+This separation tests whether the model-facing handoff can stay small without deleting the independently inspectable evidence surface. The capsule is not counted as if it embedded the complete audit pack.
+
+### 14.4 Real-repository retrieval study
+
+The development study follows the real GitHub issue-resolution framing introduced by SWE-bench [1]. It pins the official `princeton-nlp/SWE-bench_Lite` test artifact at Git revision `6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2` [2]. The pinned test Parquet has SHA-256 `7a21f37b8bc179c7db5beeb14e88ac538ba283455c776e6b2535bbfb6e3551b4`, contains 300 unique tasks, and exposes 12 exact repository identifiers. The official product page describes Lite as 300 tasks from 11 repositories; the committed repository manifest preserves and explains that upstream prose/artifact discrepancy rather than silently normalizing it.
+
+Within each repository, tasks are ordered by creation time. The earliest 20% (60 tasks total) build prior memory; the remaining 240 tasks are queried only against evidence available strictly before their timestamp. Static evaluation freezes the warm-up memory. Online/prequential evaluation admits an earlier held-out task only after its query has been scored. This prevents future-task evidence from entering an earlier query.
+
+Compared retrieval conditions include admitted BM25, the earlier balanced Qarinah profile, Qarinah v2, Qarinah v2 without graph expansion, and a structural oracle. BM25 is treated as a strong lexical baseline following the Okapi family [3]. The temporal, update, and abstention categories are informed by LongMemEval [4], extended here with repository isolation, evidence identity, supersession, retention, and disclosure authority.
+
+This phase makes zero provider model calls and does not apply generated patches. Labels are a deterministic graded structural oracle based on pre-task file, symbol, API, test, and error overlap. They are not independent human relevance judgments. Results are development evidence because v2 and the conservative evidence gate were designed after v0.1 was inspected. The next protocol freezes 40 paired tasks from the 500-instance, human-validated SWE-bench Verified corpus [5], excluding Lite development instances before any final outcome is observed.
+
+### 14.5 Long-document benchmark
 
 The evaluator constructs a deterministic 384-section synthetic operations handbook with eight answer-bearing passages distributed across the beginning, middle, and end. It runs:
 
@@ -607,7 +632,7 @@ The evaluator constructs a deterministic 384-section synthetic operations handbo
 
 Every positive query receives the same fixed 600-token ceiling. The evaluator does not tune the budget per question.
 
-### 14.4 Retrieval-regression fixture
+### 14.6 Retrieval-regression fixture
 
 A separate 54-record fixture checks:
 
@@ -621,7 +646,7 @@ A separate 54-record fixture checks:
 
 This smaller fixture is a regression suite, not the public context-volume headline.
 
-### 14.5 Runtime benchmark
+### 14.7 Runtime benchmark
 
 The repository also benchmarks deterministic local append, replay, build, and query operations over a fixed retained workspace. These measurements identify implementation regressions. They are not presented as end-to-end model speed or "coding faster" results because model latency, tool execution, user review, and task difficulty are outside that measurement.
 
@@ -655,7 +680,36 @@ The benchmark sends 436,431 fewer estimated input-context tokens. Under a flat p
 
 This cost translation is arithmetic over the measured context slice. It excludes output tokens, cached-input discounts, tool calls, retrieval work, fixed provider fees, and any provider-specific billing rules. It is not a claim of 98.71% lower total application cost.
 
-### 15.2 Long-document retrieval
+### 15.2 Cross-session continuation
+
+| Measurement | Complete audit pack | Model-facing capsule |
+| --- | ---: | ---: |
+| Full-history baseline | 9,489 estimated tokens | 9,489 estimated tokens |
+| Qarinah output | 1,039 estimated tokens | 119 estimated tokens |
+| Exact estimated reduction | 89.0505% | 98.7459% |
+| Rounded release figure | **89.05%** | **98.75%** |
+| Evidence retained | All three source IDs/hashes plus selected raw source | Summary event ID/hash plus audit-pack manifest pointer |
+
+The fresh session retrieves the inferred handoff summary at rank 3. All three summary-source identities and hashes remain present in the complete pack, the capsule points to that exact pack manifest, the zero-write query does not mutate persisted derived state, and the final integrity check passes. The two percentages answer different questions: the capsule measures minimal model-facing continuation text, whereas the audit pack measures the complete evidence-bearing artifact.
+
+### 15.3 Real-repository retrieval development results
+
+| Measurement | Static | Online/prequential |
+| --- | ---: | ---: |
+| Total held-out queries | 240 | 240 |
+| Structurally scorable queries | 191 | 209 |
+| Qarinah v2 Recall@10 | 0.7626 | 0.5383 |
+| Qarinah v2 MRR | 0.7032 | 0.6956 |
+| Earlier balanced-profile MRR | 0.6443 | 0.6007 |
+| Qarinah v2 direct-evidence acceptance | 8 / 240 | 12 / 240 |
+| Observed direct false accepts under structural oracle | 0 / 49 | 0 / 31 |
+| Acceptance coverage | 3.33% | 5.00% |
+
+Qarinah v2 exactly matches admitted BM25 ranking in both settings. Its contribution in this experiment is therefore not a new ranking algorithm; it is lexical ranking inside temporal, repository, retention, supersession, and authority admission boundaries. Removing graph expansion produces identical ranking metrics, so graph retrieval adds no measured ranking value in this corpus. The graph remains useful for provenance, conflict, supersession, and relationship representation.
+
+For the online paired comparison with the earlier balanced profile, the MRR difference is 0.0949 with a repository-clustered 95% bootstrap interval of [0.0572, 0.1115]. The Recall@10 difference is 0.0649 with interval [-0.0150, 0.1025], so improved total relevant-record recall is not established. The conservative evidence gate observes zero direct false accepts under the development structural oracle, but exact 95% upper bounds remain 7.25% static and 11.22% online, and the gate abstains on most queries. These results support a small high-confidence subset, not a claim of perfect evidence detection.
+
+### 15.4 Long-document retrieval
 
 | Measurement | Result |
 | --- | ---: |
@@ -670,9 +724,11 @@ This cost translation is arithmetic over the measured context slice. It excludes
 | Unsupported controls rejected | 4 / 4 |
 | Model-written summary items | 0 |
 
+The worst supported case retains **98.4% estimated context reduction** under the fixture's portable `ceil(characters / 4)` estimator.
+
 This result shows targeted retrieval from a large pre-segmented source under a fixed context ceiling. It does not demonstrate native PDF ingestion, whole-book summarization, or universal question answering.
 
-### 15.3 Retrieval regression
+### 15.5 Retrieval regression
 
 | Measurement | Result |
 | --- | ---: |
@@ -688,9 +744,9 @@ All four fixed targets remain retrievable. The selected pack is larger than the 
 
 ## 16. Interpretation
 
-The results support four conclusions about the tested implementation.
+The results support six conclusions about the tested implementation.
 
-First, accumulated project history can be separated from current-task source material and replaced with a much smaller cited pack. Second, the selected evidence can retain the required decision targets without relying on model-written summaries. Third, unsupported questions can fail closed when the caller requires direct coverage. Fourth, citations, conflict handling, and coverage metadata can fit inside a strict output budget rather than being added after selection.
+First, accumulated project history can be separated from current-task source material and replaced with a much smaller cited pack. Second, the selected evidence can retain the required decision targets without relying on model-written summaries. Third, a minimal model-facing continuation capsule can remain cryptographically linked to a larger inspectable audit pack. Fourth, unsupported questions can fail closed when the caller requires direct coverage, although the conservative gate's low coverage and wide confidence intervals matter. Fifth, strong lexical ranking remains competitive; Qarinah's measured contribution in the real-repository study comes from admission boundaries and evidence semantics rather than a novel ranker. Sixth, citations, conflict handling, and coverage metadata can fit inside a strict output budget rather than being added after selection.
 
 The results do **not** establish:
 
@@ -698,6 +754,8 @@ The results do **not** establish:
 - 98.71% lower total provider cost;
 - faster coding by a particular percentage;
 - improved answer quality for every model;
+- improved official SWE-bench patch-resolution rate;
+- provider-token savings for the frozen 40-task sample;
 - complete semantic recall; or
 - superiority over every memory or retrieval system.
 
@@ -705,7 +763,7 @@ Those questions require provider-reported token usage, task-success evaluation, 
 
 The appropriate public statement is therefore precise:
 
-> Qarinah reduced estimated repeated project context from 442,113 to 5,682 tokens in the committed software-task evaluation - 98.71% less context and 77.81:1 compression - while every required target ranked in the top five with direct evidence coverage.
+> In the committed six-task fixture, Qarinah reduced estimated repeated project context from 442,113 to 5,682 tokens (98.7148%). In the separate two-session continuation fixture, a model-facing capsule reduced the same 9,489-token history to 119 estimated tokens (98.7459%), while the complete cited audit pack used 1,039 estimated tokens (89.0505%).
 
 ## 17. Reproducibility
 
@@ -720,8 +778,12 @@ Run the individual evaluations:
 
 ```sh
 npm run evaluate:software-tasks
+npm run evaluate:continuation
 npm run evaluate:long-document
 npm run evaluate:context
+npm run evaluate:research-retrieval:v0.2
+npm run evaluate:research-sufficiency:v0.3
+npm run check:benchmark-release
 npm run benchmark
 ```
 
@@ -729,12 +791,17 @@ The relevant evidence is committed at:
 
 - [`bench/fixtures/software-task-scenarios.mjs`](../bench/fixtures/software-task-scenarios.mjs);
 - [`bench/results/software-task-context-0.1.0.json`](../bench/results/software-task-context-0.1.0.json);
+- [`bench/results/continuation-context-0.1.5.json`](../bench/results/continuation-context-0.1.5.json);
 - [`bench/results/long-document-context-0.1.0.json`](../bench/results/long-document-context-0.1.0.json);
 - [`bench/results/context-evaluation-0.1.0.json`](../bench/results/context-evaluation-0.1.0.json);
+- [`bench/results/research-retrieval-development-v0.2.json`](../bench/results/research-retrieval-development-v0.2.json);
+- [`bench/results/research-sufficiency-development-v0.3.json`](../bench/results/research-sufficiency-development-v0.3.json);
+- [`bench/results/benchmark-release-0.1.5.json`](../bench/results/benchmark-release-0.1.5.json);
 - [`scripts/evaluate-software-tasks.mjs`](../scripts/evaluate-software-tasks.mjs);
 - [`scripts/evaluate-long-document.mjs`](../scripts/evaluate-long-document.mjs);
 - [`scripts/evaluate-context.mjs`](../scripts/evaluate-context.mjs); and
-- [`scripts/verify-benchmark-evidence.mjs`](../scripts/verify-benchmark-evidence.mjs).
+- [`scripts/verify-benchmark-evidence.mjs`](../scripts/verify-benchmark-evidence.mjs); and
+- [`scripts/verify-benchmark-release-0.1.5.mjs`](../scripts/verify-benchmark-release-0.1.5.mjs).
 
 The evidence verifier recomputes public percentages and rejects unsupported headline claims. Documentation checks verify local links, architecture-source integrity, and encoding. The complete package check also rebuilds both host plugins, exercises MCP transport, runs the test and type matrices, executes every benchmark, and performs a dry-run package build.
 
@@ -764,7 +831,7 @@ Qarinah meets that threshold for an **implementation-backed technical white pape
 - the project has an Apache-2.0 license; and
 - the paper distinguishes measured results from open research questions.
 
-The paper must not be represented as peer-reviewed academic research, independent third-party validation, a provider invoice, or a universal performance guarantee. Distribution should identify the exact implementation and paper versions.
+The paper must be represented as an implementation-backed technical white paper, not as independent third-party validation, a provider invoice, an official SWE-bench patch-resolution result, or a universal performance guarantee. Distribution should identify the exact implementation and paper versions.
 
 Recommended publication metadata:
 
@@ -772,12 +839,12 @@ Recommended publication metadata:
 - **Title:** *Qarinah: Less Context. More Proof.*
 - **Subtitle:** *An evidence-linked project-memory compiler for coding agents*
 - **Author:** Ajnas NB
-- **Implementation version:** `0.1.0`
-- **Paper version:** 1.0
+- **Implementation version:** `0.1.5`
+- **Paper version:** 1.1
 - **License:** Apache-2.0
 - **Canonical source:** this repository at one reviewed commit
 - **Evidence:** the machine-readable files and commands listed in Section 17
-- **Review status:** implementation-backed, not peer-reviewed
+- **Evidence status:** implementation-backed; independent validation is not claimed
 
 The release tag, paper, package, generated plugins, benchmark results, and architecture image should all point to the same reviewed commit. If code or evidence changes, the paper version should advance rather than silently changing an archived release.
 
@@ -814,11 +881,19 @@ Coding agents need continuity, but continuity should not require replaying every
 
 Qarinah keeps durable evidence and task-time context as two different artifacts. The append-only ledger preserves the permitted project record. Deterministic projections make that record searchable and inspectable. The context compiler selects a small cited working set under an explicit budget. Conflicts, supersession, authority, retention, and evidence coverage remain visible rather than being compressed away.
 
-Qarinah 0.1.0 demonstrates that this design works end to end across local storage, project structure, retrieval, Codex and Claude Code adapters, MCP diagnostics, Maqam governance, crawler evidence, workflow provenance, and portable OKF export. Its committed evaluations show large context-volume reductions while preserving the required evidence in the evaluated scenarios.
+Qarinah 0.1.5 demonstrates that this design works end to end across local storage, project structure, retrieval, Codex and Claude Code adapters, MCP diagnostics, Maqam governance, crawler evidence, workflow provenance, and portable OKF export. Its committed evaluations show large context-volume reductions while preserving the required evidence in the evaluated scenarios, and its real-repository development study identifies both useful controls and unresolved limits.
 
 The central promise is intentionally simple:
 
 > Less context. More proof.
+
+## 22. References
+
+1. Carlos E. Jimenez, John Yang, Alexander Wettig, Shunyu Yao, Kexin Pei, Ofir Press, and Karthik R. Narasimhan. ["SWE-bench: Can Language Models Resolve Real-World GitHub Issues?"](https://openreview.net/forum?id=VTF8yNQM66) *The Twelfth International Conference on Learning Representations*, 2024.
+2. Princeton NLP. [`princeton-nlp/SWE-bench_Lite`](https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite), test artifact pinned at revision `6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2`; see also the [official SWE-bench Lite page](https://www.swebench.com/lite.html).
+3. Stephen E. Robertson, Steve Walker, Susan Jones, Micheline Hancock-Beaulieu, and Mike Gatford. ["Okapi at TREC-3."](https://doi.org/10.6028/NIST.SP.500-225.routing-city) *Proceedings of the Third Text REtrieval Conference*, NIST Special Publication 500-225, pages 109-126, 1994.
+4. Di Wu, Hongwei Wang, Wenhao Yu, Yuwei Zhang, Kai-Wei Chang, and Dong Yu. ["LongMemEval: Benchmarking Chat Assistants on Long-Term Interactive Memory."](https://proceedings.iclr.cc/paper_files/paper/2025/file/d813d324dbf0598bbdc9c8e79740ed01-Paper-Conference.pdf) *International Conference on Learning Representations*, 2025.
+5. SWE-bench team. ["SWE-bench Verified."](https://www.swebench.com/verified.html) Human-validated subset of 500 SWE-bench instances, accessed August 2026.
 
 ## Acknowledgements
 
@@ -829,6 +904,8 @@ The author gratefully acknowledges Shahin Ahammed, Qarinah's non-technical cofou
 | Public claim | Evidence | Qualification |
 | --- | --- | --- |
 | 98.71% less estimated context | Software-task result: 442,113 to 5,682 estimated tokens | Compared with the named full-history baseline using `ceil(characters / 4)` |
+| 98.75% continuation-capsule reduction | Continuation result: 9,489 to 119 estimated tokens | Model-facing pointer to the complete pack, not the complete evidence payload |
+| 89.05% complete continuation-pack reduction | Continuation result: 9,489 to 1,039 estimated tokens | Complete cited audit surface; not a regression against the smaller capsule |
 | 77.81:1 context compression | Same committed software-task result | Ratio of total estimated input-context tokens |
 | 98.71% lower input-context cost at the same token rate | Arithmetic over the same measured context slice | Not total provider or application cost |
 | Every required target ranked in the top five | Six committed software-task results | Applies to the committed scenarios |
@@ -836,6 +913,8 @@ The author gratefully acknowledges Shahin Ahammed, Qarinah's non-technical cofou
 | No model-written summary items | Software-task and long-document assertions | Does not prohibit retaining a summary as a separately labeled event |
 | At least 98.4% estimated reduction on the long document | Largest fixed-budget pack compared with the complete synthetic source | Pre-segmented deterministic source; not native PDF ingestion |
 | Unsupported controls failed closed | Four long-document controls with direct coverage required | Callers permitting partial coverage choose a weaker policy |
+| Qarinah v2 matches admitted BM25 | SWE-bench Lite development retrieval result | Ranking equality; Qarinah retains temporal, repository, retention, supersession, and authority admission |
+| Zero observed direct false accepts at the conservative gate | 0/49 static and 0/31 online under the structural development oracle | Low 3.33%-5.00% coverage, wide exact intervals, and no independent human relevance labels |
 | Local-first and no Qarinah API key | Runtime architecture and package dependencies | AI hosts and external sources may still require their own access |
 | Deterministic rebuildable graph, index, Markdown, and OKF | Source implementation and test suite | Reproducibility depends on the same verified event head and build inputs |
 
@@ -857,5 +936,6 @@ The author gratefully acknowledges Shahin Ahammed, Qarinah's non-technical cofou
 ```text
 Ajnas NB. "Qarinah: Less Context. More Proof. An evidence-linked
 project-memory compiler for coding agents." Technical white paper,
-version 1.0, July 2026. Qarinah 0.1.0.
+version 1.1, August 2026. Qarinah 0.1.5. Concept DOI:
+https://doi.org/10.5281/zenodo.21547684.
 ```
