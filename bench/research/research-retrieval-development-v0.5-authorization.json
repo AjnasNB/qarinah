@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "qarinah.research-retrieval-development-authorization.v1",
+  "attemptId": "v05-attempt-001",
+  "authorizedCommand": "node scripts/evaluate-research-retrieval-v0.5.mjs --execute --write",
+  "explicitlyAuthorized": true,
+  "resultPath": "bench/results/research-retrieval-development-v0.5.json",
+  "resultPathAbsentAtAuthorization": true,
+  "protocolBinding": {
+    "commit": "7c50a69bf587159b350da19954a2469a3a089ad5",
+    "tag": "research-retrieval-development-v0.5-protocol",
+    "manifestSha256": "sha256:608a15bc48a80bd281ab593157bd9e0371ce867f77b79c32aa8ef0370e6f7a11",
+    "documentSha256": "sha256:a761f92886dcc93d01bc84b0096b6594125037e0210ad912dff5af954651a3e7"
+  },
+  "evaluatorBinding": {
+    "path": "scripts/evaluate-research-retrieval-v0.5.mjs",
+    "commit": "7203035684abd1af691fbef1e3ba7c1708dfd9f7",
+    "tag": "research-retrieval-development-v0.5-evaluator",
+    "sha256": "sha256:90d1de79e20f8afffeba0b5e765e438eea35e27d12de29229b50a22fac877d9a"
+  },
+  "packageBinding": {
+    "path": "package.json",
+    "commit": "7203035684abd1af691fbef1e3ba7c1708dfd9f7",
+    "sha256": "sha256:16f0607fc5e923e855d7e4ede07faa1456b556cd1a5824a1966a63f6055b064e"
+  },
+  "typesBinding": {
+    "path": "types/index.d.ts",
+    "commit": "7203035684abd1af691fbef1e3ba7c1708dfd9f7",
+    "sha256": "sha256:7ea52a360792b870baaae5b08d7da6c15a6a4cd5cf7587acedbd731e0dd0c811"
+  },
+  "review": {
+    "decision": "approved",
+    "independent": true,
+    "reviewerId": "codex:/root/qarinah_v05_review",
+    "reviewedAt": "2026-08-08T07:55:58.139Z"
+  }
+}
