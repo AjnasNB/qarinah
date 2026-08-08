@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -28,15 +30,21 @@ import {
   SOURCE_COMMIT,
   bm25Lexemes,
   buildNeutralLedger,
+  buildSafetyLedgers,
   completePreflightBeforeRetrievalLoad,
   evidenceCompletePrefix,
   eventId,
   qarinahOptions,
   rankAdmissionFilteredBm25,
+  runV2FramePreflight,
   runMutationVerificationSuite,
   sha256,
   withVerifiedFrozenSource
 } from "../scripts/context-efficiency-v2-lib.mjs";
+import {
+  softwareTaskScenarios,
+  unrelatedRecordCount
+} from "../bench/fixtures/software-task-scenarios.mjs";
 import {
   buildDerivedState,
   createEventEnvelope,
@@ -262,8 +270,55 @@ test("neutral relevance labels remain external to every retrievable event field"
   }
 });
 
-test("Amendment-002 preflight validates all 1,476 frames before retrieval can load or run", async () => {
-  await withVerifiedFrozenSource(repositoryRoot, async (context) => {
+test("source-bound preflight enforces the exact frozen runtime before retrieval", async () => {
+  const frozenProtocol = JSON.parse(await readFile(
+    path.join(repositoryRoot, "bench/research/context-efficiency-comparison-v2-protocol.json"),
+    "utf8"
+  ));
+  const reference = frozenProtocol.referenceRuntime;
+  const executableSha256 = `sha256:${createHash("sha256")
+    .update(await readFile(process.execPath))
+    .digest("hex")}`;
+  const executablePathForAudit = path.resolve(process.execPath).replaceAll("\\", "/");
+  const exactFrozenRuntime = process.version === reference.node
+    && process.versions.v8 === reference.v8
+    && process.versions.modules === reference.modulesAbi
+    && process.platform === reference.platform
+    && process.arch === reference.arch
+    && executablePathForAudit === reference.executablePathForAudit
+    && executableSha256 === reference.executableSha256;
+  let callbackCalls = 0;
+  if (exactFrozenRuntime) {
+    await withVerifiedFrozenSource(repositoryRoot, async (context) => {
+      callbackCalls += 1;
+      assert.equal(context.preflight.completed, true);
+      assert.equal(context.preflight.totalFrames, 1476);
+      assert.equal(context.preflight.retrievalModulesLoadedDuringPreflight, false);
+      assert.equal(context.preflight.retrievalOrRankingCallsDuringPreflight, 0);
+    }, { loadRetrieval: false });
+    assert.equal(callbackCalls, 1);
+  } else {
+    await assert.rejects(
+      () => withVerifiedFrozenSource(repositoryRoot, async () => {
+        callbackCalls += 1;
+      }, { loadRetrieval: true }),
+      (error) => error?.code === "BINDING_RUNTIME"
+    );
+    assert.equal(callbackCalls, 0);
+  }
+});
+
+test("runtime-independent Amendment-002 preflight validates all 1,476 frames before retrieval can load or run", async () => {
+  const protocol = JSON.parse(await readFile(
+    path.join(repositoryRoot, "bench/research/context-efficiency-comparison-v2-protocol.json"),
+    "utf8"
+  ));
+  const frozen = {
+    fixture: { softwareTaskScenarios },
+    neutralLedger: buildNeutralLedger(softwareTaskScenarios, unrelatedRecordCount, createEventEnvelope, protocol),
+    safetyLedgers: buildSafetyLedgers(createEventEnvelope)
+  };
+  const context = { protocol, frozen, preflight: runV2FramePreflight({ protocol, frozen }) };
     const report = context.preflight;
     assert.equal(report.completed, true);
     assert.equal(report.neutralFrames, 1452);
@@ -363,7 +418,6 @@ test("Amendment-002 preflight validates all 1,476 frames before retrieval can lo
       assert.equal(failureLoaderCalls, 0);
       assert.deepEqual(calls, before);
     }
-  }, { loadRetrieval: false });
 });
 
 test("all 24 protocol mutations fail closed without executing either retrieval method", () => {
