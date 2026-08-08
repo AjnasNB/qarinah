@@ -63,6 +63,23 @@ The comparison is a representative category guide based on public product docume
 
 Compare source ownership, host portability, evidence and supersession, runtime scope, model or infrastructure dependencies, and whether derived memory can be rebuilt independently. Do not compare unrelated benchmark numbers as if they share a task, corpus, or scorer.
 
+## Open-source governed-agent toolkit
+
+Canonical article: https://qarinah.io/articles/open-source-governed-agent-toolkit/
+
+The article is a composition guide written by Ajnas N B and reviewed against official project documentation on 9 August 2026. It is not a best-tool ranking, matched benchmark, endorsement, or affiliation claim.
+
+- Qarinah: project memory and bounded cited context for supported coding agents.
+- Maqam: policy, exact-input approval, one-use consumption, and receipts for registered TypeScript actions only.
+- Cockroach Browser: authorized interactive browser sessions and evidence. It uses Playwright and Chromium rather than replacing the browser automation layer.
+- Cockroach Crawler: bounded web acquisition and evidence records. Its optional quality surface uses Trafilatura as a disclosed dependency.
+- Playwright and Puppeteer: browser automation primitives.
+- Browser Use and Stagehand: higher-level agentic browser frameworks.
+- Trafilatura, Firecrawl, and Docling: web extraction, web-data, and document-conversion tools with different product centers.
+- LangGraph and OpenAI Agents SDK: agent or workflow runtimes that can own orchestration while the authored projects supply optional adjacent boundaries.
+
+Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler are the four projects by Ajnas N B discussed in the article. Every other named tool is a third-party project maintained by its own organization or community.
+
 ## Direct questions and answers
 
 ### What is Qarinah?
@@ -172,6 +189,7 @@ The documented long-document fixture is segmented synthetic retrieval, not whole
 - Verified cross-agent handoffs: https://qarinah.io/docs/cross-agent-handoffs/
 - Documentation search: https://qarinah.io/search/
 - Qarinah alternatives and coding-agent memory comparison: https://qarinah.io/alternatives/
+- Open-source governed-agent toolkit: https://qarinah.io/articles/open-source-governed-agent-toolkit/
 - Getting started: https://qarinah.io/docs/getting-started/
 - CLI reference: https://qarinah.io/docs/cli/
 - JavaScript API reference: https://qarinah.io/docs/api/

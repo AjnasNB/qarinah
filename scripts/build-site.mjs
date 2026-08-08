@@ -18,6 +18,7 @@ const historicalPaperPdfs = new Map([
   ["Qarinah-Technical-White-Paper-v1.3.pdf", "/paper/Qarinah-Technical-White-Paper-v1.3.pdf"]
 ]);
 const releaseDate = "2026-08-08";
+const toolkitArticleDate = "2026-08-09";
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 const productVersion = packageJson.version;
 const productPositioning = "Evidence-linked project memory for coding agents.";
@@ -155,6 +156,143 @@ const alternativeQuestions = [
   {
     name: "How should teams compare coding-agent memory systems?",
     text: "Compare ownership of the source record, portability across hosts, provenance, conflict and supersession handling, model and infrastructure requirements, runtime scope, and how evidence can be inspected or rebuilt."
+  }
+];
+
+const governedToolkitProjects = [
+  {
+    name: "Qarinah",
+    slug: "qarinah-project-memory",
+    category: "Project memory and context",
+    role: "Keeps an inspectable project-owned record and compiles bounded, cited context packs for supported coding agents.",
+    boundary: "Qarinah does not run the agent loop, execute browser actions, or grant tool authority.",
+    url: "https://qarinah.io/",
+    source: "https://github.com/AjnasNB/qarinah"
+  },
+  {
+    name: "Maqam",
+    slug: "maqam-action-governance",
+    category: "Registered action governance",
+    role: "Applies policy before registered TypeScript actions, can bind approval to an exact input, and records execution receipts.",
+    boundary: "Maqam governs only calls deliberately routed through its registered gateway. It is not complete enterprise governance or universal interception.",
+    url: "https://maqamagent.com/",
+    source: "https://github.com/AjnasNB/maqam"
+  },
+  {
+    name: "Cockroach Browser",
+    slug: "cockroach-browser-runtime",
+    category: "Authorized browser runtime",
+    role: "Provides explicit browser sessions, semantic interaction, bounded evidence, and human handoff for browser-capable agents.",
+    boundary: "Cockroach Browser uses Playwright and Chromium. It adds session authority and evidence boundaries; it is not a new browser engine and does not bypass access controls.",
+    url: "https://cockroachbrowser.com/",
+    source: "https://github.com/AjnasNB/cockroach-browser"
+  },
+  {
+    name: "Cockroach Crawler",
+    slug: "cockroach-crawler-acquisition",
+    category: "Governed web acquisition",
+    role: "Collects, renders, extracts, and normalizes web evidence under explicit origin, request, byte, redirect, concurrency, and time limits.",
+    boundary: "It is not a hosted proxy fleet or an access-control bypass. Its optional quality surface uses Trafilatura as a disclosed dependency.",
+    url: "https://cockroachcrawler.com/",
+    source: "https://github.com/AjnasNB/cockroach-crawler"
+  }
+];
+
+const governedToolkitPrimitives = [
+  {
+    name: "Playwright",
+    slug: "playwright",
+    category: "Browser automation primitive",
+    role: "Automates Chromium, Firefox, and WebKit through one testing and automation API.",
+    relationship: "Cockroach Browser uses Playwright for browser control and adds its own authorization, evidence, and session contracts.",
+    url: "https://playwright.dev/docs/intro"
+  },
+  {
+    name: "Puppeteer",
+    slug: "puppeteer",
+    category: "Browser automation primitive",
+    role: "Controls Chrome or Firefox through a high-level JavaScript API over DevTools Protocol or WebDriver BiDi.",
+    relationship: "A direct browser-automation choice when host code should own authority, session policy, evidence, and approvals.",
+    url: "https://pptr.dev/guides/what-is-puppeteer"
+  },
+  {
+    name: "Browser Use",
+    slug: "browser-use",
+    category: "Agentic browser framework",
+    role: "Makes websites available to AI agents through an open-source browser-use framework and optional cloud services.",
+    relationship: "A higher-level browser-agent option. Evaluate its agent autonomy and deployment model separately from Cockroach Browser's explicit session boundary.",
+    url: "https://github.com/browser-use/browser-use"
+  },
+  {
+    name: "Stagehand",
+    slug: "stagehand",
+    category: "Agentic browser framework",
+    role: "Combines code and natural-language browser automation through act, extract, observe, and agent interfaces.",
+    relationship: "Useful when AI-assisted interaction authoring is the product center. A host can still add separate action governance where required.",
+    url: "https://docs.stagehand.dev/v3/first-steps/introduction"
+  },
+  {
+    name: "Trafilatura",
+    slug: "trafilatura",
+    category: "Web extraction library",
+    role: "Discovers, downloads, and extracts main text, metadata, comments, and links from web documents in Python.",
+    relationship: "Cockroach Crawler discloses Trafilatura as the optional quality dependency instead of presenting that extraction algorithm as its own.",
+    url: "https://trafilatura.readthedocs.io/en/stable/index.html"
+  },
+  {
+    name: "Firecrawl",
+    slug: "firecrawl",
+    category: "Web data platform",
+    role: "Offers search, scrape, crawl, map, browser, and agent surfaces that return LLM-ready web data.",
+    relationship: "A broader managed or self-hosted web-data platform. Cockroach Crawler is the local TypeScript option when bounded acquisition and attached evidence are the center.",
+    url: "https://docs.firecrawl.dev/introduction"
+  },
+  {
+    name: "Docling",
+    slug: "docling",
+    category: "Document conversion toolkit",
+    role: "Parses formats such as PDF, DOCX, PPTX, HTML, and images into a unified document representation for export, chunking, and AI workflows.",
+    relationship: "A document-ingestion complement or alternative when file conversion is more important than site traversal or interactive browser control.",
+    url: "https://docling-project.github.io/docling/"
+  },
+  {
+    name: "LangGraph",
+    slug: "langgraph",
+    category: "Agent and workflow runtime",
+    role: "Provides low-level orchestration for long-running, stateful agents with durable execution and human-in-the-loop control.",
+    relationship: "Can own the workflow while Qarinah supplies project memory and Maqam governs selected registered effects.",
+    url: "https://docs.langchain.com/oss/javascript/langgraph/overview"
+  },
+  {
+    name: "OpenAI Agents SDK",
+    slug: "openai-agents-sdk",
+    category: "Agent runtime",
+    role: "Provides an agent loop, tools, handoffs, sessions, tracing, guardrails, and human-in-the-loop mechanisms for TypeScript agents.",
+    relationship: "Can build and run the agent while the authored toolkit supplies optional memory, browser, acquisition, and registered-action boundaries.",
+    url: "https://openai.github.io/openai-agents-js/"
+  }
+];
+
+const governedToolkitQuestions = [
+  {
+    name: "Is this one bundled agent platform?",
+    text: "No. Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler are separate open-source projects that can be adopted independently. The other named tools are third-party primitives or integration choices maintained by their own projects."
+  },
+  {
+    name: "Does Cockroach Browser replace Playwright?",
+    text: "No. Cockroach Browser uses Playwright and Chromium. Its separate contribution is an explicit session-authority, evidence, audit, and human-handoff boundary for agent use."
+  },
+  {
+    name: "Does Maqam govern every action an agent can take?",
+    text: "No. Maqam governs only actions deliberately routed through a registered Maqam gateway. Calls that bypass that boundary remain outside its control."
+  },
+  {
+    name: "Are Playwright, Puppeteer, Trafilatura, Firecrawl, Browser Use, Stagehand, LangGraph, OpenAI Agents SDK, or Docling products by Ajnas N B?",
+    text: "No. They are established third-party projects linked to their official documentation. Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler are the projects authored by Ajnas N B discussed in this guide."
+  },
+  {
+    name: "Is this a best-tool ranking?",
+    text: "No. It is a category and composition guide based on documented product boundaries. It contains no matched cross-product benchmark and makes no best, first, or only claim."
   }
 ];
 
@@ -353,6 +491,30 @@ const searchEntries = [
       "cross-agent memory"
     ],
     content: alternativeSystems.map((system) => `${system.name}. ${system.category}. ${system.primaryJob} ${system.overlap} ${system.boundary} ${system.fit}`).join(" ")
+  },
+  {
+    route: "/articles/open-source-governed-agent-toolkit/",
+    title: "An open-source toolkit for governed AI agents",
+    description: "See how Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler compose with established agent, browser, web-data, and document tools.",
+    headings: [
+      { id: "authored-projects", text: "Four projects, four explicit boundaries" },
+      { id: "established-tools", text: "Established tools stay in their own categories" },
+      { id: "reference-architecture", text: "A reference architecture, not a required bundle" },
+      { id: "questions", text: "Questions about the toolkit boundary" },
+      { id: "method", text: "Authorship, sources, and limits" }
+    ],
+    keywords: [
+      "open-source governed AI agents",
+      "AI agent governance toolkit",
+      "Qarinah Maqam Cockroach Browser Cockroach Crawler",
+      "Playwright agent governance",
+      "agent memory browser crawler stack"
+    ],
+    content: [
+      ...governedToolkitProjects.map((project) => `${project.name}. ${project.category}. ${project.role} ${project.boundary}`),
+      ...governedToolkitPrimitives.map((tool) => `${tool.name}. ${tool.category}. ${tool.role} ${tool.relationship}`),
+      ...governedToolkitQuestions.map((entry) => `${entry.name} ${entry.text}`)
+    ].join(" ")
   }
 ];
 
@@ -498,6 +660,7 @@ function footer() {
         <div>
           <strong>Verify</strong>
           <a href="/docs/faq/">Direct answers</a>
+          <a href="/articles/open-source-governed-agent-toolkit/">Governed-agent toolkit</a>
           <a href="/alternatives/">Compare approaches</a>
           <a href="/docs/benchmarks/">Benchmarks</a>
           <a href="/docs/security/">Security</a>
@@ -512,7 +675,7 @@ function footer() {
         </div>
       </div>
       <div class="shell footer-meta">
-        <span>Built openly by Ajnas NB and contributors.</span>
+        <span>Built openly by Ajnas N B and contributors.</span>
         <span>Qarinah ${productVersion}</span>
       </div>
     </footer>`;
@@ -541,7 +704,7 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
   const person = {
     "@type": "Person",
     "@id": `${siteOrigin}/#ajnas-nb`,
-    name: "Ajnas NB",
+    name: "Ajnas N B",
     url: "https://github.com/AjnasNB"
   };
   const graph = [person];
@@ -685,6 +848,55 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
         "@id": `${url}#faq`,
         name: "Qarinah alternatives questions",
         mainEntity: alternativeQuestions.map((entry) => ({
+          "@type": "Question",
+          name: entry.name,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: entry.text
+          }
+        }))
+      }
+    );
+  } else if (kind === "toolkit") {
+    const toolkitItems = [...governedToolkitProjects, ...governedToolkitPrimitives];
+    graph.push(
+      {
+        "@type": "Article",
+        "@id": `${url}#article`,
+        headline: title,
+        description,
+        url,
+        mainEntityOfPage: url,
+        inLanguage: "en",
+        datePublished: toolkitArticleDate,
+        dateModified: toolkitArticleDate,
+        author: { "@id": person["@id"] },
+        isPartOf: { "@id": `${siteOrigin}/#website` },
+        about: { "@id": `${url}#toolkit-map` }
+      },
+      {
+        "@type": "ItemList",
+        "@id": `${url}#toolkit-map`,
+        name: "Open-source governed-agent toolkit and established adjacent tools",
+        itemListOrder: "https://schema.org/ItemListUnordered",
+        numberOfItems: toolkitItems.length,
+        itemListElement: toolkitItems.map((item, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          item: {
+            "@type": "SoftwareApplication",
+            name: item.name,
+            description: item.role,
+            applicationCategory: "DeveloperApplication",
+            url: item.url
+          }
+        }))
+      },
+      {
+        "@type": "FAQPage",
+        "@id": `${url}#faq`,
+        name: "Governed-agent toolkit questions",
+        mainEntity: governedToolkitQuestions.map((entry) => ({
           "@type": "Question",
           name: entry.name,
           acceptedAnswer: {
@@ -1255,6 +1467,174 @@ function alternativesPage() {
   });
 }
 
+function governedToolkitPage() {
+  const projectCards = governedToolkitProjects.map((project, index) => `
+    <article class="toolkit-project-card" id="${project.slug}">
+      <header>
+        <span>${String(index + 1).padStart(2, "0")}</span>
+        <p>${project.category}</p>
+      </header>
+      <h3>${project.name}</h3>
+      <p>${project.role}</p>
+      <p class="toolkit-boundary"><strong>Boundary:</strong> ${project.boundary}</p>
+      <div class="toolkit-links">
+        <a href="${project.url}" rel="noreferrer">Official site</a>
+        <a href="${project.source}" rel="noreferrer">Source</a>
+      </div>
+    </article>`).join("");
+
+  const categories = [
+    ["Browser automation primitives", "The low-level browser control layer. The host still owns authorization, evidence, and policy.", ["playwright", "puppeteer"]],
+    ["Agentic browser frameworks", "Higher-level browser-agent interfaces for natural-language actions, extraction, and planning.", ["browser-use", "stagehand"]],
+    ["Web and document acquisition", "Tools for web extraction, broader web-data APIs, or document conversion into AI-ready structures.", ["trafilatura", "firecrawl", "docling"]],
+    ["Agent and workflow runtimes", "Frameworks that own the agent loop, workflow state, tools, handoffs, or durable orchestration.", ["langgraph", "openai-agents-sdk"]]
+  ];
+  const categoryMarkup = categories.map(([title, description, slugs], categoryIndex) => {
+    const tools = slugs.map((slug) => governedToolkitPrimitives.find((tool) => tool.slug === slug));
+    return `
+      <section class="toolkit-category" aria-labelledby="toolkit-category-${categoryIndex + 1}">
+        <header>
+          <span>${String(categoryIndex + 1).padStart(2, "0")}</span>
+          <div>
+            <h3 id="toolkit-category-${categoryIndex + 1}">${title}</h3>
+            <p>${description}</p>
+          </div>
+        </header>
+        <div class="toolkit-tool-list">
+          ${tools.map((tool) => `
+            <article id="${tool.slug}">
+              <div>
+                <p>${tool.category}</p>
+                <h4>${tool.name}</h4>
+                <a href="${tool.url}" rel="noreferrer">Official documentation</a>
+              </div>
+              <p>${tool.role}</p>
+              <p><strong>Composition note:</strong> ${tool.relationship}</p>
+            </article>`).join("")}
+        </div>
+      </section>`;
+  }).join("");
+
+  const questionMarkup = governedToolkitQuestions.map((entry) => `
+    <article>
+      <h3>${entry.name}</h3>
+      <p>${entry.text}</p>
+    </article>`).join("");
+
+  return layout({
+    title: "An open-source toolkit for governed AI agents",
+    description: "See how Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler compose with established agent, browser, web-data, and document tools.",
+    canonical: "/articles/open-source-governed-agent-toolkit/",
+    kind: "toolkit",
+    body: `
+      <section class="toolkit-hero">
+        <div class="shell toolkit-hero-grid">
+          <div>
+            <p class="eyebrow">Open-source governed-agent toolkit</p>
+            <h1>Governed agents need explicit layers.</h1>
+            <p class="toolkit-lede">Qarinah keeps project memory. Maqam governs registered actions. Cockroach Browser provides authorized interactive sessions. Cockroach Crawler acquires bounded web evidence. Established runtimes and primitives can sit around those projects without being relabeled as part of them.</p>
+            <p class="toolkit-byline">Written by <strong>Ajnas N B</strong> - reviewed <time datetime="2026-08-09">9 August 2026</time></p>
+            <div class="comparison-actions">
+              <a class="btn btn-primary btn-large" href="#authored-projects">See the four boundaries</a>
+              <a class="hero-text-link" href="#reference-architecture">View a reference stack</a>
+            </div>
+          </div>
+          <aside class="toolkit-disclosure" aria-label="Authorship and comparison disclosure">
+            <p>Authorship disclosure</p>
+            <strong>Four authored projects. Nine established tools.</strong>
+            <p>Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler are projects by Ajnas N B. Every other named project remains the work of its respective maintainers.</p>
+            <p>This is a composition guide, not a ranking, endorsement, or claim of affiliation.</p>
+          </aside>
+        </div>
+        <div class="shell toolkit-layer-strip" aria-label="The four authored project boundaries">
+          ${governedToolkitProjects.map((project, index) => `<a href="#${project.slug}"><span>0${index + 1}</span><strong>${project.name}</strong><small>${project.category}</small></a>`).join("")}
+        </div>
+      </section>
+
+      <section class="section shell" aria-labelledby="authored-projects">
+        <div class="section-heading split-heading">
+          <div>
+            <p class="eyebrow">The authored project family</p>
+            <h2 id="authored-projects">Four projects, four explicit boundaries.</h2>
+          </div>
+          <p>Each project can be adopted on its own. Calling them a toolkit describes how their boundaries can compose; it does not make them one mandatory runtime or one shared license.</p>
+        </div>
+        <div class="toolkit-project-grid">${projectCards}</div>
+      </section>
+
+      <section class="section section-alt" aria-labelledby="established-tools">
+        <div class="shell">
+          <div class="section-heading split-heading">
+            <div>
+              <p class="eyebrow">Primitives, frameworks, and adjacent products</p>
+              <h2 id="established-tools">Established tools stay in their own categories.</h2>
+            </div>
+            <p>These projects solve important parts of the stack. They are linked to official documentation and described by product job, not absorbed into the authored project family.</p>
+          </div>
+          <div class="toolkit-categories">${categoryMarkup}</div>
+        </div>
+      </section>
+
+      <section class="section shell" aria-labelledby="reference-architecture">
+        <div class="section-heading split-heading">
+          <div>
+            <p class="eyebrow">One possible composition</p>
+            <h2 id="reference-architecture">A reference architecture, not a required bundle.</h2>
+          </div>
+          <p>Start with the layer your system is missing. A production system may use one, several, or none of these projects.</p>
+        </div>
+        <ol class="toolkit-reference-stack">
+          <li><span>01</span><div><strong>Run the agent or workflow</strong><p>Use LangGraph, OpenAI Agents SDK, or another host to own models, tools, handoffs, and state.</p></div></li>
+          <li><span>02</span><div><strong>Compile project memory when needed</strong><p>Use Qarinah when supported coding agents need one local, cited project record across sessions and hosts.</p></div></li>
+          <li><span>03</span><div><strong>Gate selected effects</strong><p>Route only the actions that require exact-input policy, approval, and receipts through Maqam.</p></div></li>
+          <li><span>04</span><div><strong>Open an authorized browser session</strong><p>Use Cockroach Browser for interactive web work. It uses Playwright rather than replacing the browser automation layer.</p></div></li>
+          <li><span>05</span><div><strong>Acquire bounded web evidence</strong><p>Use Cockroach Crawler for site traversal and evidence records, or start with Trafilatura or Firecrawl when their product center fits better.</p></div></li>
+          <li><span>06</span><div><strong>Convert document-heavy sources</strong><p>Use Docling when PDF, office document, image, and document-structure conversion is the primary ingestion problem.</p></div></li>
+        </ol>
+      </section>
+
+      <section class="section section-alt" aria-labelledby="questions">
+        <div class="shell">
+          <div class="section-heading split-heading">
+            <div>
+              <p class="eyebrow">Direct answers</p>
+              <h2 id="questions">Questions about the toolkit boundary.</h2>
+            </div>
+            <p>The short answers below match the Article, ItemList, FAQ, and breadcrumb metadata published with this page.</p>
+          </div>
+          <div class="comparison-faq">${questionMarkup}</div>
+        </div>
+      </section>
+
+      <section class="comparison-method" id="method" aria-labelledby="toolkit-method-title">
+        <div class="shell comparison-method-grid">
+          <div>
+            <p class="eyebrow">Authorship, sources, and limits</p>
+            <h2 id="toolkit-method-title">Every category points to its official source.</h2>
+          </div>
+          <div>
+            <p>Written by Ajnas N B. Product descriptions were reviewed against official project documentation on 9 August 2026. External projects are not presented as dependencies unless the relationship is explicitly disclosed.</p>
+            <p>Cockroach Browser uses Playwright. Cockroach Crawler's optional quality surface uses Trafilatura. Other composition examples are architectural options, not installed dependencies or endorsements.</p>
+            <p>This page makes no best, first, only, certification, or matched-performance claim. Verify current versions, licenses, deployment models, and guarantees before adoption.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section final-cta">
+        <div class="shell final-cta-inner">
+          <div>
+            <p class="eyebrow">Begin with the missing boundary</p>
+            <h2>Use Qarinah when the missing layer is cited project memory.</h2>
+          </div>
+          <div>
+            <a class="btn btn-primary btn-large" href="/docs/getting-started/">Set up Qarinah</a>
+            <a class="text-link" href="/alternatives/">Compare memory approaches</a>
+          </div>
+        </div>
+      </section>`
+  });
+}
+
 function docsIndex() {
   const cards = docPages.filter((page) => page.route !== "paper").map((page, index) => `
     <a class="doc-card" href="/${page.route}/">
@@ -1446,6 +1826,9 @@ await writeFile(path.join(output, "index.html"), homePage());
 const alternativesDestination = path.join(output, "alternatives");
 await mkdir(alternativesDestination, { recursive: true });
 await writeFile(path.join(alternativesDestination, "index.html"), alternativesPage());
+const toolkitDestination = path.join(output, "articles", "open-source-governed-agent-toolkit");
+await mkdir(toolkitDestination, { recursive: true });
+await writeFile(path.join(toolkitDestination, "index.html"), governedToolkitPage());
 await mkdir(path.join(output, "docs"), { recursive: true });
 await writeFile(path.join(output, "docs", "index.html"), docsIndex());
 
@@ -1460,7 +1843,14 @@ await mkdir(searchDestination, { recursive: true });
 await writeFile(path.join(searchDestination, "index.html"), searchPage());
 await writeFile(path.join(output, "search-index.json"), `${JSON.stringify(searchEntries, null, 2)}\n`);
 
-const sitemapRoutes = ["/", "/alternatives/", "/docs/", "/search/", ...docPages.map((page) => `/${page.route}/`)];
+const sitemapRoutes = [
+  "/",
+  "/alternatives/",
+  "/articles/open-source-governed-agent-toolkit/",
+  "/docs/",
+  "/search/",
+  ...docPages.map((page) => `/${page.route}/`)
+];
 await writeFile(
   path.join(output, "sitemap.xml"),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapRoutes.map((route) => `  <url><loc>${siteOrigin}${route}</loc><lastmod>${releaseDate}</lastmod></url>`).join("\n")}\n</urlset>\n`

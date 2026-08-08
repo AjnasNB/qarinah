@@ -12,6 +12,7 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 - [Verified cross-agent handoffs](https://qarinah.io/docs/cross-agent-handoffs/): Switch coding agents and continue a real task with compact, cited project context.
 - [Direct answers](https://qarinah.io/docs/faq/): Concise answers about Qarinah, context reduction, cost boundaries, Codex, Claude Code, privacy, and open-source licensing.
 - [Qarinah alternatives](https://qarinah.io/alternatives/): Product-boundary comparison with Mem0, Letta, LangMem, LangGraph memory, Graphiti, Zep, and native coding-host memory.
+- [Open-source governed-agent toolkit](https://qarinah.io/articles/open-source-governed-agent-toolkit/): How Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler can compose with established agent, browser, web-data, and document tools.
 - [Getting started](https://qarinah.io/docs/getting-started/): Install Qarinah, opt in one workspace, connect a supported host, and compile a cited context pack.
 - [Documentation index](https://qarinah.io/docs/): Documentation by task.
 - [npm package](https://www.npmjs.com/package/qarinah): Published `qarinah` package and registry metadata.
@@ -22,6 +23,8 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 - Qarinah is a universal context engine for software projects and an independent local tool; Maqam is an optional governance integration.
 - Qarinah is a local, evidence-linked project-memory compiler for coding agents. It is not a complete autonomous-agent runtime or a general personalization service.
 - The alternatives guide is a representative category comparison, not a performance ranking or a claim that Qarinah is universally better than adjacent products.
+- Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler are separate projects by Ajnas N B. The ecosystem guide distinguishes them from third-party tools maintained by their own projects.
+- Cockroach Browser uses Playwright. Cockroach Crawler discloses Trafilatura as the optional quality dependency. The ecosystem guide does not claim that those established projects were created by Qarinah's author.
 - Qarinah's primary workflow is verified handoffs between coding agents.
 - Qarinah supports reviewed Codex and Claude Code integrations that can use the same explicitly opted-in project record.
 - The published evaluator measured 98.71% less estimated repeated input context in its compared task set: 442,113 estimated input-context tokens became 5,682 while every required target was directly covered in the top five.
