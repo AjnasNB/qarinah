@@ -679,27 +679,39 @@ function homePage() {
         <div class="shell hero-grid">
           <div class="hero-copy">
             <p class="eyebrow">${productPositioning}</p>
-            <h1>Your project remembers - even when your coding agent changes.</h1>
+            <h1>Your project remembers when your coding agent changes.</h1>
             <p class="hero-lede">${productExplanation}</p>
             <div class="hero-actions">
               <a class="btn btn-primary btn-large" href="/docs/getting-started/">Set up one project</a>
-              <a class="btn btn-outline btn-large" href="/docs/cross-agent-handoffs/">See the handoff</a>
+              <a class="hero-text-link" href="/docs/cross-agent-handoffs/">See the verified handoff</a>
             </div>
+            <a class="hero-evidence-link" href="/docs/benchmarks/">Measured with public artifacts and explicit limits</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="handoff-stage" aria-labelledby="handoff-stage-title">
+        <div class="shell handoff-stage-grid">
+          <div class="handoff-stage-copy">
+            <p class="eyebrow">One project record</p>
+            <h2 id="handoff-stage-title">Set it up once. Continue from any supported agent.</h2>
+            <p>Qarinah keeps the durable record beside the repository. Every supported host queries the same cited decisions, outcomes, conflicts, and superseded context.</p>
             ${commandBlock("npx qarinah setup . --codex --claude --cursor --capture content --allow-query", "One-time project setup")}
             <div class="host-shortcuts" aria-label="Qarinah host commands">
               <span><strong>Codex</strong><code>$qarinah</code></span>
               <span><strong>Claude Code</strong><code>/qarinah &lt;task&gt;</code></span>
               <span><strong>Any terminal</strong><code>npx qarinah query "&lt;task&gt;"</code></span>
             </div>
-            <div class="hero-proof" aria-label="Benchmark summary">
-              <div class="hero-proof-result">
-                <strong>98.71%</strong>
-                <span>less repeated context</span>
-              </div>
-              <p>442,113 estimated input-context tokens became 5,682. Every required target was directly covered in the top five, and the compared input-context cost fell by the same 98.71% at the same token rate.</p>
-              <a href="/docs/benchmarks/">Open the evidence</a>
-            </div>
           </div>
+          <aside class="hero-proof" aria-label="Benchmark summary">
+            <p class="eyebrow">One measured result</p>
+            <div class="hero-proof-result">
+              <strong>98.71%</strong>
+              <span>less repeated context</span>
+            </div>
+            <p>442,113 estimated input-context tokens became 5,682. Every required target was directly covered in the top five in the published fixture.</p>
+            <a href="/docs/benchmarks/">Read the method, artifacts, and limits</a>
+          </aside>
         </div>
       </section>
 
