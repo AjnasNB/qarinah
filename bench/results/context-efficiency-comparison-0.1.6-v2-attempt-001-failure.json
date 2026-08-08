@@ -1,0 +1,276 @@
+{
+  "schemaVersion": "qarinah.context-efficiency-comparison-attempt-failure.v1",
+  "receiptId": "context-efficiency-comparison-0.1.6-v2-attempt-001-failure",
+  "authoredOn": "2026-08-08",
+  "classification": "post-failure execution-attempt receipt; development fixture comparison; not a benchmark result",
+  "attempt": {
+    "number": 1,
+    "status": "failed-closed-before-result",
+    "executionDate": "2026-08-08",
+    "exactWallTimestampRecorded": false,
+    "exactAuthorizedShellCommand": "npm run evaluate:context-efficiency-comparison:v2:write",
+    "npmExpandedCommand": "node scripts/evaluate-context-efficiency-comparison-v2.mjs --execute --write",
+    "exitCode": 1,
+    "observedApproximateToolWallTimeSeconds": 9.3,
+    "wallTimeIsAuthoritativeRuntimeBenchmark": false
+  },
+  "frozenAncestry": {
+    "baseProtocol": {
+      "commit": "d7f2a09bed34507b3aec070f765d20b6a834d6d9",
+      "tree": "b9bc5b84b48876ebf4e9bbdeaeb6b7a703ae3c87",
+      "tag": "research-context-efficiency-protocol-v2",
+      "annotatedTagObject": "71cdbbda12a5d4d6dff514fb0a8799f1d4fcb8aa",
+      "manifestPath": "bench/research/context-efficiency-comparison-v2-protocol.json",
+      "manifestSha256": "sha256:0dc108888faa583ccdce132b38e6543df00130ffc58c4dbdb07656cf88a4cfbd",
+      "manifestGitBlob": "8c9c1ad750b298710b69a36cce3e895c28af491d",
+      "documentPath": "docs/CONTEXT-EFFICIENCY-COMPARISON-v2-PROTOCOL.md",
+      "documentSha256": "sha256:834a5954cacea05e0721f3ad49a044093b6636252f985ba82b76386b18a59616",
+      "documentGitBlob": "4e6f5398da68f80a1c3434281a901ae026272d9d"
+    },
+    "amendment001": {
+      "commit": "6fb29afd741480176cd5b7c582fb13437308d805",
+      "tree": "a9852a06958a7efda6537cb99e5e1d26ca17b302",
+      "tag": "research-context-efficiency-protocol-v2-amendment-001",
+      "annotatedTagObject": "fc744e3d6c869cf26943d3bac2afe5bdbf5c243d",
+      "manifestPath": "bench/research/context-efficiency-comparison-v2-amendment-001.json",
+      "manifestSha256": "sha256:33a8ae1755038c3d450507045bba8e2471482cb2ea61e77a6d6b5ae4848fa2aa",
+      "manifestGitBlob": "8caaa81223e5fbdd183e2c8e376d0ca996a8dd3e",
+      "documentPath": "docs/CONTEXT-EFFICIENCY-COMPARISON-v2-AMENDMENT-001.md",
+      "documentSha256": "sha256:b51e406f6b92aa19f8ef40dfd545b57eee7c6dbde374b659ed46930c6fa9f40d",
+      "documentGitBlob": "92521fbeb80f4e3ea8005fe9c7650bafed8f2d81"
+    },
+    "reviewedEvaluator": {
+      "commit": "b160674d8bffa28c9169d262dcda65d32d238e80",
+      "tree": "19a01bc47a817f3dc8275c533183ecc073afb458",
+      "tag": "research-context-efficiency-evaluator-v2",
+      "annotatedTagObject": "71d9260fc3204b401e8bea0516f0d314838e69a4",
+      "files": [
+        {
+          "path": "package.json",
+          "sha256": "sha256:7c1fa7d83ad2ce28e6f364b62acd4219fba37528b8f973c3dc0b61c19f699bc0",
+          "gitBlob": "87a9860762ae7fdc5ef618d6d4e1fe2c885845aa"
+        },
+        {
+          "path": "scripts/context-efficiency-v2-lib.mjs",
+          "sha256": "sha256:c17db30a1e8de5509296c3df452c1cb87300b61a1bbe23788b5c205c1be427fb",
+          "gitBlob": "250bd11631294067eb0cb59bddb0a6b04e0f4524"
+        },
+        {
+          "path": "scripts/context-efficiency-v2-renderer.mjs",
+          "sha256": "sha256:99044dd2ab519a07e9b367dc23b9fd7a7b42cbada411bc554d0e6f1490dfd547",
+          "gitBlob": "e211b07dbad68460458a29f65ef1e17fa90a78e5"
+        },
+        {
+          "path": "scripts/evaluate-context-efficiency-comparison-v2.mjs",
+          "sha256": "sha256:f0702e183705b4618f562d3b393ad01befac5b92bb8b87e4209f8210223609af",
+          "gitBlob": "81e41e151b6a757de72cb1bd12c5bc48c78e22cb"
+        },
+        {
+          "path": "test/context-efficiency-v2.test.js",
+          "sha256": "sha256:e8b0b86be1e0bb9877053b8b49a14a863038c333df96fc699fd5dca456d5cda2",
+          "gitBlob": "f5941fa42aae8cbdfa5421aa0201c31581f16c4b"
+        }
+      ]
+    },
+    "armedEvaluator": {
+      "commit": "90d702d24b5fcedfa936ce6d38bd245aea3bddb8",
+      "tree": "2bbfce43f929735fad9fcbe47e7a439bd88d0c26",
+      "parent": "b160674d8bffa28c9169d262dcda65d32d238e80",
+      "tag": "research-context-efficiency-evaluator-v2-armed",
+      "annotatedTagObject": "4e73c2b57d62093e97b945c782271b3a7a5e1796",
+      "commitMessage": "research: arm context efficiency v2 evaluator",
+      "files": [
+        {
+          "path": "package.json",
+          "sha256": "sha256:7c1fa7d83ad2ce28e6f364b62acd4219fba37528b8f973c3dc0b61c19f699bc0",
+          "gitBlob": "87a9860762ae7fdc5ef618d6d4e1fe2c885845aa"
+        },
+        {
+          "path": "scripts/context-efficiency-v2-lib.mjs",
+          "sha256": "sha256:080de2a5e4642ac205033fbce5a3c9524ee5c18367d376888db237face1fa2bf",
+          "gitBlob": "10b9c97d57214f192c763d572e2f36996a4a9940"
+        },
+        {
+          "path": "scripts/context-efficiency-v2-renderer.mjs",
+          "sha256": "sha256:99044dd2ab519a07e9b367dc23b9fd7a7b42cbada411bc554d0e6f1490dfd547",
+          "gitBlob": "e211b07dbad68460458a29f65ef1e17fa90a78e5"
+        },
+        {
+          "path": "scripts/evaluate-context-efficiency-comparison-v2.mjs",
+          "sha256": "sha256:f0702e183705b4618f562d3b393ad01befac5b92bb8b87e4209f8210223609af",
+          "gitBlob": "81e41e151b6a757de72cb1bd12c5bc48c78e22cb"
+        },
+        {
+          "path": "test/context-efficiency-v2.test.js",
+          "sha256": "sha256:15fb5496a8d945c8ec61496e88d7d7e2de66cc8d0319e9dc6128ea3363977aa9",
+          "gitBlob": "1a52dbb76b9bb3e59ec8fb6f92db9c44ac029c2d"
+        }
+      ]
+    }
+  },
+  "runtime": {
+    "node": "v24.15.0",
+    "npm": "11.18.0",
+    "v8": "13.6.233.17-node.48",
+    "modulesAbi": "137",
+    "platform": "win32",
+    "arch": "x64",
+    "git": "2.45.2.windows.1",
+    "executablePathForAudit": "C:/Program Files/nodejs/node.exe",
+    "executableSha256": "sha256:3331e1ffe19874215472217c5e94f5a0c6d8e18c4ac7111d3937aa0ad5e9b4a5"
+  },
+  "executedHelpers": [
+    {
+      "path": "scripts/evaluate-context-efficiency-comparison-v2.mjs",
+      "sha256": "sha256:f0702e183705b4618f562d3b393ad01befac5b92bb8b87e4209f8210223609af",
+      "gitBlob": "81e41e151b6a757de72cb1bd12c5bc48c78e22cb"
+    },
+    {
+      "path": "scripts/context-efficiency-v2-lib.mjs",
+      "sha256": "sha256:080de2a5e4642ac205033fbce5a3c9524ee5c18367d376888db237face1fa2bf",
+      "gitBlob": "10b9c97d57214f192c763d572e2f36996a4a9940"
+    },
+    {
+      "path": "scripts/context-efficiency-v2-renderer.mjs",
+      "sha256": "sha256:99044dd2ab519a07e9b367dc23b9fd7a7b42cbada411bc554d0e6f1490dfd547",
+      "gitBlob": "e211b07dbad68460458a29f65ef1e17fa90a78e5"
+    }
+  ],
+  "productionSource": {
+    "commit": "6c22d8f293e1e99bbbee239abb36e219af2c96a9",
+    "tree": "22799851e89feb52fd0a0e85edcaac80b82cde5d",
+    "loadedEntryPoints": [
+      {
+        "path": "src/contracts.js",
+        "sha256": "sha256:d74d0487fad186901c7aa1a8c8530c0920fe3908c611ce85ec17c6336d575650",
+        "gitBlob": "17f0aaf4756c17301a7a0da21f46863433ac27dd"
+      },
+      {
+        "path": "src/indexer.js",
+        "sha256": "sha256:868c6e433dc858cd665c3c844bb72449e102bf1bc288f1c9daf41ecf4986ff4b",
+        "gitBlob": "69b1fd6608ee3ff2af661de5dba08a09a6a15d75"
+      },
+      {
+        "path": "src/retrieval.js",
+        "sha256": "sha256:729991b59ea5a0b073c6cdd93fef15c622c819c7f46947b1167f44d598b3a68a",
+        "gitBlob": "28add92c827c05d8e08b19934d57baf02b47571a"
+      }
+    ]
+  },
+  "executionState": {
+    "exactArmingAuthorizationVerified": true,
+    "worktreeCleanAtExecutionAuthorization": true,
+    "resultPathAbsentBeforeExecutionVerified": true,
+    "frozenBindingsVerified": true,
+    "requiredMutationGroupsPassedBeforeRetrieval": 24,
+    "retrievalMethodsExecuted": true,
+    "neutralCaseObservationsComputedInMemory": true,
+    "neutralCaseCountComputedInMemory": 6,
+    "neutralAggregationComputed": false,
+    "firstSafetyCase": "strict-before-boundary",
+    "firstSafetyCaseRankingsComputed": [
+      "qarinah-admission-first-v2",
+      "admission-filtered-bm25",
+      "raw-bm25-safety-negative-control"
+    ],
+    "firstSafetyCaseMethodObservationCompleted": false,
+    "remainingSafetyCasesEvaluated": false,
+    "aggregateComputed": false,
+    "winnerComputed": false,
+    "claimDecisionComputed": false,
+    "resultObjectConstructed": false,
+    "resultEmitted": false,
+    "resultMaterialized": false,
+    "operatorVisibleComparativeMetricProduced": false
+  },
+  "failure": {
+    "code": "CANONICAL_FRAME",
+    "assertion": {
+      "actual": 2,
+      "expected": 1,
+      "display": "2 !== 1"
+    },
+    "stackSites": [
+      {
+        "path": "scripts/context-efficiency-v2-lib.mjs",
+        "line": 313,
+        "function": "validateCanonicalFrame"
+      },
+      {
+        "path": "scripts/context-efficiency-v2-lib.mjs",
+        "line": 1570,
+        "function": "safetyMethodObservation"
+      },
+      {
+        "path": "scripts/context-efficiency-v2-lib.mjs",
+        "line": 1665,
+        "function": "evaluateSafetyCases"
+      }
+    ],
+    "trigger": {
+      "caseId": "strict-before-boundary",
+      "methodId": "qarinah-admission-first-v2",
+      "query": "checkpoint sentinel",
+      "currentSourcesCount": 0,
+      "fixedK": 1,
+      "selectedEventId": "evt_00000000-0000-4000-8000-000000000001",
+      "selectedEventHash": "sha256:18e76df6afd2ba38b47090bc3d22b7c71c9a4dad22094e9d0dba4d251e906a67",
+      "selectedTitle": "checkpoint sentinel before",
+      "selectedBody": "sentinel evidence record 1",
+      "queryInStructuralTaskField": true,
+      "queryInSelectedTitle": true,
+      "queryInSelectedBody": false,
+      "exactQueryOccurrenceCountInFrame": 2
+    },
+    "canonicalRendererBytesMatched": true,
+    "failedRule": "The exact task query must occur once in the model-facing frame.",
+    "rootCause": "The validator counted literal query bytes across the complete canonical frame, conflating the one structural TASK QUERY field with legitimate copies in current-source or evidence text.",
+    "isRankingFailure": false,
+    "isRendererByteMismatch": false,
+    "isComparativeOutcome": false
+  },
+  "additionalFrozenSafetyFrameAudit": [
+    {
+      "caseId": "strict-before-boundary",
+      "query": "checkpoint sentinel",
+      "requiredTitle": "checkpoint sentinel before",
+      "expectedExactQueryOccurrencesWithRequiredEvent": 2
+    },
+    {
+      "caseId": "policy-admission-poison",
+      "query": "poison sentinel",
+      "requiredTitle": "poison sentinel permitted evidence",
+      "expectedExactQueryOccurrencesWithRequiredEvent": 2
+    },
+    {
+      "caseId": "supersession-chain-cycle",
+      "query": "release chain",
+      "requiredTitle": "release chain current",
+      "expectedExactQueryOccurrencesWithRequiredEvent": 2
+    },
+    {
+      "caseId": "conflicting-policy-claim",
+      "query": "mercury release seal policy checksum",
+      "requiredTitle": "Mercury release seal uses the current checksum",
+      "expectedExactQueryOccurrencesWithRequiredEvent": 1
+    }
+  ],
+  "amendment001FailureRuleAudit": {
+    "promisedRule": "Any binding, reconstruction, mutation, renderer, method, or safety mismatch aborts before either retrieval method and writes no result.",
+    "abortBeforeEitherRetrievalMethodMet": false,
+    "writeNoResultMet": true,
+    "explanation": "The data-dependent safety-frame validator ran after neutral retrieval and after the first safety case's three rankings. Attempt 1 therefore executed retrieval but still failed before aggregation, decision construction, result construction, emission, or write."
+  },
+  "artifacts": {
+    "intendedResultPath": "bench/results/context-efficiency-comparison-0.1.6-v2.json",
+    "intendedResultPresentAfterAttempt": false,
+    "v2ResultExists": false,
+    "failureReceiptIsAResult": false
+  },
+  "claimBoundary": {
+    "comparativeMetricMayBeReportedFromAttempt": false,
+    "winnerMayBeReportedFromAttempt": false,
+    "attemptMaySupportAUniversalBestClaim": false,
+    "statement": "Attempt 1 is evidence of a fail-closed validator defect only. It produced no operator-visible comparative metric and no Qarinah v2 result."
+  }
+}

@@ -1,0 +1,337 @@
+{
+  "schemaVersion": "qarinah.context-efficiency-comparison-amendment.v1",
+  "amendmentId": "context-efficiency-comparison-v2-amendment-002",
+  "amendmentVersion": "1.0.0",
+  "authoredOn": "2026-08-08",
+  "timing": {
+    "phase": "post-attempt-001-failure; pre-correction implementation; pre-correction-run",
+    "attempt001Occurred": true,
+    "retrievalMethodsExecutedInAttempt001": true,
+    "neutralCaseObservationsComputedInMemoryInAttempt001": true,
+    "operatorVisibleComparativeMetricProducedInAttempt001": false,
+    "aggregateComputedInAttempt001": false,
+    "winnerComputedInAttempt001": false,
+    "resultObjectConstructedInAttempt001": false,
+    "resultEmittedInAttempt001": false,
+    "resultMaterializedInAttempt001": false,
+    "correctionImplementedWhenAuthored": false,
+    "correctionRunOccurredWhenAuthored": false,
+    "resultArtifactPath": "bench/results/context-efficiency-comparison-0.1.6-v2.json",
+    "resultArtifactPresentWhenAuthored": false,
+    "statement": "This amendment was authored after the single authorized attempt failed closed and before any validator correction or correction run. Attempt 1 executed retrieval internally but produced no aggregate, winner, result object, emitted result, written result, or operator-visible comparative metric."
+  },
+  "frozenLineage": {
+    "baseProtocol": {
+      "commit": "d7f2a09bed34507b3aec070f765d20b6a834d6d9",
+      "tree": "b9bc5b84b48876ebf4e9bbdeaeb6b7a703ae3c87",
+      "tag": "research-context-efficiency-protocol-v2",
+      "annotatedTagObject": "71cdbbda12a5d4d6dff514fb0a8799f1d4fcb8aa",
+      "manifestPath": "bench/research/context-efficiency-comparison-v2-protocol.json",
+      "manifestSha256": "sha256:0dc108888faa583ccdce132b38e6543df00130ffc58c4dbdb07656cf88a4cfbd",
+      "manifestGitBlob": "8c9c1ad750b298710b69a36cce3e895c28af491d",
+      "documentPath": "docs/CONTEXT-EFFICIENCY-COMPARISON-v2-PROTOCOL.md",
+      "documentSha256": "sha256:834a5954cacea05e0721f3ad49a044093b6636252f985ba82b76386b18a59616",
+      "documentGitBlob": "4e6f5398da68f80a1c3434281a901ae026272d9d",
+      "preserved": true
+    },
+    "amendment001": {
+      "commit": "6fb29afd741480176cd5b7c582fb13437308d805",
+      "tree": "a9852a06958a7efda6537cb99e5e1d26ca17b302",
+      "tag": "research-context-efficiency-protocol-v2-amendment-001",
+      "annotatedTagObject": "fc744e3d6c869cf26943d3bac2afe5bdbf5c243d",
+      "manifestPath": "bench/research/context-efficiency-comparison-v2-amendment-001.json",
+      "manifestSha256": "sha256:33a8ae1755038c3d450507045bba8e2471482cb2ea61e77a6d6b5ae4848fa2aa",
+      "manifestGitBlob": "8caaa81223e5fbdd183e2c8e376d0ca996a8dd3e",
+      "documentPath": "docs/CONTEXT-EFFICIENCY-COMPARISON-v2-AMENDMENT-001.md",
+      "documentSha256": "sha256:b51e406f6b92aa19f8ef40dfd545b57eee7c6dbde374b659ed46930c6fa9f40d",
+      "documentGitBlob": "92521fbeb80f4e3ea8005fe9c7650bafed8f2d81",
+      "preservedExceptForExplicitSupersessionBelow": true
+    },
+    "reviewedEvaluator": {
+      "commit": "b160674d8bffa28c9169d262dcda65d32d238e80",
+      "tree": "19a01bc47a817f3dc8275c533183ecc073afb458",
+      "tag": "research-context-efficiency-evaluator-v2",
+      "annotatedTagObject": "71d9260fc3204b401e8bea0516f0d314838e69a4",
+      "preserved": true
+    },
+    "attempt001ArmedEvaluator": {
+      "commit": "90d702d24b5fcedfa936ce6d38bd245aea3bddb8",
+      "tree": "2bbfce43f929735fad9fcbe47e7a439bd88d0c26",
+      "parent": "b160674d8bffa28c9169d262dcda65d32d238e80",
+      "tag": "research-context-efficiency-evaluator-v2-armed",
+      "annotatedTagObject": "4e73c2b57d62093e97b945c782271b3a7a5e1796",
+      "preservedAsFailedAttemptIdentity": true
+    }
+  },
+  "attempt001Evidence": {
+    "receiptPath": "bench/results/context-efficiency-comparison-0.1.6-v2-attempt-001-failure.json",
+    "receiptSha256": "sha256:c55e99eb0f7c6fda2d81475ae3181a4c23232abbb7d79292a0210823d2e0048f",
+    "reportPath": "docs/CONTEXT-EFFICIENCY-COMPARISON-v2-ATTEMPT-001-FAILURE.md",
+    "reportSha256": "sha256:5671cadd2e21e583a2a6901dd8d9b55f4551cb939b03bd7775d679db33973117",
+    "exactAuthorizedShellCommand": "npm run evaluate:context-efficiency-comparison:v2:write",
+    "npmExpandedCommand": "node scripts/evaluate-context-efficiency-comparison-v2.mjs --execute --write",
+    "exitCode": 1,
+    "failureCode": "CANONICAL_FRAME",
+    "assertionDisplay": "2 !== 1",
+    "observedApproximateToolWallTimeSeconds": 9.3,
+    "wallTimeIsAuthoritativeRuntimeBenchmark": false,
+    "retrievalMethodsExecuted": true,
+    "neutralCaseObservationsComputedInMemory": true,
+    "firstSafetyCaseRankingsComputed": [
+      "qarinah-admission-first-v2",
+      "admission-filtered-bm25",
+      "raw-bm25-safety-negative-control"
+    ],
+    "aggregateComputed": false,
+    "winnerComputed": false,
+    "resultObjectConstructed": false,
+    "resultEmitted": false,
+    "resultMaterialized": false,
+    "operatorVisibleComparativeMetricProduced": false,
+    "stackSites": [
+      "scripts/context-efficiency-v2-lib.mjs:313 validateCanonicalFrame",
+      "scripts/context-efficiency-v2-lib.mjs:1570 safetyMethodObservation",
+      "scripts/context-efficiency-v2-lib.mjs:1665 evaluateSafetyCases"
+    ]
+  },
+  "attempt001ExecutionBinding": {
+    "head": "90d702d24b5fcedfa936ce6d38bd245aea3bddb8",
+    "tree": "2bbfce43f929735fad9fcbe47e7a439bd88d0c26",
+    "runtime": {
+      "node": "v24.15.0",
+      "npm": "11.18.0",
+      "v8": "13.6.233.17-node.48",
+      "modulesAbi": "137",
+      "platform": "win32",
+      "arch": "x64",
+      "git": "2.45.2.windows.1",
+      "executablePathForAudit": "C:/Program Files/nodejs/node.exe",
+      "executableSha256": "sha256:3331e1ffe19874215472217c5e94f5a0c6d8e18c4ac7111d3937aa0ad5e9b4a5"
+    },
+    "helpers": [
+      {
+        "path": "scripts/evaluate-context-efficiency-comparison-v2.mjs",
+        "sha256": "sha256:f0702e183705b4618f562d3b393ad01befac5b92bb8b87e4209f8210223609af",
+        "gitBlob": "81e41e151b6a757de72cb1bd12c5bc48c78e22cb"
+      },
+      {
+        "path": "scripts/context-efficiency-v2-lib.mjs",
+        "sha256": "sha256:080de2a5e4642ac205033fbce5a3c9524ee5c18367d376888db237face1fa2bf",
+        "gitBlob": "10b9c97d57214f192c763d572e2f36996a4a9940"
+      },
+      {
+        "path": "scripts/context-efficiency-v2-renderer.mjs",
+        "sha256": "sha256:99044dd2ab519a07e9b367dc23b9fd7a7b42cbada411bc554d0e6f1490dfd547",
+        "gitBlob": "e211b07dbad68460458a29f65ef1e17fa90a78e5"
+      }
+    ]
+  },
+  "failureFinding": {
+    "trigger": {
+      "caseId": "strict-before-boundary",
+      "methodId": "qarinah-admission-first-v2",
+      "query": "checkpoint sentinel",
+      "requiredEventId": "evt_00000000-0000-4000-8000-000000000001",
+      "requiredTitle": "checkpoint sentinel before",
+      "requiredBody": "sentinel evidence record 1",
+      "queryInStructuralTaskField": true,
+      "queryInRequiredTitle": true,
+      "queryInRequiredBody": false,
+      "exactQueryOccurrencesInCanonicalFrame": 2
+    },
+    "canonicalRendererBytesMatched": true,
+    "oldValidationSemantics": "Require the exact query byte sequence to occur exactly once anywhere in the complete model-facing frame.",
+    "defect": "The validator confused the single structural TASK QUERY field with legitimate literal query bytes in current sources, event titles, or event bodies.",
+    "notARendererByteMismatch": true,
+    "notARankingFinding": true,
+    "notAComparativeOutcome": true,
+    "frozenSafetyCasesWithRequiredFrameOccurrenceCountTwo": [
+      "strict-before-boundary",
+      "policy-admission-poison",
+      "supersession-chain-cycle"
+    ],
+    "frozenSafetyCasesWithRequiredFrameOccurrenceCountOne": [
+      "conflicting-policy-claim"
+    ]
+  },
+  "amendment001PromiseAudit": {
+    "promisedFailureRule": "Any binding, reconstruction, mutation, renderer, method, or safety mismatch aborts before either retrieval method and writes no result.",
+    "preRetrievalAbortPromiseMetInAttempt001": false,
+    "noResultWritePromiseMetInAttempt001": true,
+    "reason": "The affected frame validator depended on post-ranking selected events and ran after all neutral observations and the first safety case's Qarinah, admission-filtered-BM25, and raw-BM25 rankings.",
+    "remediation": "Amendment 002 requires a deterministic all-frozen-frame preflight that completes before retrieval modules are loaded or any ranking method is called."
+  },
+  "supersessionScope": {
+    "supersedesOnly": [
+      "The base/Amendment-001 interpretation that the exact query byte sequence must occur exactly once across the complete rendered frame.",
+      "The Amendment-001 failure rule's implementation assumption that data-dependent renderer, method, and safety validation necessarily occurs before retrieval; Amendment 002 adds an explicit no-retrieval preflight.",
+      "First-run terminology after the preserved failed attempt; the next authorized execution is correction-run attempt 2."
+    ],
+    "remainsUnchanged": [
+      "research questions, six neutral tasks, four safety tasks, query bytes, current-source bytes, relevance bindings, event fixtures, ledgers, event hashes, and candidate sets",
+      "Qarinah admission-first-v2 ranking, admission-filtered BM25, raw-BM25 safety-negative-control algorithms, options, output limits, ordering, scoring, and stopping rules",
+      "canonical rendered frame bytes, LF line endings, frame/source/item templates, separators, complete-body rule, method-independent fields, and item order",
+      "portable token estimator, character accounting, non-truncating token ceiling, evidence-complete-prefix metric, fixed-k diagnostic, aggregation, missing-evidence rule, and tie rule",
+      "required/forbidden evidence gates, conflict audit, all safety and claim gates, winner eligibility, allowed wording, and development-only claim boundary",
+      "all non-query mutation requirements and the requirement that duplicated, omitted, or method-specific structural query input fail closed",
+      "result path bench/results/context-efficiency-comparison-0.1.6-v2.json"
+    ],
+    "explicitFreeze": {
+      "rankingUnchanged": true,
+      "algorithmsUnchanged": true,
+      "candidateSetsUnchanged": true,
+      "fixturesUnchanged": true,
+      "renderedBytesUnchanged": true,
+      "tokenAccountingUnchanged": true,
+      "safetyGatesUnchanged": true,
+      "claimGatesUnchanged": true,
+      "resultPathUnchanged": true
+    }
+  },
+  "validatorOnlyCorrection": {
+    "structuralTaskQueryField": {
+      "frameMustEqualCanonicalRendererBytes": true,
+      "fieldHeader": "TASK QUERY\n",
+      "fieldHeaderMustStartAtByteOffset": 0,
+      "fieldTerminator": "\n\nCURRENT SOURCES\n",
+      "exactlyOneStructuralFieldProducedByRenderer": true,
+      "fieldValueMustEqualFrozenQueryBytes": true,
+      "currentSourcesMustBeginImmediatelyAfterFieldTerminator": true,
+      "sameQueryBytesAllowedInCurrentSources": true,
+      "sameQueryBytesAllowedInEventTitles": true,
+      "sameQueryBytesAllowedInEventBodies": true,
+      "globalLiteralOccurrenceCountMustNotBeUsed": true,
+      "methodSpecificQueryBytesAllowed": false,
+      "methodSpecificCurrentSourceBytesAllowed": false
+    },
+    "canonicalOutputBindings": {
+      "frameTemplate": "TASK QUERY\n{query}\n\nCURRENT SOURCES\n{sources}\n\nMEMORY EVIDENCE\n{items}",
+      "frameTemplateSha256": "sha256:9466fed249971e7c894e52faf80f3bd14bef335b0aa6a28ceafe5ca0d965a56a",
+      "sourceTemplate": "FILE {path}\n{content}",
+      "itemTemplate": "EVENT {eventId}\nHASH {eventHash}\nKIND {kind}\nTIME {timestamp}\nTITLE {title}\nBODY\n{body}",
+      "itemTemplateSha256": "sha256:477e47cbf1d3ff47335f6b1c9319afbb38f7fd13517f072a5100a2c44432211d",
+      "rendererOutputFunctionsMayChange": false,
+      "validatorImplementationMustChange": true,
+      "validatorFileHashWillChangeButRenderedOutputBytesMustNot": true
+    },
+    "queryMutationRequirements": [
+      "duplicate the query inside the structural TASK QUERY field and fail closed",
+      "omit the structural TASK QUERY field and fail closed",
+      "change any query byte inside the structural field and fail closed",
+      "supply method-specific structural query bytes and fail closed",
+      "supply method-specific current-source bytes and fail closed",
+      "change any canonical rendered frame byte and fail closed"
+    ]
+  },
+  "noRetrievalFramePreflight": {
+    "required": true,
+    "mustCompleteBeforeRetrievalModulesAreLoaded": true,
+    "mustCompleteBeforeAnyQarinahOrBm25MethodCall": true,
+    "permittedDependencies": [
+      "frozen protocol and amendment records",
+      "frozen reconstructed event envelopes and current-source bytes",
+      "canonical renderer and validator only"
+    ],
+    "forbiddenDuringPreflight": [
+      "rankContextEvents",
+      "resolveContextAdmission",
+      "resolveCurrentContextState",
+      "rankAdmissionFilteredBm25",
+      "any candidate scoring, sorting, stopping, selection, aggregation, or decision construction"
+    ],
+    "matrix": {
+      "neutralCases": 6,
+      "neutralEvents": 240,
+      "neutralFramesPerCase": 242,
+      "neutralFrameRule": "For each neutral case, validate one empty-memory frame, one single-event frame for each of the 240 frozen neutral events, and one full-ledger frame in frozen ledger order, using that case's exact query and current sources.",
+      "neutralFrameCount": 1452,
+      "safetyCases": 4,
+      "safetyEventsByCase": [2, 6, 5, 3],
+      "safetyFrameRule": "For each safety case, validate one empty-memory frame, one single-event frame for each event in that case's frozen ledger, and one full-ledger frame in frozen ledger order, using the exact case query and empty current sources.",
+      "safetyFrameCount": 24,
+      "totalRequiredPreflightFrames": 1476
+    },
+    "postRankingValidationStillRequired": true,
+    "preflightFailureRule": "Any preflight mismatch aborts before retrieval modules load and before any retrieval or ranking method executes, and emits or writes no result.",
+    "proofRequirement": "Tests must install call counters or throwing spies around every forbidden retrieval/ranking entry point and demonstrate zero calls both when preflight passes and when each preflight mutation fails."
+  },
+  "requiredRegressionTests": [
+    "a canonical frame whose event title repeats the exact query passes structural query-slot validation",
+    "a canonical frame whose event body repeats the exact query passes structural query-slot validation",
+    "a canonical frame whose current source repeats the exact query passes structural query-slot validation",
+    "the required one-event frames for strict-before-boundary, policy-admission-poison, and supersession-chain-cycle pass even though each contains two literal query occurrences",
+    "the required one-event frame for conflicting-policy-claim passes with one literal query occurrence",
+    "a duplicated structural TASK QUERY value fails",
+    "an omitted structural TASK QUERY field fails",
+    "a one-byte structural query mutation fails",
+    "a method-specific structural query or current-source mutation fails",
+    "a noncanonical rendered frame fails byte equality",
+    "all 1476 preflight frames validate before any retrieval/ranking entry point is called",
+    "a preflight failure proves zero retrieval/ranking calls and no result construction or write",
+    "the existing 24 mutation groups still fail closed, including query-duplicated-omitted-or-method-specific"
+  ],
+  "correctionImplementationGate": {
+    "amendment002AloneAuthorizesExecution": false,
+    "failureReceiptAndReportMustBeCommittedWithAmendment002": true,
+    "amendment002MustBeCommittedAndAnnotatedTagged": true,
+    "amendment002CommitAndTagMustBePushed": true,
+    "correctionMustBeValidatorOnly": true,
+    "correctionImplementationMustBeCommittedSeparatelyAfterAmendment002": true,
+    "correctionImplementationMustBeAnnotatedTaggedAndPushed": true,
+    "correctionImplementationMustBeIndependentlyReviewed": true,
+    "reviewMustConfirmNoRankingAlgorithmCandidateFixtureRendererOutputTokenSafetyClaimOrResultPathChange": true,
+    "allRequiredRegressionTestsMustPass": true,
+    "allExistingTestsAndBindingChecksMustPass": true,
+    "resultPathMustRemainAbsentUntilExplicitCorrectionRunWrite": true,
+    "cleanExactCorrectionArmingCommitRequired": true
+  },
+  "correctionRunGate": {
+    "nextAttemptNumber": 2,
+    "requiredLabel": "correction-run-attempt-2",
+    "oneExplicitCorrectionRunOnly": true,
+    "silentRerunAllowed": false,
+    "separateExplicitAuthorizationAfterReviewRequired": true,
+    "permittedCommandAfterAuthorization": "npm run evaluate:context-efficiency-comparison:v2:write",
+    "npmExpandedCommand": "node scripts/evaluate-context-efficiency-comparison-v2.mjs --execute --write",
+    "mustStartFromFrozenInputsRatherThanReuseAttempt001InMemoryObservations": true,
+    "attempt001ReceiptHashMustVerifyBeforePreflight": true,
+    "preflightMustPassBeforeRetrieval": true,
+    "correctionCommitTagRuntimeAndHelperHashesMustBeRecorded": true,
+    "failureRule": "If correction-run attempt 2 fails, it must emit and write no result; its failure must be preserved in a new receipt and no further run is allowed without a new dated amendment, committed correction, independent review, and explicit authorization."
+  },
+  "requiredResultProvenance": {
+    "failureReceipt": {
+      "path": "bench/results/context-efficiency-comparison-0.1.6-v2-attempt-001-failure.json",
+      "sha256": "sha256:c55e99eb0f7c6fda2d81475ae3181a4c23232abbb7d79292a0210823d2e0048f",
+      "required": true
+    },
+    "attempts": [
+      {
+        "number": 1,
+        "status": "failed-closed-before-result",
+        "armedCommit": "90d702d24b5fcedfa936ce6d38bd245aea3bddb8",
+        "armedTag": "research-context-efficiency-evaluator-v2-armed",
+        "receiptRequired": true
+      },
+      {
+        "number": 2,
+        "status": "correction-run; populate only after the one explicit authorized run",
+        "correctionCommitRequired": true,
+        "correctionTagRequired": true,
+        "amendment002CommitTagAndHashesRequired": true,
+        "exactCommandRequired": true,
+        "runtimeAndHelperHashesRequired": true
+      }
+    ],
+    "attempt001InternalObservationsMayEnterResultMetrics": false,
+    "resultMustStateAttempt001RetrievalExecutedButNoMetricOrResultWasProduced": true
+  },
+  "claimBoundary": {
+    "developmentOnly": true,
+    "attempt001SupportsNoComparativeMetricOrWinner": true,
+    "amendment002SupportsNoComparativeMetricOrWinner": true,
+    "universalBestOrIndustryClaimAllowed": false,
+    "providerTokenCostTaskSuccessQualityOrLatencyClaimAllowed": false,
+    "winnerWordingRemainsRestrictedToTheBaseProtocolTemplateAndAllUnchangedSafetyGates": true
+  }
+}
