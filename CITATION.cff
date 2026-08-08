@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use Qarinah, please cite the software and its technical white paper."
+title: "Qarinah"
+type: software
+version: 0.1.6
+license: Apache-2.0
+authors:
+  - family-names: "N B"
+    given-names: "Ajnas"
+repository-code: "https://github.com/AjnasNB/qarinah"
+url: "https://qarinah.io"
+abstract: >-
+  Evidence-linked local project memory for coding agents, with deterministic
+  retrieval, cited context packs, temporal authority, and verifiable handoffs.
+keywords:
+  - coding agents
+  - project memory
+  - context retrieval
+  - provenance
+  - local-first
+preferred-citation:
+  type: article
+  title: "Qarinah: Less Context. More Proof."
+  subtitle: "An evidence-linked project-memory compiler for coding agents"
+  version: "1.4"
+  year: 2026
+  authors:
+    - family-names: "N B"
+      given-names: "Ajnas"
+  doi: "10.5281/zenodo.21547684"
+  url: "https://qarinah.io/paper/"

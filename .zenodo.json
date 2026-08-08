@@ -1,0 +1,43 @@
+{
+  "title": "Qarinah: Less Context. More Proof.",
+  "description": "Implementation-backed technical white paper for Qarinah 0.1.6. Version 1.4 adds the audited current-product v0.5 differential reproduction and the frozen context-efficiency comparison v2 no-primary-result outcome. Measured claims remain scoped to their named committed fixtures and portable estimator.",
+  "upload_type": "publication",
+  "publication_type": "report",
+  "creators": [
+    {
+      "name": "N B, Ajnas"
+    }
+  ],
+  "contributors": [
+    {
+      "name": "Ahammed, Shahin",
+      "type": "Other"
+    }
+  ],
+  "version": "1.4",
+  "publication_date": "2026-08-08",
+  "access_right": "open",
+  "license": "apache-2.0",
+  "language": "eng",
+  "keywords": [
+    "coding agents",
+    "project memory",
+    "context retrieval",
+    "provenance",
+    "local-first",
+    "MCP"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "10.5281/zenodo.21547684",
+      "relation": "isVersionOf",
+      "scheme": "doi"
+    },
+    {
+      "identifier": "https://github.com/AjnasNB/qarinah",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ],
+  "notes": "This manuscript is not peer reviewed. The 98.71% figure is a portable estimated input-context reduction in a named six-task fixture, not a universal provider-token, cost, latency, or task-success claim. Qarinah and admission-filtered BM25 produced no primary comparative result in context-efficiency comparison v2."
+}

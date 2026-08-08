@@ -1,0 +1,31 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "name": "Qarinah",
+  "description": "Evidence-linked local project memory for coding agents with deterministic retrieval, cited context packs, temporal authority, and verifiable handoffs.",
+  "version": "0.1.6",
+  "license": "https://spdx.org/licenses/Apache-2.0",
+  "codeRepository": "https://github.com/AjnasNB/qarinah",
+  "issueTracker": "https://github.com/AjnasNB/qarinah/issues",
+  "url": "https://qarinah.io",
+  "programmingLanguage": [
+    "JavaScript",
+    "TypeScript"
+  ],
+  "runtimePlatform": "Node.js 22, 24, or 26",
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Ajnas",
+      "familyName": "N B"
+    }
+  ],
+  "citation": "https://doi.org/10.5281/zenodo.21547684",
+  "keywords": [
+    "coding agents",
+    "project memory",
+    "context retrieval",
+    "provenance",
+    "local-first"
+  ]
+}
