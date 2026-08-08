@@ -482,11 +482,22 @@ async function loadFrozenReference(repositoryRoot) {
 }
 
 async function verifyResultGitProvenance(repositoryRoot, currentBytes) {
-  const introductions = (await gitText(repositoryRoot, ["log", "--reverse", "--format=%H", "--diff-filter=A", "--", V05_RESULT_PATH]))
-    .split(/\r?\n/u).filter(Boolean);
-  same(introductions, [V05_RESULT_COMMIT], "RESULT_SINGLE_INTRODUCTION", "Result must have exactly one introducing commit.", "result-provenance");
-  exact(await gitText(repositoryRoot, ["log", "-1", "--format=%H", "--", V05_RESULT_PATH]) === V05_RESULT_COMMIT, "RESULT_MUTATED", "Result changed after its introducing commit.", "result-provenance");
   await assertAncestor(repositoryRoot, V05_RESULT_COMMIT, "HEAD", "RESULT_HEAD_ANCESTRY");
+  exact(
+    await gitText(repositoryRoot, ["diff-tree", "--no-commit-id", "--name-status", "-r", V05_RESULT_COMMIT, "--", V05_RESULT_PATH]) === `A\t${V05_RESULT_PATH}`,
+    "RESULT_SINGLE_INTRODUCTION",
+    "The tagged result commit must introduce the result on its canonical lineage.",
+    "result-provenance"
+  );
+  const laterCanonicalChanges = (await gitText(repositoryRoot, [
+    "log",
+    "--format=%H",
+    "--ancestry-path",
+    `${V05_RESULT_COMMIT}..HEAD`,
+    "--",
+    V05_RESULT_PATH
+  ])).split(/\r?\n/u).filter(Boolean);
+  same(laterCanonicalChanges, [], "RESULT_MUTATED", "Result changed after its canonical introduction.", "result-provenance");
   const committed = await gitBlob(repositoryRoot, V05_RESULT_TAG, V05_RESULT_PATH);
   exact(currentBytes.equals(committed), "RESULT_WORKTREE_BYTES", "Working result bytes differ from the tagged result.", "result-provenance");
   exact(gitBlobSha1(currentBytes) === V05_RESULT_GIT_BLOB, "RESULT_GIT_BLOB", "Result Git blob identity differs.", "result-provenance");

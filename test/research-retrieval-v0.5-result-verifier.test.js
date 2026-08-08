@@ -73,6 +73,29 @@ test("v0.5 post-result verifier accepts the exact tagged artifact without rewrit
   }
 });
 
+test("v0.5 result has one immutable canonical introduction even after a byte-identical squash release", async () => {
+  const { stdout: introduction } = await run("git", [
+    "diff-tree",
+    "--no-commit-id",
+    "--name-status",
+    "-r",
+    V05_RESULT_COMMIT,
+    "--",
+    V05_RESULT_PATH
+  ], { cwd: repositoryRoot, encoding: "utf8", windowsHide: true });
+  assert.equal(introduction.trim(), `A\t${V05_RESULT_PATH}`);
+
+  const { stdout: laterChanges } = await run("git", [
+    "log",
+    "--format=%H",
+    "--ancestry-path",
+    `${V05_RESULT_COMMIT}..HEAD`,
+    "--",
+    V05_RESULT_PATH
+  ], { cwd: repositoryRoot, encoding: "utf8", windowsHide: true });
+  assert.equal(laterChanges.trim(), "");
+});
+
 test("v0.5 post-result verifier rejects byte-level artifact tampering", async () => {
   const temporaryRoot = await mkdtemp(path.join(os.tmpdir(), "qarinah-v05-result-tamper-"));
   try {
