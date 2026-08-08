@@ -183,6 +183,14 @@ A separate authenticated Codex CLI smoke uses two distinct ephemeral sessions wi
 
 This is continuation-product evidence, not a controlled model-quality claim. See [the complete method and limitations](CROSS-SESSION-CONTINUATION-BENCHMARK.md), the [0.1.6 deterministic result](../bench/results/continuation-context-0.1.6.json), and the explicitly historical [0.1.5 provider-backed smoke receipt](../bench/results/codex-cross-session-continuation-0.1.5.json). No provider-backed 0.1.6 continuation receipt is claimed.
 
+## Frozen context-efficiency comparison v2
+
+The audited attempt-2 development artifact produced **no primary comparative context-efficiency result**. Qarinah and admission-filtered BM25 were each primary-eligible on five of six frozen cases and had identical portable token estimates on those five cases: 630, 680, 574, 1,191, and 1,202. Their shared 4,277-token subtotal is diagnostic only because both methods missed required TypeScript support-3 event `evt_00000000-0000-4000-8000-000000000012` by the frozen top-32 boundary. The artifact's `0` rank value is a not-found sentinel, not rank 33.
+
+Both filtered methods passed 4/4 safety cases with zero forbidden inclusions. Raw BM25 was a safety-only negative control; it passed 0/4 and produced 26 forbidden-inclusion detections. The fixed-`k` diagnostic was exact on 2/6 cases for each filtered method and is not a token ranking. The conflict audit and all 24 required mutation groups passed.
+
+See the [complete attempt-2 result report](CONTEXT-EFFICIENCY-COMPARISON-v2-RESULT.md) and [machine-readable artifact](../bench/results/context-efficiency-comparison-0.1.6-v2.json). The separately verified 98.7148% six-task repeated-history estimator fixture remains unchanged; it is not a v2 comparison result or evidence that one v2 method outperformed the other.
+
 ## Claims Qarinah does not make
 
 - exact token or cost savings without a provider-specific tokenizer and usage receipt;
