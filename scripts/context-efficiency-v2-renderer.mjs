@@ -5,6 +5,8 @@ export const FRAME_TEMPLATE = "TASK QUERY\n{query}\n\nCURRENT SOURCES\n{sources}
 export const SOURCE_TEMPLATE = "FILE {path}\n{content}";
 export const ITEM_TEMPLATE = "EVENT {eventId}\nHASH {eventHash}\nKIND {kind}\nTIME {timestamp}\nTITLE {title}\nBODY\n{body}";
 export const RECORD_SEPARATOR = "\n\n";
+export const TASK_QUERY_HEADER = "TASK QUERY\n";
+export const TASK_QUERY_TERMINATOR = "\n\nCURRENT SOURCES\n";
 
 export const COMMON_RENDERER_BINDING = Object.freeze({
   lineEnding: "LF",
@@ -79,7 +81,14 @@ export function estimatedPortableTokens(text) {
 export function assertCanonicalFrame({ frame, query, currentSources, events }) {
   const expected = renderModelFacingFrame({ query, currentSources, events });
   assert.equal(frame, expected, "Model-facing frame bytes differ from the canonical renderer.");
-  assert.equal(frame.split(query).length - 1, 1, "The exact task query must occur once in the model-facing frame.");
+  assert.equal(frame.startsWith(TASK_QUERY_HEADER), true, "The structural TASK QUERY header must start at byte offset zero.");
+  const taskQueryEnd = frame.indexOf(TASK_QUERY_TERMINATOR, TASK_QUERY_HEADER.length);
+  assert.equal(taskQueryEnd, TASK_QUERY_HEADER.length + query.length, "The structural TASK QUERY slot has the wrong length or terminator.");
+  assert.equal(
+    frame.slice(TASK_QUERY_HEADER.length, taskQueryEnd),
+    query,
+    "The structural TASK QUERY slot differs from the exact task query."
+  );
   return Object.freeze({
     characters: frame.length,
     estimatedTokens: estimatedPortableTokens(frame),

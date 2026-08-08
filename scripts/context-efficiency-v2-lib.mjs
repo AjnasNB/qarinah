@@ -21,6 +21,10 @@ export const AMENDMENT_COMMIT = "6fb29afd741480176cd5b7c582fb13437308d805";
 export const AMENDMENT_TAG = "research-context-efficiency-protocol-v2-amendment-001";
 export const EVALUATOR_COMMIT = "b160674d8bffa28c9169d262dcda65d32d238e80";
 export const EVALUATOR_TAG = "research-context-efficiency-evaluator-v2";
+export const ATTEMPT_001_ARMED_COMMIT = "90d702d24b5fcedfa936ce6d38bd245aea3bddb8";
+export const ATTEMPT_001_ARMED_TAG = "research-context-efficiency-evaluator-v2-armed";
+export const AMENDMENT_002_COMMIT = "b0e3ab2434cdbc9e8357e93a82b4da6cfeca7206";
+export const AMENDMENT_002_TAG = "research-context-efficiency-protocol-v2-amendment-002";
 export const SOURCE_COMMIT = "6c22d8f293e1e99bbbee239abb36e219af2c96a9";
 export const PROTOCOL_PATH = "bench/research/context-efficiency-comparison-v2-protocol.json";
 export const PROTOCOL_DOCUMENT_PATH = "docs/CONTEXT-EFFICIENCY-COMPARISON-v2-PROTOCOL.md";
@@ -30,13 +34,26 @@ export const AMENDMENT_PATH = "bench/research/context-efficiency-comparison-v2-a
 export const AMENDMENT_DOCUMENT_PATH = "docs/CONTEXT-EFFICIENCY-COMPARISON-v2-AMENDMENT-001.md";
 export const AMENDMENT_SHA256 = "sha256:33a8ae1755038c3d450507045bba8e2471482cb2ea61e77a6d6b5ae4848fa2aa";
 export const AMENDMENT_DOCUMENT_SHA256 = "sha256:b51e406f6b92aa19f8ef40dfd545b57eee7c6dbde374b659ed46930c6fa9f40d";
+export const AMENDMENT_002_PATH = "bench/research/context-efficiency-comparison-v2-amendment-002.json";
+export const AMENDMENT_002_DOCUMENT_PATH = "docs/CONTEXT-EFFICIENCY-COMPARISON-v2-AMENDMENT-002.md";
+export const AMENDMENT_002_SHA256 = "sha256:bea45b82f934eb52f174ffb3c3a5f6c193fe0abaa5b61feb93d1313eb634f4b9";
+export const AMENDMENT_002_DOCUMENT_SHA256 = "sha256:72751dc76210bef2cc6bc42e278641c99a0aa450ec61eefe1217fbf20d0561ab";
+export const ATTEMPT_001_FAILURE_PATH = "bench/results/context-efficiency-comparison-0.1.6-v2-attempt-001-failure.json";
+export const ATTEMPT_001_FAILURE_SHA256 = "sha256:c55e99eb0f7c6fda2d81475ae3181a4c23232abbb7d79292a0210823d2e0048f";
+export const ATTEMPT_001_FAILURE_REPORT_PATH = "docs/CONTEXT-EFFICIENCY-COMPARISON-v2-ATTEMPT-001-FAILURE.md";
+export const ATTEMPT_001_FAILURE_REPORT_SHA256 = "sha256:5671cadd2e21e583a2a6901dd8d9b55f4551cb939b03bd7775d679db33973117";
 export const EVALUATOR_PATH = "scripts/evaluate-context-efficiency-comparison-v2.mjs";
 export const LIBRARY_PATH = "scripts/context-efficiency-v2-lib.mjs";
 export const RENDERER_PATH = "scripts/context-efficiency-v2-renderer.mjs";
 export const TEST_PATH = "test/context-efficiency-v2.test.js";
 export const RESULT_PATH = "bench/results/context-efficiency-comparison-0.1.6-v2.json";
-export const ARMING_COMMIT_MESSAGE = "research: arm context efficiency v2 evaluator";
-export const ARMING_COMMIT_FILES = Object.freeze([LIBRARY_PATH, TEST_PATH]);
+export const CORRECTION_ATTEMPT_NUMBER = 2;
+export const CORRECTION_ATTEMPT_LABEL = "correction-run-attempt-2";
+export const CORRECTION_COMMIT_MESSAGE = "research: correct context efficiency v2 preflight";
+export const CORRECTION_TAG = "research-context-efficiency-evaluator-v2-correction-001";
+export const CORRECTION_COMMIT_FILES = Object.freeze([LIBRARY_PATH, RENDERER_PATH, TEST_PATH]);
+export const ARMING_COMMIT_MESSAGE = CORRECTION_COMMIT_MESSAGE;
+export const ARMING_COMMIT_FILES = CORRECTION_COMMIT_FILES;
 
 export const PRIMARY_METHOD_IDS = Object.freeze([
   "qarinah-admission-first-v2",
@@ -245,6 +262,117 @@ function verifyStaticAmendment(baseProtocol, amendment) {
   exact(amendment.claimBoundary.universalOrIndustryClaimAllowed === false, "BINDING_CLAIM_BOUNDARY", "Amendment permits an unsupported universal claim.");
 }
 
+function verifyStaticAmendment002(amendment002, failureReceipt) {
+  exact(amendment002.schemaVersion === "qarinah.context-efficiency-comparison-amendment.v1", "BINDING_AMENDMENT_002_SCHEMA", "Unexpected Amendment 002 schema.");
+  exact(amendment002.amendmentId === "context-efficiency-comparison-v2-amendment-002", "BINDING_AMENDMENT_002_ID", "Unexpected Amendment 002 ID.");
+  exact(amendment002.amendmentVersion === "1.0.0", "BINDING_AMENDMENT_002_VERSION", "Unexpected Amendment 002 version.");
+  exact(amendment002.timing.phase === "post-attempt-001-failure; pre-correction implementation; pre-correction-run", "BINDING_AMENDMENT_002_TIMING", "Amendment 002 timing differs.");
+  exact(amendment002.timing.attempt001Occurred === true, "BINDING_ATTEMPT_001", "Amendment 002 does not preserve attempt 1.");
+  exact(amendment002.timing.retrievalMethodsExecutedInAttempt001 === true, "BINDING_ATTEMPT_001", "Amendment 002 does not preserve attempt-1 retrieval execution.");
+  exact(amendment002.timing.operatorVisibleComparativeMetricProducedInAttempt001 === false, "BINDING_ATTEMPT_001", "Amendment 002 records an attempt-1 metric.");
+  exact(amendment002.timing.aggregateComputedInAttempt001 === false, "BINDING_ATTEMPT_001", "Amendment 002 records an attempt-1 aggregate.");
+  exact(amendment002.timing.winnerComputedInAttempt001 === false, "BINDING_ATTEMPT_001", "Amendment 002 records an attempt-1 winner.");
+  exact(amendment002.timing.resultObjectConstructedInAttempt001 === false, "BINDING_ATTEMPT_001", "Amendment 002 records an attempt-1 result object.");
+  exact(amendment002.timing.resultMaterializedInAttempt001 === false, "BINDING_ATTEMPT_001", "Amendment 002 records an attempt-1 result artifact.");
+  exact(amendment002.timing.correctionRunOccurredWhenAuthored === false, "BINDING_AMENDMENT_002_TIMING", "Amendment 002 records a correction run.");
+  exact(amendment002.timing.resultArtifactPath === RESULT_PATH, "BINDING_AMENDMENT_002_RESULT_PATH", "Amendment 002 result path differs.");
+  exact(amendment002.timing.resultArtifactPresentWhenAuthored === false, "BINDING_AMENDMENT_002_RESULT_PATH", "Amendment 002 does not preserve the absent result.");
+
+  exact(amendment002.frozenLineage.baseProtocol.commit === PROTOCOL_COMMIT, "BINDING_AMENDMENT_002_LINEAGE", "Amendment 002 base protocol differs.");
+  exact(amendment002.frozenLineage.baseProtocol.tag === PROTOCOL_TAG, "BINDING_AMENDMENT_002_LINEAGE", "Amendment 002 base protocol tag differs.");
+  exact(amendment002.frozenLineage.amendment001.commit === AMENDMENT_COMMIT, "BINDING_AMENDMENT_002_LINEAGE", "Amendment 001 lineage differs.");
+  exact(amendment002.frozenLineage.amendment001.tag === AMENDMENT_TAG, "BINDING_AMENDMENT_002_LINEAGE", "Amendment 001 tag lineage differs.");
+  exact(amendment002.frozenLineage.reviewedEvaluator.commit === EVALUATOR_COMMIT, "BINDING_AMENDMENT_002_LINEAGE", "Reviewed evaluator lineage differs.");
+  exact(amendment002.frozenLineage.reviewedEvaluator.tag === EVALUATOR_TAG, "BINDING_AMENDMENT_002_LINEAGE", "Reviewed evaluator tag lineage differs.");
+  exact(amendment002.frozenLineage.attempt001ArmedEvaluator.commit === ATTEMPT_001_ARMED_COMMIT, "BINDING_AMENDMENT_002_LINEAGE", "Attempt-1 armed commit differs.");
+  exact(amendment002.frozenLineage.attempt001ArmedEvaluator.tag === ATTEMPT_001_ARMED_TAG, "BINDING_AMENDMENT_002_LINEAGE", "Attempt-1 armed tag differs.");
+
+  exact(amendment002.attempt001Evidence.receiptPath === ATTEMPT_001_FAILURE_PATH, "BINDING_ATTEMPT_001_RECEIPT", "Attempt-1 receipt path differs.");
+  exact(amendment002.attempt001Evidence.receiptSha256 === ATTEMPT_001_FAILURE_SHA256, "BINDING_ATTEMPT_001_RECEIPT", "Attempt-1 receipt hash differs.");
+  exact(amendment002.attempt001Evidence.reportPath === ATTEMPT_001_FAILURE_REPORT_PATH, "BINDING_ATTEMPT_001_REPORT", "Attempt-1 report path differs.");
+  exact(amendment002.attempt001Evidence.reportSha256 === ATTEMPT_001_FAILURE_REPORT_SHA256, "BINDING_ATTEMPT_001_REPORT", "Attempt-1 report hash differs.");
+  exact(amendment002.attempt001Evidence.exactAuthorizedShellCommand === "npm run evaluate:context-efficiency-comparison:v2:write", "BINDING_ATTEMPT_001", "Attempt-1 command differs.");
+  exact(amendment002.attempt001Evidence.exitCode === 1, "BINDING_ATTEMPT_001", "Attempt-1 exit code differs.");
+  exact(amendment002.attempt001Evidence.failureCode === "CANONICAL_FRAME", "BINDING_ATTEMPT_001", "Attempt-1 failure code differs.");
+  exact(amendment002.attempt001Evidence.retrievalMethodsExecuted === true, "BINDING_ATTEMPT_001", "Attempt-1 retrieval fact differs.");
+  exact(amendment002.attempt001Evidence.aggregateComputed === false, "BINDING_ATTEMPT_001", "Attempt-1 aggregate fact differs.");
+  exact(amendment002.attempt001Evidence.winnerComputed === false, "BINDING_ATTEMPT_001", "Attempt-1 winner fact differs.");
+  exact(amendment002.attempt001Evidence.resultObjectConstructed === false, "BINDING_ATTEMPT_001", "Attempt-1 result-object fact differs.");
+  exact(amendment002.attempt001Evidence.resultMaterialized === false, "BINDING_ATTEMPT_001", "Attempt-1 result-materialization fact differs.");
+
+  exact(amendment002.supersessionScope.explicitFreeze.rankingUnchanged === true, "BINDING_AMENDMENT_002_FREEZE", "Ranking is not frozen by Amendment 002.");
+  exact(amendment002.supersessionScope.explicitFreeze.algorithmsUnchanged === true, "BINDING_AMENDMENT_002_FREEZE", "Algorithms are not frozen by Amendment 002.");
+  exact(amendment002.supersessionScope.explicitFreeze.candidateSetsUnchanged === true, "BINDING_AMENDMENT_002_FREEZE", "Candidate sets are not frozen by Amendment 002.");
+  exact(amendment002.supersessionScope.explicitFreeze.fixturesUnchanged === true, "BINDING_AMENDMENT_002_FREEZE", "Fixtures are not frozen by Amendment 002.");
+  exact(amendment002.supersessionScope.explicitFreeze.renderedBytesUnchanged === true, "BINDING_AMENDMENT_002_FREEZE", "Rendered bytes are not frozen by Amendment 002.");
+  exact(amendment002.supersessionScope.explicitFreeze.tokenAccountingUnchanged === true, "BINDING_AMENDMENT_002_FREEZE", "Token accounting is not frozen by Amendment 002.");
+  exact(amendment002.supersessionScope.explicitFreeze.safetyGatesUnchanged === true, "BINDING_AMENDMENT_002_FREEZE", "Safety gates are not frozen by Amendment 002.");
+  exact(amendment002.supersessionScope.explicitFreeze.claimGatesUnchanged === true, "BINDING_AMENDMENT_002_FREEZE", "Claim gates are not frozen by Amendment 002.");
+  exact(amendment002.supersessionScope.explicitFreeze.resultPathUnchanged === true, "BINDING_AMENDMENT_002_FREEZE", "Result path is not frozen by Amendment 002.");
+
+  const querySlot = amendment002.validatorOnlyCorrection.structuralTaskQueryField;
+  exact(querySlot.frameMustEqualCanonicalRendererBytes === true, "BINDING_STRUCTURAL_QUERY_SLOT", "Canonical byte equality is not required.");
+  exact(querySlot.fieldHeader === "TASK QUERY\n" && querySlot.fieldHeaderMustStartAtByteOffset === 0, "BINDING_STRUCTURAL_QUERY_SLOT", "Structural query header differs.");
+  exact(querySlot.fieldTerminator === "\n\nCURRENT SOURCES\n", "BINDING_STRUCTURAL_QUERY_SLOT", "Structural query terminator differs.");
+  exact(querySlot.fieldValueMustEqualFrozenQueryBytes === true, "BINDING_STRUCTURAL_QUERY_SLOT", "Structural query bytes are not bound.");
+  exact(querySlot.sameQueryBytesAllowedInCurrentSources === true, "BINDING_STRUCTURAL_QUERY_SLOT", "Current-source query overlap is not allowed by Amendment 002.");
+  exact(querySlot.sameQueryBytesAllowedInEventTitles === true, "BINDING_STRUCTURAL_QUERY_SLOT", "Title query overlap is not allowed by Amendment 002.");
+  exact(querySlot.sameQueryBytesAllowedInEventBodies === true, "BINDING_STRUCTURAL_QUERY_SLOT", "Body query overlap is not allowed by Amendment 002.");
+  exact(querySlot.globalLiteralOccurrenceCountMustNotBeUsed === true, "BINDING_STRUCTURAL_QUERY_SLOT", "Global query occurrence counting remains permitted.");
+  exact(amendment002.validatorOnlyCorrection.canonicalOutputBindings.frameTemplateSha256 === COMMON_RENDERER_BINDING.frameTemplateSha256, "BINDING_RENDERER", "Amendment 002 frame-template hash differs.");
+  exact(amendment002.validatorOnlyCorrection.canonicalOutputBindings.itemTemplateSha256 === COMMON_RENDERER_BINDING.itemTemplateSha256, "BINDING_RENDERER", "Amendment 002 item-template hash differs.");
+  exact(amendment002.validatorOnlyCorrection.canonicalOutputBindings.rendererOutputFunctionsMayChange === false, "BINDING_RENDERER", "Amendment 002 permits renderer output changes.");
+
+  const preflight = amendment002.noRetrievalFramePreflight;
+  exact(preflight.required === true, "BINDING_PREFLIGHT", "Amendment 002 does not require preflight.");
+  exact(preflight.mustCompleteBeforeRetrievalModulesAreLoaded === true, "BINDING_PREFLIGHT", "Preflight is not required before retrieval module load.");
+  exact(preflight.mustCompleteBeforeAnyQarinahOrBm25MethodCall === true, "BINDING_PREFLIGHT", "Preflight is not required before ranking calls.");
+  sameJson(preflight.matrix, {
+    neutralCases: 6,
+    neutralEvents: 240,
+    neutralFramesPerCase: 242,
+    neutralFrameRule: "For each neutral case, validate one empty-memory frame, one single-event frame for each of the 240 frozen neutral events, and one full-ledger frame in frozen ledger order, using that case's exact query and current sources.",
+    neutralFrameCount: 1452,
+    safetyCases: 4,
+    safetyEventsByCase: [2, 6, 5, 3],
+    safetyFrameRule: "For each safety case, validate one empty-memory frame, one single-event frame for each event in that case's frozen ledger, and one full-ledger frame in frozen ledger order, using the exact case query and empty current sources.",
+    safetyFrameCount: 24,
+    totalRequiredPreflightFrames: 1476
+  }, "BINDING_PREFLIGHT", "Amendment 002 preflight matrix differs.");
+  exact(preflight.postRankingValidationStillRequired === true, "BINDING_PREFLIGHT", "Post-ranking validation is not preserved.");
+
+  exact(amendment002.correctionImplementationGate.amendment002AloneAuthorizesExecution === false, "BINDING_CORRECTION_GATE", "Amendment 002 incorrectly authorizes execution.");
+  exact(amendment002.correctionImplementationGate.correctionImplementationMustBeCommittedSeparatelyAfterAmendment002 === true, "BINDING_CORRECTION_GATE", "Separate correction commit is not required.");
+  exact(amendment002.correctionImplementationGate.correctionImplementationMustBeIndependentlyReviewed === true, "BINDING_CORRECTION_GATE", "Independent correction review is not required.");
+  exact(amendment002.correctionImplementationGate.cleanExactCorrectionArmingCommitRequired === true, "BINDING_CORRECTION_GATE", "A clean exact correction tree is not required.");
+  exact(amendment002.correctionRunGate.nextAttemptNumber === CORRECTION_ATTEMPT_NUMBER, "BINDING_CORRECTION_RUN", "Correction attempt number differs.");
+  exact(amendment002.correctionRunGate.requiredLabel === CORRECTION_ATTEMPT_LABEL, "BINDING_CORRECTION_RUN", "Correction attempt label differs.");
+  exact(amendment002.correctionRunGate.separateExplicitAuthorizationAfterReviewRequired === true, "BINDING_CORRECTION_RUN", "Explicit correction-run authorization is not required.");
+  exact(amendment002.correctionRunGate.attempt001ReceiptHashMustVerifyBeforePreflight === true, "BINDING_CORRECTION_RUN", "Attempt-1 receipt verification is not required before preflight.");
+  exact(amendment002.correctionRunGate.preflightMustPassBeforeRetrieval === true, "BINDING_CORRECTION_RUN", "Preflight is not required before retrieval.");
+  exact(amendment002.requiredResultProvenance.failureReceipt.path === ATTEMPT_001_FAILURE_PATH, "BINDING_RESULT_PROVENANCE", "Required result receipt path differs.");
+  exact(amendment002.requiredResultProvenance.failureReceipt.sha256 === ATTEMPT_001_FAILURE_SHA256, "BINDING_RESULT_PROVENANCE", "Required result receipt hash differs.");
+  exact(amendment002.requiredResultProvenance.attempts[0].number === 1 && amendment002.requiredResultProvenance.attempts[1].number === 2, "BINDING_RESULT_PROVENANCE", "Required attempt sequence differs.");
+  exact(amendment002.requiredResultProvenance.attempt001InternalObservationsMayEnterResultMetrics === false, "BINDING_RESULT_PROVENANCE", "Attempt-1 internal observations may enter result metrics.");
+  exact(amendment002.claimBoundary.developmentOnly === true, "BINDING_CLAIM_BOUNDARY", "Amendment 002 is not development-only.");
+  exact(amendment002.claimBoundary.attempt001SupportsNoComparativeMetricOrWinner === true, "BINDING_CLAIM_BOUNDARY", "Amendment 002 permits attempt-1 comparison claims.");
+  exact(amendment002.claimBoundary.universalBestOrIndustryClaimAllowed === false, "BINDING_CLAIM_BOUNDARY", "Amendment 002 permits a universal best claim.");
+
+  exact(failureReceipt.schemaVersion === "qarinah.context-efficiency-comparison-attempt-failure.v1", "BINDING_ATTEMPT_001_RECEIPT", "Unexpected attempt-1 receipt schema.");
+  exact(failureReceipt.attempt.number === 1, "BINDING_ATTEMPT_001_RECEIPT", "Attempt-1 receipt number differs.");
+  exact(failureReceipt.attempt.status === "failed-closed-before-result", "BINDING_ATTEMPT_001_RECEIPT", "Attempt-1 receipt status differs.");
+  exact(failureReceipt.attempt.exactAuthorizedShellCommand === "npm run evaluate:context-efficiency-comparison:v2:write", "BINDING_ATTEMPT_001_RECEIPT", "Attempt-1 receipt command differs.");
+  exact(failureReceipt.attempt.exitCode === 1, "BINDING_ATTEMPT_001_RECEIPT", "Attempt-1 receipt exit code differs.");
+  exact(failureReceipt.executionState.retrievalMethodsExecuted === true, "BINDING_ATTEMPT_001_RECEIPT", "Attempt-1 receipt retrieval fact differs.");
+  exact(failureReceipt.executionState.neutralCaseObservationsComputedInMemory === true && failureReceipt.executionState.neutralCaseCountComputedInMemory === 6, "BINDING_ATTEMPT_001_RECEIPT", "Attempt-1 neutral execution facts differ.");
+  exact(failureReceipt.executionState.aggregateComputed === false && failureReceipt.executionState.winnerComputed === false, "BINDING_ATTEMPT_001_RECEIPT", "Attempt-1 aggregate facts differ.");
+  exact(failureReceipt.executionState.resultObjectConstructed === false && failureReceipt.executionState.resultMaterialized === false, "BINDING_ATTEMPT_001_RECEIPT", "Attempt-1 result facts differ.");
+  exact(failureReceipt.executionState.operatorVisibleComparativeMetricProduced === false, "BINDING_ATTEMPT_001_RECEIPT", "Attempt-1 receipt records a comparative metric.");
+  exact(failureReceipt.failure.code === "CANONICAL_FRAME", "BINDING_ATTEMPT_001_RECEIPT", "Attempt-1 receipt failure code differs.");
+  exact(failureReceipt.failure.isRankingFailure === false && failureReceipt.failure.isComparativeOutcome === false, "BINDING_ATTEMPT_001_RECEIPT", "Attempt-1 failure classification differs.");
+  exact(failureReceipt.artifacts.intendedResultPath === RESULT_PATH && failureReceipt.artifacts.v2ResultExists === false, "BINDING_ATTEMPT_001_RECEIPT", "Attempt-1 result-artifact facts differ.");
+}
+
 function composeAmendedProtocol(baseProtocol, amendment) {
   const amendedRequired = new Map(amendment.neutralLedgerBinding.requiredEvidence.map((binding) => [
     `${binding.baseCaseIndex}:${binding.baseRequiredEvidenceIndex}`,
@@ -294,14 +422,31 @@ function composeAmendedProtocol(baseProtocol, amendment) {
 }
 
 async function readAmendedProtocol(repositoryRoot) {
-  const [baseProtocol, amendment] = await Promise.all([
+  const [baseProtocol, amendment, amendment002Bytes, failureReceiptBytes, failureReportBytes] = await Promise.all([
     readFile(path.join(repositoryRoot, PROTOCOL_PATH), "utf8").then(JSON.parse),
-    readFile(path.join(repositoryRoot, AMENDMENT_PATH), "utf8").then(JSON.parse)
+    readFile(path.join(repositoryRoot, AMENDMENT_PATH), "utf8").then(JSON.parse),
+    readFile(path.join(repositoryRoot, AMENDMENT_002_PATH)),
+    readFile(path.join(repositoryRoot, ATTEMPT_001_FAILURE_PATH)),
+    readFile(path.join(repositoryRoot, ATTEMPT_001_FAILURE_REPORT_PATH))
   ]);
+  exact(sha256(amendment002Bytes) === AMENDMENT_002_SHA256, "BINDING_AMENDMENT_002_HASH", "Working Amendment 002 manifest differs from the committed bytes.");
+  exact(sha256(failureReceiptBytes) === ATTEMPT_001_FAILURE_SHA256, "BINDING_ATTEMPT_001_RECEIPT", "Working attempt-1 receipt differs from the committed bytes.");
+  exact(sha256(failureReportBytes) === ATTEMPT_001_FAILURE_REPORT_SHA256, "BINDING_ATTEMPT_001_REPORT", "Working attempt-1 report differs from the committed bytes.");
+  const amendment002 = JSON.parse(amendment002Bytes.toString("utf8"));
+  const failureReceipt = JSON.parse(failureReceiptBytes.toString("utf8"));
   verifyStaticAmendment(baseProtocol, amendment);
+  verifyStaticAmendment002(amendment002, failureReceipt);
   return Object.freeze({
     baseProtocol: Object.freeze(baseProtocol),
     amendment: Object.freeze(amendment),
+    amendment002: Object.freeze(amendment002),
+    failureReceipt: Object.freeze(failureReceipt),
+    attempt001Evidence: Object.freeze({
+      receiptPath: ATTEMPT_001_FAILURE_PATH,
+      receiptSha256: ATTEMPT_001_FAILURE_SHA256,
+      reportPath: ATTEMPT_001_FAILURE_REPORT_PATH,
+      reportSha256: ATTEMPT_001_FAILURE_REPORT_SHA256
+    }),
     protocol: composeAmendedProtocol(baseProtocol, amendment)
   });
 }
@@ -876,6 +1021,42 @@ async function verifyGitFreeze(repositoryRoot) {
   } catch {
     fail("BINDING_EVALUATOR_ANCESTRY", "The working tree is not descended from the reviewed evaluator commit.");
   }
+
+  const attempt001TagCommit = await gitText(repositoryRoot, ["rev-parse", `${ATTEMPT_001_ARMED_TAG}^{}`]);
+  exact(attempt001TagCommit === ATTEMPT_001_ARMED_COMMIT, "BINDING_ATTEMPT_001_TAG", "The attempt-1 armed tag does not resolve to the preserved armed commit.");
+  exact(await gitText(repositoryRoot, ["cat-file", "-t", ATTEMPT_001_ARMED_TAG]) === "tag", "BINDING_ATTEMPT_001_TAG", "The attempt-1 armed tag must remain annotated.");
+  exact(await gitText(repositoryRoot, ["rev-parse", `${ATTEMPT_001_ARMED_COMMIT}^`]) === EVALUATOR_COMMIT, "BINDING_ATTEMPT_001_ANCESTRY", "The attempt-1 armed commit is not a direct child of the reviewed evaluator.");
+
+  const amendment002TagCommit = await gitText(repositoryRoot, ["rev-parse", `${AMENDMENT_002_TAG}^{}`]);
+  exact(amendment002TagCommit === AMENDMENT_002_COMMIT, "BINDING_AMENDMENT_002_TAG", "The Amendment-002 tag does not resolve to the amendment commit.");
+  exact(await gitText(repositoryRoot, ["cat-file", "-t", AMENDMENT_002_TAG]) === "tag", "BINDING_AMENDMENT_002_TAG", "The Amendment-002 tag must remain annotated.");
+  exact(await gitText(repositoryRoot, ["rev-parse", `${AMENDMENT_002_COMMIT}^`]) === ATTEMPT_001_ARMED_COMMIT, "BINDING_AMENDMENT_002_ANCESTRY", "Amendment 002 is not directly based on the failed attempt identity.");
+  const amendment002Changed = (await gitText(repositoryRoot, [
+    "diff-tree", "--no-commit-id", "--name-only", "-r", AMENDMENT_002_COMMIT
+  ])).split(/\r?\n/u).filter(Boolean).sort();
+  sameJson(
+    amendment002Changed,
+    [AMENDMENT_002_PATH, AMENDMENT_002_DOCUMENT_PATH, ATTEMPT_001_FAILURE_PATH, ATTEMPT_001_FAILURE_REPORT_PATH].sort(),
+    "BINDING_AMENDMENT_002_COMMIT_SCOPE",
+    "The Amendment-002 commit does not contain exactly the amendment and attempt-1 evidence files."
+  );
+  const amendment002Bytes = await gitBytes(repositoryRoot, `${AMENDMENT_002_COMMIT}:${AMENDMENT_002_PATH}`);
+  const amendment002DocumentBytes = await gitBytes(repositoryRoot, `${AMENDMENT_002_COMMIT}:${AMENDMENT_002_DOCUMENT_PATH}`);
+  const attempt001ReceiptBytes = await gitBytes(repositoryRoot, `${AMENDMENT_002_COMMIT}:${ATTEMPT_001_FAILURE_PATH}`);
+  const attempt001ReportBytes = await gitBytes(repositoryRoot, `${AMENDMENT_002_COMMIT}:${ATTEMPT_001_FAILURE_REPORT_PATH}`);
+  exact(sha256(amendment002Bytes) === AMENDMENT_002_SHA256, "BINDING_AMENDMENT_002_HASH", "Committed Amendment-002 manifest hash differs.");
+  exact(sha256(amendment002DocumentBytes) === AMENDMENT_002_DOCUMENT_SHA256, "BINDING_AMENDMENT_002_HASH", "Committed Amendment-002 document hash differs.");
+  exact(sha256(attempt001ReceiptBytes) === ATTEMPT_001_FAILURE_SHA256, "BINDING_ATTEMPT_001_RECEIPT", "Committed attempt-1 receipt hash differs.");
+  exact(sha256(attempt001ReportBytes) === ATTEMPT_001_FAILURE_REPORT_SHA256, "BINDING_ATTEMPT_001_REPORT", "Committed attempt-1 report hash differs.");
+  exact(await fileSha256(path.join(repositoryRoot, AMENDMENT_002_PATH)) === AMENDMENT_002_SHA256, "BINDING_AMENDMENT_002_HASH", "Working Amendment-002 manifest differs.");
+  exact(await fileSha256(path.join(repositoryRoot, AMENDMENT_002_DOCUMENT_PATH)) === AMENDMENT_002_DOCUMENT_SHA256, "BINDING_AMENDMENT_002_HASH", "Working Amendment-002 document differs.");
+  exact(await fileSha256(path.join(repositoryRoot, ATTEMPT_001_FAILURE_PATH)) === ATTEMPT_001_FAILURE_SHA256, "BINDING_ATTEMPT_001_RECEIPT", "Working attempt-1 receipt differs.");
+  exact(await fileSha256(path.join(repositoryRoot, ATTEMPT_001_FAILURE_REPORT_PATH)) === ATTEMPT_001_FAILURE_REPORT_SHA256, "BINDING_ATTEMPT_001_REPORT", "Working attempt-1 report differs.");
+  try {
+    await run("git", ["merge-base", "--is-ancestor", AMENDMENT_002_COMMIT, "HEAD"], { cwd: repositoryRoot, encoding: "utf8" });
+  } catch {
+    fail("BINDING_AMENDMENT_002_ANCESTRY", "The working tree is not descended from Amendment 002.");
+  }
   return Object.freeze({
     baseProtocol: Object.freeze({
       commit: PROTOCOL_COMMIT,
@@ -892,6 +1073,21 @@ async function verifyGitFreeze(repositoryRoot) {
     evaluator: Object.freeze({
       commit: EVALUATOR_COMMIT,
       tag: EVALUATOR_TAG
+    }),
+    attempt001: Object.freeze({
+      armedCommit: ATTEMPT_001_ARMED_COMMIT,
+      armedTag: ATTEMPT_001_ARMED_TAG,
+      status: "failed-closed-before-result",
+      receiptPath: ATTEMPT_001_FAILURE_PATH,
+      receiptSha256: ATTEMPT_001_FAILURE_SHA256,
+      reportPath: ATTEMPT_001_FAILURE_REPORT_PATH,
+      reportSha256: ATTEMPT_001_FAILURE_REPORT_SHA256
+    }),
+    amendment002: Object.freeze({
+      commit: AMENDMENT_002_COMMIT,
+      tag: AMENDMENT_002_TAG,
+      manifestSha256: AMENDMENT_002_SHA256,
+      documentSha256: AMENDMENT_002_DOCUMENT_SHA256
     })
   });
 }
@@ -944,6 +1140,9 @@ function validateExecutionBindingReport(report, expected) {
   sameJson(report.productionModules, expected.productionModules, "BINDING_REPORT", "Loaded production-module binding report differs.");
   sameJson(report.fixtureBindings, expected.fixtureBindings, "BINDING_REPORT", "Fixture, workspace, event, or chain-head binding report differs.");
   sameJson(report.renderer, expected.renderer, "BINDING_REPORT", "Renderer binding report differs.");
+  sameJson(report.preflight, expected.preflight, "BINDING_REPORT", "Preflight binding report differs from the verified frame matrix.");
+  exact(report.preflight.completed === true && report.preflight.totalFrames === 1476, "BINDING_PREFLIGHT", "Binding report lacks the complete Amendment-002 preflight.");
+  exact(report.preflight.retrievalOrRankingCallsDuringPreflight === 0, "BINDING_PREFLIGHT", "Binding report records retrieval during preflight.");
   exact(report.retrievalMethodsExecuted === false, "BINDING_REPORT", "A binding report cannot claim retrieval execution.");
   exact(report.resultMaterialized === false, "BINDING_REPORT", "A binding report cannot claim result materialization.");
   return report;
@@ -1027,9 +1226,6 @@ async function verifyMaterializedSource(repositoryRoot, sourceRoot, protocol, am
   await verifyAmendedSourceBinding(repositoryRoot, sourceRoot, amendment, implementation, modules);
   const fixture = await importFrozenModule(sourceRoot, "bench/fixtures/software-task-scenarios.mjs");
   const contracts = await importFrozenModule(sourceRoot, "src/contracts.js");
-  const retrievalExports = await importFrozenModule(sourceRoot, "src/retrieval.js");
-  exact(typeof retrievalExports.resolveContextAdmission === "function", "BINDING_ENTRYPOINTS", "resolveContextAdmission is not exported by the bound retrieval module.");
-  exact(typeof retrievalExports.resolveCurrentContextState === "function", "BINDING_ENTRYPOINTS", "resolveCurrentContextState is not exported by the bound retrieval module.");
   const neutralLedger = buildNeutralLedger(
     fixture.softwareTaskScenarios,
     fixture.unrelatedRecordCount,
@@ -1049,7 +1245,6 @@ async function verifyMaterializedSource(repositoryRoot, sourceRoot, protocol, am
     modules,
     fixture,
     contracts,
-    retrievalExports,
     neutralLedger,
     safetyLedgers,
     neutralVerification,
@@ -1057,8 +1252,146 @@ async function verifyMaterializedSource(repositoryRoot, sourceRoot, protocol, am
   });
 }
 
+function preflightVariants(events) {
+  return [
+    Object.freeze({ kind: "empty", eventId: null, events: Object.freeze([]) }),
+    ...events.map((event) => Object.freeze({
+      kind: "single-event",
+      eventId: event.eventId,
+      events: Object.freeze([event])
+    })),
+    Object.freeze({ kind: "full-ledger", eventId: null, events })
+  ];
+}
+
+export function runV2FramePreflight({ protocol, frozen, mutateFrame = null, onFrameValidated = null }) {
+  exact(protocol.neutralStratum.cases.length === 6, "PREFLIGHT_MATRIX", "Preflight requires six neutral cases.");
+  exact(frozen.neutralLedger.events.length === 240, "PREFLIGHT_MATRIX", "Preflight requires the frozen 240-event neutral ledger.");
+  exact(protocol.safetyStratum.cases.length === 4, "PREFLIGHT_MATRIX", "Preflight requires four safety cases.");
+  const entries = [];
+  const cases = [];
+  let ordinal = 0;
+  const validateCase = ({ stratum, caseDefinition, currentSources, events }) => {
+    const firstOrdinal = ordinal + 1;
+    for (const variant of preflightVariants(events)) {
+      ordinal += 1;
+      const descriptor = Object.freeze({
+        ordinal,
+        stratum,
+        caseId: caseDefinition.id,
+        variant: variant.kind,
+        eventId: variant.eventId
+      });
+      const canonicalFrame = renderModelFacingFrame({
+        query: caseDefinition.query,
+        currentSources,
+        events: variant.events
+      });
+      const frame = typeof mutateFrame === "function"
+        ? mutateFrame(Object.freeze({ descriptor, frame: canonicalFrame }))
+        : canonicalFrame;
+      exact(typeof frame === "string", "PREFLIGHT_FRAME", "A preflight frame mutation returned a non-string value.");
+      const audit = validateCanonicalFrame({
+        frame,
+        query: caseDefinition.query,
+        currentSources,
+        events: variant.events
+      });
+      entries.push(Object.freeze({ ...descriptor, frameSha256: audit.frameSha256 }));
+      if (typeof onFrameValidated === "function") onFrameValidated(descriptor);
+    }
+    cases.push(Object.freeze({
+      stratum,
+      caseId: caseDefinition.id,
+      eventCount: events.length,
+      frameCount: events.length + 2,
+      firstOrdinal,
+      lastOrdinal: ordinal
+    }));
+  };
+
+  for (const caseDefinition of protocol.neutralStratum.cases) {
+    const scenario = frozen.fixture.softwareTaskScenarios.find((candidate) => candidate.id === caseDefinition.id);
+    exact(scenario !== undefined, "PREFLIGHT_MATRIX", `Missing neutral preflight scenario: ${caseDefinition.id}.`);
+    validateCase({
+      stratum: "neutral",
+      caseDefinition,
+      currentSources: scenario.currentSources,
+      events: frozen.neutralLedger.events
+    });
+  }
+  const neutralFrames = ordinal;
+  for (const caseDefinition of protocol.safetyStratum.cases) {
+    const ledger = frozen.safetyLedgers.get(caseDefinition.id);
+    exact(ledger !== undefined, "PREFLIGHT_MATRIX", `Missing safety preflight ledger: ${caseDefinition.id}.`);
+    validateCase({
+      stratum: "safety",
+      caseDefinition,
+      currentSources: Object.freeze([]),
+      events: ledger.events
+    });
+  }
+  const safetyFrames = ordinal - neutralFrames;
+  exact(neutralFrames === 1452, "PREFLIGHT_MATRIX", "Neutral preflight did not validate exactly 1,452 frames.");
+  exact(safetyFrames === 24, "PREFLIGHT_MATRIX", "Safety preflight did not validate exactly 24 frames.");
+  exact(ordinal === 1476, "PREFLIGHT_MATRIX", "Preflight did not validate exactly 1,476 frames.");
+  sameJson(
+    cases.filter((entry) => entry.stratum === "safety").map((entry) => entry.eventCount),
+    [2, 6, 5, 3],
+    "PREFLIGHT_MATRIX",
+    "Safety preflight event counts differ from Amendment 002."
+  );
+  return Object.freeze({
+    schemaVersion: "qarinah.context-efficiency-comparison-frame-preflight.v1",
+    completed: true,
+    neutralFrames,
+    safetyFrames,
+    totalFrames: ordinal,
+    cases: Object.freeze(cases),
+    frameOrderSha256: jsonSha256(entries),
+    firstFrame: entries[0],
+    lastFrame: entries.at(-1),
+    retrievalModulesLoadedDuringPreflight: false,
+    retrievalOrRankingCallsDuringPreflight: 0,
+    resultConstructedDuringPreflight: false,
+    resultMaterializedDuringPreflight: false
+  });
+}
+
+export async function completePreflightBeforeRetrievalLoad({
+  protocol,
+  frozen,
+  loadRetrieval,
+  mutateFrame = null,
+  onFrameValidated = null
+}) {
+  exact(typeof loadRetrieval === "function", "BINDING_EXECUTION_MODULES", "A post-preflight retrieval loader is required.");
+  const preflight = runV2FramePreflight({ protocol, frozen, mutateFrame, onFrameValidated });
+  exact(preflight.completed === true && preflight.totalFrames === 1476, "PREFLIGHT_MATRIX", "Retrieval loading was reached without a complete preflight.");
+  const execution = await loadRetrieval(preflight);
+  return Object.freeze({ preflight, execution });
+}
+
+async function loadFrozenRetrievalModules(sourceRoot) {
+  const [indexer, retrieval] = await Promise.all([
+    importFrozenModule(sourceRoot, "src/indexer.js"),
+    importFrozenModule(sourceRoot, "src/retrieval.js")
+  ]);
+  exact(typeof indexer.buildDerivedState === "function", "BINDING_ENTRYPOINTS", "buildDerivedState is not exported by the bound indexer module.");
+  exact(typeof retrieval.rankContextEvents === "function", "BINDING_ENTRYPOINTS", "rankContextEvents is not exported by the bound retrieval module.");
+  exact(typeof retrieval.resolveContextAdmission === "function", "BINDING_ENTRYPOINTS", "resolveContextAdmission is not exported by the bound retrieval module.");
+  exact(typeof retrieval.resolveCurrentContextState === "function", "BINDING_ENTRYPOINTS", "resolveCurrentContextState is not exported by the bound retrieval module.");
+  return Object.freeze({ indexer, retrieval });
+}
+
 export async function withVerifiedFrozenSource(repositoryRoot, callback, { loadRetrieval = false } = {}) {
-  const { protocol, amendment } = await readAmendedProtocol(repositoryRoot);
+  const {
+    protocol,
+    amendment,
+    amendment002,
+    failureReceipt,
+    attempt001Evidence
+  } = await readAmendedProtocol(repositoryRoot);
   verifyAlgorithmBindings(protocol);
   const gitFreeze = await verifyGitFreeze(repositoryRoot);
   const runtime = await verifyReferenceRuntime(protocol);
@@ -1066,12 +1399,17 @@ export async function withVerifiedFrozenSource(repositoryRoot, callback, { loadR
   const materialized = await materializeSourceCommit(repositoryRoot, SOURCE_COMMIT);
   try {
     const frozen = await verifyMaterializedSource(repositoryRoot, materialized.root, protocol, amendment);
-    const execution = loadRetrieval
-      ? Object.freeze({
-          indexer: await importFrozenModule(materialized.root, "src/indexer.js"),
-          retrieval: frozen.retrievalExports
+    const preflightState = loadRetrieval
+      ? await completePreflightBeforeRetrievalLoad({
+          protocol,
+          frozen,
+          loadRetrieval: () => loadFrozenRetrievalModules(materialized.root)
         })
-      : null;
+      : Object.freeze({
+          preflight: runV2FramePreflight({ protocol, frozen }),
+          execution: null
+        });
+    const { preflight, execution } = preflightState;
     const expectedBindingReport = Object.freeze({
       schemaVersion: "qarinah.context-efficiency-comparison-bindings.v2",
       protocol: gitFreeze,
@@ -1097,6 +1435,7 @@ export async function withVerifiedFrozenSource(repositoryRoot, callback, { loadR
         specification: COMMON_RENDERER_BINDING,
         implementation: helpers.find((entry) => entry.path === RENDERER_PATH)
       }),
+      preflight,
       retrievalMethodsExecuted: false,
       resultMaterialized: false
     });
@@ -1107,9 +1446,13 @@ export async function withVerifiedFrozenSource(repositoryRoot, callback, { loadR
       sourceRoot: materialized.root,
       protocol,
       amendment,
+      amendment002,
+      failureReceipt,
+      attempt001Evidence,
       bindingReport,
       frozen,
-      execution
+      execution,
+      preflight
     }));
   } finally {
     await materialized.cleanup();
@@ -1119,7 +1462,7 @@ export async function withVerifiedFrozenSource(repositoryRoot, callback, { loadR
 async function assertResultPathAbsent(repositoryRoot) {
   try {
     await lstat(path.join(repositoryRoot, ...RESULT_PATH.split("/")));
-    fail("BINDING_RESULT_ABSENT", "The v2 result path must remain absent before explicit first-run authorization.");
+    fail("BINDING_RESULT_ABSENT", "The v2 result path must remain absent before the explicit correction-run attempt 2 write.");
   } catch (error) {
     if (error instanceof V2VerificationError) throw error;
     if (error?.code !== "ENOENT") throw error;
@@ -1133,46 +1476,74 @@ export async function inspectV2ArmingState(repositoryRoot) {
   let parentCommit = null;
   let changedFiles = [];
   let commitMessage = null;
-  if (currentHead !== EVALUATOR_COMMIT) {
+  if (currentHead !== AMENDMENT_002_COMMIT) {
     parentCommit = await gitText(repositoryRoot, ["rev-parse", "HEAD^"]);
     changedFiles = (await gitText(repositoryRoot, [
       "diff-tree", "--no-commit-id", "--name-only", "-r", "HEAD"
     ])).split(/\r?\n/u).filter(Boolean).sort();
     commitMessage = await gitText(repositoryRoot, ["show", "-s", "--format=%B", "HEAD"]);
   }
-  const requiredChangedFiles = [...ARMING_COMMIT_FILES].sort();
-  const directChildOfReviewedEvaluator = parentCommit === EVALUATOR_COMMIT;
+  let correctionTagAnnotated = false;
+  let correctionTagCommit = null;
+  try {
+    correctionTagAnnotated = await gitText(repositoryRoot, ["cat-file", "-t", CORRECTION_TAG]) === "tag";
+    correctionTagCommit = await gitText(repositoryRoot, ["rev-parse", `${CORRECTION_TAG}^{}`]);
+  } catch {
+    correctionTagAnnotated = false;
+    correctionTagCommit = null;
+  }
+  const requiredChangedFiles = [...CORRECTION_COMMIT_FILES].sort();
+  const directChildOfAmendment002 = parentCommit === AMENDMENT_002_COMMIT;
   const exactArmingScope = JSON.stringify(changedFiles) === JSON.stringify(requiredChangedFiles);
-  const exactArmingMessage = commitMessage === ARMING_COMMIT_MESSAGE;
+  const exactArmingMessage = commitMessage === CORRECTION_COMMIT_MESSAGE;
   const worktreeClean = worktreeStatus.length === 0;
+  const correctionTagMatchesHead = correctionTagAnnotated && correctionTagCommit === currentHead;
   return Object.freeze({
+    amendment002Commit: AMENDMENT_002_COMMIT,
+    amendment002Tag: AMENDMENT_002_TAG,
     reviewedEvaluatorCommit: EVALUATOR_COMMIT,
     reviewedEvaluatorTag: EVALUATOR_TAG,
+    failedAttemptArmedCommit: ATTEMPT_001_ARMED_COMMIT,
+    failedAttemptArmedTag: ATTEMPT_001_ARMED_TAG,
+    correctionAttemptNumber: CORRECTION_ATTEMPT_NUMBER,
+    correctionAttemptLabel: CORRECTION_ATTEMPT_LABEL,
     currentHead,
     currentTree,
     parentCommit,
     worktreeClean,
-    directChildOfReviewedEvaluator,
+    directChildOfAmendment002,
     changedFiles: Object.freeze(changedFiles),
     requiredChangedFiles: Object.freeze(requiredChangedFiles),
     exactArmingScope,
     commitMessage,
-    requiredCommitMessage: ARMING_COMMIT_MESSAGE,
+    requiredCommitMessage: CORRECTION_COMMIT_MESSAGE,
     exactArmingMessage,
+    requiredCorrectionTag: CORRECTION_TAG,
+    correctionTagAnnotated,
+    correctionTagCommit,
+    correctionTagMatchesHead,
+    independentCorrectionReviewRequired: true,
+    separateExplicitCorrectionRunAuthorizationRequired: true,
     explicitExecuteFlagRequired: true,
     resultPathMustBeAbsent: true,
-    executionReady: worktreeClean && directChildOfReviewedEvaluator && exactArmingScope && exactArmingMessage
+    executionReady: worktreeClean
+      && directChildOfAmendment002
+      && exactArmingScope
+      && exactArmingMessage
+      && correctionTagMatchesHead
   });
 }
 
 async function verifyV2ExecutionAuthorization(repositoryRoot) {
   await assertResultPathAbsent(repositoryRoot);
   const authorization = await inspectV2ArmingState(repositoryRoot);
-  exact(authorization.worktreeClean, "EXECUTION_WORKTREE_DIRTY", "V2 execution requires a clean committed arming tree.");
-  exact(authorization.directChildOfReviewedEvaluator, "EXECUTION_ARMING_ANCESTRY", "The arming commit must be a direct child of the reviewed evaluator commit.");
-  exact(authorization.exactArmingScope, "EXECUTION_ARMING_SCOPE", "The arming commit changed files outside the frozen two-file arming scope.");
-  exact(authorization.exactArmingMessage, "EXECUTION_ARMING_MESSAGE", "The arming commit message differs from the frozen arming semantics.");
-  exact(authorization.executionReady, "EXECUTION_NOT_AUTHORIZED", "The committed arming state is not ready for an explicit first execution.");
+  exact(authorization.worktreeClean, "EXECUTION_WORKTREE_DIRTY", "Correction-run attempt 2 requires a clean committed correction tree.");
+  exact(authorization.directChildOfAmendment002, "EXECUTION_ARMING_ANCESTRY", "The correction commit must be a direct child of Amendment 002.");
+  exact(authorization.exactArmingScope, "EXECUTION_ARMING_SCOPE", "The correction commit changed files outside the exact validator/preflight/test scope.");
+  exact(authorization.exactArmingMessage, "EXECUTION_ARMING_MESSAGE", "The correction commit message differs from the frozen correction semantics.");
+  exact(authorization.correctionTagAnnotated, "EXECUTION_CORRECTION_TAG", "The correction commit requires its annotated correction tag.");
+  exact(authorization.correctionTagMatchesHead, "EXECUTION_CORRECTION_TAG", "The annotated correction tag does not resolve to the exact correction commit.");
+  exact(authorization.executionReady, "EXECUTION_NOT_AUTHORIZED", "The committed correction state is not ready for the separately authorized correction-run attempt 2.");
   return authorization;
 }
 
@@ -1186,12 +1557,36 @@ export async function verifyBindingsOnly(repositoryRoot) {
     return Object.freeze({
       ...context.bindingReport,
       schemaVersion: "qarinah.context-efficiency-comparison-amended-bindings.v2",
-      status: "Amendment 001 and the reviewed evaluator are fully bound. Binding-only executes no benchmark retrieval; the outcome path requires an explicit --execute invocation from the exact clean arming commit.",
-      amendmentCommit: AMENDMENT_COMMIT,
-      amendmentTag: AMENDMENT_TAG,
+      status: "Amendments 001 and 002, the attempt-1 failure evidence, and the 1,476-frame preflight are bound. Binding-only loads no retrieval module and executes no benchmark retrieval. Correction-run attempt 2 remains separately gated.",
+      amendment001Commit: AMENDMENT_COMMIT,
+      amendment001Tag: AMENDMENT_TAG,
+      amendment002Commit: AMENDMENT_002_COMMIT,
+      amendment002Tag: AMENDMENT_002_TAG,
+      amendment002ManifestSha256: AMENDMENT_002_SHA256,
+      amendment002DocumentSha256: AMENDMENT_002_DOCUMENT_SHA256,
       evaluatorCommit: EVALUATOR_COMMIT,
       evaluatorTag: EVALUATOR_TAG,
       arming,
+      attempt001: Object.freeze({
+        number: 1,
+        status: "failed-closed-before-result",
+        retrievalMethodsExecuted: true,
+        aggregateComputed: false,
+        winnerComputed: false,
+        resultObjectConstructed: false,
+        resultMaterialized: false,
+        operatorVisibleComparativeMetricProduced: false,
+        ...context.attempt001Evidence
+      }),
+      futureCorrectionAttempt: Object.freeze({
+        number: CORRECTION_ATTEMPT_NUMBER,
+        label: CORRECTION_ATTEMPT_LABEL,
+        correctionCommitRequired: true,
+        correctionTag: CORRECTION_TAG,
+        independentReviewRequired: true,
+        explicitAuthorizationRequired: true
+      }),
+      preflight: context.preflight,
       frozenProtocolSourceCommit: context.amendment.sourceBinding.sourceCommit,
       sourceFiles: Object.freeze(context.protocol.sourceBindings.files),
       fixtureLedgerBindingsVerified: true,
@@ -1814,6 +2209,11 @@ function mutationBindingReport() {
       specification: COMMON_RENDERER_BINDING,
       implementation: Object.freeze({ path: RENDERER_PATH, sha256: "sha256:renderer" })
     }),
+    preflight: Object.freeze({
+      completed: true,
+      totalFrames: 1476,
+      retrievalOrRankingCallsDuringPreflight: 0
+    }),
     retrievalMethodsExecuted: false,
     resultMaterialized: false
   });
@@ -1932,11 +2332,20 @@ export function runMutationVerificationSuite() {
     };
     expectClosed("JSON_SELECTION_DEPENDENCY", () => validateMethodSelectionObservation(changed));
   });
-  add("query-duplicated-omitted-or-method-specific", 3, () => {
+  add("query-duplicated-omitted-or-method-specific", 7, () => {
     const frame = renderModelFacingFrame({ query, currentSources, events: requiredEvents });
-    expectClosed("CANONICAL_FRAME", () => validateCanonicalFrame({
-      frame: `${frame}\n${query}`, query, currentSources, events: requiredEvents
-    }));
+    const frameMutations = [
+      `${frame}\n${query}`,
+      frame.replace(`TASK QUERY\n${query}\n\nCURRENT SOURCES\n`, `TASK QUERY\n${query}\n${query}\n\nCURRENT SOURCES\n`),
+      frame.replace(`TASK QUERY\n${query}\n\n`, ""),
+      frame.replace(`TASK QUERY\n${query}`, `TASK QUERY\nX${query.slice(1)}`),
+      renderModelFacingFrame({ query: `${query} changed for one method`, currentSources, events: requiredEvents })
+    ];
+    for (const mutatedFrame of frameMutations) {
+      expectClosed("CANONICAL_FRAME", () => validateCanonicalFrame({
+        frame: mutatedFrame, query, currentSources, events: requiredEvents
+      }));
+    }
     const basePrefix = baseCase.methods[0].primaryPrefix;
     for (const changedQuery of ["", `${query} changed for one method`]) {
       const changed = {
@@ -2228,6 +2637,7 @@ export async function executeV2Evaluation(repositoryRoot) {
   const executionAuthorization = await verifyV2ExecutionAuthorization(repositoryRoot);
   return withVerifiedFrozenSource(repositoryRoot, async (context) => {
     exact(context.execution !== null, "BINDING_EXECUTION_MODULES", "Frozen retrieval modules were not loaded.");
+    exact(context.preflight.completed === true && context.preflight.totalFrames === 1476, "BINDING_PREFLIGHT", "Retrieval execution was reached without the complete Amendment-002 preflight.");
     const mutations = runMutationVerificationSuite();
     sameJson(
       mutations.map((entry) => entry.id),
@@ -2259,12 +2669,44 @@ export async function executeV2Evaluation(repositoryRoot) {
         tag: PROTOCOL_TAG,
         manifestSha256: PROTOCOL_SHA256,
         documentSha256: PROTOCOL_DOCUMENT_SHA256,
-        amendmentCommit: AMENDMENT_COMMIT,
-        amendmentTag: AMENDMENT_TAG,
-        amendmentManifestSha256: AMENDMENT_SHA256,
-        amendmentDocumentSha256: AMENDMENT_DOCUMENT_SHA256,
+        amendment001Commit: AMENDMENT_COMMIT,
+        amendment001Tag: AMENDMENT_TAG,
+        amendment001ManifestSha256: AMENDMENT_SHA256,
+        amendment001DocumentSha256: AMENDMENT_DOCUMENT_SHA256,
+        amendment002Commit: AMENDMENT_002_COMMIT,
+        amendment002Tag: AMENDMENT_002_TAG,
+        amendment002ManifestSha256: AMENDMENT_002_SHA256,
+        amendment002DocumentSha256: AMENDMENT_002_DOCUMENT_SHA256,
         fixedBeforeV2Outcome: true,
         externallyPreregistered: false
+      }),
+      attemptProvenance: Object.freeze({
+        correctionAttempt: Object.freeze({
+          number: CORRECTION_ATTEMPT_NUMBER,
+          label: CORRECTION_ATTEMPT_LABEL,
+          correctionCommit: executionAuthorization.currentHead,
+          correctionTag: CORRECTION_TAG,
+          exactCommand: "npm run evaluate:context-efficiency-comparison:v2:write"
+        }),
+        attempt001: Object.freeze({
+          number: 1,
+          status: "failed-closed-before-result",
+          armedCommit: ATTEMPT_001_ARMED_COMMIT,
+          armedTag: ATTEMPT_001_ARMED_TAG,
+          retrievalMethodsExecuted: true,
+          neutralCaseObservationsComputedInMemory: true,
+          aggregateComputed: false,
+          winnerComputed: false,
+          resultObjectConstructed: false,
+          resultEmitted: false,
+          resultMaterialized: false,
+          operatorVisibleComparativeMetricProduced: false,
+          internalObservationsReusedInAttempt2Metrics: false,
+          receiptPath: ATTEMPT_001_FAILURE_PATH,
+          receiptSha256: ATTEMPT_001_FAILURE_SHA256,
+          reportPath: ATTEMPT_001_FAILURE_REPORT_PATH,
+          reportSha256: ATTEMPT_001_FAILURE_REPORT_SHA256
+        })
       }),
       sourceBinding: Object.freeze({
         sourceCommit: SOURCE_COMMIT,
@@ -2275,6 +2717,7 @@ export async function executeV2Evaluation(repositoryRoot) {
         runtime: context.bindingReport.runtime,
         renderer: context.bindingReport.renderer
       }),
+      preflight: context.preflight,
       estimator: context.protocol.tokenAccounting.estimator,
       neutral: Object.freeze({
         fixtureCases: neutralCases.length,
