@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -7,6 +8,12 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const readJson = async (relativePath) => JSON.parse(await readFile(path.join(root, relativePath), "utf8"));
 const sha256 = async (relativePath) => `sha256:${createHash("sha256").update(await readFile(path.join(root, relativePath))).digest("hex")}`;
+const historicalPaperSourceCommit = "785b3b1734b92bf37f91c41bc6b48a71c0149a92";
+const readHistoricalBlob = (relativePath) => execFileSync(
+  "git",
+  ["show", `${historicalPaperSourceCommit}:${relativePath}`],
+  { cwd: root, encoding: "buffer", windowsHide: true }
+);
 
 const packageJson = await readJson("package.json");
 const release = await readJson("bench/results/benchmark-release-0.1.6.json");
@@ -18,7 +25,6 @@ const currentResearch = await readJson("bench/results/research-retrieval-develop
 const finalManifest = await readJson("bench/final/final-task-manifest-v1.json");
 const abstentionControls = await readJson("bench/final/final-abstention-controls-v1.json");
 const contamination = await readJson("bench/final/contamination-audit-v1.json");
-const whitePaperSource = await readFile(path.join(root, "docs", "WHITEPAPER.md"), "utf8");
 const paperPdf = await readFile(path.join(root, release.paperArtifact.path));
 const paperSourceReceipt = (await readFile(path.join(root, release.paperArtifact.sourceReceiptPath), "utf8")).trim();
 const paperPdfReceipt = (await readFile(path.join(root, release.paperArtifact.pdfReceiptPath), "utf8")).trim();
@@ -29,8 +35,15 @@ const paperSourcePaths = [
   "scripts/build-whitepaper-pdf-v1.3.py"
 ];
 const paperSourceBytes = await Promise.all(
-  paperSourcePaths.map((relativePath) => readFile(path.join(root, relativePath)))
+  paperSourcePaths.map(async (relativePath) => readHistoricalBlob(relativePath))
 );
+const whitePaperSource = paperSourceBytes[0].toString("utf8");
+
+execFileSync("git", ["merge-base", "--is-ancestor", historicalPaperSourceCommit, "HEAD"], {
+  cwd: root,
+  stdio: "ignore",
+  windowsHide: true
+});
 
 assert.equal(release.schemaVersion, "qarinah.benchmark-release.v2");
 assert.equal(release.packageVersion, packageJson.version);

@@ -26,6 +26,7 @@ const required = [
   "search/index.html",
   "search-index.json",
   "paper/index.html",
+  "paper/Qarinah-Technical-White-Paper-v1.4.pdf",
   "paper/Qarinah-Technical-White-Paper-v1.3.pdf",
   "paper/Qarinah-Technical-White-Paper-v1.2.pdf",
   "assets/qarinah-mark.svg",
@@ -77,6 +78,10 @@ for (const file of htmlFiles) {
   const relative = path.relative(output, file).replaceAll("\\", "/");
   const route = relative === "index.html" ? "/" : `/${relative.replace(/index\.html$/, "")}`;
   htmlByRoute.set(route, html);
+
+  if (/\u2014|&mdash;|&#8212;|&#x2014;/i.test(html)) {
+    errors.push(`${fileLabel} contains an em dash; public pages must use a normal hyphen`);
+  }
 
   if (html.includes("â€”") || html.includes("â€“")) {
     errors.push(`${fileLabel} contains corrupted dash encoding`);
@@ -216,8 +221,11 @@ for (const benchmarkProof of ["98.7148%", "98.75%", "89.05%", "Three outputs. Th
 if (!home.includes("What coding agents and developers need to know.") || !home.includes('href="/docs/faq/"')) {
   errors.push("Homepage is missing the direct answer-engine surface.");
 }
-if (!home.includes("Your project remembers&mdash;even when your coding agent changes.") || !home.includes('href="/docs/cross-agent-handoffs/"')) {
+if (!home.includes("Your project remembers - even when your coding agent changes.") || !home.includes('href="/docs/cross-agent-handoffs/"')) {
   errors.push("Homepage is missing the verified cross-agent handoff workflow.");
+}
+if (home.indexOf('<section class="hero">') > home.indexOf('<section class="benchmark-ribbon"')) {
+  errors.push("Homepage must lead with the centered product hero before benchmark detail.");
 }
 if (!home.includes("Evidence-linked project memory for coding agents.") || !home.includes("continue from verified context instead of starting from zero")) {
   errors.push("Homepage is missing the cross-agent category or long-term vision.");
@@ -228,15 +236,17 @@ if (!faq.includes('"@type":"FAQPage"') || !faq.includes('"mainEntity"')) {
 if (!paper.includes('src="/assets/qarinah-flow.svg"')) {
   errors.push("Paper architecture image is not bound to the deployed asset.");
 }
-if (!paper.includes("/paper/Qarinah-Technical-White-Paper-v1.3.pdf")) {
+if (!paper.includes("/paper/Qarinah-Technical-White-Paper-v1.4.pdf")) {
   errors.push("Paper download does not point to the versioned website PDF.");
 }
-if (!paper.includes("https://doi.org/10.5281/zenodo.21843240")
+if (!paper.includes("https://doi.org/10.5281/zenodo.21850747")
+  || !paper.includes("https://doi.org/10.5281/zenodo.21547684")
+  || !paper.includes("https://doi.org/10.5281/zenodo.21843240")
   || !paper.includes('"creativeWorkStatus":"Published"')
-  || !paper.includes(`"datePublished":"2026-08-08"`)) {
-  errors.push("Paper page must link and structurally bind the published Zenodo v1.3 DOI.");
+  || !paper.includes('"datePublished":"2026-08-08"')) {
+  errors.push("Paper page must bind published v1.4 to its version and series DOIs and preserve the published v1.3 DOI.");
 }
-if (/release[- ]candidate|activates on publication|not registered or published|DOI reserved/iu.test(paper)) {
+if (/release[- ]candidate|activates on publication|not registered or published|DOI reserved|assigned only when this manuscript is deposited|assigned by Zenodo when v1\.4 is deposited|A version DOI is assigned/iu.test(paper)) {
   errors.push("Paper page contains stale pre-publication lifecycle wording.");
 }
 if (!paper.includes("View on GitHub") || paper.includes("Edit on GitHub")) {
