@@ -35,7 +35,11 @@ export {
 } from "./compiler.js";
 export { PROJECT_STRUCTURE_SCHEMA_VERSION, scanProjectStructure } from "./project-structure.js";
 export { OKF_EXPORT_SCHEMA_VERSION, OKF_VERSION, exportOkf } from "./okf.js";
-export { rankContextEvents } from "./retrieval.js";
+export {
+  rankContextEvents,
+  resolveContextAdmission,
+  resolveCurrentContextState
+} from "./retrieval.js";
 export {
   SQLITE_READ_MODEL_FILENAME,
   SQLITE_READ_MODEL_SCHEMA_VERSION,

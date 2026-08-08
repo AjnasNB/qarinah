@@ -579,6 +579,47 @@ export function rankContextEvents(index: unknown, query: string | undefined, opt
   sqliteCandidates?: Array<{ eventId: string; rank: number }>;
   asOf: string;
 }): Readonly<Record<string, unknown>>;
+export interface QarinahContextAdmission {
+  readonly asOf: string;
+  readonly temporalBoundary: "inclusive" | "strict-before";
+  readonly authorityScopes: readonly string[];
+  readonly repositoryIds: readonly string[];
+  readonly eligibleEventIds: readonly string[];
+  readonly excludedEventIds: readonly string[];
+  readonly exclusions: readonly Readonly<{
+    eventId: string;
+    reasons: readonly ("expired" | "future" | "not-yet-valid" | "stale" | "disclosure" | "repository")[];
+  }>[];
+  readonly filters: Readonly<{
+    expired: number;
+    future: number;
+    notYetValid: number;
+    stale: number;
+    unauthorized: number;
+  }>;
+}
+export function resolveContextAdmission(index: unknown, options: {
+  temporalBoundary?: "inclusive" | "strict-before";
+  authorityScope?: string;
+  authorityScopes?: readonly string[];
+  repositoryIds?: readonly string[];
+  asOf: string;
+}): QarinahContextAdmission;
+export interface QarinahCurrentContextState {
+  readonly asOf: string;
+  readonly supersessionPolicy: "prefer-current" | "include-history";
+  readonly policyEligibleEventIds: readonly string[];
+  readonly orderedEventIds: readonly string[];
+  readonly eligibleEventIds: readonly string[];
+  readonly excludedEventIds: readonly string[];
+  readonly exclusions: readonly Readonly<{ eventId: string; reason: "superseded"; by: readonly string[] }>[];
+}
+export function resolveCurrentContextState(index: unknown, orderedEventIds: readonly string[], options: {
+  asOf: string;
+  query?: string;
+  supersessionPolicy?: "prefer-current" | "include-history";
+  policyEligibleEventIds: readonly string[];
+}): QarinahCurrentContextState;
 export function captureCodexHook(input: Record<string, unknown>, options?: { cwd?: string }): Promise<{ captured: boolean; reason?: string; eventId?: string; hash?: string }>;
 export function captureClaudeHook(input: Record<string, unknown>, options?: { cwd?: string }): Promise<{ captured: boolean; reason?: string; eventId?: string; hash?: string }>;
 export interface QarinahMcpServer {
