@@ -316,10 +316,23 @@ function rewriteMarkdownAssets(markdown) {
 
 function rewritePublicationLink(markdown, source) {
   if (source !== "docs/WHITEPAPER.md") return markdown;
-  return markdown.replace(
-    `https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v${paperVersion}.pdf`,
-    paperPdf
-  );
+  return markdown
+    .replace(
+      `https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v${paperVersion}.pdf`,
+      paperPdf
+    )
+    .replace(
+      "The v1.4 version DOI is assigned only when this manuscript is deposited; the persistent paper series uses concept DOI",
+      "The published v1.4 version DOI is [10.5281/zenodo.21850747](https://doi.org/10.5281/zenodo.21850747); the persistent paper series uses concept DOI"
+    )
+    .replace(
+      "- **Version DOI:** assigned by Zenodo when v1.4 is deposited",
+      "- **Version DOI:** [10.5281/zenodo.21850747](https://doi.org/10.5281/zenodo.21850747)"
+    )
+    .replace(
+      "https://doi.org/10.5281/zenodo.21547684. A version DOI is assigned\nwhen this manuscript is deposited.",
+      "https://doi.org/10.5281/zenodo.21547684. The published v1.4 version DOI is\nhttps://doi.org/10.5281/zenodo.21850747."
+    );
 }
 
 function nav(active = "") {

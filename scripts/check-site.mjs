@@ -239,7 +239,7 @@ if (!paper.includes("https://doi.org/10.5281/zenodo.21850747")
   || !paper.includes('"datePublished":"2026-08-08"')) {
   errors.push("Paper page must bind published v1.4 to its version and series DOIs and preserve the published v1.3 DOI.");
 }
-if (/release[- ]candidate|activates on publication|not registered or published|DOI reserved/iu.test(paper)) {
+if (/release[- ]candidate|activates on publication|not registered or published|DOI reserved|assigned only when this manuscript is deposited|assigned by Zenodo when v1\.4 is deposited|A version DOI is assigned/iu.test(paper)) {
   errors.push("Paper page contains stale pre-publication lifecycle wording.");
 }
 if (!paper.includes("View on GitHub") || paper.includes("Edit on GitHub")) {
