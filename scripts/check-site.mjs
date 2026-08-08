@@ -6,6 +6,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const output = path.join(root, "site-dist");
 const required = [
   "index.html",
+  "alternatives/index.html",
   "docs/index.html",
   "docs/cross-agent-handoffs/index.html",
   "docs/getting-started/index.html",
@@ -183,6 +184,9 @@ for (const route of availableRoutes) {
     errors.push(`search-index.json is missing ${route}`);
   }
 }
+if (!indexedRoutes.has("/alternatives/")) {
+  errors.push("search-index.json is missing /alternatives/");
+}
 if (!searchIndex.every((entry) =>
   entry.title
   && entry.description
@@ -202,6 +206,7 @@ const llms = await readFile(path.join(output, "llms.txt"), "utf8");
 for (const canonicalResource of [
   "https://qarinah.io/docs/",
   "https://qarinah.io/docs/faq/",
+  "https://qarinah.io/alternatives/",
   "https://www.npmjs.com/package/qarinah",
   "https://github.com/AjnasNB/qarinah",
   "https://doi.org/10.5281/zenodo.21547684"
@@ -210,6 +215,7 @@ for (const canonicalResource of [
 }
 
 const home = await readFile(path.join(output, "index.html"), "utf8");
+const alternatives = await readFile(path.join(output, "alternatives", "index.html"), "utf8");
 const paper = await readFile(path.join(output, "paper", "index.html"), "utf8");
 const faq = await readFile(path.join(output, "docs", "faq", "index.html"), "utf8");
 if (!home.includes("<strong>98.71%</strong>") || !home.includes("the evaluated full-history input was 77.81 times larger")) {
@@ -229,6 +235,31 @@ if (home.indexOf('<section class="hero">') > home.indexOf('<section class="bench
 }
 if (!home.includes("Evidence-linked project memory for coding agents.") || !home.includes("continue from verified context instead of starting from zero")) {
   errors.push("Homepage is missing the cross-agent category or long-term vision.");
+}
+for (const requiredAlternative of [
+  "Qarinah alternatives and coding-agent memory comparison",
+  "Mem0",
+  "Letta",
+  "LangMem and LangGraph memory",
+  "Graphiti and Zep",
+  "GitHub Copilot Memory",
+  "Claude Code memory",
+  "Cursor Memories",
+  "One category choice, not a universal winner",
+  "It is not a performance ranking"
+]) {
+  if (!alternatives.includes(requiredAlternative)) {
+    errors.push(`Alternatives page is missing ${requiredAlternative}`);
+  }
+}
+if (!alternatives.includes('"@type":"ItemList"')
+  || !alternatives.includes('"itemListOrder":"https://schema.org/ItemListUnordered"')
+  || !alternatives.includes('"@type":"FAQPage"')) {
+  errors.push("Alternatives page is missing unordered comparison or answer-oriented structured data.");
+}
+const alternativesClaimCopy = alternatives.replaceAll("Is Qarinah better than Mem0, Letta, LangMem, or Graphiti?", "");
+if (/Qarinah is (?:the )?(?:best|only)|Qarinah (?:is )?better than|Qarinah outperforms?/iu.test(alternativesClaimCopy)) {
+  errors.push("Alternatives page contains an unsupported superiority term.");
 }
 if (!faq.includes('"@type":"FAQPage"') || !faq.includes('"mainEntity"')) {
   errors.push("FAQ is missing answer-oriented structured data.");

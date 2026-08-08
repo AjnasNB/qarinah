@@ -11,6 +11,7 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 - [Homepage](https://qarinah.io/): Product overview, benchmark summary, and primary navigation.
 - [Verified cross-agent handoffs](https://qarinah.io/docs/cross-agent-handoffs/): Switch coding agents and continue a real task with compact, cited project context.
 - [Direct answers](https://qarinah.io/docs/faq/): Concise answers about Qarinah, context reduction, cost boundaries, Codex, Claude Code, privacy, and open-source licensing.
+- [Qarinah alternatives](https://qarinah.io/alternatives/): Product-boundary comparison with Mem0, Letta, LangMem, LangGraph memory, Graphiti, Zep, and native coding-host memory.
 - [Getting started](https://qarinah.io/docs/getting-started/): Install Qarinah, opt in one workspace, connect a supported host, and compile a cited context pack.
 - [Documentation index](https://qarinah.io/docs/): Documentation by task.
 - [npm package](https://www.npmjs.com/package/qarinah): Published `qarinah` package and registry metadata.
@@ -19,6 +20,8 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 ## Direct facts
 
 - Qarinah is a universal context engine for software projects and an independent local tool; Maqam is an optional governance integration.
+- Qarinah is a local, evidence-linked project-memory compiler for coding agents. It is not a complete autonomous-agent runtime or a general personalization service.
+- The alternatives guide is a representative category comparison, not a performance ranking or a claim that Qarinah is universally better than adjacent products.
 - Qarinah's primary workflow is verified handoffs between coding agents.
 - Qarinah supports reviewed Codex and Claude Code integrations that can use the same explicitly opted-in project record.
 - The published evaluator measured 98.71% less estimated repeated input context in its compared task set: 442,113 estimated input-context tokens became 5,682 while every required target was directly covered in the top five.

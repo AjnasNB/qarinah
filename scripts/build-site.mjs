@@ -65,6 +65,99 @@ const answerEngineQuestions = [
   }
 ];
 
+const alternativeSystems = [
+  {
+    name: "Qarinah",
+    slug: "qarinah",
+    category: "Local project-memory compiler",
+    primaryJob: "Preserve permitted software-project history in an inspectable local ledger and compile bounded, cited context packs for coding agents.",
+    overlap: "Long-term project memory, retrieval, provenance, and cross-session continuity.",
+    boundary: "Qarinah does not run an autonomous agent loop or provide a general personalization service. Its focus is repository-owned evidence that can move across supported coding hosts.",
+    fit: "A project needs one auditable memory record across Codex, Claude Code, Cursor, CLI, and compatible MCP workflows.",
+    sources: [{ label: "Qarinah source", url: github }]
+  },
+  {
+    name: "Mem0",
+    slug: "mem0",
+    category: "Personalization and agent memory",
+    primaryJob: "Provide user-, session-, and agent-level memory for applications through managed or self-hosted operation.",
+    overlap: "Long-term memory extraction, storage, retrieval, and use in agent applications.",
+    boundary: "Mem0 addresses broader application personalization. Qarinah foregrounds a local software-project ledger, source identities, conflicts, supersession, and deterministic cited packs.",
+    fit: "An application needs reusable personalized memory for users or agents beyond a software repository workflow.",
+    sources: [{ label: "Mem0 source", url: "https://github.com/mem0ai/mem0" }]
+  },
+  {
+    name: "Letta",
+    slug: "letta",
+    category: "Stateful agent platform",
+    primaryJob: "Run stateful agents with memory blocks, tools, agent APIs, and local or hosted operation.",
+    overlap: "Persistent agent state and memory that survives across conversations or tasks.",
+    boundary: "Letta owns the agent runtime and its model loop. Qarinah supplies portable project memory to external coding agents instead of replacing their runtime.",
+    fit: "The system needs an integrated stateful-agent runtime, not only a project-memory layer.",
+    sources: [{ label: "Letta source", url: "https://github.com/letta-ai/letta" }]
+  },
+  {
+    name: "LangMem and LangGraph memory",
+    slug: "langmem-langgraph",
+    category: "Programmable agent-memory toolkit",
+    primaryJob: "Add semantic, episodic, and procedural memory plus persistence to LangGraph and custom agent systems.",
+    overlap: "Memory formation, storage, search, consolidation, and cross-session agent context.",
+    boundary: "LangMem is a programmable toolkit used with a chosen model and store. Qarinah's core ledger, lexical and graph retrieval, and pack rendering do not require a model or hosted store.",
+    fit: "A LangGraph or custom-agent application needs memory behavior embedded directly in its graph or runtime.",
+    sources: [
+      { label: "LangMem documentation", url: "https://langchain-ai.github.io/langmem/" },
+      { label: "LangGraph memory", url: "https://langchain-ai.github.io/langgraph/agents/memory/" }
+    ]
+  },
+  {
+    name: "Graphiti and Zep",
+    slug: "graphiti-zep",
+    category: "Temporal context graph",
+    primaryJob: "Represent evolving entities and facts in a temporal graph with episode provenance and hybrid retrieval.",
+    overlap: "Temporal state, provenance, graph relationships, and retrieval over changing knowledge.",
+    boundary: "Graphiti targets general evolving knowledge and graph infrastructure. Qarinah targets repository and coding-work evidence stored with the project.",
+    fit: "An application needs a general temporal knowledge graph across people, entities, events, or business facts.",
+    sources: [{ label: "Graphiti source", url: "https://github.com/getzep/graphiti" }]
+  },
+  {
+    name: "Native coding-host memory",
+    slug: "native-coding-host-memory",
+    category: "Memory inside one coding product",
+    primaryJob: "Retain repository facts, preferences, rules, or instructions within GitHub Copilot, Claude Code, or Cursor.",
+    overlap: "Repository context carried across sessions inside a coding assistant.",
+    boundary: "Native memory is integrated with its host. Qarinah keeps an independent, inspectable project record designed for use across supported hosts, with explicit citations, hashes, conflicts, and rebuildable views.",
+    fit: "A team prefers the convenience and native behavior of one coding host and does not need an independent cross-host record.",
+    sources: [
+      { label: "GitHub Copilot Memory", url: "https://docs.github.com/en/copilot/concepts/agents/copilot-memory" },
+      { label: "Claude Code memory", url: "https://code.claude.com/docs/en/memory" },
+      { label: "Cursor Memories", url: "https://docs.cursor.com/en/context/memories" }
+    ]
+  }
+];
+
+const alternativeQuestions = [
+  {
+    name: "What kind of product is Qarinah?",
+    text: "Qarinah is a local, evidence-linked project-memory compiler for coding agents. It preserves permitted software-project history in an inspectable ledger and compiles bounded cited context packs for supported hosts."
+  },
+  {
+    name: "Is Qarinah better than Mem0, Letta, LangMem, or Graphiti?",
+    text: "There is no universal winner because these products solve different jobs. Qarinah emphasizes repository-owned, cross-host project evidence; the alternatives may emphasize personalization, a complete agent runtime, programmable application memory, or a general temporal graph."
+  },
+  {
+    name: "Does Qarinah replace GitHub Copilot Memory, Claude Code memory, or Cursor Memories?",
+    text: "Not necessarily. Native host memory is convenient inside its own product. Qarinah is useful when a project needs one independent, inspectable record that can be queried by several supported coding hosts."
+  },
+  {
+    name: "Does Qarinah require a hosted service, embedding API, or vector database?",
+    text: "No. Qarinah's core local workflow uses the project ledger plus deterministic lexical and graph retrieval. Hosted services, an embedding API, and a vector database are not required for that workflow."
+  },
+  {
+    name: "How should teams compare coding-agent memory systems?",
+    text: "Compare ownership of the source record, portability across hosts, provenance, conflict and supersession handling, model and infrastructure requirements, runtime scope, and how evidence can be inspected or rebuilt."
+  }
+];
+
 const docPages = [
   {
     route: "docs/cross-agent-handoffs",
@@ -237,6 +330,29 @@ const searchEntries = [
     headings: [],
     keywords: ["coding agent memory", "project memory", "context compiler", "token-efficient context"],
     content: "Qarinah keeps a local evidence-linked project record and compiles the small cited context pack needed for the current coding task."
+  },
+  {
+    route: "/alternatives/",
+    title: "Qarinah alternatives and coding-agent memory comparison",
+    description: "Compare Qarinah with Mem0, Letta, LangMem, LangGraph memory, Graphiti, Zep, and native coding-host memory by product boundary.",
+    headings: [
+      { id: "choose-by-job", text: "Start with the job you need done" },
+      { id: "comparison", text: "Compare the operating boundaries" },
+      { id: "evaluation-criteria", text: "Six questions for a useful evaluation" },
+      { id: "method", text: "Method and sources" },
+      { id: "questions", text: "Questions teams ask before choosing" }
+    ],
+    keywords: [
+      "Qarinah alternatives",
+      "Qarinah vs Mem0",
+      "Qarinah vs Letta",
+      "Qarinah vs LangMem",
+      "Qarinah vs Graphiti",
+      "coding agent memory comparison",
+      "project memory for coding agents",
+      "cross-agent memory"
+    ],
+    content: alternativeSystems.map((system) => `${system.name}. ${system.category}. ${system.primaryJob} ${system.overlap} ${system.boundary} ${system.fit}`).join(" ")
   }
 ];
 
@@ -340,6 +456,7 @@ function nav(active = "") {
     ["Product", "/", "home"],
     ["Docs", "/docs/", "docs"],
     ["Answers", "/docs/faq/", "answers"],
+    ["Compare", "/alternatives/", "alternatives"],
     ["Benchmarks", "/docs/benchmarks/", "benchmarks"],
     ["Paper", "/paper/", "paper"],
     ["Search", "/search/", "search"]
@@ -381,6 +498,7 @@ function footer() {
         <div>
           <strong>Verify</strong>
           <a href="/docs/faq/">Direct answers</a>
+          <a href="/alternatives/">Compare approaches</a>
           <a href="/docs/benchmarks/">Benchmarks</a>
           <a href="/docs/security/">Security</a>
           <a href="/paper/">White paper</a>
@@ -526,6 +644,56 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
       sameAs: [doi],
       isPartOf: { "@id": `${siteOrigin}/#website` }
     });
+  } else if (kind === "alternatives") {
+    graph.push(
+      {
+        "@type": "CollectionPage",
+        "@id": `${url}#comparison`,
+        name: title,
+        description,
+        url,
+        inLanguage: "en",
+        dateModified: releaseDate,
+        author: { "@id": person["@id"] },
+        about: alternativeSystems.map((system) => ({
+          "@type": "SoftwareApplication",
+          name: system.name,
+          applicationCategory: "DeveloperApplication",
+          url: system.sources[0].url
+        }))
+      },
+      {
+        "@type": "ItemList",
+        "@id": `${url}#systems`,
+        name: "Project-memory and coding-agent memory approaches",
+        itemListOrder: "https://schema.org/ItemListUnordered",
+        numberOfItems: alternativeSystems.length,
+        itemListElement: alternativeSystems.map((system, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          item: {
+            "@type": "SoftwareApplication",
+            name: system.name,
+            description: system.primaryJob,
+            applicationCategory: "DeveloperApplication",
+            url: system.sources[0].url
+          }
+        }))
+      },
+      {
+        "@type": "FAQPage",
+        "@id": `${url}#faq`,
+        name: "Qarinah alternatives questions",
+        mainEntity: alternativeQuestions.map((entry) => ({
+          "@type": "Question",
+          name: entry.name,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: entry.text
+          }
+        }))
+      }
+    );
   } else if (kind === "benchmark") {
     graph.push(
       {
@@ -891,7 +1059,196 @@ function homePage() {
           </div>
           <div>
             <a class="btn btn-primary btn-large" href="/docs/getting-started/">Start in five minutes</a>
+            <a class="text-link" href="/alternatives/">Compare memory approaches</a>
             <a class="text-link" href="/paper/">Read the white paper</a>
+          </div>
+        </div>
+      </section>`
+  });
+}
+
+function alternativesPage() {
+  const decisionPaths = [
+    {
+      need: "One inspectable software-project record across supported coding hosts",
+      system: "Qarinah",
+      href: "#qarinah"
+    },
+    {
+      need: "Personalized user or agent memory inside an application",
+      system: "Mem0",
+      href: "#mem0"
+    },
+    {
+      need: "A complete stateful-agent runtime with integrated memory",
+      system: "Letta",
+      href: "#letta"
+    },
+    {
+      need: "Programmable memory inside a LangGraph or custom agent",
+      system: "LangMem and LangGraph memory",
+      href: "#langmem-langgraph"
+    },
+    {
+      need: "A general temporal knowledge graph for evolving facts",
+      system: "Graphiti and Zep",
+      href: "#graphiti-zep"
+    },
+    {
+      need: "Memory integrated directly into one coding assistant",
+      system: "Native coding-host memory",
+      href: "#native-coding-host-memory"
+    }
+  ];
+  const decisionMarkup = decisionPaths.map((path, index) => `
+    <a class="decision-row" href="${path.href}">
+      <span>${String(index + 1).padStart(2, "0")}</span>
+      <strong>${path.need}</strong>
+      <em>${path.system}</em>
+    </a>`).join("");
+  const systemMarkup = alternativeSystems.map((system, index) => `
+    <article class="comparison-row" id="${system.slug}">
+      <header>
+        <span>${String(index + 1).padStart(2, "0")}</span>
+        <h3>${system.name}</h3>
+        <p>${system.category}</p>
+        <div class="comparison-sources">
+          ${system.sources.map((source) => `<a href="${source.url}" rel="noreferrer">${source.label}</a>`).join("")}
+        </div>
+      </header>
+      <div>
+        <strong class="comparison-label">Primary job</strong>
+        <p>${system.primaryJob}</p>
+      </div>
+      <div>
+        <strong class="comparison-label">Closest overlap</strong>
+        <p>${system.overlap}</p>
+      </div>
+      <div>
+        <strong class="comparison-label">Meaningful boundary</strong>
+        <p>${system.boundary}</p>
+      </div>
+      <p class="comparison-fit"><strong>Consider this approach when:</strong> ${system.fit}</p>
+    </article>`).join("");
+  const evaluationCriteria = [
+    ["Source ownership", "Is the authoritative memory stored with the project, inside a vendor product, or in application infrastructure you operate?"],
+    ["Host portability", "Can the same record move across coding agents, or is memory intentionally native to one host or runtime?"],
+    ["Evidence model", "Can a selected fact point back to source events, content digests, validity, conflicts, and superseded decisions?"],
+    ["Runtime scope", "Are you choosing a memory layer, a complete agent runtime, a graph database, or a native assistant feature?"],
+    ["Model dependency", "Does the core memory path require a model, embedding service, vector database, or hosted control plane?"],
+    ["Rebuild and review", "Can derived memory be reconstructed and inspected independently of the assistant that consumes it?"]
+  ];
+  const criteriaMarkup = evaluationCriteria.map(([title, text], index) => `
+    <article>
+      <span>${String(index + 1).padStart(2, "0")}</span>
+      <h3>${title}</h3>
+      <p>${text}</p>
+    </article>`).join("");
+  const questionMarkup = alternativeQuestions.map((entry) => `
+    <article>
+      <h3>${entry.name}</h3>
+      <p>${entry.text}</p>
+    </article>`).join("");
+
+  return layout({
+    title: "Qarinah alternatives and coding-agent memory comparison",
+    description: "Compare Qarinah with Mem0, Letta, LangMem, LangGraph memory, Graphiti, Zep, GitHub Copilot Memory, Claude Code memory, and Cursor Memories by product boundary.",
+    active: "alternatives",
+    canonical: "/alternatives/",
+    kind: "alternatives",
+    body: `
+      <section class="comparison-hero">
+        <div class="shell comparison-hero-grid">
+          <div>
+            <p class="eyebrow">Project-memory comparison</p>
+            <h1>Choose memory by boundary, not by buzzword.</h1>
+            <p class="comparison-lede">Qarinah is a local, evidence-linked project-memory compiler for coding agents. This guide compares it with adjacent memory products by the job each system owns, the overlap, and the boundary that remains different.</p>
+            <div class="comparison-actions">
+              <a class="btn btn-primary btn-large" href="#choose-by-job">Find the matching category</a>
+              <a class="hero-text-link" href="#method">Read the method</a>
+            </div>
+          </div>
+          <aside class="comparison-scope" aria-label="Qarinah scope in one view">
+            <p>Qarinah in one view</p>
+            <dl>
+              <div><dt>Record</dt><dd>Project-owned local ledger</dd></div>
+              <div><dt>Output</dt><dd>Bounded cited context packs</dd></div>
+              <div><dt>Runtime</dt><dd>External supported coding agents</dd></div>
+              <div><dt>Position</dt><dd>One category choice, not a universal winner</dd></div>
+            </dl>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section shell" aria-labelledby="choose-by-job">
+        <div class="section-heading split-heading">
+          <div>
+            <p class="eyebrow">The shortest useful comparison</p>
+            <h2 id="choose-by-job">Start with the job you need done.</h2>
+          </div>
+          <p>These systems overlap around retained context, but they do not occupy one interchangeable category. A requirement-led choice is more useful than a feature-count ranking.</p>
+        </div>
+        <div class="decision-list">${decisionMarkup}</div>
+      </section>
+
+      <section class="section section-alt" aria-labelledby="comparison">
+        <div class="shell">
+          <div class="section-heading split-heading">
+            <div>
+              <p class="eyebrow">Representative maintained alternatives</p>
+              <h2 id="comparison">Compare the operating boundaries.</h2>
+            </div>
+            <p>This is a category comparison based on public product documentation reviewed on 8 August 2026. It is not a performance ranking and does not claim to enumerate every memory library or hosted wrapper.</p>
+          </div>
+          <div class="comparison-list">${systemMarkup}</div>
+        </div>
+      </section>
+
+      <section class="section shell" aria-labelledby="evaluation-criteria">
+        <div class="section-heading split-heading">
+          <div>
+            <p class="eyebrow">Evaluation criteria</p>
+            <h2 id="evaluation-criteria">Six questions for a useful evaluation.</h2>
+          </div>
+          <p>A memory comparison should disclose architecture and authority before it reaches for benchmarks. Measure performance only after the products are solving the same task under the same scorer.</p>
+        </div>
+        <div class="evaluation-grid">${criteriaMarkup}</div>
+      </section>
+
+      <section class="comparison-method" id="method" aria-labelledby="method-title">
+        <div class="shell comparison-method-grid">
+          <div>
+            <p class="eyebrow">Method and sources</p>
+            <h2 id="method-title">Claims stop at the public evidence.</h2>
+          </div>
+          <div>
+            <p>The comparison uses each project's official source repository or product documentation. It describes product scope and architectural emphasis; it does not merge unrelated benchmarks or infer a universal quality order.</p>
+            <p>Qarinah's benchmark results remain on the dedicated <a href="/docs/benchmarks/">benchmark page</a> with their fixtures and limits. No alternative is scored on that Qarinah-specific task set here.</p>
+            <p>Found a changed product boundary? <a href="${github}/issues/new" rel="noreferrer">Open a source-linked correction</a>.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section shell" aria-labelledby="questions">
+        <div class="section-heading split-heading">
+          <div>
+            <p class="eyebrow">Direct answers</p>
+            <h2 id="questions">Questions teams ask before choosing.</h2>
+          </div>
+          <p>These answers state Qarinah's scope without turning product differences into unsupported superiority claims.</p>
+        </div>
+        <div class="comparison-faq">${questionMarkup}</div>
+      </section>
+
+      <section class="section final-cta">
+        <div class="shell final-cta-inner">
+          <div>
+            <p class="eyebrow">Try the category, then verify the record</p>
+            <h2>Keep one cited project memory beside the code.</h2>
+          </div>
+          <div>
+            <a class="btn btn-primary btn-large" href="/docs/getting-started/">Set up Qarinah</a>
+            <a class="text-link" href="/docs/architecture/">Inspect the architecture</a>
           </div>
         </div>
       </section>`
@@ -1086,6 +1443,9 @@ async function markdownPage(page) {
 }
 
 await writeFile(path.join(output, "index.html"), homePage());
+const alternativesDestination = path.join(output, "alternatives");
+await mkdir(alternativesDestination, { recursive: true });
+await writeFile(path.join(alternativesDestination, "index.html"), alternativesPage());
 await mkdir(path.join(output, "docs"), { recursive: true });
 await writeFile(path.join(output, "docs", "index.html"), docsIndex());
 
@@ -1100,7 +1460,7 @@ await mkdir(searchDestination, { recursive: true });
 await writeFile(path.join(searchDestination, "index.html"), searchPage());
 await writeFile(path.join(output, "search-index.json"), `${JSON.stringify(searchEntries, null, 2)}\n`);
 
-const sitemapRoutes = ["/", "/docs/", "/search/", ...docPages.map((page) => `/${page.route}/`)];
+const sitemapRoutes = ["/", "/alternatives/", "/docs/", "/search/", ...docPages.map((page) => `/${page.route}/`)];
 await writeFile(
   path.join(output, "sitemap.xml"),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapRoutes.map((route) => `  <url><loc>${siteOrigin}${route}</loc><lastmod>${releaseDate}</lastmod></url>`).join("\n")}\n</urlset>\n`
