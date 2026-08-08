@@ -1,0 +1,1685 @@
+{
+  "schemaVersion": "qarinah.context-efficiency-development-protocol.v3",
+  "protocolVersion": "3.0.0-development",
+  "classification": "pre-outcome inspected-development protocol",
+  "createdAt": "2026-08-08",
+  "companionDocument": {
+    "path": "docs/CONTEXT-EFFICIENCY-DEVELOPMENT-v3-PROTOCOL.md",
+    "sha256": "sha256:e7ca373821eee0e4719febeb2d8f5e7d51e903e6eaa02523a911631a9f7fc5be"
+  },
+  "timing": {
+    "authoredAgainstCommit": "85834f51605d207e100c95a335b38bdd352aa5cc",
+    "priorV2OutcomeObserved": true,
+    "priorV05OutcomeObserved": true,
+    "v3MethodExistsAtAuthorship": false,
+    "v3EvaluatorExistsAtAuthorship": false,
+    "v3AuthorizationExistsAtAuthorship": false,
+    "v3FailureReceiptExistsAtAuthorship": false,
+    "v3ResultExistsAtAuthorship": false,
+    "v3RetrievalExecutedAtAuthorship": false,
+    "finalQarinahOutcomeOpenedOrExecutedForThisWork": false,
+    "providerExperimentOpenedOrExecutedForThisWork": false,
+    "externallyPreregistered": false,
+    "freezeRule": "The first commit must contain only this manifest and its companion protocol document. It must be independently reviewed and tagged before a v3 method or evaluator is implemented or any v3 retrieval executes. Any outcome-informed change requires a new protocol version and result destination.",
+    "authorizationBoundary": "This protocol alone authorizes no retrieval execution, provider call, release, deployment, publication, merge, DOI update, or marketing claim."
+  },
+  "immutableEvidence": {
+    "v2Protocol": {
+      "tag": "research-context-efficiency-protocol-v2",
+      "commit": "d7f2a09bed34507b3aec070f765d20b6a834d6d9",
+      "manifestPath": "bench/research/context-efficiency-comparison-v2-protocol.json",
+      "manifestSha256": "sha256:0dc108888faa583ccdce132b38e6543df00130ffc58c4dbdb07656cf88a4cfbd",
+      "documentPath": "docs/CONTEXT-EFFICIENCY-COMPARISON-v2-PROTOCOL.md",
+      "documentSha256": "sha256:834a5954cacea05e0721f3ad49a044093b6636252f985ba82b76386b18a59616"
+    },
+    "v2Result": {
+      "tag": "research-context-efficiency-result-v2-attempt-002",
+      "commit": "e5b74ef270e01564076e3434c884658cfba16870",
+      "artifactPath": "bench/results/context-efficiency-comparison-0.1.6-v2.json",
+      "artifactSha256": "sha256:a1dab5b0768c0f242262e5bbce9a7d613a3bfc5ebdf1cad0bfd65687366f9701",
+      "documentPath": "docs/CONTEXT-EFFICIENCY-COMPARISON-v2-RESULT.md",
+      "documentCommit": "18e4a179888ee35122af9a57ace1e3cf2195f4f2",
+      "documentSha256": "sha256:85bb576aaafa35133c7a6691fac4303bd919f47eba244a825b6c1a3d43b95122",
+      "primaryComparison": "no primary comparative context-efficiency result",
+      "winner": null,
+      "inspectedFailure": {
+        "caseId": "typescript-codebase-refactor",
+        "eventId": "evt_00000000-0000-4000-8000-000000000012",
+        "eventRole": "support-3",
+        "v2RankSentinel": 0,
+        "sentinelMeaning": "not found by rank 32; not rank 33",
+        "observedGraphRelationship": {
+          "directionFromSupport": "outgoing",
+          "directionFromTarget": "incoming",
+          "type": "references",
+          "targetEventId": "evt_00000000-0000-4000-8000-000000000009"
+        },
+        "architecturalDiagnosis": "The lexical cascade puts every fuzzy candidate in tier 2 and graph-only evidence in tier 3, allowing weak fuzzy candidates to precede a directly linked support record."
+      }
+    },
+    "retrievalDevelopmentV05": {
+      "protocolTag": "research-retrieval-development-v0.5-protocol",
+      "protocolCommit": "7c50a69bf587159b350da19954a2469a3a089ad5",
+      "protocolManifestPath": "bench/research/research-retrieval-development-v0.5-amendment.json",
+      "protocolManifestSha256": "sha256:608a15bc48a80bd281ab593157bd9e0371ce867f77b79c32aa8ef0370e6f7a11",
+      "resultTag": "research-retrieval-development-v0.5-result",
+      "resultCommit": "4dba5b667a8c3a135c4574fcfefe12502f792a32",
+      "resultPath": "bench/results/research-retrieval-development-v0.5.json",
+      "resultSha256": "sha256:38a753e82e1f9e8e0337dca3f764c941a4cf78748c09a7b8341ae08cf7494a94",
+      "mutationAllowed": false
+    }
+  },
+  "researchQuestion": "On already-inspected development data, can an admission-bounded lexical-anchor and one-hop evidence-bundle method recover linked evidence missed by admission-first v2 and admitted BM25 without weakening temporal, repository, retention, disclosure, authority, supersession, conflict, citation, or mutation controls?",
+  "data": {
+    "developmentOnly": true,
+    "populations": [
+      {
+        "id": "constructed-six-case-regression",
+        "classification": "inspected development regression",
+        "fixturePath": "bench/fixtures/software-task-scenarios.mjs",
+        "fixtureSha256": "sha256:46d460d22be26b06023eb261ef32466402485a806d5d279251520a6f773365db",
+        "caseCount": 6,
+        "requiredEventCount": 24,
+        "claimEligible": false
+      },
+      {
+        "id": "swe-bench-lite-development",
+        "classification": "inspected development corpus",
+        "dataset": "princeton-nlp/SWE-bench_Lite",
+        "revision": "6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2",
+        "chronologicalWarmupTasks": 60,
+        "evaluationTasks": 240,
+        "exactRepositoryIdentifierCount": 12,
+        "logicalCorpusDigest": "sha256:01b35115ac639c1fcd3779561f83d5bb21988eb74ee5e93798c5d7579d757863",
+        "leaveOneRepositoryOutRemainsDevelopment": true,
+        "claimEligible": false
+      }
+    ],
+    "prohibitedDevelopmentReads": [
+      "bench/final/final-task-manifest-v1.json",
+      "bench/final/final-abstention-controls-v1.json",
+      "bench/final/** results",
+      "provider transcripts or receipts",
+      "final human labels",
+      "gold patches",
+      "test patches",
+      "post-resolution discussions",
+      "target-task future records",
+      "the deterministic 40-task agent sample as an evaluation population"
+    ],
+    "futureManifestBindingsAreMetadataOnly": true
+  },
+  "sharedAdmission": {
+    "applicationOrder": [
+      "strict-before event timestamp",
+      "retention expiry",
+      "temporal validity",
+      "disclosure and authority scopes",
+      "repository selector",
+      "prefer-current supersession",
+      "document-frequency and average-length calculation",
+      "lexical and entity scoring",
+      "fuzzy scoring",
+      "graph expansion",
+      "ordering"
+    ],
+    "sameCandidateSetRequiredAcrossPrimaryMethods": true,
+    "relationCannotReintroduceExcludedEvent": true,
+    "temporalBoundary": "strict-before",
+    "supersessionPolicy": "prefer-current",
+    "asOf": "case value",
+    "repositoryIds": "case value or []",
+    "authorityScopes": "case value or []"
+  },
+  "sharedProjection": {
+    "id": "admitted-title-body-v3",
+    "documentText": "event.title + LF + event.body",
+    "unicodeNormalization": "NFKC",
+    "caseMapping": "JavaScript String.prototype.toLowerCase",
+    "tokenRegex": "[\\p{L}\\p{N}][\\p{L}\\p{N}_-]{1,63}",
+    "tokenRegexFlags": "gu",
+    "stopWords": [
+      "a",
+      "an",
+      "and",
+      "are",
+      "as",
+      "at",
+      "be",
+      "by",
+      "for",
+      "from",
+      "has",
+      "in",
+      "is",
+      "it",
+      "of",
+      "on",
+      "or",
+      "that",
+      "the",
+      "this",
+      "to",
+      "was",
+      "were",
+      "will",
+      "with"
+    ],
+    "termFrequencyRetainsDuplicates": true,
+    "documentLengthRetainsDuplicates": true,
+    "documentFrequencyUsesUniqueTermsPerDocument": true,
+    "eventDataIncluded": false,
+    "benchmarkOnlyFieldsStructurallyUnreadable": [
+      "data.scenario",
+      "data.role"
+    ],
+    "historicalProductionV2IsInputIdenticalPrimaryComparator": false
+  },
+  "queryEntityExtraction": {
+    "maximumEntities": 64,
+    "externalModelAllowed": false,
+    "externalServiceAllowed": false,
+    "sources": [
+      "shared query lexemes",
+      "single-backtick spans up to 256 characters",
+      "bounded path-like tokens",
+      "bounded dotted tokens",
+      "bounded snake-case tokens",
+      "bounded kebab-case tokens",
+      "bounded camel-case tokens"
+    ],
+    "backtickScan": "ASCII backtick pairs left-to-right without nesting; ignore unmatched or spans above 256 UTF-16 code units",
+    "candidateRegex": "[\\p{L}\\p{N}_./-]{2,256}",
+    "candidateRegexFlags": "gu",
+    "splitBoundaries": [
+      "path separators",
+      "dots",
+      "underscores",
+      "hyphens",
+      "lowercase-or-digit to uppercase camel-case boundary"
+    ],
+    "normalization": [
+      "NFKC",
+      "lowercase",
+      "shared stop-word removal",
+      "deduplicate"
+    ],
+    "camelBoundary": "between Unicode lowercase letter or number and a following uppercase letter",
+    "delimiterReplacement": "replace each run of slash, dot, underscore, or hyphen with one ASCII space",
+    "zeroAdmittedDocumentFrequency": "exclude from ranking entities; retain only in unmatched diagnostics",
+    "selection": "highest admitted-title-body corpus IDF first, then JavaScript default string order",
+    "currentSourceContentsUsedForRanking": false,
+    "futureCurrentSourceUseRequiresAmendmentAndInputEquality": true
+  },
+  "sanitizedRankerInput": {
+    "schemaVersion": "qarinah.context-efficiency-development-ranker-input.v3",
+    "deepFrozenBeforeMethodCall": true,
+    "topLevelFieldsExactly": [
+      "schemaVersion",
+      "query",
+      "events"
+    ],
+    "eventFieldsExactly": [
+      "eventId",
+      "eventHash",
+      "tieKey",
+      "timestamp",
+      "title",
+      "body",
+      "provenanceSourceId",
+      "relations"
+    ],
+    "relationFieldsExactly": [
+      "type",
+      "target"
+    ],
+    "tieKeyFormula": "sha256(UTF8('qarinah-v3-tie-v1\\0' + eventId))",
+    "eventInputOrder": "tieKey ascending",
+    "relationInputOrder": [
+      "relation type by JavaScript default string order",
+      "target tieKey ascending"
+    ],
+    "relationTargetMustBeAdmittedCurrent": true,
+    "bounds": {
+      "queryUtf16CodeUnits": [0, 4096],
+      "eventsMaximum": 1000,
+      "eventIdUtf16CodeUnits": [1, 512],
+      "provenanceSourceIdUtf16CodeUnits": [1, 512],
+      "titleUtf16CodeUnits": [0, 512],
+      "bodyUtf16CodeUnits": [0, 65536],
+      "relationsPerEventMaximum": 128
+    },
+    "eventCountOverMaximumStatus": "INPUT_LIMIT_FAILURE with zero ranker calls",
+    "hashPattern": "^sha256:[0-9a-f]{64}$",
+    "timestampPattern": "canonical YYYY-MM-DDTHH:mm:ss.sssZ",
+    "duplicatesForbidden": ["eventId", "eventHash", "tieKey", "relation type-target pair within event"],
+    "provenanceSourceIdIsOnlyExposedProvenanceField": true,
+    "eventIdAllowedOperations": [
+      "copy to output",
+      "exact equality comparison"
+    ],
+    "eventIdForbiddenOperations": [
+      "parse",
+      "slice",
+      "numeric conversion",
+      "ranking feature",
+      "sequence inference"
+    ],
+    "forbiddenFields": [
+      "data",
+      "repository selector",
+      "authority object",
+      "retention object",
+      "disclosure object",
+      "temporal object",
+      "oracle grade",
+      "required ID",
+      "required role",
+      "case ID",
+      "difficulty",
+      "sample flag",
+      "gold field",
+      "source file",
+      "expected result",
+      "mutable accessor"
+    ],
+    "preprocessorOwner": "evaluator",
+    "methodReceivesProductionEventObject": false,
+    "methodReceivesProtocolObject": false,
+    "methodReceivesOracleObject": false,
+    "methodReceivesEvaluatorCaseObject": false
+  },
+  "algorithmConfig": {
+    "schemaVersion": "qarinah.context-efficiency-development-algorithm-config.v3",
+    "deepFrozenBeforeMethodCall": true,
+    "separateFromRankerInput": true,
+    "containsOnly": [
+      "tokenizer constants",
+      "BM25 constants",
+      "fuzzy constants",
+      "graph constants",
+      "fanout constants",
+      "ordering constants",
+      "budget constants",
+      "timeout constants"
+    ],
+    "forbiddenValues": [
+      "event",
+      "query",
+      "corpus statistic",
+      "oracle value",
+      "expected outcome",
+      "file path"
+    ],
+    "methodImportAllowlistRequired": true,
+    "methodForbiddenImports": [
+      "this protocol",
+      "evaluator",
+      "fixture",
+      "result",
+      "oracle",
+      "production store",
+      "filesystem",
+      "network",
+      "process environment",
+      "provider module"
+    ]
+  },
+  "researchMethod": {
+    "id": "qarinah-evidence-bundle-v3",
+    "implementationPath": "bench/research/methods/evidence-bundle-v3.mjs",
+    "implementationExistsAtProtocolFreeze": false,
+    "export": "rankEvidenceBundlesV3",
+    "signature": "rankEvidenceBundlesV3(sanitizedInput, algorithmConfig)",
+    "outputContract": {
+      "schemaVersion": "qarinah.context-efficiency-development-ranker-output.v3",
+      "exactTopLevelFields": ["schemaVersion", "ordered", "pathDiagnostics"],
+      "orderedItemFieldsExactly": ["eventId", "eventHash"],
+      "orderedMustBeFullInputPermutation": true,
+      "orderedValuesCopiedByteForByteFromInput": true,
+      "pathDiagnosticFieldsExactly": ["anchorId", "anchorRank", "neighborId", "relationType", "direction", "relationWeight", "pathOrder", "assignment", "bundleLocalRank", "overflowLocalRank", "outputRank"],
+      "pathAssignments": ["promoted", "overflow", "alternate", "suppressed-duplicate", "self-loop"],
+      "plainBm25AndNoGraphPathDiagnostics": "empty array",
+      "graphMethodPathDiagnostics": "all canonical, alternate, suppressed-duplicate, and self-loop paths",
+      "nullableRanksUseNull": true,
+      "diagnosticsMayAffectOrderingOrMetrics": false,
+      "invalidOutputConditions": ["non-object result", "unknown field", "missing event", "extra event", "duplicate event ID", "unknown event ID", "event-hash mismatch", "invalid path diagnostic", "output above admitted-event count"],
+      "invalidOutputStatus": "METHOD_FAILURE",
+      "rawCitationObservationBeforeDiscard": true
+    },
+    "researchOnly": true,
+    "packageExportAllowed": false,
+    "compileContextIntegrationAllowed": false,
+    "options": {
+      "lexicalSeedLimit": 16,
+      "graphHops": 1,
+      "promotedNeighborLimitPerAnchor": 8,
+      "outputLimit": 1000,
+      "includeFuzzy": true,
+      "methodCaseTimeoutMs": 30000
+    },
+    "outputLimitBehavior": "Bound outputLimit by admitted current event count. More than 1000 admitted current events is a retained output-limit failure; never widen after outcomes.",
+    "bm25": {
+      "normativeSource": "this manifest and docs/CONTEXT-EFFICIENCY-DEVELOPMENT-v3-PROTOCOL.md",
+      "projection": "sharedProjection",
+      "candidateCorpus": "sanitized admitted-current events only",
+      "queryTerms": "sorted unique shared query lexemes",
+      "documentCount": "N = admitted-current event count",
+      "averageDocumentLength": "sum retained title/body lexeme counts including duplicates divided by N; use 1 when N is 0",
+      "termFrequency": "retained duplicate count in the event title/body",
+      "documentFrequency": "admitted-current documents containing the term at least once",
+      "idf": "Math.log(1 + ((N - df + 0.5) / (df + 0.5)))",
+      "k1": 1.2,
+      "b": 0.75,
+      "titleBoost": "1.8 exactly when the retained query term occurs in the tokenized title; otherwise 1",
+      "termDenominator": "tf + 1.2 * (1 - 0.75 + 0.75 * documentLength / Math.max(1, averageDocumentLength))",
+      "termScore": "idf * ((tf * 2.2) / termDenominator) * titleBoost",
+      "aggregation": "sum termScore over query terms; zero-tf terms contribute zero",
+      "arithmetic": "IEEE-754 binary64 with JavaScript Math.log",
+      "scoreRounding": "Math.round(score * 1000000) / 1000000",
+      "sortOrder": [
+        "rounded score descending",
+        "event timestamp descending",
+        "tieKey ascending"
+      ],
+      "anchorEligibility": "positive rounded BM25 score",
+      "maximumAnchors": 16,
+      "fuzzyOnlyAnchorAllowed": false,
+      "productionDefaultInheritanceAllowed": false
+    },
+    "fuzzy": {
+      "normativeSource": "this manifest and docs/CONTEXT-EFFICIENCY-DEVELOPMENT-v3-PROTOCOL.md",
+      "projection": "sharedProjection",
+      "normalization": [
+        "NFKC",
+        "JavaScript String.prototype.toLowerCase",
+        "replace /\\s+/gu with one ASCII space",
+        "trim",
+        "retain first 4096 UTF-16 code units"
+      ],
+      "minimumNormalizedQueryCodeUnits": 3,
+      "ngramSizeJavaScriptCodeUnits": 3,
+      "ngramConstruction": "set of every consecutive JavaScript slice of length 3",
+      "similarity": "set Jaccard; zero when either set is empty",
+      "phraseBonus": 0.5,
+      "phraseBonusCondition": "normalized document includes normalized query",
+      "unroundedCandidateThresholdInclusive": 0.025,
+      "scoreRounding": "Math.round((jaccard + phraseBonus) * 1000000) / 1000000",
+      "sortOrder": [
+        "rounded fuzzy score descending",
+        "event timestamp descending",
+        "tieKey ascending"
+      ],
+      "changesBm25Score": false,
+      "fuzzyOnlyAfterPromotedGraphAndOverflow": true,
+      "productionDefaultInheritanceAllowed": false
+    },
+    "graph": {
+      "directions": [
+        "outgoing",
+        "incoming"
+      ],
+      "outgoingDefinition": "anchor relations contains {type,target:neighborId}",
+      "incomingDefinition": "neighbor relations contains {type,target:anchorId}",
+      "enumerationTiming": "enumerate every allowed outgoing and incoming path for all anchors before deduplication or assignment",
+      "selfLoopBehavior": "retain as self-loop diagnostic only; never consume fanout or create output occurrence",
+      "maximumHops": 1,
+      "completionRelationWeights": {
+        "supports": 1.0,
+        "derived_from": 0.9,
+        "authorized_by": 0.85,
+        "governed_by": 0.85,
+        "produced": 0.75,
+        "changed": 0.7,
+        "affects": 0.65,
+        "references": 0.6
+      },
+      "positivePromotionForbiddenRelations": [
+        "contradicts",
+        "supersedes"
+      ],
+      "maximumPromotedNeighborsPerAnchor": 8,
+      "additionalNeighborsPreservedAsOverflow": true,
+      "excludedEventPromotionAllowed": false,
+      "pathFields": [
+        "anchorId",
+        "anchorRank",
+        "neighborId",
+        "relationType",
+        "direction",
+        "relationWeight"
+      ],
+      "directionOrder": [
+        "outgoing",
+        "incoming"
+      ],
+      "pathIdentity": "UTF8 JSON.stringify([anchorTieKey, neighborTieKey, relationType, direction])",
+      "identicalPathDeduplication": true,
+      "pathSortOrder": [
+        "anchor rank ascending",
+        "relation weight descending",
+        "direction order",
+        "relation type by JavaScript default string order",
+        "neighbor tieKey ascending"
+      ],
+      "multiAnchorAssignment": "assign neighbor to first path in canonical path order",
+      "alternatePathsRetained": true,
+      "everyAnchorTurnProcessed": true,
+      "anchorEmittedAsEarlierNeighborBehavior": "suppress only the anchor's second output occurrence; still process all assigned neighbors",
+      "duplicateSuppressionTiming": "at start of each anchor turn before greedy ordering/fanout, then at every later channel append",
+      "alreadyEmittedAssignedNeighborBehavior": "assignment suppressed-duplicate; no fanout capacity, entity/provenance coverage, bundleLocalRank, or overflowLocalRank",
+      "selfLoopBehaviorAfterAssignment": "assignment self-loop; no fanout capacity or local rank",
+      "anchorCoverageWhenAlreadyEmitted": "anchor still supplies initial bundle entity and provenance coverage",
+      "multiplePathsRetainedInDiagnostics": true
+    },
+    "neighborOrdering": [
+      "greedily recomputed new query-entity coverage count descending",
+      "distinct non-null provenanceSourceId before already represented source; null earns no diversity",
+      "relation weight descending",
+      "direct admitted BM25 rank ascending with no rank last",
+      "direction order outgoing before incoming",
+      "relation type by JavaScript default string order",
+      "timestamp descending",
+      "tieKey ascending"
+    ],
+    "newCoverageDefinition": "candidate query-entity set minus union covered by anchor and already selected neighbors in the bundle",
+    "deduplication": "exact event ID only; first output occurrence wins",
+    "deletionAllowed": false,
+    "overflowOrdering": [
+      "anchor rank ascending",
+      "local overflow rank ascending",
+      "tieKey ascending"
+    ],
+    "bundleOrder": [
+      "process anchors in admitted BM25 order",
+      "emit anchor only if not already global-emitted but always process its turn",
+      "suppress self-loops and already-emitted assigned neighbors before ordering without consuming capacity",
+      "emit first eight eligible unique ordered completion neighbors",
+      "preserve additional completion neighbors in overflow",
+      "after all bundles append remaining positive BM25 records",
+      "append linked overflow records",
+      "append remaining positive fuzzy records",
+      "append zero-score records by timestamp descending then tieKey ascending"
+    ],
+    "remainingPositiveBm25PreservesBm25Order": true,
+    "remainingFuzzyPreservesFuzzyOrder": true,
+    "suppressedDuplicatePathsRemainDiagnostic": true,
+    "pathDiagnosticSemantics": {
+      "pathOrder": "one-based canonical path position",
+      "promoted": "canonical eligible unique neighbor in bundleLocalRank 1..8; overflowLocalRank null",
+      "overflow": "canonical eligible unique neighbor after first eight; bundleLocalRank null; overflowLocalRank one-based",
+      "alternate": "non-canonical path; both local ranks null",
+      "suppressedDuplicate": "canonical assigned neighbor already emitted before bundle fanout; both local ranks null and no capacity consumed",
+      "selfLoop": "self-loop diagnostic only; both local ranks null and no capacity consumed",
+      "outputRank": "neighbor final one-based full-permutation rank including another channel; null only for invalid method output",
+      "overflowEmittedByEarlierBm25Channel": "retain overflow assignment/local rank, record earlier outputRank, suppress later overflow append"
+    },
+    "oneHopComparatorNeighborOrder": [
+      "relation weight descending",
+      "direct BM25 rank ascending with no rank last",
+      "direction order outgoing before incoming",
+      "relation type by JavaScript default string order",
+      "timestamp descending",
+      "tieKey ascending"
+    ],
+    "oneHopComparatorUsesRrf": false,
+    "oneHopComparatorHiddenGraphScoreAllowed": false,
+    "fuzzyBeforePromotedCompletionAllowed": false,
+    "primaryReturnsFullFrozenOrdering": true,
+    "diagnosticEarlyStop": {
+      "primaryOutcomeUsesStop": false,
+      "completeBundleBoundaryRequired": true,
+      "positiveAnchorRequired": true,
+      "allCoverableQueryEntitiesRequired": true,
+      "allCompletionNeighborsEmittedOrRecordedRequired": true,
+      "overflowMustBeEmpty": true,
+      "otherwise": "continue to next complete bundle or fail closed at fixed budget"
+    }
+  },
+  "methods": {
+    "inputIdenticalPrimaryDevelopmentMethods": [
+      {
+        "id": "admitted-title-body-bm25-v3",
+        "description": "Exact shared BM25 ordering including zero-score records."
+      },
+      {
+        "id": "admitted-title-body-bm25-one-hop-v3",
+        "description": "Shared BM25 anchors and completion relation allowlist; graph neighbors omit entity-coverage and provenance-diversity ordering."
+      },
+      {
+        "id": "qarinah-evidence-bundle-v3-no-graph",
+        "description": "Full v3 without graph promotion; query entities are diagnostic only and cannot reorder records."
+      },
+      {
+        "id": "qarinah-evidence-bundle-v3-no-entity",
+        "description": "Full v3 with only newly-covered query-entity ordering removed; provenance diversity remains active."
+      },
+      {
+        "id": "qarinah-evidence-bundle-v3-no-provenance",
+        "description": "Full v3 with only provenance-diversity ordering removed; query-entity coverage remains active."
+      },
+      {
+        "id": "qarinah-evidence-bundle-v3",
+        "description": "Full proposed research method."
+      }
+    ],
+    "optionalJointAblation": {
+      "id": "qarinah-evidence-bundle-v3-no-entity-no-provenance",
+      "primaryMethod": false,
+      "expectedEquivalentMethod": "admitted-title-body-bm25-one-hop-v3",
+      "disagreementIsImplementationFailure": true
+    },
+    "ablationMechanics": {
+      "noGraph": "construct no path, bundle, fanout, or overflow; emit positive BM25, fuzzy-only, then zero-score channels",
+      "noEntity": "remove only neighbor tuple field 1; method entity-set reads must be zero",
+      "noProvenance": "remove only neighbor tuple field 2 and replace provenanceSourceId with null in method adapter",
+      "full": "use both tuple fields",
+      "adapterOwner": "evaluator",
+      "methodSelectedOptionsAllowed": false
+    },
+    "ablationNonDegeneracyPreflight": {
+      "oracleUsed": false,
+      "subcaseAnchorCount": 1,
+      "relation": "incoming references",
+      "allNeighborsHaveDirectBm25Rank": false,
+      "subcases": {
+        "entity": {
+          "neighbors": {
+            "A": {"newEntity": true, "distinctProvenance": false, "timestamp": "2026-01-01T00:00:02.000Z"},
+            "B": {"newEntity": false, "distinctProvenance": true, "timestamp": "2026-01-01T00:00:03.000Z"},
+            "C": {"newEntity": false, "distinctProvenance": false, "provenanceSourceId": null, "timestamp": "2026-01-01T00:00:01.000Z"}
+          },
+          "expectedOrders": {
+            "full": ["A", "B", "C"],
+            "noEntity": ["B", "A", "C"],
+            "noProvenance": ["A", "B", "C"],
+            "jointAndOneHop": ["B", "A", "C"]
+          }
+        },
+        "provenance": {
+          "neighbors": {
+            "D": {"newEntity": false, "distinctProvenance": false, "timestamp": "2026-01-01T00:00:03.000Z"},
+            "E": {"newEntity": false, "distinctProvenance": true, "timestamp": "2026-01-01T00:00:02.000Z"},
+            "F": {"newEntity": false, "distinctProvenance": false, "provenanceSourceId": null, "timestamp": "2026-01-01T00:00:01.000Z"}
+          },
+          "expectedOrders": {
+            "full": ["E", "D", "F"],
+            "noEntity": ["E", "D", "F"],
+            "noProvenance": ["D", "E", "F"],
+            "jointAndOneHop": ["D", "E", "F"]
+          }
+        }
+      },
+      "removedFieldReadCounterMustRemainZero": true,
+      "failureBlocksExecution": true
+    },
+    "sharedCandidateSetRequired": true,
+    "sharedProjectionRequired": true,
+    "sharedRendererRequired": true,
+    "sharedEstimatorRequired": true,
+    "diagnosticsExcludedFromPrimary": [
+      {
+        "id": "qarinah-admission-first-v2",
+        "reason": "Historical production method has a different document projection."
+      },
+      {
+        "id": "raw-unadmitted-bm25",
+        "reason": "Safety negative control only."
+      },
+      {
+        "id": "full-retained-history",
+        "reason": "Uncapped descriptive reference."
+      },
+      {
+        "id": "evaluator-only-oracle-order",
+        "reason": "Upper bound, never a competitor."
+      }
+    ],
+    "developmentNotAuthorized": [
+      "dense retrieval",
+      "BM25 plus dense retrieval"
+    ],
+    "performanceBasedMethodRemovalAllowed": false
+  },
+  "renderingAndAccounting": {
+    "primaryRenderer": "v2 complete-record common frame",
+    "queryOccursExactlyOnce": true,
+    "currentSourcesIdenticalAcrossMethods": true,
+    "currentSourcesParticipateInRanking": false,
+    "completeFields": [
+      "title",
+      "body",
+      "eventId",
+      "eventHash",
+      "timestamp",
+      "renderer-required relationship and citation metadata"
+    ],
+    "methodSpecificTruncationAllowed": false,
+    "portableEstimator": {
+      "id": "portable-chars-div-4",
+      "version": "1",
+      "formula": "ceil(JavaScript UTF-16 string length / 4)",
+      "exactProviderTokens": false
+    },
+    "oracleTiming": "Seal and hash every full ordering before loading required identities or scoring evidence-complete prefixes.",
+    "evidenceCompletePrefix": "Every ranked record from rank 1 through the lowest-ranked required record, including intervening records.",
+    "missingRankSentinel": 0,
+    "sentinelCannotBeDescribedAsNextRank": true,
+    "budgetPacking": {
+      "budgetsPortableEstimatedTokens": [
+        512,
+        1000,
+        2000,
+        4000,
+        8000
+      ],
+      "initialFrame": "common framing, query, and current sources with zero events",
+      "initialFrameOverBudgetStatus": "FRAME_OVER_BUDGET",
+      "candidateIteration": "frozen ordering sequentially",
+      "fitTest": "render complete candidate frame then require ceil(frame.length / 4) <= budget",
+      "firstNonFittingBehavior": "stop; do not skip to a later record",
+      "excerptAllowed": false,
+      "partialBodyAllowed": false,
+      "bundleSpecificPaddingAllowed": false,
+      "additiveTokenApproximationAllowed": false,
+      "evidenceCompletePrefixMissingStatus": "INCOMPLETE",
+      "incompletePrefixTokens": null,
+      "comparativeEligibilityRequiresEveryNamedMethodCompleteOnEveryFrozenPositiveTask": true
+    },
+    "secondaryCompactRenderer": {
+      "implementationAuthorizedByThisProtocol": false,
+      "futurePreExecutionAmendmentRequired": true,
+      "unfrozenRules": [
+        "sentence segmentation",
+        "span scoring",
+        "tie-breaks"
+      ],
+      "primaryDecisionEligible": false,
+      "extractiveOnly": true,
+      "sharedAcrossMethods": true,
+      "oracleAccessAllowed": false,
+      "spanMetadata": [
+        "eventId",
+        "eventHash",
+        "complete body SHA-256",
+        "UTF-16 start offset",
+        "UTF-16 end offset",
+        "span SHA-256"
+      ],
+      "fullRecordRetrievableByIdAndHash": true,
+      "futureHumanGate": "Two method-blinded reviewers must confirm preservation on future confirmation data.",
+      "failureBehavior": "No compact-efficiency conclusion and no rerun with outcome-informed longer spans."
+    }
+  },
+  "developmentEvaluation": {
+    "sixCaseRegression": {
+      "claimEligible": false,
+      "fullV3RequiredByRank32": 24,
+      "fullV3TotalRequired": 24,
+      "specificRecovery": {
+        "eventId": "evt_00000000-0000-4000-8000-000000000012",
+        "maximumRank": 32,
+        "recordedGraphPathRequired": true,
+        "oracleFeatureAllowed": false
+      },
+      "safetyRequiredPasses": 4,
+      "safetyTotal": 4,
+      "forbiddenInclusionsAllowed": 0,
+      "conflictAuditRequired": true,
+      "supersessionAuditRequired": true,
+      "requiredMutationGroups": [
+        "every existing v2 mutation group",
+        "remove support relation",
+        "reverse support relation",
+        "change relation target",
+        "future neighbor",
+        "expired neighbor",
+        "restricted neighbor",
+        "wrong-repository neighbor",
+        "superseded neighbor",
+        "more than eight completion neighbors",
+        "fuzzy query-stuffed noise",
+        "duplicate relation paths",
+        "every ordering tie-break"
+      ],
+      "admissionRepairByGraphAllowed": false
+    },
+    "lite": {
+      "retainEveryTask": true,
+      "settings": [
+        "static",
+        "online/prequential"
+      ],
+      "aggregation": [
+        "micro",
+        "repository macro",
+        "raw per repository"
+      ],
+      "metrics": [
+        "Recall@1",
+        "Recall@5",
+        "Recall@10",
+        "Recall@32",
+        "Hit@10",
+        "Hit@32",
+        "MRR",
+        "nDCG@10",
+        "evidence-complete-prefix characters",
+        "evidence-complete-prefix portable estimated tokens",
+        "valid citation rate",
+        "forbidden exposure",
+        "future exposure",
+        "supersession precision",
+        "redundant-record rate",
+        "graph-path diagnostics",
+        "runtime excluding corpus download and index construction"
+      ],
+      "estimatedTokenBudgets": [
+        512,
+        1000,
+        2000,
+        4000,
+        8000
+      ],
+      "leaveOneRepositoryOutIsDevelopment": true
+    },
+    "relevance": {
+      "gradeDomain": [
+        0,
+        1,
+        2
+      ],
+      "gradeMeaning": {
+        "0": "not positive",
+        "1": "supporting",
+        "2": "direct"
+      },
+      "positiveSet": "events with grade > 0",
+      "directSet": "events with grade = 2",
+      "oracleOwnedByScorer": true,
+      "rankerAccessAllowed": false
+    },
+    "metricDefinitions": {
+      "requiredEvidenceSetForPrefix": "positive set exactly; never a method-specific subset",
+      "rankPositionRule": "unknown IDs and every occurrence after an ID's first occurrence have grade zero and consume their output positions; uniqueness is applied only when forming retrieval sets",
+      "recallAtK": "|unique known IDs in the first k output positions intersect positive set| / |positive set|",
+      "directRecallAtK": "|unique known IDs in first k output positions intersect direct set| / |direct set|; null when direct set empty",
+      "hitAtK": "1 when unique known IDs in first k output positions intersect positive set, otherwise 0; null when positive set empty",
+      "mrr": "1 / minimum one-based rank of a positive; 0 when absent by full output limit 1000",
+      "dcgAt10": "sum((2^grade_i - 1) / log2(i + 1), i=1..10); unknown and repeated-after-first IDs have grade 0 and consume position",
+      "idcgAt10": "sort the complete sanitized event set by grade descending and tieKey ascending, then apply DCG@10",
+      "ndcgAt10": "DCG@10 / IDCG@10",
+      "citationValidity": {
+        "numerator": "returned items whose ID occurs exactly once in sanitized input and whose returned event hash equals sanitized event hash",
+        "denominator": "every returned item including duplicate or unknown IDs",
+        "emptyOutput": null
+      },
+      "supersessionPrecision": {
+        "numerator": "returned members of frozen supersession components marked current by evaluator-owned supersession oracle",
+        "denominator": "returned members of any frozen supersession component",
+        "zeroDenominator": null,
+        "returnedSupersededAlsoForbiddenExposure": true
+      },
+      "redundancy": {
+        "contentKey": "sha256(UTF8(NFKC(title) + LF + NFKC(body)))",
+        "formula": "1 - distinct contentKey count / returned item count",
+        "emptyOutput": 0
+      },
+      "frozenScopes": {
+        "full": "validated full ordering",
+        "rankPositions": [1, 5, 10, 32],
+        "packedBudgetsPortableEstimatedTokens": [512, 1000, 2000, 4000, 8000],
+        "duplicatesConsumeRankPositions": true,
+        "citationUsesRawItems": true,
+        "supersessionAndRedundancyRequireValidatedOrdering": true,
+        "methodFailureSupersessionAndRedundancy": null
+      },
+      "exposure": {
+        "forbiddenSet": "frozen post-order exact eventId/eventHash pairs excluded for future, expiry, restriction, wrong repository, or supersession",
+        "futureSet": "forbidden-set subset not strictly before asOf",
+        "count": "returned occurrence count whose exact pair is in the set; duplicates count per occurrence",
+        "denominator": "raw returned-item count at scope",
+        "rate": "count / denominator",
+        "emptyScopeCount": 0,
+        "emptyScopeRate": null,
+        "unknownIdBehavior": "invalid citation, never silently assign to forbidden or future set",
+        "reportAtEveryFrozenScope": true,
+        "claimGateUsesCount": true,
+        "rankerAccessAllowed": false
+      },
+      "queryMacro": "arithmetic mean over positive queries for recall, hit, MRR, and nDCG; direct recall uses only queries with non-empty direct set",
+      "microRecall": "sum retrieved positive counts / sum positive counts",
+      "microDirectRecall": "sum retrieved direct counts / sum direct counts",
+      "microHit": "sum Hit@k over positive queries / positive query count",
+      "mrrAndNdcgMicroNaming": "no event-level micro value; report query-macro MRR and query-macro nDCG",
+      "repositoryRecall": "summed retrieved-positive count / summed positive count inside repository; direct uses analogous direct counts",
+      "repositoryHitMrrNdcg": "arithmetic mean of eligible per-query values inside repository",
+      "repositoryCitationAndSupersession": "sum item numerators / sum item denominators inside repository",
+      "repositoryRedundancy": "arithmetic mean of per-query redundancy including empty output",
+      "repositoryMacro": "unweighted arithmetic mean of repository values with non-zero metric denominator; redundancy includes every repository with at least one query",
+      "overallCitationAndSupersessionMicro": "sum corresponding item numerators / sum corresponding item denominators",
+      "denominatorCountsMustBeReported": true
+    },
+    "noPositiveAndFailureRules": {
+      "noPositivePositiveMetricDenominator": false,
+      "noPositiveIncludedDenominators": [
+        "abstention",
+        "unnecessary context",
+        "citation",
+        "safety",
+        "runtime"
+      ],
+      "abstainedAtBudget": "1 exactly when zero events are packed; otherwise 0",
+      "unnecessaryContextAtBudget": "max(0, packed-frame portable estimated tokens - zero-event-frame portable estimated tokens)",
+      "correctAbstentionAggregate": "arithmetic mean of abstainedAtBudget over every no-positive query",
+      "unnecessaryContextAggregate": "sum and arithmetic mean over every no-positive query",
+      "noPositiveCannotBeSilentlyCorrectRetrieval": true,
+      "methodCaseTimeoutMs": 30000,
+      "timeoutStart": "immediately before pure ranker invocation in a fresh evaluator worker",
+      "timeoutEnd": "after output-schema validation",
+      "timeoutExcludedWork": ["worker startup", "sanitized-input construction"],
+      "timeoutEnforcement": "terminate the fresh evaluator worker, discard partial ranking, and preserve raw failure observation",
+      "methodFailureStatus": "METHOD_FAILURE",
+      "methodFailureIncludes": [
+        "exception",
+        "invalid output",
+        "worker crash",
+        "timeout"
+      ],
+      "positiveMethodFailureMetrics": {
+        "recall": 0,
+        "directRecall": "0 when direct set non-empty; null when direct set empty",
+        "hit": 0,
+        "mrr": 0,
+        "dcg": 0,
+        "ndcg": 0,
+        "prefixTokens": null
+      },
+      "noPositiveMethodFailureMetrics": {
+        "recall": null,
+        "hit": null,
+        "mrr": null,
+        "ndcg": null,
+        "abstained": 0,
+        "unnecessaryContextTokens": null,
+        "correctAbstentionAllowed": false,
+        "aggregateBehavior": "report failure count and block unnecessary-context aggregate"
+      },
+      "methodFailureBlocksComparativeEligibility": true,
+      "oracleMissingStatus": "ORACLE_MISSING",
+      "oracleMissingBlocksAffectedMetricsAndClaims": true,
+      "oracleMissingTreatedAsGradeZero": false,
+      "infrastructureRetryAllowed": false
+    },
+    "statistics": {
+      "tokenDifferenceDirection": "Qarinah tokens minus comparator tokens; negative favors Qarinah",
+      "nullOrIncompletePrefixBehavior": "block token bootstrap and ratio gates; never impute",
+      "repositoryOrder": "JavaScript default string order over frozen positive-population repository IDs",
+      "resamples": 10000,
+      "clusterDrawsPerReplicate": "number of frozen positive-population repositories",
+      "clusterSamplingWithReplacement": true,
+      "clusterMultiplicityRetained": true,
+      "tokenSeedDomain": "qarinah-v3-token-bootstrap-v1",
+      "recallSeedDomain": "qarinah-v3-recall-bootstrap-v1",
+      "drawHash": "sha256(UTF8(domain + NUL + replicateIndex + NUL + drawIndex))",
+      "indexEncoding": "unsigned base-10 ASCII without leading zeros",
+      "drawIndex": "unsigned big-endian integer from first 8 hash bytes modulo repository count",
+      "tokenReplicateStatistic": "sum multiplicity(repo(q)) * (Qarinah tokens - comparator tokens) / sum multiplicity(repo(q)) over every positive task",
+      "emptyOrNonFiniteReplicateBehavior": "block result",
+      "ordinaryTwoSided95IntervalZeroBasedIndices": [
+        249,
+        9750
+      ],
+      "oneSidedUpperIndex": "ceil((1 - alpha) * 9999), capped at 9999",
+      "tokenHolm": {
+        "developmentFamilyFullV3VersusExactly": [
+          "admitted-title-body-bm25-v3",
+          "admitted-title-body-bm25-one-hop-v3",
+          "qarinah-evidence-bundle-v3-no-graph",
+          "qarinah-evidence-bundle-v3-no-entity",
+          "qarinah-evidence-bundle-v3-no-provenance"
+        ],
+        "excluded": ["optional joint ablation", "every diagnostic"],
+        "familyAlpha": 0.05,
+        "oneSidedP": "(1 + count(replicate token difference >= 0)) / 10001",
+        "sort": "p ascending; comparator ID by JavaScript default string order breaks exact p ties",
+        "rankThreshold": "0.05 / (m - i + 1) for one-based Holm rank i",
+        "stepDown": true,
+        "adjustedUpperBoundAlpha": "0.05 / (m - i + 1)",
+        "everyAdjustedUpperBoundMustBeBelowZero": true,
+        "failedComparatorRemovalAllowed": false
+      },
+      "recallNonInferiority": {
+        "separateFromTokenHolmFamily": true,
+        "budgetPortableEstimatedTokens": 8000,
+        "statistic": "microDirectRecall Qarinah minus comparator",
+        "replicateComputation": "compute both ratios from the same drawn repository multiset, preserving multiplicity in retrieved-direct and direct-label counts, then subtract comparator from Qarinah",
+        "taskPopulation": "tasks with non-empty direct set",
+        "repositoryPopulation": "repositories containing at least one task with non-empty direct set",
+        "noDirectLabels": "block gate",
+        "ordinaryOneSided95LowerBoundZeroBasedIndex": 499,
+        "margin": -0.02,
+        "everyComparatorLowerBoundAtLeastMargin": true,
+        "directionReversalAllowed": false
+      },
+      "microTokenReduction": "1 - sum positive-task Qarinah prefix tokens / sum positive-task comparator prefix tokens",
+      "repositoryTokenReduction": "1 - sum repository Qarinah prefix tokens / sum repository comparator prefix tokens",
+      "repositoryMacroTokenReduction": "unweighted arithmetic mean of repository token-reduction ratios over all repositories with positive tasks",
+      "minimumMicroTokenReduction": 0.05,
+      "minimumRepositoryMacroTokenReduction": 0.05,
+      "substituteStatisticsForbidden": [
+        "mean per-task percentage",
+        "median percentage",
+        "rounded threshold",
+        "shared-eligible subset",
+        "normal approximation",
+        "task-level bootstrap",
+        "unpaired bootstrap",
+        "p=0"
+      ]
+    },
+    "postOutcomeParameterChangeAllowed": false,
+    "frozenParameters": [
+      "thresholds",
+      "weights",
+      "fanout",
+      "seed limit",
+      "relation allowlist",
+      "tie-breaks",
+      "field projection"
+    ],
+    "changeRequiresNewProtocolAndResultDestination": true
+  },
+  "antiLeakage": {
+    "preRetrievalRequirements": [
+      "verify protocol, corpus, fixture, source, runtime, and renderer hashes",
+      "verify result and failure destinations are absent",
+      "install allowlist-based file-read guard",
+      "deny bench/final, provider, credential, final-result, gold-patch, and test-patch paths",
+      "verify method import graph contains no oracle, final-manifest, provider, network, publication, or deployment module",
+      "install throwing spies around every oracle accessor",
+      "prove zero oracle calls before all rankings are serialized and hashed",
+      "prove failed preflight causes zero retrieval calls and zero writes"
+    ],
+    "rankerForbiddenFeatures": [
+      "required event IDs",
+      "required roles",
+      "structural labels",
+      "data.scenario",
+      "data.role",
+      "instance ID",
+      "evaluator-only hashes",
+      "difficulty",
+      "final sample membership",
+      "gold fields",
+      "event sequence patterns",
+      "expected outcomes"
+    ],
+    "scorerLoadsOracleOnlyAfterRankingsSealed": true,
+    "scorerInput": "ranked event IDs and immutable event hashes, never a mutable method object",
+    "prohibitedFieldMutationMustLeaveRankingUnchangedOrRefuse": true,
+    "rankerInputMustMatchSanitizedSchemaExactly": true,
+    "rawEventDataMayCrossRankerBoundary": false,
+    "methodMayImportProtocol": false,
+    "methodMayImportOracle": false,
+    "methodMayImportRequiredIds": false,
+    "algorithmConfigSeparateFromSanitizedInput": true
+  },
+  "lifecycle": {
+    "orderedStages": [
+      {
+        "stage": 1,
+        "action": "Commit only this document and this manifest."
+      },
+      {
+        "stage": 2,
+        "action": "Independent review with no unresolved P1/P2 finding."
+      },
+      {
+        "stage": 3,
+        "action": "Tag protocol commit research-context-efficiency-development-v3-protocol."
+      },
+      {
+        "stage": 4,
+        "action": "Implement method and evaluator in a separate commit."
+      },
+      {
+        "stage": 5,
+        "action": "Independent review and tag research-context-efficiency-development-v3-evaluator."
+      },
+      {
+        "stage": 6,
+        "action": "Freeze authorization core, independently review it, commit the review artifact, and tag research-context-efficiency-development-v3-authorization-review."
+      },
+      {
+        "stage": 7,
+        "action": "Commit the authorization receipt as direct child of review commit, bind the pre-existing review artifact, and tag research-context-efficiency-development-v3-authorization."
+      },
+      {
+        "stage": 8,
+        "action": "Execute exactly one authorized development attempt from authorization commit."
+      },
+      {
+        "stage": 9,
+        "action": "Commit exactly result XOR failure as direct child of authorization commit and create exactly the matching terminal tag."
+      },
+      {
+        "stage": 10,
+        "action": "Add generic read-only terminal verifier as direct child of terminal commit and tag verifier commit."
+      }
+    ],
+    "intendedProtocolTag": "research-context-efficiency-development-v3-protocol",
+    "intendedEvaluatorTag": "research-context-efficiency-development-v3-evaluator",
+    "intendedAuthorizationReviewTag": "research-context-efficiency-development-v3-authorization-review",
+    "intendedAuthorizationTag": "research-context-efficiency-development-v3-authorization",
+    "intendedSuccessTag": "research-context-efficiency-development-v3-result-attempt-001",
+    "intendedFailureTag": "research-context-efficiency-development-v3-failure-attempt-001",
+    "intendedVerifierTag": "research-context-efficiency-development-v3-verifier",
+    "attemptId": "attempt-001",
+    "commands": {
+      "bindingsOnly": "node scripts/evaluate-context-efficiency-development-v3.mjs --bindings-only",
+      "authorizedExecute": "node scripts/evaluate-context-efficiency-development-v3.mjs --execute --write --attempt attempt-001",
+      "verifyResult": "node scripts/evaluate-context-efficiency-development-v3.mjs --verify-result"
+    },
+    "preRunVerifier": {
+      "command": "bindingsOnly",
+      "requiresTerminalAndTemporaryPathsAbsent": true,
+      "rankerCallsAllowed": 0,
+      "scorerCallsAllowed": 0,
+      "oracleCallsAllowed": 0,
+      "writesAllowed": 0,
+      "mayRunBeforeAuthorization": true,
+      "authorizationAbsentBehavior": "verify authorization path absent, report NOT_AUTHORIZED, and keep execution disabled",
+      "mayRunAfterAuthorizationBeforeAttempt": true,
+      "authorizationPresentBehavior": "validate exact authorization receipt, pre-existing review artifact/tag/commit/hash/timestamp, authorization-core digest equality, direct-parent chain, and four absent destinations"
+    },
+    "builtInPostResultVerifier": {
+      "command": "verifyResult",
+      "requiresSuccessPresent": true,
+      "requiresFailureAbsent": true,
+      "rankerCallsAllowed": 0,
+      "scorerCallsAllowed": 0,
+      "oracleCallsAllowed": 0,
+      "writesAllowed": 0,
+      "repairAllowed": false
+    },
+    "independentTerminalVerifier": {
+      "path": "scripts/verify-context-efficiency-development-v3-terminal.mjs",
+      "implementedAfterTerminalCommitAndTag": true,
+      "handles": "success XOR failure",
+      "mayImportEvaluator": false,
+      "mayImportMethod": false,
+      "retrievalCallsAllowed": 0,
+      "writesAllowed": 0,
+      "repairAllowed": false,
+      "terminalCommitDirectParent": "authorization commit",
+      "terminalCommitSingleIntroduction": "exactly one added path: matching terminal artifact",
+      "verifierCommitDirectParent": "terminal commit",
+      "checks": [
+        "exactly one terminal artifact and tag",
+        "terminal tag resolves to terminal commit",
+        "tagged blob equals terminal-commit blob, verifier-HEAD blob, and worktree bytes/hash",
+        "opposite artifact and tag absent at terminal commit, verifier HEAD, and worktree",
+        "authorization review and authorization commit/tag/direct-parent chain",
+        "canonical digest and recursively exact schema",
+        "exact classification, decision, measurementBoundary, and top-level claim-bearing values",
+        "raw metric/statistics/safety/mutation reconstruction",
+        "no fabricated winner, claim, favorable subset, tamper, later mutation, or post-result failure receipt"
+      ]
+    },
+    "bindingsOnlyRetrievalCallsAllowed": 0,
+    "bindingsOnlyWritesAllowed": 0,
+    "verifyResultRetrievalCallsAllowed": 0,
+    "verifyResultWritesAllowed": 0,
+    "authorizedAttempts": 0,
+    "futureAuthorizationMayPermitExactlyOneAttempt": true,
+    "authorizationReview": {
+      "path": "bench/research/context-efficiency-development-v3-authorization-review.json",
+      "schemaVersion": "qarinah.context-efficiency-development-authorization-review.v3",
+      "unknownFieldsAllowed": false,
+      "exactTopLevelFields": ["schemaVersion", "authorizationCoreDigest", "reviewer", "reviewedAt", "approved", "scope", "contentDigest"],
+      "authorizationCoreDefinition": "final authorization object with only review and contentDigest omitted, serialized by lifecycle.contentDigestRule canonical JSON",
+      "contentDigestRule": "lifecycle.contentDigestRule",
+      "reviewedAtRule": "lifecycle.canonicalTimestampRule",
+      "approvedRequired": true,
+      "scopeRequiredValue": "every execution-affecting authorization-core field reviewed",
+      "committedAndTaggedBeforeAuthorizationFileExists": true,
+      "reviewCommitDirectParent": "evaluator commit",
+      "intendedTag": "research-context-efficiency-development-v3-authorization-review"
+    },
+    "authorization": {
+      "path": "bench/research/context-efficiency-development-v3-authorization.json",
+      "schemaVersion": "qarinah.context-efficiency-development-authorization.v3",
+      "contentDigestRule": "lifecycle.contentDigestRule",
+      "createdAtRule": "lifecycle.canonicalTimestampRule",
+      "unknownFieldsAllowed": false,
+      "exactTopLevelFields": [
+        "schemaVersion",
+        "attemptId",
+        "executionAuthorized",
+        "protocol",
+        "evaluator",
+        "method",
+        "inputBuilder",
+        "algorithmConfig",
+        "inputs",
+        "runtime",
+        "command",
+        "destinations",
+        "review",
+        "createdAt",
+        "contentDigest"
+      ],
+      "exactNestedFields": {
+        "protocol": ["tag", "commit", "path", "sha256"],
+        "evaluator": ["tag", "commit", "path", "sha256"],
+        "method": ["path", "sha256", "export"],
+        "inputBuilder": ["path", "sha256"],
+        "algorithmConfig": ["schemaVersion", "sha256"],
+        "inputs": ["fixtureSha256", "corpusDigest", "rendererSha256", "scorerSha256", "estimatorId", "estimatorVersion"],
+        "runtime": ["nodePath", "nodeBinarySha256", "nodeVersion", "v8Version", "abi", "platform", "arch"],
+        "destinations": ["successPath", "failurePath", "resultTemporaryPath", "failureTemporaryPath", "successAbsent", "failureAbsent", "resultTemporaryAbsent", "failureTemporaryAbsent"],
+        "review": ["artifactPath", "artifactSha256", "artifactCommit", "artifactTag", "reviewedAuthorizationCoreDigest", "reviewedAt", "reviewer"]
+      },
+      "requiredFields": [
+        "schemaVersion",
+        "attemptId",
+        "executionAuthorized",
+        "protocol binding",
+        "evaluator binding",
+        "method path/hash/export binding",
+        "sanitized-input builder binding",
+        "algorithm-config SHA-256",
+        "fixture/corpus/renderer/scorer hashes and estimator identity/version",
+        "absolute trusted Node path and binary SHA-256",
+        "Node/V8/ABI/platform/architecture",
+        "exact command",
+        "success/failure/temporary paths",
+        "four path-absence booleans",
+        "pre-existing review artifact path/hash/commit/tag, matching authorization-core digest, reviewer, and timestamp",
+        "creation time",
+        "canonical content digest excluding only digest field"
+      ],
+      "attemptId": "attempt-001",
+      "futureExecutionAuthorizedValue": true,
+      "invocationsAuthorized": 1,
+      "authorizationCommitDirectParent": "authorization review commit",
+      "reviewArtifactMustPreexistAuthorization": true,
+      "credentialsAllowed": false,
+      "expectedMetricsAllowed": false,
+      "thresholdOverridesAllowed": false,
+      "mutableLatestVersionsAllowed": false
+    },
+    "successPath": "bench/results/context-efficiency-development-v3.json",
+    "failurePathTemplate": "bench/results/context-efficiency-development-v3-{attemptId}-failure.json",
+    "resolvedFailurePath": "bench/results/context-efficiency-development-v3-attempt-001-failure.json",
+    "resultTemporaryPath": "bench/results/.context-efficiency-development-v3-attempt-001-result.tmp",
+    "failureTemporaryPath": "bench/results/.context-efficiency-development-v3-attempt-001-failure.tmp",
+    "terminalArtifactRule": "success XOR failure",
+    "neitherTerminalArtifactAfterAttemptAllowed": false,
+    "bothTerminalArtifactsAllowed": false,
+    "bothTerminalTagsAllowed": false,
+    "terminalCommitAndTags": {
+      "commitRequiredBeforeIndependentVerifierSource": true,
+      "directParent": "authorization commit",
+      "singleIntroduction": true,
+      "allowedDiffExactly": "A plus matching terminal artifact path",
+      "otherPathChangesAllowed": false,
+      "successTag": "research-context-efficiency-development-v3-result-attempt-001",
+      "failureTag": "research-context-efficiency-development-v3-failure-attempt-001",
+      "annotatedTagRequired": true,
+      "tagMustResolveToTerminalCommit": true,
+      "oppositeArtifactAndTagMustBeAbsent": true,
+      "terminalArtifactMutationAfterCommitAllowed": false,
+      "verifierCommitDirectParent": "terminal commit"
+    },
+    "resultSchema": {
+      "schemaVersion": "qarinah.context-efficiency-development-result.v3",
+      "contentDigestRule": "lifecycle.contentDigestRule",
+      "createdAtRule": "lifecycle.canonicalTimestampRule",
+      "unknownFieldsAllowed": false,
+      "exactTopLevelFields": [
+        "schemaVersion",
+        "attemptId",
+        "classification",
+        "bindings",
+        "preflight",
+        "methods",
+        "cases",
+        "mutations",
+        "safety",
+        "statistics",
+        "decision",
+        "measurementBoundary",
+        "developmentWinnerClaimAllowed",
+        "createdAt",
+        "contentDigest"
+      ],
+      "exactNestedFields": {
+        "bindings": ["protocol", "evaluator", "method", "authorizationReview", "authorization", "runtime", "inputBuilder", "algorithmConfig", "fixture", "corpus", "scorer", "renderer", "estimator"],
+        "preflight": ["passed", "rankerCallsBeforeCompletion", "scorerCallsBeforeOrderSeal", "oracleCallsBeforeOrderSeal", "pathObservations", "bindingObservations"],
+        "pathObservationItem": ["path", "expectedAbsent", "observedAbsent"],
+        "bindingObservationItem": ["id", "expected", "observed", "matched"],
+        "methodItem": ["id", "configSha256"],
+        "caseItem": ["caseId", "sanitizedInputSha256", "methods", "postOrderGrades", "metrics", "status"],
+        "caseMethodItem": ["methodId", "orderedEventIds", "orderedEventHashes", "orderSha256", "pathDiagnostics", "failure", "rawMetricObservations"],
+        "caseMethodFailure": ["code", "message", "timeout", "rawCitationNumerator", "rawCitationDenominator"],
+        "pathDiagnosticItem": ["anchorId", "anchorRank", "neighborId", "relationType", "direction", "relationWeight", "pathOrder", "assignment", "bundleLocalRank", "overflowLocalRank", "outputRank"],
+        "postOrderGradeItem": ["eventId", "eventHash", "grade"],
+        "metricObservationItem": ["metric", "cutoff", "budget", "numerator", "denominator", "value", "nullReason"],
+        "mutationItem": ["id", "group", "methodId", "caseId", "expectedDigest", "observedDigest", "passed", "status"],
+        "safetyItem": ["caseId", "methodId", "requiredEventIds", "returnedRequiredEventIds", "forbiddenEventIds", "returnedForbiddenEventIds", "futureExposureCount", "passed", "status"],
+        "statistics": ["tokenComparisons", "tokenHolm", "recallNonInferiority", "tokenRatios", "status"],
+        "tokenComparisonItem": ["comparatorId", "observedDifference", "replicatesSha256", "ordinaryTwoSided95", "oneSidedP", "holmRank", "holmThreshold", "adjustedUpperBound", "status"],
+        "intervalItem": ["lower", "upper"],
+        "tokenHolm": ["family", "alpha", "orderedComparatorIds", "allRejected", "allAdjustedUpperBoundsBelowZero", "status"],
+        "recallNonInferiorityItem": ["comparatorId", "observedDifference", "replicatesSha256", "lowerBound", "margin", "passed", "status"],
+        "tokenRatioItem": ["comparatorId", "microReduction", "repositoryReductions", "repositoryMacroReduction", "microPassed", "repositoryMacroPassed", "status"],
+        "repositoryRatioItem": ["repositoryId", "qarinahTokens", "comparatorTokens", "reduction"],
+        "decision": ["primaryComparison", "winner", "developmentWinnerClaimAllowed", "allowedWording"],
+        "measurementBoundary": ["developmentOnly", "providerCalls", "providerTokens", "taskResolution", "cost", "humanFinalLabels"]
+      },
+      "unknownFieldsRejectedRecursively": true,
+      "arrayItemSchemaMap": {
+        "preflight.pathObservations": "pathObservationItem",
+        "preflight.bindingObservations": "bindingObservationItem",
+        "methods": "methodItem",
+        "cases": "caseItem",
+        "cases[].methods": "caseMethodItem",
+        "cases[].methods[].failure": "caseMethodFailure-or-null",
+        "cases[].methods[].pathDiagnostics": "pathDiagnosticItem",
+        "cases[].postOrderGrades": "postOrderGradeItem",
+        "cases[].metrics": "metricObservationItem",
+        "cases[].methods[].rawMetricObservations": "metricObservationItem",
+        "mutations": "mutationItem",
+        "safety": "safetyItem",
+        "statistics.tokenComparisons": "tokenComparisonItem",
+        "statistics.recallNonInferiority": "recallNonInferiorityItem",
+        "statistics.tokenRatios": "tokenRatioItem",
+        "statistics.tokenRatios[].repositoryReductions": "repositoryRatioItem"
+      },
+      "objectSchemaMap": {
+        "statistics.tokenComparisons[].ordinaryTwoSided95": "intervalItem"
+      },
+      "objectSchemaMapUsedByVerifier": true,
+      "objectSchemaUnknownFieldsAllowed": false,
+      "exactBindingObjectFields": {
+        "protocol": ["tag", "commit", "path", "sha256"],
+        "evaluator": ["tag", "commit", "path", "sha256"],
+        "method": ["path", "sha256", "export"],
+        "authorizationReview": ["tag", "commit", "path", "sha256", "reviewedAt", "reviewer", "authorizationCoreDigest"],
+        "authorization": ["tag", "commit", "path", "sha256"],
+        "runtime": ["nodePath", "nodeBinarySha256", "nodeVersion", "v8Version", "abi", "platform", "arch"],
+        "inputBuilder": ["path", "sha256"],
+        "algorithmConfig": ["schemaVersion", "sha256"],
+        "fixture": ["path", "sha256"],
+        "corpus": ["dataset", "revision", "logicalDigest"],
+        "scorer": ["path", "sha256"],
+        "renderer": ["path", "sha256"],
+        "estimator": ["id", "version", "formula"]
+      },
+      "aggregateOnlyAllowed": false,
+      "claimBearingExactValues": {
+        "classification": "inspected development-only result; no comparative winner claim authorized",
+        "decision": {
+          "primaryComparison": "development-only recovery and fixed-utility diagnostics; no comparative winner authorized",
+          "winner": null,
+          "developmentWinnerClaimAllowed": false,
+          "allowedWording": "On the inspected v3 development fixtures, the frozen method did or did not recover the required linked evidence under the exact admission, ordering, rendering, safety, and mutation gates."
+        },
+        "measurementBoundary": {
+          "developmentOnly": true,
+          "providerCalls": 0,
+          "providerTokens": null,
+          "taskResolution": null,
+          "cost": null,
+          "humanFinalLabels": null
+        },
+        "nullMeasurementMeaning": "unmeasured",
+        "developmentWinnerClaimAllowed": false,
+        "favorableSubsetAllowed": false
+      },
+      "requiredTopLevelContent": [
+        "schemaVersion",
+        "attemptId",
+        "classification",
+        "protocol/evaluator/method/authorization-review/authorization/runtime bindings",
+        "sanitized-input and algorithm-config bindings",
+        "fixture/corpus/scorer/renderer/estimator bindings",
+        "preflight observations",
+        "per-method configuration",
+        "every per-case raw ordering and hash",
+        "every per-case frozen path diagnostic",
+        "post-order raw relevance grades",
+        "every metric numerator/denominator/null reason/aggregate",
+        "every timeout/failure/no-positive observation",
+        "mutations",
+        "safety",
+        "statistics",
+        "decision",
+        "measurement boundary",
+        "developmentWinnerClaimAllowed false",
+        "canonical createdAt",
+        "canonical content digest excluding only digest field"
+      ]
+    },
+    "failureSchema": {
+      "schemaVersion": "qarinah.context-efficiency-development-failure.v3",
+      "contentDigestRule": "lifecycle.contentDigestRule",
+      "createdAtRule": "lifecycle.canonicalTimestampRule",
+      "unknownFieldsAllowed": false,
+      "exactTopLevelFields": [
+        "schemaVersion",
+        "attemptId",
+        "bindings",
+        "stage",
+        "error",
+        "observations",
+        "createdAt",
+        "contentDigest"
+      ],
+      "exactNestedFields": {
+        "bindings": ["protocol", "evaluator", "method", "authorizationReview", "authorization", "runtime", "inputBuilder", "algorithmConfig", "fixture", "corpus", "scorer", "renderer", "estimator"],
+        "error": ["code", "message"],
+        "observations": ["rankerCalled", "completedMethodCaseCalls", "scorerCalled", "oracleAccessed", "successPathExists", "failurePathExists", "resultTemporaryPathExists", "failureTemporaryPathExists"]
+      },
+      "unknownFieldsRejectedRecursively": true,
+      "exactBindingObjectFields": {
+        "protocol": ["tag", "commit", "path", "sha256"],
+        "evaluator": ["tag", "commit", "path", "sha256"],
+        "method": ["path", "sha256", "export"],
+        "authorizationReview": ["tag", "commit", "path", "sha256", "reviewedAt", "reviewer", "authorizationCoreDigest"],
+        "authorization": ["tag", "commit", "path", "sha256"],
+        "runtime": ["nodePath", "nodeBinarySha256", "nodeVersion", "v8Version", "abi", "platform", "arch"],
+        "inputBuilder": ["path", "sha256"],
+        "algorithmConfig": ["schemaVersion", "sha256"],
+        "fixture": ["path", "sha256"],
+        "corpus": ["dataset", "revision", "logicalDigest"],
+        "scorer": ["path", "sha256"],
+        "renderer": ["path", "sha256"],
+        "estimator": ["id", "version", "formula"]
+      },
+      "stages": [
+        "PREFLIGHT_BINDING",
+        "INPUT_SANITIZATION",
+        "METHOD_EXECUTION",
+        "ORDER_SEAL",
+        "SCORING",
+        "RESULT_VALIDATION",
+        "RESULT_PUBLICATION"
+      ],
+      "errorMessageRule": {
+        "maximumUtf16CodeUnits": 512,
+        "asciiLiteralOnly": true,
+        "interpolationAllowed": false,
+        "rawErrorTruncationCountsAsRedaction": false,
+        "forbiddenContent": ["raw exception text", "stack", "path", "query", "event ID", "secret", "credential", "provider response", "user content"],
+        "exactMessageByStage": {
+          "PREFLIGHT_BINDING": "Preflight binding validation failed.",
+          "INPUT_SANITIZATION": "Sanitized input validation failed.",
+          "METHOD_EXECUTION": "Method execution failed.",
+          "ORDER_SEAL": "Ordering seal failed.",
+          "SCORING": "Post-order scoring failed.",
+          "RESULT_VALIDATION": "Result validation failed.",
+          "RESULT_PUBLICATION": "Terminal artifact publication failed."
+        }
+      },
+      "requiredTopLevelContent": [
+        "schemaVersion",
+        "attemptId",
+        "protocol/evaluator/method/authorization-review/authorization/runtime bindings",
+        "frozen failed stage",
+        "stable error code",
+        "bounded redacted message",
+        "whether any ranker call occurred",
+        "completed method-case call count",
+        "whether scorer or oracle access occurred",
+        "result/failure/temp path observations",
+        "timestamp",
+        "bounded stage-mapped redacted error message",
+        "canonical content digest excluding only digest field"
+      ],
+      "partialComparativeAggregatesAllowed": false,
+      "winnerAllowed": false,
+      "favorableSubsetAllowed": false
+    },
+    "contentDigestRule": {
+      "appliesToSchemas": [
+        "qarinah.context-efficiency-development-authorization-review.v3",
+        "qarinah.context-efficiency-development-authorization.v3",
+        "qarinah.context-efficiency-development-result.v3",
+        "qarinah.context-efficiency-development-failure.v3"
+      ],
+      "formula": "sha256(UTF8(canonicalJson(objectWithoutContentDigest)))",
+      "objectKeyOrder": "recursive JavaScript default string order",
+      "arrayOrderPreserved": true,
+      "whitespace": "none",
+      "trailingNewline": false,
+      "invalidValues": ["non-finite number", "negative zero", "undefined", "bigint", "accessor property", "non-JSON prototype"]
+    },
+    "canonicalTimestampRule": {
+      "appliesToFields": ["authorizationReview.reviewedAt", "authorization.createdAt", "result.createdAt", "failure.createdAt"],
+      "utf16CodeUnits": 24,
+      "grammar": "YYYY-MM-DDTHH:mm:ss.sssZ",
+      "regex": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$",
+      "parseFiniteJavaScriptDateRequired": true,
+      "roundTripRule": "new Date(value).toISOString() === value",
+      "leapSecondAllowed": false,
+      "offsetAllowed": false,
+      "verifierDefaultAllowed": false,
+      "frozenBeforeDigestSerialization": true,
+      "verifierRewriteAllowed": false
+    },
+    "publication": {
+      "sameDirectoryExclusiveTemporaryFile": true,
+      "temporaryOpenMode": "exclusive create",
+      "flushBeforePublication": true,
+      "temporaryReadBackRequires": [
+        "exact byte equality",
+        "parse equality",
+        "schema validity",
+        "content-digest validity"
+      ],
+      "atomicNoReplacePrimitive": "hard-link creation from temporary path to terminal destination",
+      "hardLinkUnsupportedBehavior": "fail closed; no rename or copy fallback",
+      "terminalReadBackRequiresExactByteAndHashEquality": true,
+      "unlinkOnlyTemporaryAfterTerminalReadBack": true,
+      "directoryMetadataFlushWhenSupported": true,
+      "existingDestinationCausesRefusal": true,
+      "overwriteAllowed": false,
+      "resultDeletionAllowed": false,
+      "deleteAndRetryAllowed": false,
+      "renameOverwriteAllowed": false,
+      "copyFallbackAllowed": false,
+      "silentRetryAllowed": false,
+      "bestOfNAllowed": false,
+      "thresholdRoundingAllowed": false,
+      "failureReceiptAllowedOnlyBeforeResultLink": true,
+      "postResultFailureReceiptAllowed": false,
+      "postResultReadBackFailureBehavior": "preserve result and temporary path, exit non-zero, and require read-only verifier",
+      "retryAllowed": false
+    }
+  },
+  "claimBoundary": {
+    "developmentWinnerClaimAllowed": false,
+    "lowestContextClaimAllowed": false,
+    "bestClaimAllowed": false,
+    "industryOrUniversalClaimAllowed": false,
+    "providerTokenClaimAllowed": false,
+    "costClaimAllowed": false,
+    "taskSuccessClaimAllowed": false,
+    "codeQualityClaimAllowed": false,
+    "latencySuperiorityClaimAllowed": false,
+    "crossAgentContinuationClaimAllowed": false,
+    "productionReadinessClaimAllowed": false,
+    "releaseClaimAllowed": false,
+    "allowedDevelopmentWording": "On the inspected v3 development fixtures, the frozen method did or did not recover the required linked evidence under the exact admission, ordering, rendering, safety, and mutation gates.",
+    "disallowedShortcuts": [
+      "best AI context reduction",
+      "best in the industry",
+      "provider-token reduction",
+      "lower provider cost",
+      "better task success",
+      "production ready because development passed"
+    ]
+  },
+  "untouchedConfirmation": {
+    "authorizedByThisProtocol": false,
+    "requiresDatedFinalProtocolAmendment": true,
+    "finalProtocol": {
+      "tag": "research-protocol-v1",
+      "commit": "3e05fa30f3007fd67a6b5aba2613f14dcb896fd7",
+      "documentPath": "docs/FINAL-EXPERIMENT-PROTOCOL-v1.md",
+      "documentSha256": "sha256:93cc40c5c2a632024ff0a30077d122218d231cdd05f5121f9788d900b975b64e"
+    },
+    "finalManifest": {
+      "tag": "research-final-manifest-v1",
+      "commit": "b20bb87e6d0ab39aed7df00605d38d24deb9da36",
+      "path": "bench/final/final-task-manifest-v1.json",
+      "fileSha256": "sha256:eca1e32961cea6979a6c488cf5c7af19b2247923934059986f2e087d07016e54",
+      "logicalDigest": "sha256:26f1449acb454f2d6b46196f40c5604a6aa9acec21562af7ae1a6a1fdd86fdbb",
+      "retrievalTaskCount": 387,
+      "taskModificationAllowed": false,
+      "developmentEvaluatorReadAllowed": false
+    },
+    "abstentionControls": {
+      "amendmentTag": "research-protocol-amendment-001",
+      "amendmentTagObject": "de928d5ac503e990381e6cd61a112df7099d36b2",
+      "amendmentCommit": "5b440c02c0720dba61ceecfdaa4a46f512f0d9db",
+      "path": "bench/final/final-abstention-controls-v1.json",
+      "fileSha256": "sha256:367730f076d5d41aa7ef516aba57c04ff677fc172d97e247ff9fb3b896585990",
+      "logicalDigest": "sha256:03d45e72959401d5efb771c5d1263008d2508d872ee25ddde8cd02bc71ca8ae1",
+      "taskCount": 20,
+      "allowedMetrics": [
+        "false acceptance",
+        "correct abstention",
+        "hallucinated-evidence rate",
+        "unnecessary context supplied"
+      ],
+      "positiveRetrievalMetricsAllowed": false,
+      "developmentEvaluatorReadAllowed": false
+    },
+    "providerSample": {
+      "taskCount": 40,
+      "touchedByThisLane": false,
+      "providerExecutionAuthorized": false
+    },
+    "preRankingFreezeRequired": [
+      "pre-target memory corpus",
+      "pre-target graph",
+      "relation extractor",
+      "candidate-set construction",
+      "structural oracle",
+      "human-review pool",
+      "runtime",
+      "dense model and immutable revision",
+      "embedding dimensions",
+      "embedding normalization",
+      "distance function",
+      "cache policy"
+    ],
+    "denseBinding": {
+      "required": true,
+      "fields": [
+        "model repository",
+        "immutable model revision",
+        "every weight or shard SHA-256",
+        "tokenizer implementation and version",
+        "tokenizer file SHA-256",
+        "vocabulary file SHA-256",
+        "merges file SHA-256",
+        "special-token file SHA-256",
+        "query prefix",
+        "document prefix",
+        "pooling rule",
+        "maximum input length",
+        "truncation side",
+        "exact truncation policy",
+        "output dimension",
+        "pre-pooling normalization",
+        "post-pooling normalization",
+        "similarity or distance formula",
+        "tie order",
+        "dtype",
+        "execution device",
+        "batch size",
+        "runtime version",
+        "every material library version",
+        "deterministic-kernel flags",
+        "thread counts",
+        "random seeds",
+        "offline or network policy",
+        "cache key formula",
+        "every cache artifact SHA-256",
+        "repeated-run bit-equality result"
+      ],
+      "latestAllowed": false,
+      "unpinnedHostedEndpointAllowed": false,
+      "unboundCacheAllowed": false,
+      "missingFieldBlocksExecution": true
+    },
+    "graphEdgesUseOnlyChronologicallyPriorRecords": true,
+    "targetGoldMayCreateOrWeightGraphEdge": false,
+    "confirmationRetrievalUsesAll387Tasks": true,
+    "requiredCompetitors": [
+      "admitted-title-body-bm25-v3",
+      "admitted-title-body-bm25-one-hop-v3",
+      "frozen dense retrieval",
+      "admitted BM25 plus frozen dense retrieval",
+      "qarinah-admission-first-v2",
+      "qarinah-evidence-bundle-v3-no-graph",
+      "qarinah-evidence-bundle-v3-no-entity",
+      "qarinah-evidence-bundle-v3-no-provenance",
+      "qarinah-evidence-bundle-v3"
+    ],
+    "missingRequiredCompetitorBlocksComparativeClaim": true,
+    "structuralLabelsLoadAfterRankingsSealed": true,
+    "humanJudgment": {
+      "symmetricPoolsAcrossMethods": true,
+      "methodBlinded": true,
+      "independentReviewerCount": 2,
+      "adjudicationAfterBothIndependentPasses": true
+    },
+    "futureBoundedClaimGate": {
+      "validCitationRateRequired": 1.0,
+      "forbiddenExposureAllowed": 0,
+      "everyRequiredDirectRecordInFullOrdering": true,
+      "eightThousandTokenDirectRecallNonInferiorityMarginAbsolute": 0.02,
+      "eightThousandTokenDirectRecallPaired95CiLowerBoundMinimum": -0.02,
+      "minimumTokenReductionVersusEveryEligibleComparator": 0.05,
+      "microTokenReductionFormula": "1 - sum positive-task full-v3 prefix tokens / sum positive-task comparator prefix tokens",
+      "repositoryTokenReductionFormula": "1 - sum repository full-v3 prefix tokens / sum repository comparator prefix tokens",
+      "repositoryMacroTokenReductionFormula": "unweighted arithmetic mean of repository token-reduction ratios over every repository with positive tasks",
+      "microTotalMustPass": true,
+      "repositoryMacroMeanMustPass": true,
+      "bootstrap": {
+        "repositoryClustered": true,
+        "resamples": 10000,
+        "ordinaryConfidenceLevelReported": 0.95,
+        "tokenGate": "every Holm step-down adjusted one-sided upper bound is below zero",
+        "recallGate": "separate ordinary one-sided 95% lower bound is at least -0.02",
+        "multipleComparisonCorrectionForTokenFamily": "Holm"
+      },
+      "confirmationTokenHolmFamily": "full v3 versus every requiredCompetitors member except full v3; none may be removed after outcomes",
+      "normativeStatisticsPath": "developmentEvaluation.statistics",
+      "frozenDenominatorIncludes": [
+        "every task",
+        "every method",
+        "every refusal",
+        "every failure",
+        "every timeout",
+        "every repository"
+      ],
+      "failureOutcome": "tie, no result, or no claim according to the frozen rule",
+      "allowedFutureWordingMustName": [
+        "exact Verified-minus-Lite cohort",
+        "scorable count",
+        "structural or adjudicated oracle",
+        "every compared method",
+        "common renderer",
+        "portable estimator"
+      ],
+      "universalWordingAllowed": false
+    }
+  }
+}
