@@ -77,6 +77,10 @@ for (const file of htmlFiles) {
   const route = relative === "index.html" ? "/" : `/${relative.replace(/index\.html$/, "")}`;
   htmlByRoute.set(route, html);
 
+  if (/\u2014|&mdash;|&#8212;|&#x2014;/iu.test(html)) {
+    errors.push(`${fileLabel} contains an em dash; public pages must use a normal hyphen`);
+  }
+
   if (html.includes("â€”") || html.includes("â€“")) {
     errors.push(`${fileLabel} contains corrupted dash encoding`);
   }
@@ -215,8 +219,11 @@ for (const benchmarkProof of ["98.7148%", "98.75%", "89.05%", "Three outputs. Th
 if (!home.includes("What coding agents and developers need to know.") || !home.includes('href="/docs/faq/"')) {
   errors.push("Homepage is missing the direct answer-engine surface.");
 }
-if (!home.includes("Your project remembers&mdash;even when your coding agent changes.") || !home.includes('href="/docs/cross-agent-handoffs/"')) {
+if (!home.includes("Your project remembers when your coding agent changes.") || !home.includes("See the verified handoff") || !home.includes('href="/docs/cross-agent-handoffs/"')) {
   errors.push("Homepage is missing the verified cross-agent handoff workflow.");
+}
+if (home.indexOf('<section class="hero">') > home.indexOf('<section class="benchmark-ribbon"')) {
+  errors.push("Homepage must lead with the centered product hero before benchmark detail.");
 }
 if (!home.includes("Evidence-linked project memory for coding agents.") || !home.includes("continue from verified context instead of starting from zero")) {
   errors.push("Homepage is missing the cross-agent category or long-term vision.");
