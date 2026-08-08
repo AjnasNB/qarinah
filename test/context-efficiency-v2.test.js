@@ -3,14 +3,17 @@ import test from "node:test";
 import {
   AMENDMENT_COMMIT,
   AMENDMENT_TAG,
+  ARMING_COMMIT_FILES,
+  ARMING_COMMIT_MESSAGE,
   BM25_ALGORITHM_BINDING,
+  EVALUATOR_COMMIT,
+  EVALUATOR_TAG,
   OUTPUT_LIMIT,
   SOURCE_COMMIT,
   bm25Lexemes,
   buildNeutralLedger,
   evidenceCompletePrefix,
   eventId,
-  executeV2Evaluation,
   qarinahOptions,
   rankAdmissionFilteredBm25,
   runMutationVerificationSuite,
@@ -212,12 +215,15 @@ test("all 24 protocol mutations fail closed without executing either retrieval m
   assert.equal(outcomes.every((entry) => entry.pass && entry.probes >= 1), true);
 });
 
-test("Amendment 001 bindings are exact and execution remains hard-disabled", async () => {
+test("Amendment 001 and the reviewed evaluator have exact outcome-free arming bindings", () => {
   assert.equal(AMENDMENT_COMMIT, "6fb29afd741480176cd5b7c582fb13437308d805");
   assert.equal(AMENDMENT_TAG, "research-context-efficiency-protocol-v2-amendment-001");
+  assert.equal(EVALUATOR_COMMIT, "b160674d8bffa28c9169d262dcda65d32d238e80");
+  assert.equal(EVALUATOR_TAG, "research-context-efficiency-evaluator-v2");
   assert.equal(SOURCE_COMMIT, "6c22d8f293e1e99bbbee239abb36e219af2c96a9");
-  await assert.rejects(
-    executeV2Evaluation("unused-because-execution-is-disabled"),
-    (error) => error?.code === "EVALUATOR_REVIEW_REQUIRED"
-  );
+  assert.deepEqual(ARMING_COMMIT_FILES, [
+    "scripts/context-efficiency-v2-lib.mjs",
+    "test/context-efficiency-v2.test.js"
+  ]);
+  assert.equal(ARMING_COMMIT_MESSAGE, "research: arm context efficiency v2 evaluator");
 });

@@ -19,6 +19,8 @@ export const PROTOCOL_COMMIT = "d7f2a09bed34507b3aec070f765d20b6a834d6d9";
 export const PROTOCOL_TAG = "research-context-efficiency-protocol-v2";
 export const AMENDMENT_COMMIT = "6fb29afd741480176cd5b7c582fb13437308d805";
 export const AMENDMENT_TAG = "research-context-efficiency-protocol-v2-amendment-001";
+export const EVALUATOR_COMMIT = "b160674d8bffa28c9169d262dcda65d32d238e80";
+export const EVALUATOR_TAG = "research-context-efficiency-evaluator-v2";
 export const SOURCE_COMMIT = "6c22d8f293e1e99bbbee239abb36e219af2c96a9";
 export const PROTOCOL_PATH = "bench/research/context-efficiency-comparison-v2-protocol.json";
 export const PROTOCOL_DOCUMENT_PATH = "docs/CONTEXT-EFFICIENCY-COMPARISON-v2-PROTOCOL.md";
@@ -31,7 +33,10 @@ export const AMENDMENT_DOCUMENT_SHA256 = "sha256:b51e406f6b92aa19f8ef40dfd545b57
 export const EVALUATOR_PATH = "scripts/evaluate-context-efficiency-comparison-v2.mjs";
 export const LIBRARY_PATH = "scripts/context-efficiency-v2-lib.mjs";
 export const RENDERER_PATH = "scripts/context-efficiency-v2-renderer.mjs";
+export const TEST_PATH = "test/context-efficiency-v2.test.js";
 export const RESULT_PATH = "bench/results/context-efficiency-comparison-0.1.6-v2.json";
+export const ARMING_COMMIT_MESSAGE = "research: arm context efficiency v2 evaluator";
+export const ARMING_COMMIT_FILES = Object.freeze([LIBRARY_PATH, TEST_PATH]);
 
 export const PRIMARY_METHOD_IDS = Object.freeze([
   "qarinah-admission-first-v2",
@@ -850,10 +855,26 @@ async function verifyGitFreeze(repositoryRoot) {
   exact(sha256(amendmentDocumentBytes) === AMENDMENT_DOCUMENT_SHA256, "BINDING_AMENDMENT_HASH", "Frozen amendment document hash differs.");
   exact(await fileSha256(path.join(repositoryRoot, AMENDMENT_PATH)) === AMENDMENT_SHA256, "BINDING_AMENDMENT_HASH", "Working amendment manifest differs from the frozen bytes.");
   exact(await fileSha256(path.join(repositoryRoot, AMENDMENT_DOCUMENT_PATH)) === AMENDMENT_DOCUMENT_SHA256, "BINDING_AMENDMENT_HASH", "Working amendment document differs from the frozen bytes.");
+
+  const evaluatorTagCommit = await gitText(repositoryRoot, ["rev-parse", `${EVALUATOR_TAG}^{}`]);
+  exact(evaluatorTagCommit === EVALUATOR_COMMIT, "BINDING_EVALUATOR_TAG", "The reviewed evaluator tag does not resolve to the evaluator commit.");
+  const evaluatorType = await gitText(repositoryRoot, ["cat-file", "-t", EVALUATOR_TAG]);
+  exact(evaluatorType === "tag", "BINDING_EVALUATOR_TAG", "The reviewed evaluator tag must remain annotated.");
+  const evaluatorParent = await gitText(repositoryRoot, ["rev-parse", `${EVALUATOR_COMMIT}^`]);
+  exact(evaluatorParent === AMENDMENT_COMMIT, "BINDING_EVALUATOR_ANCESTRY", "The reviewed evaluator commit is not directly based on Amendment 001.");
+  const evaluatorChanged = (await gitText(repositoryRoot, [
+    "diff-tree", "--no-commit-id", "--name-only", "-r", EVALUATOR_COMMIT
+  ])).split(/\r?\n/u).filter(Boolean).sort();
+  sameJson(
+    evaluatorChanged,
+    ["package.json", EVALUATOR_PATH, LIBRARY_PATH, RENDERER_PATH, TEST_PATH].sort(),
+    "BINDING_EVALUATOR_COMMIT_SCOPE",
+    "The reviewed evaluator commit scope differs from the independently approved implementation."
+  );
   try {
-    await run("git", ["merge-base", "--is-ancestor", AMENDMENT_COMMIT, "HEAD"], { cwd: repositoryRoot, encoding: "utf8" });
+    await run("git", ["merge-base", "--is-ancestor", EVALUATOR_COMMIT, "HEAD"], { cwd: repositoryRoot, encoding: "utf8" });
   } catch {
-    fail("BINDING_AMENDMENT_ANCESTRY", "The evaluator working tree is not descended from the frozen amendment commit.");
+    fail("BINDING_EVALUATOR_ANCESTRY", "The working tree is not descended from the reviewed evaluator commit.");
   }
   return Object.freeze({
     baseProtocol: Object.freeze({
@@ -867,6 +888,10 @@ async function verifyGitFreeze(repositoryRoot) {
       tag: AMENDMENT_TAG,
       manifestSha256: AMENDMENT_SHA256,
       documentSha256: AMENDMENT_DOCUMENT_SHA256
+    }),
+    evaluator: Object.freeze({
+      commit: EVALUATOR_COMMIT,
+      tag: EVALUATOR_TAG
     })
   });
 }
@@ -1091,7 +1116,7 @@ export async function withVerifiedFrozenSource(repositoryRoot, callback, { loadR
   }
 }
 
-export async function verifyBindingsOnly(repositoryRoot) {
+async function assertResultPathAbsent(repositoryRoot) {
   try {
     await lstat(path.join(repositoryRoot, ...RESULT_PATH.split("/")));
     fail("BINDING_RESULT_ABSENT", "The v2 result path must remain absent before explicit first-run authorization.");
@@ -1099,6 +1124,61 @@ export async function verifyBindingsOnly(repositoryRoot) {
     if (error instanceof V2VerificationError) throw error;
     if (error?.code !== "ENOENT") throw error;
   }
+}
+
+export async function inspectV2ArmingState(repositoryRoot) {
+  const currentHead = await gitText(repositoryRoot, ["rev-parse", "HEAD"]);
+  const currentTree = await gitText(repositoryRoot, ["rev-parse", "HEAD^{tree}"]);
+  const worktreeStatus = await gitText(repositoryRoot, ["status", "--porcelain=v1", "--untracked-files=all"]);
+  let parentCommit = null;
+  let changedFiles = [];
+  let commitMessage = null;
+  if (currentHead !== EVALUATOR_COMMIT) {
+    parentCommit = await gitText(repositoryRoot, ["rev-parse", "HEAD^"]);
+    changedFiles = (await gitText(repositoryRoot, [
+      "diff-tree", "--no-commit-id", "--name-only", "-r", "HEAD"
+    ])).split(/\r?\n/u).filter(Boolean).sort();
+    commitMessage = await gitText(repositoryRoot, ["show", "-s", "--format=%B", "HEAD"]);
+  }
+  const requiredChangedFiles = [...ARMING_COMMIT_FILES].sort();
+  const directChildOfReviewedEvaluator = parentCommit === EVALUATOR_COMMIT;
+  const exactArmingScope = JSON.stringify(changedFiles) === JSON.stringify(requiredChangedFiles);
+  const exactArmingMessage = commitMessage === ARMING_COMMIT_MESSAGE;
+  const worktreeClean = worktreeStatus.length === 0;
+  return Object.freeze({
+    reviewedEvaluatorCommit: EVALUATOR_COMMIT,
+    reviewedEvaluatorTag: EVALUATOR_TAG,
+    currentHead,
+    currentTree,
+    parentCommit,
+    worktreeClean,
+    directChildOfReviewedEvaluator,
+    changedFiles: Object.freeze(changedFiles),
+    requiredChangedFiles: Object.freeze(requiredChangedFiles),
+    exactArmingScope,
+    commitMessage,
+    requiredCommitMessage: ARMING_COMMIT_MESSAGE,
+    exactArmingMessage,
+    explicitExecuteFlagRequired: true,
+    resultPathMustBeAbsent: true,
+    executionReady: worktreeClean && directChildOfReviewedEvaluator && exactArmingScope && exactArmingMessage
+  });
+}
+
+async function verifyV2ExecutionAuthorization(repositoryRoot) {
+  await assertResultPathAbsent(repositoryRoot);
+  const authorization = await inspectV2ArmingState(repositoryRoot);
+  exact(authorization.worktreeClean, "EXECUTION_WORKTREE_DIRTY", "V2 execution requires a clean committed arming tree.");
+  exact(authorization.directChildOfReviewedEvaluator, "EXECUTION_ARMING_ANCESTRY", "The arming commit must be a direct child of the reviewed evaluator commit.");
+  exact(authorization.exactArmingScope, "EXECUTION_ARMING_SCOPE", "The arming commit changed files outside the frozen two-file arming scope.");
+  exact(authorization.exactArmingMessage, "EXECUTION_ARMING_MESSAGE", "The arming commit message differs from the frozen arming semantics.");
+  exact(authorization.executionReady, "EXECUTION_NOT_AUTHORIZED", "The committed arming state is not ready for an explicit first execution.");
+  return authorization;
+}
+
+export async function verifyBindingsOnly(repositoryRoot) {
+  await assertResultPathAbsent(repositoryRoot);
+  const arming = await inspectV2ArmingState(repositoryRoot);
   return withVerifiedFrozenSource(repositoryRoot, async (context) => {
     const mutations = runMutationVerificationSuite();
     sameJson(mutations.map((entry) => entry.id), context.amendment.mutationBinding.names, "BINDING_MUTATION_LIST", "Implemented mutation order differs from Amendment 001.");
@@ -1106,9 +1186,12 @@ export async function verifyBindingsOnly(repositoryRoot) {
     return Object.freeze({
       ...context.bindingReport,
       schemaVersion: "qarinah.context-efficiency-comparison-amended-bindings.v2",
-      status: "Amendment 001 is fully bound; retrieval execution remains hard-disabled pending separate review, commit, and explicit first-run authorization.",
+      status: "Amendment 001 and the reviewed evaluator are fully bound. Binding-only executes no benchmark retrieval; the outcome path requires an explicit --execute invocation from the exact clean arming commit.",
       amendmentCommit: AMENDMENT_COMMIT,
       amendmentTag: AMENDMENT_TAG,
+      evaluatorCommit: EVALUATOR_COMMIT,
+      evaluatorTag: EVALUATOR_TAG,
+      arming,
       frozenProtocolSourceCommit: context.amendment.sourceBinding.sourceCommit,
       sourceFiles: Object.freeze(context.protocol.sourceBindings.files),
       fixtureLedgerBindingsVerified: true,
@@ -2142,10 +2225,7 @@ function aggregateSafety(cases) {
 }
 
 export async function executeV2Evaluation(repositoryRoot) {
-  fail(
-    "EVALUATOR_REVIEW_REQUIRED",
-    "V2 execution is hard-disabled after Amendment 001 binding until this evaluator is independently reviewed, committed, and separately authorized for its first run."
-  );
+  const executionAuthorization = await verifyV2ExecutionAuthorization(repositoryRoot);
   return withVerifiedFrozenSource(repositoryRoot, async (context) => {
     exact(context.execution !== null, "BINDING_EXECUTION_MODULES", "Frozen retrieval modules were not loaded.");
     const mutations = runMutationVerificationSuite();
@@ -2172,6 +2252,7 @@ export async function executeV2Evaluation(repositoryRoot) {
       schemaVersion: "qarinah.context-efficiency-comparison-result.v2",
       packageVersion: "0.1.6",
       classification: "development fixture comparison; not externally preregistered or provider-backed",
+      executionAuthorization,
       protocol: Object.freeze({
         version: context.protocol.protocolVersion,
         commit: PROTOCOL_COMMIT,
