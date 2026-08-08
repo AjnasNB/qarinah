@@ -6,3 +6,5 @@ benchmark-results/
 *.tgz
 site-dist/
 tmp/
+__pycache__/
+*.pyc

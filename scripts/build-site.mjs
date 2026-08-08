@@ -8,9 +8,16 @@ const output = path.join(root, "site-dist");
 const github = "https://github.com/AjnasNB/qarinah";
 const siteOrigin = "https://qarinah.io";
 const npmPackage = "https://www.npmjs.com/package/qarinah";
-const doi = "https://doi.org/10.5281/zenodo.21547684";
-const zenodoPdf = "/paper/Qarinah-Technical-White-Paper-v1.2.pdf";
-const releaseDate = "2026-08-07";
+const doi = "https://doi.org/10.5281/zenodo.21850747";
+const conceptDoi = "https://doi.org/10.5281/zenodo.21547684";
+const historicalVersionDoi = "https://doi.org/10.5281/zenodo.21843240";
+const paperVersion = "1.4";
+const paperPdf = `/paper/Qarinah-Technical-White-Paper-v${paperVersion}.pdf`;
+const historicalPaperPdfs = new Map([
+  ["Qarinah-Technical-White-Paper-v1.2.pdf", "/paper/Qarinah-Technical-White-Paper-v1.2.pdf"],
+  ["Qarinah-Technical-White-Paper-v1.3.pdf", "/paper/Qarinah-Technical-White-Paper-v1.3.pdf"]
+]);
+const releaseDate = "2026-08-08";
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 const productVersion = packageJson.version;
 const productPositioning = "Evidence-linked project memory for coding agents.";
@@ -245,7 +252,13 @@ await cp(path.join(root, "node_modules", "@primer", "css", "dist", "primer.css")
 await cp(path.join(root, "assets", "brand", "qarinah-mark.svg"), path.join(output, "assets", "qarinah-mark.svg"));
 await cp(path.join(root, "assets", "architecture", "qarinah-flow.svg"), path.join(output, "assets", "qarinah-flow.svg"));
 await cp(path.join(root, "assets", "launch", "qarinah-social-preview.png"), path.join(output, "assets", "qarinah-social-preview.png"));
-await cp(path.join(root, "output", "pdf", "Qarinah-Technical-White-Paper-v1.2.pdf"), path.join(output, "paper", "Qarinah-Technical-White-Paper-v1.2.pdf"));
+for (const filename of [
+  "Qarinah-Technical-White-Paper-v1.2.pdf",
+  "Qarinah-Technical-White-Paper-v1.3.pdf",
+  `Qarinah-Technical-White-Paper-v${paperVersion}.pdf`
+]) {
+  await cp(path.join(root, "output", "pdf", filename), path.join(output, "paper", filename));
+}
 
 marked.setOptions({
   gfm: true,
@@ -281,10 +294,11 @@ function rewriteMarkdownLinks(markdown, source) {
       target = "/docs/";
     } else if (resolved.startsWith("assets/")) {
       target = `/${resolved}`;
-    } else if (resolved.endsWith("Qarinah-Technical-White-Paper-v1.2.pdf")) {
-      target = source === "docs/WHITEPAPER.md"
-        ? zenodoPdf
-        : "/paper/Qarinah-Technical-White-Paper-v1.2.pdf";
+    } else if (resolved.endsWith(`Qarinah-Technical-White-Paper-v${paperVersion}.pdf`)) {
+      target = paperPdf;
+    } else if ([...historicalPaperPdfs.keys()].some((filename) => resolved.endsWith(filename))) {
+      const filename = [...historicalPaperPdfs.keys()].find((candidate) => resolved.endsWith(candidate));
+      target = historicalPaperPdfs.get(filename);
     } else {
       target = `${github}/blob/main/${resolved}`;
     }
@@ -302,10 +316,23 @@ function rewriteMarkdownAssets(markdown) {
 
 function rewritePublicationLink(markdown, source) {
   if (source !== "docs/WHITEPAPER.md") return markdown;
-  return markdown.replace(
-    "https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.2.pdf",
-    zenodoPdf
-  );
+  return markdown
+    .replace(
+      `https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v${paperVersion}.pdf`,
+      paperPdf
+    )
+    .replace(
+      "The v1.4 version DOI is assigned only when this manuscript is deposited; the persistent paper series uses concept DOI",
+      "The published v1.4 version DOI is [10.5281/zenodo.21850747](https://doi.org/10.5281/zenodo.21850747); the persistent paper series uses concept DOI"
+    )
+    .replace(
+      "- **Version DOI:** assigned by Zenodo when v1.4 is deposited",
+      "- **Version DOI:** [10.5281/zenodo.21850747](https://doi.org/10.5281/zenodo.21850747)"
+    )
+    .replace(
+      "https://doi.org/10.5281/zenodo.21547684. A version DOI is assigned\nwhen this manuscript is deposited.",
+      "https://doi.org/10.5281/zenodo.21547684. The published v1.4 version DOI is\nhttps://doi.org/10.5281/zenodo.21850747."
+    );
 }
 
 function nav(active = "") {
@@ -479,10 +506,12 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
       description,
       url,
       inLanguage: "en",
-      datePublished: releaseDate,
+      dateCreated: releaseDate,
       dateModified: releaseDate,
-      version: "1.0",
+      version: paperVersion,
       identifier: doi,
+      creativeWorkStatus: "Published",
+      datePublished: releaseDate,
       license: "https://www.apache.org/licenses/LICENSE-2.0",
       author: { "@id": person["@id"] },
       contributor: {
@@ -491,9 +520,10 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
       },
       encoding: {
         "@type": "MediaObject",
-        contentUrl: zenodoPdf,
+        contentUrl: paperPdf,
         encodingFormat: "application/pdf"
       },
+      sameAs: [doi],
       isPartOf: { "@id": `${siteOrigin}/#website` }
     });
   } else if (kind === "benchmark") {
@@ -645,6 +675,46 @@ function homePage() {
     canonical: "/",
     kind: "home",
     body: `
+      <section class="hero">
+        <div class="shell hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow">${productPositioning}</p>
+            <h1>Your project remembers when your coding agent changes.</h1>
+            <p class="hero-lede">${productExplanation}</p>
+            <div class="hero-actions">
+              <a class="btn btn-primary btn-large" href="/docs/getting-started/">Set up one project</a>
+              <a class="hero-text-link" href="/docs/cross-agent-handoffs/">See the verified handoff</a>
+            </div>
+            <a class="hero-evidence-link" href="/docs/benchmarks/">Measured with public artifacts and explicit limits</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="handoff-stage" aria-labelledby="handoff-stage-title">
+        <div class="shell handoff-stage-grid">
+          <div class="handoff-stage-copy">
+            <p class="eyebrow">One project record</p>
+            <h2 id="handoff-stage-title">Set it up once. Continue from any supported agent.</h2>
+            <p>Qarinah keeps the durable record beside the repository. Every supported host queries the same cited decisions, outcomes, conflicts, and superseded context.</p>
+            ${commandBlock("npx qarinah setup . --codex --claude --cursor --capture content --allow-query", "One-time project setup")}
+            <div class="host-shortcuts" aria-label="Qarinah host commands">
+              <span><strong>Codex</strong><code>$qarinah</code></span>
+              <span><strong>Claude Code</strong><code>/qarinah &lt;task&gt;</code></span>
+              <span><strong>Any terminal</strong><code>npx qarinah query "&lt;task&gt;"</code></span>
+            </div>
+          </div>
+          <aside class="hero-proof" aria-label="Benchmark summary">
+            <p class="eyebrow">One measured result</p>
+            <div class="hero-proof-result">
+              <strong>98.71%</strong>
+              <span>less repeated context</span>
+            </div>
+            <p>442,113 estimated input-context tokens became 5,682. Every required target was directly covered in the top five in the published fixture.</p>
+            <a href="/docs/benchmarks/">Read the method, artifacts, and limits</a>
+          </aside>
+        </div>
+      </section>
+
       <section class="benchmark-ribbon" aria-labelledby="benchmark-ribbon-title">
         <div class="shell">
           <div class="benchmark-ribbon-heading">
@@ -669,34 +739,6 @@ function homePage() {
             </article>
           </div>
           <p class="benchmark-ribbon-note">The two continuation results use the same 42-record history but measure different outputs: a minimal handoff capsule and its complete evidence-rich audit pack. A separate scale regression passed 380/380 file-specific queries across 40-, 50-, and 100-file projects, plus SQLite, graph, Markdown, conflict, supersession, repair, and abstention controls. Portable <code>ceil(characters / 4)</code> estimates; not provider billing receipts. <a href="/docs/benchmarks/">Method, artifacts, and limits</a>.</p>
-        </div>
-      </section>
-
-      <section class="hero">
-        <div class="shell hero-grid">
-          <div class="hero-copy">
-            <p class="eyebrow">${productPositioning}</p>
-            <h1>Your project remembers&mdash;even when your coding agent changes.</h1>
-            <p class="hero-lede">${productExplanation}</p>
-            <div class="hero-actions">
-              <a class="btn btn-primary btn-large" href="/docs/getting-started/">Set up one project</a>
-              <a class="btn btn-outline btn-large" href="/docs/cross-agent-handoffs/">See the handoff</a>
-            </div>
-            ${commandBlock("npx qarinah setup . --codex --claude --cursor --capture content --allow-query", "One-time project setup")}
-            <div class="host-shortcuts" aria-label="Qarinah host commands">
-              <span><strong>Codex</strong><code>$qarinah</code></span>
-              <span><strong>Claude Code</strong><code>/qarinah &lt;task&gt;</code></span>
-              <span><strong>Any terminal</strong><code>npx qarinah query "&lt;task&gt;"</code></span>
-            </div>
-            <div class="hero-proof" aria-label="Benchmark summary">
-              <div class="hero-proof-result">
-                <strong>98.71%</strong>
-                <span>less repeated context</span>
-              </div>
-              <p>442,113 estimated input-context tokens became 5,682. Every required target was directly covered in the top five, and the compared input-context cost fell by the same 98.71% at the same token rate.</p>
-              <a href="/docs/benchmarks/">Open the evidence</a>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -1004,7 +1046,7 @@ async function markdownPage(page) {
         ? "answers"
         : "docs";
   const publicationLink = page.route === "paper"
-    ? '<a href="https://doi.org/10.5281/zenodo.21547684">Cite on Zenodo</a>'
+    ? `<a href="${doi}">Published v1.4 DOI: 10.5281/zenodo.21850747</a> · <a href="${conceptDoi}">Paper series DOI</a> · <a href="${historicalVersionDoi}">Published v1.3</a>`
     : "";
 
   return layout({

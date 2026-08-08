@@ -9,10 +9,61 @@ import { loadPinnedDevelopmentDataset } from "../bench/research/swe-bench-lite.m
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 const corpusPath = path.join(root, "bench", "research", "swe-bench-lite-development-v0.2.json");
-const resultPath = path.join(root, "bench", "results", "research-retrieval-development-v0.2.json");
+const productionV04 = process.argv.includes("--production-v0.4");
+const resultPath = path.join(root, "bench", "results", "research-retrieval-development-v0.4.json");
 const TOP_K = 10;
 const BUDGETS = Object.freeze([512, 1_000, 2_000, 4_000, 8_000]);
 const BOOTSTRAP_SAMPLES = 10_000;
+const HISTORICAL_V02 = Object.freeze({
+  tag: "research-retrieval-development-v0.2",
+  commit: "bd566ac5ba7b302653b994fd0622d516fa74bbb8",
+  artifact: "bench/results/research-retrieval-development-v0.2.json",
+  artifactSha256: "sha256:bfe8015811ffbecd5e3c00eb9f4a1e104478605cd605442a1ec96d67582e4b3f"
+});
+const IMPLEMENTATION_FILES = Object.freeze([
+  "bench/research/swe-bench-lite.mjs",
+  "scripts/evaluate-research-retrieval-v0.2.mjs",
+  "scripts/evaluate-research-retrieval-v0.4.mjs",
+  "src/canonical.js",
+  "src/contracts.js",
+  "src/index.js",
+  "src/indexer.js",
+  "src/interoperability/boundary.js",
+  "src/redact.js",
+  "src/retrieval.js"
+]);
+
+if (!productionV04) {
+  throw new Error([
+    "Development retrieval v0.2 is a frozen historical run and must not be recomputed with the current production runtime.",
+    `Evaluate it from exact tag ${HISTORICAL_V02.tag} (commit ${HISTORICAL_V02.commit}) in a separate clean worktree:`,
+    `  git worktree add ../qarinah-research-v0.2 ${HISTORICAL_V02.tag}`,
+    "  cd ../qarinah-research-v0.2",
+    "  npm ci",
+    "  npm run evaluate:research-retrieval:v0.2",
+    `The preserved artifact is ${HISTORICAL_V02.artifact} (${HISTORICAL_V02.artifactSha256}).`,
+    "Run `npm run evaluate:research-retrieval:v0.4` on current source instead."
+  ].join("\n"));
+}
+
+function sha256(value) {
+  return `sha256:${createHash("sha256").update(value).digest("hex")}`;
+}
+
+async function implementationManifest() {
+  const files = await Promise.all(IMPLEMENTATION_FILES.map(async (relativePath) => {
+    const normalizedContent = (await readFile(path.join(root, relativePath), "utf8")).replace(/\r\n/gu, "\n");
+    return { path: relativePath, sha256: sha256(normalizedContent) };
+  }));
+  return Object.freeze({
+    algorithm: "sha256-path-lf-content-v1",
+    productVersion: packageJson.version,
+    rankingProfile: "admission-first-v2",
+    evidenceSufficiencyMethod: "evidence-sufficiency-v2",
+    files,
+    digest: sha256(files.map((file) => `${file.path}\n${file.sha256}`).join("\n"))
+  });
+}
 
 function rounded(value) {
   return Math.round(value * 1_000_000) / 1_000_000;
@@ -252,8 +303,69 @@ function classificationMetrics(observations) {
     noPositiveCorrectAbstentionRate: negatives.length === 0 ? null : rounded(trueNegative / negatives.length),
     rocAuc: positives.length === 0 || negatives.length === 0 ? null : rounded(concordant / (positives.length * negatives.length)),
     prAucAveragePrecision: positives.length === 0 ? null : rounded(averagePrecision / positives.length),
+    brierScore: mean(observations.map((entry) => (entry.score - Number(entry.positive)) ** 2)),
     expectedCalibrationError10Bin: rounded(calibrationError),
     riskCoverage
+  };
+}
+
+function exactEdgeInterval95(successes, trials) {
+  if (trials === 0) return null;
+  const tail = 0.025;
+  if (successes === 0) return {
+    method: "Clopper-Pearson exact two-sided",
+    successes,
+    trials,
+    lower: 0,
+    upper: rounded(1 - (tail ** (1 / trials)))
+  };
+  if (successes === trials) return {
+    method: "Clopper-Pearson exact two-sided",
+    successes,
+    trials,
+    lower: rounded(tail ** (1 / trials)),
+    upper: 1
+  };
+  throw new RangeError("This development artifact records exact edge intervals only for zero/all-success outcomes.");
+}
+
+function directDecisionMetrics(tasks) {
+  const positives = tasks.filter((task) => task.positiveUnderStructuralOracle);
+  const negatives = tasks.filter((task) => !task.positiveUnderStructuralOracle);
+  const accepted = tasks.filter((task) => task.evidenceSufficiency.decision === "ACCEPT_DIRECT");
+  const truePositive = accepted.filter((task) => task.positiveUnderStructuralOracle).length;
+  const falsePositive = accepted.filter((task) => !task.positiveUnderStructuralOracle).length;
+  const precision = accepted.length === 0 ? null : truePositive / accepted.length;
+  const recall = positives.length === 0 ? null : truePositive / positives.length;
+  assert.equal(falsePositive, 0, "Current production evidence-sufficiency-v2 produced a structural-oracle false accept.");
+  assert.equal(truePositive, accepted.length, "Current production direct precision is not an all-success edge case.");
+  return {
+    method: "evidence-sufficiency-v2",
+    directThreshold: 0.65,
+    partialThreshold: 0.4,
+    tasks: tasks.length,
+    positives: positives.length,
+    noPositiveUnderStructuralOracle: negatives.length,
+    acceptedDirect: accepted.length,
+    abstained: tasks.length - accepted.length,
+    truePositive,
+    falsePositive,
+    trueNegative: negatives.length - falsePositive,
+    falseNegative: positives.length - truePositive,
+    acceptedPrecision: precision === null ? null : rounded(precision),
+    acceptedRecall: recall === null ? null : rounded(recall),
+    acceptedF1: precision === null || recall === null || precision + recall === 0
+      ? null
+      : rounded((2 * precision * recall) / (precision + recall)),
+    falseAcceptanceRate: negatives.length === 0 ? null : rounded(falsePositive / negatives.length),
+    correctAbstentionRate: negatives.length === 0 ? null : rounded((negatives.length - falsePositive) / negatives.length),
+    acceptanceCoverage: rounded(accepted.length / tasks.length),
+    stateCounts: Object.fromEntries(["DIRECTLY_SUPPORTED", "PARTIALLY_SUPPORTED", "INSUFFICIENT_EVIDENCE"]
+      .map((state) => [state, tasks.filter((task) => task.evidenceSufficiency.state === state).length])),
+    confidenceIntervals95: {
+      acceptedPrecision: accepted.length === 0 ? null : exactEdgeInterval95(truePositive, accepted.length),
+      falseAcceptanceRate: negatives.length === 0 ? null : exactEdgeInterval95(falsePositive, negatives.length)
+    }
   };
 }
 
@@ -363,6 +475,13 @@ function evaluateSetting(records, setting, taskById) {
       })
     )]));
     const sufficiency = qarinahResult.evidenceSufficiency;
+    assert.equal(sufficiency.method, "evidence-sufficiency-v2");
+    assert.equal(sufficiency.directThreshold, 0.65);
+    assert.equal(sufficiency.partialThreshold, 0.4);
+    assert.equal(
+      sufficiency.decision,
+      sufficiency.state === "DIRECTLY_SUPPORTED" ? "ACCEPT_DIRECT" : "ABSTAIN"
+    );
     results.push({
       repository: current.repository,
       instanceId: current.instanceId,
@@ -373,7 +492,15 @@ function evaluateSetting(records, setting, taskById) {
       metrics: Object.fromEntries(Object.entries(rankings).map(([method, ids]) => [method, retrievalMetrics(ids, grades)])),
       volumes,
       budgets,
-      evidenceSufficiency: { state: sufficiency.state, score: sufficiency.score, reasonCodes: sufficiency.reasonCodes },
+      evidenceSufficiency: {
+        method: sufficiency.method,
+        state: sufficiency.state,
+        decision: sufficiency.decision,
+        score: sufficiency.score,
+        directThreshold: sufficiency.directThreshold,
+        partialThreshold: sufficiency.partialThreshold,
+        reasonCodes: sufficiency.reasonCodes
+      },
       noTemporalFutureItems: noTemporalIds.filter((eventId) => futureIds.has(eventId)).length,
       noTemporalReturnedItems: noTemporalIds.length
     });
@@ -381,8 +508,11 @@ function evaluateSetting(records, setting, taskById) {
   return results;
 }
 
-const { corpus, rows } = await loadPinnedDevelopmentDataset();
-assert.deepEqual(corpus, JSON.parse(await readFile(corpusPath, "utf8")), "Prepare the v0.2 development corpus first.");
+const committedCorpus = JSON.parse(await readFile(corpusPath, "utf8"));
+const { corpus, rows } = await loadPinnedDevelopmentDataset({
+  sourceArtifact: committedCorpus.generatedFrom.sourceArtifact
+});
+assert.deepEqual(corpus, committedCorpus, "Prepare the v0.2 development corpus first.");
 const taskById = new Map(corpus.tasks.map((task) => [task.instanceId, task]));
 const rowsByRepository = new Map();
 for (const row of rows) {
@@ -418,6 +548,7 @@ function settingSummary(tasks) {
     noPositiveUnderStructuralOracle: tasks.filter((task) => !task.positiveUnderStructuralOracle).length,
     methods: Object.fromEntries(methods.map((method) => [method, summarize(tasks, method)])),
     evidenceSufficiency: classification,
+    directDecision: directDecisionMetrics(tasks),
     noTemporalAblation: {
       returnedItems,
       futureItems,
@@ -468,20 +599,32 @@ assert.ok(expected.settings.onlinePrequential.methods.qarinahV2.meanRecallAt10
   >= expected.settings.onlinePrequential.methods.balancedV1.meanRecallAt10);
 assert.ok(expected.settings.onlinePrequential.noTemporalAblation.futureItems > 0);
 
-const artifact = {
-  schemaVersion: "qarinah.research-retrieval-development-result.v2",
+const stableArtifact = {
+  schemaVersion: "qarinah.research-retrieval-development-result.v4",
   packageVersion: packageJson.version,
-  status: "exploratory-development-after-v0.1-inspection",
+  status: "current-production-recomputation-on-inspected-development-corpus",
   confirmatoryClaimEligible: false,
+  implementation: await implementationManifest(),
+  historicalLineage: {
+    v02: HISTORICAL_V02,
+    v03: {
+      artifact: "bench/results/research-sufficiency-development-v0.3.json",
+      interpretation: "Historical post-hoc threshold calibration over the frozen evidence-sufficiency-v1 scores in v0.2; preserved unchanged."
+    },
+    current: "Production evidence-sufficiency-v2 scores and decisions recomputed as development v0.4."
+  },
   executionScope: {
     providerModelCalls: 0,
     providerReportedTokens: false,
     sweBenchDockerTaskExecution: false,
     humanRelevanceReview: false,
     humanCodeReview: false,
-    claimBoundary: "Development evidence only. The corpus is no longer untouched, and structural oracle labels are not human relevance judgments."
+    claimBoundary: "Development evidence only. The corpus was already inspected, the v0.4 run is bound to current production source hashes, and structural oracle labels are not human relevance judgments."
   },
-  expected,
+  expected
+};
+const artifact = {
+  ...stableArtifact,
   runtimeObservation: {
     node: process.version,
     platform: `${process.platform}-${process.arch}`,
@@ -495,8 +638,9 @@ if (process.argv.includes("--write")) {
 } else {
   const committed = JSON.parse(await readFile(resultPath, "utf8"));
   assert.equal(committed.schemaVersion, artifact.schemaVersion);
-  assert.deepEqual(expected, committed.expected, "Development retrieval evidence drifted from the committed artifact.");
-  process.stdout.write("Development retrieval evidence matches the committed artifact.\n");
+  const { runtimeObservation: _committedRuntime, ...committedStable } = committed;
+  assert.deepEqual(stableArtifact, committedStable, "Production-bound development-v0.4 evidence drifted from the committed artifact.");
+  process.stdout.write("Production-bound development-v0.4 evidence matches the committed artifact.\n");
 }
 
 process.stdout.write(`${JSON.stringify({

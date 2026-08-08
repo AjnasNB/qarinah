@@ -1,0 +1,271 @@
+{
+  "schemaVersion": "qarinah.research-retrieval-development-protocol-amendment.v1",
+  "amendmentId": "research-retrieval-development-v0.5",
+  "amendmentVersion": "0.5.0",
+  "authoredOn": "2026-08-08",
+  "classification": {
+    "phase": "pre-outcome",
+    "developmentOnly": true,
+    "corpusPreviouslyInspected": true,
+    "confirmatoryOrHeldOut": false,
+    "purpose": "A source-bound differential reproduction of the complete frozen v0.4 expected object through the current production retrieval API projection."
+  },
+  "timing": {
+    "v05RetrievalExecutedWhenAuthored": false,
+    "v05OutcomeObservedWhenAuthored": false,
+    "v05ResultMaterializedWhenAuthored": false,
+    "resultArtifactPath": "bench/results/research-retrieval-development-v0.5.json",
+    "resultArtifactPresentWhenAuthored": false,
+    "statement": "These bindings were authored before a v0.5 evaluator existed, before any v0.5 retrieval execution, and before any v0.5 outcome was observed."
+  },
+  "immutableV04Reference": {
+    "commit": "31a0c38be6e2f506e669e57dc30607a9f87dcc5b",
+    "annotatedTag": "research-retrieval-development-v0.4",
+    "artifact": {
+      "path": "bench/results/research-retrieval-development-v0.4.json",
+      "sha256": "sha256:607359a947e7a849512d3fcb588bc88c2b34e1289f15b735a2de0c3895a21a18"
+    },
+    "completeExpectedObject": {
+      "pathWithinArtifact": "expected",
+      "canonicalization": "sha256-utf8-json-stringify-preserved-insertion-order-v1",
+      "canonicalByteLength": 3110007,
+      "sha256": "sha256:12f00c2e831e56b26c7eeff13d8b6aed0fee22760d40f5a46a1cb579870b3d0c",
+      "rule": "Hash the UTF-8 bytes of JSON.stringify(expected), without whitespace or a trailing newline, using the parsed committed insertion order. Recursive key sorting and pretty JSON are forbidden."
+    },
+    "immutability": "v0.5 must read this artifact from the exact tagged commit, verify its file hash before parsing, and must never rewrite, normalize, migrate, or replace it."
+  },
+  "sourceBinding": {
+    "productImplementationOriginCommit": "6c22d8f293e1e99bbbee239abb36e219af2c96a9",
+    "sourceHashAlgorithm": "sha256-utf8-after-crlf-to-lf-normalization-v1",
+    "files": [
+      {
+        "path": "src/index.js",
+        "sha256": "sha256:66a69c1b2143fb559ff5c67dfd3e41031a48a5c46ca49631ac1f996ea6cf7fa7"
+      },
+      {
+        "path": "src/retrieval.js",
+        "sha256": "sha256:729991b59ea5a0b073c6cdd93fef15c622c819c7f46947b1167f44d598b3a68a"
+      },
+      {
+        "path": "src/canonical.js",
+        "sha256": "sha256:c24859c69ff8571128107c7de6718fc02aad9cb64f807f174d23bf8b12293225"
+      },
+      {
+        "path": "src/contracts.js",
+        "sha256": "sha256:d74d0487fad186901c7aa1a8c8530c0920fe3908c611ce85ec17c6336d575650"
+      },
+      {
+        "path": "src/indexer.js",
+        "sha256": "sha256:868c6e433dc858cd665c3c844bb72449e102bf1bc288f1c9daf41ecf4986ff4b"
+      },
+      {
+        "path": "src/interoperability/boundary.js",
+        "sha256": "sha256:80798113257019fa38573acf262ed69b8f1b2b887ceb8ce37f53951c2f1d3118"
+      },
+      {
+        "path": "src/redact.js",
+        "sha256": "sha256:6198154b1d4a37adfea308f8b2723c89788ab8046ca587210e278952ca4454b4"
+      }
+    ],
+    "executionRule": "The later evaluator commit may add evaluator, test, package, and receipt files, but every bound production source file must materialize with exactly these normalized hashes."
+  },
+  "corpusBinding": {
+    "classification": "inspected-development-corpus",
+    "dataset": "princeton-nlp/SWE-bench_Lite",
+    "corpus": {
+      "path": "bench/research/swe-bench-lite-development-v0.2.json",
+      "fileSha256": "sha256:d30f94bba88f72db737340f05a9d3ad3c739c46f84307abc8802a78ca4de0482",
+      "logicalContentDigest": "sha256:01b35115ac639c1fcd3779561f83d5bb21988eb74ee5e93798c5d7579d757863"
+    },
+    "loader": {
+      "path": "bench/research/swe-bench-lite.mjs",
+      "sha256": "sha256:3b92352951a07854786b1a74ee5d2e6e5cbe1247b7c39d2f1135593cfed431dc"
+    },
+    "rawSourceArtifact": {
+      "path": "data/test-00000-of-00001.parquet",
+      "url": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/data/test-00000-of-00001.parquet",
+      "bytes": 1119540,
+      "sha256": "sha256:7a21f37b8bc179c7db5beeb14e88ac538ba283455c776e6b2535bbfb6e3551b4",
+      "pathAuthority": "The path is the logical artifact identity stored in the bound corpus. The bytes are not committed locally, so no local-path presence is assumed.",
+      "verificationRule": "Before retrieval, request only the exact bound HTTPS URL into memory, require exactly 1119540 response bytes and the bound SHA-256, and discard the bytes after verification. A server-controlled redirect reached from that exact request is permitted only when the final bytes pass both bindings. No alternate URL, revision, local file, cache object, or regenerated artifact is permitted. Network or binding failure aborts before retrieval.",
+      "usageBoundary": "The fetched bytes are provenance evidence only. They must never regenerate, replace, or modify the committed development corpus or its structural labels."
+    },
+    "oracleBoundary": "Structural development labels are retained exactly for differential reproduction. They are not blinded human relevance judgments and the corpus is not an untouched test set."
+  },
+  "globalApiDifferenceBoundary": {
+    "currentAdditions": [
+      "rankContextEvents returns additive admission and currentState audit fields",
+      "src/index.js exports resolveContextAdmission and resolveCurrentContextState"
+    ],
+    "projectionRule": "The evaluator may validate or observe the additive fields and helpers for binding diagnostics, but must ignore them when constructing the v0.4-compatible expected projection exactly as v0.4 did.",
+    "repositoryDifference": "With a non-empty repository filter, an absent or undefined event.repository now fails closed instead of potentially throwing. Explicit null and exact repository matches retain their bound semantics.",
+    "invalidInputDifference": "Invalid-input error precedence may differ because admission and current-state validation are explicit helpers.",
+    "corpusApplicability": "Every benchmark event in the bound corpus has validated repository metadata and the benchmark supplies valid inputs, so these global API differences are outside the measured corpus.",
+    "claimLimit": "Exact projected equality on this corpus does not establish universal or global behavior equivalence."
+  },
+  "measurementContract": {
+    "referenceProjection": "The complete immutable v0.4 expected object, including corpus metadata, both evaluation settings, inference entries, and every task result.",
+    "candidateProjection": "The complete v0.5 generated expected object constructed with the same field construction and insertion order as v0.4.",
+    "equalityRequirements": [
+      "Node deep strict equality of the complete reference and candidate expected objects",
+      "candidate canonical byte length equals 3110007",
+      "candidate canonical SHA-256 equals sha256:12f00c2e831e56b26c7eeff13d8b6aed0fee22760d40f5a46a1cb579870b3d0c",
+      "candidate canonical bytes exactly equal the reference canonical bytes"
+    ],
+    "partialEqualityForbidden": true,
+    "tolerance": 0,
+    "roundingOrMetricSubstitutionForbidden": true,
+    "mismatchDisposition": "Fail closed, publish no result artifact, and publish only the authorized failure receipt."
+  },
+  "resultContract": {
+    "schemaVersion": "qarinah.research-retrieval-development-result.v5",
+    "path": "bench/results/research-retrieval-development-v0.5.json",
+    "requiredTopLevelFields": [
+      "schemaVersion",
+      "packageVersion",
+      "status",
+      "confirmatoryClaimEligible",
+      "protocolBinding",
+      "sourceBinding",
+      "corpusBinding",
+      "globalApiDifferenceBoundary",
+      "executionScope",
+      "expectedCanonical",
+      "expected",
+      "runtimeObservation"
+    ],
+    "expectedObjectRule": "The expected field must be the exact candidate projection that passed every equality requirement; no summary-only or omitted-task result is valid.",
+    "writeLimit": 1,
+    "resultPathMustBeAbsentAtAuthorization": true,
+    "atomicPublication": "Serialize and verify the complete result in a same-directory exclusive temporary file, flush it, then publish with an atomic no-replace operation. A pre-existing destination must cause refusal; rename-overwrite is forbidden.",
+    "overwriteOrDeleteForbidden": true,
+    "rerunAfterSuccessfulPublicationForbidden": true
+  },
+  "futureBinding": {
+    "protocol": {
+      "commit": null,
+      "tag": null,
+      "manifestSha256": null,
+      "documentSha256": null
+    },
+    "evaluator": {
+      "path": "scripts/evaluate-research-retrieval-v0.5.mjs",
+      "commit": null,
+      "tag": null,
+      "sha256": null
+    },
+    "package": {
+      "path": "package.json",
+      "commit": null,
+      "sha256": null
+    },
+    "types": {
+      "path": "types/index.d.ts",
+      "commit": null,
+      "sha256": null
+    },
+    "authorizationReceipt": {
+      "path": null,
+      "commit": null,
+      "sha256": null,
+      "attemptId": null,
+      "explicitlyAuthorized": false
+    },
+    "nullFieldReason": "These values do not exist at protocol-authorship time and must not be guessed or self-referential.",
+    "postCommitBindingProcedure": [
+      "Commit and independently review exactly this manifest and its companion document as a pre-outcome protocol commit.",
+      "Implement and review the evaluator in a later, separate commit and create a reviewed immutable tag for that evaluator state.",
+      "Create a separate pre-execution authorization receipt that binds the protocol commit and tag, both protocol file hashes, evaluator commit and tag, evaluator hash, package.json hash, types/index.d.ts hash, exact result absence, reviewer decision, attempt ID, and the one authorized command.",
+      "Commit the authorization receipt before execution and require its exact bindings at evaluator startup."
+    ]
+  },
+  "executionContract": {
+    "executionMustWaitFor": [
+      "committed and independently reviewed protocol files",
+      "a separate committed and independently reviewed evaluator",
+      "an immutable evaluator tag",
+      "a committed separately reviewed authorization receipt",
+      "explicit authorization for the receipt's one attempt and exact write command"
+    ],
+    "allowedCommands": [
+      {
+        "mode": "binding-only",
+        "packageScript": "npm run check:research-retrieval:v0.5:bindings",
+        "argv": "node scripts/evaluate-research-retrieval-v0.5.mjs --bindings-only",
+        "retrievalAllowed": false,
+        "writesAllowed": false
+      },
+      {
+        "mode": "authorized-atomic-write",
+        "packageScript": "npm run evaluate:research-retrieval:v0.5:write",
+        "argv": "node scripts/evaluate-research-retrieval-v0.5.mjs --execute --write",
+        "retrievalAllowed": true,
+        "writesAllowed": true,
+        "explicitAuthorizationRequired": true,
+        "maximumAuthorizedAttempts": 1
+      },
+      {
+        "mode": "post-result-read-only-verification",
+        "packageScript": "npm run check:research-retrieval:v0.5:result",
+        "argv": "node scripts/evaluate-research-retrieval-v0.5.mjs --verify-result",
+        "retrievalAllowed": false,
+        "writesAllowed": false
+      }
+    ],
+    "otherModesOrCommandsAllowed": false,
+    "directNodeExecutionOutsideBoundPackageScriptsForbidden": true,
+    "silentFallbackOrAutomaticRerunForbidden": true,
+    "outcomePrintingBeforePublicationForbidden": true
+  },
+  "failureReceiptContract": {
+    "schemaVersion": "qarinah.research-retrieval-development-failure-receipt.v1",
+    "pathTemplate": "bench/results/research-retrieval-development-v0.5-{attemptId}-failure.json",
+    "requiredOnAuthorizedExecutionFailure": true,
+    "requiredFields": [
+      "schemaVersion",
+      "attemptId",
+      "command",
+      "protocolBinding",
+      "evaluatorBinding",
+      "sourceBinding",
+      "corpusBinding",
+      "startedAt",
+      "failedAt",
+      "failedStage",
+      "failureCode",
+      "sanitizedMessage",
+      "retrievalStarted",
+      "retrievalCompleted",
+      "resultPublished",
+      "resultPathAbsentAtStart",
+      "resultPathAbsentAtFailure"
+    ],
+    "mustRecordResultPublishedFalse": true,
+    "partialExpectedObjectOrMetricsForbidden": true,
+    "atomicNoReplacePublicationRequired": true,
+    "overwriteOrDeleteForbidden": true,
+    "failureDoesNotAuthorizeAnotherAttempt": true,
+    "rule": "Any binding, source, corpus, loader, raw-artifact, schema, mutation, execution-mode, canonical-byte, hash, or deep-equality failure aborts publication and emits only this bounded failure receipt."
+  },
+  "executionScope": {
+    "providerModelCalls": 0,
+    "providerReportedTokens": false,
+    "sweBenchDockerTaskExecution": false,
+    "humanRelevanceReview": false,
+    "humanCodeReview": false,
+    "taskPatchGeneration": false,
+    "latencyStudy": false,
+    "costStudy": false
+  },
+  "claimBoundary": {
+    "allowedAfterPassing": "On the inspected SWE-bench Lite development corpus, the bound current production retrieval API projection reproduced the complete frozen v0.4 expected object exactly under protocol v0.5.",
+    "disallowed": [
+      "new retrieval-quality improvement",
+      "confirmatory or held-out evidence",
+      "universal or global behavior equivalence",
+      "provider-token, cost, latency, task-success, patch-quality, or human-quality claims",
+      "best AI, best context reduction, best in industry, or peer-reviewed claims"
+    ],
+    "noOutcomeClaimBeforePassing": true
+  }
+}

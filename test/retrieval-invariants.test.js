@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildDerivedState, createEventEnvelope, rankContextEvents } from "../src/index.js";
+import {
+  buildDerivedState,
+  createEventEnvelope,
+  rankContextEvents,
+  resolveContextAdmission,
+  resolveCurrentContextState
+} from "../src/index.js";
 
 const WORKSPACE_ID = "ws_11111111111111111111111111111111";
 
@@ -54,6 +60,83 @@ test("strict-before temporal admission excludes evidence at the exact query time
     repositoryIds: ["owner/repository-a"]
   });
   assert.ok(inclusive.ranked.some((entry) => entry.event.eventId === equal.eventId));
+});
+
+test("exported admission is the ranker admission and preserves exact repository-null semantics", () => {
+  const explicitNullRepository = input(3, {
+    timestamp: "2026-01-03T00:00:00.000Z",
+    repository: null
+  });
+  const candidates = [
+    input(1, { timestamp: "2026-01-01T00:00:00.000Z" }),
+    input(2, {
+      timestamp: "2026-01-02T00:00:00.000Z",
+      repository: { id: "owner/repository-b", branch: "main", commit: "b".repeat(40) }
+    }),
+    explicitNullRepository,
+    input(4, {
+      timestamp: "2026-01-04T00:00:00.000Z",
+      disclosure: { classification: "restricted", scopes: ["private-review"] }
+    }),
+    input(5, { timestamp: "2026-01-10T00:00:00.000Z" })
+  ];
+  const stored = events(candidates);
+  const index = buildDerivedState(stored, WORKSPACE_ID).index;
+  const options = {
+    asOf: "2026-01-10T00:00:00.000Z",
+    temporalBoundary: "strict-before",
+    repositoryIds: ["owner/repository-a"],
+    authorityScopes: []
+  };
+  const admission = resolveContextAdmission(index, options);
+  assert.deepEqual(admission.eligibleEventIds, [eventId(1), eventId(3)]);
+  assert.deepEqual(admission.excludedEventIds, [eventId(2), eventId(4), eventId(5)]);
+  assert.deepEqual(admission.filters, { expired: 0, future: 1, notYetValid: 0, stale: 0, unauthorized: 2 });
+  assert.deepEqual(
+    admission.exclusions.map((entry) => [entry.eventId, entry.reasons]),
+    [
+      [eventId(2), ["repository"]],
+      [eventId(4), ["disclosure"]],
+      [eventId(5), ["future"]]
+    ]
+  );
+  const ranked = rankContextEvents(index, "generated boundary evidence", {
+    ...options,
+    rankingProfile: "admission-first-v2",
+    limit: 32
+  });
+  assert.deepEqual(ranked.admission, admission);
+  assert.deepEqual(new Set(ranked.ranked.map((entry) => entry.event.eventId)), new Set([eventId(1), eventId(3)]));
+  assert.deepEqual(ranked.filters, admission.filters);
+
+  const undefinedRepositoryIndex = {
+    ...index,
+    events: index.events.map((event) => event.eventId === eventId(3)
+      ? { ...event, repository: undefined }
+      : event)
+  };
+  const undefinedRepositoryAdmission = resolveContextAdmission(undefinedRepositoryIndex, options);
+  assert.equal(undefinedRepositoryAdmission.eligibleEventIds.includes(eventId(3)), false);
+  assert.deepEqual(
+    undefinedRepositoryAdmission.exclusions.find((entry) => entry.eventId === eventId(3))?.reasons,
+    ["repository"]
+  );
+
+  const absentRepositoryIndex = {
+    ...index,
+    events: index.events.map((event) => {
+      if (event.eventId !== eventId(3)) return event;
+      const withoutRepository = { ...event };
+      delete withoutRepository.repository;
+      return withoutRepository;
+    })
+  };
+  const absentRepositoryAdmission = resolveContextAdmission(absentRepositoryIndex, options);
+  assert.equal(absentRepositoryAdmission.eligibleEventIds.includes(eventId(3)), false);
+  assert.deepEqual(
+    absentRepositoryAdmission.exclusions.find((entry) => entry.eventId === eventId(3))?.reasons,
+    ["repository"]
+  );
 });
 
 test("evidence-sufficiency v2 accepts only conservative direct evidence and abstains on partial matches", () => {
@@ -178,6 +261,35 @@ test("supersession chains and cycles fail closed for current-state retrieval", (
     result.exclusions.map((entry) => entry.eventId).sort(),
     [old.eventId, middle.eventId, cycleA.eventId, cycleB.eventId].sort()
   );
+  const resolved = resolveCurrentContextState(
+    index,
+    result.currentState.orderedEventIds,
+    {
+      asOf: "2026-01-10T00:00:00.000Z",
+      query: "release chain",
+      supersessionPolicy: "prefer-current",
+      policyEligibleEventIds: result.admission.eligibleEventIds
+    }
+  );
+  assert.deepEqual(result.currentState, resolved);
+  assert.deepEqual(result.currentState.eligibleEventIds, [current.eventId]);
+  assert.deepEqual(
+    [...result.currentState.excludedEventIds].sort(),
+    [old.eventId, middle.eventId, cycleA.eventId, cycleB.eventId].sort()
+  );
+
+  const exactIdException = resolveCurrentContextState(
+    index,
+    [old.eventId, current.eventId],
+    {
+      asOf: "2026-01-10T00:00:00.000Z",
+      query: `inspect ${old.eventId}`,
+      supersessionPolicy: "prefer-current",
+      policyEligibleEventIds: result.admission.eligibleEventIds
+    }
+  );
+  assert.deepEqual(exactIdException.eligibleEventIds, [old.eventId, current.eventId]);
+  assert.deepEqual(exactIdException.excludedEventIds, []);
 });
 
 test("generated admission combinations are deterministic and never cross policy boundaries", () => {

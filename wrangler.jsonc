@@ -1,0 +1,9 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "qarinah",
+  "compatibility_date": "2026-08-08",
+  "assets": {
+    "directory": "./site-dist",
+    "html_handling": "auto-trailing-slash"
+  }
+}

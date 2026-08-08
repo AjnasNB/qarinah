@@ -1,6 +1,6 @@
 # MCP guide
 
-Qarinah 0.1.5 includes a native, zero-write Model Context Protocol server. It always provides local ledger status and integrity diagnostics. It provides `context.query` only after the user creates an explicit permit bound to the exact workspace, current consent-policy hash, and response ceilings.
+Qarinah 0.1.6 includes a native, zero-write Model Context Protocol server. It always provides local ledger status and integrity diagnostics. It provides `context.query` only after the user creates an explicit permit bound to the exact workspace, current consent-policy hash, and response ceilings.
 
 That narrow boundary is intentional:
 
@@ -15,7 +15,7 @@ That narrow boundary is intentional:
 | --- | --- |
 | MCP name | `io.github.AjnasNB/qarinah` |
 | npm package | `qarinah` |
-| Version | `0.1.5` |
+| Version | `0.1.6` |
 | Transport | `stdio` |
 | CLI entry | `npx qarinah mcp` |
 | Default tools | `context_status`, `context_doctor` |
@@ -64,7 +64,7 @@ For a host configuration that accepts an MCP command object:
   "mcpServers": {
     "qarinah-context": {
       "command": "npx",
-      "args": ["-y", "qarinah@0.1.0", "mcp"]
+      "args": ["-y", "qarinah@0.1.6", "mcp"]
     }
   }
 }
@@ -105,7 +105,7 @@ The packaged Codex integration defines:
 Install the reviewed release:
 
 ```sh
-codex plugin marketplace add AjnasNB/qarinah --ref v0.1.0
+codex plugin marketplace add AjnasNB/qarinah --ref v0.1.6
 codex plugin add qarinah@qarinah
 ```
 
@@ -147,14 +147,14 @@ The packaged Claude integration defines:
 Install:
 
 ```sh
-claude plugin marketplace add AjnasNB/qarinah@v0.1.0 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.1.6 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 
 Project and local scopes are also supported by Claude Code:
 
 ```sh
-claude plugin marketplace add AjnasNB/qarinah@v0.1.0 --scope project
+claude plugin marketplace add AjnasNB/qarinah@v0.1.6 --scope project
 claude plugin install qarinah@qarinah --scope project
 ```
 
@@ -267,7 +267,7 @@ Compiles a bounded, cited context pack without writing to the workspace. This to
 
 Retrieval uses the `admission-first-v2` profile: repository, time, retention, disclosure, and supersession admission happens before ranking; admissible lexical candidates retain BM25 order, and fuzzy or graph evidence may only fill gaps. `temporalBoundary: "strict-before"` excludes evidence at the exact `asOf` timestamp and is recommended for prequential research evaluation. The default `inclusive` boundary is appropriate for normal as-of queries.
 
-`minimumEvidence` accepts `any`, `partial`, or `direct`. A stricter value returns `CONTEXT_EVIDENCE_INSUFFICIENT` when the deterministic evidence diagnostic does not meet the requested level. In `evidence-sufficiency-v2`, only `DIRECTLY_SUPPORTED` produces `ACCEPT_DIRECT`; partial and insufficient evidence both produce `ABSTAIN`. The frozen development run observed zero direct false accepts at the conservative 0.65 operating point, but exact 95% upper bounds remain 7.25% static and 11.22% online and acceptance coverage is only 3.33%-5.00%. Callers must still inspect cited records and reason codes.
+`minimumEvidence` accepts `any`, `partial`, or `direct`. A stricter value returns `CONTEXT_EVIDENCE_INSUFFICIENT` when the deterministic evidence diagnostic does not meet the requested level. In `evidence-sufficiency-v2`, only `DIRECTLY_SUPPORTED` produces `ACCEPT_DIRECT`; partial and insufficient evidence both produce `ABSTAIN`. The production-bound development-v0.4 recomputation observed zero direct false accepts at the conservative 0.65 operating point among 49 static and 31 online oracle-negative cases, but exact 95% upper bounds remain 7.25% and 11.22% and acceptance coverage is only 4.17%-6.25%. Callers must still inspect cited records and reason codes.
 
 ## Tool result errors
 

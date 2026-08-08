@@ -44,6 +44,8 @@ assert.equal(backup.remotePublished, false);
 
 assert.equal(sufficiency.productionRule.method, "evidence-sufficiency-v2");
 assert.equal(sufficiency.productionRule.directThreshold, 0.65);
+assert.equal(sufficiency.sourceArtifact.path, "bench/results/research-retrieval-development-v0.2.json");
+assert.equal(sufficiency.sourceArtifact.sha256, "sha256:bfe8015811ffbecd5e3c00eb9f4a1e104478605cd605442a1ec96d67582e4b3f");
 assert.equal(sufficiency.claimBoundary.confirmatory, false);
 assert.equal(sufficiency.claimBoundary.humanValidatedRelevance, false);
 for (const settingName of ["static", "onlinePrequential"]) {
@@ -87,10 +89,12 @@ for (const fragment of [
   "0%-11.22%",
   "3.33% acceptance coverage",
   "5.00% acceptance coverage",
+  "frozen v0.2 `evidence-sufficiency-v1` score",
+  "historical threshold calibration rather than a recomputation of current production `evidence-sufficiency-v2`",
   "not a universal semantic guarantee",
   "awaiting two independent human reviewers"
 ]) assert.ok(research.includes(fragment), `Research report is missing: ${fragment}`);
-assert.ok(benchmarks.includes("conservative development-v0.3 gate"));
+assert.ok(benchmarks.includes("Historical development v0.3"));
 
 assert.equal(packageJson.scripts["prepare:research-repositories:v0.2"], "node scripts/prepare-repository-manifest-v0.2.mjs");
 assert.equal(packageJson.scripts["prepare:research-audit:v0.3"], "node scripts/prepare-relevance-audit-v0.3.mjs");

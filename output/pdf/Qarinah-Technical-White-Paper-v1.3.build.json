@@ -1,0 +1,53 @@
+{
+  "combinedSourceSha256": "sha256:1d058bd27537a2b716667decea0b50d4f521f500bafadec34275d41f6c323393",
+  "generator": {
+    "command": "python scripts/build-whitepaper-pdf-v1.3.py",
+    "fonts": [
+      {
+        "fileName": "arial.ttf",
+        "registeredName": "QBody",
+        "role": "body",
+        "sha256": "b3658eadae55e682b5f69eb64c439c1ecc8f196c0bb8d4756d145d13bc86476a"
+      },
+      {
+        "fileName": "arialbd.ttf",
+        "registeredName": "QBody-Bold",
+        "role": "bold",
+        "sha256": "e8f4e3baf6cc35fed6fcce3a540e8b39e8f6cda1d22a28f2ec8f526fef7a43f5"
+      },
+      {
+        "fileName": "ariali.ttf",
+        "registeredName": "QBody-Italic",
+        "role": "italic",
+        "sha256": "86b32db9a06f9694e2a3760c42e5117bcdc5cc1255bb5186ca8ce0305e22f288"
+      },
+      {
+        "fileName": "consola.ttf",
+        "registeredName": "QMono",
+        "role": "monospace",
+        "sha256": "cf00b507b3286870cc5064ebd0633c303f70b491a4af25eec2d32df413db0179"
+      }
+    ],
+    "platform": "win32",
+    "pythonImplementation": "CPython",
+    "pythonVersion": "3.12.13",
+    "reportlabVersion": "4.4.9"
+  },
+  "paperVersion": "1.3",
+  "schemaVersion": "qarinah.white-paper-build.v1",
+  "sourceDigestAlgorithm": "sha256(file-bytes + NUL + file-bytes + NUL + file-bytes; listed order)",
+  "sources": [
+    {
+      "path": "docs/WHITEPAPER.md",
+      "sha256": "sha256:de7da69087eaf2e9bbad40122f724cff488834aa366d5205b14ca58a9b75e840"
+    },
+    {
+      "path": "scripts/build-whitepaper-pdf.py",
+      "sha256": "sha256:bab8180794f7d5416c06d394a215ea3b85cc5520073fd1f860e1bea169155bdf"
+    },
+    {
+      "path": "scripts/build-whitepaper-pdf-v1.3.py",
+      "sha256": "sha256:b49f12e2670ae1db0470179acc7e202c1dc907130168d29da25f3fd12d648354"
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { setTimeout as delay } from "node:timers/promises";
 
 export const DATASET_ID = "princeton-nlp/SWE-bench_Lite";
 export const DATASET_REVISION = "6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2";
@@ -59,22 +60,48 @@ function requestUrl(base, parameters) {
   return url;
 }
 
+async function withTransientRetries(label, operation) {
+  const attempts = 4;
+  let lastError;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error;
+      if (error?.retryable === false || attempt === attempts) break;
+      await delay(250 * (2 ** (attempt - 1)));
+    }
+  }
+  throw new Error(`${label} failed after ${attempts} attempts.`, { cause: lastError });
+}
+
+function requireSuccessfulResponse(response, label) {
+  if (response.ok) return;
+  const error = new Error(`${label} failed with HTTP ${response.status}.`);
+  error.retryable = response.status === 408 || response.status === 429 || response.status >= 500;
+  throw error;
+}
+
 async function getJson(url, label) {
-  const response = await fetch(url, {
-    headers: { "user-agent": "qarinah-research-benchmark/1" },
-    signal: AbortSignal.timeout(30_000)
+  return withTransientRetries(label, async () => {
+    const response = await fetch(url, {
+      headers: { "user-agent": "qarinah-research-benchmark/1" },
+      signal: AbortSignal.timeout(30_000)
+    });
+    requireSuccessfulResponse(response, label);
+    return response.json();
   });
-  if (!response.ok) throw new Error(`${label} failed with HTTP ${response.status}.`);
-  return response.json();
 }
 
 async function getBytes(url, label) {
-  const response = await fetch(url, {
-    headers: { "user-agent": "qarinah-research-benchmark/2" },
-    signal: AbortSignal.timeout(60_000)
+  return withTransientRetries(label, async () => {
+    const response = await fetch(url, {
+      headers: { "user-agent": "qarinah-research-benchmark/2" },
+      signal: AbortSignal.timeout(60_000)
+    });
+    requireSuccessfulResponse(response, label);
+    return Buffer.from(await response.arrayBuffer());
   });
-  if (!response.ok) throw new Error(`${label} failed with HTTP ${response.status}.`);
-  return Buffer.from(await response.arrayBuffer());
 }
 
 export async function fetchDatasetMetadata() {
@@ -448,11 +475,21 @@ export function buildRepositoryManifest(rows, metadata, sourceArtifact, historic
   return { ...manifest, content_sha256: sha256(JSON.stringify(manifest)) };
 }
 
-export async function loadPinnedDevelopmentDataset() {
+export async function loadPinnedDevelopmentDataset(options = {}) {
+  const suppliedSourceArtifact = options.sourceArtifact ?? null;
+  if (suppliedSourceArtifact !== null) {
+    if (suppliedSourceArtifact.path !== DATASET_TEST_ARTIFACT
+      || !/^sha256:[0-9a-f]{64}$/u.test(suppliedSourceArtifact.sha256)
+      || !Number.isSafeInteger(suppliedSourceArtifact.bytes)
+      || suppliedSourceArtifact.bytes < 1
+      || typeof suppliedSourceArtifact.url !== "string") {
+      throw new TypeError("sourceArtifact must be exact pinned-artifact metadata from the committed development corpus.");
+    }
+  }
   const [metadata, rows, sourceArtifact] = await Promise.all([
     fetchDatasetMetadata(),
     fetchDatasetRows(),
-    fetchDatasetArtifactMetadata()
+    suppliedSourceArtifact === null ? fetchDatasetArtifactMetadata() : suppliedSourceArtifact
   ]);
   return {
     metadata,

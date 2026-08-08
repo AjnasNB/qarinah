@@ -10,23 +10,52 @@ const serverManifest = JSON.parse(await read("server.json"));
 const runtimeVersion = await read("src/version.js");
 const typeDeclarations = await read("types/index.d.ts");
 const llmsFullSource = await read("website/static/llms-full.txt");
+const contributing = await read("CONTRIBUTING.md");
 const architecture = (await read("docs/architecture.mmd")).trim();
 const architectureSvg = await read("assets/architecture/qarinah-flow.svg");
 const architectureDigest = createHash("sha256").update(`${architecture}\n`, "utf8").digest("hex");
 const committedDigest = (await read("assets/architecture/qarinah-flow.source.sha256")).trim();
 const whitePaperSource = await read("docs/WHITEPAPER.md");
-const whitePaperBuilder = await read("scripts/build-whitepaper-pdf.py");
-const whitePaperPdf = await readFile(
+const publishedWhitePaperPdf = await readFile(
   path.join(root, "output", "pdf", "Qarinah-Technical-White-Paper-v1.2.pdf")
 );
-const whitePaperPdfDigest = (
+const publishedWhitePaperSourceReceipt = (
   await read("output/pdf/Qarinah-Technical-White-Paper-v1.2.source.sha256")
 ).trim();
-const expectedWhitePaperDigest = createHash("sha256")
-  .update(whitePaperSource, "utf8")
-  .update("\0", "utf8")
-  .update(whitePaperBuilder, "utf8")
-  .digest("hex");
+const historicalV13WhitePaperPdf = await readFile(
+  path.join(root, "output", "pdf", "Qarinah-Technical-White-Paper-v1.3.pdf")
+);
+const historicalV13WhitePaperSourceReceipt = (
+  await read("output/pdf/Qarinah-Technical-White-Paper-v1.3.source.sha256")
+).trim();
+const historicalV13WhitePaperPdfReceipt = (
+  await read("output/pdf/Qarinah-Technical-White-Paper-v1.3.pdf.sha256")
+).trim();
+const historicalV13WhitePaperBuildMetadata = JSON.parse(
+  await read("output/pdf/Qarinah-Technical-White-Paper-v1.3.build.json")
+);
+const currentWhitePaperPdf = await readFile(
+  path.join(root, "output", "pdf", "Qarinah-Technical-White-Paper-v1.4.pdf")
+);
+const currentWhitePaperSourceReceipt = (
+  await read("output/pdf/Qarinah-Technical-White-Paper-v1.4.source.sha256")
+).trim();
+const currentWhitePaperPdfReceipt = (
+  await read("output/pdf/Qarinah-Technical-White-Paper-v1.4.pdf.sha256")
+).trim();
+const currentWhitePaperBuildMetadata = JSON.parse(
+  await read("output/pdf/Qarinah-Technical-White-Paper-v1.4.build.json")
+);
+const publishedWhitePaperSourceDigest = "7b76b3ed889b5939ef3fba2e7bf302b41fcf010ce6dfc2d8ab612145865d7756";
+const publishedWhitePaperPdfDigest = "6b214e40697179bc9eca6544824b201926e901b4209fca642849d191906fb8cd";
+const currentWhitePaperSourcePaths = [
+  "docs/WHITEPAPER.md",
+  "scripts/build-whitepaper-pdf.py",
+  "scripts/build-whitepaper-pdf-v1.4.py"
+];
+const currentWhitePaperSourceBytes = await Promise.all(
+  currentWhitePaperSourcePaths.map((relativePath) => readFile(path.join(root, relativePath)))
+);
 
 const escapedVersion = packageJson.version.replaceAll(".", "\\.");
 if (!new RegExp(`QARINAH_VERSION\\s*=\\s*["']${escapedVersion}["']`, "u").test(runtimeVersion)) {
@@ -38,8 +67,17 @@ if (!new RegExp(`QARINAH_VERSION:\\s*["']${escapedVersion}["']`, "u").test(typeD
 if (serverManifest.version !== packageJson.version || serverManifest.packages?.[0]?.version !== packageJson.version) {
   throw new Error("server.json package and server versions must match package.json.");
 }
-if (!llmsFullSource.includes(`Current documented release: \`${packageJson.version}\``)) {
+if (!llmsFullSource.includes(`Current release: \`${packageJson.version}\``)) {
   throw new Error("website/static/llms-full.txt must match package.json.");
+}
+if (packageJson.scripts?.["build:whitepaper"] !== undefined
+  || packageJson.files.some((entry) => entry.includes("build-whitepaper-pdf"))) {
+  throw new Error("White-paper generation must remain a source-checkout workflow, not a public npm-package contract.");
+}
+if (!contributing.includes("python scripts/build-whitepaper-pdf-v1.4.py")
+  || !contributing.includes("v1.3 remains an immutable historical publication")
+  || !contributing.includes("intentionally excluded from the npm tarball")) {
+  throw new Error("CONTRIBUTING.md must document the repository-only white-paper build contract.");
 }
 
 if (!/^flowchart T[BD]\b/u.test(architecture)) {
@@ -55,23 +93,74 @@ for (const label of ["Codex / Claude Code / Cursor", "Hash-chained JSONL ledger"
 if (/Â/u.test(architectureSvg)) {
   throw new Error("Rendered architecture image contains a likely text-encoding artifact.");
 }
-if (!whitePaperPdf.subarray(0, 5).equals(Buffer.from("%PDF-", "ascii"))) {
-  throw new Error("The publication white paper is not a valid PDF artifact.");
+if (!publishedWhitePaperPdf.subarray(0, 5).equals(Buffer.from("%PDF-", "ascii"))) {
+  throw new Error("The immutable v1.2 publication is not a valid PDF artifact.");
 }
-if (whitePaperPdf.byteLength < 150_000) {
-  throw new Error("The publication white paper is unexpectedly small.");
+if (publishedWhitePaperPdf.byteLength < 150_000) {
+  throw new Error("The immutable v1.2 publication is unexpectedly small.");
 }
-if (
-  whitePaperPdfDigest
-    !== `${expectedWhitePaperDigest}  docs/WHITEPAPER.md+scripts/build-whitepaper-pdf.py`
-) {
-  throw new Error("The publication white paper is stale. Rebuild it with scripts/build-whitepaper-pdf.py.");
+if (publishedWhitePaperSourceReceipt !== `${publishedWhitePaperSourceDigest}  docs/WHITEPAPER.md+scripts/build-whitepaper-pdf.py`) {
+  throw new Error("The immutable v1.2 publication source receipt changed.");
 }
-for (const relativePath of ["README.md", "docs/WHITEPAPER.md"]) {
-  const markdown = await read(relativePath);
-  if (!markdown.includes("output/pdf/Qarinah-Technical-White-Paper-v1.2.pdf")) {
-    throw new Error(`${relativePath} does not link to the publication PDF.`);
+if (createHash("sha256").update(publishedWhitePaperPdf).digest("hex") !== publishedWhitePaperPdfDigest) {
+  throw new Error("The immutable v1.2 publication PDF changed.");
+}
+if (!historicalV13WhitePaperPdf.subarray(0, 5).equals(Buffer.from("%PDF-", "ascii"))
+  || historicalV13WhitePaperPdf.byteLength < 150_000
+  || historicalV13WhitePaperSourceReceipt !== "1d058bd27537a2b716667decea0b50d4f521f500bafadec34275d41f6c323393  docs/WHITEPAPER.md+scripts/build-whitepaper-pdf.py+scripts/build-whitepaper-pdf-v1.3.py"
+  || historicalV13WhitePaperBuildMetadata.paperVersion !== "1.3"
+  || historicalV13WhitePaperBuildMetadata.combinedSourceSha256 !== "sha256:1d058bd27537a2b716667decea0b50d4f521f500bafadec34275d41f6c323393"
+  || historicalV13WhitePaperPdfReceipt !== `${createHash("sha256").update(historicalV13WhitePaperPdf).digest("hex")}  output/pdf/Qarinah-Technical-White-Paper-v1.3.pdf`) {
+  throw new Error("The immutable v1.3 white-paper publication changed.");
+}
+if (!currentWhitePaperPdf.subarray(0, 5).equals(Buffer.from("%PDF-", "ascii")) || currentWhitePaperPdf.byteLength < 150_000) {
+  throw new Error("The v1.4 white paper is not a valid PDF artifact.");
+}
+const currentWhitePaperSourceHash = createHash("sha256");
+for (const [index, sourceBytes] of currentWhitePaperSourceBytes.entries()) {
+  if (index) currentWhitePaperSourceHash.update(Buffer.from([0]));
+  currentWhitePaperSourceHash.update(sourceBytes);
+}
+const currentWhitePaperSourceDigest = currentWhitePaperSourceHash.digest("hex");
+if (currentWhitePaperSourceReceipt !== `${currentWhitePaperSourceDigest}  ${currentWhitePaperSourcePaths.join("+")}`) {
+  throw new Error("The v1.4 white-paper source receipt is stale.");
+}
+if (currentWhitePaperBuildMetadata.schemaVersion !== "qarinah.white-paper-build.v1"
+  || currentWhitePaperBuildMetadata.paperVersion !== "1.4"
+  || currentWhitePaperBuildMetadata.combinedSourceSha256 !== `sha256:${currentWhitePaperSourceDigest}`
+  || currentWhitePaperBuildMetadata.generator?.command !== "python scripts/build-whitepaper-pdf-v1.4.py"
+  || !currentWhitePaperBuildMetadata.generator?.pythonImplementation
+  || !currentWhitePaperBuildMetadata.generator?.pythonVersion
+  || !currentWhitePaperBuildMetadata.generator?.reportlabVersion
+  || !currentWhitePaperBuildMetadata.generator?.platform
+  || currentWhitePaperBuildMetadata.generator?.fonts?.length !== 4) {
+  throw new Error("The v1.4 white-paper build metadata is incomplete or stale.");
+}
+for (const [index, relativePath] of currentWhitePaperSourcePaths.entries()) {
+  const recorded = currentWhitePaperBuildMetadata.sources?.[index];
+  const digest = createHash("sha256").update(currentWhitePaperSourceBytes[index]).digest("hex");
+  if (recorded?.path !== relativePath || recorded?.sha256 !== `sha256:${digest}`) {
+    throw new Error(`The v1.4 build metadata does not bind ${relativePath}.`);
   }
+}
+const currentWhitePaperPdfDigest = createHash("sha256").update(currentWhitePaperPdf).digest("hex");
+if (currentWhitePaperPdfReceipt !== `${currentWhitePaperPdfDigest}  output/pdf/Qarinah-Technical-White-Paper-v1.4.pdf`) {
+  throw new Error("The v1.4 white-paper PDF receipt is stale.");
+}
+if (!whitePaperSource.includes("**Paper version:** 1.4")
+  || !whitePaperSource.includes("**Implementation:** Qarinah `0.1.6`")
+  || !whitePaperSource.includes("current-product v0.5 differential reproduction")
+  || !whitePaperSource.includes("no primary comparative result")
+  || !whitePaperSource.includes("[10.5281/zenodo.21843240](https://doi.org/10.5281/zenodo.21843240)")
+  || !whitePaperSource.includes("[10.5281/zenodo.21547684](https://doi.org/10.5281/zenodo.21547684)")) {
+  throw new Error("The v1.4 source must disclose its version, implementation, v0.5/v2 evidence, and historical/concept DOIs.");
+}
+for (const [relativePath, paperPath] of [
+  ["README.md", "output/pdf/Qarinah-Technical-White-Paper-v1.4.pdf"],
+  ["docs/WHITEPAPER.md", "output/pdf/Qarinah-Technical-White-Paper-v1.4.pdf"]
+]) {
+  const markdown = await read(relativePath);
+  if (!markdown.includes(paperPath)) throw new Error(`${relativePath} does not link to the v1.4 PDF.`);
 }
 
 for (const [relativePath, imagePath] of [

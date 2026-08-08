@@ -4,9 +4,9 @@
 
 **Author:** Ajnas NB  
 **Protocol version:** 1.0  
-**Implementation:** Qarinah 0.1.2  
+**Implementation:** Qarinah 0.1.6
 **Date:** August 2026  
-**Status:** Research draft; exploratory v0.1 frozen, development v0.2 preserved, conservative gate v0.3 completed, not peer-reviewed and not preregistered
+**Status:** Research draft; exploratory v0.1 frozen, development v0.2 and historical calibration v0.3 preserved, current production-bound development v0.4 completed, not peer-reviewed and not preregistered
 **Artifact license:** Apache License 2.0; upstream repositories and benchmark data retain their own terms
 
 ## Abstract
@@ -15,7 +15,7 @@ This research track studies whether evidence-linked, time-explicit project memor
 
 Exploratory v0.1 evaluates retrieval and governance, not patch generation. Only 79 of the 240 held-out tasks have a prior task that overlaps a gold production-file path, so retrieval effectiveness is reported on those 79 tasks and coverage behavior is reported on all 240. Plain BM25 outperforms the original Qarinah balanced hybrid ranking on this oracle: Recall@10 is 0.687 versus 0.518, and mean reciprocal rank is 0.430 versus 0.320. The lexical coverage gate accepts all 161 tasks for which the file-overlap oracle identifies no positive prior record; those tasks are not proven semantically unsupported. Removing time controls produces 971 future citations, or 42.44% of citations in that ablation. Separately, 72 constructed boundary records across all 12 repositories verify rejection of future, expired, stale, restricted, wrong-repository, and superseded evidence with zero forbidden records returned.
 
-Exploratory v0.1 is frozen at Git tag `research-benchmark-exploratory-v0.1`. Development v0.2 changes Qarinah to admission-first lexical ranking and evaluates a deterministic graded structural oracle in both static and online/prequential settings. Qarinah v2 now matches admitted BM25 exactly on ranking while retaining governance controls and improves over the original balanced-v1 profile. Its graph stage adds no measured ranking value in this corpus. Development v0.3 changes the evidence decision to a conservative direct-only acceptance rule: partial evidence is exposed as an abstention, not accepted as sufficient. At this frozen operating point, we observed zero direct false accepts under the development structural oracle at the cost of accepting only 3.33% of static queries and 5.00% of online queries. The exact intervals remain wide, the underlying score remains poorly calibrated, and human relevance review is still pending. Provider-reported tokens, SWE-bench resolve rate, patch quality, model portability, cost, and independent human review remain unmeasured.
+Exploratory v0.1 is frozen at Git tag `research-benchmark-exploratory-v0.1`. Development v0.2 changes Qarinah to admission-first lexical ranking and evaluates a deterministic graded structural oracle in both static and online/prequential settings. Qarinah v2 matches admitted BM25 exactly on ranking while retaining governance controls and improves over the original balanced-v1 profile. Its graph stage adds no measured ranking value in this corpus. Historical development v0.3 applies a conservative direct-only threshold to the frozen v0.2 `evidence-sufficiency-v1` scores. Development v0.4 separately recomputes current production `evidence-sufficiency-v2` behavior and binds the result to implementation hashes. V0.4 observes zero direct false accepts under the development structural oracle while accepting 4.17% of static queries and 6.25% online. The exact intervals remain wide, the underlying score remains poorly calibrated, and human relevance review is still pending. Provider-reported tokens, SWE-bench resolve rate, patch quality, model portability, cost, and independent human review remain unmeasured.
 
 ## 1. Research questions
 
@@ -167,9 +167,9 @@ The experimental evidence-sufficiency score is not ready as a fail-closed semant
 
 The v2 no-temporal ablation returns 1,083 future items out of 2,288, a 47.33% item-level violation rate, and affects all 240 queries. This separates item-level from query-level leakage and reinforces that the higher-leakage ranking must not be treated as a valid system result.
 
-### Conservative evidence decision v0.3
+### Historical conservative evidence decision v0.3
 
-Development v0.3 preserves the v0.2 score as a diagnostic but changes the decision boundary. A score of at least 0.65 returns `DIRECTLY_SUPPORTED` with decision `ACCEPT_DIRECT`; `PARTIALLY_SUPPORTED` always returns `ABSTAIN`. This distinction fixes the earlier mistake of counting partial evidence as a successful sufficiency decision.
+Development v0.3 preserves the frozen v0.2 `evidence-sufficiency-v1` score as a diagnostic but changes the decision boundary. A score of at least 0.65 returns `DIRECTLY_SUPPORTED` with decision `ACCEPT_DIRECT`; `PARTIALLY_SUPPORTED` always returns `ABSTAIN`. This fixes the earlier interpretation that counted partial evidence as a successful sufficiency decision, but it is historical threshold calibration rather than a recomputation of current production `evidence-sufficiency-v2`.
 
 | Setting | No-positive tasks | Direct accepts | False accepts | Direct precision (exact 95% CI) | False-accept rate (exact 95% CI) | Direct recall | Coverage |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -179,6 +179,17 @@ Development v0.3 preserves the v0.2 score as a diagnostic but changes the decisi
 Leave-one-repository-out validation also observed zero direct false accepts, but the exact intervals show why this is not proof of a perfect gate. The result applies only to the deterministic structural development oracle and is not a universal semantic guarantee. The intentionally conservative threshold has 3.33% acceptance coverage in the static setting and 5.00% acceptance coverage online, while the raw score still has online ROC-AUC 0.538, Brier score 0.269, and calibration error 0.388.
 
 The structural oracle itself remains unvalidated. A blinded audit artifact contains the complete census of all 49 static no-positive cases, with Qarinah scores, decisions, target gold patches, and target gold paths hidden. It is awaiting two independent human reviewers; reviewer agreement, Cohen's kappa, disagreements, and adjudicated labels must not be reported until real reviewers complete them.
+
+### Current production-bound evidence decision v0.4
+
+Development v0.4 reruns the same inspected 240-query corpus through current production `evidence-sufficiency-v2`. The artifact includes the exact method name, decisions, thresholds, reason codes, per-file source hashes, and a combined implementation digest.
+
+| Setting | No-positive tasks | Direct accepts | False accepts | Direct precision (exact 95% CI) | False-accept rate (exact 95% CI) | Direct recall | Coverage |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Static | 49 | 10/240 | 0/49 | 100% (69.15%-100%) | 0% (0%-7.25%) | 5.24% | 4.17% |
+| Online/prequential | 31 | 15/240 | 0/31 | 100% (78.20%-100%) | 0% (0%-11.22%) | 7.18% | 6.25% |
+
+The current product therefore retains the observed zero direct false accepts while accepting two additional static and three additional online structural-oracle positives relative to historical v0.3. This is still development evidence on the same inspected corpus. It does not establish semantic precision on new repositories, and it does not convert partial-score diagnostics into accepted evidence.
 
 ## 8. What the pilot changes
 
@@ -225,11 +236,13 @@ Until then, Qarinah must not claim improved SWE-bench resolve rate, provider-tok
 - Machine-readable result: [`bench/results/research-retrieval-0.1.2.json`](../bench/results/research-retrieval-0.1.2.json)
 - Frozen exploratory tag: `research-benchmark-exploratory-v0.1`
 - Development-v0.2 corpus: [`bench/research/swe-bench-lite-development-v0.2.json`](../bench/research/swe-bench-lite-development-v0.2.json)
-- Development-v0.2 evaluator: [`scripts/evaluate-research-retrieval-v0.2.mjs`](../scripts/evaluate-research-retrieval-v0.2.mjs)
+- Historical development-v0.2 evaluator guard and exact-tag instructions: [`scripts/evaluate-research-retrieval-v0.2.mjs`](../scripts/evaluate-research-retrieval-v0.2.mjs)
 - Development-v0.2 result: [`bench/results/research-retrieval-development-v0.2.json`](../bench/results/research-retrieval-development-v0.2.json)
 - Repository-count resolution: [`bench/research/repository-manifest-v0.2.json`](../bench/research/repository-manifest-v0.2.json)
 - Offline-backup receipt: [`bench/research/development-backup-v0.2.json`](../bench/research/development-backup-v0.2.json)
-- Conservative sufficiency result: [`bench/results/research-sufficiency-development-v0.3.json`](../bench/results/research-sufficiency-development-v0.3.json)
+- Historical conservative sufficiency result: [`bench/results/research-sufficiency-development-v0.3.json`](../bench/results/research-sufficiency-development-v0.3.json)
+- Current production-bound v0.4 evaluator: [`scripts/evaluate-research-retrieval-v0.4.mjs`](../scripts/evaluate-research-retrieval-v0.4.mjs)
+- Current production-bound v0.4 result: [`bench/results/research-retrieval-development-v0.4.json`](../bench/results/research-retrieval-development-v0.4.json)
 - Blinded relevance-review artifact: [`bench/research/relevance-audit-review-v0.3.json`](../bench/research/relevance-audit-review-v0.3.json)
 - Separate review-admin manifest: [`bench/research/relevance-audit-admin-v0.3.json`](../bench/research/relevance-audit-admin-v0.3.json)
 - Frozen final protocol receipt: [`bench/final/protocol-v1.json`](../bench/final/protocol-v1.json)
@@ -241,7 +254,7 @@ Until then, Qarinah must not claim improved SWE-bench resolve rate, provider-tok
 - Pilot authorization guardrail: [`bench/final/pilot-authorization-v1.json`](../bench/final/pilot-authorization-v1.json)
 - Local execution-readiness receipt: [`bench/final/execution-readiness-v1.json`](../bench/final/execution-readiness-v1.json)
 
-The evaluator fails if the pinned corpus, deterministic metrics, temporal leakage count, or governance results drift from the committed evidence. Runtime latency is retained as an observation and excluded from deterministic equality checks.
+The current v0.4 evaluator fails if the pinned corpus, deterministic metrics, temporal leakage count, direct-decision counts, or bound implementation hashes drift from the committed evidence. Runtime latency is retained as an observation and excluded from deterministic equality checks. Historical v0.2 reproduction must use its exact tag and commit in a separate clean worktree.
 
 ## 11. Publication path
 

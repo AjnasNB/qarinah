@@ -1,0 +1,232 @@
+{
+  "schemaVersion": "qarinah.benchmark-release.v2",
+  "packageVersion": "0.1.6",
+  "paperVersion": "1.3",
+  "status": "release-candidate-locally-verified-not-published",
+  "preparedAt": "2026-08-08",
+  "receiptScope": "timestamped-pre-publication-local-verification",
+  "lifecycleSemantics": "These status fields record the state when the exact release source was locally verified; they are not a live publication-status endpoint.",
+  "paperArtifact": {
+    "status": "local-release-candidate-zenodo-version-doi-reserved",
+    "conceptDoi": "10.5281/zenodo.21547684",
+    "newVersionDoi": "10.5281/zenodo.21843240",
+    "zenodoDraftRecordId": "21843240",
+    "doiStatus": "reserved-draft-not-registered-or-published",
+    "path": "output/pdf/Qarinah-Technical-White-Paper-v1.3.pdf",
+    "sha256": "sha256:4b0c87adc03504dafa9817e3cf6c0fc78c02f7dd2c8d9951e94ae9d722f8ec20",
+    "sourceReceiptPath": "output/pdf/Qarinah-Technical-White-Paper-v1.3.source.sha256",
+    "sourceReceiptSha256": "sha256:58d707332648318aa52d815223dd536a1da0e6edf70f1cf9ab1519e7abee054f",
+    "pdfReceiptPath": "output/pdf/Qarinah-Technical-White-Paper-v1.3.pdf.sha256",
+    "pdfReceiptSha256": "sha256:4de46c9cbb669f55effbfff5d4d0bdbe95780e566b12f92d6f8714dd80380708",
+    "buildMetadataPath": "output/pdf/Qarinah-Technical-White-Paper-v1.3.build.json",
+    "buildMetadataSha256": "sha256:2a7315698579918826eb8931ceda5ae2040ecc1ce3e08f0142ab356b12b08ef0"
+  },
+  "portableTokenEstimator": {
+    "method": "ceil(characters / 4)",
+    "exactProviderTokenizer": false,
+    "providerBillingMeasurement": false
+  },
+  "headlineContextResults": [
+    {
+      "id": "six-task-repeated-context",
+      "baselineEstimatedTokens": 442113,
+      "qarinahEstimatedTokens": 5682,
+      "exactReduction": 0.987148,
+      "displayReduction": "98.7148%",
+      "coverage": "Every required target directly covered in the top five.",
+      "artifact": {
+        "path": "bench/results/software-task-context-0.1.0.json",
+        "sha256": "sha256:92ab5041c609caf226729724555bd9b70c0a52cf2e2418370c228ea6a9452594"
+      }
+    },
+    {
+      "id": "two-session-model-facing-capsule",
+      "baselineEstimatedTokens": 9489,
+      "qarinahEstimatedTokens": 119,
+      "exactReduction": 0.987459,
+      "displayReduction": "98.75%",
+      "coverage": "Summary event ID/hash and complete audit-pack manifest pointer retained.",
+      "artifact": {
+        "path": "bench/results/continuation-context-0.1.6.json",
+        "sha256": "sha256:3e0d7388bfb65a68da4e533d22cf02aefeb73b450c751fe85c38fba7ccf51e19"
+      }
+    },
+    {
+      "id": "two-session-complete-audit-pack",
+      "baselineEstimatedTokens": 9489,
+      "qarinahEstimatedTokens": 1039,
+      "exactReduction": 0.890505,
+      "displayReduction": "89.05%",
+      "coverage": "All three summary-source event IDs/hashes plus a selected raw source retained.",
+      "artifact": {
+        "path": "bench/results/continuation-context-0.1.6.json",
+        "sha256": "sha256:3e0d7388bfb65a68da4e533d22cf02aefeb73b450c751fe85c38fba7ccf51e19"
+      }
+    }
+  ],
+  "multiFileProjectStudy": {
+    "status": "deterministic-synthetic-local-retrieval-and-projection-integrity",
+    "totalFiles": 190,
+    "positiveQueriesPassed": 380,
+    "unsupportedQueriesCorrectlyRejected": 9,
+    "allScalesPassed": true,
+    "providerModelCalls": 0,
+    "providerBillingMeasurement": false,
+    "scales": [
+      {
+        "fileCount": 40,
+        "positiveQueriesPassed": 80,
+        "minimumEstimatedReduction": 0.934803
+      },
+      {
+        "fileCount": 50,
+        "positiveQueriesPassed": 100,
+        "minimumEstimatedReduction": 0.946948
+      },
+      {
+        "fileCount": 100,
+        "positiveQueriesPassed": 200,
+        "minimumEstimatedReduction": 0.971521
+      }
+    ],
+    "artifact": {
+      "path": "bench/results/multifile-context-0.1.6.json",
+      "sha256": "sha256:d8d6ff65e1e2420c13bf6094d1cd7307499b4a422dfa28cff3baf31dd4f25b99"
+    }
+  },
+  "realRepositoryDevelopmentStudy": {
+    "status": "development-after-exploratory-inspection-not-confirmatory",
+    "providerModelCalls": 0,
+    "officialPatchResolutionExecuted": false,
+    "dataset": {
+      "name": "princeton-nlp/SWE-bench_Lite",
+      "revision": "6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2",
+      "rawTestParquetSha256": "sha256:7a21f37b8bc179c7db5beeb14e88ac538ba283455c776e6b2535bbfb6e3551b4",
+      "tasks": 300,
+      "exactRepositoryIdentifiers": 12,
+      "warmupTasks": 60,
+      "heldoutQueries": 240
+    },
+    "onlinePrequential": {
+      "scorableQueries": 209,
+      "qarinahV2RecallAt10": 0.538341,
+      "qarinahV2MeanReciprocalRank": 0.695595,
+      "balancedV1MeanReciprocalRank": 0.600665,
+      "pairedMrrDifference": 0.09493,
+      "repositoryClusteredBootstrap95": [0.057183, 0.111456],
+      "graphRankingImprovement": 0
+    },
+    "productionBoundEvidenceGate": {
+      "method": "evidence-sufficiency-v2",
+      "static": {
+        "acceptedDirect": 10,
+        "queries": 240,
+        "observedFalseAccepts": 0,
+        "structuralOracleNegativeQueries": 49,
+        "acceptanceCoverage": 0.041667,
+        "acceptedPrecisionExact95Lower": 0.691503,
+        "falseAcceptanceRateExact95Upper": 0.072519
+      },
+      "onlinePrequential": {
+        "acceptedDirect": 15,
+        "queries": 240,
+        "observedFalseAccepts": 0,
+        "structuralOracleNegativeQueries": 31,
+        "acceptanceCoverage": 0.0625,
+        "acceptedPrecisionExact95Lower": 0.781981,
+        "falseAcceptanceRateExact95Upper": 0.112189
+      },
+      "humanValidatedRelevance": false
+    },
+    "artifacts": [
+      {
+        "role": "current-production-bound-development-v0.4",
+        "path": "bench/results/research-retrieval-development-v0.4.json",
+        "sha256": "sha256:607359a947e7a849512d3fcb588bc88c2b34e1289f15b735a2de0c3895a21a18"
+      },
+      {
+        "role": "historical-development-v0.2",
+        "path": "bench/results/research-retrieval-development-v0.2.json",
+        "sha256": "sha256:bfe8015811ffbecd5e3c00eb9f4a1e104478605cd605442a1ec96d67582e4b3f"
+      },
+      {
+        "role": "historical-threshold-calibration-v0.3",
+        "path": "bench/results/research-sufficiency-development-v0.3.json",
+        "sha256": "sha256:fda449d36c6de2d2aea3d5cb8b69ceac2c57dfcb1c0b63161208a6ec1fc28986"
+      }
+    ]
+  },
+  "providerBackedProductSmoke": {
+    "currentReleaseReceiptPresent": false,
+    "currentReleaseProviderCalls": 0,
+    "currentReleaseClaimEligible": false,
+    "historicalReceipt": {
+      "classification": "historical-0.1.5-provider-backed-product-smoke-not-controlled-research",
+      "packageVersion": "0.1.5",
+      "artifact": {
+        "path": "bench/results/codex-cross-session-continuation-0.1.5.json",
+        "sha256": "sha256:c6ebb38626550d1cb9293a42f7dda292eb55558865d53c735b7996414752783f"
+      },
+      "distinctSessions": true,
+      "nativeResumeUsed": false,
+      "queriedQarinahBeforeContinuation": true,
+      "acceptanceTestsPassed": true
+    }
+  },
+  "frozenConfirmatoryProtocol": {
+    "status": "protocol-frozen-results-unobserved",
+    "sourceDataset": "princeton-nlp/SWE-bench_Verified",
+    "sourceTasks": 500,
+    "eligibleRetrievalTasks": 387,
+    "pairedAgentTasks": 40,
+    "abstentionControls": 20,
+    "officialContainerEvaluationPlanned": true,
+    "providerUsageReceiptsRequired": true,
+    "resultsObserved": false,
+    "artifacts": [
+      {
+        "path": "bench/final/final-task-manifest-v1.json",
+        "sha256": "sha256:eca1e32961cea6979a6c488cf5c7af19b2247923934059986f2e087d07016e54"
+      },
+      {
+        "path": "bench/final/final-abstention-controls-v1.json",
+        "sha256": "sha256:367730f076d5d41aa7ef516aba57c04ff677fc172d97e247ff9fb3b896585990"
+      },
+      {
+        "path": "bench/final/contamination-audit-v1.json",
+        "sha256": "sha256:d4692b9b88147e9ef75708ad2815f02285ba91abeb5bc4f01f567d303ddc26bf"
+      }
+    ]
+  },
+  "citations": [
+    {
+      "id": "swe-bench-iclr-2024",
+      "url": "https://openreview.net/forum?id=VTF8yNQM66"
+    },
+    {
+      "id": "swe-bench-lite-pinned-dataset",
+      "url": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite"
+    },
+    {
+      "id": "bm25-okapi-trec-3",
+      "url": "https://doi.org/10.6028/NIST.SP.500-225.routing-city"
+    },
+    {
+      "id": "longmemeval-iclr-2025",
+      "url": "https://proceedings.iclr.cc/paper_files/paper/2025/file/d813d324dbf0598bbdc9c8e79740ed01-Paper-Conference.pdf"
+    },
+    {
+      "id": "swe-bench-verified",
+      "url": "https://www.swebench.com/verified.html"
+    }
+  ],
+  "claimBoundary": [
+    "The 0.1.6 package, website, and v1.3 paper are locally prepared release candidates; DOI 10.5281/zenodo.21843240 is reserved for a Zenodo draft and is not registered or published until that draft is published.",
+    "The three headline percentages are portable estimated context-volume reductions, not provider billing reductions.",
+    "The multi-file result is a deterministic synthetic local retrieval and projection-integrity regression, not provider task-completion evidence.",
+    "The real-repository results evaluate retrieval and evidence admission on inspected development data, not generated-patch resolution.",
+    "The only provider-backed continuation receipt is historical Qarinah 0.1.5 evidence and is not a 0.1.6 result.",
+    "The 40-task provider-backed confirmatory protocol has no observed outcome in Qarinah 0.1.6.",
+    "No result is a universal guarantee across repositories, models, languages, or tasks."
+  ]
+}
