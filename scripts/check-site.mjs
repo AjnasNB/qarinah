@@ -221,7 +221,7 @@ for (const benchmarkProof of ["98.7148%", "98.75%", "89.05%", "Three outputs. Th
 if (!home.includes("What coding agents and developers need to know.") || !home.includes('href="/docs/faq/"')) {
   errors.push("Homepage is missing the direct answer-engine surface.");
 }
-if (!home.includes("Your project remembers - even when your coding agent changes.") || !home.includes('href="/docs/cross-agent-handoffs/"')) {
+if (!home.includes("Your project remembers when your coding agent changes.") || !home.includes("See the verified handoff") || !home.includes('href="/docs/cross-agent-handoffs/"')) {
   errors.push("Homepage is missing the verified cross-agent handoff workflow.");
 }
 if (home.indexOf('<section class="hero">') > home.indexOf('<section class="benchmark-ribbon"')) {
