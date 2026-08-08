@@ -11,7 +11,7 @@
   "contributors": [
     {
       "name": "Ahammed, Shahin",
-      "type": "Other"
+      "type": "ProjectMember"
     }
   ],
   "version": "1.4",
@@ -28,11 +28,6 @@
     "MCP"
   ],
   "related_identifiers": [
-    {
-      "identifier": "10.5281/zenodo.21547684",
-      "relation": "isVersionOf",
-      "scheme": "doi"
-    },
     {
       "identifier": "https://github.com/AjnasNB/qarinah",
       "relation": "isSupplementTo",
