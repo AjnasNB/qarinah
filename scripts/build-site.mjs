@@ -8,7 +8,8 @@ const output = path.join(root, "site-dist");
 const github = "https://github.com/AjnasNB/qarinah";
 const siteOrigin = "https://qarinah.io";
 const npmPackage = "https://www.npmjs.com/package/qarinah";
-const doi = "https://doi.org/10.5281/zenodo.21547684";
+const doi = "https://doi.org/10.5281/zenodo.21850747";
+const conceptDoi = "https://doi.org/10.5281/zenodo.21547684";
 const historicalVersionDoi = "https://doi.org/10.5281/zenodo.21843240";
 const paperVersion = "1.4";
 const paperPdf = `/paper/Qarinah-Technical-White-Paper-v${paperVersion}.pdf`;
@@ -496,7 +497,8 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
       dateModified: releaseDate,
       version: paperVersion,
       identifier: doi,
-      creativeWorkStatus: "Preprint",
+      creativeWorkStatus: "Published",
+      datePublished: releaseDate,
       license: "https://www.apache.org/licenses/LICENSE-2.0",
       author: { "@id": person["@id"] },
       contributor: {
@@ -1019,7 +1021,7 @@ async function markdownPage(page) {
         ? "answers"
         : "docs";
   const publicationLink = page.route === "paper"
-    ? `<a href="${doi}">Paper series DOI: 10.5281/zenodo.21547684</a> · <a href="${historicalVersionDoi}">Published v1.3</a>`
+    ? `<a href="${doi}">Published v1.4 DOI: 10.5281/zenodo.21850747</a> · <a href="${conceptDoi}">Paper series DOI</a> · <a href="${historicalVersionDoi}">Published v1.3</a>`
     : "";
 
   return layout({

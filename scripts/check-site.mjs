@@ -232,11 +232,12 @@ if (!paper.includes('src="/assets/qarinah-flow.svg"')) {
 if (!paper.includes("/paper/Qarinah-Technical-White-Paper-v1.4.pdf")) {
   errors.push("Paper download does not point to the versioned website PDF.");
 }
-if (!paper.includes("https://doi.org/10.5281/zenodo.21547684")
+if (!paper.includes("https://doi.org/10.5281/zenodo.21850747")
+  || !paper.includes("https://doi.org/10.5281/zenodo.21547684")
   || !paper.includes("https://doi.org/10.5281/zenodo.21843240")
-  || !paper.includes('"creativeWorkStatus":"Preprint"')
-  || paper.includes('"datePublished":"2026-08-08"')) {
-  errors.push("Paper page must bind the v1.4 preprint to the series DOI and preserve the published v1.3 DOI.");
+  || !paper.includes('"creativeWorkStatus":"Published"')
+  || !paper.includes('"datePublished":"2026-08-08"')) {
+  errors.push("Paper page must bind published v1.4 to its version and series DOIs and preserve the published v1.3 DOI.");
 }
 if (/release[- ]candidate|activates on publication|not registered or published|DOI reserved/iu.test(paper)) {
   errors.push("Paper page contains stale pre-publication lifecycle wording.");

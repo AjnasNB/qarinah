@@ -26,7 +26,7 @@ Scale regression: Qarinah also passed **380 / 380 file-specific exact and typo-t
   <a href="https://qarinah.io/docs/"><strong>Documentation</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://qarinah.io/paper/"><strong>White paper</strong></a>&nbsp;&middot;&nbsp;
   <a href="docs/RESEARCH-BENCHMARK.md"><strong>Research benchmark</strong></a>&nbsp;&middot;&nbsp;
-  <a href="https://doi.org/10.5281/zenodo.21547684"><strong>DOI</strong></a>
+  <a href="https://doi.org/10.5281/zenodo.21850747"><strong>v1.4 DOI</strong></a>
 </p>
 
 <p align="center">
@@ -103,8 +103,9 @@ The JSONL chain remains authoritative. Graph, index, Markdown, dashboard, and OK
 
 <p align="center">
   <a href="docs/WHITEPAPER.md">Technical paper</a>&nbsp;&middot;&nbsp;
-  <a href="https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.4.pdf">White-paper v1.4 preprint</a>&nbsp;&middot;&nbsp;
-  <a href="https://doi.org/10.5281/zenodo.21843240">Published v1.3 DOI</a>&nbsp;&middot;&nbsp;
+  <a href="output/pdf/Qarinah-Technical-White-Paper-v1.4.pdf">Verified v1.4 PDF</a>&nbsp;&middot;&nbsp;
+  <a href="https://doi.org/10.5281/zenodo.21850747">Published white paper v1.4</a>&nbsp;&middot;&nbsp;
+  <a href="https://doi.org/10.5281/zenodo.21547684">Paper series DOI</a>&nbsp;&middot;&nbsp;
   <a href="docs/ARCHITECTURE.md">Architecture</a>&nbsp;&middot;&nbsp;
   <a href="docs/DASHBOARD.md">Dashboard</a>&nbsp;&middot;&nbsp;
   <a href="docs/BENCHMARKS.md">Benchmarks</a>&nbsp;&middot;&nbsp;
