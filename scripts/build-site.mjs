@@ -9,10 +9,13 @@ const github = "https://github.com/AjnasNB/qarinah";
 const siteOrigin = "https://qarinah.io";
 const npmPackage = "https://www.npmjs.com/package/qarinah";
 const doi = "https://doi.org/10.5281/zenodo.21547684";
-const versionDoi = "https://doi.org/10.5281/zenodo.21843240";
-const paperVersion = "1.3";
+const historicalVersionDoi = "https://doi.org/10.5281/zenodo.21843240";
+const paperVersion = "1.4";
 const paperPdf = `/paper/Qarinah-Technical-White-Paper-v${paperVersion}.pdf`;
-const historicalPaperPdf = "/paper/Qarinah-Technical-White-Paper-v1.2.pdf";
+const historicalPaperPdfs = new Map([
+  ["Qarinah-Technical-White-Paper-v1.2.pdf", "/paper/Qarinah-Technical-White-Paper-v1.2.pdf"],
+  ["Qarinah-Technical-White-Paper-v1.3.pdf", "/paper/Qarinah-Technical-White-Paper-v1.3.pdf"]
+]);
 const releaseDate = "2026-08-08";
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 const productVersion = packageJson.version;
@@ -250,6 +253,7 @@ await cp(path.join(root, "assets", "architecture", "qarinah-flow.svg"), path.joi
 await cp(path.join(root, "assets", "launch", "qarinah-social-preview.png"), path.join(output, "assets", "qarinah-social-preview.png"));
 for (const filename of [
   "Qarinah-Technical-White-Paper-v1.2.pdf",
+  "Qarinah-Technical-White-Paper-v1.3.pdf",
   `Qarinah-Technical-White-Paper-v${paperVersion}.pdf`
 ]) {
   await cp(path.join(root, "output", "pdf", filename), path.join(output, "paper", filename));
@@ -291,8 +295,9 @@ function rewriteMarkdownLinks(markdown, source) {
       target = `/${resolved}`;
     } else if (resolved.endsWith(`Qarinah-Technical-White-Paper-v${paperVersion}.pdf`)) {
       target = paperPdf;
-    } else if (resolved.endsWith("Qarinah-Technical-White-Paper-v1.2.pdf")) {
-      target = historicalPaperPdf;
+    } else if ([...historicalPaperPdfs.keys()].some((filename) => resolved.endsWith(filename))) {
+      const filename = [...historicalPaperPdfs.keys()].find((candidate) => resolved.endsWith(candidate));
+      target = historicalPaperPdfs.get(filename);
     } else {
       target = `${github}/blob/main/${resolved}`;
     }
@@ -489,10 +494,9 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
       inLanguage: "en",
       dateCreated: releaseDate,
       dateModified: releaseDate,
-      datePublished: releaseDate,
       version: paperVersion,
-      identifier: versionDoi,
-      creativeWorkStatus: "Published",
+      identifier: doi,
+      creativeWorkStatus: "Preprint",
       license: "https://www.apache.org/licenses/LICENSE-2.0",
       author: { "@id": person["@id"] },
       contributor: {
@@ -504,7 +508,7 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
         contentUrl: paperPdf,
         encodingFormat: "application/pdf"
       },
-      sameAs: [versionDoi, doi],
+      sameAs: [doi],
       isPartOf: { "@id": `${siteOrigin}/#website` }
     });
   } else if (kind === "benchmark") {
@@ -1015,7 +1019,7 @@ async function markdownPage(page) {
         ? "answers"
         : "docs";
   const publicationLink = page.route === "paper"
-    ? `<a href="${versionDoi}">Version DOI: 10.5281/zenodo.21843240</a>`
+    ? `<a href="${doi}">Paper series DOI: 10.5281/zenodo.21547684</a> · <a href="${historicalVersionDoi}">Published v1.3</a>`
     : "";
 
   return layout({
