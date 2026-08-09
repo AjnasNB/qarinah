@@ -23,6 +23,19 @@ const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "
 const productVersion = packageJson.version;
 const productPositioning = "Evidence-linked project memory for coding agents.";
 const productExplanation = "Qarinah keeps one compact, cited project memory beside your code, so Codex, Claude Code, Cursor, and compatible tools can continue from verified context instead of starting from zero.";
+const qarinahFeatures = [
+  "Verified handoffs between coding agents",
+  "Local append-only project memory",
+  "Evidence-linked cited context packs",
+  "Typed project and provenance graph",
+  "Budgeted hybrid retrieval",
+  "Codex and Claude Code integrations",
+  "Consent-gated MCP context retrieval",
+  "Multi-repository memory with separate authority",
+  "Freshness checks and a visual memory dashboard",
+  "Encrypted team bundles and signed checkpoints",
+  "Deterministic Markdown, JSON, graph, and OKF exports"
+];
 const answerEngineQuestions = [
   {
     name: "What is Qarinah?",
@@ -312,6 +325,14 @@ const docPages = [
     description: "Install Qarinah local project memory, initialize one codebase, and compile the first cited context pack.",
     section: "Start",
     aliases: ["install qarinah", "project setup", "first query", "coding agent memory quickstart"]
+  },
+  {
+    route: "docs/features",
+    source: "docs/FEATURES.md",
+    title: "Features",
+    description: "Explore Qarinah project memory, cited context compilation, agent integrations, local dashboards, team memory, exports, and operating boundaries.",
+    section: "Start",
+    aliases: ["qarinah features", "project memory features", "coding agent memory capabilities", "context compiler capabilities"]
   },
   {
     route: "docs/cli",
@@ -615,7 +636,9 @@ function rewritePublicationLink(markdown, source) {
 
 function nav(active = "") {
   const items = [
-    ["Product", "/", "home"],
+    ["Overview", "/", "home"],
+    ["Features", "/docs/features/", "features"],
+    ["Install", "/docs/getting-started/", "install"],
     ["Docs", "/docs/", "docs"],
     ["Answers", "/docs/faq/", "answers"],
     ["Compare", "/alternatives/", "alternatives"],
@@ -652,7 +675,8 @@ function footer() {
         </div>
         <div>
           <strong>Build</strong>
-          <a href="/docs/getting-started/">Getting started</a>
+          <a href="/docs/features/">Features</a>
+          <a href="/docs/getting-started/">Install and get started</a>
           <a href="/docs/cli/">CLI reference</a>
           <a href="/docs/api/">JavaScript API</a>
           <a href="/docs/integrations/">Integrations</a>
@@ -758,19 +782,7 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
         installUrl: `${siteOrigin}/docs/getting-started/`,
         codeRepository: github,
         releaseNotes: `${github}/releases/tag/v${productVersion}`,
-        featureList: [
-          "Verified handoffs between coding agents",
-          "Local append-only project memory",
-          "Evidence-linked cited context packs",
-          "Typed project and provenance graph",
-          "Budgeted hybrid retrieval",
-          "Codex and Claude Code integrations",
-          "Consent-gated MCP context retrieval",
-          "Multi-repository memory with separate authority",
-          "Freshness checks and a visual memory dashboard",
-          "Encrypted team bundles and signed checkpoints",
-          "Deterministic Markdown, JSON, graph, and OKF exports"
-        ],
+        featureList: qarinahFeatures,
         offers: {
           "@type": "Offer",
           price: "0",
@@ -916,6 +928,32 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
             "@type": "Answer",
             text: entry.text
           }
+        }))
+      }
+    );
+  } else if (kind === "features") {
+    graph.push(
+      {
+        "@type": "CollectionPage",
+        "@id": `${url}#features`,
+        name: title,
+        description,
+        url,
+        inLanguage: "en",
+        dateModified: releaseDate,
+        author: { "@id": person["@id"] },
+        about: { "@id": `${siteOrigin}/#software` }
+      },
+      {
+        "@type": "ItemList",
+        "@id": `${url}#capability-list`,
+        name: "Qarinah product capabilities",
+        itemListOrder: "https://schema.org/ItemListUnordered",
+        numberOfItems: qarinahFeatures.length,
+        itemListElement: qarinahFeatures.map((name, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name
         }))
       }
     );
@@ -1794,7 +1832,11 @@ async function markdownPage(page) {
       ? "benchmarks"
       : page.route === "docs/faq"
         ? "answers"
-        : "docs";
+        : page.route === "docs/features"
+          ? "features"
+          : page.route === "docs/getting-started"
+            ? "install"
+            : "docs";
   const publicationLink = page.route === "paper"
     ? `<a href="${doi}">Published v1.4 DOI: 10.5281/zenodo.21850747</a> · <a href="${conceptDoi}">Paper series DOI</a> · <a href="${historicalVersionDoi}">Published v1.3</a>`
     : "";
@@ -1810,6 +1852,8 @@ async function markdownPage(page) {
         ? "benchmark"
         : page.route === "docs/faq"
           ? "faq"
+        : page.route === "docs/features"
+          ? "features"
         : page.route === "docs/getting-started" || page.route === "docs/cross-agent-handoffs"
           ? "howto"
           : page.route === "docs/api" || page.route === "docs/cli" || page.route === "docs/mcp"

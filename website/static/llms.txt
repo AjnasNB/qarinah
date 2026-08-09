@@ -14,6 +14,7 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 - [Qarinah alternatives](https://qarinah.io/alternatives/): Product-boundary comparison with Mem0, Letta, LangMem, LangGraph memory, Graphiti, Zep, and native coding-host memory.
 - [Open-source governed-agent toolkit](https://qarinah.io/articles/open-source-governed-agent-toolkit/): How Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler can compose with established agent, browser, web-data, and document tools.
 - [Getting started](https://qarinah.io/docs/getting-started/): Install Qarinah, opt in one workspace, connect a supported host, and compile a cited context pack.
+- [Features](https://qarinah.io/docs/features/): Complete product capability map for project-owned memory, cited retrieval, integrations, dashboards, team memory, portability, and boundaries.
 - [Documentation index](https://qarinah.io/docs/): Documentation by task.
 - [npm package](https://www.npmjs.com/package/qarinah): Published `qarinah` package and registry metadata.
 - [GitHub repository](https://github.com/AjnasNB/qarinah): Source, releases, issues, and contribution history.
@@ -34,6 +35,7 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 
 ## Technical documentation
 
+- [Features](https://qarinah.io/docs/features/): Shipped project-memory, context-compilation, integration, team, export, and verification capabilities.
 - [CLI reference](https://qarinah.io/docs/cli/): Every command, option, stdin mode, exit code, and machine-readable output.
 - [JavaScript API reference](https://qarinah.io/docs/api/): Public exports, types, functions, and bounded programmatic workflows.
 - [Host integrations](https://qarinah.io/docs/integrations/): Codex, Claude Code, Cursor, CLI, and consent-gated MCP integration guidance.

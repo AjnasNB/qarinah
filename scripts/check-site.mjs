@@ -11,6 +11,7 @@ const required = [
   "docs/index.html",
   "docs/cross-agent-handoffs/index.html",
   "docs/getting-started/index.html",
+  "docs/features/index.html",
   "docs/cli/index.html",
   "docs/api/index.html",
   "docs/integrations/index.html",
@@ -209,6 +210,7 @@ for (const crawler of ["Googlebot", "Bingbot", "OAI-SearchBot", "Claude-SearchBo
 const llms = await readFile(path.join(output, "llms.txt"), "utf8");
 for (const canonicalResource of [
   "https://qarinah.io/docs/",
+  "https://qarinah.io/docs/features/",
   "https://qarinah.io/docs/faq/",
   "https://qarinah.io/alternatives/",
   "https://qarinah.io/articles/open-source-governed-agent-toolkit/",
@@ -224,6 +226,7 @@ const alternatives = await readFile(path.join(output, "alternatives", "index.htm
 const toolkit = await readFile(path.join(output, "articles", "open-source-governed-agent-toolkit", "index.html"), "utf8");
 const paper = await readFile(path.join(output, "paper", "index.html"), "utf8");
 const faq = await readFile(path.join(output, "docs", "faq", "index.html"), "utf8");
+const features = await readFile(path.join(output, "docs", "features", "index.html"), "utf8");
 if (!home.includes("<strong>98.71%</strong>") || !home.includes("the evaluated full-history input was 77.81 times larger")) {
   errors.push("Homepage is missing the plain-language benchmark proof.");
 }
@@ -241,6 +244,28 @@ if (home.indexOf('<section class="hero">') > home.indexOf('<section class="bench
 }
 if (!home.includes("Evidence-linked project memory for coding agents.") || !home.includes("continue from verified context instead of starting from zero")) {
   errors.push("Homepage is missing the cross-agent category or long-term vision.");
+}
+for (const primaryDestination of [
+  'href="/docs/features/">Features</a>',
+  'href="/docs/getting-started/">Install</a>',
+  'href="/docs/">Docs</a>'
+]) {
+  if (!home.includes(primaryDestination)) errors.push(`Homepage navigation is missing ${primaryDestination}`);
+}
+for (const capability of [
+  "Project-owned memory",
+  "Cited context compilation",
+  "Project structure and derived views",
+  "Coding-agent integrations",
+  "Team memory and portability",
+  "Verify the boundary"
+]) {
+  if (!features.includes(capability)) errors.push(`Features page is missing ${capability}`);
+}
+if (!features.includes('"@type":"CollectionPage"')
+  || !features.includes('"@type":"ItemList"')
+  || !features.includes('"numberOfItems":11')) {
+  errors.push("Features page is missing its visible capability collection structured data.");
 }
 for (const launchDirectoryMarkup of [
   'href="https://startupbase.io/products/qarinah?utm_source=startupbase&amp;utm_medium=badge&amp;utm_campaign=launch-badge-dark"',
