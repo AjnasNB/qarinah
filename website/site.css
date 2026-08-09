@@ -1977,8 +1977,12 @@ a {
   border-right: 1px solid #31584b;
 }
 
-.toolkit-layer-strip a:last-child {
+.toolkit-layer-strip a:nth-child(4n) {
   border-right: 0;
+}
+
+.toolkit-layer-strip a:nth-child(n + 5) {
+  border-top: 1px solid #31584b;
 }
 
 .toolkit-layer-strip span,
@@ -2068,6 +2072,7 @@ a {
   grid-template-columns: minmax(240px, 0.72fr) minmax(0, 1.8fr);
   gap: clamp(28px, 5vw, 70px);
   padding: 46px 0;
+  scroll-margin-top: 82px;
   border-bottom: 1px solid var(--q-border);
 }
 
@@ -2076,6 +2081,8 @@ a {
   grid-template-columns: 42px minmax(0, 1fr);
   gap: 12px;
   align-content: start;
+  grid-column: 1;
+  grid-row: 1 / span 4;
 }
 
 .toolkit-category > header > span {
@@ -2094,6 +2101,26 @@ a {
 .toolkit-category header p {
   margin: 0;
   color: var(--q-muted);
+}
+
+.toolkit-category > .toolkit-selection,
+.toolkit-category > .toolkit-correction,
+.toolkit-category > .toolkit-tool-list,
+.toolkit-category > .toolkit-adjacent {
+  grid-column: 2;
+}
+
+.toolkit-selection,
+.toolkit-correction {
+  margin: 0;
+  padding: 18px 20px;
+  background: var(--q-surface);
+  border-left: 2px solid var(--q-accent);
+}
+
+.toolkit-correction {
+  color: var(--q-text);
+  background: color-mix(in srgb, var(--q-accent) 8%, var(--q-surface));
 }
 
 .toolkit-tool-list {
@@ -2127,6 +2154,34 @@ a {
 }
 
 .toolkit-tool-list article > p:last-child {
+  color: var(--q-muted);
+}
+
+.toolkit-adjacent {
+  margin-top: 10px;
+  padding: 26px;
+  background: var(--q-surface);
+  border: 1px solid var(--q-border-muted);
+}
+
+.toolkit-adjacent > div:first-child > p:first-child {
+  margin: 0 0 6px;
+  color: var(--q-accent);
+  font-family: var(--q-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.toolkit-adjacent h4 {
+  margin: 0 0 8px;
+  font-family: var(--q-serif);
+  font-size: 28px;
+  font-weight: 500;
+}
+
+.toolkit-adjacent > div:first-child > p:last-child {
+  margin: 0 0 20px;
   color: var(--q-muted);
 }
 
@@ -2169,6 +2224,15 @@ a {
     grid-template-columns: 1fr;
   }
 
+  .toolkit-category > header,
+  .toolkit-category > .toolkit-selection,
+  .toolkit-category > .toolkit-correction,
+  .toolkit-category > .toolkit-tool-list,
+  .toolkit-category > .toolkit-adjacent {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
   .toolkit-disclosure {
     max-width: 680px;
   }
@@ -2177,7 +2241,7 @@ a {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .toolkit-layer-strip a:nth-child(2) {
+  .toolkit-layer-strip a:nth-child(2n) {
     border-right: 0;
   }
 
@@ -2215,7 +2279,7 @@ a {
   }
 
   .toolkit-layer-strip a,
-  .toolkit-layer-strip a:nth-child(2) {
+  .toolkit-layer-strip a:nth-child(2n) {
     border-top: 1px solid #31584b;
     border-right: 0;
   }

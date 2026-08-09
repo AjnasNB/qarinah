@@ -63,22 +63,24 @@ The comparison is a representative category guide based on public product docume
 
 Compare source ownership, host portability, evidence and supersession, runtime scope, model or infrastructure dependencies, and whether derived memory can be rebuilt independently. Do not compare unrelated benchmark numbers as if they share a task, corpus, or scorer.
 
-## Open-source governed-agent toolkit
+## Open-Source Toolkit for Building AI Agents
 
 Canonical article: https://qarinah.io/articles/open-source-governed-agent-toolkit/
 
-The article is a composition guide written by Ajnas N B and reviewed against official project documentation on 9 August 2026. It is not a best-tool ranking, matched benchmark, endorsement, or affiliation claim.
+The article is a neutral educational category map written by Ajnas N B and reviewed against official project documentation on 9 August 2026. It is not a leaderboard, matched benchmark, endorsement, or affiliation claim.
 
-- Qarinah: project memory and bounded cited context for supported coding agents.
-- Maqam: policy, exact-input approval, one-use consumption, and receipts for registered TypeScript actions only.
-- Cockroach Browser: authorized interactive browser sessions and evidence. It uses Playwright and Chromium rather than replacing the browser automation layer.
-- Cockroach Crawler: bounded web acquisition and evidence records. Its optional quality surface uses Trafilatura as a disclosed dependency.
-- Playwright and Puppeteer: browser automation primitives.
-- Browser Use and Stagehand: higher-level agentic browser frameworks.
-- Trafilatura, Firecrawl, and Docling: web extraction, web-data, and document-conversion tools with different product centers.
-- LangGraph and OpenAI Agents SDK: agent or workflow runtimes that can own orchestration while the authored projects supply optional adjacent boundaries.
+The categories, in order, are:
 
-Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler are the four projects by Ajnas N B discussed in the article. Every other named tool is a third-party project maintained by its own organization or community.
+1. Document Processing: Docling and Unstructured. Trafilatura, Firecrawl, and Cockroach Crawler are identified separately as adjacent web-acquisition and extraction tools.
+2. Browser Automation: Playwright, Puppeteer, Stagehand, and Cockroach Browser. Cockroach Browser discloses that it uses Playwright and Chromium.
+3. Evaluation & Monitoring: OpenTelemetry, Langfuse, Arize Phoenix, and Ragas. The article separates instrumentation, trace storage, evaluation, and regression gates.
+4. Computer Use: Browser Use, Cua, and Microsoft UFO. Browser-focused agents are distinguished from general desktop or device operation.
+5. Frameworks: LangGraph, OpenAI Agents SDK, Microsoft Agent Framework, and CrewAI. Frameworks own orchestration; they do not automatically replace memory, authorization, or evaluation.
+6. Vertical Agents: OpenHands, mini-SWE-agent, and Aider as software-engineering-focused agent products.
+7. Memory: Mem0, Letta, LangMem, and Qarinah. Speech-to-text and computer-vision tools are perception or modality components, not memory, unless another system persists and retrieves their outputs.
+8. Governance & Safety: Open Policy Agent, Cedar, NeMo Guardrails, Guardrails AI, Invariant Guardrails, and Maqam. Policy engines, input and output rails, trace rules, and registered-action gateways have different enforcement points.
+
+Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler are projects by Ajnas N B. Every other named tool is maintained independently and links to an official project source. The article describes Qarinah as project memory, Maqam as a registered-action gateway rather than complete enterprise governance, Cockroach Browser as a Playwright-based browser runtime, and Cockroach Crawler as governed web acquisition.
 
 ## Direct questions and answers
 
