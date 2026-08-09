@@ -674,6 +674,19 @@ function footer() {
           <a href="${github}/blob/main/LICENSE">Apache-2.0</a>
         </div>
       </div>
+      <div class="shell launch-recognition" aria-label="Launch directories">
+        <span>Find Qarinah on</span>
+        <div class="launch-recognition-links">
+          <a class="startupbase-badge" href="https://startupbase.io/products/qarinah?utm_source=startupbase&amp;utm_medium=badge&amp;utm_campaign=launch-badge-dark" rel="noreferrer">
+            <img src="https://statics.startupbase.io/site/badges/launched-on-sb-dark.svg" alt="Launched on StartupBase" height="55">
+          </a>
+          <a href="https://fazier.com/launches/qarinah.io" target="_blank"><img src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=launched&amp;theme=light" width="120" alt="Fazier badge" /></a>
+          <a class="tiny-startups-link" href="https://tinystartups.com/startup/qarinah" rel="noreferrer">
+            <span>Listed on</span>
+            <strong>Tiny Startups</strong>
+          </a>
+        </div>
+      </div>
       <div class="shell footer-meta">
         <span>Built openly by Ajnas N B and contributors.</span>
         <span>Qarinah ${productVersion}</span>

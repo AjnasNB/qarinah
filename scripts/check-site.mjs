@@ -242,6 +242,20 @@ if (home.indexOf('<section class="hero">') > home.indexOf('<section class="bench
 if (!home.includes("Evidence-linked project memory for coding agents.") || !home.includes("continue from verified context instead of starting from zero")) {
   errors.push("Homepage is missing the cross-agent category or long-term vision.");
 }
+for (const launchDirectoryMarkup of [
+  'href="https://startupbase.io/products/qarinah?utm_source=startupbase&amp;utm_medium=badge&amp;utm_campaign=launch-badge-dark"',
+  'src="https://statics.startupbase.io/site/badges/launched-on-sb-dark.svg"',
+  'alt="Launched on StartupBase" height="55"',
+  'href="https://fazier.com/launches/qarinah.io" target="_blank"',
+  'src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=launched&amp;theme=light"',
+  'width="120" alt="Fazier badge"',
+  'href="https://tinystartups.com/startup/qarinah"',
+  "Tiny Startups"
+]) {
+  if (!home.includes(launchDirectoryMarkup)) {
+    errors.push(`Homepage launch recognition is missing ${launchDirectoryMarkup}`);
+  }
+}
 for (const requiredAlternative of [
   "Qarinah alternatives and coding-agent memory comparison",
   "Mem0",
