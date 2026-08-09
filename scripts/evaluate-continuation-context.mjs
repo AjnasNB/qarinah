@@ -16,7 +16,8 @@ import {
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const packageJson = JSON.parse(await readFile(path.join(repositoryRoot, "package.json"), "utf8"));
-const resultPath = path.join(repositoryRoot, "bench", "results", `continuation-context-${packageJson.version}.json`);
+const evidencePackageVersion = "0.1.6";
+const resultPath = path.join(repositoryRoot, "bench", "results", `continuation-context-${evidencePackageVersion}.json`);
 const writeResult = process.argv.includes("--write");
 const root = await mkdtemp(path.join(os.tmpdir(), "qarinah-continuation-context-"));
 process.env.QARINAH_STATE_DIR = path.join(root, ".machine-state");
@@ -205,7 +206,7 @@ try {
 
   const artifact = {
     schemaVersion: "qarinah.continuation-context-eval-result.v1",
-    packageVersion: packageJson.version,
+    packageVersion: evidencePackageVersion,
     fixture: {
       description: "Deterministic two-session fixture with an inferred handoff summary linked to extracted prompt, verified test outcome, and completed-turn evidence, followed by lifecycle events that deliberately stale persisted derived state.",
       tokenEstimator: "portable ceil(characters / 4)",
@@ -229,6 +230,7 @@ try {
   process.stdout.write(`${JSON.stringify({
     schemaVersion: "qarinah.continuation-context-eval-run.v1",
     packageVersion: packageJson.version,
+    evidencePackageVersion,
     node: process.version,
     platform: `${process.platform}-${process.arch}`,
     ...artifact
