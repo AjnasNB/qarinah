@@ -1,8 +1,7 @@
 # Qarinah project overview
 
 > This is first-party project documentation. It is a factual synopsis of the
-> public software and its stated boundaries, not an independent review or a
-> source that establishes Wikipedia notability.
+> public software and its stated boundaries, not an independent review.
 
 ## What it is
 
