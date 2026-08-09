@@ -1550,10 +1550,100 @@ a {
   font-size: 13px;
 }
 
+.launch-recognition {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--q-border-muted);
+}
+
+.launch-recognition > span {
+  color: var(--q-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.launch-recognition-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.startupbase-badge,
+.launch-recognition-links > a[href^="https://fazier.com/"],
+.tiny-startups-link {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  min-height: 55px;
+  border-radius: 10px;
+}
+
+.startupbase-badge {
+  overflow: hidden;
+}
+
+.startupbase-badge img {
+  display: block;
+  width: auto;
+  height: 55px;
+}
+
+.launch-recognition-links > a[href^="https://fazier.com/"] {
+  justify-content: center;
+  padding-inline: 16px;
+  border: 1px solid var(--q-border);
+  background: #ffffff;
+}
+
+.launch-recognition-links > a[href^="https://fazier.com/"] img {
+  display: block;
+  width: 120px;
+  height: auto;
+}
+
+.tiny-startups-link {
+  flex-direction: column;
+  justify-content: center;
+  min-width: 174px;
+  padding: 8px 18px;
+  border: 1px solid var(--q-border);
+  color: var(--q-fg);
+  line-height: 1.25;
+  text-decoration: none;
+}
+
+.tiny-startups-link span {
+  color: var(--q-muted);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.tiny-startups-link strong {
+  font-size: 14px;
+}
+
+.startupbase-badge:hover,
+.launch-recognition-links > a[href^="https://fazier.com/"]:hover,
+.tiny-startups-link:hover {
+  filter: brightness(1.08);
+}
+
+.startupbase-badge:focus-visible,
+.launch-recognition-links > a[href^="https://fazier.com/"]:focus-visible,
+.tiny-startups-link:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--q-accent) 45%, transparent);
+  outline-offset: 3px;
+}
+
 .footer-meta {
   display: flex;
   justify-content: space-between;
-  margin-top: 56px;
+  margin-top: 24px;
   padding-top: 20px;
   border-top: 1px solid var(--q-border-muted);
   color: var(--q-muted);
@@ -1849,6 +1939,17 @@ a {
 
   .footer-grid {
     grid-template-columns: 1fr;
+  }
+
+  .launch-recognition {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .launch-recognition-links {
+    align-items: flex-start;
+    flex-direction: column;
+    width: 100%;
   }
 
   .footer-meta {
