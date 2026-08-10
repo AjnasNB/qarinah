@@ -14,11 +14,13 @@ Do not publish these drafts until the gates in [../LAUNCH.md](../LAUNCH.md) are 
 
 **Proof tagline:** Nearly 99% less repeated project context. Every selected memory points back to its source.
 
-**Evidence line:** 436,431 fewer portable estimated input-context tokens in the compared six-task slice; the full-history input was 77.81 times larger than the cited Qarinah packs.
+**Evidence line:** 436,431 fewer portable estimated input-context tokens in the compared six-task slice; the full-history baseline contained 77.81 times as many estimated tokens as the cited Qarinah packs, a 77.81:1 baseline-to-pack ratio.
 
 **Scale line:** 380 / 380 file-specific exact and typo-tolerant queries ranked the target first across deterministic 40-, 50-, and 100-file projects.
 
 **Measured cost line:** 98.71% lower input-context cost at the same input-token rate.
+
+**Illustrative cost line:** At a flat $3 per million uncached input tokens, the aggregate six-fixture slice estimates $1.326339 for full-history replay versus $0.017046 for Qarinah - $1.309293 saved per repeat or $13.092930 across ten repeats. This is arithmetic over the portable estimate, not a provider invoice.
 
 **Coding value line:** Less replay. More room for current code, tools, and cited project memory.
 
@@ -50,7 +52,7 @@ Possible factual title to rewrite:
 
 **Tagline:** Send 98.71% less repeated project context - keep the proof
 
-**Description (under 260 characters):** Qarinah gives Codex, Claude Code, Cursor, CLI, and compatible MCP clients compact, cited project memory instead of complete history replay. Its reproducible fixture measured 98.71% less repeated context.
+**Description (under 260 characters):** Qarinah gives coding agents compact, cited project memory instead of full-history replay. Its reproducible six-fixture result was 442,113 to 5,682 estimated tokens; at a flat $3/M uncached rate, about $1.33 to $0.02.
 
 **Topics:** Developer Tools, Artificial Intelligence, Open Source, Productivity
 
@@ -60,16 +62,17 @@ Possible factual title to rewrite:
 
 I built Qarinah because agent memory usually fails in two directions: the next model receives the entire noisy history, or it receives a short summary with no evidence trail. Qarinah keeps the source record separate from the compiled pack. The ledger is local and append-only; graph, index, Markdown, and OKF views are rebuildable; every selected item cites its event ID and hash.
 
-442,113 estimated input-context tokens became 5,682 while every required target remained directly covered in the top five. That is 436,431 fewer estimated tokens, 98.71% less repeated context, and a 77.81:1 ratio in the compared slice. A separate deterministic scale regression ranked the target first for 380 / 380 file-specific exact and typo-tolerant queries. These are portable context-volume and retrieval-regression measurements, not provider usage receipts. I want real-project feedback on missing evidence, setup friction, and second-session usefulness.
+442,113 estimated input-context tokens became 5,682 while every required target remained directly covered in the top five. The full-history baseline therefore contained 77.81 times as many estimated tokens as the Qarinah path: a 77.81:1 ratio and 98.71% less repeated context in the compared slice. At a flat $3 per million uncached input tokens, the aggregate slice estimates $1.326339 versus $0.017046, saving $1.309293 each time it would otherwise be resent. A separate deterministic scale regression ranked the target first for 380 / 380 file-specific exact and typo-tolerant queries. These are portable context-volume, arithmetic cost-equivalent, and retrieval-regression measurements - not provider usage receipts or a claim that sessions run 77.81 times longer. I want real-project feedback on missing evidence, setup friction, and second-session usefulness.
 
 ## X thread
 
 1. Stop replaying entire agent histories. Qarinah gives a later agent the smallest cited project context it needs - not the whole transcript and not an opaque rolling summary.
 2. Permitted prompts, tool outcomes, approvals, sources, decisions, compactions, and project structure enter a local hash-chained event record. Metadata-only capture is the default.
 3. Graph, index, Markdown, and OKF views are deterministic and disposable. Every selected context item points back to an event ID and content hash.
-4. Qarinah packs plus identical task sources used 5,682 estimated tokens versus 442,113 for full-history replay: 436,431 fewer estimated tokens and 98.71% less repeated context, with every target directly covered in the top five.
-5. The estimate is `ceil(characters / 4)`, not provider billing. Qarinah does not capture hidden reasoning, grant itself disclosure authority, or require a Qarinah API key.
-6. Stable install and plugin links: [ADD ONLY AFTER VERIFIED RELEASE]
+4. Qarinah packs plus identical task sources used 5,682 estimated tokens versus 442,113 for full-history replay: a 77.81:1 baseline-to-pack ratio, 436,431 fewer estimated tokens, and 98.71% less repeated context, with every target directly covered in the top five.
+5. At a flat $3/M uncached input rate, that aggregate compared slice estimates $1.33 versus $0.02. The formula and exclusions are public; this is not a provider invoice.
+6. The estimate is `ceil(characters / 4)`, not provider billing. Qarinah does not capture hidden reasoning, grant itself disclosure authority, or require a Qarinah API key.
+7. Stable install and plugin links: [ADD ONLY AFTER VERIFIED RELEASE]
 
 ## LinkedIn
 

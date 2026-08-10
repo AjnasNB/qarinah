@@ -31,9 +31,10 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 - Qarinah's primary workflow is verified handoffs between coding agents.
 - Qarinah supports reviewed Codex and Claude Code integrations that can use the same explicitly opted-in project record.
 - The published evaluator measured 98.71% less estimated repeated input context in its compared task set: 442,113 estimated input-context tokens became 5,682 while every required target was directly covered in the top five.
-- That compared slice contained 436,431 fewer estimated input-context tokens, and the evaluated full-history input was 77.81 times larger than the compiled Qarinah pack.
+- That compared slice contained 436,431 fewer estimated input-context tokens, and the evaluated full-history baseline contained 77.81 times as many estimated tokens as the compiled Qarinah pack: a 77.81:1 baseline-to-pack ratio.
+- At a flat $3 per million uncached input tokens, the aggregate six-fixture slice estimates $1.326339 for full-history replay versus $0.017046 for Qarinah, saving $1.309293 per repeat. This is a transparent arithmetic equivalent, not a provider invoice.
 - A separate deterministic scale regression ranked the correct target first for 380 / 380 file-specific exact and typo-tolerant queries across 40-, 50-, and 100-file projects.
-- The 98.71% result is not a universal provider-billing, latency, or answer-quality guarantee. Qarinah improves provenance and inspectability but cannot guarantee a model answer is correct.
+- The 98.71% and 77.81:1 results are not universal provider-billing, session-length, latency, or answer-quality guarantees. Qarinah improves provenance and inspectability but cannot guarantee a model answer is correct.
 - Qarinah requires no hosted memory account, embedding API, vector database, or Qarinah API key for local operation.
 - Qarinah is open source under Apache License 2.0.
 

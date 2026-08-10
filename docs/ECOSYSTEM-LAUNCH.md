@@ -42,9 +42,9 @@ This is the canonical Qarinah category line for GitHub, npm, the website, launch
 
 > **98.71% fewer estimated context tokens than full-history replay.**
 
-Keep the direct details beside the number: identical current-task source snippets on both sides; full-history replay versus cited Qarinah packs; 442,113 versus 5,682 estimated tokens; every target in the top five with direct coverage; zero model-written summary items; `ceil(characters / 4)` estimate rather than provider billing.
+Keep the direct details beside the number: identical current-task source snippets on both sides; full-history replay versus cited Qarinah packs; 442,113 versus 5,682 estimated tokens; a 77.81:1 baseline-to-pack ratio; every target in the top five with direct coverage; zero model-written summary items; `ceil(characters / 4)` estimate rather than provider billing.
 
-The approved cost translation is equally narrow: at a flat $1 per million uncached input tokens, the compared context slice moves from $0.442113 to $0.005682. That is 98.71% less input-context cost under the same unit price, not a measurement of output, tools, caching, retrieval, or a provider's total bill.
+The approved cost translation is equally narrow: at a flat $3 per million uncached input tokens, the aggregate six-fixture slice estimates $1.326339 for full-history replay versus $0.017046 for Qarinah, saving $1.309293 per repeat. That is 98.71% less estimated input-context cost under the same unit price, not a measurement of provider-native tokens, output, reasoning, tools, caching, retrieval, hosting, or a provider's total bill.
 
 ### Claim that is not yet approved
 

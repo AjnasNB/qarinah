@@ -58,9 +58,11 @@ Estimated tokens use `ceil(characters / 4)`. They are reproducible context-volum
 
 ### Cost translation
 
-The six-task benchmark sends 436,431 fewer estimated input-context tokens. At a flat $1 per million uncached input tokens, the compared context slice moves from $0.442113 to $0.005682. That is 98.71% less input-context cost under the same unit price.
+The six-task benchmark sends 436,431 fewer estimated input-context tokens. Its baseline-to-pack ratio is `442,113 / 5,682 = 77.809398...`, reported as **77.81:1**. The precise public wording is: **the evaluated full-history baseline contained 77.81 times as many estimated input-context tokens as the Qarinah path.**
 
-This translation is useful because the percentage is independent of the chosen flat unit price. It is not a provider invoice: output tokens, tool calls, cached-input discounts, indexing, retrieval, and fixed provider charges remain separate.
+At a flat $3 per million uncached input tokens, the aggregate compared context slice moves from $1.326339 to $0.017046, saving $1.309293 each time the complete slice would otherwise be sent or $13.092930 across ten repeats. The general formula is `estimated tokens / 1,000,000 x flat uncached input rate x repeats`.
+
+This translation is useful because the percentage is independent of the chosen flat unit price. It is not a provider invoice: provider-native tokenization, output, reasoning, tool calls, cache writes and reads, indexing, retrieval, hosting, and fixed provider charges remain separate. Tiered long-context pricing requires a provider-specific calculation.
 
 The exact scenario sources, expected decisions, unrelated retained history, queries, arithmetic, and per-task results are committed in [`bench/fixtures/software-task-scenarios.mjs`](../bench/fixtures/software-task-scenarios.mjs), [`scripts/evaluate-software-tasks.mjs`](../scripts/evaluate-software-tasks.mjs), and [`bench/results/software-task-context-0.1.0.json`](../bench/results/software-task-context-0.1.0.json). The evaluator fails when any committed deterministic result changes.
 

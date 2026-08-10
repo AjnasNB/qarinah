@@ -6,7 +6,7 @@ Qarinah 0.1.0 was the first stable open-source release. For every later release,
 
 > Send 98.71% less repeated project context. Keep the proof.
 
-Your project remembers even when your coding agent changes. Qarinah keeps one compact, cited project memory beside your code. Its published six-task benchmark used 436,431 fewer portable estimated tokens - 98.71% less repeated context - than full-history replay while keeping every required target in the top five with direct evidence coverage. A separate scale regression ranked the target first for 380 / 380 file-specific queries. These are deterministic context-volume and retrieval-regression measurements, not provider billing or universal task-quality claims.
+Your project remembers even when your coding agent changes. Qarinah keeps one compact, cited project memory beside your code. Its published six-task benchmark used 436,431 fewer portable estimated tokens - 98.71% less repeated context - than full-history replay while keeping every required target in the top five with direct evidence coverage. The baseline contained 77.81 times as many estimated tokens as the Qarinah path. At a flat $3 per million uncached input tokens, the aggregate slice estimates $1.326339 versus $0.017046. A separate scale regression ranked the target first for 380 / 380 file-specific queries. These are deterministic context-volume, arithmetic cost-equivalent, and retrieval-regression measurements, not provider billing, 77.81-times-longer session evidence, or universal task-quality claims.
 
 The complete channel copy, media assignments, and claims gate are in [`docs/launch/`](launch/README.md).
 
@@ -58,7 +58,8 @@ Use:
 - "Local-first and no Qarinah API key."
 - "Maqam governs. Cockroach gathers. Qarinah remembers. ProductLoop orchestrates."
 - "98.71% fewer estimated context tokens than full-history replay," with the identical-source, top-five/direct-coverage, and `ceil(characters / 4)` details available in the linked methodology.
-- "At a flat $1 per million uncached input tokens, the compared context slice moves from $0.442113 to $0.005682 - 98.71% less input-context cost under the same unit price," only as a transparent translation of the committed estimate.
+- "The evaluated full-history baseline contained 77.81 times as many estimated input-context tokens as the Qarinah path," or "77.81:1 baseline-to-pack ratio."
+- "At a flat $3 per million uncached input tokens, the aggregate compared context slice estimates $1.326339 versus $0.017046 - $1.309293 saved per repeat," only as a transparent translation of the committed estimate.
 
 Avoid:
 

@@ -16,7 +16,7 @@ Your project remembers even when your coding agent changes. Qarinah keeps permit
 
 Keep the scope beside the number: identical current-task source snippets in both paths; 442,113 estimated tokens for full-history replay versus 5,682 for Qarinah packs plus the same sources; every required target in the top five with direct coverage; no model-written summaries; `ceil(characters / 4)` estimation.
 
-Equivalent fixture-bound proof: 436,431 fewer estimated input-context tokens and a 77.81:1 baseline-to-pack ratio. Separate scale proof: 380 / 380 file-specific exact and typo-tolerant queries ranked the target first. Neither number is a provider billing receipt or a universal task-quality guarantee.
+Equivalent fixture-bound proof: 436,431 fewer estimated input-context tokens and a 77.81:1 baseline-to-pack ratio - the full-history baseline contained 77.81 times as many estimated tokens as the Qarinah path. At a flat $3 per million uncached input tokens, the aggregate slice estimates $1.326339 versus $0.017046, saving $1.309293 per repeat. Separate scale proof: 380 / 380 file-specific exact and typo-tolerant queries ranked the target first. These are not provider billing receipts, 77.81-times-longer session evidence, or universal task-quality guarantees.
 
 ## Who should care
 

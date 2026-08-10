@@ -18,6 +18,7 @@ const historicalPaperPdfs = new Map([
   ["Qarinah-Technical-White-Paper-v1.3.pdf", "/paper/Qarinah-Technical-White-Paper-v1.3.pdf"]
 ]);
 const releaseDate = "2026-08-08";
+const publicMetricsUpdatedDate = "2026-08-10";
 const toolkitArticleDate = "2026-08-09";
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 const benchmarkRelease = JSON.parse(await readFile(path.join(root, "bench", "results", "benchmark-release-0.1.6.json"), "utf8"));
@@ -34,11 +35,20 @@ if (!repeatedContextMetric
 }
 const repeatedContextTokensAvoided = repeatedContextMetric.baselineEstimatedTokens - repeatedContextMetric.qarinahEstimatedTokens;
 const repeatedContextRatio = repeatedContextMetric.baselineEstimatedTokens / repeatedContextMetric.qarinahEstimatedTokens;
+const illustrativeFlatInputRates = [1, 3, 5, 15];
+const estimatedInputCost = (tokens, usdPerMillion, repeats = 1) => Number(((tokens / 1_000_000) * usdPerMillion * repeats).toFixed(6));
+const illustrativeCostExamples = illustrativeFlatInputRates.map((usdPerMillionInputTokens) => ({
+  usdPerMillionInputTokens,
+  baselineUsd: estimatedInputCost(repeatedContextMetric.baselineEstimatedTokens, usdPerMillionInputTokens),
+  qarinahUsd: estimatedInputCost(repeatedContextMetric.qarinahEstimatedTokens, usdPerMillionInputTokens),
+  savedUsd: estimatedInputCost(repeatedContextTokensAvoided, usdPerMillionInputTokens),
+  savedAcrossTenRepeatsUsd: estimatedInputCost(repeatedContextTokensAvoided, usdPerMillionInputTokens, 10)
+}));
 const publicMetrics = {
   schemaVersion: "qarinah.public-metrics.v1",
   product: "Qarinah",
   productVersion,
-  updatedAt: releaseDate,
+  updatedAt: publicMetricsUpdatedDate,
   evidenceSource: `${github}/blob/main/bench/results/benchmark-release-0.1.6.json`,
   estimator: benchmarkRelease.portableTokenEstimator.method,
   providerBillingMeasurement: false,
@@ -60,6 +70,17 @@ const publicMetrics = {
       unsupportedQueriesCorrectlyRejected: benchmarkRelease.multiFileProjectStudy.unsupportedQueriesCorrectlyRejected,
       providerModelCalls: benchmarkRelease.multiFileProjectStudy.providerModelCalls
     }
+  },
+  illustrativeCostModel: {
+    scope: "the aggregate repeated-context slice across the six committed software-task fixtures",
+    formula: "estimatedTokens / 1000000 * usdPerMillionInputTokens * repeats",
+    pricingBasis: "flat uncached input-token rate chosen by the reader",
+    examples: illustrativeCostExamples,
+    exclusions: [
+      "provider-native tokenization and usage receipts",
+      "cached-input discounts or cache-write premiums",
+      "output, reasoning, tool, retrieval, hosting, and fixed charges"
+    ]
   },
   claimBoundary: [
     "These are deterministic portable context-volume and retrieval-regression measurements, not provider usage receipts.",
@@ -1167,7 +1188,7 @@ function homePage() {
           <div class="hero-copy">
             <p class="eyebrow">Measured project memory for coding agents</p>
             <h1>Send 98.71% less repeated project context. Keep the proof.</h1>
-            <p class="hero-lede">In six committed software-task fixtures, Qarinah compiled 442,113 estimated input-context tokens into 5,682 cited tokens while directly covering every required target in the top five.</p>
+            <p class="hero-lede">In six committed software-task fixtures, the full-history baseline contained 77.81&times; as many estimated input tokens as Qarinah's cited packs: 442,113 versus 5,682, with every required target directly covered in the top five.</p>
             <div class="hero-actions">
               <a class="btn btn-primary btn-large" href="/docs/getting-started/">Set up one project</a>
               <a class="hero-text-link" href="/docs/benchmarks/">Verify the 98.71% result</a>
@@ -1193,10 +1214,10 @@ function homePage() {
           <aside class="hero-proof" aria-label="Benchmark summary">
             <p class="eyebrow">One measured result</p>
             <div class="hero-proof-result">
-              <strong>98.71%</strong>
-              <span>less repeated context</span>
+              <strong>77.81&times;</strong>
+              <span>baseline-to-pack ratio</span>
             </div>
-            <p>442,113 estimated input-context tokens became 5,682. Every required target was directly covered in the top five in the published fixture.</p>
+            <p>442,113 estimated input-context tokens became 5,682 - 98.71% less repeated context. Every required target was directly covered in the top five in the published fixture.</p>
             <a href="/docs/benchmarks/">Read the method, artifacts, and limits</a>
           </aside>
         </div>
@@ -1233,9 +1254,42 @@ function homePage() {
         <div class="shell proof-strip-grid">
           <div><strong>98.71%</strong><span>less repeated context in the published six-task fixture</span></div>
           <div><strong>436,431</strong><span>fewer portable estimated input-context tokens in the compared slice</span></div>
-          <div><strong>77.81x</strong><span>the full-history input was larger than the compiled context pack</span></div>
+          <div><strong>77.81&times;</strong><span>as many estimated tokens in the full-history baseline as the compiled context pack</span></div>
           <div><strong>380 / 380</strong><span>file-specific exact and typo-tolerant queries ranked the target first</span></div>
         </div>
+      </section>
+
+      <section class="section shell" aria-labelledby="cost-equivalent-title">
+        <div class="section-heading split-heading">
+          <div>
+            <p class="eyebrow">Transparent cost equivalent</p>
+            <h2 id="cost-equivalent-title">At a flat $3/M input rate: $1.33 becomes $0.02.</h2>
+          </div>
+          <p>The aggregate six-fixture repeated-context slice estimates $1.326339 for full-history replay and $0.017046 for Qarinah's cited packs, saving $1.309293 each time that complete slice would otherwise be sent. Ten repeats save an estimated $13.092930.</p>
+        </div>
+        <div class="cost-equivalent-grid" aria-label="Illustrative flat uncached input-token cost equivalents">
+          <article>
+            <strong>$1/M</strong>
+            <span>$0.442113 &rarr; $0.005682</span>
+            <small>$0.436431 estimated saving per repeat</small>
+          </article>
+          <article>
+            <strong>$3/M</strong>
+            <span>$1.326339 &rarr; $0.017046</span>
+            <small>$1.309293 estimated saving per repeat</small>
+          </article>
+          <article>
+            <strong>$5/M</strong>
+            <span>$2.210565 &rarr; $0.028410</span>
+            <small>$2.182155 estimated saving per repeat</small>
+          </article>
+          <article>
+            <strong>$15/M</strong>
+            <span>$6.631695 &rarr; $0.085230</span>
+            <small>$6.546465 estimated saving per repeat</small>
+          </article>
+        </div>
+        <p class="benchmark-ribbon-note">Formula: <code>estimated tokens / 1,000,000 &times; flat uncached input rate &times; repeats</code>. This is arithmetic over the committed portable estimate, not a provider invoice. It excludes provider tokenization, caching, output, reasoning, tools, retrieval, hosting, and fixed charges. <a href="/docs/public-metrics/">Use the calculator table and approved wording</a>.</p>
       </section>
 
       <section class="section shell">

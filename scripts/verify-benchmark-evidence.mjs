@@ -14,6 +14,7 @@ const readme = await readFile(path.join(root, "README.md"), "utf8");
 const whitePaper = await readFile(path.join(root, "docs", "WHITEPAPER.md"), "utf8");
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 const platformCopy = await readFile(path.join(root, "docs", "launch", "PLATFORM-COPY.md"), "utf8");
+const publicMetricsCopy = await readFile(path.join(root, "docs", "PUBLIC-METRICS.md"), "utf8");
 
 assert.equal(live.schemaVersion, "qarinah.workspace-volume-observation.v1");
 assert.equal(live.claimEligible, false);
@@ -74,6 +75,11 @@ const compressionRatio = (totalBaselineEstimatedTokens / totalQarinahEstimatedTo
 const savedEstimatedTokens = totalBaselineEstimatedTokens - totalQarinahEstimatedTokens;
 const baselineAtOneDollarPerMillion = totalBaselineEstimatedTokens / 1_000_000;
 const qarinahAtOneDollarPerMillion = totalQarinahEstimatedTokens / 1_000_000;
+const illustrativeUsdPerMillion = 3;
+const baselineAtIllustrativeRate = baselineAtOneDollarPerMillion * illustrativeUsdPerMillion;
+const qarinahAtIllustrativeRate = qarinahAtOneDollarPerMillion * illustrativeUsdPerMillion;
+const savedAtIllustrativeRate = (savedEstimatedTokens / 1_000_000) * illustrativeUsdPerMillion;
+const savedAcrossTenRepeatsAtIllustrativeRate = savedAtIllustrativeRate * 10;
 
 assert.equal(publicPercent, "98.71%");
 assert.equal(compressionRatio, "77.81");
@@ -99,6 +105,15 @@ assert.ok(whitePaper.includes(`${savedEstimatedTokens.toLocaleString("en-US")} f
 assert.ok(readme.includes(`$${baselineAtOneDollarPerMillion.toFixed(4)}`));
 assert.ok(readme.includes(`$${qarinahAtOneDollarPerMillion.toFixed(4)}`));
 assert.ok(readme.includes(`${publicPercent} lower input-context cost at the same token rate.`));
+for (const surface of [readme, platformCopy, publicMetricsCopy]) {
+  assert.ok(surface.includes(`${compressionRatio}:1 baseline-to-pack ratio`));
+  assert.ok(surface.includes(`$${baselineAtIllustrativeRate.toFixed(6)}`));
+  assert.ok(surface.includes(`$${qarinahAtIllustrativeRate.toFixed(6)}`));
+  assert.ok(surface.includes(`$${savedAtIllustrativeRate.toFixed(6)}`));
+}
+assert.ok(readme.includes(`$${savedAcrossTenRepeatsAtIllustrativeRate.toFixed(6)}`));
+assert.ok(publicMetricsCopy.includes(`$${savedAcrossTenRepeatsAtIllustrativeRate.toFixed(6)}`));
+assert.ok(publicMetricsCopy.includes("Do not say agents run 70x longer"));
 assert.ok(whitePaper.includes(`**${publicPercent} lower input-context cost at the same token rate**`));
 assert.ok(whitePaper.includes("not a claim of 98.71% lower total application cost"));
 assert.ok(whitePaper.includes("not peer-reviewed"));

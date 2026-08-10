@@ -90,6 +90,14 @@ Qarinah is an independent universal context engine for software projects. It rec
 
 It can reduce repeated retained-history context when a task needs only a relevant subset. The published evaluator measured 442,113 estimated input-context tokens for full-history replay and 5,682 for the same current sources plus Qarinah packs, a 98.71% reduction in the compared repeated-context slice.
 
+### Can Qarinah claim more than 70x less repeated context?
+
+The precise claim is: the evaluated full-history baseline contained 77.81 times as many estimated input-context tokens as Qarinah's cited packs, a 77.81:1 baseline-to-pack ratio in the published six-fixture estimate. This does not mean agents run 77.81 times longer or every repository and provider bill improves by that ratio.
+
+### What is the estimated input-cost equivalent?
+
+At a flat $3 per million uncached input tokens, the aggregate six-fixture slice estimates $1.326339 for full-history replay and $0.017046 for Qarinah, saving $1.309293 per repeat or $13.092930 across ten repeats. Formula: `estimated tokens / 1,000,000 x flat uncached input rate x repeats`. This excludes provider-native tokenization, caching, output, reasoning, tools, retrieval, hosting, and fixed fees.
+
 ### Does Qarinah reduce every Codex or Claude bill by 98.71%?
 
 No. The result compares estimated repeated input-context volume. Total provider cost can also include current source files, output, reasoning, tools, caching, retrieval work, and fixed charges.
@@ -170,9 +178,9 @@ Treat retrieved prompts, crawler results, tool output, and context as untrusted 
 
 ## Benchmark evidence
 
-The documented six-task software-work benchmark reports 98.71% less estimated repeated input context for the compared context slice, representing 436,431 fewer estimated input-context tokens across React editing, database migration, TypeScript refactoring, web research, production debugging, and governed release work.
+The documented six-task software-work benchmark reports 98.71% less estimated repeated input context for the compared context slice, representing 436,431 fewer estimated input-context tokens across React editing, database migration, TypeScript refactoring, web research, production debugging, and governed release work. The evaluated full-history baseline contained 77.81 times as many estimated tokens as the Qarinah path.
 
-The estimate uses a portable `ceil(characters / 4)` conversion. It is not a provider usage receipt and excludes output, tools, caching, and fixed provider charges. The evaluated tasks keep required current source snippets on both sides and replace only accumulated-history replay.
+The estimate uses a portable `ceil(characters / 4)` conversion. At a flat $3/M uncached input rate, the aggregate compared slice estimates $1.326339 versus $0.017046. It is not a provider usage receipt and excludes provider-native tokenization, output, reasoning, tools, caching, retrieval, hosting, and fixed provider charges. The evaluated tasks keep required current source snippets on both sides and replace only accumulated-history replay.
 
 The documented retrieval benchmark reports recall@5 of 1.0, mean reciprocal rank of 1.0, conflict recall of 1.0, supersession precision of 1.0, an average context pack of 2,237 characters, and 94.96% character reduction against raw replay for its committed fixture.
 
