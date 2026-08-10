@@ -32,11 +32,19 @@ In Qarinah's committed software-task benchmark, full-history replay plus the req
 
 The estimate is `ceil(characters / 4)`, not provider-reported usage. Results will vary with the project, retained history, query, budget, and task. See [benchmarks](BENCHMARKS.md).
 
+## Can Qarinah claim a 70x context reduction?
+
+The precise published claim is stronger but narrower: **the evaluated full-history baseline contained 77.81 times as many estimated input-context tokens as the Qarinah path** (`442,113 / 5,682`). That is a 77.81:1 baseline-to-pack ratio for the committed six-fixture estimate.
+
+It does not mean coding-agent sessions run 77.81 times longer, every repository compresses by that ratio, or total provider bills fall by 77.81 times. Session runway depends on model limits, current source files, tool schemas, output, cache behavior, and how often the compared history would otherwise be resent.
+
 ## Does Qarinah reduce the total Codex, Claude, OpenAI, or Anthropic bill by 98.71%?
 
 No universal provider-billing claim is made.
 
 At the same flat input-token rate, a context slice that is 98.71% smaller costs 98.71% less to send. A total application bill can also include current source files, output, reasoning, tools, cached-input pricing, retrieval work, and fixed charges. The published estimate is therefore a comparison of repeated input-context volume, not an invoice or total-cost guarantee.
+
+For a transparent example, at a flat $3 per million uncached input tokens, the aggregate six-fixture slice estimates $1.326339 for full-history replay versus $0.017046 for Qarinah. That is $1.309293 saved per repeat or $13.092930 across ten repeats. Replace $3 with the current rate that applies to your workload; tiered long-context and cache prices require a provider-specific calculation.
 
 ## Does Qarinah eliminate hallucinations or guarantee correct answers?
 

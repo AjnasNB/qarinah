@@ -19,6 +19,14 @@
 
 The continuation percentages use the same 42-record, two-session history but measure two different outputs: the 119-token capsule is the smallest model-facing handoff, while the 1,039-token pack preserves the complete cited audit surface. All three measurements use the reproducible portable estimator `ceil(characters / 4)`; they are not provider billing receipts. [Inspect the fixtures, exact arithmetic, and claim boundaries.](docs/BENCHMARKS.md)
 
+### What the 77.81x ratio means
+
+The evaluated full-history baseline contained **77.81 times as many estimated input-context tokens** as the Qarinah path: `442,113 / 5,682 = 77.81`. This supports a **77.81:1 baseline-to-pack ratio** or **more than 70x baseline-to-pack compression** for the published six-fixture estimate. It does not mean agents run 77.81 times longer or every provider bill is 77.81 times lower.
+
+At a flat **$3 per million uncached input tokens**, the aggregate compared slice estimates **$1.326339 for full-history replay versus $0.017046 for Qarinah**, saving **$1.309293 per repeat** or **$13.092930 across ten repeats**. Use `estimated tokens / 1,000,000 x your input rate x repeats` for another rate. This arithmetic excludes provider-native tokenization, caching, output, reasoning, tools, retrieval, hosting, and fixed fees. [See the complete cost table and approved wording.](docs/PUBLIC-METRICS.md)
+
+At the normalized $1-per-million reference rate, the same calculation is **$0.4421 versus $0.0057**. In either flat-rate example, the fixture-bound statement remains: **98.71% lower input-context cost at the same token rate.**
+
 Scale regression: Qarinah also passed **380 / 380 file-specific exact and typo-tolerant queries** across deterministic 40-, 50-, and 100-file projects. The same run verified SQLite retrieval, graph relations, generated Markdown, conflicts, supersession, stale-projection repair, and 9 / 9 correct unsupported-query abstentions. [Inspect the multi-file method and result.](docs/BENCHMARKS.md#multi-file-project-context-and-projection-integrity-benchmark)
 
 <p align="center"><em>Switch agents. Keep the decisions, outcomes, and proof.</em></p>
@@ -77,9 +85,9 @@ npx qarinah setup . --codex --claude --cursor --capture content --allow-query
 | Team workspace | Multi-repository relationships, freshness, encrypted bundles, signed checkpoints, membership, and separate authority boundaries |
 | Governed workflow | Optional Maqam memory scopes and disclosure controls without making Maqam a requirement |
 
-Qarinah achieved 98.71% fewer estimated repeated-project-context tokens in its published software-task benchmark. That compared slice contained 436,431 fewer estimated input-context tokens, and the full-history baseline was 77.81 times larger than the compiled Qarinah packs. A separate deterministic scale regression ranked the correct target first for 380 / 380 file-specific exact and typo-tolerant queries. We found no directly comparable public benchmark measuring the same project-history replay baseline. These results measure portable estimated input context and deterministic retrieval behavior, not provider billing, output tokens, latency, or universal task quality.
+Qarinah achieved 98.71% fewer estimated repeated-project-context tokens in its published software-task benchmark. That compared slice contained 436,431 fewer estimated input-context tokens, and the full-history baseline contained 77.81 times as many estimated tokens as the compiled Qarinah packs. A separate deterministic scale regression ranked the correct target first for 380 / 380 file-specific exact and typo-tolerant queries. We found no directly comparable public benchmark measuring the same project-history replay baseline. These results measure portable estimated input context and deterministic retrieval behavior, not provider billing, output tokens, latency, or universal task quality.
 
-98.71% lower input-context cost at the same token rate.
+For the compared slice only: 98.71% lower estimated input-context cost at the same flat uncached-input token rate.
 
 ## One complete workflow
 
@@ -130,7 +138,7 @@ The JSONL chain remains authoritative. Graph, index, Markdown, dashboard, and OK
 
 <p align="center"><em>Nearly 99% less repeated context. Every selected memory points back to its source.</em></p>
 
-> Successfully verified across React editing, database migration, TypeScript refactoring, web research, production debugging, and governed release work. The evaluated tasks sent 436,431 fewer estimated input-context tokens. At a flat $1 per million uncached input tokens, that compared context slice moves from $0.4421 to $0.0057 - 98.71% less input-context cost under the same unit price. The percentage is independent of the chosen flat unit price; the portable token estimate excludes output, tools, caching, and fixed provider charges. See the [machine-readable result](bench/results/software-task-context-0.1.0.json) and [methodology](docs/BENCHMARKS.md).
+> Successfully verified across React editing, database migration, TypeScript refactoring, web research, production debugging, and governed release work. The evaluated tasks sent 436,431 fewer estimated input-context tokens. At a flat $3 per million uncached input tokens, that aggregate compared context slice moves from $1.326339 to $0.017046, saving $1.309293 each time the complete slice would otherwise be sent. The percentage is independent of the chosen flat unit price; the portable token estimate excludes provider-native tokenization, output, tools, caching, retrieval, hosting, and fixed provider charges. See the [machine-readable public metrics](https://qarinah.io/metrics.json) and [methodology](docs/BENCHMARKS.md).
 
 ## Install and compile the first cited pack
 

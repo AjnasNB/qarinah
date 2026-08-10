@@ -9,10 +9,37 @@ Qarinah publishes outcome-first numbers only when the repository contains the fi
 The same result can be stated in three equivalent, fixture-bound ways:
 
 - **436,431 fewer estimated input-context tokens** in the compared repeated-history slice.
-- **77.81x smaller** than the evaluated full-history input (`442,113 / 5,682`).
+- **77.81:1 baseline-to-pack ratio**: the evaluated full-history baseline contained 77.81 times as many estimated tokens as the Qarinah path (`442,113 / 5,682`).
 - **98.71% lower input-context cost at the same flat uncached-input token rate**, for the compared slice only.
 
 The estimator is `ceil(characters / 4)`. These are reproducible portable estimates, not a provider billing receipt.
+
+## Can Qarinah claim more than 70x?
+
+Yes, with the measured object in the sentence. Approved wording:
+
+> **The evaluated full-history baseline contained 77.81x as many estimated input-context tokens as Qarinah's cited packs.**
+
+Short alternatives are **77.81:1 baseline-to-pack ratio** or **more than 70x baseline-to-pack compression in the published six-fixture estimate**. Do not say agents run 70x longer, bills are 70x lower, or every repository compresses 70x. The benchmark did not measure session duration, provider invoices, or universal repositories.
+
+## Transparent input-cost equivalents
+
+The cost formula is:
+
+```text
+estimated input cost = estimated tokens / 1,000,000 x flat uncached input rate x repeats
+```
+
+Applied to the aggregate repeated-context slice across all six committed fixtures:
+
+| Flat uncached input rate | Full-history baseline | Qarinah path | Estimated saving per repeat | Estimated saving across 10 repeats |
+| ---: | ---: | ---: | ---: | ---: |
+| $1 / million | $0.442113 | $0.005682 | $0.436431 | $4.364310 |
+| $3 / million | $1.326339 | $0.017046 | $1.309293 | $13.092930 |
+| $5 / million | $2.210565 | $0.028410 | $2.182155 | $21.821550 |
+| $15 / million | $6.631695 | $0.085230 | $6.546465 | $65.464650 |
+
+The $3 example can be stated as **about $1.33 to $0.02, saving about $1.31 each time the complete compared slice would otherwise be sent**. These are arithmetic equivalents at a reader-selected flat rate, not observed provider charges. They exclude provider-native tokenization, cache writes and reads, output, reasoning, tools, retrieval, hosting, and fixed fees. A provider with tiered long-context pricing will not follow one flat rate across both inputs.
 
 ## The strongest verified scale result
 
@@ -26,13 +53,17 @@ The 380 positives include exact and typo-tolerant queries. The same run verified
 
 **Send 98.71% less repeated project context. Keep the proof.**
 
+### Ratio-led headline
+
+**The baseline carried 77.81x as many estimated tokens. Qarinah keeps the cited pack.**
+
 ### Product-directory tagline
 
 Evidence-linked project memory that lets coding agents continue with compact, cited context instead of replaying complete project history.
 
 ### Short announcement
 
-Qarinah keeps one project-owned memory across Codex, Claude Code, Cursor, CLI, and compatible MCP workflows. Its published six-task fixture compiled 442,113 estimated repeated-context tokens into 5,682 cited tokens - 98.71% less - while directly covering every required target in the top five. The source, evaluator, machine-readable result, and limitations are public.
+Qarinah keeps one project-owned memory across Codex, Claude Code, Cursor, CLI, and compatible MCP workflows. Its published six-task fixture compiled 442,113 estimated repeated-context tokens into 5,682 cited tokens - a 77.81:1 baseline-to-pack ratio and 98.71% less repeated context - while directly covering every required target in the top five. At a flat $3 per million uncached input tokens, that aggregate compared slice estimates $1.33 versus $0.02. The source, evaluator, machine-readable result, formula, and limitations are public.
 
 ### Evidence links
 

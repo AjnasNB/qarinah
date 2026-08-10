@@ -288,7 +288,7 @@ if (home.includes('"@type":"SearchAction"') || home.includes("search_term_string
 }
 if (!home.includes("<strong>98.71%</strong>")
   || !home.includes("<strong>436,431</strong>")
-  || !home.includes("<strong>77.81x</strong>")
+  || !home.includes("<strong>77.81&times;</strong>")
   || !home.includes("<strong>380 / 380</strong>")) {
   errors.push("Homepage is missing the plain-language benchmark proof.");
 }
@@ -303,21 +303,37 @@ if (!home.includes("Send 98.71% less repeated project context. Keep the proof.")
   || !home.includes('href="/metrics.json"')) {
   errors.push("Homepage is missing the outcome-first metric and evidence workflow.");
 }
+for (const costProof of [
+  "At a flat $3/M input rate: $1.33 becomes $0.02.",
+  "$1.326339 &rarr; $0.017046",
+  "$1.309293 estimated saving per repeat",
+  "Ten repeats save an estimated $13.092930"
+]) {
+  if (!home.includes(costProof)) errors.push(`Homepage is missing the bounded cost equivalent: ${costProof}`);
+}
 if (home.indexOf('<section class="hero">') > home.indexOf('<section class="benchmark-ribbon"')) {
   errors.push("Homepage must lead with the centered product hero before benchmark detail.");
 }
 if (!home.includes("Evidence-linked project memory for coding agents.") || !home.includes("continue from verified context instead of starting from zero")) {
-  if (!home.includes("Measured project memory for coding agents") || !home.includes("directly covering every required target")) {
+  if (!home.includes("Measured project memory for coding agents") || !home.includes("every required target directly covered in the top five")) {
     errors.push("Homepage is missing the cross-agent category or benchmark scope.");
   }
 }
 if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
+  || publicMetrics.updatedAt !== "2026-08-10"
   || publicMetrics.providerBillingMeasurement !== false
   || publicMetrics.metrics?.repeatedProjectContext?.baselineEstimatedTokens !== 442113
   || publicMetrics.metrics?.repeatedProjectContext?.qarinahEstimatedTokens !== 5682
   || publicMetrics.metrics?.repeatedProjectContext?.estimatedTokensAvoided !== 436431
   || publicMetrics.metrics?.repeatedProjectContext?.baselineToQarinahRatio !== 77.81
   || publicMetrics.metrics?.multiFileRetrieval?.rankOnePositiveQueries !== 380
+  || publicMetrics.illustrativeCostModel?.pricingBasis !== "flat uncached input-token rate chosen by the reader"
+  || publicMetrics.illustrativeCostModel?.examples?.length !== 4
+  || publicMetrics.illustrativeCostModel.examples[1]?.usdPerMillionInputTokens !== 3
+  || publicMetrics.illustrativeCostModel.examples[1]?.baselineUsd !== 1.326339
+  || publicMetrics.illustrativeCostModel.examples[1]?.qarinahUsd !== 0.017046
+  || publicMetrics.illustrativeCostModel.examples[1]?.savedUsd !== 1.309293
+  || publicMetrics.illustrativeCostModel.examples[1]?.savedAcrossTenRepeatsUsd !== 13.09293
   || !Array.isArray(publicMetrics.claimBoundary)
   || publicMetrics.claimBoundary.length < 3) {
   errors.push("metrics.json is incomplete or has drifted from the verified public benchmark receipt.");
@@ -325,7 +341,9 @@ if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
 for (const requiredPublicMetricCopy of [
   "98.7148% less estimated repeated project context",
   "436,431 fewer estimated input-context tokens",
-  "77.81x smaller",
+  "full-history baseline contained 77.81 times as many estimated tokens",
+  "$1.326339",
+  "$13.092930",
   "380 / 380 file-specific queries",
   "Do not publish these claims",
   "provider billing receipt"

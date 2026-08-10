@@ -20,7 +20,10 @@
 ## Benchmark wording
 
 - [ ] Use: “98.71% less estimated context.”
+- [ ] Use: “The evaluated full-history baseline contained 77.81 times as many estimated input-context tokens as the Qarinah path,” or “77.81:1 baseline-to-pack ratio.”
+- [ ] If translating cost, show the formula and scope: at a flat $3/M uncached input rate, the aggregate six-fixture estimate is $1.326339 versus $0.017046, not a provider invoice.
 - [ ] State 240 records, 442,113 versus 5,682 estimated tokens, identical task sources, top-five direct coverage, no model-written summaries, and `ceil(characters / 4)`.
+- [ ] Never say agents run 77.81 times longer or every provider bill is 77.81 times lower.
 - [ ] If translating the result to cost, use the explicit flat-price example: $0.442113 versus $0.005682 at $1 per million uncached input tokens for the compared context slice.
 - [ ] Do not call the result provider-native Codex/Claude usage, a provider bill, total AI cost savings, universal retrieval quality, or a production guarantee.
 
