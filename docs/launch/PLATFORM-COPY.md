@@ -52,7 +52,7 @@ Possible factual title to rewrite:
 
 **Tagline:** Send 98.71% less repeated project context - keep the proof
 
-**Description (under 260 characters):** Qarinah gives coding agents compact, cited project memory instead of full-history replay. Its reproducible six-fixture result was 442,113 to 5,682 estimated tokens; at a flat $3/M uncached rate, about $1.33 to $0.02.
+**Current listing description (482 / 500 characters):** Qarinah 0.1.6 gives Codex, Claude Code, Cursor, CLI tools, and compatible MCP clients one local, cited project memory. Published six-fixture estimate: 442,113 full-history tokens vs 5,682 Qarinah tokens—98.71% less repeated context and a 77.81:1 ratio, with every required target top-five. At a flat $3/M uncached input rate, the compared slice is $1.326339 vs $0.017046, an estimated $1.309293 saving per repeat. Apache-2.0, local-first; not a provider bill or universal guarantee.
 
 **Topics:** Developer Tools, Artificial Intelligence, Open Source, Productivity
 

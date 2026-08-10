@@ -304,12 +304,23 @@ if (!home.includes("Send 98.71% less repeated project context. Keep the proof.")
   errors.push("Homepage is missing the outcome-first metric and evidence workflow.");
 }
 for (const costProof of [
-  "At a flat $3/M input rate: $1.33 becomes $0.02.",
-  "$1.326339 &rarr; $0.017046",
-  "$1.309293 estimated saving per repeat",
-  "Ten repeats save an estimated $13.092930"
+  "98.71% less repeated context. A 77.81:1 baseline-to-pack ratio.",
+  "More than 70:1 compression in the published six-fixture estimate",
+  'class="cost-equivalent-table"',
+  "<th scope=\"col\">Rate</th>",
+  "<th scope=\"col\">Baseline</th>",
+  "<th scope=\"col\">Qarinah</th>",
+  "<th scope=\"col\">Estimated saving</th>",
+  "<th scope=\"row\">$1/M tokens</th><td>$0.442113</td><td>$0.005682</td><td>$0.436431</td>",
+  "<th scope=\"row\">$3/M tokens</th><td>$1.326339</td><td>$0.017046</td><td>$1.309293</td>",
+  "<th scope=\"row\">$5/M tokens</th><td>$2.210565</td><td>$0.028410</td><td>$2.182155</td>",
+  "<th scope=\"row\">$15/M tokens</th><td>$6.631695</td><td>$0.085230</td><td>$6.546465</td>",
+  "$13.092930 across ten repeats"
 ]) {
   if (!home.includes(costProof)) errors.push(`Homepage is missing the bounded cost equivalent: ${costProof}`);
+}
+if (home.indexOf('class="front-proof section shell"') > home.indexOf('class="handoff-stage"')) {
+  errors.push("Homepage must place the verified claim and cost table directly after the hero, before the setup workflow.");
 }
 if (home.indexOf('<section class="hero">') > home.indexOf('<section class="benchmark-ribbon"')) {
   errors.push("Homepage must lead with the centered product hero before benchmark detail.");

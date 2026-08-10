@@ -113,6 +113,13 @@ for (const surface of [readme, platformCopy, publicMetricsCopy]) {
 }
 assert.ok(readme.includes(`$${savedAcrossTenRepeatsAtIllustrativeRate.toFixed(6)}`));
 assert.ok(publicMetricsCopy.includes(`$${savedAcrossTenRepeatsAtIllustrativeRate.toFixed(6)}`));
+for (const flatRate of [1, 3, 5, 15]) {
+  const baselineCost = baselineAtOneDollarPerMillion * flatRate;
+  const qarinahCost = qarinahAtOneDollarPerMillion * flatRate;
+  const savedCost = ((savedEstimatedTokens / 1_000_000) * flatRate);
+  const readmeCostRow = `| $${flatRate}/M tokens | $${baselineCost.toFixed(6)} | $${qarinahCost.toFixed(6)} | $${savedCost.toFixed(6)} |`;
+  assert.ok(readme.includes(readmeCostRow), `README.md must carry the evidence-derived cost row: ${readmeCostRow}`);
+}
 assert.ok(publicMetricsCopy.includes("Do not say agents run 70x longer"));
 assert.ok(whitePaper.includes(`**${publicPercent} lower input-context cost at the same token rate**`));
 assert.ok(whitePaper.includes("not a claim of 98.71% lower total application cost"));
