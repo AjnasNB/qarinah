@@ -58,6 +58,10 @@ Possible factual title to rewrite:
 
 **Pricing:** Free
 
+**Gallery proof card:** `assets/launch/qarinah-what-you-save.png`
+
+**Long-form publication draft:** [WHAT-YOU-SAVE.md](WHAT-YOU-SAVE.md). Use the same proof card as the cover image on Medium or DEV. Do not remove its fixture-boundary footer or rewrite the 77.81:1 ratio as a session-length guarantee.
+
 **Maker comment:**
 
 I built Qarinah because agent memory usually fails in two directions: the next model receives the entire noisy history, or it receives a short summary with no evidence trail. Qarinah keeps the source record separate from the compiled pack. The ledger is local and append-only; graph, index, Markdown, and OKF views are rebuildable; every selected item cites its event ID and hash.

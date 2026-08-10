@@ -625,6 +625,7 @@ await cp(path.join(root, "node_modules", "@primer", "css", "dist", "primer.css")
 await cp(path.join(root, "assets", "brand", "qarinah-mark.svg"), path.join(output, "assets", "qarinah-mark.svg"));
 await cp(path.join(root, "assets", "architecture", "qarinah-flow.svg"), path.join(output, "assets", "qarinah-flow.svg"));
 await cp(path.join(root, "assets", "launch", "qarinah-social-preview.png"), path.join(output, "assets", "qarinah-social-preview.png"));
+await cp(path.join(root, "assets", "launch", "qarinah-what-you-save.png"), path.join(output, "assets", "qarinah-what-you-save.png"));
 for (const filename of [
   "Qarinah-Technical-White-Paper-v1.2.pdf",
   "Qarinah-Technical-White-Paper-v1.3.pdf",
@@ -1206,6 +1207,10 @@ function homePage() {
           </div>
           <p>More than 70:1 compression in the published six-fixture estimate: 442,113 portable estimated input-context tokens for full-history replay versus 5,682 for Qarinah's cited packs. Every required target was directly covered in the top five.</p>
         </div>
+        <figure class="what-you-save-figure">
+          <img src="/assets/qarinah-what-you-save.png" width="1664" height="936" loading="lazy" decoding="async" alt="What you save with Qarinah: 98.71% less repeated context, a 77.81 to 1 baseline-to-pack ratio, 442,113 baseline tokens versus 5,682 Qarinah pack tokens, and exact illustrative savings at four flat uncached input-token rates.">
+          <figcaption>Shareable proof card. The semantic table below remains the source for accessible text and exact values.</figcaption>
+        </figure>
         <div class="cost-equivalent-table-wrap">
           <table class="cost-equivalent-table" aria-describedby="cost-equivalent-note">
             <caption>Illustrative flat uncached input-token cost equivalents for the published six-fixture estimate</caption>

@@ -10,6 +10,10 @@
   Qarinah compiles a compact, cited project memory for Codex, Claude Code, Cursor, and compatible tools. In six committed software-task fixtures, 442,113 estimated repeated-context tokens became 5,682 - with every required target directly covered in the top five.
 </p>
 
+<p align="center">
+  <img src="assets/launch/qarinah-what-you-save.png" width="100%" alt="What you save with Qarinah: 98.71% less repeated context, a 77.81 to 1 baseline-to-pack ratio, 442,113 baseline tokens versus 5,682 Qarinah pack tokens, and exact illustrative savings at four flat uncached input-token rates.">
+</p>
+
 ## Reproducible benchmark results
 
 | **98.7148%** | **98.75%** | **89.05%** |
