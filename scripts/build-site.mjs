@@ -20,9 +20,54 @@ const historicalPaperPdfs = new Map([
 const releaseDate = "2026-08-08";
 const toolkitArticleDate = "2026-08-09";
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
+const benchmarkRelease = JSON.parse(await readFile(path.join(root, "bench", "results", "benchmark-release-0.1.6.json"), "utf8"));
 const productVersion = packageJson.version;
 const productPositioning = "Evidence-linked project memory for coding agents.";
 const productExplanation = "Qarinah keeps one compact, cited project memory beside your code, so Codex, Claude Code, Cursor, and compatible tools can continue from verified context instead of starting from zero.";
+const repeatedContextMetric = benchmarkRelease.headlineContextResults.find((result) => result.id === "six-task-repeated-context");
+if (!repeatedContextMetric
+  || repeatedContextMetric.baselineEstimatedTokens !== 442113
+  || repeatedContextMetric.qarinahEstimatedTokens !== 5682
+  || repeatedContextMetric.displayReduction !== "98.7148%"
+  || benchmarkRelease.multiFileProjectStudy.positiveQueriesPassed !== 380) {
+  throw new Error("The public metrics surface does not match the verified Qarinah 0.1.6 benchmark receipt.");
+}
+const repeatedContextTokensAvoided = repeatedContextMetric.baselineEstimatedTokens - repeatedContextMetric.qarinahEstimatedTokens;
+const repeatedContextRatio = repeatedContextMetric.baselineEstimatedTokens / repeatedContextMetric.qarinahEstimatedTokens;
+const publicMetrics = {
+  schemaVersion: "qarinah.public-metrics.v1",
+  product: "Qarinah",
+  productVersion,
+  updatedAt: releaseDate,
+  evidenceSource: `${github}/blob/main/bench/results/benchmark-release-0.1.6.json`,
+  estimator: benchmarkRelease.portableTokenEstimator.method,
+  providerBillingMeasurement: false,
+  metrics: {
+    repeatedProjectContext: {
+      fixture: "six committed software-task fixtures",
+      baselineEstimatedTokens: repeatedContextMetric.baselineEstimatedTokens,
+      qarinahEstimatedTokens: repeatedContextMetric.qarinahEstimatedTokens,
+      estimatedTokensAvoided: repeatedContextTokensAvoided,
+      exactReduction: repeatedContextMetric.exactReduction,
+      displayReduction: repeatedContextMetric.displayReduction,
+      baselineToQarinahRatio: Number(repeatedContextRatio.toFixed(2)),
+      coverage: repeatedContextMetric.coverage
+    },
+    multiFileRetrieval: {
+      fileCounts: benchmarkRelease.multiFileProjectStudy.scales.map((scale) => scale.fileCount),
+      totalFiles: benchmarkRelease.multiFileProjectStudy.totalFiles,
+      rankOnePositiveQueries: benchmarkRelease.multiFileProjectStudy.positiveQueriesPassed,
+      unsupportedQueriesCorrectlyRejected: benchmarkRelease.multiFileProjectStudy.unsupportedQueriesCorrectlyRejected,
+      providerModelCalls: benchmarkRelease.multiFileProjectStudy.providerModelCalls
+    }
+  },
+  claimBoundary: [
+    "These are deterministic portable context-volume and retrieval-regression measurements, not provider usage receipts.",
+    "The percentage does not measure output tokens, reasoning tokens, tool calls, cache pricing, latency, task completion, or total provider cost.",
+    "The multi-file study is a synthetic, auditable local regression and not a universal repository or model-quality guarantee."
+  ],
+  methodology: `${siteOrigin}/docs/benchmarks/`
+};
 const qarinahFeatures = [
   "Verified handoffs between coding agents",
   "Local append-only project memory",
@@ -429,6 +474,14 @@ const docPages = [
     description: "Reproduce Qarinah's 98.71% estimated repeated-context reduction and its 40/50/100-file retrieval and projection-integrity regression.",
     section: "Verify",
     aliases: ["token benchmark", "context compression", "cost comparison", "machine readable result", "multi file benchmark", "sqlite graph markdown"]
+  },
+  {
+    route: "docs/public-metrics",
+    source: "docs/PUBLIC-METRICS.md",
+    title: "Public metrics and launch claims",
+    description: "Use Qarinah's verified context-volume and retrieval metrics with exact evidence links, approved wording, and explicit claim boundaries.",
+    section: "Verify",
+    aliases: ["Qarinah metrics", "launch claims", "98.71 percent", "token savings", "benchmark evidence", "marketing claims"]
   },
   {
     route: "docs/security",
@@ -968,11 +1021,20 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
         version: productVersion,
         license: "https://www.apache.org/licenses/LICENSE-2.0",
         creator: { "@id": person["@id"] },
-        distribution: {
-          "@type": "DataDownload",
-          encodingFormat: "application/json",
-          contentUrl: `${github}/blob/main/bench/results/software-task-context-0.1.1.json`
-        }
+        distribution: [
+          {
+            "@type": "DataDownload",
+            name: "Qarinah public metrics and claim boundaries",
+            encodingFormat: "application/json",
+            contentUrl: `${siteOrigin}/metrics.json`
+          },
+          {
+            "@type": "DataDownload",
+            name: "Six-task software-context result",
+            encodingFormat: "application/json",
+            contentUrl: `${github}/blob/main/bench/results/software-task-context-0.1.1.json`
+          }
+        ]
       }
     );
   } else if (kind === "howto") {
@@ -1094,8 +1156,8 @@ function commandBlock(command, label = "Terminal") {
 
 function homePage() {
   return layout({
-    title: "Qarinah - Cross-Agent Context Engine",
-    description: productPositioning,
+    title: "Qarinah - 98.71% Less Repeated Coding-Agent Context",
+    description: "Qarinah compiled 442,113 estimated repeated-project-context tokens into 5,682 cited tokens in six committed software-task fixtures - 98.71% less, with public evidence and explicit limits.",
     active: "home",
     canonical: "/",
     kind: "home",
@@ -1103,14 +1165,14 @@ function homePage() {
       <section class="hero">
         <div class="shell hero-grid">
           <div class="hero-copy">
-            <p class="eyebrow">${productPositioning}</p>
-            <h1>Your project remembers when your coding agent changes.</h1>
-            <p class="hero-lede">${productExplanation}</p>
+            <p class="eyebrow">Measured project memory for coding agents</p>
+            <h1>Send 98.71% less repeated project context. Keep the proof.</h1>
+            <p class="hero-lede">In six committed software-task fixtures, Qarinah compiled 442,113 estimated input-context tokens into 5,682 cited tokens while directly covering every required target in the top five.</p>
             <div class="hero-actions">
               <a class="btn btn-primary btn-large" href="/docs/getting-started/">Set up one project</a>
-              <a class="hero-text-link" href="/docs/cross-agent-handoffs/">See the verified handoff</a>
+              <a class="hero-text-link" href="/docs/benchmarks/">Verify the 98.71% result</a>
             </div>
-            <a class="hero-evidence-link" href="/docs/benchmarks/">Measured with public artifacts and explicit limits</a>
+            <a class="hero-evidence-link" href="/metrics.json">Open the machine-readable metrics and claim boundaries</a>
           </div>
         </div>
       </section>
@@ -1144,7 +1206,7 @@ function homePage() {
         <div class="shell">
           <div class="benchmark-ribbon-heading">
             <p class="eyebrow">Reproducible release benchmarks</p>
-            <h2 id="benchmark-ribbon-title">Three outputs. Three exact measurements.</h2>
+            <h2 id="benchmark-ribbon-title">Measured, reproducible, and explicitly scoped.</h2>
           </div>
           <div class="benchmark-ribbon-grid">
             <article>
@@ -1169,10 +1231,10 @@ function homePage() {
 
       <section class="proof-strip" aria-label="Qarinah proof points">
         <div class="shell proof-strip-grid">
-          <div><strong>98.71%</strong><span>less repeated context and input-context cost at the same token rate</span></div>
-          <div><strong>77.81 to 1</strong><span>the evaluated full-history input was 77.81 times larger than the compiled context pack</span></div>
-          <div><strong>100%</strong><span>required target coverage in the evaluated tasks</span></div>
-          <div><strong>Shared memory</strong><span>Codex, Claude Code, Cursor, CLI, and compatible MCP workflows</span></div>
+          <div><strong>98.71%</strong><span>less repeated context in the published six-task fixture</span></div>
+          <div><strong>436,431</strong><span>fewer portable estimated input-context tokens in the compared slice</span></div>
+          <div><strong>77.81x</strong><span>the full-history input was larger than the compiled context pack</span></div>
+          <div><strong>380 / 380</strong><span>file-specific exact and typo-tolerant queries ranked the target first</span></div>
         </div>
       </section>
 
@@ -1893,6 +1955,7 @@ const searchDestination = path.join(output, "search");
 await mkdir(searchDestination, { recursive: true });
 await writeFile(path.join(searchDestination, "index.html"), searchPage());
 await writeFile(path.join(output, "search-index.json"), `${JSON.stringify(searchEntries, null, 2)}\n`);
+await writeFile(path.join(output, "metrics.json"), `${JSON.stringify(publicMetrics, null, 2)}\n`);
 
 const sitemapRoutes = [
   "/",

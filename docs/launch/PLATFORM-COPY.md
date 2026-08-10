@@ -4,13 +4,19 @@ Do not publish these drafts until the gates in [../LAUNCH.md](../LAUNCH.md) are 
 
 ## Canonical descriptions
 
-**Headline:** Your project remembers, even when your coding agent changes.
+**Outcome headline:** Send 98.71% less repeated project context. Keep the proof.
+
+**Product headline:** Your project remembers, even when your coding agent changes.
 
 **Category:** Evidence-linked project memory that stays with your code.
 
 **Tagline:** Switch agents. Keep the decisions, outcomes, and proof.
 
 **Proof tagline:** Nearly 99% less repeated project context. Every selected memory points back to its source.
+
+**Evidence line:** 436,431 fewer portable estimated input-context tokens in the compared six-task slice; the full-history input was 77.81 times larger than the cited Qarinah packs.
+
+**Scale line:** 380 / 380 file-specific exact and typo-tolerant queries ranked the target first across deterministic 40-, 50-, and 100-file projects.
 
 **Measured cost line:** 98.71% lower input-context cost at the same input-token rate.
 
@@ -42,9 +48,9 @@ Possible factual title to rewrite:
 
 **Name:** Qarinah
 
-**Tagline:** Your project remembers when your coding agent changes
+**Tagline:** Send 98.71% less repeated project context - keep the proof
 
-**Description (under 260 characters):** Switch agents without restarting the story. Qarinah keeps compact, cited project memory beside your code for Codex, Claude Code, Cursor, CLI, and compatible MCP clients.
+**Description (under 260 characters):** Qarinah gives Codex, Claude Code, Cursor, CLI, and compatible MCP clients compact, cited project memory instead of complete history replay. Its reproducible fixture measured 98.71% less repeated context.
 
 **Topics:** Developer Tools, Artificial Intelligence, Open Source, Productivity
 
@@ -54,14 +60,14 @@ Possible factual title to rewrite:
 
 I built Qarinah because agent memory usually fails in two directions: the next model receives the entire noisy history, or it receives a short summary with no evidence trail. Qarinah keeps the source record separate from the compiled pack. The ledger is local and append-only; graph, index, Markdown, and OKF views are rebuildable; every selected item cites its event ID and hash.
 
-442,113 estimated input-context tokens became 5,682 while every required target remained directly covered in the top five. That is 98.71% less repeated context and 77.81:1 context compression. At the same flat uncached input-token price, the context-input portion costs 98.71% less to send. I want real-project feedback on missing evidence, setup friction, and second-session usefulness.
+442,113 estimated input-context tokens became 5,682 while every required target remained directly covered in the top five. That is 436,431 fewer estimated tokens, 98.71% less repeated context, and a 77.81:1 ratio in the compared slice. A separate deterministic scale regression ranked the target first for 380 / 380 file-specific exact and typo-tolerant queries. These are portable context-volume and retrieval-regression measurements, not provider usage receipts. I want real-project feedback on missing evidence, setup friction, and second-session usefulness.
 
 ## X thread
 
 1. Stop replaying entire agent histories. Qarinah gives a later agent the smallest cited project context it needs - not the whole transcript and not an opaque rolling summary.
 2. Permitted prompts, tool outcomes, approvals, sources, decisions, compactions, and project structure enter a local hash-chained event record. Metadata-only capture is the default.
 3. Graph, index, Markdown, and OKF views are deterministic and disposable. Every selected context item points back to an event ID and content hash.
-4. Qarinah packs plus identical task sources used 5,682 estimated tokens versus 442,113 for full-history replay: 98.71% less estimated context, with every target directly covered in the top five.
+4. Qarinah packs plus identical task sources used 5,682 estimated tokens versus 442,113 for full-history replay: 436,431 fewer estimated tokens and 98.71% less repeated context, with every target directly covered in the top five.
 5. The estimate is `ceil(characters / 4)`, not provider billing. Qarinah does not capture hidden reasoning, grant itself disclosure authority, or require a Qarinah API key.
 6. Stable install and plugin links: [ADD ONLY AFTER VERIFIED RELEASE]
 
@@ -71,7 +77,7 @@ The hardest context problem in agent work is not storage. It is deciding what th
 
 Qarinah keeps a local, append-only record of permitted agent activity and explicit project decisions. It rebuilds graph, index, Markdown, and OKF views deterministically, then compiles a bounded pack whose selected items cite the source event and hash.
 
-The Qarinah path used 98.71% less estimated context than replaying the full history while keeping every required target directly covered in the top five. The measurement uses a transparent characters-divided-by-four estimate, not provider billing.
+The Qarinah path used 436,431 fewer portable estimated tokens - 98.71% less repeated context - than replaying the full history while keeping every required target directly covered in the top five. A separate deterministic scale regression ranked the correct target first for 380 / 380 file-specific exact and typo-tolerant queries. These measurements use a transparent characters-divided-by-four estimate and zero provider model calls; they are not provider billing or universal task-quality evidence.
 
 The stable release supports Codex and Claude Code plugins, a CLI, and read-only MCP diagnostics. Capture is opt-in per project, metadata-only by default, and requires machine-local trust. I am looking for developers willing to reproduce the fixture and report the first missing piece of evidence on a real codebase.
 
@@ -100,6 +106,6 @@ I would value a reproducible missing-evidence case or a critique of the consent,
 
 ## YouTube
 
-**Title:** Your project remembers | Qarinah in 60 seconds
+**Title:** 98.71% less repeated project context | Qarinah in 60 seconds
 
 **Description:** Qarinah records permitted project activity and explicit decisions in a local evidence-linked ledger, then compiles a small cited context pack for the next agent task. This demo shows opt-in, one decision, project scan, deterministic build, direct-evidence retrieval, and doctor verification. Benchmark method and limitations: [ADD PUBLIC URL AFTER RELEASE]
