@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -14,8 +14,11 @@ test("website deployment is bound to exact published Qarinah assets", async () =
   const config = JSON.parse(configSource);
 
   assert.equal(config.name, "qarinah");
+  assert.equal(config.main, "./website/worker.mjs");
   assert.equal(config.assets.directory, "./site-dist");
+  assert.equal(config.assets.binding, "ASSETS");
   assert.equal(config.assets.html_handling, "auto-trailing-slash");
+  assert.equal(config.assets.run_worker_first, true);
   assert.equal(config.compatibility_date, "2026-08-08");
 
   assert.doesNotMatch(workflow, /^\s+workflow_run:/m);
@@ -46,6 +49,30 @@ test("website deployment is bound to exact published Qarinah assets", async () =
   assert.match(workflow, /secrets\.CLOUDFLARE_API_TOKEN/);
   assert.match(workflow, /secrets\.CLOUDFLARE_ACCOUNT_ID/);
   assert.doesNotMatch(workflow, /gitHubToken:/);
+});
+
+test("website worker permanently upgrades HTTP before delegating canonical HTTPS assets", async () => {
+  const workerPath = path.join(root, "website", "worker.mjs");
+  const worker = (await import(pathToFileURL(workerPath))).default;
+  let delegated = 0;
+  const env = {
+    ASSETS: {
+      async fetch(request) {
+        delegated += 1;
+        return new Response(request.url, { status: 200 });
+      }
+    }
+  };
+
+  const redirect = await worker.fetch(new Request("http://qarinah.io/docs?source=search-console"), env);
+  assert.equal(redirect.status, 308);
+  assert.equal(redirect.headers.get("location"), "https://qarinah.io/docs?source=search-console");
+  assert.equal(delegated, 0);
+
+  const served = await worker.fetch(new Request("https://qarinah.io/docs/"), env);
+  assert.equal(served.status, 200);
+  assert.equal(await served.text(), "https://qarinah.io/docs/");
+  assert.equal(delegated, 1);
 });
 
 test("trusted npm publishing retries eventual-consistency signature checks", async () => {
