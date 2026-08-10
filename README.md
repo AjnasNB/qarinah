@@ -23,6 +23,8 @@ Scale regression: Qarinah also passed **380 / 380 file-specific exact and typo-t
 
 <p align="center">
   <a href="https://qarinah.io"><strong>Website</strong></a>&nbsp;&middot;&nbsp;
+  <a href="https://qarinah.io/docs/features/"><strong>Features</strong></a>&nbsp;&middot;&nbsp;
+  <a href="https://qarinah.io/docs/getting-started/"><strong>Install</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://qarinah.io/docs/"><strong>Documentation</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://qarinah.io/paper/"><strong>White paper</strong></a>&nbsp;&middot;&nbsp;
   <a href="docs/RESEARCH-BENCHMARK.md"><strong>Research benchmark</strong></a>&nbsp;&middot;&nbsp;
@@ -139,7 +141,7 @@ npx qarinah query "release provenance" \
   --format markdown
 ```
 
-Start with the [five-minute guide](docs/GETTING-STARTED.md), then use the [cross-agent handoff guide](docs/CROSS-AGENT-HANDOFFS.md), [dashboard guide](docs/DASHBOARD.md), [team-memory guide](docs/TEAM-MEMORY.md), [CLI reference](docs/CLI-REFERENCE.md), [JavaScript API reference](docs/API-REFERENCE.md), [MCP guide](docs/MCP-GUIDE.md), [task recipes](docs/RECIPES.md), or [troubleshooting guide](docs/TROUBLESHOOTING.md).
+Start with the [feature map](docs/FEATURES.md) and [five-minute installation guide](docs/GETTING-STARTED.md), then use the [cross-agent handoff guide](docs/CROSS-AGENT-HANDOFFS.md), [dashboard guide](docs/DASHBOARD.md), [team-memory guide](docs/TEAM-MEMORY.md), [CLI reference](docs/CLI-REFERENCE.md), [JavaScript API reference](docs/API-REFERENCE.md), [MCP guide](docs/MCP-GUIDE.md), [task recipes](docs/RECIPES.md), or [troubleshooting guide](docs/TROUBLESHOOTING.md).
 
 Your project already contains the decisions and evidence behind its changes. Qarinah lets the next agent query that record and receive a bounded, cited pack selected for the current task. The same local memory can support Codex, Claude Code, CLI workflows, and compatible MCP clients instead of locking project context to one editor.
 

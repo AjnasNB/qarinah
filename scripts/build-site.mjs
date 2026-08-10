@@ -23,6 +23,19 @@ const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "
 const productVersion = packageJson.version;
 const productPositioning = "Evidence-linked project memory for coding agents.";
 const productExplanation = "Qarinah keeps one compact, cited project memory beside your code, so Codex, Claude Code, Cursor, and compatible tools can continue from verified context instead of starting from zero.";
+const qarinahFeatures = [
+  "Verified handoffs between coding agents",
+  "Local append-only project memory",
+  "Evidence-linked cited context packs",
+  "Typed project and provenance graph",
+  "Budgeted hybrid retrieval",
+  "Codex and Claude Code integrations",
+  "Consent-gated MCP context retrieval",
+  "Multi-repository memory with separate authority",
+  "Freshness checks and a visual memory dashboard",
+  "Encrypted team bundles and signed checkpoints",
+  "Deterministic Markdown, JSON, graph, and OKF exports"
+];
 const answerEngineQuestions = [
   {
     name: "What is Qarinah?",
@@ -312,6 +325,14 @@ const docPages = [
     description: "Install Qarinah local project memory, initialize one codebase, and compile the first cited context pack.",
     section: "Start",
     aliases: ["install qarinah", "project setup", "first query", "coding agent memory quickstart"]
+  },
+  {
+    route: "docs/features",
+    source: "docs/FEATURES.md",
+    title: "Features",
+    description: "Explore Qarinah project memory, cited context compilation, agent integrations, local dashboards, team memory, exports, and operating boundaries.",
+    section: "Start",
+    aliases: ["qarinah features", "project memory features", "coding agent memory capabilities", "context compiler capabilities"]
   },
   {
     route: "docs/cli",
@@ -615,7 +636,9 @@ function rewritePublicationLink(markdown, source) {
 
 function nav(active = "") {
   const items = [
-    ["Product", "/", "home"],
+    ["Overview", "/", "home"],
+    ["Features", "/docs/features/", "features"],
+    ["Install", "/docs/getting-started/", "install"],
     ["Docs", "/docs/", "docs"],
     ["Answers", "/docs/faq/", "answers"],
     ["Compare", "/alternatives/", "alternatives"],
@@ -652,7 +675,8 @@ function footer() {
         </div>
         <div>
           <strong>Build</strong>
-          <a href="/docs/getting-started/">Getting started</a>
+          <a href="/docs/features/">Features</a>
+          <a href="/docs/getting-started/">Install and get started</a>
           <a href="/docs/cli/">CLI reference</a>
           <a href="/docs/api/">JavaScript API</a>
           <a href="/docs/integrations/">Integrations</a>
@@ -731,15 +755,7 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
         name: "Qarinah",
         description,
         inLanguage: "en",
-        publisher: { "@id": person["@id"] },
-        potentialAction: {
-          "@type": "SearchAction",
-          target: {
-            "@type": "EntryPoint",
-            urlTemplate: `${siteOrigin}/search/?q={search_term_string}`
-          },
-          "query-input": "required name=search_term_string"
-        }
+        publisher: { "@id": person["@id"] }
       },
       {
         "@type": "SoftwareApplication",
@@ -758,19 +774,7 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
         installUrl: `${siteOrigin}/docs/getting-started/`,
         codeRepository: github,
         releaseNotes: `${github}/releases/tag/v${productVersion}`,
-        featureList: [
-          "Verified handoffs between coding agents",
-          "Local append-only project memory",
-          "Evidence-linked cited context packs",
-          "Typed project and provenance graph",
-          "Budgeted hybrid retrieval",
-          "Codex and Claude Code integrations",
-          "Consent-gated MCP context retrieval",
-          "Multi-repository memory with separate authority",
-          "Freshness checks and a visual memory dashboard",
-          "Encrypted team bundles and signed checkpoints",
-          "Deterministic Markdown, JSON, graph, and OKF exports"
-        ],
+        featureList: qarinahFeatures,
         offers: {
           "@type": "Offer",
           price: "0",
@@ -919,6 +923,32 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
         }))
       }
     );
+  } else if (kind === "features") {
+    graph.push(
+      {
+        "@type": "CollectionPage",
+        "@id": `${url}#features`,
+        name: title,
+        description,
+        url,
+        inLanguage: "en",
+        dateModified: releaseDate,
+        author: { "@id": person["@id"] },
+        about: { "@id": `${siteOrigin}/#software` }
+      },
+      {
+        "@type": "ItemList",
+        "@id": `${url}#capability-list`,
+        name: "Qarinah product capabilities",
+        itemListOrder: "https://schema.org/ItemListUnordered",
+        numberOfItems: qarinahFeatures.length,
+        itemListElement: qarinahFeatures.map((name, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name
+        }))
+      }
+    );
   } else if (kind === "benchmark") {
     graph.push(
       {
@@ -1023,6 +1053,8 @@ function layout({ title, description, body, active = "", canonical = "/", kind =
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
   <meta name="theme-color" content="#0d1117">
   <link rel="canonical" href="${url}">
+  <link rel="alternate" hreflang="en" href="${url}">
+  <link rel="alternate" hreflang="x-default" href="${url}">
   <link rel="alternate" type="text/plain" href="/llms.txt" title="Qarinah machine-readable overview">
   <meta property="og:type" content="${ogType}">
   <meta property="og:site_name" content="Qarinah">
@@ -1794,7 +1826,11 @@ async function markdownPage(page) {
       ? "benchmarks"
       : page.route === "docs/faq"
         ? "answers"
-        : "docs";
+        : page.route === "docs/features"
+          ? "features"
+          : page.route === "docs/getting-started"
+            ? "install"
+            : "docs";
   const publicationLink = page.route === "paper"
     ? `<a href="${doi}">Published v1.4 DOI: 10.5281/zenodo.21850747</a> · <a href="${conceptDoi}">Paper series DOI</a> · <a href="${historicalVersionDoi}">Published v1.3</a>`
     : "";
@@ -1810,6 +1846,8 @@ async function markdownPage(page) {
         ? "benchmark"
         : page.route === "docs/faq"
           ? "faq"
+        : page.route === "docs/features"
+          ? "features"
         : page.route === "docs/getting-started" || page.route === "docs/cross-agent-handoffs"
           ? "howto"
           : page.route === "docs/api" || page.route === "docs/cli" || page.route === "docs/mcp"
@@ -1864,6 +1902,14 @@ const sitemapRoutes = [
   "/search/",
   ...docPages.map((page) => `/${page.route}/`)
 ];
+const staticRedirects = (await readFile(path.join(root, "website", "static", "_redirects"), "utf8")).trim();
+const canonicalDirectoryRedirects = sitemapRoutes
+  .filter((route) => route !== "/")
+  .map((route) => `${route.slice(0, -1)} ${route} 308`);
+await writeFile(
+  path.join(output, "_redirects"),
+  `${canonicalDirectoryRedirects.join("\n")}\n${staticRedirects}\n`
+);
 await writeFile(
   path.join(output, "sitemap.xml"),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapRoutes.map((route) => `  <url><loc>${siteOrigin}${route}</loc><lastmod>${releaseDate}</lastmod></url>`).join("\n")}\n</urlset>\n`

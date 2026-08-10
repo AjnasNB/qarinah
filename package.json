@@ -50,6 +50,7 @@
     "schemas/",
     "docs/ARCHITECTURE.md",
     "docs/GETTING-STARTED.md",
+    "docs/FEATURES.md",
     "docs/CROSS-AGENT-HANDOFFS.md",
     "docs/CROSS-SESSION-CONTINUATION-BENCHMARK.md",
     "docs/CROSS-AGENT-VIDEO-PROTOCOL.md",

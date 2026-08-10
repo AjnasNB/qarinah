@@ -11,6 +11,7 @@ const required = [
   "docs/index.html",
   "docs/cross-agent-handoffs/index.html",
   "docs/getting-started/index.html",
+  "docs/features/index.html",
   "docs/cli/index.html",
   "docs/api/index.html",
   "docs/integrations/index.html",
@@ -67,6 +68,11 @@ const availableRoutes = new Set(htmlFiles.map((file) => {
   const relative = path.relative(output, file).replaceAll("\\", "/");
   return relative === "index.html" ? "/" : `/${relative.replace(/index\.html$/, "")}`;
 }));
+const slashlessDirectoryAliases = new Map(
+  [...availableRoutes]
+    .filter((route) => route !== "/")
+    .map((route) => [route.slice(0, -1), route])
+);
 
 const errors = [];
 const titles = new Map();
@@ -118,6 +124,12 @@ for (const file of htmlFiles) {
     canonicals.set(canonical, fileLabel);
   }
 
+  for (const language of ["en", "x-default"]) {
+    const alternate = html.match(new RegExp(`<link rel="alternate" hreflang="${language}" href="([^"]+)">`))?.[1];
+    const expected = `https://qarinah.io${route}`;
+    if (alternate !== expected) errors.push(`${fileLabel} ${language} alternate ${alternate ?? "is missing"}; expected ${expected}`);
+  }
+
   if ((html.match(/<h1(?:\s|>)/g) || []).length !== 1) {
     errors.push(`${fileLabel} must contain exactly one h1`);
   }
@@ -155,6 +167,13 @@ for (const file of htmlFiles) {
       errors.push(`${fileLabel} links to missing route ${linkedRoute}`);
     }
   }
+
+  for (const match of html.matchAll(/href="(\/[^"#?]*)(?:[?#][^"]*)?"/g)) {
+    const linkedPath = match[1];
+    if (slashlessDirectoryAliases.has(linkedPath)) {
+      errors.push(`${fileLabel} links to slashless directory alias ${linkedPath}; use ${slashlessDirectoryAliases.get(linkedPath)}`);
+    }
+  }
 }
 
 for (const [sourceRoute, html] of htmlByRoute) {
@@ -176,10 +195,42 @@ for (const route of availableRoutes) {
 }
 for (const route of sitemapRoutes) {
   if (!availableRoutes.has(route)) errors.push(`sitemap.xml contains unknown route ${route}`);
+  if (route !== "/" && !route.endsWith("/")) errors.push(`sitemap.xml contains non-canonical slashless route ${route}`);
+}
+
+const redirects = await readFile(path.join(output, "_redirects"), "utf8");
+const redirectRules = redirects
+  .split(/\r?\n/)
+  .map((line) => line.trim())
+  .filter((line) => line && !line.startsWith("#"))
+  .map((line) => line.split(/\s+/));
+const redirectSources = new Set();
+for (const [source, destination, status] of redirectRules) {
+  if (redirectSources.has(source)) errors.push(`_redirects contains duplicate source ${source}`);
+  redirectSources.add(source);
+  if (slashlessDirectoryAliases.has(source)) {
+    const expected = slashlessDirectoryAliases.get(source);
+    if (destination !== expected || !["301", "308"].includes(status)) {
+      errors.push(`_redirects must permanently canonicalize ${source} to ${expected}`);
+    }
+  }
+}
+for (const [source, destination] of slashlessDirectoryAliases) {
+  if (!redirectRules.some(([candidateSource, candidateDestination, status]) =>
+    candidateSource === source && candidateDestination === destination && ["301", "308"].includes(status)
+  )) {
+    errors.push(`_redirects is missing permanent canonicalization ${source} -> ${destination}`);
+  }
 }
 
 const searchIndex = JSON.parse(await readFile(path.join(output, "search-index.json"), "utf8"));
 const indexedRoutes = new Set(searchIndex.map((entry) => entry.route));
+for (const entry of searchIndex) {
+  if (entry.route !== "/" && !entry.route.endsWith("/")) {
+    errors.push(`search-index.json contains non-canonical slashless route ${entry.route}`);
+  }
+  if (!availableRoutes.has(entry.route)) errors.push(`search-index.json contains unknown route ${entry.route}`);
+}
 for (const route of availableRoutes) {
   if (route.startsWith("/docs/") && route !== "/docs/" && !indexedRoutes.has(route)) {
     errors.push(`search-index.json is missing ${route}`);
@@ -209,6 +260,7 @@ for (const crawler of ["Googlebot", "Bingbot", "OAI-SearchBot", "Claude-SearchBo
 const llms = await readFile(path.join(output, "llms.txt"), "utf8");
 for (const canonicalResource of [
   "https://qarinah.io/docs/",
+  "https://qarinah.io/docs/features/",
   "https://qarinah.io/docs/faq/",
   "https://qarinah.io/alternatives/",
   "https://qarinah.io/articles/open-source-governed-agent-toolkit/",
@@ -224,6 +276,10 @@ const alternatives = await readFile(path.join(output, "alternatives", "index.htm
 const toolkit = await readFile(path.join(output, "articles", "open-source-governed-agent-toolkit", "index.html"), "utf8");
 const paper = await readFile(path.join(output, "paper", "index.html"), "utf8");
 const faq = await readFile(path.join(output, "docs", "faq", "index.html"), "utf8");
+const features = await readFile(path.join(output, "docs", "features", "index.html"), "utf8");
+if (home.includes('"@type":"SearchAction"') || home.includes("search_term_string")) {
+  errors.push("Homepage must not emit the retired sitelinks-search SearchAction or its crawlable URL template.");
+}
 if (!home.includes("<strong>98.71%</strong>") || !home.includes("the evaluated full-history input was 77.81 times larger")) {
   errors.push("Homepage is missing the plain-language benchmark proof.");
 }
@@ -241,6 +297,28 @@ if (home.indexOf('<section class="hero">') > home.indexOf('<section class="bench
 }
 if (!home.includes("Evidence-linked project memory for coding agents.") || !home.includes("continue from verified context instead of starting from zero")) {
   errors.push("Homepage is missing the cross-agent category or long-term vision.");
+}
+for (const primaryDestination of [
+  'href="/docs/features/">Features</a>',
+  'href="/docs/getting-started/">Install</a>',
+  'href="/docs/">Docs</a>'
+]) {
+  if (!home.includes(primaryDestination)) errors.push(`Homepage navigation is missing ${primaryDestination}`);
+}
+for (const capability of [
+  "Project-owned memory",
+  "Cited context compilation",
+  "Project structure and derived views",
+  "Coding-agent integrations",
+  "Team memory and portability",
+  "Verify the boundary"
+]) {
+  if (!features.includes(capability)) errors.push(`Features page is missing ${capability}`);
+}
+if (!features.includes('"@type":"CollectionPage"')
+  || !features.includes('"@type":"ItemList"')
+  || !features.includes('"numberOfItems":11')) {
+  errors.push("Features page is missing its visible capability collection structured data.");
 }
 for (const launchDirectoryMarkup of [
   'href="https://startupbase.io/products/qarinah?utm_source=startupbase&amp;utm_medium=badge&amp;utm_campaign=launch-badge-dark"',
