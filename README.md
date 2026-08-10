@@ -25,6 +25,13 @@ The evaluated full-history baseline contained **77.81 times as many estimated in
 
 At a flat **$3 per million uncached input tokens**, the aggregate compared slice estimates **$1.326339 for full-history replay versus $0.017046 for Qarinah**, saving **$1.309293 per repeat** or **$13.092930 across ten repeats**. Use `estimated tokens / 1,000,000 x your input rate x repeats` for another rate. This arithmetic excludes provider-native tokenization, caching, output, reasoning, tools, retrieval, hosting, and fixed fees. [See the complete cost table and approved wording.](docs/PUBLIC-METRICS.md)
 
+| Flat uncached input rate | Full-history baseline | Qarinah pack | Estimated saving |
+| --- | ---: | ---: | ---: |
+| $1/M tokens | $0.442113 | $0.005682 | $0.436431 |
+| $3/M tokens | $1.326339 | $0.017046 | $1.309293 |
+| $5/M tokens | $2.210565 | $0.028410 | $2.182155 |
+| $15/M tokens | $6.631695 | $0.085230 | $6.546465 |
+
 At the normalized $1-per-million reference rate, the same calculation is **$0.4421 versus $0.0057**. In either flat-rate example, the fixture-bound statement remains: **98.71% lower input-context cost at the same token rate.**
 
 Scale regression: Qarinah also passed **380 / 380 file-specific exact and typo-tolerant queries** across deterministic 40-, 50-, and 100-file projects. The same run verified SQLite retrieval, graph relations, generated Markdown, conflicts, supersession, stale-projection repair, and 9 / 9 correct unsupported-query abstentions. [Inspect the multi-file method and result.](docs/BENCHMARKS.md#multi-file-project-context-and-projection-integrity-benchmark)

@@ -1198,6 +1198,36 @@ function homePage() {
         </div>
       </section>
 
+      <section class="front-proof section shell" aria-labelledby="cost-equivalent-title">
+        <div class="section-heading split-heading">
+          <div>
+            <p class="eyebrow">Published evidence and cost equivalent</p>
+            <h2 id="cost-equivalent-title">98.71% less repeated context. A 77.81:1 baseline-to-pack ratio.</h2>
+          </div>
+          <p>More than 70:1 compression in the published six-fixture estimate: 442,113 portable estimated input-context tokens for full-history replay versus 5,682 for Qarinah's cited packs. Every required target was directly covered in the top five.</p>
+        </div>
+        <div class="cost-equivalent-table-wrap">
+          <table class="cost-equivalent-table" aria-describedby="cost-equivalent-note">
+            <caption>Illustrative flat uncached input-token cost equivalents for the published six-fixture estimate</caption>
+            <thead>
+              <tr>
+                <th scope="col">Rate</th>
+                <th scope="col">Baseline</th>
+                <th scope="col">Qarinah</th>
+                <th scope="col">Estimated saving</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">$1/M tokens</th><td>$0.442113</td><td>$0.005682</td><td>$0.436431</td></tr>
+              <tr><th scope="row">$3/M tokens</th><td>$1.326339</td><td>$0.017046</td><td>$1.309293</td></tr>
+              <tr><th scope="row">$5/M tokens</th><td>$2.210565</td><td>$0.028410</td><td>$2.182155</td></tr>
+              <tr><th scope="row">$15/M tokens</th><td>$6.631695</td><td>$0.085230</td><td>$6.546465</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="benchmark-ribbon-note" id="cost-equivalent-note">Formula: <code>estimated tokens / 1,000,000 &times; flat uncached input rate &times; repeats</code>. At a flat $3/M input rate, the aggregate compared slice estimates $1.326339 for full-history replay and $0.017046 for Qarinah, saving $1.309293 per repeat and $13.092930 across ten repeats. This is arithmetic over the committed portable estimate, not a provider invoice. It excludes provider tokenization, caching, output, reasoning, tools, retrieval, hosting, fixed charges, and tiered pricing. <a href="/docs/public-metrics/">Method, calculator, and approved wording</a>.</p>
+      </section>
+
       <section class="handoff-stage" aria-labelledby="handoff-stage-title">
         <div class="shell handoff-stage-grid">
           <div class="handoff-stage-copy">
@@ -1257,39 +1287,6 @@ function homePage() {
           <div><strong>77.81&times;</strong><span>as many estimated tokens in the full-history baseline as the compiled context pack</span></div>
           <div><strong>380 / 380</strong><span>file-specific exact and typo-tolerant queries ranked the target first</span></div>
         </div>
-      </section>
-
-      <section class="section shell" aria-labelledby="cost-equivalent-title">
-        <div class="section-heading split-heading">
-          <div>
-            <p class="eyebrow">Transparent cost equivalent</p>
-            <h2 id="cost-equivalent-title">At a flat $3/M input rate: $1.33 becomes $0.02.</h2>
-          </div>
-          <p>The aggregate six-fixture repeated-context slice estimates $1.326339 for full-history replay and $0.017046 for Qarinah's cited packs, saving $1.309293 each time that complete slice would otherwise be sent. Ten repeats save an estimated $13.092930.</p>
-        </div>
-        <div class="cost-equivalent-grid" aria-label="Illustrative flat uncached input-token cost equivalents">
-          <article>
-            <strong>$1/M</strong>
-            <span>$0.442113 &rarr; $0.005682</span>
-            <small>$0.436431 estimated saving per repeat</small>
-          </article>
-          <article>
-            <strong>$3/M</strong>
-            <span>$1.326339 &rarr; $0.017046</span>
-            <small>$1.309293 estimated saving per repeat</small>
-          </article>
-          <article>
-            <strong>$5/M</strong>
-            <span>$2.210565 &rarr; $0.028410</span>
-            <small>$2.182155 estimated saving per repeat</small>
-          </article>
-          <article>
-            <strong>$15/M</strong>
-            <span>$6.631695 &rarr; $0.085230</span>
-            <small>$6.546465 estimated saving per repeat</small>
-          </article>
-        </div>
-        <p class="benchmark-ribbon-note">Formula: <code>estimated tokens / 1,000,000 &times; flat uncached input rate &times; repeats</code>. This is arithmetic over the committed portable estimate, not a provider invoice. It excludes provider tokenization, caching, output, reasoning, tools, retrieval, hosting, and fixed charges. <a href="/docs/public-metrics/">Use the calculator table and approved wording</a>.</p>
       </section>
 
       <section class="section shell">
