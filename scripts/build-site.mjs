@@ -755,15 +755,7 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
         name: "Qarinah",
         description,
         inLanguage: "en",
-        publisher: { "@id": person["@id"] },
-        potentialAction: {
-          "@type": "SearchAction",
-          target: {
-            "@type": "EntryPoint",
-            urlTemplate: `${siteOrigin}/search/?q={search_term_string}`
-          },
-          "query-input": "required name=search_term_string"
-        }
+        publisher: { "@id": person["@id"] }
       },
       {
         "@type": "SoftwareApplication",
@@ -1061,6 +1053,8 @@ function layout({ title, description, body, active = "", canonical = "/", kind =
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
   <meta name="theme-color" content="#0d1117">
   <link rel="canonical" href="${url}">
+  <link rel="alternate" hreflang="en" href="${url}">
+  <link rel="alternate" hreflang="x-default" href="${url}">
   <link rel="alternate" type="text/plain" href="/llms.txt" title="Qarinah machine-readable overview">
   <meta property="og:type" content="${ogType}">
   <meta property="og:site_name" content="Qarinah">
@@ -1908,6 +1902,14 @@ const sitemapRoutes = [
   "/search/",
   ...docPages.map((page) => `/${page.route}/`)
 ];
+const staticRedirects = (await readFile(path.join(root, "website", "static", "_redirects"), "utf8")).trim();
+const canonicalDirectoryRedirects = sitemapRoutes
+  .filter((route) => route !== "/")
+  .map((route) => `${route.slice(0, -1)} ${route} 308`);
+await writeFile(
+  path.join(output, "_redirects"),
+  `${canonicalDirectoryRedirects.join("\n")}\n${staticRedirects}\n`
+);
 await writeFile(
   path.join(output, "sitemap.xml"),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapRoutes.map((route) => `  <url><loc>${siteOrigin}${route}</loc><lastmod>${releaseDate}</lastmod></url>`).join("\n")}\n</urlset>\n`
