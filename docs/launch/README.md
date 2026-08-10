@@ -1,20 +1,22 @@
 # Qarinah public launch kit
 
-Last verified: 2026-08-07.
+Last verified: 2026-08-10.
 
 Qarinah is public on GitHub, npm, and qarinah.io. Use this kit for reviewed launch copy and keep every benchmark qualification beside the result. Future package or website changes still follow the gates in [../LAUNCH.md](../LAUNCH.md).
 
 ## The one-line story
 
-> Your project remembers, even when your coding agent changes.
+> Send 98.71% less repeated project context. Keep the proof.
 
-Switch agents. Keep the decisions, outcomes, and proof. Qarinah keeps permitted project activity and explicit decisions in a local evidence-linked record, then returns only the small cited pack a later agent needs for a verified handoff.
+Your project remembers even when your coding agent changes. Qarinah keeps permitted project activity and explicit decisions in a local evidence-linked record, then returns a small cited pack for a verified handoff.
 
 ## Proof line
 
 > 98.71% less estimated context.
 
 Keep the scope beside the number: identical current-task source snippets in both paths; 442,113 estimated tokens for full-history replay versus 5,682 for Qarinah packs plus the same sources; every required target in the top five with direct coverage; no model-written summaries; `ceil(characters / 4)` estimation.
+
+Equivalent fixture-bound proof: 436,431 fewer estimated input-context tokens and a 77.81:1 baseline-to-pack ratio. Separate scale proof: 380 / 380 file-specific exact and typo-tolerant queries ranked the target first. Neither number is a provider billing receipt or a universal task-quality guarantee.
 
 ## Who should care
 

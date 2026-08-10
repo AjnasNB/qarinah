@@ -2,6 +2,14 @@
   <img src="assets/launch/qarinah-social-preview.svg" width="100%" alt="Qarinah - your project remembers across coding agents">
 </p>
 
+<h1 align="center">Qarinah</h1>
+
+<p align="center"><strong>Send 98.71% less repeated project context. Keep the proof.</strong></p>
+
+<p align="center">
+  Qarinah compiles a compact, cited project memory for Codex, Claude Code, Cursor, and compatible tools. In six committed software-task fixtures, 442,113 estimated repeated-context tokens became 5,682 - with every required target directly covered in the top five.
+</p>
+
 ## Reproducible benchmark results
 
 | **98.7148%** | **98.75%** | **89.05%** |
@@ -12,8 +20,6 @@
 The continuation percentages use the same 42-record, two-session history but measure two different outputs: the 119-token capsule is the smallest model-facing handoff, while the 1,039-token pack preserves the complete cited audit surface. All three measurements use the reproducible portable estimator `ceil(characters / 4)`; they are not provider billing receipts. [Inspect the fixtures, exact arithmetic, and claim boundaries.](docs/BENCHMARKS.md)
 
 Scale regression: Qarinah also passed **380 / 380 file-specific exact and typo-tolerant queries** across deterministic 40-, 50-, and 100-file projects. The same run verified SQLite retrieval, graph relations, generated Markdown, conflicts, supersession, stale-projection repair, and 9 / 9 correct unsupported-query abstentions. [Inspect the multi-file method and result.](docs/BENCHMARKS.md#multi-file-project-context-and-projection-integrity-benchmark)
-
-<h1 align="center">Qarinah</h1>
 
 <p align="center"><em>Switch agents. Keep the decisions, outcomes, and proof.</em></p>
 
@@ -26,6 +32,7 @@ Scale regression: Qarinah also passed **380 / 380 file-specific exact and typo-t
   <a href="https://qarinah.io/docs/features/"><strong>Features</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://qarinah.io/docs/getting-started/"><strong>Install</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://qarinah.io/docs/"><strong>Documentation</strong></a>&nbsp;&middot;&nbsp;
+  <a href="https://qarinah.io/docs/public-metrics/"><strong>Public metrics</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://qarinah.io/paper/"><strong>White paper</strong></a>&nbsp;&middot;&nbsp;
   <a href="docs/RESEARCH-BENCHMARK.md"><strong>Research benchmark</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://doi.org/10.5281/zenodo.21850747"><strong>v1.4 DOI</strong></a>
@@ -70,7 +77,7 @@ npx qarinah setup . --codex --claude --cursor --capture content --allow-query
 | Team workspace | Multi-repository relationships, freshness, encrypted bundles, signed checkpoints, membership, and separate authority boundaries |
 | Governed workflow | Optional Maqam memory scopes and disclosure controls without making Maqam a requirement |
 
-Qarinah achieved 98.71% fewer estimated repeated-project-context tokens in its published software-task benchmark. We found no directly comparable public benchmark measuring the same project-history replay baseline. The result measures estimated input context, not provider billing, output tokens, latency, or universal task quality.
+Qarinah achieved 98.71% fewer estimated repeated-project-context tokens in its published software-task benchmark. That compared slice contained 436,431 fewer estimated input-context tokens, and the full-history baseline was 77.81 times larger than the compiled Qarinah packs. A separate deterministic scale regression ranked the correct target first for 380 / 380 file-specific exact and typo-tolerant queries. We found no directly comparable public benchmark measuring the same project-history replay baseline. These results measure portable estimated input context and deterministic retrieval behavior, not provider billing, output tokens, latency, or universal task quality.
 
 98.71% lower input-context cost at the same token rate.
 

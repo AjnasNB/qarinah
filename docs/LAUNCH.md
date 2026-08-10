@@ -4,9 +4,9 @@ Qarinah 0.1.0 was the first stable open-source release. For every later release,
 
 ## Launch message
 
-> Your project remembers, even when your coding agent changes.
+> Send 98.71% less repeated project context. Keep the proof.
 
-Switch agents. Keep the decisions, outcomes, and proof. Qarinah keeps one compact, cited project memory beside your code. Its published six-task benchmark used 98.71% less estimated context than full-history replay while keeping every required target in the top five with direct evidence coverage. The estimate is `ceil(characters / 4)`, not provider billing or a universal cost claim.
+Your project remembers even when your coding agent changes. Qarinah keeps one compact, cited project memory beside your code. Its published six-task benchmark used 436,431 fewer portable estimated tokens - 98.71% less repeated context - than full-history replay while keeping every required target in the top five with direct evidence coverage. A separate scale regression ranked the target first for 380 / 380 file-specific queries. These are deterministic context-volume and retrieval-regression measurements, not provider billing or universal task-quality claims.
 
 The complete channel copy, media assignments, and claims gate are in [`docs/launch/`](launch/README.md).
 
@@ -50,6 +50,7 @@ The complete channel copy, media assignments, and claims gate are in [`docs/laun
 
 Use:
 
+- "Send 98.71% less repeated project context. Keep the proof."
 - "Your project remembers, even when your coding agent changes."
 - "Switch agents. Keep the decisions, outcomes, and proof."
 - "Qarinah - less context. More proof."

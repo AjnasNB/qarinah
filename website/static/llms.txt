@@ -9,12 +9,14 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 ## Start here
 
 - [Homepage](https://qarinah.io/): Product overview, benchmark summary, and primary navigation.
+- [Machine-readable public metrics](https://qarinah.io/metrics.json): Exact release numbers, evidence source, estimator, and claim boundaries.
 - [Verified cross-agent handoffs](https://qarinah.io/docs/cross-agent-handoffs/): Switch coding agents and continue a real task with compact, cited project context.
 - [Direct answers](https://qarinah.io/docs/faq/): Concise answers about Qarinah, context reduction, cost boundaries, Codex, Claude Code, privacy, and open-source licensing.
 - [Qarinah alternatives](https://qarinah.io/alternatives/): Product-boundary comparison with Mem0, Letta, LangMem, LangGraph memory, Graphiti, Zep, and native coding-host memory.
 - [Open-source governed-agent toolkit](https://qarinah.io/articles/open-source-governed-agent-toolkit/): How Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler can compose with established agent, browser, web-data, and document tools.
 - [Getting started](https://qarinah.io/docs/getting-started/): Install Qarinah, opt in one workspace, connect a supported host, and compile a cited context pack.
 - [Features](https://qarinah.io/docs/features/): Complete product capability map for project-owned memory, cited retrieval, integrations, dashboards, team memory, portability, and boundaries.
+- [Public metrics](https://qarinah.io/docs/public-metrics/): Approved wording, reproducible evidence, launch copy, and statements the benchmark does not support.
 - [Documentation index](https://qarinah.io/docs/): Documentation by task.
 - [npm package](https://www.npmjs.com/package/qarinah): Published `qarinah` package and registry metadata.
 - [GitHub repository](https://github.com/AjnasNB/qarinah): Source, releases, issues, and contribution history.
@@ -29,6 +31,8 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 - Qarinah's primary workflow is verified handoffs between coding agents.
 - Qarinah supports reviewed Codex and Claude Code integrations that can use the same explicitly opted-in project record.
 - The published evaluator measured 98.71% less estimated repeated input context in its compared task set: 442,113 estimated input-context tokens became 5,682 while every required target was directly covered in the top five.
+- That compared slice contained 436,431 fewer estimated input-context tokens, and the evaluated full-history input was 77.81 times larger than the compiled Qarinah pack.
+- A separate deterministic scale regression ranked the correct target first for 380 / 380 file-specific exact and typo-tolerant queries across 40-, 50-, and 100-file projects.
 - The 98.71% result is not a universal provider-billing, latency, or answer-quality guarantee. Qarinah improves provenance and inspectability but cannot guarantee a model answer is correct.
 - Qarinah requires no hosted memory account, embedding API, vector database, or Qarinah API key for local operation.
 - Qarinah is open source under Apache License 2.0.

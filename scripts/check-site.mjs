@@ -21,6 +21,7 @@ const required = [
   "docs/recipes/index.html",
   "docs/architecture/index.html",
   "docs/benchmarks/index.html",
+  "docs/public-metrics/index.html",
   "docs/security/index.html",
   "docs/interoperability/index.html",
   "docs/troubleshooting/index.html",
@@ -28,6 +29,7 @@ const required = [
   "docs/migrations/index.html",
   "search/index.html",
   "search-index.json",
+  "metrics.json",
   "paper/index.html",
   "paper/Qarinah-Technical-White-Paper-v1.4.pdf",
   "paper/Qarinah-Technical-White-Paper-v1.3.pdf",
@@ -262,6 +264,8 @@ for (const canonicalResource of [
   "https://qarinah.io/docs/",
   "https://qarinah.io/docs/features/",
   "https://qarinah.io/docs/faq/",
+  "https://qarinah.io/docs/public-metrics/",
+  "https://qarinah.io/metrics.json",
   "https://qarinah.io/alternatives/",
   "https://qarinah.io/articles/open-source-governed-agent-toolkit/",
   "https://www.npmjs.com/package/qarinah",
@@ -277,26 +281,58 @@ const toolkit = await readFile(path.join(output, "articles", "open-source-govern
 const paper = await readFile(path.join(output, "paper", "index.html"), "utf8");
 const faq = await readFile(path.join(output, "docs", "faq", "index.html"), "utf8");
 const features = await readFile(path.join(output, "docs", "features", "index.html"), "utf8");
+const publicMetricsPage = await readFile(path.join(output, "docs", "public-metrics", "index.html"), "utf8");
+const publicMetrics = JSON.parse(await readFile(path.join(output, "metrics.json"), "utf8"));
 if (home.includes('"@type":"SearchAction"') || home.includes("search_term_string")) {
   errors.push("Homepage must not emit the retired sitelinks-search SearchAction or its crawlable URL template.");
 }
-if (!home.includes("<strong>98.71%</strong>") || !home.includes("the evaluated full-history input was 77.81 times larger")) {
+if (!home.includes("<strong>98.71%</strong>")
+  || !home.includes("<strong>436,431</strong>")
+  || !home.includes("<strong>77.81x</strong>")
+  || !home.includes("<strong>380 / 380</strong>")) {
   errors.push("Homepage is missing the plain-language benchmark proof.");
 }
-for (const benchmarkProof of ["98.7148%", "98.75%", "89.05%", "Three outputs. Three exact measurements."]) {
+for (const benchmarkProof of ["98.7148%", "98.75%", "89.05%", "Measured, reproducible, and explicitly scoped."]) {
   if (!home.includes(benchmarkProof)) errors.push(`Homepage benchmark ribbon is missing ${benchmarkProof}`);
 }
 if (!home.includes("What coding agents and developers need to know.") || !home.includes('href="/docs/faq/"')) {
   errors.push("Homepage is missing the direct answer-engine surface.");
 }
-if (!home.includes("Your project remembers when your coding agent changes.") || !home.includes("See the verified handoff") || !home.includes('href="/docs/cross-agent-handoffs/"')) {
-  errors.push("Homepage is missing the verified cross-agent handoff workflow.");
+if (!home.includes("Send 98.71% less repeated project context. Keep the proof.")
+  || !home.includes("Verify the 98.71% result")
+  || !home.includes('href="/metrics.json"')) {
+  errors.push("Homepage is missing the outcome-first metric and evidence workflow.");
 }
 if (home.indexOf('<section class="hero">') > home.indexOf('<section class="benchmark-ribbon"')) {
   errors.push("Homepage must lead with the centered product hero before benchmark detail.");
 }
 if (!home.includes("Evidence-linked project memory for coding agents.") || !home.includes("continue from verified context instead of starting from zero")) {
-  errors.push("Homepage is missing the cross-agent category or long-term vision.");
+  if (!home.includes("Measured project memory for coding agents") || !home.includes("directly covering every required target")) {
+    errors.push("Homepage is missing the cross-agent category or benchmark scope.");
+  }
+}
+if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
+  || publicMetrics.providerBillingMeasurement !== false
+  || publicMetrics.metrics?.repeatedProjectContext?.baselineEstimatedTokens !== 442113
+  || publicMetrics.metrics?.repeatedProjectContext?.qarinahEstimatedTokens !== 5682
+  || publicMetrics.metrics?.repeatedProjectContext?.estimatedTokensAvoided !== 436431
+  || publicMetrics.metrics?.repeatedProjectContext?.baselineToQarinahRatio !== 77.81
+  || publicMetrics.metrics?.multiFileRetrieval?.rankOnePositiveQueries !== 380
+  || !Array.isArray(publicMetrics.claimBoundary)
+  || publicMetrics.claimBoundary.length < 3) {
+  errors.push("metrics.json is incomplete or has drifted from the verified public benchmark receipt.");
+}
+for (const requiredPublicMetricCopy of [
+  "98.7148% less estimated repeated project context",
+  "436,431 fewer estimated input-context tokens",
+  "77.81x smaller",
+  "380 / 380 file-specific queries",
+  "Do not publish these claims",
+  "provider billing receipt"
+]) {
+  if (!publicMetricsPage.includes(requiredPublicMetricCopy)) {
+    errors.push(`Public metrics page is missing ${requiredPublicMetricCopy}`);
+  }
 }
 for (const primaryDestination of [
   'href="/docs/features/">Features</a>',

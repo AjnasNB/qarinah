@@ -179,6 +179,8 @@ The documented retrieval benchmark reports recall@5 of 1.0, mean reciprocal rank
 The documented long-document fixture is segmented synthetic retrieval, not whole-book summarization, native PDF ingestion, or provider-billed token usage.
 
 - Methodology and qualifications: https://qarinah.io/docs/benchmarks/
+- Public metric wording and claim boundaries: https://qarinah.io/docs/public-metrics/
+- Machine-readable public metrics: https://qarinah.io/metrics.json
 - Software-task machine-readable result: https://github.com/AjnasNB/qarinah/blob/main/bench/results/software-task-context-0.1.1.json
 - Retrieval machine-readable result: https://github.com/AjnasNB/qarinah/blob/main/bench/results/context-evaluation-0.1.1.json
 - Long-document machine-readable result: https://github.com/AjnasNB/qarinah/blob/main/bench/results/long-document-context-0.1.1.json
