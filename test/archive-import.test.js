@@ -77,6 +77,21 @@ test("full portable archive import preserves visible messages and is idempotent"
   assert.equal(overview.recentOutcomes[0].title, "Imported assistant outcome");
 });
 
+test("portable import accepts one UTF-8 byte-order mark at the start of a Windows JSONL export", async (t) => {
+  const root = await temporaryDirectory(t);
+  await initializeWorkspace(root, { capture: "content" });
+  const archive = path.join(root, "windows-export.jsonl");
+  const record = JSON.stringify({
+    role: "assistant",
+    sessionId: "windows-bom-1",
+    content: "The Windows export remains portable."
+  });
+  await writeFile(archive, `\uFEFF${record}\r\n`, "utf8");
+  const result = await importAgentArchive(archive, { cwd: root, format: "portable", mode: "compact" });
+  assert.equal(result.importedEvents, 1);
+  assert.match((await readEvents(root))[0].body, /Windows export remains portable/u);
+});
+
 test("Kimi stream-json import retains visible messages and tool calls without reasoning", async (t) => {
   const root = await temporaryDirectory(t);
   await initializeWorkspace(root, { capture: "content" });

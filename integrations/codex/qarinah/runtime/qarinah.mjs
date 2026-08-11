@@ -6342,7 +6342,7 @@ async function importAgentArchive(source, options = {}) {
       if (recordsSeen > limits.maxRecords) throw new QarinahError("ARCHIVE_LIMIT_EXCEEDED", "Archive contains more records than allowed.");
       let record2;
       try {
-        record2 = JSON.parse(line);
+        record2 = JSON.parse(lineNumber === 1 ? line.replace(/^\uFEFF/u, "") : line);
       } catch {
         throw new QarinahError("ARCHIVE_RECORD_INVALID", `Archive file ${fileIndex + 1}, line ${lineNumber} is not valid JSON.`);
       }
