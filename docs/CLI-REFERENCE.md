@@ -413,7 +413,7 @@ Stream an exported coding-agent history into the trusted project memory.
 
 ```sh
 qarinah import <archive-file-or-directory> \
-  [--format auto|codex|claude|portable] \
+  [--format auto|codex|claude|kimi|portable] \
   [--mode compact|full] \
   [--max-bytes <integer>] \
   [--max-files <integer>] \
@@ -421,7 +421,7 @@ qarinah import <archive-file-or-directory> \
   [--max-line-bytes <integer>]
 ```
 
-The source must be an explicit regular `.jsonl` or `.ndjson` file, or a directory containing those files. Linked files and directories are not followed. `auto` detects supported Codex and Claude records and otherwise applies the portable format.
+The source must be an explicit regular `.jsonl` or `.ndjson` file, or a directory containing those files. Linked files and directories are not followed. `auto` detects supported Codex and Claude records and otherwise applies the portable format. Use explicit `kimi` for Kimi's documented stream-json user, assistant, tool-call, and tool-result messages.
 
 `compact` is the default. It writes one cited summary per session and is appropriate for large exports. `full` writes each supported visible item separately and requires content-authorized capture. Hidden reasoning and encrypted reasoning blocks are ignored in either mode. The result reports source bytes, files, records, visible items, sessions, newly imported events, formats, and rebuilt-state identity.
 
@@ -631,13 +631,13 @@ The result includes store verification fields plus `enabled` and `maxLogBytes`. 
 
 ## `setup`
 
-Initialize one project, install project-local Codex, Claude Code, and Cursor integrations, configure MCP, rebuild views, and run an integrity check:
+Initialize one project, install selected project-local coding-agent integrations, configure MCP, initialize SQLite/graph/readable views/dashboard, and run an integrity check:
 
 ```sh
-npx qarinah setup . --codex --claude --cursor --capture content --allow-query
+npx qarinah setup . --codex --claude --cursor --kimi --antigravity --capture content --allow-query
 ```
 
-Omit host flags to configure all three. Omit `--allow-query` for diagnostic-only MCP. With `--allow-query`, setup binds the zero-write `context.query` tool to the exact workspace's current consent-policy hash and response ceilings.
+Omit host flags to configure all five supported project integrations. Omit `--allow-query` for diagnostic-only MCP. With `--allow-query`, setup binds the zero-write `context.query` tool to the exact workspace's current consent-policy hash and response ceilings. Codex and Claude Code receive reviewed lifecycle hooks; Cursor, Kimi, and Antigravity receive their documented project-local MCP/configuration surfaces. See [Coding-agent host compatibility](HOST-COMPATIBILITY.md).
 
 ## `mcp`
 

@@ -38,8 +38,9 @@ Qarinah is evidence-linked project memory for coding agents. It keeps an inspect
 
 ## Coding-agent integrations
 
-- Reviewed Codex and Claude Code integrations that use the same explicitly trusted project record.
-- Cursor setup, terminal workflows, and project-level instructions.
+- Reviewed Codex and Claude Code lifecycle integrations that use the same explicitly trusted project record.
+- Project-local MCP setup for Cursor, Kimi Code, classic Kimi CLI, and Google Antigravity, with host-appropriate project rules/configuration.
+- Explicit Kimi stream-json import for visible user, assistant, tool-call, and tool-result messages.
 - A native MCP stdio server with diagnostic-only defaults and explicitly authorized, zero-write context retrieval.
 - Cross-agent handoff capsules for continuing a task without replaying the complete retained history.
 

@@ -11,7 +11,7 @@ import { loadWorkspace } from "./workspace.js";
 
 export const AGENT_ARCHIVE_IMPORT_SCHEMA_VERSION = "qarinah.agent-archive-import.v1";
 
-const ALLOWED_FORMATS = new Set(["auto", "codex", "claude", "portable"]);
+const ALLOWED_FORMATS = new Set(["auto", "codex", "claude", "kimi", "portable"]);
 const ALLOWED_MODES = new Set(["compact", "full"]);
 const ARCHIVE_EXTENSIONS = new Set([".jsonl", ".ndjson"]);
 const DEFAULT_MAX_BYTES = 100 * 1024 * 1024 * 1024;
@@ -167,6 +167,46 @@ function normalizePortable(record, fallbackSession, ordinal) {
   return [];
 }
 
+function normalizeKimi(record, fallbackSession, ordinal) {
+  if (!record || typeof record !== "object" || Array.isArray(record)) return [];
+  const session = sessionId(record, fallbackSession);
+  const role = String(record.role ?? "").toLowerCase();
+  const common = {
+    sessionId: session,
+    turnId: turnId(record),
+    timestamp: record.timestamp ?? record.createdAt ?? record.created_at,
+    rawType: role || "record"
+  };
+  if (role === "user") return [{ ...common, kind: "prompt", content: textContent(record.content) }];
+  if (role === "tool") {
+    return [{
+      ...common,
+      kind: "tool.result",
+      toolName: String(record.name ?? "tool").slice(0, 256),
+      toolCallId: record.tool_call_id ?? null,
+      content: textContent(record.content)
+    }];
+  }
+  if (role !== "assistant") return [];
+  const output = [];
+  const content = textContent(record.content);
+  if (content) output.push({ ...common, kind: "assistant", content });
+  if (Array.isArray(record.tool_calls)) {
+    for (const call of record.tool_calls.slice(0, 1_000)) {
+      if (!call || typeof call !== "object") continue;
+      const fn = call.function && typeof call.function === "object" ? call.function : call;
+      output.push({
+        ...common,
+        kind: "tool.request",
+        toolName: String(fn.name ?? "tool").slice(0, 256),
+        toolCallId: call.id ?? null,
+        content: textContent(fn.arguments)
+      });
+    }
+  }
+  return output;
+}
+
 function detectedFormat(record) {
   if (["session_meta", "response_item", "event_msg", "turn_context"].includes(record?.type)) return "codex";
   if (record?.message && typeof record.message === "object" && (record.sessionId || record.session_id || ["user", "assistant"].includes(record.type))) return "claude";
@@ -179,9 +219,11 @@ function normalizeRecord(record, format, fallbackSession, ordinal) {
     ? normalizeCodex(record, fallbackSession, ordinal)
     : selected === "claude"
       ? normalizeClaude(record, fallbackSession, ordinal)
+      : selected === "kimi"
+        ? normalizeKimi(record, fallbackSession, ordinal)
       : normalizePortable(record, fallbackSession, ordinal);
   return {
-    format: selected === "codex" || selected === "claude" ? selected : "portable",
+    format: ["codex", "claude", "kimi"].includes(selected) ? selected : "portable",
     items: rawItems.map((item) => ({
       kind: item.kind,
       sessionId: String(item.sessionId ?? fallbackSession).slice(0, 256),
@@ -402,7 +444,7 @@ export async function importAgentArchive(source, options = {}) {
   if (options.rebuild !== undefined && typeof options.rebuild !== "boolean") throw new TypeError("rebuild must be a boolean.");
   const format = options.format ?? "auto";
   const mode = options.mode ?? "compact";
-  if (!ALLOWED_FORMATS.has(format)) throw new TypeError("format must be auto, codex, claude, or portable.");
+  if (!ALLOWED_FORMATS.has(format)) throw new TypeError("format must be auto, codex, claude, kimi, or portable.");
   if (!ALLOWED_MODES.has(mode)) throw new TypeError("mode must be compact or full.");
   const limits = {
     maxBytes: boundedInteger(options.maxBytes, DEFAULT_MAX_BYTES, 1, 1024 * 1024 * 1024 * 1024, "maxBytes"),

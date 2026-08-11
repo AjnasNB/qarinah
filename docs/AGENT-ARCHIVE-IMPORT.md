@@ -2,7 +2,7 @@
 
 Qarinah can turn an exported coding-agent history into durable project memory. This is useful when a native chat is about to be deleted, when work moves from one coding agent to another, or when a project already has months of visible conversation and tool results.
 
-The importer reads JSON Lines (`.jsonl` or `.ndjson`) exports from Codex, Claude, or a portable agent format. It streams the source one line at a time, so the complete archive is not loaded into memory. The default input ceiling is 100 GiB and every byte, file, record, and line limit can be lowered by the operator.
+The importer reads JSON Lines (`.jsonl` or `.ndjson`) exports from Codex, Claude, Kimi stream-json, or a portable agent format. It streams the source one line at a time, so the complete archive is not loaded into memory. The default input ceiling is 100 GiB and every byte, file, record, and line limit can be lowered by the operator.
 
 ## The safe default: compact import
 
@@ -29,6 +29,12 @@ It does not copy hidden reasoning, encrypted reasoning blocks, credentials, brow
 npx qarinah import ./portable-history.ndjson --format portable --mode full
 ```
 
+Kimi's documented stream-json message format has an explicit adapter:
+
+```sh
+npx qarinah import ./kimi-session.jsonl --format kimi --mode compact
+```
+
 Full mode records each supported visible user message, assistant outcome, tool request, tool result, session marker, and summary as a separate Qarinah event. It requires a workspace initialized with `--capture content` and remains subject to the workspace's event and ledger limits.
 
 Use compact mode for very large archives. Use full mode only when individual visible turns must remain independently retrievable.
@@ -48,7 +54,7 @@ This portable boundary lets another host—including a future or less common cod
 
 ## What survives a deleted native chat
 
-Once the import succeeds, the permitted record lives beside the project in `.qarinah/events/events.jsonl`. SQLite search, the graph, and readable Markdown are rebuildable from that ledger. A later Codex, Claude Code, Cursor, CLI, or authorized MCP client can request a small cited pack from the retained record.
+Once the import succeeds, the permitted record lives beside the project in `.qarinah/events/events.jsonl`. SQLite search, the graph, and readable Markdown are rebuildable from that ledger. A later Codex, Claude Code, Cursor, Kimi, Antigravity, CLI, or authorized MCP client can request a small cited pack from the retained record.
 
 This continuity applies only to content Qarinah actually captured or imported. Deleting both the native history and the project-owned `.qarinah` ledger removes the available record unless the operator has an authorized backup or encrypted team bundle.
 

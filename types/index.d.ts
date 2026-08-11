@@ -307,7 +307,7 @@ export function scanProjectStructure(options?: {
 export interface QarinahAgentArchiveImportResult {
   readonly schemaVersion: "qarinah.agent-archive-import.v1";
   readonly mode: "compact" | "full";
-  readonly formats: readonly ("codex" | "claude" | "portable")[];
+  readonly formats: readonly ("codex" | "claude" | "kimi" | "portable")[];
   readonly filesRead: number;
   readonly sourceBytes: number;
   readonly recordsSeen: number;
@@ -320,7 +320,7 @@ export interface QarinahAgentArchiveImportResult {
 export const AGENT_ARCHIVE_IMPORT_SCHEMA_VERSION: "qarinah.agent-archive-import.v1";
 export function importAgentArchive(source: string, options?: {
   cwd?: string;
-  format?: "auto" | "codex" | "claude" | "portable";
+  format?: "auto" | "codex" | "claude" | "kimi" | "portable";
   mode?: "compact" | "full";
   maxBytes?: number;
   maxFiles?: number;
@@ -683,6 +683,8 @@ export function setupWorkspace(options?: {
   codex?: boolean;
   claude?: boolean;
   cursor?: boolean;
+  kimi?: boolean;
+  antigravity?: boolean;
   allowQuery?: boolean;
   maxChars?: number;
   maxItems?: number;

@@ -403,7 +403,7 @@ function importAgentArchive(
   source: string,
   options?: {
     cwd?: string;
-    format?: "auto" | "codex" | "claude" | "portable";
+    format?: "auto" | "codex" | "claude" | "kimi" | "portable";
     mode?: "compact" | "full";
     maxBytes?: number;
     maxFiles?: number;

@@ -231,14 +231,14 @@ function help() {
 
 Usage:
   qarinah init [path] [--capture metadata|content]
-  qarinah setup [path] [--codex] [--claude] [--cursor] [--capture metadata|content] [--allow-query] [--backup-source <export>] [--backup-destination <external-directory>]
+  qarinah setup [path] [--codex] [--claude] [--cursor] [--kimi] [--antigravity] [--capture metadata|content] [--allow-query] [--backup-source <export>] [--backup-destination <external-directory>]
   qarinah record --kind <kind> --title <title> [--body <text>] [--data-json <json>] [--relation type:target]
   qarinah record --stdin-json
   qarinah hook codex|claude
   qarinah mcp [--allow-query --workspace-id ws_<id> --policy-hash sha256:<digest>] [--max-chars n] [--max-items n]
   qarinah build | rebuild
   qarinah scan [--max-files n] [--max-file-bytes n] [--max-total-bytes n] [--max-depth n]
-  qarinah import <archive-file-or-directory> [--format auto|codex|claude|portable] [--mode compact|full] [--max-bytes n] [--max-files n] [--max-records n] [--max-line-bytes n]
+  qarinah import <archive-file-or-directory> [--format auto|codex|claude|kimi|portable] [--mode compact|full] [--max-bytes n] [--max-files n] [--max-records n] [--max-line-bytes n]
   qarinah backup <archive-file-or-directory>... --destination <external-directory> [--max-bytes n] [--max-files n]
   qarinah overview [--format json|markdown]
   qarinah export okf [--output <path>]
@@ -273,7 +273,7 @@ async function run(argv) {
     return;
   }
   if (command === "setup") {
-    const flags = new Set(["--codex", "--claude", "--cursor", "--allow-query"]);
+    const flags = new Set(["--codex", "--claude", "--cursor", "--kimi", "--antigravity", "--allow-query"]);
     const values = new Set(["--capture", "--max-chars", "--max-items", "--backup-source", "--backup-destination", "--backup-max-bytes", "--backup-max-files"]);
     const parsed = { positionals: [], flags: new Set(), values: new Map() };
     for (let index = 0; index < args.length; index += 1) {
@@ -306,6 +306,8 @@ async function run(argv) {
       codex: parsed.flags.has("--codex"),
       claude: parsed.flags.has("--claude"),
       cursor: parsed.flags.has("--cursor"),
+      kimi: parsed.flags.has("--kimi"),
+      antigravity: parsed.flags.has("--antigravity"),
       allowQuery: parsed.flags.has("--allow-query"),
       maxChars: positive("--max-chars"),
       maxItems: positive("--max-items"),

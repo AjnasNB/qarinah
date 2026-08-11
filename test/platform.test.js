@@ -31,18 +31,15 @@ async function contentWorkspace(t) {
   return root;
 }
 
-test("one-command setup configures Codex, Claude, Cursor, hooks, skills, and consent-gated MCP", async (t) => {
+test("one-command setup configures Codex, Claude, Cursor, Kimi, Antigravity, hooks, skills, and consent-gated MCP", async (t) => {
   const root = await temporaryDirectory(t);
   const result = await setupWorkspace({
     cwd: root,
     capture: "content",
-    codex: true,
-    claude: true,
-    cursor: true,
     allowQuery: true
   });
   assert.equal(result.ok, true);
-  assert.deepEqual(result.targets, ["codex", "claude", "cursor"]);
+  assert.deepEqual(result.targets, ["codex", "claude", "cursor", "kimi", "antigravity"]);
   assert.equal(result.projectStructure.captured, true);
   const codexConfig = await readFile(path.join(root, ".codex", "config.toml"), "utf8");
   assert.match(codexConfig, /\[mcp_servers\.qarinah\]/);
@@ -60,6 +57,15 @@ test("one-command setup configures Codex, Claude, Cursor, hooks, skills, and con
   assert.match(await readFile(path.join(root, ".claude", "skills", "qarinah", "SKILL.md"), "utf8"), /\$ARGUMENTS/);
   assert.match(await readFile(path.join(root, ".claude", "settings.json"), "utf8"), /UserPromptSubmit/);
   assert.match(await readFile(path.join(root, ".cursor", "rules", "qarinah.mdc"), "utf8"), /bounded, cited memory pack/);
+  const kimiMcp = JSON.parse(await readFile(path.join(root, ".kimi-code", "mcp.json"), "utf8"));
+  assert.ok(kimiMcp.mcpServers.qarinah.args.includes("--workspace-id"));
+  const classicKimiMcp = JSON.parse(await readFile(path.join(root, ".kimi", "qarinah-mcp.json"), "utf8"));
+  assert.ok(classicKimiMcp.mcpServers.qarinah.args.includes("--allow-query"));
+  assert.match(await readFile(path.join(root, ".kimi", "README-QARINAH.md"), "utf8"), /--mcp-config-file/);
+  assert.deepEqual(JSON.parse(await readFile(path.join(root, ".agents", "plugins", "qarinah", "plugin.json"), "utf8")), { name: "qarinah" });
+  const antigravityMcp = JSON.parse(await readFile(path.join(root, ".agents", "plugins", "qarinah", "mcp_config.json"), "utf8"));
+  assert.ok(antigravityMcp.mcpServers.qarinah.args.includes("--policy-hash"));
+  assert.match(await readFile(path.join(root, ".agents", "plugins", "qarinah", "rules", "qarinah.md"), "utf8"), /untrusted evidence/);
   assert.match(await readFile(path.join(root, ".qarinah", "records", "OVERVIEW.md"), "utf8"), /Qarinah project overview/);
   assert.match(await readFile(path.join(root, ".qarinah", "records", "DECISIONS.md"), "utf8"), /Project decisions/);
   assert.match(await readFile(path.join(root, ".qarinah", "records", "FLOW.md"), "utf8"), /Project execution flow/);
