@@ -2,6 +2,7 @@ import { lstat, mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { QarinahError } from "./errors.js";
+import { backupAgentArchives } from "./archive-backup.js";
 import { writeMemoryDashboard } from "./dashboard.js";
 import { rebuildDerivedState } from "./indexer.js";
 import { writeProjectOverview } from "./project-overview.js";
@@ -289,6 +290,15 @@ export async function setupWorkspace(options = {}) {
       nextCommand: "npx qarinah scan --max-files <bounded-count>"
     });
   }
+  const backupRequested = options.backupSources !== undefined || options.backupDestination !== undefined;
+  if (backupRequested && (!Array.isArray(options.backupSources) || options.backupSources.length === 0 || !options.backupDestination)) {
+    throw new TypeError("backupSources and backupDestination must be supplied together.");
+  }
+  const backup = backupRequested ? await backupAgentArchives(options.backupSources, options.backupDestination, {
+    cwd: workspace.root,
+    maxBytes: options.backupMaxBytes,
+    maxFiles: options.backupMaxFiles
+  }) : null;
   await rebuildDerivedState(workspace.root);
   const overview = await writeProjectOverview({ cwd: workspace.root });
   const dashboard = await writeMemoryDashboard({ cwd: workspace.root });
@@ -302,6 +312,7 @@ export async function setupWorkspace(options = {}) {
     targets,
     files,
     projectStructure,
+    backup,
     overview: overview.output,
     dashboard: dashboard.output,
     health

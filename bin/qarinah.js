@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 import process from "node:process";
+import path from "node:path";
 import {
   QarinahError,
   appendEvent,
   approveWorkspaceTrust,
+  backupAgentArchives,
   buildProjectOverview,
   captureClaudeHook,
   captureCodexHook,
@@ -229,7 +231,7 @@ function help() {
 
 Usage:
   qarinah init [path] [--capture metadata|content]
-  qarinah setup [path] [--codex] [--claude] [--cursor] [--capture metadata|content] [--allow-query]
+  qarinah setup [path] [--codex] [--claude] [--cursor] [--capture metadata|content] [--allow-query] [--backup-source <export>] [--backup-destination <external-directory>]
   qarinah record --kind <kind> --title <title> [--body <text>] [--data-json <json>] [--relation type:target]
   qarinah record --stdin-json
   qarinah hook codex|claude
@@ -237,6 +239,7 @@ Usage:
   qarinah build | rebuild
   qarinah scan [--max-files n] [--max-file-bytes n] [--max-total-bytes n] [--max-depth n]
   qarinah import <archive-file-or-directory> [--format auto|codex|claude|portable] [--mode compact|full] [--max-bytes n] [--max-files n] [--max-records n] [--max-line-bytes n]
+  qarinah backup <archive-file-or-directory>... --destination <external-directory> [--max-bytes n] [--max-files n]
   qarinah overview [--format json|markdown]
   qarinah export okf [--output <path>]
   qarinah query [text] [--format json|markdown|handoff] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp] [--minimum-coverage any|partial|direct] [--minimum-evidence any|partial|direct]
@@ -271,7 +274,7 @@ async function run(argv) {
   }
   if (command === "setup") {
     const flags = new Set(["--codex", "--claude", "--cursor", "--allow-query"]);
-    const values = new Set(["--capture", "--max-chars", "--max-items"]);
+    const values = new Set(["--capture", "--max-chars", "--max-items", "--backup-source", "--backup-destination", "--backup-max-bytes", "--backup-max-files"]);
     const parsed = { positionals: [], flags: new Set(), values: new Map() };
     for (let index = 0; index < args.length; index += 1) {
       const value = args[index];
@@ -305,7 +308,11 @@ async function run(argv) {
       cursor: parsed.flags.has("--cursor"),
       allowQuery: parsed.flags.has("--allow-query"),
       maxChars: positive("--max-chars"),
-      maxItems: positive("--max-items")
+      maxItems: positive("--max-items"),
+      backupSources: parsed.values.has("--backup-source") ? [path.resolve(parsed.values.get("--backup-source"))] : undefined,
+      backupDestination: parsed.values.has("--backup-destination") ? path.resolve(parsed.values.get("--backup-destination")) : undefined,
+      backupMaxBytes: positive("--backup-max-bytes"),
+      backupMaxFiles: positive("--backup-max-files")
     });
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
     return;
@@ -448,6 +455,29 @@ async function run(argv) {
       maxRecords: integer("--max-records"),
       maxLineBytes: integer("--max-line-bytes")
     });
+    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+    return;
+  }
+  if (command === "backup") {
+    const parsed = strictValueOptions(args, "backup", ["--destination", "--max-bytes", "--max-files"]);
+    if (parsed.positionals.length === 0) throw new TypeError("backup requires at least one archive file or directory.");
+    const destination = parsed.values.get("--destination");
+    if (!destination) throw new TypeError("backup requires --destination <external-directory>.");
+    const integer = (name) => {
+      const value = parsed.values.get(name);
+      if (value === undefined) return undefined;
+      if (!/^[0-9]+$/.test(value) || Number(value) < 1) throw new TypeError(`${name} must be a positive integer.`);
+      return Number(value);
+    };
+    const result = await backupAgentArchives(
+      parsed.positionals.map((source) => path.resolve(source)),
+      path.resolve(destination),
+      {
+        cwd: process.cwd(),
+        maxBytes: integer("--max-bytes"),
+        maxFiles: integer("--max-files")
+      }
+    );
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
     return;
   }

@@ -86,10 +86,10 @@ function sortJsonValue(value) {
 function sanitizeJsonValue(value, options = {}) {
   const limits = { ...DEFAULT_LIMITS, ...options };
   let nodes = 0;
-  function visit(candidate, path13, depth) {
+  function visit(candidate, path15, depth) {
     nodes += 1;
     if (nodes > limits.maximumNodes) throw new TypeError(`JSON value exceeds ${limits.maximumNodes} nodes.`);
-    if (depth > limits.maximumDepth) throw new TypeError(`JSON value exceeds depth ${limits.maximumDepth} at ${path13}.`);
+    if (depth > limits.maximumDepth) throw new TypeError(`JSON value exceeds depth ${limits.maximumDepth} at ${path15}.`);
     if (candidate === null || typeof candidate === "boolean") return candidate;
     if (typeof candidate === "string") {
       if (candidate.length > limits.maximumStringLength) {
@@ -99,42 +99,42 @@ function sanitizeJsonValue(value, options = {}) {
       return candidate;
     }
     if (typeof candidate === "number") {
-      if (!Number.isFinite(candidate)) throw new TypeError(`${path13} must contain only finite numbers.`);
+      if (!Number.isFinite(candidate)) throw new TypeError(`${path15} must contain only finite numbers.`);
       return Object.is(candidate, -0) ? 0 : candidate;
     }
     if (Array.isArray(candidate)) {
       if (candidate.length > limits.maximumArrayLength) {
-        throw new TypeError(`${path13} exceeds ${limits.maximumArrayLength} array items.`);
+        throw new TypeError(`${path15} exceeds ${limits.maximumArrayLength} array items.`);
       }
       const descriptors2 = Object.getOwnPropertyDescriptors(candidate);
       const allowed = /* @__PURE__ */ new Set(["length", ...Array.from({ length: candidate.length }, (_, index) => String(index))]);
       for (const key of Reflect.ownKeys(descriptors2)) {
-        if (typeof key !== "string" || !allowed.has(key)) throw new TypeError(`${path13} contains an unsupported array property.`);
+        if (typeof key !== "string" || !allowed.has(key)) throw new TypeError(`${path15} contains an unsupported array property.`);
       }
       return Array.from({ length: candidate.length }, (_, index) => {
         const descriptor = descriptors2[String(index)];
         if (!descriptor?.enumerable || !Object.hasOwn(descriptor, "value")) {
-          throw new TypeError(`${path13}[${index}] must be an enumerable data property.`);
+          throw new TypeError(`${path15}[${index}] must be an enumerable data property.`);
         }
-        return visit(descriptor.value, `${path13}[${index}]`, depth + 1);
+        return visit(descriptor.value, `${path15}[${index}]`, depth + 1);
       });
     }
-    if (!candidate || typeof candidate !== "object") throw new TypeError(`${path13} contains an unsupported value.`);
+    if (!candidate || typeof candidate !== "object") throw new TypeError(`${path15} contains an unsupported value.`);
     const prototype = Object.getPrototypeOf(candidate);
     if (prototype !== Object.prototype && prototype !== null) {
-      throw new TypeError(`${path13} must contain only plain records.`);
+      throw new TypeError(`${path15} must contain only plain records.`);
     }
     const descriptors = Object.getOwnPropertyDescriptors(candidate);
     const keys = Reflect.ownKeys(descriptors);
-    if (keys.length > limits.maximumObjectKeys) throw new TypeError(`${path13} exceeds ${limits.maximumObjectKeys} fields.`);
+    if (keys.length > limits.maximumObjectKeys) throw new TypeError(`${path15} exceeds ${limits.maximumObjectKeys} fields.`);
     const result = /* @__PURE__ */ Object.create(null);
     for (const key of keys) {
-      if (typeof key !== "string") throw new TypeError(`${path13} cannot contain symbol keys.`);
+      if (typeof key !== "string") throw new TypeError(`${path15} cannot contain symbol keys.`);
       const descriptor = descriptors[key];
       if (!descriptor.enumerable || !Object.hasOwn(descriptor, "value") || descriptor.value === void 0) {
-        throw new TypeError(`${path13}.${key} must be an enumerable data property with a defined value.`);
+        throw new TypeError(`${path15}.${key} must be an enumerable data property with a defined value.`);
       }
-      result[key] = visit(descriptor.value, `${path13}.${key}`, depth + 1);
+      result[key] = visit(descriptor.value, `${path15}.${key}`, depth + 1);
     }
     return result;
   }
@@ -159,56 +159,56 @@ function snapshotJsonBoundary(value, options = {}) {
   const limits = { ...DEFAULT_LIMITS2, ...options };
   const seen = /* @__PURE__ */ new WeakSet();
   let nodes = 0;
-  function visit(candidate, path13, depth) {
+  function visit(candidate, path15, depth) {
     nodes += 1;
     if (nodes > limits.maximumNodes) throw new TypeError(`${limits.label} exceeds ${limits.maximumNodes} JSON nodes.`);
-    if (depth > limits.maximumDepth) throw new TypeError(`${limits.label} exceeds depth ${limits.maximumDepth} at ${path13}.`);
+    if (depth > limits.maximumDepth) throw new TypeError(`${limits.label} exceeds depth ${limits.maximumDepth} at ${path15}.`);
     if (candidate === null || typeof candidate === "boolean") return candidate;
     if (typeof candidate === "string") {
       if (candidate.length > limits.maximumStringLength) {
-        throw new TypeError(`${path13} exceeds ${limits.maximumStringLength} characters.`);
+        throw new TypeError(`${path15} exceeds ${limits.maximumStringLength} characters.`);
       }
       return candidate;
     }
     if (typeof candidate === "number") {
       if (!Number.isFinite(candidate) || Object.is(candidate, -0)) {
-        throw new TypeError(`${path13} must be a finite JSON number other than negative zero.`);
+        throw new TypeError(`${path15} must be a finite JSON number other than negative zero.`);
       }
       return candidate;
     }
-    if (!candidate || typeof candidate !== "object") throw new TypeError(`${path13} contains a non-JSON value.`);
-    if (seen.has(candidate)) throw new TypeError(`${path13} contains a cyclic or repeated object reference.`);
+    if (!candidate || typeof candidate !== "object") throw new TypeError(`${path15} contains a non-JSON value.`);
+    if (seen.has(candidate)) throw new TypeError(`${path15} contains a cyclic or repeated object reference.`);
     seen.add(candidate);
     if (Array.isArray(candidate)) {
       if (candidate.length > limits.maximumArrayLength) {
-        throw new TypeError(`${path13} exceeds ${limits.maximumArrayLength} array entries.`);
+        throw new TypeError(`${path15} exceeds ${limits.maximumArrayLength} array entries.`);
       }
       const descriptors2 = Object.getOwnPropertyDescriptors(candidate);
       const expected = /* @__PURE__ */ new Set(["length", ...Array.from({ length: candidate.length }, (_, index) => String(index))]);
       for (const key of Reflect.ownKeys(descriptors2)) {
-        if (typeof key !== "string" || !expected.has(key)) throw new TypeError(`${path13} contains an unsupported array property.`);
+        if (typeof key !== "string" || !expected.has(key)) throw new TypeError(`${path15} contains an unsupported array property.`);
       }
       return Array.from({ length: candidate.length }, (_, index) => {
         const descriptor = descriptors2[String(index)];
         if (!descriptor?.enumerable || !Object.hasOwn(descriptor, "value")) {
-          throw new TypeError(`${path13}[${index}] must be an enumerable data property.`);
+          throw new TypeError(`${path15}[${index}] must be an enumerable data property.`);
         }
-        return visit(descriptor.value, `${path13}[${index}]`, depth + 1);
+        return visit(descriptor.value, `${path15}[${index}]`, depth + 1);
       });
     }
     const prototype = Object.getPrototypeOf(candidate);
-    if (prototype !== Object.prototype && prototype !== null) throw new TypeError(`${path13} must be a plain record.`);
+    if (prototype !== Object.prototype && prototype !== null) throw new TypeError(`${path15} must be a plain record.`);
     const descriptors = Object.getOwnPropertyDescriptors(candidate);
     const keys = Reflect.ownKeys(descriptors);
-    if (keys.length > limits.maximumObjectKeys) throw new TypeError(`${path13} exceeds ${limits.maximumObjectKeys} fields.`);
+    if (keys.length > limits.maximumObjectKeys) throw new TypeError(`${path15} exceeds ${limits.maximumObjectKeys} fields.`);
     const result = /* @__PURE__ */ Object.create(null);
     for (const key of keys) {
-      if (typeof key !== "string") throw new TypeError(`${path13} cannot contain symbol keys.`);
+      if (typeof key !== "string") throw new TypeError(`${path15} cannot contain symbol keys.`);
       const descriptor = descriptors[key];
       if (!descriptor.enumerable || !Object.hasOwn(descriptor, "value") || descriptor.value === void 0) {
-        throw new TypeError(`${path13}.${key} must be an enumerable data property with a defined value.`);
+        throw new TypeError(`${path15}.${key} must be an enumerable data property with a defined value.`);
       }
-      result[key] = visit(descriptor.value, `${path13}.${key}`, depth + 1);
+      result[key] = visit(descriptor.value, `${path15}.${key}`, depth + 1);
     }
     return result;
   }
@@ -2621,6 +2621,7 @@ async function initializeWorkspace(target = process.cwd(), options = {}) {
     "index/",
     "snapshots/",
     "locks/",
+    "dashboard/",
     "",
     "!.gitignore",
     "!config.json",
@@ -2749,7 +2750,7 @@ var init_workspace = __esm({
       "retentionClass",
       "createdAt"
     ]);
-    STORAGE_DIRECTORIES = Object.freeze(["events", "objects", "records", "graph", "index", "snapshots", "locks"]);
+    STORAGE_DIRECTORIES = Object.freeze(["events", "objects", "records", "graph", "index", "snapshots", "locks", "dashboard"]);
     MAX_CONFIG_BYTES = 64 * 1024;
   }
 });
@@ -3995,7 +3996,7 @@ var require_ignore = __commonJS({
       //   path matching.
       // - check `string` either `MODE_IGNORE` or `MODE_CHECK_IGNORE`
       // @returns {TestResult} true if a file is ignored
-      test(path13, checkUnignored, mode) {
+      test(path15, checkUnignored, mode) {
         let ignored = false;
         let unignored = false;
         let matchedRule;
@@ -4004,7 +4005,7 @@ var require_ignore = __commonJS({
           if (unignored === negative && ignored !== unignored || negative && !ignored && !unignored && !checkUnignored) {
             return;
           }
-          const matched = rule[mode].test(path13);
+          const matched = rule[mode].test(path15);
           if (!matched) {
             return;
           }
@@ -4025,17 +4026,17 @@ var require_ignore = __commonJS({
     var throwError = (message, Ctor) => {
       throw new Ctor(message);
     };
-    var checkPath = (path13, originalPath, doThrow) => {
-      if (!isString(path13)) {
+    var checkPath = (path15, originalPath, doThrow) => {
+      if (!isString(path15)) {
         return doThrow(
           `path must be a string, but got \`${originalPath}\``,
           TypeError
         );
       }
-      if (!path13) {
+      if (!path15) {
         return doThrow(`path must not be empty`, TypeError);
       }
-      if (checkPath.isNotRelative(path13)) {
+      if (checkPath.isNotRelative(path15)) {
         const r = "`path.relative()`d";
         return doThrow(
           `path should be a ${r} string, but got "${originalPath}"`,
@@ -4044,7 +4045,7 @@ var require_ignore = __commonJS({
       }
       return true;
     };
-    var isNotRelative = (path13) => REGEX_TEST_INVALID_PATH.test(path13);
+    var isNotRelative = (path15) => REGEX_TEST_INVALID_PATH.test(path15);
     checkPath.isNotRelative = isNotRelative;
     checkPath.convert = (p) => p;
     var Ignore = class {
@@ -4074,19 +4075,19 @@ var require_ignore = __commonJS({
       }
       // @returns {TestResult}
       _test(originalPath, cache, checkUnignored, slices) {
-        const path13 = originalPath && checkPath.convert(originalPath);
+        const path15 = originalPath && checkPath.convert(originalPath);
         checkPath(
-          path13,
+          path15,
           originalPath,
           this._strictPathCheck ? throwError : RETURN_FALSE
         );
-        return this._t(path13, cache, checkUnignored, slices);
+        return this._t(path15, cache, checkUnignored, slices);
       }
-      checkIgnore(path13) {
-        if (!REGEX_TEST_TRAILING_SLASH.test(path13)) {
-          return this.test(path13);
+      checkIgnore(path15) {
+        if (!REGEX_TEST_TRAILING_SLASH.test(path15)) {
+          return this.test(path15);
         }
-        const slices = path13.split(SLASH).filter(Boolean);
+        const slices = path15.split(SLASH).filter(Boolean);
         slices.pop();
         if (slices.length) {
           const parent = this._t(
@@ -4099,18 +4100,18 @@ var require_ignore = __commonJS({
             return parent;
           }
         }
-        return this._rules.test(path13, false, MODE_CHECK_IGNORE);
+        return this._rules.test(path15, false, MODE_CHECK_IGNORE);
       }
-      _t(path13, cache, checkUnignored, slices) {
-        if (path13 in cache) {
-          return cache[path13];
+      _t(path15, cache, checkUnignored, slices) {
+        if (path15 in cache) {
+          return cache[path15];
         }
         if (!slices) {
-          slices = path13.split(SLASH).filter(Boolean);
+          slices = path15.split(SLASH).filter(Boolean);
         }
         slices.pop();
         if (!slices.length) {
-          return cache[path13] = this._rules.test(path13, checkUnignored, MODE_IGNORE);
+          return cache[path15] = this._rules.test(path15, checkUnignored, MODE_IGNORE);
         }
         const parent = this._t(
           slices.join(SLASH) + SLASH,
@@ -4118,29 +4119,29 @@ var require_ignore = __commonJS({
           checkUnignored,
           slices
         );
-        return cache[path13] = parent.ignored ? parent : this._rules.test(path13, checkUnignored, MODE_IGNORE);
+        return cache[path15] = parent.ignored ? parent : this._rules.test(path15, checkUnignored, MODE_IGNORE);
       }
-      ignores(path13) {
-        return this._test(path13, this._ignoreCache, false).ignored;
+      ignores(path15) {
+        return this._test(path15, this._ignoreCache, false).ignored;
       }
       createFilter() {
-        return (path13) => !this.ignores(path13);
+        return (path15) => !this.ignores(path15);
       }
       filter(paths) {
         return makeArray(paths).filter(this.createFilter());
       }
       // @returns {TestResult}
-      test(path13) {
-        return this._test(path13, this._testCache, true);
+      test(path15) {
+        return this._test(path15, this._testCache, true);
       }
     };
     var factory = (options) => new Ignore(options);
-    var isPathValid = (path13) => checkPath(path13 && checkPath.convert(path13), path13, RETURN_FALSE);
+    var isPathValid = (path15) => checkPath(path15 && checkPath.convert(path15), path15, RETURN_FALSE);
     var setupWindows = () => {
       const makePosix = (str) => /^\\\\\?\\/.test(str) || /["<>|\u0000-\u001F]+/u.test(str) ? str : str.replace(/\\/g, "/");
       checkPath.convert = makePosix;
       const REGEX_TEST_WINDOWS_PATH_ABSOLUTE = /^[a-z]:\//i;
-      checkPath.isNotRelative = (path13) => REGEX_TEST_WINDOWS_PATH_ABSOLUTE.test(path13) || isNotRelative(path13);
+      checkPath.isNotRelative = (path15) => REGEX_TEST_WINDOWS_PATH_ABSOLUTE.test(path15) || isNotRelative(path15);
     };
     if (
       // Detect `process` so that it can run in browsers.
@@ -4157,6 +4158,7 @@ var require_ignore = __commonJS({
 
 // bin/qarinah.js
 import process2 from "node:process";
+import path14 from "node:path";
 
 // src/index.js
 init_errors();
@@ -6412,6 +6414,230 @@ async function importAgentArchive(source, options = {}) {
   });
 }
 
+// src/archive-backup.js
+init_canonical();
+init_capture_policy();
+init_errors();
+init_store();
+init_workspace();
+init_indexer();
+import { createHash as createHash5 } from "node:crypto";
+import { createReadStream as createReadStream2, createWriteStream } from "node:fs";
+import { lstat as lstat6, mkdir as mkdir4, opendir as opendir2, realpath as realpath5, rename as rename5, rm as rm5 } from "node:fs/promises";
+import path7 from "node:path";
+import { Readable, Transform } from "node:stream";
+import { pipeline } from "node:stream/promises";
+var AGENT_ARCHIVE_BACKUP_SCHEMA_VERSION = "qarinah.agent-archive-backup.v1";
+var EXTENSIONS = /* @__PURE__ */ new Set([".jsonl", ".ndjson"]);
+var DEFAULT_MAX_BYTES2 = 100 * 1024 * 1024 * 1024;
+var DEFAULT_MAX_FILES3 = 1e5;
+var MAX_DEPTH = 64;
+function boundedInteger3(value, fallback, label, maximum) {
+  const selected3 = value ?? fallback;
+  if (!Number.isSafeInteger(selected3) || selected3 < 1 || selected3 > maximum) {
+    throw new TypeError(`${label} must be an integer from 1 to ${maximum}.`);
+  }
+  return selected3;
+}
+function isWithin3(root, candidate) {
+  const relative = path7.relative(root, candidate);
+  return relative === "" || !relative.startsWith("..") && !path7.isAbsolute(relative);
+}
+function safeName(value) {
+  const cleaned = value.normalize("NFKC").replaceAll(/[^a-zA-Z0-9._-]+/gu, "-").replaceAll(/^-+|-+$/gu, "");
+  return cleaned.slice(0, 80) || "archive";
+}
+async function inspectSource(source, limits, sourceIndex) {
+  if (typeof source !== "string" || source.trim() === "" || !path7.isAbsolute(source)) {
+    throw new TypeError("Every backup source must be an explicit absolute path.");
+  }
+  const requested = path7.resolve(source);
+  const requestedStat = await lstat6(requested);
+  if (requestedStat.isSymbolicLink()) throw new QarinahError("BACKUP_LINK_REJECTED", "Backup sources cannot be symbolic links or junctions.");
+  const root = await realpath5(requested);
+  const rootStat = await lstat6(root);
+  const files = [];
+  let totalBytes = 0;
+  let directories = 0;
+  async function addFile(candidate, relativePath) {
+    const metadata = await lstat6(candidate);
+    if (metadata.isSymbolicLink()) throw new QarinahError("BACKUP_LINK_REJECTED", "Backup source trees cannot contain symbolic links or junctions.");
+    if (!metadata.isFile() || metadata.nlink !== 1) throw new QarinahError("BACKUP_SOURCE_INVALID", "Backup sources must contain singly linked regular files.");
+    if (!EXTENSIONS.has(path7.extname(candidate).toLowerCase())) return;
+    totalBytes += metadata.size;
+    if (files.length + 1 > limits.maxFiles) throw new QarinahError("BACKUP_LIMIT_EXCEEDED", "Backup contains more files than allowed.");
+    if (totalBytes > limits.maxBytes) throw new QarinahError("BACKUP_LIMIT_EXCEEDED", "Backup exceeds the configured byte limit.");
+    files.push({ sourceIndex, source: candidate, relativePath, expectedBytes: metadata.size });
+  }
+  async function walk(directory, relativeDirectory = "", depth = 0) {
+    if (depth > MAX_DEPTH) throw new QarinahError("BACKUP_LIMIT_EXCEEDED", `Backup directory depth exceeds ${MAX_DEPTH}.`);
+    directories += 1;
+    if (directories > limits.maxFiles) throw new QarinahError("BACKUP_LIMIT_EXCEEDED", "Backup contains more directories than allowed.");
+    const entries = [];
+    const handle = await opendir2(directory);
+    for await (const entry of handle) entries.push(entry);
+    entries.sort((left, right) => left.name.localeCompare(right.name));
+    for (const entry of entries) {
+      const candidate = path7.join(directory, entry.name);
+      const relative = path7.join(relativeDirectory, entry.name);
+      if (entry.isSymbolicLink()) throw new QarinahError("BACKUP_LINK_REJECTED", "Backup source trees cannot contain symbolic links or junctions.");
+      if (entry.isDirectory()) await walk(candidate, relative, depth + 1);
+      else if (entry.isFile()) await addFile(candidate, relative);
+    }
+  }
+  if (rootStat.isFile()) await addFile(root, path7.basename(root));
+  else if (rootStat.isDirectory()) await walk(root);
+  else throw new QarinahError("BACKUP_SOURCE_INVALID", "Backup source must be a regular file or directory.");
+  return {
+    root,
+    label: safeName(path7.basename(root)),
+    sourceId: sha256(root),
+    files,
+    totalBytes
+  };
+}
+async function prepareDestination(destination, sources) {
+  if (typeof destination !== "string" || destination.trim() === "" || !path7.isAbsolute(destination)) {
+    throw new TypeError("backup destination must be an explicit absolute path.");
+  }
+  const requested = path7.resolve(destination);
+  for (const source of sources) {
+    if (isWithin3(source.root, requested) || isWithin3(requested, source.root)) {
+      throw new QarinahError("BACKUP_PATH_OVERLAP", "Backup source and destination must not contain one another.");
+    }
+  }
+  const parent = await realpath5(path7.dirname(requested));
+  const parentStat = await lstat6(parent);
+  if (parentStat.isSymbolicLink() || !parentStat.isDirectory()) {
+    throw new QarinahError("BACKUP_DESTINATION_INVALID", "Backup destination parent must be a real directory.");
+  }
+  await mkdir4(requested, { recursive: false, mode: 448 });
+  const metadata = await lstat6(requested);
+  if (metadata.isSymbolicLink() || !metadata.isDirectory()) {
+    throw new QarinahError("BACKUP_DESTINATION_INVALID", "Backup destination must be a real directory.");
+  }
+  return realpath5(requested);
+}
+async function copyVerified(file, destination, state, limits) {
+  const target = path7.join(destination, `source-${file.sourceIndex + 1}`, file.relativePath);
+  await mkdir4(path7.dirname(target), { recursive: true, mode: 448 });
+  const temporary = `${target}.partial`;
+  const digest = createHash5("sha256");
+  let copied = 0;
+  const meter = new Transform({
+    transform(chunk, _encoding, callback) {
+      copied += chunk.length;
+      state.copiedBytes += chunk.length;
+      if (copied > file.expectedBytes || state.copiedBytes > limits.maxBytes) {
+        callback(new QarinahError("BACKUP_LIMIT_EXCEEDED", "Backup source changed or exceeded its byte limit while copying."));
+        return;
+      }
+      digest.update(chunk);
+      callback(null, chunk);
+    }
+  });
+  try {
+    await pipeline(createReadStream2(file.source), meter, createWriteStream(temporary, { flags: "wx", mode: 384 }));
+    if (copied !== file.expectedBytes) throw new QarinahError("BACKUP_SOURCE_CHANGED", "Backup source changed while it was being copied.");
+    await rename5(temporary, target);
+  } finally {
+    await rm5(temporary, { force: true });
+  }
+  return {
+    sourceIndex: file.sourceIndex,
+    relativePath: file.relativePath.replaceAll("\\", "/"),
+    bytes: copied,
+    sha256: digest.digest("hex")
+  };
+}
+async function backupAgentArchives(sources, destination, options = {}) {
+  if (!Array.isArray(sources) || sources.length < 1 || sources.length > 32) {
+    throw new TypeError("sources must contain from 1 to 32 explicit absolute paths.");
+  }
+  const limits = {
+    maxBytes: boundedInteger3(options.maxBytes, DEFAULT_MAX_BYTES2, "maxBytes", 1024 * 1024 * 1024 * 1024),
+    maxFiles: boundedInteger3(options.maxFiles, DEFAULT_MAX_FILES3, "maxFiles", 1e6)
+  };
+  const inspected = [];
+  let totalFiles = 0;
+  let totalBytes = 0;
+  for (let index = 0; index < sources.length; index += 1) {
+    const source = await inspectSource(sources[index], limits, index);
+    totalFiles += source.files.length;
+    totalBytes += source.totalBytes;
+    if (totalFiles > limits.maxFiles || totalBytes > limits.maxBytes) {
+      throw new QarinahError("BACKUP_LIMIT_EXCEEDED", "Combined backup sources exceed the configured limits.");
+    }
+    inspected.push(source);
+  }
+  if (totalFiles === 0) throw new QarinahError("BACKUP_EMPTY", "No JSONL or NDJSON files were found in the explicit sources.");
+  const createdAt = (options.clock?.() ?? /* @__PURE__ */ new Date()).toISOString();
+  const suffix = sha256(inspected.map((source) => source.sourceId).join("\n")).slice(7, 19);
+  const root = await prepareDestination(path7.join(destination, `qarinah-agent-archive-${createdAt.replaceAll(/[:.]/gu, "-")}-${suffix}`), inspected);
+  const state = { copiedBytes: 0 };
+  try {
+    const files = [];
+    for (const source of inspected) {
+      for (const file of source.files) files.push(await copyVerified(file, root, state, limits));
+    }
+    const core = {
+      schemaVersion: AGENT_ARCHIVE_BACKUP_SCHEMA_VERSION,
+      createdAt,
+      sources: inspected.map((source, index) => ({ index, label: source.label, sourceId: source.sourceId })),
+      files,
+      totals: { files: files.length, bytes: state.copiedBytes }
+    };
+    const manifestHash = sha256(canonicalStringify(core));
+    const manifest = { ...core, manifestHash };
+    const manifestPath = path7.join(root, "manifest.json");
+    const temporary = `${manifestPath}.partial`;
+    await pipeline(
+      Readable.from([`${JSON.stringify(manifest, null, 2)}
+`]),
+      createWriteStream(temporary, { flags: "wx", mode: 384 })
+    );
+    await rename5(temporary, manifestPath);
+    let event = null;
+    if (options.cwd !== void 0) {
+      const workspace = await loadWorkspace(options.cwd);
+      event = await appendEvent(reviewMetadataEventInput({
+        kind: "artifact",
+        actor: { type: "human", id: "local-operator" },
+        title: "Backed up exported agent archives",
+        body: "",
+        data: {
+          agentArchiveBackup: {
+            schemaVersion: AGENT_ARCHIVE_BACKUP_SCHEMA_VERSION,
+            sourceCount: inspected.length,
+            fileCount: files.length,
+            totalBytes: state.copiedBytes,
+            manifestHash,
+            backupName: path7.basename(root)
+          }
+        },
+        confidence: "verified",
+        relations: [],
+        provenance: { adapter: "qarinah-archive-backup", sourceId: manifestHash },
+        retention: { class: workspace.config.retentionClass, expiresAt: null }
+      }), { cwd: workspace.root });
+      await rebuildDerivedState(workspace.root);
+    }
+    return Object.freeze({
+      schemaVersion: AGENT_ARCHIVE_BACKUP_SCHEMA_VERSION,
+      destination: root,
+      manifest: manifestPath,
+      manifestHash,
+      sourceCount: inspected.length,
+      fileCount: files.length,
+      totalBytes: state.copiedBytes,
+      eventId: event?.eventId ?? null
+    });
+  } catch (error) {
+    await rm5(root, { recursive: true, force: true });
+    throw error;
+  }
+}
+
 // src/project-overview.js
 init_canonical();
 init_store();
@@ -6502,7 +6728,12 @@ async function buildProjectOverview(options = {}) {
       authoritativeLedger: ".qarinah/events/events.jsonl",
       sqliteSearch: ".qarinah/index/qarinah.db",
       graph: ".qarinah/graph/graph.json",
-      readableMemory: ".qarinah/records/CONTEXT.md"
+      readableMemory: ".qarinah/records/CONTEXT.md",
+      overview: ".qarinah/records/OVERVIEW.md",
+      decisions: ".qarinah/records/DECISIONS.md",
+      flow: ".qarinah/records/FLOW.md",
+      changes: ".qarinah/records/CHANGES.md",
+      dashboard: ".qarinah/dashboard/index.html"
     }
   });
 }
@@ -6538,6 +6769,11 @@ function renderProjectOverviewMarkdown(overview) {
     `- Fast SQLite search: \`${overview.durableFiles.sqliteSearch}\``,
     `- Relationship graph: \`${overview.durableFiles.graph}\``,
     `- Readable project memory: \`${overview.durableFiles.readableMemory}\``,
+    `- Project overview: \`${overview.durableFiles.overview}\``,
+    `- Decisions and reasons: \`${overview.durableFiles.decisions}\``,
+    `- Execution flow: \`${overview.durableFiles.flow}\``,
+    `- Major changes: \`${overview.durableFiles.changes}\``,
+    `- Local dashboard: \`${overview.durableFiles.dashboard}\``,
     ""
   ].join("\n");
 }
@@ -6558,8 +6794,8 @@ init_markdown();
 init_store();
 init_workspace();
 import { randomBytes as randomBytes4 } from "node:crypto";
-import { lstat as lstat6, mkdir as mkdir4, readFile as readFile2, readdir as readdir3, realpath as realpath5, rename as rename5, rm as rm5 } from "node:fs/promises";
-import path7 from "node:path";
+import { lstat as lstat7, mkdir as mkdir5, readFile as readFile2, readdir as readdir3, realpath as realpath6, rename as rename6, rm as rm6 } from "node:fs/promises";
+import path8 from "node:path";
 var OKF_VERSION = "0.1";
 var OKF_EXPORT_SCHEMA_VERSION = "qarinah.okf-export.v1";
 var DEFAULT_OUTPUT_SEGMENTS = Object.freeze([".qarinah", "records", "okf"]);
@@ -6572,13 +6808,13 @@ var ROOT_FILES = Object.freeze([EXPORT_MARKER, "events", "index.md", "log.md"]);
 function compareText(left, right) {
   return left < right ? -1 : left > right ? 1 : 0;
 }
-function isWithin3(root, candidate) {
-  const relative = path7.relative(root, candidate);
-  return relative === "" || !relative.startsWith("..") && !path7.isAbsolute(relative);
+function isWithin4(root, candidate) {
+  const relative = path8.relative(root, candidate);
+  return relative === "" || !relative.startsWith("..") && !path8.isAbsolute(relative);
 }
 async function optionalLstat(candidate) {
   try {
-    return await lstat6(candidate);
+    return await lstat7(candidate);
   } catch (error) {
     if (error?.code === "ENOENT") return null;
     throw error;
@@ -6606,11 +6842,11 @@ function validateOptions(value) {
 }
 function resolveOutputDirectory(workspace, output) {
   const outputDirectory = output === void 0 ? resolveWithin(workspace.root, ...DEFAULT_OUTPUT_SEGMENTS) : resolveWithin(workspace.root, output);
-  const relative = path7.relative(workspace.root, outputDirectory);
+  const relative = path8.relative(workspace.root, outputDirectory);
   if (relative === "") {
     throw new QarinahError("OKF_OUTPUT_PROTECTED", "The workspace root cannot be replaced by an OKF export.");
   }
-  const segments = relative.split(path7.sep).filter(Boolean);
+  const segments = relative.split(path8.sep).filter(Boolean);
   const normalized = segments.map((segment) => process.platform === "win32" ? segment.toLowerCase() : segment);
   if (normalized[0] === ".git") {
     throw new QarinahError("OKF_OUTPUT_PROTECTED", "An OKF export cannot be written inside .git.");
@@ -6627,21 +6863,21 @@ function resolveOutputDirectory(workspace, output) {
   return outputDirectory;
 }
 async function ensureSafeDirectoryChain(root, directory) {
-  const relative = path7.relative(root, directory);
-  if (!isWithin3(root, directory)) {
+  const relative = path8.relative(root, directory);
+  if (!isWithin4(root, directory)) {
     throw new QarinahError("PATH_OUTSIDE_WORKSPACE", "OKF output parent escapes the workspace root.");
   }
   let current = root;
-  for (const segment of relative.split(path7.sep).filter(Boolean)) {
-    current = path7.join(current, segment);
+  for (const segment of relative.split(path8.sep).filter(Boolean)) {
+    current = path8.join(current, segment);
     let metadata = await optionalLstat(current);
     if (!metadata) {
       try {
-        await mkdir4(current, { mode: 448 });
+        await mkdir5(current, { mode: 448 });
       } catch (error) {
         if (error?.code !== "EEXIST") throw error;
       }
-      metadata = await lstat6(current);
+      metadata = await lstat7(current);
     }
     if (metadata.isSymbolicLink()) {
       throw new QarinahError("STORAGE_LINK_REJECTED", "OKF output paths cannot traverse a symbolic link or junction.");
@@ -6649,8 +6885,8 @@ async function ensureSafeDirectoryChain(root, directory) {
     if (!metadata.isDirectory()) {
       throw new QarinahError("OKF_OUTPUT_INVALID", "Every existing OKF output parent must be a directory.");
     }
-    const actual = await realpath5(current);
-    if (!isWithin3(root, actual)) {
+    const actual = await realpath6(current);
+    if (!isWithin4(root, actual)) {
       throw new QarinahError("PATH_OUTSIDE_WORKSPACE", "OKF output parent resolves outside the workspace root.");
     }
   }
@@ -6910,7 +7146,7 @@ function validateMarker(value, workspaceId, eventFileCount) {
   }
 }
 async function assertRegularFile(candidate, label, maximumBytes = 256 * 1024 * 1024) {
-  const metadata = await lstat6(candidate);
+  const metadata = await lstat7(candidate);
   if (metadata.isSymbolicLink()) {
     throw new QarinahError("STORAGE_LINK_REJECTED", `${label} cannot be a symbolic link or junction.`);
   }
@@ -6929,16 +7165,16 @@ async function assertOwnedOutput(outputDirectory, workspace) {
   if (!metadata.isDirectory()) {
     throw new QarinahError("OKF_OUTPUT_INVALID", "Existing OKF output must be a directory.");
   }
-  const actual = await realpath5(outputDirectory);
-  if (!isWithin3(workspace.root, actual)) {
+  const actual = await realpath6(outputDirectory);
+  if (!isWithin4(workspace.root, actual)) {
     throw new QarinahError("PATH_OUTSIDE_WORKSPACE", "Existing OKF output resolves outside the workspace root.");
   }
   const entries = (await readdir3(outputDirectory)).sort(compareText);
   if (entries.join("\0") !== [...ROOT_FILES].sort(compareText).join("\0")) {
     throw new QarinahError("OKF_OUTPUT_NOT_OWNED", "Existing OKF output contains unexpected or missing entries.");
   }
-  const eventDirectory = path7.join(outputDirectory, "events");
-  const eventMetadata = await lstat6(eventDirectory);
+  const eventDirectory = path8.join(outputDirectory, "events");
+  const eventMetadata = await lstat7(eventDirectory);
   if (eventMetadata.isSymbolicLink()) {
     throw new QarinahError("STORAGE_LINK_REJECTED", "OKF event directory cannot be a symbolic link or junction.");
   }
@@ -6949,13 +7185,13 @@ async function assertOwnedOutput(outputDirectory, workspace) {
   if (eventFiles.length > MAX_EVENTS2 || eventFiles.some((name) => !EVENT_FILE_PATTERN.test(name))) {
     throw new QarinahError("OKF_OUTPUT_NOT_OWNED", "Existing OKF output contains invalid event concept paths.");
   }
-  await assertRegularFile(path7.join(outputDirectory, EXPORT_MARKER), "OKF ownership marker", 64 * 1024);
-  await assertRegularFile(path7.join(outputDirectory, "index.md"), "OKF root index", 64 * 1024 * 1024);
-  await assertRegularFile(path7.join(outputDirectory, "log.md"), "OKF root log", 64 * 1024 * 1024);
+  await assertRegularFile(path8.join(outputDirectory, EXPORT_MARKER), "OKF ownership marker", 64 * 1024);
+  await assertRegularFile(path8.join(outputDirectory, "index.md"), "OKF root index", 64 * 1024 * 1024);
+  await assertRegularFile(path8.join(outputDirectory, "log.md"), "OKF root log", 64 * 1024 * 1024);
   for (const name of eventFiles) {
-    await assertRegularFile(path7.join(eventDirectory, name), `OKF event concept '${name}'`, 2 * 1024 * 1024);
+    await assertRegularFile(path8.join(eventDirectory, name), `OKF event concept '${name}'`, 2 * 1024 * 1024);
   }
-  const markerText = await readFile2(path7.join(outputDirectory, EXPORT_MARKER), "utf8");
+  const markerText = await readFile2(path8.join(outputDirectory, EXPORT_MARKER), "utf8");
   let marker;
   try {
     marker = JSON.parse(markerText);
@@ -6968,12 +7204,12 @@ async function assertOwnedOutput(outputDirectory, workspace) {
   }
   validateMarker(marker, workspace.config.workspaceId, eventFiles.length);
   const existingFiles = /* @__PURE__ */ new Map([
-    ["index.md", await readFile2(path7.join(outputDirectory, "index.md"), "utf8")],
-    ["log.md", await readFile2(path7.join(outputDirectory, "log.md"), "utf8")]
+    ["index.md", await readFile2(path8.join(outputDirectory, "index.md"), "utf8")],
+    ["log.md", await readFile2(path8.join(outputDirectory, "log.md"), "utf8")]
   ]);
   let totalBytes = Buffer.byteLength(existingFiles.get("index.md")) + Buffer.byteLength(existingFiles.get("log.md"));
   for (const name of eventFiles) {
-    const contents = await readFile2(path7.join(eventDirectory, name), "utf8");
+    const contents = await readFile2(path8.join(eventDirectory, name), "utf8");
     totalBytes += Buffer.byteLength(contents);
     if (totalBytes > 256 * 1024 * 1024) {
       throw new QarinahError("OKF_OUTPUT_NOT_OWNED", "Existing OKF output exceeds its bounded aggregate size.");
@@ -6988,7 +7224,7 @@ async function assertOwnedOutput(outputDirectory, workspace) {
 async function renameWithRetry(source, destination) {
   for (let attempt = 0; ; attempt += 1) {
     try {
-      await rename5(source, destination);
+      await rename6(source, destination);
       return;
     } catch (error) {
       if (attempt >= 19 || !["EPERM", "EACCES", "EBUSY"].includes(error?.code)) throw error;
@@ -7002,9 +7238,9 @@ async function replaceOutput(stage, outputDirectory, workspace) {
     await renameWithRetry(stage, outputDirectory);
     return;
   }
-  const parent = path7.dirname(outputDirectory);
-  const backup = path7.join(parent, `.${path7.basename(outputDirectory)}.qarinah-okf-backup-${process.pid}-${randomBytes4(8).toString("hex")}`);
-  resolveWithin(workspace.root, path7.relative(workspace.root, backup));
+  const parent = path8.dirname(outputDirectory);
+  const backup = path8.join(parent, `.${path8.basename(outputDirectory)}.qarinah-okf-backup-${process.pid}-${randomBytes4(8).toString("hex")}`);
+  resolveWithin(workspace.root, path8.relative(workspace.root, backup));
   await renameWithRetry(outputDirectory, backup);
   try {
     await renameWithRetry(stage, outputDirectory);
@@ -7019,15 +7255,15 @@ async function replaceOutput(stage, outputDirectory, workspace) {
     }
     throw error;
   }
-  await rm5(backup, { recursive: true, force: true });
+  await rm6(backup, { recursive: true, force: true });
 }
 async function writeStage(stage, files) {
-  await mkdir4(stage, { mode: 448 });
-  await mkdir4(path7.join(stage, "events"), { mode: 448 });
+  await mkdir5(stage, { mode: 448 });
+  await mkdir5(path8.join(stage, "events"), { mode: 448 });
   for (const [relativePath, contents] of [...files.entries()].sort(([left], [right]) => compareText(left, right))) {
     const segments = relativePath.split("/");
-    const destination = path7.join(stage, ...segments);
-    if (!isWithin3(stage, destination)) throw new QarinahError("PATH_OUTSIDE_WORKSPACE", "Generated OKF path escaped its staging directory.");
+    const destination = path8.join(stage, ...segments);
+    if (!isWithin4(stage, destination)) throw new QarinahError("PATH_OUTSIDE_WORKSPACE", "Generated OKF path escaped its staging directory.");
     await atomicWriteFile(destination, contents);
   }
 }
@@ -7035,19 +7271,19 @@ async function exportOkf(options = {}) {
   const normalized = validateOptions(options);
   const workspace = await loadWorkspace(normalized.cwd ?? process.cwd());
   const outputDirectory = resolveOutputDirectory(workspace, normalized.output);
-  const parent = path7.dirname(outputDirectory);
+  const parent = path8.dirname(outputDirectory);
   await ensureSafeDirectoryChain(workspace.root, parent);
   await assertOwnedOutput(outputDirectory, workspace);
   const events = await readEvents(workspace.root);
   const { files, manifest } = buildBundle(events, workspace.config.workspaceId);
-  const stage = path7.join(parent, `.${path7.basename(outputDirectory)}.qarinah-okf-stage-${process.pid}-${randomBytes4(8).toString("hex")}`);
-  resolveWithin(workspace.root, path7.relative(workspace.root, stage));
+  const stage = path8.join(parent, `.${path8.basename(outputDirectory)}.qarinah-okf-stage-${process.pid}-${randomBytes4(8).toString("hex")}`);
+  resolveWithin(workspace.root, path8.relative(workspace.root, stage));
   if (await optionalLstat(stage)) throw new QarinahError("OKF_OUTPUT_INVALID", "Generated OKF staging path already exists.");
   try {
     await writeStage(stage, files);
     await replaceOutput(stage, outputDirectory, workspace);
   } finally {
-    await rm5(stage, { recursive: true, force: true });
+    await rm6(stage, { recursive: true, force: true });
   }
   return Object.freeze({ ...manifest, outputDirectory });
 }
@@ -7059,7 +7295,7 @@ init_errors();
 init_boundary();
 init_store();
 init_workspace();
-import path8 from "node:path";
+import path9 from "node:path";
 var PERMISSION_MODES = /* @__PURE__ */ new Set(["default", "acceptEdits", "plan", "dontAsk", "bypassPermissions"]);
 var EVENT_MAP = Object.freeze({
   SessionStart: { kind: "session.started", title: "Codex session started", actor: { type: "system", id: "codex" } },
@@ -7197,9 +7433,9 @@ function bodyContentEntry(input) {
 function hookPayload(input, workspace) {
   const eventName = input.hook_event_name;
   const mapping = EVENT_MAP[eventName];
-  const requestedCwd = path8.resolve(input.cwd);
-  const relativeCwd = path8.relative(workspace.root, requestedCwd);
-  const workspaceRelativeCwd = relativeCwd === "" || !relativeCwd.startsWith("..") && !path8.isAbsolute(relativeCwd) ? relativeCwd || "." : "[outside-workspace]";
+  const requestedCwd = path9.resolve(input.cwd);
+  const relativeCwd = path9.relative(workspace.root, requestedCwd);
+  const workspaceRelativeCwd = relativeCwd === "" || !relativeCwd.startsWith("..") && !path9.isAbsolute(relativeCwd) ? relativeCwd || "." : "[outside-workspace]";
   const metadata = {
     hookEvent: eventName,
     model: input.model,
@@ -7294,7 +7530,7 @@ init_errors();
 init_boundary();
 init_store();
 init_workspace();
-import path9 from "node:path";
+import path10 from "node:path";
 var PERMISSION_MODES2 = /* @__PURE__ */ new Set(["default", "plan", "acceptEdits", "auto", "dontAsk", "bypassPermissions"]);
 var EFFORT_LEVELS = /* @__PURE__ */ new Set(["low", "medium", "high", "xhigh", "max"]);
 var SESSION_END_REASONS = /* @__PURE__ */ new Set(["clear", "logout", "prompt_input_exit", "other"]);
@@ -7533,9 +7769,9 @@ function bodyContentEntry2(input) {
 function hookPayload2(input, ignoredFieldCount, workspace) {
   const eventName = input.hook_event_name;
   const mapping = EVENT_MAP2[eventName];
-  const requestedCwd = path9.resolve(input.cwd);
-  const relativeCwd = path9.relative(workspace.root, requestedCwd);
-  const workspaceRelativeCwd = relativeCwd === "" || !relativeCwd.startsWith("..") && !path9.isAbsolute(relativeCwd) ? relativeCwd || "." : "[outside-workspace]";
+  const requestedCwd = path10.resolve(input.cwd);
+  const relativeCwd = path10.relative(workspace.root, requestedCwd);
+  const workspaceRelativeCwd = relativeCwd === "" || !relativeCwd.startsWith("..") && !path10.isAbsolute(relativeCwd) ? relativeCwd || "." : "[outside-workspace]";
   const metadata = {
     host: "claude-code",
     hookEvent: eventName,
@@ -7638,8 +7874,8 @@ async function captureClaudeHook(value, options = {}) {
 }
 
 // src/mcp/server.js
-import { realpath as realpath6 } from "node:fs/promises";
-import path10 from "node:path";
+import { realpath as realpath7 } from "node:fs/promises";
+import path11 from "node:path";
 import { fileURLToPath } from "node:url";
 init_errors();
 init_indexer();
@@ -7810,7 +8046,7 @@ function pathFromSelector(value) {
       throw new QarinahError("MCP_WORKSPACE_INVALID", "The MCP workspace selector is not a valid local file URI.");
     }
   }
-  if (!path10.isAbsolute(selector)) {
+  if (!path11.isAbsolute(selector)) {
     throw new QarinahError("MCP_WORKSPACE_INVALID", "The MCP workspace selector must be an absolute local path.");
   }
   return selector;
@@ -7903,8 +8139,8 @@ function createMcpServer(options = {}) {
       try {
         const workspace = await loadWorkspace(candidate.value);
         if (candidate.exact) {
-          const expectedRoot = await realpath6(path10.resolve(candidate.value));
-          if (path10.normalize(workspace.root) !== path10.normalize(expectedRoot)) {
+          const expectedRoot = await realpath7(path11.resolve(candidate.value));
+          if (path11.normalize(workspace.root) !== path11.normalize(expectedRoot)) {
             throw new QarinahError(
               "WORKSPACE_NOT_INITIALIZED",
               "The explicitly selected MCP root is not an initialized Context Ledger workspace."
@@ -8167,8 +8403,8 @@ async function runMcpServer(options = {}) {
 
 // src/setup.js
 init_errors();
-import { lstat as lstat7, mkdir as mkdir5, readFile as readFile3 } from "node:fs/promises";
-import path11 from "node:path";
+import { lstat as lstat8, mkdir as mkdir6, readFile as readFile3 } from "node:fs/promises";
+import path12 from "node:path";
 import { fileURLToPath as fileURLToPath2 } from "node:url";
 
 // src/dashboard.js
@@ -8341,8 +8577,8 @@ init_workspace();
 var MAX_MANAGED_FILE_BYTES = 512 * 1024;
 var MANAGED_TOML_START = "# qarinah:managed:start";
 var MANAGED_TOML_END = "# qarinah:managed:end";
-var PACKAGE_ROOT = path11.resolve(path11.dirname(fileURLToPath2(import.meta.url)), "..");
-var BIN_PATH = path11.join(PACKAGE_ROOT, "bin", "qarinah.js");
+var PACKAGE_ROOT = path12.resolve(path12.dirname(fileURLToPath2(import.meta.url)), "..");
+var BIN_PATH = path12.join(PACKAGE_ROOT, "bin", "qarinah.js");
 function tomlString(value) {
   return JSON.stringify(String(value));
 }
@@ -8353,7 +8589,7 @@ function normalizeTargets(options) {
 async function safeRead(candidate, label) {
   let metadata;
   try {
-    metadata = await lstat7(candidate);
+    metadata = await lstat8(candidate);
   } catch (error) {
     if (error?.code === "ENOENT") return null;
     throw error;
@@ -8369,21 +8605,21 @@ async function safeRead(candidate, label) {
 async function ensureDirectory(candidate, root, label) {
   let metadata;
   try {
-    metadata = await lstat7(candidate);
+    metadata = await lstat8(candidate);
   } catch (error) {
     if (error?.code !== "ENOENT") throw error;
   }
   if (!metadata) {
-    await mkdir5(candidate, { recursive: true, mode: 448 });
-    metadata = await lstat7(candidate);
+    await mkdir6(candidate, { recursive: true, mode: 448 });
+    metadata = await lstat8(candidate);
   }
   if (metadata.isSymbolicLink() || !metadata.isDirectory()) {
     throw new QarinahError("SETUP_LINK_REJECTED", `${label} must be a real directory.`);
   }
-  resolveWithin(root, path11.relative(root, candidate));
+  resolveWithin(root, path12.relative(root, candidate));
 }
 async function writeJsonMerged(candidate, root, label, update) {
-  resolveWithin(root, path11.relative(root, candidate));
+  resolveWithin(root, path12.relative(root, candidate));
   const existing = await safeRead(candidate, label);
   let value = {};
   if (existing !== null && existing.trim() !== "") {
@@ -8443,23 +8679,23 @@ async function installSkill(workspace, host, skillName, files) {
   await ensureDirectory(resolveWithin(workspace.root, `.${host}`), workspace.root, `.${host}`);
   await ensureDirectory(resolveWithin(workspace.root, `.${host}`, "skills"), workspace.root, `.${host}/skills`);
   await ensureDirectory(skillRoot, workspace.root, `.${host}/skills/${skillName}`);
-  const sourceRoot = path11.join(PACKAGE_ROOT, "integrations", host, "qarinah", "skills", skillName);
+  const sourceRoot = path12.join(PACKAGE_ROOT, "integrations", host, "qarinah", "skills", skillName);
   for (const relative of files) {
-    const destinationDirectory = path11.dirname(resolveWithin(skillRoot, relative));
+    const destinationDirectory = path12.dirname(resolveWithin(skillRoot, relative));
     if (destinationDirectory !== skillRoot) {
       await ensureDirectory(
         destinationDirectory,
         workspace.root,
-        `.${host}/skills/${skillName}/${path11.relative(skillRoot, destinationDirectory)}`
+        `.${host}/skills/${skillName}/${path12.relative(skillRoot, destinationDirectory)}`
       );
     }
-    const contents = await readFile3(path11.join(sourceRoot, relative), "utf8");
+    const contents = await readFile3(path12.join(sourceRoot, relative), "utf8");
     const destination = resolveWithin(skillRoot, relative);
     const existing = await safeRead(destination, `${host} Qarinah skill`);
     if (existing !== null && existing !== contents) {
       throw new QarinahError(
         "SETUP_CONFLICT",
-        `${path11.relative(workspace.root, destination)} already exists with different content. Preserve it or remove it before setup.`
+        `${path12.relative(workspace.root, destination)} already exists with different content. Preserve it or remove it before setup.`
       );
     }
     if (existing === null) await atomicWriteFile(destination, contents);
@@ -8468,7 +8704,7 @@ async function installSkill(workspace, host, skillName, files) {
 async function installHostSkills(workspace, host) {
   await installSkill(workspace, host, "qarinah-context", [
     "SKILL.md",
-    path11.join("references", "event-contract.md")
+    path12.join("references", "event-contract.md")
   ]);
   await installSkill(workspace, host, "qarinah", ["SKILL.md"]);
 }
@@ -8560,11 +8796,11 @@ Before replaying broad project history, query the Qarinah MCP server for a bound
   return [".cursor/mcp.json", ".cursor/rules/qarinah.mdc"];
 }
 async function setupWorkspace(options = {}) {
-  const target = path11.resolve(options.cwd ?? process.cwd());
+  const target = path12.resolve(options.cwd ?? process.cwd());
   let workspace;
   let exactConfigExists = false;
   try {
-    await lstat7(path11.join(target, ".qarinah", "config.json"));
+    await lstat8(path12.join(target, ".qarinah", "config.json"));
     exactConfigExists = true;
   } catch (error) {
     if (error?.code !== "ENOENT") throw error;
@@ -8592,6 +8828,15 @@ async function setupWorkspace(options = {}) {
       nextCommand: "npx qarinah scan --max-files <bounded-count>"
     });
   }
+  const backupRequested = options.backupSources !== void 0 || options.backupDestination !== void 0;
+  if (backupRequested && (!Array.isArray(options.backupSources) || options.backupSources.length === 0 || !options.backupDestination)) {
+    throw new TypeError("backupSources and backupDestination must be supplied together.");
+  }
+  const backup = backupRequested ? await backupAgentArchives(options.backupSources, options.backupDestination, {
+    cwd: workspace.root,
+    maxBytes: options.backupMaxBytes,
+    maxFiles: options.backupMaxFiles
+  }) : null;
   await rebuildDerivedState(workspace.root);
   const overview = await writeProjectOverview({ cwd: workspace.root });
   const dashboard = await writeMemoryDashboard({ cwd: workspace.root });
@@ -8605,6 +8850,7 @@ async function setupWorkspace(options = {}) {
     targets,
     files,
     projectStructure,
+    backup,
     overview: overview.output,
     dashboard: dashboard.output,
     health
@@ -8674,9 +8920,9 @@ async function compileTaskMemoryPack(task, query = "", options = {}) {
 // src/freshness.js
 init_canonical();
 init_errors();
-import { createHash as createHash5 } from "node:crypto";
-import { lstat as lstat8, readFile as readFile4, realpath as realpath7 } from "node:fs/promises";
-import path12 from "node:path";
+import { createHash as createHash6 } from "node:crypto";
+import { lstat as lstat9, readFile as readFile4, realpath as realpath8 } from "node:fs/promises";
+import path13 from "node:path";
 init_store();
 init_workspace();
 function latestSnapshot(events) {
@@ -8689,13 +8935,13 @@ function latestSnapshot(events) {
   return null;
 }
 function hashBytes2(bytes) {
-  return `sha256:${createHash5("sha256").update(bytes).digest("hex")}`;
+  return `sha256:${createHash6("sha256").update(bytes).digest("hex")}`;
 }
 async function inspectFile(workspace, file) {
   const absolute = resolveWithin(workspace.root, ...file.path.split("/"));
   let metadata;
   try {
-    metadata = await lstat8(absolute);
+    metadata = await lstat9(absolute);
   } catch (error) {
     if (error?.code === "ENOENT") return { path: file.path, status: "missing", expectedHash: file.contentHash ?? file.hash };
     throw error;
@@ -8703,9 +8949,9 @@ async function inspectFile(workspace, file) {
   if (metadata.isSymbolicLink() || !metadata.isFile()) {
     return { path: file.path, status: "unsafe", expectedHash: file.contentHash ?? file.hash };
   }
-  const resolved = await realpath7(absolute);
-  const relative = path12.relative(workspace.root, resolved);
-  if (relative.startsWith("..") || path12.isAbsolute(relative)) {
+  const resolved = await realpath8(absolute);
+  const relative = path13.relative(workspace.root, resolved);
+  if (relative.startsWith("..") || path13.isAbsolute(relative)) {
     throw new QarinahError("PATH_OUTSIDE_WORKSPACE", "A freshness target resolves outside the trusted workspace.");
   }
   if (file.bytes !== void 0 && metadata.size > file.bytes || metadata.size > 4 * 1024 * 1024) {
@@ -9018,7 +9264,7 @@ function help() {
 
 Usage:
   qarinah init [path] [--capture metadata|content]
-  qarinah setup [path] [--codex] [--claude] [--cursor] [--capture metadata|content] [--allow-query]
+  qarinah setup [path] [--codex] [--claude] [--cursor] [--capture metadata|content] [--allow-query] [--backup-source <export>] [--backup-destination <external-directory>]
   qarinah record --kind <kind> --title <title> [--body <text>] [--data-json <json>] [--relation type:target]
   qarinah record --stdin-json
   qarinah hook codex|claude
@@ -9026,6 +9272,7 @@ Usage:
   qarinah build | rebuild
   qarinah scan [--max-files n] [--max-file-bytes n] [--max-total-bytes n] [--max-depth n]
   qarinah import <archive-file-or-directory> [--format auto|codex|claude|portable] [--mode compact|full] [--max-bytes n] [--max-files n] [--max-records n] [--max-line-bytes n]
+  qarinah backup <archive-file-or-directory>... --destination <external-directory> [--max-bytes n] [--max-files n]
   qarinah overview [--format json|markdown]
   qarinah export okf [--output <path>]
   qarinah query [text] [--format json|markdown|handoff] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp] [--minimum-coverage any|partial|direct] [--minimum-evidence any|partial|direct]
@@ -9060,7 +9307,7 @@ async function run(argv) {
   }
   if (command === "setup") {
     const flags = /* @__PURE__ */ new Set(["--codex", "--claude", "--cursor", "--allow-query"]);
-    const values = /* @__PURE__ */ new Set(["--capture", "--max-chars", "--max-items"]);
+    const values = /* @__PURE__ */ new Set(["--capture", "--max-chars", "--max-items", "--backup-source", "--backup-destination", "--backup-max-bytes", "--backup-max-files"]);
     const parsed = { positionals: [], flags: /* @__PURE__ */ new Set(), values: /* @__PURE__ */ new Map() };
     for (let index = 0; index < args.length; index += 1) {
       const value = args[index];
@@ -9094,7 +9341,11 @@ async function run(argv) {
       cursor: parsed.flags.has("--cursor"),
       allowQuery: parsed.flags.has("--allow-query"),
       maxChars: positive("--max-chars"),
-      maxItems: positive("--max-items")
+      maxItems: positive("--max-items"),
+      backupSources: parsed.values.has("--backup-source") ? [path14.resolve(parsed.values.get("--backup-source"))] : void 0,
+      backupDestination: parsed.values.has("--backup-destination") ? path14.resolve(parsed.values.get("--backup-destination")) : void 0,
+      backupMaxBytes: positive("--backup-max-bytes"),
+      backupMaxFiles: positive("--backup-max-files")
     });
     process2.stdout.write(`${JSON.stringify(result, null, 2)}
 `);
@@ -9241,6 +9492,30 @@ async function run(argv) {
       maxRecords: integer2("--max-records"),
       maxLineBytes: integer2("--max-line-bytes")
     });
+    process2.stdout.write(`${JSON.stringify(result, null, 2)}
+`);
+    return;
+  }
+  if (command === "backup") {
+    const parsed = strictValueOptions(args, "backup", ["--destination", "--max-bytes", "--max-files"]);
+    if (parsed.positionals.length === 0) throw new TypeError("backup requires at least one archive file or directory.");
+    const destination = parsed.values.get("--destination");
+    if (!destination) throw new TypeError("backup requires --destination <external-directory>.");
+    const integer2 = (name) => {
+      const value = parsed.values.get(name);
+      if (value === void 0) return void 0;
+      if (!/^[0-9]+$/.test(value) || Number(value) < 1) throw new TypeError(`${name} must be a positive integer.`);
+      return Number(value);
+    };
+    const result = await backupAgentArchives(
+      parsed.positionals.map((source) => path14.resolve(source)),
+      path14.resolve(destination),
+      {
+        cwd: process2.cwd(),
+        maxBytes: integer2("--max-bytes"),
+        maxFiles: integer2("--max-files")
+      }
+    );
     process2.stdout.write(`${JSON.stringify(result, null, 2)}
 `);
     return;

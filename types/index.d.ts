@@ -328,6 +328,27 @@ export function importAgentArchive(source: string, options?: {
   maxLineBytes?: number;
   rebuild?: boolean;
 }): Promise<QarinahAgentArchiveImportResult>;
+export const AGENT_ARCHIVE_BACKUP_SCHEMA_VERSION: "qarinah.agent-archive-backup.v1";
+export interface QarinahAgentArchiveBackupResult {
+  readonly schemaVersion: "qarinah.agent-archive-backup.v1";
+  readonly destination: string;
+  readonly manifest: string;
+  readonly manifestHash: string;
+  readonly sourceCount: number;
+  readonly fileCount: number;
+  readonly totalBytes: number;
+  readonly eventId: string | null;
+}
+export function backupAgentArchives(
+  sources: readonly string[],
+  destination: string,
+  options?: {
+    cwd?: string;
+    maxBytes?: number;
+    maxFiles?: number;
+    clock?: () => Date;
+  }
+): Promise<Readonly<QarinahAgentArchiveBackupResult>>;
 export interface QarinahProjectOverview {
   readonly schemaVersion: "qarinah.project-overview.v1";
   readonly workspaceId: string;
@@ -665,6 +686,10 @@ export function setupWorkspace(options?: {
   allowQuery?: boolean;
   maxChars?: number;
   maxItems?: number;
+  backupSources?: string[];
+  backupDestination?: string;
+  backupMaxBytes?: number;
+  backupMaxFiles?: number;
 }): Promise<Readonly<Record<string, unknown>>>;
 export function rankContextEvents(index: unknown, query: string | undefined, options: {
   limit?: number;

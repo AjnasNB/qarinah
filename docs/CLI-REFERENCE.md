@@ -425,6 +425,31 @@ The source must be an explicit regular `.jsonl` or `.ndjson` file, or a director
 
 `compact` is the default. It writes one cited summary per session and is appropriate for large exports. `full` writes each supported visible item separately and requires content-authorized capture. Hidden reasoning and encrypted reasoning blocks are ignored in either mode. The result reports source bytes, files, records, visible items, sessions, newly imported events, formats, and rebuilt-state identity.
 
+## `backup`
+
+Copy explicit exported agent JSONL/NDJSON sources to an existing external directory with a verified manifest.
+
+```sh
+qarinah backup <archive-file-or-directory>... \
+  --destination <absolute-external-directory> \
+  [--max-bytes <integer>] \
+  [--max-files <integer>]
+```
+
+The command requires an initialized project because it records a compact artifact receipt after the copy succeeds. Sources and destination are resolved to absolute paths. Source/destination overlap, links, junctions, hard-linked files, unsupported extensions, changed sources, and exceeded limits fail closed. The output reports the generated backup directory, manifest path/hash, source count, file count, copied bytes, and receipt event ID.
+
+Setup can perform one backup in the same explicit initialization command:
+
+```sh
+qarinah setup . --codex \
+  --backup-source <absolute-export-path> \
+  --backup-destination <absolute-external-directory> \
+  [--backup-max-bytes <integer>] \
+  [--backup-max-files <integer>]
+```
+
+Qarinah never auto-discovers a private agent transcript store or external drive. See [External agent-archive backup](AGENT-ARCHIVE-BACKUP.md).
+
 ## `overview`
 
 Explain the retained project memory and latest codebase map in readable Markdown or JSON.

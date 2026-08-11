@@ -394,7 +394,7 @@ function querySqliteReadModel(
 
 The database at `.qarinah/index/qarinah.db` is a disposable read model. Rebuild verifies the hash-chained JSONL authority, derives typed tables and FTS5 rows, commits a temporary SQLite database, checkpoints WAL, and atomically replaces the previous projection. Inspect and query reject a schema, workspace, or ledger-head mismatch.
 
-## Agent archive import and project overview
+## Agent archive import, backup, and project overview
 
 ### `importAgentArchive(source, options?)`
 
@@ -415,6 +415,23 @@ function importAgentArchive(
 ```
 
 Streams explicit JSONL or NDJSON archive sources into the trusted workspace. Compact mode emits one cited session summary. Full mode emits separately retrievable visible messages and tool events and requires content authorization. Both modes exclude private reasoning record types, enforce resource ceilings, and use deterministic event IDs for idempotent replay.
+
+### `backupAgentArchives(sources, destination, options?)`
+
+```ts
+function backupAgentArchives(
+  sources: readonly string[],
+  destination: string,
+  options?: {
+    cwd?: string;
+    maxBytes?: number;
+    maxFiles?: number;
+    clock?: () => Date;
+  }
+): Promise<Readonly<QarinahAgentArchiveBackupResult>>;
+```
+
+Streams from 1 to 32 explicit absolute JSONL/NDJSON files or directories into a new directory beneath an existing absolute destination. It rejects linked paths and source/destination overlap, meters files and bytes before and during copying, verifies per-file SHA-256 digests, writes `manifest.json`, and optionally records a compact receipt when `cwd` identifies a trusted workspace. See [External agent-archive backup](AGENT-ARCHIVE-BACKUP.md).
 
 ### `buildProjectOverview(options?)`
 

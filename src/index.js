@@ -35,6 +35,7 @@ export {
 } from "./compiler.js";
 export { PROJECT_STRUCTURE_SCHEMA_VERSION, scanProjectStructure } from "./project-structure.js";
 export { AGENT_ARCHIVE_IMPORT_SCHEMA_VERSION, importAgentArchive } from "./archive-import.js";
+export { AGENT_ARCHIVE_BACKUP_SCHEMA_VERSION, backupAgentArchives } from "./archive-backup.js";
 export {
   PROJECT_OVERVIEW_SCHEMA_VERSION,
   buildProjectOverview,

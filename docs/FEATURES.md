@@ -34,6 +34,7 @@ Qarinah is evidence-linked project memory for coding agents. It keeps an inspect
 - Full mode for independently retaining supported visible messages and tool events when content capture is authorized.
 - Idempotent re-import, byte/file/record/line/session ceilings, source digests, and explicit exclusion of hidden reasoning and encrypted reasoning blocks.
 - Portable input for compatible or future agent hosts without falsely claiming an untested native integration.
+- Opt-in external backup of explicitly selected JSONL/NDJSON exports during setup or later, with streaming limits, link rejection, per-file hashes, an external manifest, and a compact ledger receipt.
 
 ## Coding-agent integrations
 
