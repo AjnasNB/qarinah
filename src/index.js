@@ -34,6 +34,8 @@ export {
   renderContextPackMarkdown
 } from "./compiler.js";
 export { PROJECT_STRUCTURE_SCHEMA_VERSION, scanProjectStructure } from "./project-structure.js";
+export { AGENT_ARCHIVE_IMPORT_SCHEMA_VERSION, importAgentArchive } from "./archive-import.js";
+export { PROJECT_OVERVIEW_SCHEMA_VERSION, buildProjectOverview, renderProjectOverviewMarkdown } from "./project-overview.js";
 export { OKF_EXPORT_SCHEMA_VERSION, OKF_VERSION, exportOkf } from "./okf.js";
 export {
   rankContextEvents,

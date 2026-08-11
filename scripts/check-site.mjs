@@ -385,7 +385,7 @@ for (const capability of [
 }
 if (!features.includes('"@type":"CollectionPage"')
   || !features.includes('"@type":"ItemList"')
-  || !features.includes('"numberOfItems":11')) {
+  || !features.includes('"numberOfItems":14')) {
   errors.push("Features page is missing its visible capability collection structured data.");
 }
 for (const launchDirectoryMarkup of [

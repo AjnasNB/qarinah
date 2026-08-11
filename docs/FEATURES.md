@@ -23,6 +23,16 @@ Qarinah is evidence-linked project memory for coding agents. It keeps an inspect
 - A rebuildable typed graph and retrieval index derived from the authoritative event record.
 - An optional SQLite WAL and FTS5 read model that remains disposable derived state.
 - A local read-only dashboard for current and superseded decisions, conflicts, citations, permitted activity, affected files, and caller-supplied context measurements.
+- Immediate SQLite, graph, index, and Markdown initialization, so a new workspace starts with a complete empty read model instead of a missing database.
+- A beginner-readable project overview combining memory counts, latest outcomes, codebase areas, languages, relationships, and evidence identities.
+
+## Existing-history recovery
+
+- Streaming import for Codex, Claude, and portable JSONL or NDJSON agent exports.
+- Compact mode that turns large visible histories into one cited summary per session without loading the complete archive into memory.
+- Full mode for independently retaining supported visible messages and tool events when content capture is authorized.
+- Idempotent re-import, byte/file/record/line/session ceilings, source digests, and explicit exclusion of hidden reasoning and encrypted reasoning blocks.
+- Portable input for compatible or future agent hosts without falsely claiming an untested native integration.
 
 ## Coding-agent integrations
 
@@ -42,4 +52,6 @@ Qarinah is evidence-linked project memory for coding agents. It keeps an inspect
 
 Qarinah is not an autonomous agent runtime, a hosted personalization service, or a guarantee that a model answer is correct. It supplies inspectable project memory to a caller that remains responsible for model choice, current source files, tools, and execution authority.
 
-Continue with [installation and setup](GETTING-STARTED.md), [host integrations](HOST-INTEGRATIONS.md), the [CLI reference](CLI-REFERENCE.md), or the [JavaScript and TypeScript API](API-REFERENCE.md).
+Qarinah can support private and NDA-conscious projects with local storage, explicit consent, metadata-only defaults, redaction, encrypted bundles, and signed checkpoints. It does not create or replace a legal NDA. See [private projects](PRIVATE-PROJECTS.md).
+
+Continue with [installation and setup](GETTING-STARTED.md), [project overview](PROJECT-OVERVIEW.md), [agent archive import](AGENT-ARCHIVE-IMPORT.md), [host integrations](HOST-INTEGRATIONS.md), the [CLI reference](CLI-REFERENCE.md), or the [JavaScript and TypeScript API](API-REFERENCE.md).

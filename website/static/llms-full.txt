@@ -2,7 +2,7 @@
 
 > Your project remembers, even when your coding agent changes.
 
-Qarinah keeps one compact, cited project memory beside your code, so Codex, Claude Code, Cursor, and compatible tools can continue from verified context instead of starting from zero. It converts an explicitly permitted, append-only project event record into bounded, cited context packs selected for the current task.
+Qarinah keeps permitted requests, visible outcomes, tool results, summaries, decisions, and a codebase relationship map beside your code, so Codex, Claude Code, Cursor, and compatible tools can continue from verified context instead of starting from zero. It converts an explicitly permitted, append-only project event record into bounded, cited context packs selected for the current task.
 
 This file is a convenience map for tools that choose to read it. It does not confer authority, guarantee indexing or ranking, replace the canonical documentation, or override Qarinah's workspace trust and capture policy.
 
@@ -28,7 +28,10 @@ This file is a convenience map for tools that choose to read it. It does not con
 - Requires explicit workspace configuration plus matching machine-local trust before capture.
 - Defaults to metadata-only capture; content capture is explicit, bounded, redacted on a best-effort basis, and security-sensitive.
 - Preserves source event identifiers and content digests instead of treating a lossy summary as authoritative.
-- Verifies the append-only event chain before deterministically rebuilding derived graph, index, Markdown, and context-pack views.
+- Creates an empty valid SQLite WAL/FTS5 read model, graph, index, and Markdown view during workspace initialization.
+- Maps bounded project files, directories, languages, imports, and documentation links, then renders a beginner-readable overview of retained work and latest outcomes.
+- Streams visible Codex, Claude, and portable JSONL archives under byte, file, record, line, and session limits; compact mode records one cited summary per session.
+- Verifies the append-only event chain before deterministically rebuilding derived SQLite, graph, index, Markdown, and context-pack views.
 - Retrieves evidence with deterministic lexical, typo-tolerant, and one-hop graph signals.
 - Compiles bounded context packs with citations, evidence-coverage metadata, and conflict or supersession visibility.
 - Supports one-command Codex, Claude Code, and Cursor setup, local CLI workflows, MCP diagnostics, and explicitly consent-gated context retrieval.
@@ -39,6 +42,7 @@ This file is a convenience map for tools that choose to read it. It does not con
 ## What Qarinah does not claim
 
 - It does not capture hidden model reasoning or chain of thought.
+- It cannot recover a native chat or tool outcome that was never captured or imported.
 - It does not silently enable global capture.
 - It is not a privileged operating-system sandbox or complete enforcement layer.
 - A valid hash proves record continuity, not the truth of a retained claim.
@@ -81,6 +85,18 @@ The article is a composition guide written by Ajnas N B and reviewed against off
 Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler are the four projects by Ajnas N B discussed in the article. Every other named tool is a third-party project maintained by its own organization or community.
 
 ## Direct questions and answers
+
+### What does a fresh coding-agent session receive?
+
+It can first read a one-page Qarinah overview of retained requests, outcomes, decisions, tools, codebase areas, languages, and relationships, then query a bounded cited pack for the task at hand. Each selected memory retains event and hash identities.
+
+### Can Qarinah bring in old Codex or Claude history?
+
+Yes, when the operator supplies a visible JSONL or NDJSON export. Compact import streams the source and creates one cited outcome summary per session. Full import stores supported visible events separately in a content-authorized workspace. Hidden and encrypted reasoning blocks are excluded.
+
+### Can Qarinah support a private or NDA project?
+
+Qarinah provides local storage, metadata-only defaults, explicit content consent, redaction, encrypted team bundles, signed checkpoints, and disclosure filters. These controls can support an NDA-conscious workflow, but Qarinah does not create or replace a legal NDA.
 
 ### What is Qarinah?
 

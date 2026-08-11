@@ -40,7 +40,16 @@ Metadata-only capture is the default. If the project may retain bounded content 
 npx qarinah init . --capture content
 ```
 
-Initialization creates the portable project configuration and requests machine-local trust. Trust and revocation stay outside the repository so a cloned configuration cannot silently grant itself permission.
+Initialization creates the portable project configuration, an empty SQLite/FTS5 read model, graph, retrieval index, and readable Markdown view. It also requests machine-local trust. Trust and revocation stay outside the repository so a cloned configuration cannot silently grant itself permission.
+
+For a complete first setup that also maps the codebase and connects supported hosts, use:
+
+```sh
+npx qarinah setup . --codex --claude --cursor --capture content --allow-query
+npx qarinah overview
+```
+
+`setup` records a bounded project-structure snapshot before it reports success. `overview` explains the retained work, latest outcomes, codebase areas, languages, relationships, and durable files in one readable page.
 
 ## Record one durable decision
 
@@ -61,6 +70,17 @@ npx qarinah build
 ```
 
 `scan` records a bounded project-structure snapshot. `build` verifies the canonical record and deterministically rebuilds the typed graph, hybrid retrieval index, Markdown view, and idempotency projection.
+
+## Bring in an existing agent history
+
+If Codex, Claude, or another host has already exported visible session history as JSONL or NDJSON, import it without loading the entire archive into memory:
+
+```sh
+npx qarinah import ./agent-exports --format auto --mode compact
+npx qarinah overview
+```
+
+Compact mode retains cited session summaries, outcomes, tool names, timestamps, and source digests. Full mode is available for separately retaining each supported visible turn in a content-authorized workspace. Hidden reasoning and credentials are not imported. See [agent archive import](AGENT-ARCHIVE-IMPORT.md).
 
 ## Query a small cited pack
 
@@ -108,6 +128,7 @@ Continue with [Codex and Claude Code integrations](HOST-INTEGRATIONS.md).
   events/events.jsonl
   graph/graph.json
   index/index.json
+  index/qarinah.db
   records/CONTEXT.md
   records/okf/
   index/event-ids/

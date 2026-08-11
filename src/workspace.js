@@ -225,7 +225,7 @@ export async function initializeWorkspace(target = process.cwd(), options = {}) 
     workspaceId: `ws_${randomBytes(16).toString("hex")}`,
     enabled: true,
     capture,
-    maxEventBytes: 256 * 1024,
+    maxEventBytes: 1024 * 1024,
     maxLogBytes: 32 * 1024 * 1024,
     contextMaxChars: 12_000,
     retentionClass: "project",
@@ -238,7 +238,10 @@ export async function initializeWorkspace(target = process.cwd(), options = {}) 
   ].join("\n"));
   await atomicWriteFile(eventPath, "");
   await grantWorkspaceConsent(root, config, { eventCount: 0, headHash: null, logBytes: 0 });
-  return loadWorkspace(root);
+  const workspace = await loadWorkspace(root);
+  const { rebuildDerivedState } = await import("./indexer.js");
+  await rebuildDerivedState(root);
+  return workspace;
 }
 
 export async function findWorkspaceRoot(start = process.cwd()) {

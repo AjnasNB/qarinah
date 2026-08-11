@@ -70,6 +70,8 @@ Invalid JavaScript argument shapes generally throw `TypeError`. Storage, trust, 
 | `INDEX_SCHEMA_VERSION` | `"qarinah.index.v2"` |
 | `GRAPH_SCHEMA_VERSION` | `"qarinah.graph.v2"` |
 | `PROJECT_STRUCTURE_SCHEMA_VERSION` | `"qarinah.project-structure.v1"` |
+| `AGENT_ARCHIVE_IMPORT_SCHEMA_VERSION` | `"qarinah.agent-archive-import.v1"` |
+| `PROJECT_OVERVIEW_SCHEMA_VERSION` | `"qarinah.project-overview.v1"` |
 | `OKF_EXPORT_SCHEMA_VERSION` | `"qarinah.okf-export.v1"` |
 | `OKF_VERSION` | `"0.1"` |
 | `EVENT_KINDS` | Frozen list of supported event kinds. |
@@ -391,6 +393,43 @@ function querySqliteReadModel(
 ```
 
 The database at `.qarinah/index/qarinah.db` is a disposable read model. Rebuild verifies the hash-chained JSONL authority, derives typed tables and FTS5 rows, commits a temporary SQLite database, checkpoints WAL, and atomically replaces the previous projection. Inspect and query reject a schema, workspace, or ledger-head mismatch.
+
+## Agent archive import and project overview
+
+### `importAgentArchive(source, options?)`
+
+```ts
+function importAgentArchive(
+  source: string,
+  options?: {
+    cwd?: string;
+    format?: "auto" | "codex" | "claude" | "portable";
+    mode?: "compact" | "full";
+    maxBytes?: number;
+    maxFiles?: number;
+    maxRecords?: number;
+    maxLineBytes?: number;
+    rebuild?: boolean;
+  }
+): Promise<QarinahAgentArchiveImportResult>;
+```
+
+Streams explicit JSONL or NDJSON archive sources into the trusted workspace. Compact mode emits one cited session summary. Full mode emits separately retrievable visible messages and tool events and requires content authorization. Both modes exclude private reasoning record types, enforce resource ceilings, and use deterministic event IDs for idempotent replay.
+
+### `buildProjectOverview(options?)`
+
+```ts
+function buildProjectOverview(options?: {
+  cwd?: string;
+  maxOutcomes?: number;
+}): Promise<QarinahProjectOverview>;
+
+function renderProjectOverviewMarkdown(
+  overview: QarinahProjectOverview
+): string;
+```
+
+Combines verified memory counts, latest outcome identities, the latest project-structure snapshot, languages, directories, relationships, changes, and durable file locations. Rendering is deterministic and does not replace the cited source events.
 
 ### `loadIndex(start?, options?)`
 

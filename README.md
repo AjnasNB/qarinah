@@ -87,12 +87,35 @@ npx qarinah setup . --codex --claude --cursor --capture content --allow-query
 
 ---
 
+## What Qarinah remembers for you
+
+| Qarinah keeps | What a new coding-agent session gets |
+| --- | --- |
+| Your requests and visible agent outcomes | A short explanation of what was asked and what was completed |
+| Tool results, decisions, approvals, and summaries | The latest verified result instead of a replay of the complete chat |
+| A map of files, folders, languages, imports, and documentation links | A one-page codebase overview plus task-specific cited context |
+| Event IDs, content hashes, freshness, conflicts, and superseded decisions | A way to inspect where each selected memory came from |
+| Local SQLite search, a relationship graph, and readable Markdown | Fast retrieval without a hosted memory account or vector database |
+
+```sh
+# Set up memory, map the project, and connect supported coding agents.
+npx qarinah setup . --codex --claude --cursor --capture content --allow-query
+
+# See the whole project in one readable page.
+npx qarinah overview
+
+# Bring an exported Codex, Claude, or portable JSONL history with you.
+npx qarinah import ./agent-exports --format auto --mode compact
+```
+
+If a native chat later disappears, Qarinah can still retrieve the permitted events and archive summaries already stored in the project-owned ledger. It cannot recover a chat that was never captured or imported. Compact archive import streams large JSONL exports, excludes hidden reasoning and encrypted reasoning blocks, and keeps one cited outcome summary per session. Read [agent archive import](docs/AGENT-ARCHIVE-IMPORT.md), [the project overview](docs/PROJECT-OVERVIEW.md), and [private/NDA-conscious operation](docs/PRIVATE-PROJECTS.md).
+
 ## Use Qarinah your way
 
 | Setup | What Qarinah gives you |
 | --- | --- |
 | Personal project | One local cited memory shared by Codex, Claude Code, Cursor, CLI tools, and compatible MCP clients |
-| Portable review | Rebuildable Markdown, JSON, graph, OKF, and a local static dashboard for inspecting project memory on desktop or mobile |
+| Portable review | Rebuildable SQLite, Markdown, JSON, graph, OKF, and a local static dashboard for inspecting project memory on desktop or mobile |
 | Team workspace | Multi-repository relationships, freshness, encrypted bundles, signed checkpoints, membership, and separate authority boundaries |
 | Governed workflow | Optional Maqam memory scopes and disclosure controls without making Maqam a requirement |
 
@@ -118,8 +141,9 @@ Qarinah is a universal context engine for software projects, built on local-firs
 ├── events/events.jsonl       # append-only evidence record
 ├── graph/graph.json          # typed decisions, sources, files, and relations
 ├── index/index.json          # deterministic lexical retrieval index
-├── CONTEXT.md                # rebuildable human-readable view
-├── okf/                      # portable Open Knowledge Format export
+├── index/qarinah.db          # rebuildable SQLite WAL and FTS5 search
+├── records/CONTEXT.md        # rebuildable human-readable view
+├── records/okf/              # portable Open Knowledge Format export
 └── dashboard/index.html     # decisions, conflicts, citations, activity, files, and measured savings
 
 .codex/skills/qarinah/        # invoke with $qarinah
@@ -167,7 +191,7 @@ npx qarinah query "release provenance" \
   --format markdown
 ```
 
-Start with the [feature map](docs/FEATURES.md) and [five-minute installation guide](docs/GETTING-STARTED.md), then use the [cross-agent handoff guide](docs/CROSS-AGENT-HANDOFFS.md), [dashboard guide](docs/DASHBOARD.md), [team-memory guide](docs/TEAM-MEMORY.md), [CLI reference](docs/CLI-REFERENCE.md), [JavaScript API reference](docs/API-REFERENCE.md), [MCP guide](docs/MCP-GUIDE.md), [task recipes](docs/RECIPES.md), or [troubleshooting guide](docs/TROUBLESHOOTING.md).
+Start with the [feature map](docs/FEATURES.md) and [five-minute installation guide](docs/GETTING-STARTED.md), then use the [project overview](docs/PROJECT-OVERVIEW.md), [agent archive import](docs/AGENT-ARCHIVE-IMPORT.md), [private-project guide](docs/PRIVATE-PROJECTS.md), [cross-agent handoff guide](docs/CROSS-AGENT-HANDOFFS.md), [dashboard guide](docs/DASHBOARD.md), [team-memory guide](docs/TEAM-MEMORY.md), [CLI reference](docs/CLI-REFERENCE.md), [JavaScript API reference](docs/API-REFERENCE.md), [MCP guide](docs/MCP-GUIDE.md), [task recipes](docs/RECIPES.md), or [troubleshooting guide](docs/TROUBLESHOOTING.md).
 
 Your project already contains the decisions and evidence behind its changes. Qarinah lets the next agent query that record and receive a bounded, cited pack selected for the current task. The same local memory can support Codex, Claude Code, CLI workflows, and compatible MCP clients instead of locking project context to one editor.
 
@@ -240,9 +264,11 @@ The package is designed for local use. It does not require a hosted Qarinah acco
 
 ## Initialize once, remember across supported sessions
 
-`npx qarinah setup . --codex --claude --cursor --capture content --allow-query` is the one-time, explicit opt-in for that exact workspace and capture policy. It initializes the project, installs project-local integrations, configures consent-gated MCP retrieval, rebuilds derived views, and runs a health check. After a supported host restarts, reviewed lifecycle hooks can append permitted events whenever the host emits them. Qarinah can then compile a small cited pack on demand, so a new task in that folder does not need the whole retained history replayed into its prompt.
+`npx qarinah setup . --codex --claude --cursor --capture content --allow-query` is the one-time, explicit opt-in for that exact workspace and capture policy. It initializes SQLite and the other derived views, records a bounded map of the codebase, installs project-local integrations, configures consent-gated MCP retrieval, and runs a health check. After a supported host restarts, reviewed lifecycle hooks can append permitted events whenever the host emits them. Qarinah can then compile a small cited pack on demand, so a new task in that folder does not need the whole retained history replayed into its prompt.
 
 Qarinah is project memory, not an always-running agent or application supervisor. It does not keep an agent running, prevent provider-side context compaction, or capture host activity the host does not expose. When a host compacts its own conversation, Qarinah preserves only the permitted evidence it actually received and makes it available to an explicit CLI/API query or a workspace-authorized, bounded MCP query.
+
+Existing visible Codex, Claude, or portable agent exports can be streamed in later with `qarinah import`. The safe compact mode is designed for large histories: it records cited per-session summaries and source digests rather than copying every raw byte into Qarinah. Full visible-history import is available only in a content-authorized workspace and remains bounded by the configured ledger limits.
 
 ## Team-memory platform
 

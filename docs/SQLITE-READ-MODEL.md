@@ -1,6 +1,6 @@
 # SQLite read model
 
-Qarinah keeps `.qarinah/events/events.jsonl` as the authority and builds `.qarinah/index/qarinah.db` only as a fast, disposable read model. Deleting the database does not delete memory. `qarinah rebuild` verifies the chain and recreates the complete database from ledger events and deterministic graph state.
+Qarinah keeps `.qarinah/events/events.jsonl` as the authority and creates `.qarinah/index/qarinah.db` during workspace initialization as a fast, disposable read model. A brand-new workspace therefore has an empty but valid SQLite schema before its first event. Deleting the database does not delete memory. `qarinah rebuild` verifies the chain and recreates the complete database from ledger events and deterministic graph state.
 
 ## Why both formats exist
 
@@ -25,6 +25,7 @@ Project references are relationally unique by source, relationship type, target,
 ```sh
 npx qarinah rebuild
 npx qarinah doctor
+npx qarinah overview
 npx qarinah query "release approval" --minimum-coverage direct
 ```
 

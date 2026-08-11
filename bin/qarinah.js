@@ -4,6 +4,7 @@ import {
   QarinahError,
   appendEvent,
   approveWorkspaceTrust,
+  buildProjectOverview,
   captureClaudeHook,
   captureCodexHook,
   compileContext,
@@ -13,10 +14,12 @@ import {
   initializeWorkspace,
   inspectMemoryFreshness,
   inspectWorkspacePolicy,
+  importAgentArchive,
   loadIndex,
   loadWorkspace,
   readEvents,
   rebuildDerivedState,
+  renderProjectOverviewMarkdown,
   renderContextPackMarkdown,
   revokeWorkspaceTrust,
   runMcpServer,
@@ -233,6 +236,8 @@ Usage:
   qarinah mcp [--allow-query --workspace-id ws_<id> --policy-hash sha256:<digest>] [--max-chars n] [--max-items n]
   qarinah build | rebuild
   qarinah scan [--max-files n] [--max-file-bytes n] [--max-total-bytes n] [--max-depth n]
+  qarinah import <archive-file-or-directory> [--format auto|codex|claude|portable] [--mode compact|full] [--max-bytes n] [--max-files n] [--max-records n] [--max-line-bytes n]
+  qarinah overview [--format json|markdown]
   qarinah export okf [--output <path>]
   qarinah query [text] [--format json|markdown|handoff] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp] [--minimum-coverage any|partial|direct] [--minimum-evidence any|partial|direct]
   qarinah query --stdin-json
@@ -423,6 +428,36 @@ async function run(argv) {
     });
     if (result.captured) await rebuildDerivedState(process.cwd());
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+    return;
+  }
+  if (command === "import") {
+    const parsed = strictValueOptions(args, "import", ["--format", "--mode", "--max-bytes", "--max-files", "--max-records", "--max-line-bytes"]);
+    if (parsed.positionals.length !== 1) throw new TypeError("import requires exactly one archive file or directory.");
+    const integer = (name) => {
+      const value = parsed.values.get(name);
+      if (value === undefined) return undefined;
+      if (!/^[0-9]+$/.test(value) || Number(value) < 1) throw new TypeError(`${name} must be a positive integer.`);
+      return Number(value);
+    };
+    const result = await importAgentArchive(parsed.positionals[0], {
+      cwd: process.cwd(),
+      format: parsed.values.get("--format") ?? "auto",
+      mode: parsed.values.get("--mode") ?? "compact",
+      maxBytes: integer("--max-bytes"),
+      maxFiles: integer("--max-files"),
+      maxRecords: integer("--max-records"),
+      maxLineBytes: integer("--max-line-bytes")
+    });
+    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+    return;
+  }
+  if (command === "overview") {
+    const parsed = strictValueOptions(args, "overview", ["--format"]);
+    if (parsed.positionals.length !== 0) throw new TypeError("overview accepts options only.");
+    const format = parsed.values.get("--format") ?? "markdown";
+    if (!["json", "markdown"].includes(format)) throw new TypeError("overview --format must be json or markdown.");
+    const overview = await buildProjectOverview({ cwd: process.cwd() });
+    process.stdout.write(format === "json" ? `${JSON.stringify(overview, null, 2)}\n` : renderProjectOverviewMarkdown(overview));
     return;
   }
   if (command === "export") {
