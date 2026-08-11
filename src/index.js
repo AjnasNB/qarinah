@@ -35,7 +35,22 @@ export {
 } from "./compiler.js";
 export { PROJECT_STRUCTURE_SCHEMA_VERSION, scanProjectStructure } from "./project-structure.js";
 export { AGENT_ARCHIVE_IMPORT_SCHEMA_VERSION, importAgentArchive } from "./archive-import.js";
-export { PROJECT_OVERVIEW_SCHEMA_VERSION, buildProjectOverview, renderProjectOverviewMarkdown } from "./project-overview.js";
+export { AGENT_ARCHIVE_BACKUP_SCHEMA_VERSION, backupAgentArchives } from "./archive-backup.js";
+export { MEMORY_FOOTPRINT_SCHEMA_VERSION, measureMemoryFootprint } from "./memory-footprint.js";
+export {
+  PROJECT_OVERVIEW_SCHEMA_VERSION,
+  buildProjectOverview,
+  renderProjectOverviewMarkdown,
+  writeProjectOverview
+} from "./project-overview.js";
+export {
+  PROJECT_RECORD_VIEWS_SCHEMA_VERSION,
+  buildProjectRecordViews,
+  renderChangesMarkdown,
+  renderDecisionsMarkdown,
+  renderFlowMarkdown,
+  renderProjectRecordViews
+} from "./project-views.js";
 export { OKF_EXPORT_SCHEMA_VERSION, OKF_VERSION, exportOkf } from "./okf.js";
 export {
   rankContextEvents,

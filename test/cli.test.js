@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { access, readFile, realpath, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, realpath, writeFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -128,6 +128,45 @@ test("CLI imports visible agent history and renders a project overview", async (
   assert.equal(result.memory.sessions, 1);
   assert.equal(result.memory.summaries, 1);
   assert.match(result.recentOutcomes[0].excerpt, /SQLite index/);
+});
+
+test("CLI backs up explicit agent exports with a verified external manifest", async (t) => {
+  const root = await temporaryDirectory(t);
+  const project = path.join(root, "project");
+  const external = path.join(root, "external");
+  const archive = path.join(root, "codex.jsonl");
+  await mkdir(external);
+  await writeFile(archive, `${JSON.stringify({ type: "summary", content: "Durable outcome" })}\n`, "utf8");
+  assert.equal((await run(["init", project], repositoryRoot)).code, 0);
+  const backedUp = await run(["backup", archive, "--destination", external], project);
+  assert.equal(backedUp.code, 0, backedUp.stderr);
+  const result = JSON.parse(backedUp.stdout);
+  assert.equal(result.fileCount, 1);
+  assert.match(await readFile(result.manifest, "utf8"), /qarinah\.agent-archive-backup\.v1/u);
+  const missingDestination = await run(["backup", archive], project);
+  assert.equal(missingDestination.code, 1);
+  assert.match(JSON.parse(missingDestination.stderr).message, /--destination/u);
+});
+
+test("CLI reports a bounded memory footprint and caller-supplied cost comparison", async (t) => {
+  const root = await temporaryDirectory(t);
+  assert.equal((await run(["init", root, "--capture", "content"], repositoryRoot)).code, 0);
+  const result = await run([
+    "footprint", "project", "decisions",
+    "--baseline-tokens", "10000",
+    "--rate-per-million", "3"
+  ], root);
+  assert.equal(result.code, 0, result.stderr);
+  const report = JSON.parse(result.stdout);
+  assert.equal(report.schemaVersion, "qarinah.memory-footprint.v1");
+  assert.equal(report.query, "project decisions");
+  assert.equal(report.comparison.baselineTokens, 10_000);
+  assert.equal(report.comparison.costs.baseline, 0.03);
+  assert.match(report.deliveredPack.manifestHash, /^sha256:[a-f0-9]{64}$/u);
+
+  const invalid = await run(["footprint", "--rate-per-million", "free"], root);
+  assert.equal(invalid.code, 1);
+  assert.match(JSON.parse(invalid.stderr).message, /finite number/u);
 });
 
 test("JSON stdin keeps model-controlled record and query text out of shell syntax", async (t) => {

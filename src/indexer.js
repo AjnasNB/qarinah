@@ -2,6 +2,7 @@ import path from "node:path";
 import { canonicalStringify, deepFreezeJson, sha256 } from "./canonical.js";
 import { QarinahError } from "./errors.js";
 import { markdownDataBlock, markdownInline } from "./markdown.js";
+import { buildProjectRecordViews, renderProjectRecordViews } from "./project-views.js";
 import { readEvents } from "./store.js";
 import {
   SQLITE_READ_MODEL_SCHEMA_VERSION,
@@ -348,6 +349,10 @@ export async function rebuildDerivedState(start = process.cwd()) {
   const indexPath = await secureStoragePath(workspace, ["index", "index.json"], { type: "file", allowMissing: true });
   const graphPath = await secureStoragePath(workspace, ["graph", "graph.json"], { type: "file", allowMissing: true });
   const markdownPath = await secureStoragePath(workspace, ["records", "CONTEXT.md"], { type: "file", allowMissing: true });
+  const decisionsPath = await secureStoragePath(workspace, ["records", "DECISIONS.md"], { type: "file", allowMissing: true });
+  const flowPath = await secureStoragePath(workspace, ["records", "FLOW.md"], { type: "file", allowMissing: true });
+  const changesPath = await secureStoragePath(workspace, ["records", "CHANGES.md"], { type: "file", allowMissing: true });
+  const recordViews = renderProjectRecordViews(buildProjectRecordViews(events, workspace.config.workspaceId));
   await atomicWriteFile(
     indexPath,
     `${canonicalStringify(derived.index)}\n`
@@ -360,6 +365,9 @@ export async function rebuildDerivedState(start = process.cwd()) {
     markdownPath,
     markdownFor(events, workspace.config.workspaceId, derived.index.headHash)
   );
+  await atomicWriteFile(decisionsPath, recordViews.decisions);
+  await atomicWriteFile(flowPath, recordViews.flow);
+  await atomicWriteFile(changesPath, recordViews.changes);
   const readModel = await rebuildSqliteReadModel(workspace, events, derived);
   return Object.freeze({
     workspaceId: workspace.config.workspaceId,
@@ -439,9 +447,31 @@ export async function loadIndex(start = process.cwd(), options = {}) {
       Math.min(16 * 1024 * 1024, workspace.config.maxLogBytes),
       "Derived Markdown record"
     )).toString("utf8");
+    const expectedRecordViews = renderProjectRecordViews(buildProjectRecordViews(events, workspace.config.workspaceId));
+    const decisions = (await readBoundedFile(
+      workspace,
+      ["records", "DECISIONS.md"],
+      Math.min(16 * 1024 * 1024, workspace.config.maxLogBytes),
+      "Derived decisions record"
+    )).toString("utf8");
+    const flow = (await readBoundedFile(
+      workspace,
+      ["records", "FLOW.md"],
+      Math.min(16 * 1024 * 1024, workspace.config.maxLogBytes),
+      "Derived execution-flow record"
+    )).toString("utf8");
+    const changes = (await readBoundedFile(
+      workspace,
+      ["records", "CHANGES.md"],
+      Math.min(16 * 1024 * 1024, workspace.config.maxLogBytes),
+      "Derived changes record"
+    )).toString("utf8");
     persistedViewsCurrent = persistedViewsCurrent
       && canonicalStringify(graph) === canonicalStringify(expected.graph)
-      && markdown === markdownFor(events, workspace.config.workspaceId, expected.index.headHash);
+      && markdown === markdownFor(events, workspace.config.workspaceId, expected.index.headHash)
+      && decisions === expectedRecordViews.decisions
+      && flow === expectedRecordViews.flow
+      && changes === expectedRecordViews.changes;
   } catch (error) {
     if (error?.code !== "ENOENT") throw error;
     persistedViewsCurrent = false;

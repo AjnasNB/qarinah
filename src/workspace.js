@@ -16,7 +16,7 @@ const CONFIG_KEYS = new Set([
   "schemaVersion", "workspaceId", "enabled", "capture", "maxEventBytes", "maxLogBytes",
   "contextMaxChars", "retentionClass", "createdAt"
 ]);
-const STORAGE_DIRECTORIES = Object.freeze(["events", "objects", "records", "graph", "index", "snapshots", "locks"]);
+const STORAGE_DIRECTORIES = Object.freeze(["events", "objects", "records", "graph", "index", "snapshots", "locks", "dashboard"]);
 const MAX_CONFIG_BYTES = 64 * 1024;
 
 function isWithin(root, candidate) {
@@ -233,7 +233,7 @@ export async function initializeWorkspace(target = process.cwd(), options = {}) 
   };
   await atomicWriteFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
   await atomicWriteFile(resolveWithin(qarinahDir, ".gitignore"), [
-    "events/", "objects/", "records/", "graph/", "index/", "snapshots/", "locks/", "",
+    "events/", "objects/", "records/", "graph/", "index/", "snapshots/", "locks/", "dashboard/", "",
     "!.gitignore", "!config.json", ""
   ].join("\n"));
   await atomicWriteFile(eventPath, "");

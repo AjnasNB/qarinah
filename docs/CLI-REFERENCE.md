@@ -413,7 +413,7 @@ Stream an exported coding-agent history into the trusted project memory.
 
 ```sh
 qarinah import <archive-file-or-directory> \
-  [--format auto|codex|claude|portable] \
+  [--format auto|codex|claude|kimi|portable] \
   [--mode compact|full] \
   [--max-bytes <integer>] \
   [--max-files <integer>] \
@@ -421,9 +421,34 @@ qarinah import <archive-file-or-directory> \
   [--max-line-bytes <integer>]
 ```
 
-The source must be an explicit regular `.jsonl` or `.ndjson` file, or a directory containing those files. Linked files and directories are not followed. `auto` detects supported Codex and Claude records and otherwise applies the portable format.
+The source must be an explicit regular `.jsonl` or `.ndjson` file, or a directory containing those files. Linked files and directories are not followed. `auto` detects supported Codex and Claude records and otherwise applies the portable format. Use explicit `kimi` for Kimi's documented stream-json user, assistant, tool-call, and tool-result messages.
 
 `compact` is the default. It writes one cited summary per session and is appropriate for large exports. `full` writes each supported visible item separately and requires content-authorized capture. Hidden reasoning and encrypted reasoning blocks are ignored in either mode. The result reports source bytes, files, records, visible items, sessions, newly imported events, formats, and rebuilt-state identity.
+
+## `backup`
+
+Copy explicit exported agent JSONL/NDJSON sources to an existing external directory with a verified manifest.
+
+```sh
+qarinah backup <archive-file-or-directory>... \
+  --destination <absolute-external-directory> \
+  [--max-bytes <integer>] \
+  [--max-files <integer>]
+```
+
+The command requires an initialized project because it records a compact artifact receipt after the copy succeeds. Sources and destination are resolved to absolute paths. Source/destination overlap, links, junctions, hard-linked files, unsupported extensions, changed sources, and exceeded limits fail closed. The output reports the generated backup directory, manifest path/hash, source count, file count, copied bytes, and receipt event ID.
+
+Setup can perform one backup in the same explicit initialization command:
+
+```sh
+qarinah setup . --codex \
+  --backup-source <absolute-export-path> \
+  --backup-destination <absolute-external-directory> \
+  [--backup-max-bytes <integer>] \
+  [--backup-max-files <integer>]
+```
+
+Qarinah never auto-discovers a private agent transcript store or external drive. See [External agent-archive backup](AGENT-ARCHIVE-BACKUP.md).
 
 ## `overview`
 
@@ -435,6 +460,28 @@ npx qarinah overview --format json
 ```
 
 The overview reports memory counts, latest outcomes with event IDs and hashes, codebase files and directories, languages, observed relationships, changes, and the paths of the authoritative ledger and rebuildable views.
+
+## `footprint`
+
+Measure retained project memory and the bounded pack selected for one query:
+
+```sh
+qarinah footprint [query] \
+  [--baseline-tokens <non-negative-integer>] \
+  [--rate-per-million <positive-number>] \
+  [--max-chars <integer>] \
+  [--max-tokens <integer>]
+```
+
+The report separates imported source bytes, every known Qarinah storage file, and the current task pack. Compact-import receipts can provide a portable character-based source estimate. An explicit `--baseline-tokens` takes precedence. Cost fields appear only with `--rate-per-million` and use flat uncached input-token arithmetic.
+
+```sh
+npx qarinah footprint "release decisions and failed checks" \
+  --baseline-tokens 12000 \
+  --rate-per-million 3
+```
+
+See [Measure project memory](MEMORY-FOOTPRINT.md) for interpretation and boundaries.
 
 ## `query` and `context`
 
@@ -606,13 +653,13 @@ The result includes store verification fields plus `enabled` and `maxLogBytes`. 
 
 ## `setup`
 
-Initialize one project, install project-local Codex, Claude Code, and Cursor integrations, configure MCP, rebuild views, and run an integrity check:
+Initialize one project, install selected project-local coding-agent integrations, configure MCP, initialize SQLite/graph/readable views/dashboard, and run an integrity check:
 
 ```sh
-npx qarinah setup . --codex --claude --cursor --capture content --allow-query
+npx qarinah setup . --codex --claude --cursor --kimi --antigravity --capture content --allow-query
 ```
 
-Omit host flags to configure all three. Omit `--allow-query` for diagnostic-only MCP. With `--allow-query`, setup binds the zero-write `context.query` tool to the exact workspace's current consent-policy hash and response ceilings.
+Omit host flags to configure all five supported project integrations. Omit `--allow-query` for diagnostic-only MCP. With `--allow-query`, setup binds the zero-write `context.query` tool to the exact workspace's current consent-policy hash and response ceilings. Codex and Claude Code receive reviewed lifecycle hooks; Cursor, Kimi, and Antigravity receive their documented project-local MCP/configuration surfaces. See [Coding-agent host compatibility](HOST-COMPATIBILITY.md).
 
 ## `mcp`
 

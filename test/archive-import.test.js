@@ -77,6 +77,48 @@ test("full portable archive import preserves visible messages and is idempotent"
   assert.equal(overview.recentOutcomes[0].title, "Imported assistant outcome");
 });
 
+test("portable import accepts one UTF-8 byte-order mark at the start of a Windows JSONL export", async (t) => {
+  const root = await temporaryDirectory(t);
+  await initializeWorkspace(root, { capture: "content" });
+  const archive = path.join(root, "windows-export.jsonl");
+  const record = JSON.stringify({
+    role: "assistant",
+    sessionId: "windows-bom-1",
+    content: "The Windows export remains portable."
+  });
+  await writeFile(archive, `\uFEFF${record}\r\n`, "utf8");
+  const result = await importAgentArchive(archive, { cwd: root, format: "portable", mode: "compact" });
+  assert.equal(result.importedEvents, 1);
+  assert.match((await readEvents(root))[0].body, /Windows export remains portable/u);
+});
+
+test("Kimi stream-json import retains visible messages and tool calls without reasoning", async (t) => {
+  const root = await temporaryDirectory(t);
+  await initializeWorkspace(root, { capture: "content" });
+  const archive = path.join(root, "kimi-stream.jsonl");
+  const records = [
+    { role: "user", sessionId: "kimi-1", content: "Inspect the current project decision ledger." },
+    {
+      role: "assistant",
+      sessionId: "kimi-1",
+      content: "I will inspect the project.",
+      tool_calls: [{ type: "function", id: "tc_1", function: { name: "Shell", arguments: "{\"command\":\"npm test\"}" } }]
+    },
+    { role: "tool", sessionId: "kimi-1", tool_call_id: "tc_1", content: "All tests passed." },
+    { role: "assistant", sessionId: "kimi-1", content: "The ledger and tests are healthy." }
+  ];
+  await writeFile(archive, `${records.map(JSON.stringify).join("\n")}\n`, "utf8");
+  const result = await importAgentArchive(archive, { cwd: root, format: "kimi", mode: "full" });
+  assert.deepEqual(result.formats, ["kimi"]);
+  assert.equal(result.importedEvents, 5);
+  const events = await readEvents(root);
+  assert.deepEqual(events.map((event) => event.kind), [
+    "prompt.submitted", "turn.completed", "tool.requested", "tool.completed", "turn.completed"
+  ]);
+  assert.match(events[2].title, /Shell/u);
+  assert.doesNotMatch(JSON.stringify(events), /reasoning|thinking/u);
+});
+
 test("compact import streams a many-record archive into bounded per-session memory", async (t) => {
   const root = await temporaryDirectory(t);
   await initializeWorkspace(root, { capture: "content" });

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { generateKeyPairSync, randomBytes } from "node:crypto";
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, realpath, writeFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import {
@@ -31,18 +31,15 @@ async function contentWorkspace(t) {
   return root;
 }
 
-test("one-command setup configures Codex, Claude, Cursor, hooks, skills, and consent-gated MCP", async (t) => {
+test("one-command setup configures Codex, Claude, Cursor, Kimi, Antigravity, hooks, skills, and consent-gated MCP", async (t) => {
   const root = await temporaryDirectory(t);
   const result = await setupWorkspace({
     cwd: root,
     capture: "content",
-    codex: true,
-    claude: true,
-    cursor: true,
     allowQuery: true
   });
   assert.equal(result.ok, true);
-  assert.deepEqual(result.targets, ["codex", "claude", "cursor"]);
+  assert.deepEqual(result.targets, ["codex", "claude", "cursor", "kimi", "antigravity"]);
   assert.equal(result.projectStructure.captured, true);
   const codexConfig = await readFile(path.join(root, ".codex", "config.toml"), "utf8");
   assert.match(codexConfig, /\[mcp_servers\.qarinah\]/);
@@ -60,10 +57,44 @@ test("one-command setup configures Codex, Claude, Cursor, hooks, skills, and con
   assert.match(await readFile(path.join(root, ".claude", "skills", "qarinah", "SKILL.md"), "utf8"), /\$ARGUMENTS/);
   assert.match(await readFile(path.join(root, ".claude", "settings.json"), "utf8"), /UserPromptSubmit/);
   assert.match(await readFile(path.join(root, ".cursor", "rules", "qarinah.mdc"), "utf8"), /bounded, cited memory pack/);
+  const kimiMcp = JSON.parse(await readFile(path.join(root, ".kimi-code", "mcp.json"), "utf8"));
+  assert.ok(kimiMcp.mcpServers.qarinah.args.includes("--workspace-id"));
+  const classicKimiMcp = JSON.parse(await readFile(path.join(root, ".kimi", "qarinah-mcp.json"), "utf8"));
+  assert.ok(classicKimiMcp.mcpServers.qarinah.args.includes("--allow-query"));
+  assert.match(await readFile(path.join(root, ".kimi", "README-QARINAH.md"), "utf8"), /--mcp-config-file/);
+  assert.deepEqual(JSON.parse(await readFile(path.join(root, ".agents", "plugins", "qarinah", "plugin.json"), "utf8")), { name: "qarinah" });
+  const antigravityMcp = JSON.parse(await readFile(path.join(root, ".agents", "plugins", "qarinah", "mcp_config.json"), "utf8"));
+  assert.ok(antigravityMcp.mcpServers.qarinah.args.includes("--policy-hash"));
+  assert.match(await readFile(path.join(root, ".agents", "plugins", "qarinah", "rules", "qarinah.md"), "utf8"), /untrusted evidence/);
+  assert.match(await readFile(path.join(root, ".qarinah", "records", "OVERVIEW.md"), "utf8"), /Qarinah project overview/);
+  assert.match(await readFile(path.join(root, ".qarinah", "records", "DECISIONS.md"), "utf8"), /Project decisions/);
+  assert.match(await readFile(path.join(root, ".qarinah", "records", "FLOW.md"), "utf8"), /Project execution flow/);
+  assert.match(await readFile(path.join(root, ".qarinah", "records", "CHANGES.md"), "utf8"), /Major project changes/);
+  assert.match(await readFile(path.join(root, ".qarinah", "dashboard", "index.html"), "utf8"), /Shared memory your team can inspect/);
 
   const repeated = await setupWorkspace({ cwd: root, codex: true, claude: true, cursor: true, allowQuery: true });
   assert.equal(repeated.ok, true);
   assert.equal((await readFile(path.join(root, ".codex", "config.toml"), "utf8")).match(/qarinah:managed:start/g).length, 1);
+});
+
+test("setup initializes the exact requested project instead of attaching an initialized parent", async (t) => {
+  const parent = await temporaryDirectory(t);
+  const parentWorkspace = await initializeWorkspace(parent, { capture: "content" });
+  const child = path.join(parent, "child-project");
+  await mkdir(child);
+  await writeFile(path.join(child, "README.md"), "# Child project\n", "utf8");
+
+  const result = await setupWorkspace({ cwd: child, codex: true, capture: "content" });
+  const canonicalChild = await realpath(child);
+
+  assert.equal(result.root, canonicalChild);
+  assert.notEqual(result.workspaceId, parentWorkspace.config.workspaceId);
+  assert.equal(result.projectStructure.captured, true);
+  assert.equal(
+    (await readFile(path.join(child, ".codex", "config.toml"), "utf8")).includes(canonicalChild.replaceAll("\\", "\\\\")),
+    true
+  );
+  assert.equal((await readFile(path.join(child, ".qarinah", "config.json"), "utf8")).includes(result.workspaceId), true);
 });
 
 test("freshness detects changed and missing cited project files", async (t) => {
@@ -142,8 +173,25 @@ test("dashboard exposes decisions, conflicts, citations, activity, savings, and 
   const oldDecision = await appendEvent(eventInput({ title: "Use REST", provenance: { adapter: "test", sourceId: "adr-1" } }), { cwd: root });
   await appendEvent(eventInput({
     title: "Use MCP",
+    sessionId: "session-dashboard",
+    turnId: "turn-dashboard",
+    body: "Use a bounded protocol surface for agent retrieval.",
+    data: {
+      reason: "Agents need one interoperable, consent-gated retrieval boundary.",
+      outcome: "Codex, Claude, and compatible hosts query the same project ledger.",
+      alternatives: ["Maintain a custom transport for every agent"]
+    },
     provenance: { adapter: "test", sourceId: "adr-2" },
     relations: [{ type: "supersedes", target: oldDecision.eventId }]
+  }), { cwd: root });
+  await appendEvent(eventInput({
+    kind: "tool.requested",
+    actor: { type: "agent", id: "codex" },
+    sessionId: "session-dashboard",
+    turnId: "turn-dashboard",
+    title: "Inspect package scripts",
+    body: "",
+    data: { toolName: "shell" }
   }), { cwd: root });
   await appendEvent(eventInput({
     kind: "claim",
@@ -158,8 +206,19 @@ test("dashboard exposes decisions, conflicts, citations, activity, savings, and 
   assert.equal(dashboard.totals.supersededDecisions, 1);
   assert.equal(dashboard.totals.conflicts, 1);
   assert.equal(dashboard.contextSavings.savingsPercent, 90);
+  assert.equal(dashboard.schemaVersion, "qarinah.memory-dashboard.v2");
+  assert.equal(dashboard.currentDecisions[0].reason, "Agents need one interoperable, consent-gated retrieval boundary.");
+  assert.equal(dashboard.tools[0].toolName, "shell");
+  assert.ok(dashboard.executionFlow.some((step) => step.kind === "tool.requested"));
+  assert.ok(dashboard.majorChanges.some((change) => change.title === "Use MCP"));
+  assert.equal(dashboard.durableRecords.decisions, ".qarinah/records/DECISIONS.md");
+  assert.equal(dashboard.memoryFootprint.schemaVersion, "qarinah.memory-footprint.v1");
+  assert.match(dashboard.memoryFootprint.deliveredPack.manifestHash, /^sha256:/u);
   const written = await writeMemoryDashboard({ cwd: root, baselineTokens: 1000, deliveredTokens: 100 });
   assert.match(await readFile(written.output, "utf8"), /Shared memory your team can inspect/);
+  assert.match(await readFile(written.output, "utf8"), /Execution flow/);
+  assert.match(await readFile(written.output, "utf8"), /Agents need one interoperable/);
+  assert.match(await readFile(written.output, "utf8"), /Memory footprint/);
 });
 
 test("causal receipts bind evidence, memory, policy, execution, and observation", () => {

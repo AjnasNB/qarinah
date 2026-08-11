@@ -432,6 +432,14 @@ const docPages = [
     aliases: ["codex archive", "claude history", "chat import", "agent export", "large context recovery"]
   },
   {
+    route: "docs/agent-archive-backup",
+    source: "docs/AGENT-ARCHIVE-BACKUP.md",
+    title: "Back up coding-agent archives",
+    description: "Copy explicitly selected JSONL or NDJSON agent exports to an external destination with limits, SHA-256 verification, and a compact project receipt.",
+    section: "Operate",
+    aliases: ["codex jsonl backup", "external archive", "agent history backup", "verified transcript export"]
+  },
+  {
     route: "docs/private-projects",
     source: "docs/PRIVATE-PROJECTS.md",
     title: "Private and NDA projects",
@@ -464,6 +472,14 @@ const docPages = [
     aliases: ["codex memory", "claude code memory", "cross editor memory", "coding agent integrations"]
   },
   {
+    route: "docs/host-compatibility",
+    source: "docs/HOST-COMPATIBILITY.md",
+    title: "Coding-agent host compatibility",
+    description: "Understand the reviewed Codex and Claude hooks, Cursor MCP, Kimi project configuration and import, Antigravity plugin, and portable fallback.",
+    section: "Connect",
+    aliases: ["kimi memory", "antigravity memory", "codex claude cursor integration", "agent cli compatibility"]
+  },
+  {
     route: "docs/mcp",
     source: "docs/MCP-GUIDE.md",
     title: "MCP server guide",
@@ -486,6 +502,22 @@ const docPages = [
     description: "Generate and interpret Qarinah's local dashboard for decisions, supersession, conflicts, citations, permitted activity, affected files, and measured context savings.",
     section: "Operate",
     aliases: ["memory dashboard", "project dashboard", "decision dashboard", "context savings", "agent activity", "affected files"]
+  },
+  {
+    route: "docs/memory-footprint",
+    source: "docs/MEMORY-FOOTPRINT.md",
+    title: "Measure retained and delivered project memory",
+    description: "Separate archive bytes, local Qarinah storage, task-specific context, and optional flat-rate cost arithmetic without making a lossless compression claim.",
+    section: "Understand",
+    aliases: ["memory footprint", "context size", "token savings", "archive compression", "coding agent cost"]
+  },
+  {
+    route: "docs/azure-evaluation",
+    source: "docs/AZURE-EVALUATION.md",
+    title: "Evaluate Azure-backed team retrieval",
+    description: "Choose between local SQLite project memory and an explicit Azure AI Search and Blob Storage evaluation for larger teams.",
+    section: "Operate",
+    aliases: ["azure ai search", "azure rag", "cloud project memory", "vector search", "blob backup"]
   },
   {
     route: "docs/sqlite-read-model",

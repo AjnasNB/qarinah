@@ -224,7 +224,7 @@ export const PROJECT_STRUCTURE_SCHEMA_VERSION: "qarinah.project-structure.v1";
 export const SQLITE_READ_MODEL_SCHEMA_VERSION: 1;
 export const SQLITE_READ_MODEL_FILENAME: "qarinah.db";
 export const MEMORY_ATTACHMENT_SCHEMA_VERSION: "qarinah.memory-attachment.v1";
-export const QARINAH_VERSION: "0.1.7";
+export const QARINAH_VERSION: "0.1.8";
 export const EVENT_KINDS: readonly QarinahEventKind[];
 export const RELATION_TYPES: readonly QarinahRelationType[];
 export function initializeWorkspace(target?: string, options?: { capture?: "metadata" | "content" }): Promise<QarinahWorkspace>;
@@ -307,7 +307,7 @@ export function scanProjectStructure(options?: {
 export interface QarinahAgentArchiveImportResult {
   readonly schemaVersion: "qarinah.agent-archive-import.v1";
   readonly mode: "compact" | "full";
-  readonly formats: readonly ("codex" | "claude" | "portable")[];
+  readonly formats: readonly ("codex" | "claude" | "kimi" | "portable")[];
   readonly filesRead: number;
   readonly sourceBytes: number;
   readonly recordsSeen: number;
@@ -320,7 +320,7 @@ export interface QarinahAgentArchiveImportResult {
 export const AGENT_ARCHIVE_IMPORT_SCHEMA_VERSION: "qarinah.agent-archive-import.v1";
 export function importAgentArchive(source: string, options?: {
   cwd?: string;
-  format?: "auto" | "codex" | "claude" | "portable";
+  format?: "auto" | "codex" | "claude" | "kimi" | "portable";
   mode?: "compact" | "full";
   maxBytes?: number;
   maxFiles?: number;
@@ -328,6 +328,70 @@ export function importAgentArchive(source: string, options?: {
   maxLineBytes?: number;
   rebuild?: boolean;
 }): Promise<QarinahAgentArchiveImportResult>;
+export const AGENT_ARCHIVE_BACKUP_SCHEMA_VERSION: "qarinah.agent-archive-backup.v1";
+export interface QarinahAgentArchiveBackupResult {
+  readonly schemaVersion: "qarinah.agent-archive-backup.v1";
+  readonly destination: string;
+  readonly manifest: string;
+  readonly manifestHash: string;
+  readonly sourceCount: number;
+  readonly fileCount: number;
+  readonly totalBytes: number;
+  readonly eventId: string | null;
+}
+export function backupAgentArchives(
+  sources: readonly string[],
+  destination: string,
+  options?: {
+    cwd?: string;
+    maxBytes?: number;
+    maxFiles?: number;
+    clock?: () => Date;
+  }
+): Promise<Readonly<QarinahAgentArchiveBackupResult>>;
+export const MEMORY_FOOTPRINT_SCHEMA_VERSION: "qarinah.memory-footprint.v1";
+export interface QarinahMemoryFootprint {
+  readonly schemaVersion: "qarinah.memory-footprint.v1";
+  readonly workspaceId: string;
+  readonly query: string;
+  readonly retained: Readonly<{
+    eventCount: number;
+    importedSourceBytes: number;
+    importedSourceBytesKnown: boolean;
+    storageBytes: Readonly<Record<"ledger" | "sqlite" | "graph" | "index" | "context" | "overview" | "decisions" | "flow" | "changes" | "dashboard" | "total", number>>;
+  }>;
+  readonly deliveredPack: Readonly<{
+    itemCount: number;
+    usedChars: number;
+    estimatedTokens: number;
+    renderedBytes: number;
+    manifestHash: string;
+  }>;
+  readonly comparison: Readonly<{
+    status: "not-measured" | "measured";
+    source: "caller-supplied" | "portable-chars-div-4-from-compact-import-receipts" | "not-measured";
+    baselineTokens: number | null;
+    deliveredTokens: number;
+    savedTokens: number | null;
+    reductionPercent: number | null;
+    baselineToPackRatio: number | null;
+    costs: null | Readonly<{
+      ratePerMillion: number;
+      baseline: number;
+      delivered: number;
+      estimatedSaving: number;
+    }>;
+  }>;
+  readonly boundaries: Readonly<Record<string, string>>;
+}
+export function measureMemoryFootprint(options?: {
+  cwd?: string;
+  query?: string;
+  maxChars?: number;
+  maxTokens?: number;
+  baselineTokens?: number;
+  ratePerMillion?: number;
+}): Promise<Readonly<QarinahMemoryFootprint>>;
 export interface QarinahProjectOverview {
   readonly schemaVersion: "qarinah.project-overview.v1";
   readonly workspaceId: string;
@@ -351,6 +415,51 @@ export interface QarinahProjectOverview {
 export const PROJECT_OVERVIEW_SCHEMA_VERSION: "qarinah.project-overview.v1";
 export function buildProjectOverview(options?: { cwd?: string; maxOutcomes?: number }): Promise<QarinahProjectOverview>;
 export function renderProjectOverviewMarkdown(overview: QarinahProjectOverview): string;
+export function writeProjectOverview(options?: {
+  cwd?: string;
+  output?: string;
+  maxOutcomes?: number;
+}): Promise<Readonly<{ output: string; overview: QarinahProjectOverview }>>;
+export interface QarinahProjectRecordViews {
+  readonly schemaVersion: "qarinah.project-record-views.v1";
+  readonly workspaceId: string;
+  readonly generatedFrom: Readonly<{ eventCount: number; headHash: string | null }>;
+  readonly decisions: readonly Readonly<{
+    eventId: string;
+    hash: string;
+    timestamp: string;
+    sourceId: string | null;
+    title: string;
+    status: "current" | "superseded";
+    reason: string;
+    outcome: string;
+    alternatives: readonly string[];
+    affected: readonly string[];
+    tools: readonly Readonly<Record<string, unknown>>[];
+  }>[];
+  readonly flow: readonly Readonly<Record<string, unknown>>[];
+  readonly majorChanges: readonly Readonly<Record<string, unknown>>[];
+  readonly projectChanges: null | Readonly<{
+    eventId: string;
+    hash: string;
+    snapshotHash: string;
+    added: readonly string[];
+    changed: readonly string[];
+    deleted: readonly string[];
+    renamed: readonly Readonly<{ from: string; to: string; contentHash: string | null }>[];
+  }>;
+  readonly limits: Readonly<{ decisions: number; flowSteps: number; majorChanges: number }>;
+}
+export const PROJECT_RECORD_VIEWS_SCHEMA_VERSION: "qarinah.project-record-views.v1";
+export function buildProjectRecordViews(events: readonly QarinahEvent[], workspaceId: string): QarinahProjectRecordViews;
+export function renderDecisionsMarkdown(view: QarinahProjectRecordViews): string;
+export function renderFlowMarkdown(view: QarinahProjectRecordViews): string;
+export function renderChangesMarkdown(view: QarinahProjectRecordViews): string;
+export function renderProjectRecordViews(view: QarinahProjectRecordViews): Readonly<{
+  decisions: string;
+  flow: string;
+  changes: string;
+}>;
 export function exportOkf(options?: { cwd?: string; output?: string }): Promise<QarinahOkfExportResult>;
 export const PORTABLE_TOKEN_ESTIMATOR: Readonly<QarinahTokenEstimator & { exact: false }>;
 export function normalizeTokenEstimator(candidate?: QarinahTokenEstimator): Readonly<QarinahTokenEstimator & { exact: boolean }>;
@@ -521,7 +630,7 @@ export function createCausalReceipt(input: Record<
   { id: string; hash: `sha256:${string}`; system: string; timestamp: string }
 >): Readonly<Record<string, unknown>>;
 export interface QarinahMemoryDashboard {
-  schemaVersion: "qarinah.memory-dashboard.v1";
+  schemaVersion: "qarinah.memory-dashboard.v2";
   workspaceId: string;
   generatedAt: string;
   capture: "metadata" | "content";
@@ -533,8 +642,18 @@ export interface QarinahMemoryDashboard {
     savedTokens: number | null;
     savingsPercent: number | null;
   };
+  memoryFootprint: QarinahMemoryFootprint;
   currentDecisions: Record<string, unknown>[];
   supersededDecisions: Record<string, unknown>[];
+  tools: Record<string, unknown>[];
+  executionFlow: Record<string, unknown>[];
+  majorChanges: Record<string, unknown>[];
+  latestProjectChanges: Record<string, unknown> | null;
+  durableRecords: Readonly<{
+    decisions: ".qarinah/records/DECISIONS.md";
+    flow: ".qarinah/records/FLOW.md";
+    changes: ".qarinah/records/CHANGES.md";
+  }>;
   conflicts: Record<string, unknown>[];
   citations: Record<string, unknown>[];
   activity: Record<string, unknown>[];
@@ -608,9 +727,15 @@ export function setupWorkspace(options?: {
   codex?: boolean;
   claude?: boolean;
   cursor?: boolean;
+  kimi?: boolean;
+  antigravity?: boolean;
   allowQuery?: boolean;
   maxChars?: number;
   maxItems?: number;
+  backupSources?: string[];
+  backupDestination?: string;
+  backupMaxBytes?: number;
+  backupMaxFiles?: number;
 }): Promise<Readonly<Record<string, unknown>>>;
 export function rankContextEvents(index: unknown, query: string | undefined, options: {
   limit?: number;

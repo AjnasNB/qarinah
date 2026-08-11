@@ -18,7 +18,7 @@ import { captureClaudeHook } from "qarinah/claude";
 import { createMcpServer, runMcpServer } from "qarinah/mcp";
 ```
 
-The declarations shipped in `types/index.d.ts`, `types/codex.d.ts`, `types/claude.d.ts`, and `types/mcp.d.ts` are the exact compile-time contract for version 0.1.7. JSON Schemas are available through package exports such as `qarinah/schemas/event.json`.
+The declarations shipped in `types/index.d.ts`, `types/codex.d.ts`, `types/claude.d.ts`, and `types/mcp.d.ts` are the exact compile-time contract for version 0.1.8. JSON Schemas are available through package exports such as `qarinah/schemas/event.json`.
 
 ## Runtime boundary
 
@@ -61,9 +61,9 @@ Invalid JavaScript argument shapes generally throw `TypeError`. Storage, trust, 
 
 ## Version and contract constants
 
-| Export | Value in 0.1.7 |
+| Export | Value in 0.1.8 |
 | --- | --- |
-| `QARINAH_VERSION` | `"0.1.7"` |
+| `QARINAH_VERSION` | `"0.1.8"` |
 | `EVENT_SCHEMA_VERSION` | `"qarinah.event.v1"` |
 | `CONTEXT_PACK_SCHEMA_VERSION` | `"qarinah.context-pack.v2"` |
 | `CONFIG_SCHEMA_VERSION` | `"qarinah.config.v1"` |
@@ -71,6 +71,8 @@ Invalid JavaScript argument shapes generally throw `TypeError`. Storage, trust, 
 | `GRAPH_SCHEMA_VERSION` | `"qarinah.graph.v2"` |
 | `PROJECT_STRUCTURE_SCHEMA_VERSION` | `"qarinah.project-structure.v1"` |
 | `AGENT_ARCHIVE_IMPORT_SCHEMA_VERSION` | `"qarinah.agent-archive-import.v1"` |
+| `AGENT_ARCHIVE_BACKUP_SCHEMA_VERSION` | `"qarinah.agent-archive-backup.v1"` |
+| `MEMORY_FOOTPRINT_SCHEMA_VERSION` | `"qarinah.memory-footprint.v1"` |
 | `PROJECT_OVERVIEW_SCHEMA_VERSION` | `"qarinah.project-overview.v1"` |
 | `OKF_EXPORT_SCHEMA_VERSION` | `"qarinah.okf-export.v1"` |
 | `OKF_VERSION` | `"0.1"` |
@@ -394,7 +396,7 @@ function querySqliteReadModel(
 
 The database at `.qarinah/index/qarinah.db` is a disposable read model. Rebuild verifies the hash-chained JSONL authority, derives typed tables and FTS5 rows, commits a temporary SQLite database, checkpoints WAL, and atomically replaces the previous projection. Inspect and query reject a schema, workspace, or ledger-head mismatch.
 
-## Agent archive import and project overview
+## Agent archive import, backup, and project overview
 
 ### `importAgentArchive(source, options?)`
 
@@ -403,7 +405,7 @@ function importAgentArchive(
   source: string,
   options?: {
     cwd?: string;
-    format?: "auto" | "codex" | "claude" | "portable";
+    format?: "auto" | "codex" | "claude" | "kimi" | "portable";
     mode?: "compact" | "full";
     maxBytes?: number;
     maxFiles?: number;
@@ -415,6 +417,23 @@ function importAgentArchive(
 ```
 
 Streams explicit JSONL or NDJSON archive sources into the trusted workspace. Compact mode emits one cited session summary. Full mode emits separately retrievable visible messages and tool events and requires content authorization. Both modes exclude private reasoning record types, enforce resource ceilings, and use deterministic event IDs for idempotent replay.
+
+### `backupAgentArchives(sources, destination, options?)`
+
+```ts
+function backupAgentArchives(
+  sources: readonly string[],
+  destination: string,
+  options?: {
+    cwd?: string;
+    maxBytes?: number;
+    maxFiles?: number;
+    clock?: () => Date;
+  }
+): Promise<Readonly<QarinahAgentArchiveBackupResult>>;
+```
+
+Streams from 1 to 32 explicit absolute JSONL/NDJSON files or directories into a new directory beneath an existing absolute destination. It rejects linked paths and source/destination overlap, meters files and bytes before and during copying, verifies per-file SHA-256 digests, writes `manifest.json`, and optionally records a compact receipt when `cwd` identifies a trusted workspace. See [External agent-archive backup](AGENT-ARCHIVE-BACKUP.md).
 
 ### `buildProjectOverview(options?)`
 
@@ -430,6 +449,21 @@ function renderProjectOverviewMarkdown(
 ```
 
 Combines verified memory counts, latest outcome identities, the latest project-structure snapshot, languages, directories, relationships, changes, and durable file locations. Rendering is deterministic and does not replace the cited source events.
+
+### `measureMemoryFootprint(options?)`
+
+```ts
+function measureMemoryFootprint(options?: {
+  cwd?: string;
+  query?: string;
+  maxChars?: number;
+  maxTokens?: number;
+  baselineTokens?: number;
+  ratePerMillion?: number;
+}): Promise<Readonly<QarinahMemoryFootprint>>;
+```
+
+Reports imported source bytes retained in compact-import receipts, current local storage bytes by view, and the manifest-bound pack delivered for one query. A comparison is present only when the caller provides a baseline or a compact import supplies a reproducible portable estimate. Cost fields are simple flat input-token arithmetic, not provider billing. See [Measure project memory](MEMORY-FOOTPRINT.md).
 
 ### `loadIndex(start?, options?)`
 
@@ -755,9 +789,11 @@ function writeMemoryDashboard(options?: {
 }): Promise<Readonly<{ output: string; data: QarinahMemoryDashboard }>>;
 ```
 
-`buildMemoryDashboard` verifies the local ledger and returns a frozen `qarinah.memory-dashboard.v1` view without writing a file. `renderMemoryDashboard` turns a compatible view into self-contained HTML. `writeMemoryDashboard` writes that HTML atomically to `.qarinah/dashboard/index.html` by default.
+`buildMemoryDashboard` verifies the local ledger and returns a frozen `qarinah.memory-dashboard.v2` view without writing a file. `renderMemoryDashboard` turns a compatible view into self-contained HTML. `writeMemoryDashboard` writes that HTML atomically to `.qarinah/dashboard/index.html` by default.
 
-The view contains workspace and capture metadata, totals, current and superseded decisions, explicit conflicts, source-linked events, the latest 100 permitted activity events, affected files from the latest project-structure scan, and optional caller-supplied context measurements. Both token estimates must be supplied together. The functions do not infer provider billing, run a live server, or modify the authoritative ledger.
+The view contains workspace and capture metadata, totals, decisions with explicit reasons/outcomes/alternatives/linked tools, bounded execution flow, tool activity, major changes, explicit conflicts, source-linked events, the latest 100 permitted activity events, affected files from the latest project-structure scan, durable-record paths, and optional caller-supplied context measurements. Both token estimates must be supplied together. The functions do not infer provider billing, run a live server, or modify the authoritative ledger.
+
+`writeProjectOverview(options?)` writes the deterministic beginner-readable overview to `.qarinah/records/OVERVIEW.md` by default and returns both the resolved path and typed overview. `setupWorkspace` now initializes this overview, `DECISIONS.md`, `FLOW.md`, `CHANGES.md`, SQLite, the graph, and the local dashboard in one run.
 
 See the [local memory dashboard guide](DASHBOARD.md) for the complete interface, data lineage, examples, and sharing boundary.
 

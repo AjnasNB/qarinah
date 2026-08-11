@@ -1,6 +1,6 @@
 # Getting started
 
-Qarinah is the evidence-linked cross-agent context engine for software projects. It lets Codex, Claude Code, Cursor, and other supported coding agents continue the same project using a shared, cited record of decisions, outcomes, code relationships, and current evidence. It works for one developer and one repository, across several supported coding agents, or as the memory layer in a larger team workflow. Maqam integration is optional.
+Qarinah is the evidence-linked cross-agent context engine for software projects. It lets Codex, Claude Code, Cursor, Kimi, Antigravity, and compatible MCP clients continue the same project using a shared, cited record of decisions, outcomes, code relationships, and current evidence. It works for one developer and one repository, across several supported coding agents, or as the memory layer in a larger team workflow. Maqam integration is optional.
 
 Its primary job is verified handoffs between coding agents: start a task in one agent, record the permitted outcome, switch agents, and request a compact cited handoff instead of replaying the complete project history. See the [cross-agent handoff guide](CROSS-AGENT-HANDOFFS.md).
 
@@ -9,7 +9,7 @@ Qarinah gives an agent a small, cited slice of project memory instead of replayi
 For the supported hosts, the quickest complete setup is:
 
 ```sh
-npx qarinah setup . --codex --claude --cursor --capture content --allow-query
+npx qarinah setup . --capture content --allow-query
 ```
 
 ## Requirements
@@ -45,7 +45,7 @@ Initialization creates the portable project configuration, an empty SQLite/FTS5 
 For a complete first setup that also maps the codebase and connects supported hosts, use:
 
 ```sh
-npx qarinah setup . --codex --claude --cursor --capture content --allow-query
+npx qarinah setup . --capture content --allow-query
 npx qarinah overview
 ```
 
@@ -80,7 +80,7 @@ npx qarinah import ./agent-exports --format auto --mode compact
 npx qarinah overview
 ```
 
-Compact mode retains cited session summaries, outcomes, tool names, timestamps, and source digests. Full mode is available for separately retaining each supported visible turn in a content-authorized workspace. Hidden reasoning and credentials are not imported. See [agent archive import](AGENT-ARCHIVE-IMPORT.md).
+Compact mode retains cited session summaries, outcomes, tool names, timestamps, and source digests. Full mode is available for separately retaining each supported visible turn in a content-authorized workspace. Kimi's documented stream-json output is supported with `--format kimi`. Hidden reasoning and credentials are not imported. See [agent archive import](AGENT-ARCHIVE-IMPORT.md) and [host compatibility](HOST-COMPATIBILITY.md).
 
 ## Query a small cited pack
 

@@ -72,7 +72,7 @@ Scale regression: Qarinah also passed **380 / 380 file-specific exact and typo-t
 </p>
 
 ```sh
-npx qarinah setup . --codex --claude --cursor --capture content --allow-query
+npx qarinah setup . --capture content --allow-query
 ```
 
 <p align="center">
@@ -98,13 +98,13 @@ npx qarinah setup . --codex --claude --cursor --capture content --allow-query
 | Local SQLite search, a relationship graph, and readable Markdown | Fast retrieval without a hosted memory account or vector database |
 
 ```sh
-# Set up memory, map the project, and connect supported coding agents.
-npx qarinah setup . --codex --claude --cursor --capture content --allow-query
+# Set up memory, map the project, and connect all supported coding agents.
+npx qarinah setup . --capture content --allow-query
 
 # See the whole project in one readable page.
 npx qarinah overview
 
-# Bring an exported Codex, Claude, or portable JSONL history with you.
+# Bring an exported Codex, Claude, Kimi, or portable JSONL history with you.
 npx qarinah import ./agent-exports --format auto --mode compact
 ```
 
@@ -114,7 +114,7 @@ If a native chat later disappears, Qarinah can still retrieve the permitted even
 
 | Setup | What Qarinah gives you |
 | --- | --- |
-| Personal project | One local cited memory shared by Codex, Claude Code, Cursor, CLI tools, and compatible MCP clients |
+| Personal project | One local cited memory shared by Codex, Claude Code, Cursor, Kimi, Antigravity, CLI tools, and compatible MCP clients |
 | Portable review | Rebuildable SQLite, Markdown, JSON, graph, OKF, and a local static dashboard for inspecting project memory on desktop or mobile |
 | Team workspace | Multi-repository relationships, freshness, encrypted bundles, signed checkpoints, membership, and separate authority boundaries |
 | Governed workflow | Optional Maqam memory scopes and disclosure controls without making Maqam a requirement |
@@ -142,9 +142,13 @@ Qarinah is a universal context engine for software projects, built on local-firs
 ├── graph/graph.json          # typed decisions, sources, files, and relations
 ├── index/index.json          # deterministic lexical retrieval index
 ├── index/qarinah.db          # rebuildable SQLite WAL and FTS5 search
-├── records/CONTEXT.md        # rebuildable human-readable view
+├── records/CONTEXT.md        # rebuildable retrieved-memory view
+├── records/OVERVIEW.md       # beginner-readable project summary
+├── records/DECISIONS.md      # decisions, reasons, outcomes, tools, and evidence
+├── records/FLOW.md           # bounded agent and tool execution flow
+├── records/CHANGES.md        # major outcomes and latest scanned changes
 ├── records/okf/              # portable Open Knowledge Format export
-└── dashboard/index.html     # decisions, conflicts, citations, activity, files, and measured savings
+└── dashboard/index.html     # decisions, tools, flow, changes, evidence, and measured savings
 
 .codex/skills/qarinah/        # invoke with $qarinah
 .claude/skills/qarinah/       # invoke with /qarinah <task>
@@ -191,7 +195,7 @@ npx qarinah query "release provenance" \
   --format markdown
 ```
 
-Start with the [feature map](docs/FEATURES.md) and [five-minute installation guide](docs/GETTING-STARTED.md), then use the [project overview](docs/PROJECT-OVERVIEW.md), [agent archive import](docs/AGENT-ARCHIVE-IMPORT.md), [private-project guide](docs/PRIVATE-PROJECTS.md), [cross-agent handoff guide](docs/CROSS-AGENT-HANDOFFS.md), [dashboard guide](docs/DASHBOARD.md), [team-memory guide](docs/TEAM-MEMORY.md), [CLI reference](docs/CLI-REFERENCE.md), [JavaScript API reference](docs/API-REFERENCE.md), [MCP guide](docs/MCP-GUIDE.md), [task recipes](docs/RECIPES.md), or [troubleshooting guide](docs/TROUBLESHOOTING.md).
+Start with the [feature map](docs/FEATURES.md) and [five-minute installation guide](docs/GETTING-STARTED.md), then use [host compatibility](docs/HOST-COMPATIBILITY.md), the [project overview](docs/PROJECT-OVERVIEW.md), [agent archive import](docs/AGENT-ARCHIVE-IMPORT.md), [external archive backup](docs/AGENT-ARCHIVE-BACKUP.md), [private-project guide](docs/PRIVATE-PROJECTS.md), [cross-agent handoff guide](docs/CROSS-AGENT-HANDOFFS.md), [dashboard guide](docs/DASHBOARD.md), [team-memory guide](docs/TEAM-MEMORY.md), [CLI reference](docs/CLI-REFERENCE.md), [JavaScript API reference](docs/API-REFERENCE.md), [MCP guide](docs/MCP-GUIDE.md), [task recipes](docs/RECIPES.md), or [troubleshooting guide](docs/TROUBLESHOOTING.md).
 
 Your project already contains the decisions and evidence behind its changes. Qarinah lets the next agent query that record and receive a bounded, cited pack selected for the current task. The same local memory can support Codex, Claude Code, CLI workflows, and compatible MCP clients instead of locking project context to one editor.
 
@@ -247,7 +251,7 @@ Qarinah is intentionally small, local, and inspectable:
 | Retrieval | SQLite FTS5, BM25, typo tolerance, graph traversal, reciprocal-rank fusion, time and freshness filters, host-owned authority scopes, repository isolation, conflict/supersession handling, and diversity |
 | Context compiler | Complete-output character and token budgets, explicit output headroom, evidence-coverage gates, deterministic citations, and reproducible manifests |
 | Human-readable views | Rebuildable Markdown, JSON, graph, index, and Google OKF 0.1 Draft exports |
-| Agent integration | One-command Codex, Claude Code, and Cursor setup; lifecycle hooks; strict JSON stdin; typed JavaScript API; and consent-gated stdio MCP retrieval |
+| Agent integration | One-command Codex, Claude Code, Cursor, Kimi, and Antigravity setup; reviewed Codex/Claude lifecycle hooks; strict JSON stdin; typed JavaScript API; and consent-gated stdio MCP retrieval |
 | Optional adapters | Local or customer-provided embeddings, query expansion, and rerankers may reorder admitted cited evidence without replacing ledger authority |
 | Infrastructure | No required vector database, hosted backend, embedding bill, model provider, daemon, analytics endpoint, or Qarinah API key |
 
@@ -257,25 +261,25 @@ Qarinah requires a maintained Node.js 22, 24, or 26 release.
 
 ```sh
 npm install --save-dev qarinah
-npx qarinah setup . --codex --claude --cursor --capture content --allow-query
+npx qarinah setup . --capture content --allow-query
 ```
 
 The package is designed for local use. It does not require a hosted Qarinah account, embedding service, or Qarinah API key.
 
 ## Initialize once, remember across supported sessions
 
-`npx qarinah setup . --codex --claude --cursor --capture content --allow-query` is the one-time, explicit opt-in for that exact workspace and capture policy. It initializes SQLite and the other derived views, records a bounded map of the codebase, installs project-local integrations, configures consent-gated MCP retrieval, and runs a health check. After a supported host restarts, reviewed lifecycle hooks can append permitted events whenever the host emits them. Qarinah can then compile a small cited pack on demand, so a new task in that folder does not need the whole retained history replayed into its prompt.
+`npx qarinah setup . --capture content --allow-query` is the one-time, explicit opt-in for that exact workspace and capture policy. It initializes SQLite and the other derived views, records a bounded map of the codebase, installs project-local integrations, configures consent-gated MCP retrieval, and runs a health check. Codex and Claude Code have reviewed lifecycle capture adapters. Cursor, Kimi, and Antigravity use their documented project-level MCP surfaces; their host history is imported only from an explicit supported export. Qarinah can then compile a small cited pack on demand, so a new task in that folder does not need the whole retained history replayed into its prompt.
 
 Qarinah is project memory, not an always-running agent or application supervisor. It does not keep an agent running, prevent provider-side context compaction, or capture host activity the host does not expose. When a host compacts its own conversation, Qarinah preserves only the permitted evidence it actually received and makes it available to an explicit CLI/API query or a workspace-authorized, bounded MCP query.
 
-Existing visible Codex, Claude, or portable agent exports can be streamed in later with `qarinah import`. The safe compact mode is designed for large histories: it records cited per-session summaries and source digests rather than copying every raw byte into Qarinah. Full visible-history import is available only in a content-authorized workspace and remains bounded by the configured ledger limits.
+Existing visible Codex, Claude, Kimi stream-json, or portable agent exports can be streamed in later with `qarinah import`. The safe compact mode is designed for large histories: it records cited per-session summaries and source digests rather than copying every raw byte into Qarinah. Full visible-history import is available only in a content-authorized workspace and remains bounded by the configured ledger limits.
 
 ## Team-memory platform
 
 The public package now includes:
 
 - consent-gated, zero-write MCP `context.query` with exact workspace and policy-hash authorization;
-- one-command Codex, Claude Code, and Cursor setup;
+- one-command Codex, Claude Code, Cursor, Kimi, and Antigravity setup;
 - a local visual dashboard for decisions, supersession, conflicts, citations, activity, savings, and affected files;
 - freshness checks for changed, missing, or unsafe cited files;
 - temporal validity, point-in-time queries, stale-citation detection, conflicts, and supersessions;
@@ -302,12 +306,15 @@ npx qarinah dashboard
 
 Open `.qarinah/dashboard/index.html` in a browser. The dashboard shows:
 
-- current and explicitly superseded decisions;
+- current and explicitly superseded decisions, including recorded reasons, outcomes, alternatives, linked tools, and evidence hashes;
+- the bounded execution flow and the tools requested or completed in each retained turn;
+- major recorded outcomes and latest scanned file changes;
 - explicit conflicts requiring attention;
 - source-linked events and their evidence identifiers;
 - the latest 100 permitted activity events;
 - paths, languages, and content hashes from the latest project scan; and
-- an optional measured baseline-versus-delivered context comparison.
+- an optional measured baseline-versus-delivered context comparison; and
+- current retained project-memory bytes, measured imported source bytes when available, and the task-pack manifest and estimated size.
 
 To include a context comparison for a real run, supply both estimates:
 
@@ -317,7 +324,19 @@ npx qarinah dashboard --baseline-tokens 12000 --delivered-tokens 1500
 
 Those numbers are supplied by the caller; the dashboard does not infer provider billing or manufacture a savings result. It is a static, rebuildable view with no remote scripts or analytics. The hash-chained JSONL ledger remains authoritative, and the separate `qarinah freshness` command checks whether cited files have changed.
 
-Read the complete [local memory dashboard guide](docs/DASHBOARD.md) for every panel, data lineage, CLI and JavaScript APIs, population recipes, privacy guidance, and troubleshooting.
+Measure the three quantities directly:
+
+```sh
+npx qarinah footprint "release decisions and failed checks"
+```
+
+Qarinah does not claim that a large source archive becomes a lossless few-kilobyte file. It preserves authorized project memory locally and sends a small task-relevant cited pack to the agent. Read [memory-footprint measurement](docs/MEMORY-FOOTPRINT.md) for the exact distinction and [the Azure evaluation](docs/AZURE-EVALUATION.md) before considering a shared remote index.
+
+`qarinah setup` creates the empty SQLite database, relationship graph, readable overview, decision/flow/change records, and dashboard immediately. Later records and scans rebuild the derived views from the verified ledger.
+
+To preserve an exported Codex/Claude/portable JSONL archive on an external drive during setup, add explicit `--backup-source` and `--backup-destination` paths. Qarinah streams only JSONL/NDJSON files, enforces limits, rejects linked paths, verifies SHA-256 digests, writes an external manifest, and records a compact project receipt. See [External agent-archive backup](docs/AGENT-ARCHIVE-BACKUP.md).
+
+Read the complete [local memory dashboard guide](docs/DASHBOARD.md) for every panel, data lineage, CLI and JavaScript APIs, population recipes, privacy guidance, and troubleshooting. Release maintainers should also use the [0.5.0 readiness checklist](docs/RELEASE-READINESS-0.5.md).
 
 ## Five-minute proof
 
@@ -414,15 +433,15 @@ The repository also runs `npm run mcp:smoke` against the exact bundled Codex and
 
 ### Install once, initialize each project
 
-Install the reviewed `v0.1.7` plugin once in each host after that release is published:
+Install the reviewed `v0.1.8` plugin once in each host after that release is published:
 
 ```sh
 # Codex: personal installation, available to opted-in projects.
-codex plugin marketplace add AjnasNB/qarinah --ref v0.1.7
+codex plugin marketplace add AjnasNB/qarinah --ref v0.1.8
 codex plugin add qarinah@qarinah
 
 # Claude Code: personal installation across projects.
-claude plugin marketplace add AjnasNB/qarinah@v0.1.7 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.1.8 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 
