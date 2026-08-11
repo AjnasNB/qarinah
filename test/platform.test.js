@@ -203,13 +203,14 @@ test("dashboard exposes decisions, conflicts, citations, activity, savings, and 
   await writeFile(path.join(root, "README.md"), "# demo\n", "utf8");
   await scanProjectStructure({ cwd: root });
   const dashboard = await buildMemoryDashboard({ cwd: root, baselineTokens: 1000, deliveredTokens: 100 });
+  const canonicalRoot = await realpath(root);
   assert.equal(dashboard.totals.currentDecisions, 1);
   assert.equal(dashboard.totals.supersededDecisions, 1);
   assert.equal(dashboard.totals.conflicts, 1);
   assert.equal(dashboard.contextSavings.savingsPercent, 90);
   assert.equal(dashboard.schemaVersion, "qarinah.memory-dashboard.v2");
-  assert.equal(dashboard.workspace.root, root);
-  assert.equal(dashboard.workspace.name, path.basename(root));
+  assert.equal(dashboard.workspace.root, canonicalRoot);
+  assert.equal(dashboard.workspace.name, path.basename(canonicalRoot));
   assert.equal(dashboard.workspace.eventCount, dashboard.totals.events);
   assert.equal(dashboard.workspace.ledgerPath, ".qarinah/events/events.jsonl");
   assert.match(dashboard.workspace.ledgerHeadHash, /^sha256:/u);
