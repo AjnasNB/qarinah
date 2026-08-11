@@ -51,7 +51,7 @@ test("website deployment is bound to exact published Qarinah assets", async () =
   assert.doesNotMatch(workflow, /gitHubToken:/);
 });
 
-test("website worker permanently upgrades HTTP before delegating canonical HTTPS assets", async () => {
+test("website worker permanently canonicalizes scheme and host before delegating assets", async () => {
   const workerPath = path.join(root, "website", "worker.mjs");
   const worker = (await import(pathToFileURL(workerPath))).default;
   let delegated = 0;
@@ -67,6 +67,28 @@ test("website worker permanently upgrades HTTP before delegating canonical HTTPS
   const redirect = await worker.fetch(new Request("http://qarinah.io/docs?source=search-console"), env);
   assert.equal(redirect.status, 308);
   assert.equal(redirect.headers.get("location"), "https://qarinah.io/docs?source=search-console");
+  assert.equal(delegated, 0);
+
+  const wwwRedirect = await worker.fetch(
+    new Request("https://www.qarinah.io/docs/?source=search-console"),
+    env
+  );
+  assert.equal(wwwRedirect.status, 308);
+  assert.equal(
+    wwwRedirect.headers.get("location"),
+    "https://qarinah.io/docs/?source=search-console"
+  );
+  assert.equal(delegated, 0);
+
+  const combinedRedirect = await worker.fetch(
+    new Request("http://www.qarinah.io/docs/?source=search-console"),
+    env
+  );
+  assert.equal(combinedRedirect.status, 308);
+  assert.equal(
+    combinedRedirect.headers.get("location"),
+    "https://qarinah.io/docs/?source=search-console"
+  );
   assert.equal(delegated, 0);
 
   const served = await worker.fetch(new Request("https://qarinah.io/docs/"), env);
