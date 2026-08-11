@@ -19,6 +19,7 @@ import {
   importAgentArchive,
   loadIndex,
   loadWorkspace,
+  measureMemoryFootprint,
   readEvents,
   rebuildDerivedState,
   renderProjectOverviewMarkdown,
@@ -241,6 +242,7 @@ Usage:
   qarinah import <archive-file-or-directory> [--format auto|codex|claude|kimi|portable] [--mode compact|full] [--max-bytes n] [--max-files n] [--max-records n] [--max-line-bytes n]
   qarinah backup <archive-file-or-directory>... --destination <external-directory> [--max-bytes n] [--max-files n]
   qarinah overview [--format json|markdown]
+  qarinah footprint [query] [--baseline-tokens n] [--rate-per-million n] [--max-chars n] [--max-tokens n]
   qarinah export okf [--output <path>]
   qarinah query [text] [--format json|markdown|handoff] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp] [--minimum-coverage any|partial|direct] [--minimum-evidence any|partial|direct]
   qarinah query --stdin-json
@@ -490,6 +492,30 @@ async function run(argv) {
     if (!["json", "markdown"].includes(format)) throw new TypeError("overview --format must be json or markdown.");
     const overview = await buildProjectOverview({ cwd: process.cwd() });
     process.stdout.write(format === "json" ? `${JSON.stringify(overview, null, 2)}\n` : renderProjectOverviewMarkdown(overview));
+    return;
+  }
+  if (command === "footprint") {
+    const parsed = strictValueOptions(args, "footprint", ["--baseline-tokens", "--rate-per-million", "--max-chars", "--max-tokens"]);
+    const integer = (name) => {
+      const value = parsed.values.get(name);
+      if (value === undefined) return undefined;
+      if (!/^[0-9]+$/u.test(value)) throw new TypeError(`${name} must be a non-negative integer.`);
+      return Number(value);
+    };
+    const rateValue = parsed.values.get("--rate-per-million");
+    const ratePerMillion = rateValue === undefined ? undefined : Number(rateValue);
+    if (rateValue !== undefined && (rateValue.trim() === "" || !Number.isFinite(ratePerMillion) || ratePerMillion <= 0)) {
+      throw new TypeError("--rate-per-million must be a finite number greater than 0.");
+    }
+    const result = await measureMemoryFootprint({
+      cwd: process.cwd(),
+      query: parsed.positionals.join(" ") || undefined,
+      baselineTokens: integer("--baseline-tokens"),
+      ratePerMillion,
+      maxChars: integer("--max-chars"),
+      maxTokens: integer("--max-tokens")
+    });
+    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
     return;
   }
   if (command === "export") {

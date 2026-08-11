@@ -349,6 +349,49 @@ export function backupAgentArchives(
     clock?: () => Date;
   }
 ): Promise<Readonly<QarinahAgentArchiveBackupResult>>;
+export const MEMORY_FOOTPRINT_SCHEMA_VERSION: "qarinah.memory-footprint.v1";
+export interface QarinahMemoryFootprint {
+  readonly schemaVersion: "qarinah.memory-footprint.v1";
+  readonly workspaceId: string;
+  readonly query: string;
+  readonly retained: Readonly<{
+    eventCount: number;
+    importedSourceBytes: number;
+    importedSourceBytesKnown: boolean;
+    storageBytes: Readonly<Record<"ledger" | "sqlite" | "graph" | "index" | "context" | "overview" | "decisions" | "flow" | "changes" | "dashboard" | "total", number>>;
+  }>;
+  readonly deliveredPack: Readonly<{
+    itemCount: number;
+    usedChars: number;
+    estimatedTokens: number;
+    renderedBytes: number;
+    manifestHash: string;
+  }>;
+  readonly comparison: Readonly<{
+    status: "not-measured" | "measured";
+    source: "caller-supplied" | "portable-chars-div-4-from-compact-import-receipts" | "not-measured";
+    baselineTokens: number | null;
+    deliveredTokens: number;
+    savedTokens: number | null;
+    reductionPercent: number | null;
+    baselineToPackRatio: number | null;
+    costs: null | Readonly<{
+      ratePerMillion: number;
+      baseline: number;
+      delivered: number;
+      estimatedSaving: number;
+    }>;
+  }>;
+  readonly boundaries: Readonly<Record<string, string>>;
+}
+export function measureMemoryFootprint(options?: {
+  cwd?: string;
+  query?: string;
+  maxChars?: number;
+  maxTokens?: number;
+  baselineTokens?: number;
+  ratePerMillion?: number;
+}): Promise<Readonly<QarinahMemoryFootprint>>;
 export interface QarinahProjectOverview {
   readonly schemaVersion: "qarinah.project-overview.v1";
   readonly workspaceId: string;
@@ -599,6 +642,7 @@ export interface QarinahMemoryDashboard {
     savedTokens: number | null;
     savingsPercent: number | null;
   };
+  memoryFootprint: QarinahMemoryFootprint;
   currentDecisions: Record<string, unknown>[];
   supersededDecisions: Record<string, unknown>[];
   tools: Record<string, unknown>[];

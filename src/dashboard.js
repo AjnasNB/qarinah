@@ -1,4 +1,5 @@
 import { deepFreezeJson } from "./canonical.js";
+import { measureMemoryFootprint } from "./memory-footprint.js";
 import { buildProjectRecordViews } from "./project-views.js";
 import { readEvents } from "./store.js";
 import { atomicWriteFile, loadWorkspace, resolveWithin } from "./workspace.js";
@@ -51,6 +52,7 @@ export async function buildMemoryDashboard(options = {}) {
   const savingsPercent = baselineTokens > 0
     ? Math.round((savedTokens / baselineTokens) * 10000) / 100
     : null;
+  const memoryFootprint = await measureMemoryFootprint({ cwd: workspace.root });
   return deepFreezeJson({
     schemaVersion: "qarinah.memory-dashboard.v2",
     workspaceId: workspace.config.workspaceId,
@@ -75,6 +77,7 @@ export async function buildMemoryDashboard(options = {}) {
       savedTokens,
       savingsPercent
     },
+    memoryFootprint,
     currentDecisions: projectRecords.decisions.filter((decision) => decision.status === "current"),
     supersededDecisions: projectRecords.decisions.filter((decision) => decision.status === "superseded"),
     tools: tools.slice(-100).reverse().map((event) => ({
@@ -126,6 +129,10 @@ export function renderMemoryDashboard(data) {
   const savings = data.contextSavings.status === "measured"
     ? `${data.contextSavings.savingsPercent}% (${data.contextSavings.savedTokens.toLocaleString()} estimated tokens)`
     : "Not measured for this workspace";
+  const footprint = data.memoryFootprint;
+  const imported = footprint.retained.importedSourceBytesKnown
+    ? `${footprint.retained.importedSourceBytes.toLocaleString()} bytes`
+    : "No measured import receipt";
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Qarinah memory dashboard</title>
@@ -162,6 +169,12 @@ table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:12px;bor
 <section class="wide"><h2>Execution flow</h2>${data.executionFlow.length === 0 ? '<p class="empty">No execution steps recorded.</p>' : `<table><thead><tr><th>#</th><th>Kind</th><th>Action</th><th>Tool</th><th>Evidence</th></tr></thead><tbody>${data.executionFlow.map((step) => `<tr><td>${step.sequence}</td><td><code>${escapeHtml(step.kind)}</code></td><td>${escapeHtml(step.title)}</td><td>${step.toolName ? `<code>${escapeHtml(step.toolName)}</code>` : "—"}</td><td><code>${escapeHtml(step.eventId)}</code></td></tr>`).join("")}</tbody></table>`}</section>
 <section><h2>Tools called</h2>${list(data.tools.map((tool) => ({ ...tool, title: `${tool.toolName} · ${tool.kind}` })),"No tool activity recorded.")}</section>
 <section><h2>Major changes</h2>${list(data.majorChanges,"No major changes recorded.")}</section>
+<section><h2>Memory footprint</h2><table><tbody>
+<tr><th>Project memory on disk</th><td>${footprint.retained.storageBytes.total.toLocaleString()} bytes</td></tr>
+<tr><th>Measured imported source</th><td>${escapeHtml(imported)}</td></tr>
+<tr><th>Task pack delivered</th><td>${footprint.deliveredPack.estimatedTokens.toLocaleString()} estimated tokens</td></tr>
+<tr><th>Pack identity</th><td><code>${escapeHtml(footprint.deliveredPack.manifestHash)}</code></td></tr>
+</tbody></table><p>Retained project memory and the small task-specific pack are different quantities. The dashboard never presents this as lossless archive compression.</p></section>
 <section><h2>Source citations</h2>${list(data.citations,"No external source citations recorded.")}</section>
 <section><h2>Agent activity timeline</h2>${list(data.activity,"No activity recorded.")}</section>
 <section class="wide"><h2>Files and systems affected</h2>${data.affectedFiles.length === 0 ? '<p class="empty">Run qarinah scan to populate the project map.</p>' : `<table><thead><tr><th>Path</th><th>Language</th><th>Content hash</th></tr></thead><tbody>${data.affectedFiles.map((file) => `<tr><td>${escapeHtml(file.path)}</td><td>${escapeHtml(file.language)}</td><td><code>${escapeHtml(file.contentHash)}</code></td></tr>`).join("")}</tbody></table>`}</section>

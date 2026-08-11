@@ -148,6 +148,27 @@ test("CLI backs up explicit agent exports with a verified external manifest", as
   assert.match(JSON.parse(missingDestination.stderr).message, /--destination/u);
 });
 
+test("CLI reports a bounded memory footprint and caller-supplied cost comparison", async (t) => {
+  const root = await temporaryDirectory(t);
+  assert.equal((await run(["init", root, "--capture", "content"], repositoryRoot)).code, 0);
+  const result = await run([
+    "footprint", "project", "decisions",
+    "--baseline-tokens", "10000",
+    "--rate-per-million", "3"
+  ], root);
+  assert.equal(result.code, 0, result.stderr);
+  const report = JSON.parse(result.stdout);
+  assert.equal(report.schemaVersion, "qarinah.memory-footprint.v1");
+  assert.equal(report.query, "project decisions");
+  assert.equal(report.comparison.baselineTokens, 10_000);
+  assert.equal(report.comparison.costs.baseline, 0.03);
+  assert.match(report.deliveredPack.manifestHash, /^sha256:[a-f0-9]{64}$/u);
+
+  const invalid = await run(["footprint", "--rate-per-million", "free"], root);
+  assert.equal(invalid.code, 1);
+  assert.match(JSON.parse(invalid.stderr).message, /finite number/u);
+});
+
 test("JSON stdin keeps model-controlled record and query text out of shell syntax", async (t) => {
   const root = await temporaryDirectory(t);
   const marker = path.join(root, "command-injection-marker.txt");
