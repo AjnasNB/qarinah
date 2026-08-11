@@ -567,6 +567,26 @@ a {
   padding-block: 76px;
 }
 
+.what-you-save-figure {
+  margin: 32px 0 0;
+}
+
+.what-you-save-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--q-border);
+  border-radius: 12px;
+  box-shadow: 0 24px 64px rgb(0 0 0 / 22%);
+}
+
+.what-you-save-figure figcaption {
+  margin-top: 10px;
+  color: var(--q-muted);
+  font: 500 12px/1.5 var(--q-mono);
+  text-align: center;
+}
+
 .cost-equivalent-table-wrap {
   margin-top: 32px;
   overflow: hidden;

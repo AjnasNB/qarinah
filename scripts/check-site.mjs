@@ -37,6 +37,7 @@ const required = [
   "assets/qarinah-mark.svg",
   "assets/qarinah-flow.svg",
   "assets/qarinah-social-preview.png",
+  "assets/qarinah-what-you-save.png",
   "site.css",
   "site.js",
   "primer.css",
@@ -306,6 +307,8 @@ if (!home.includes("Send 98.71% less repeated project context. Keep the proof.")
 for (const costProof of [
   "98.71% less repeated context. A 77.81:1 baseline-to-pack ratio.",
   "More than 70:1 compression in the published six-fixture estimate",
+  'src="/assets/qarinah-what-you-save.png"',
+  'alt="What you save with Qarinah: 98.71% less repeated context, a 77.81 to 1 baseline-to-pack ratio, 442,113 baseline tokens versus 5,682 Qarinah pack tokens, and exact illustrative savings at four flat uncached input-token rates."',
   'class="cost-equivalent-table"',
   "<th scope=\"col\">Rate</th>",
   "<th scope=\"col\">Baseline</th>",
