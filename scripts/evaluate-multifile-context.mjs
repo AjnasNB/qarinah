@@ -19,7 +19,8 @@ import {
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const packageJson = JSON.parse(await readFile(path.join(repositoryRoot, "package.json"), "utf8"));
-const resultPath = path.join(repositoryRoot, "bench", "results", `multifile-context-${packageJson.version}.json`);
+const evidencePackageVersion = "0.1.6";
+const resultPath = path.join(repositoryRoot, "bench", "results", `multifile-context-${evidencePackageVersion}.json`);
 const writeResult = process.argv.includes("--write");
 const fileCounts = Object.freeze([40, 50, 100]);
 const asOf = "2099-02-01T00:00:00.000Z";
@@ -418,7 +419,7 @@ const totalPositiveQueries = scales.reduce((sum, scale) => sum + scale.exactQuer
 const totalUnsupportedQueries = scales.reduce((sum, scale) => sum + scale.unsupportedQueries, 0);
 const artifact = {
   schemaVersion: "qarinah.multifile-context-eval-result.v1",
-  packageVersion: packageJson.version,
+  packageVersion: evidencePackageVersion,
   fixture: {
     description: "Deterministic 40/50/100-file project workspaces with nested JavaScript and Markdown files, resolved imports/links, one unique answer-bearing memory record per file, lexical distractors, graph-only evidence, supersession, contradiction, stale derived projections, and unsupported controls.",
     fileCounts,
@@ -474,6 +475,7 @@ if (writeResult) {
 process.stdout.write(`${JSON.stringify({
   schemaVersion: "qarinah.multifile-context-eval-run.v1",
   packageVersion: packageJson.version,
+  evidencePackageVersion,
   node: process.version,
   platform: `${process.platform}-${process.arch}`,
   ...artifact
