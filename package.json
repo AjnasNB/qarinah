@@ -1,6 +1,6 @@
 {
   "name": "qarinah",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Evidence-linked project memory for coding agents with verified handoffs and a reproducible 98.71% estimated repeated-context reduction.",
   "license": "Apache-2.0",
   "author": "Ajnas NB",

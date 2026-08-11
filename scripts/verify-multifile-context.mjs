@@ -5,14 +5,15 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
+const evidencePackageVersion = "0.1.6";
 const result = JSON.parse(await readFile(
-  path.join(root, "bench", "results", `multifile-context-${packageJson.version}.json`),
+  path.join(root, "bench", "results", `multifile-context-${evidencePackageVersion}.json`),
   "utf8"
 ));
 const benchmarks = await readFile(path.join(root, "docs", "BENCHMARKS.md"), "utf8");
 
 assert.equal(result.schemaVersion, "qarinah.multifile-context-eval-result.v1");
-assert.equal(result.packageVersion, packageJson.version);
+assert.equal(result.packageVersion, evidencePackageVersion);
 assert.deepEqual(result.fixture.fileCounts, [40, 50, 100]);
 assert.equal(result.fixture.totalFiles, 190);
 assert.equal(result.fixture.totalPositiveQueries, 380);

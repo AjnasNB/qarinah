@@ -414,15 +414,15 @@ The repository also runs `npm run mcp:smoke` against the exact bundled Codex and
 
 ### Install once, initialize each project
 
-Install the reviewed `v0.1.6` plugin once in each host after that release is published:
+Install the reviewed `v0.1.7` plugin once in each host after that release is published:
 
 ```sh
 # Codex: personal installation, available to opted-in projects.
-codex plugin marketplace add AjnasNB/qarinah --ref v0.1.6
+codex plugin marketplace add AjnasNB/qarinah --ref v0.1.7
 codex plugin add qarinah@qarinah
 
 # Claude Code: personal installation across projects.
-claude plugin marketplace add AjnasNB/qarinah@v0.1.6 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.1.7 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 

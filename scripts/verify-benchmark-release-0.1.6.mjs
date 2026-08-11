@@ -46,7 +46,7 @@ execFileSync("git", ["merge-base", "--is-ancestor", historicalPaperSourceCommit,
 });
 
 assert.equal(release.schemaVersion, "qarinah.benchmark-release.v2");
-assert.equal(release.packageVersion, packageJson.version);
+assert.equal(packageJson.version, "0.1.7");
 assert.equal(release.packageVersion, "0.1.6");
 assert.equal(release.paperVersion, "1.3");
 assert.equal(release.status, "release-candidate-locally-verified-not-published");
@@ -132,7 +132,7 @@ assert.equal(software.expected.cases, 6);
 assert.equal(software.expected.allTargetsInTopFive, true);
 assert.equal(software.expected.allCoverageDirect, true);
 
-assert.equal(continuation.packageVersion, packageJson.version);
+assert.equal(continuation.packageVersion, release.packageVersion);
 assert.equal(capsule.id, "two-session-model-facing-capsule");
 assert.equal(capsule.baselineEstimatedTokens, continuation.expected.rawHistoryTokens);
 assert.equal(capsule.qarinahEstimatedTokens, continuation.expected.capsuleTokens);
@@ -149,7 +149,7 @@ assert.equal(auditPack.displayReduction, "89.05%");
 assert.equal(continuation.expected.sourceIdsPreserved, true);
 assert.equal(continuation.expected.sourceHashesPreserved, true);
 
-assert.equal(multifile.packageVersion, packageJson.version);
+assert.equal(multifile.packageVersion, release.packageVersion);
 assert.equal(release.multiFileProjectStudy.totalFiles, multifile.fixture.totalFiles);
 assert.equal(release.multiFileProjectStudy.positiveQueriesPassed, multifile.fixture.totalPositiveQueries);
 assert.equal(release.multiFileProjectStudy.unsupportedQueriesCorrectlyRejected, multifile.fixture.totalUnsupportedQueries);
@@ -170,7 +170,7 @@ assert.deepEqual(
 const development = release.realRepositoryDevelopmentStudy;
 const staticSetting = currentResearch.expected.settings.static;
 const onlineSetting = currentResearch.expected.settings.onlinePrequential;
-assert.equal(currentResearch.packageVersion, packageJson.version);
+assert.equal(currentResearch.packageVersion, release.packageVersion);
 assert.equal(currentResearch.implementation.evidenceSufficiencyMethod, "evidence-sufficiency-v2");
 assert.equal(development.dataset.tasks, currentResearch.expected.corpus.tasks);
 assert.equal(development.dataset.heldoutQueries, currentResearch.expected.corpus.heldoutTasks);
