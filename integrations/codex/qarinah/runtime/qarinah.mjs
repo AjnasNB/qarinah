@@ -86,10 +86,10 @@ function sortJsonValue(value) {
 function sanitizeJsonValue(value, options = {}) {
   const limits = { ...DEFAULT_LIMITS, ...options };
   let nodes = 0;
-  function visit(candidate, path16, depth) {
+  function visit(candidate, path18, depth) {
     nodes += 1;
     if (nodes > limits.maximumNodes) throw new TypeError(`JSON value exceeds ${limits.maximumNodes} nodes.`);
-    if (depth > limits.maximumDepth) throw new TypeError(`JSON value exceeds depth ${limits.maximumDepth} at ${path16}.`);
+    if (depth > limits.maximumDepth) throw new TypeError(`JSON value exceeds depth ${limits.maximumDepth} at ${path18}.`);
     if (candidate === null || typeof candidate === "boolean") return candidate;
     if (typeof candidate === "string") {
       if (candidate.length > limits.maximumStringLength) {
@@ -99,42 +99,42 @@ function sanitizeJsonValue(value, options = {}) {
       return candidate;
     }
     if (typeof candidate === "number") {
-      if (!Number.isFinite(candidate)) throw new TypeError(`${path16} must contain only finite numbers.`);
+      if (!Number.isFinite(candidate)) throw new TypeError(`${path18} must contain only finite numbers.`);
       return Object.is(candidate, -0) ? 0 : candidate;
     }
     if (Array.isArray(candidate)) {
       if (candidate.length > limits.maximumArrayLength) {
-        throw new TypeError(`${path16} exceeds ${limits.maximumArrayLength} array items.`);
+        throw new TypeError(`${path18} exceeds ${limits.maximumArrayLength} array items.`);
       }
       const descriptors2 = Object.getOwnPropertyDescriptors(candidate);
       const allowed = /* @__PURE__ */ new Set(["length", ...Array.from({ length: candidate.length }, (_, index) => String(index))]);
       for (const key of Reflect.ownKeys(descriptors2)) {
-        if (typeof key !== "string" || !allowed.has(key)) throw new TypeError(`${path16} contains an unsupported array property.`);
+        if (typeof key !== "string" || !allowed.has(key)) throw new TypeError(`${path18} contains an unsupported array property.`);
       }
       return Array.from({ length: candidate.length }, (_, index) => {
         const descriptor = descriptors2[String(index)];
         if (!descriptor?.enumerable || !Object.hasOwn(descriptor, "value")) {
-          throw new TypeError(`${path16}[${index}] must be an enumerable data property.`);
+          throw new TypeError(`${path18}[${index}] must be an enumerable data property.`);
         }
-        return visit(descriptor.value, `${path16}[${index}]`, depth + 1);
+        return visit(descriptor.value, `${path18}[${index}]`, depth + 1);
       });
     }
-    if (!candidate || typeof candidate !== "object") throw new TypeError(`${path16} contains an unsupported value.`);
+    if (!candidate || typeof candidate !== "object") throw new TypeError(`${path18} contains an unsupported value.`);
     const prototype = Object.getPrototypeOf(candidate);
     if (prototype !== Object.prototype && prototype !== null) {
-      throw new TypeError(`${path16} must contain only plain records.`);
+      throw new TypeError(`${path18} must contain only plain records.`);
     }
     const descriptors = Object.getOwnPropertyDescriptors(candidate);
     const keys = Reflect.ownKeys(descriptors);
-    if (keys.length > limits.maximumObjectKeys) throw new TypeError(`${path16} exceeds ${limits.maximumObjectKeys} fields.`);
+    if (keys.length > limits.maximumObjectKeys) throw new TypeError(`${path18} exceeds ${limits.maximumObjectKeys} fields.`);
     const result = /* @__PURE__ */ Object.create(null);
     for (const key of keys) {
-      if (typeof key !== "string") throw new TypeError(`${path16} cannot contain symbol keys.`);
+      if (typeof key !== "string") throw new TypeError(`${path18} cannot contain symbol keys.`);
       const descriptor = descriptors[key];
       if (!descriptor.enumerable || !Object.hasOwn(descriptor, "value") || descriptor.value === void 0) {
-        throw new TypeError(`${path16}.${key} must be an enumerable data property with a defined value.`);
+        throw new TypeError(`${path18}.${key} must be an enumerable data property with a defined value.`);
       }
-      result[key] = visit(descriptor.value, `${path16}.${key}`, depth + 1);
+      result[key] = visit(descriptor.value, `${path18}.${key}`, depth + 1);
     }
     return result;
   }
@@ -159,56 +159,56 @@ function snapshotJsonBoundary(value, options = {}) {
   const limits = { ...DEFAULT_LIMITS2, ...options };
   const seen = /* @__PURE__ */ new WeakSet();
   let nodes = 0;
-  function visit(candidate, path16, depth) {
+  function visit(candidate, path18, depth) {
     nodes += 1;
     if (nodes > limits.maximumNodes) throw new TypeError(`${limits.label} exceeds ${limits.maximumNodes} JSON nodes.`);
-    if (depth > limits.maximumDepth) throw new TypeError(`${limits.label} exceeds depth ${limits.maximumDepth} at ${path16}.`);
+    if (depth > limits.maximumDepth) throw new TypeError(`${limits.label} exceeds depth ${limits.maximumDepth} at ${path18}.`);
     if (candidate === null || typeof candidate === "boolean") return candidate;
     if (typeof candidate === "string") {
       if (candidate.length > limits.maximumStringLength) {
-        throw new TypeError(`${path16} exceeds ${limits.maximumStringLength} characters.`);
+        throw new TypeError(`${path18} exceeds ${limits.maximumStringLength} characters.`);
       }
       return candidate;
     }
     if (typeof candidate === "number") {
       if (!Number.isFinite(candidate) || Object.is(candidate, -0)) {
-        throw new TypeError(`${path16} must be a finite JSON number other than negative zero.`);
+        throw new TypeError(`${path18} must be a finite JSON number other than negative zero.`);
       }
       return candidate;
     }
-    if (!candidate || typeof candidate !== "object") throw new TypeError(`${path16} contains a non-JSON value.`);
-    if (seen.has(candidate)) throw new TypeError(`${path16} contains a cyclic or repeated object reference.`);
+    if (!candidate || typeof candidate !== "object") throw new TypeError(`${path18} contains a non-JSON value.`);
+    if (seen.has(candidate)) throw new TypeError(`${path18} contains a cyclic or repeated object reference.`);
     seen.add(candidate);
     if (Array.isArray(candidate)) {
       if (candidate.length > limits.maximumArrayLength) {
-        throw new TypeError(`${path16} exceeds ${limits.maximumArrayLength} array entries.`);
+        throw new TypeError(`${path18} exceeds ${limits.maximumArrayLength} array entries.`);
       }
       const descriptors2 = Object.getOwnPropertyDescriptors(candidate);
       const expected = /* @__PURE__ */ new Set(["length", ...Array.from({ length: candidate.length }, (_, index) => String(index))]);
       for (const key of Reflect.ownKeys(descriptors2)) {
-        if (typeof key !== "string" || !expected.has(key)) throw new TypeError(`${path16} contains an unsupported array property.`);
+        if (typeof key !== "string" || !expected.has(key)) throw new TypeError(`${path18} contains an unsupported array property.`);
       }
       return Array.from({ length: candidate.length }, (_, index) => {
         const descriptor = descriptors2[String(index)];
         if (!descriptor?.enumerable || !Object.hasOwn(descriptor, "value")) {
-          throw new TypeError(`${path16}[${index}] must be an enumerable data property.`);
+          throw new TypeError(`${path18}[${index}] must be an enumerable data property.`);
         }
-        return visit(descriptor.value, `${path16}[${index}]`, depth + 1);
+        return visit(descriptor.value, `${path18}[${index}]`, depth + 1);
       });
     }
     const prototype = Object.getPrototypeOf(candidate);
-    if (prototype !== Object.prototype && prototype !== null) throw new TypeError(`${path16} must be a plain record.`);
+    if (prototype !== Object.prototype && prototype !== null) throw new TypeError(`${path18} must be a plain record.`);
     const descriptors = Object.getOwnPropertyDescriptors(candidate);
     const keys = Reflect.ownKeys(descriptors);
-    if (keys.length > limits.maximumObjectKeys) throw new TypeError(`${path16} exceeds ${limits.maximumObjectKeys} fields.`);
+    if (keys.length > limits.maximumObjectKeys) throw new TypeError(`${path18} exceeds ${limits.maximumObjectKeys} fields.`);
     const result = /* @__PURE__ */ Object.create(null);
     for (const key of keys) {
-      if (typeof key !== "string") throw new TypeError(`${path16} cannot contain symbol keys.`);
+      if (typeof key !== "string") throw new TypeError(`${path18} cannot contain symbol keys.`);
       const descriptor = descriptors[key];
       if (!descriptor.enumerable || !Object.hasOwn(descriptor, "value") || descriptor.value === void 0) {
-        throw new TypeError(`${path16}.${key} must be an enumerable data property with a defined value.`);
+        throw new TypeError(`${path18}.${key} must be an enumerable data property with a defined value.`);
       }
-      result[key] = visit(descriptor.value, `${path16}.${key}`, depth + 1);
+      result[key] = visit(descriptor.value, `${path18}.${key}`, depth + 1);
     }
     return result;
   }
@@ -2685,7 +2685,10 @@ async function loadWorkspace(start = process.cwd(), options = {}) {
   }
   const provisional = { root: actualRoot, qarinahDir, config, configPath };
   for (const directory of STORAGE_DIRECTORIES) {
-    await secureStoragePath(provisional, [directory], { type: "directory" });
+    await secureStoragePath(provisional, [directory], {
+      type: "directory",
+      allowMissing: directory === "dashboard"
+    });
   }
   try {
     await secureStoragePath(provisional, ["events", "events.jsonl"], { type: "file" });
@@ -3996,7 +3999,7 @@ var require_ignore = __commonJS({
       //   path matching.
       // - check `string` either `MODE_IGNORE` or `MODE_CHECK_IGNORE`
       // @returns {TestResult} true if a file is ignored
-      test(path16, checkUnignored, mode) {
+      test(path18, checkUnignored, mode) {
         let ignored = false;
         let unignored = false;
         let matchedRule;
@@ -4005,7 +4008,7 @@ var require_ignore = __commonJS({
           if (unignored === negative && ignored !== unignored || negative && !ignored && !unignored && !checkUnignored) {
             return;
           }
-          const matched = rule[mode].test(path16);
+          const matched = rule[mode].test(path18);
           if (!matched) {
             return;
           }
@@ -4026,17 +4029,17 @@ var require_ignore = __commonJS({
     var throwError = (message, Ctor) => {
       throw new Ctor(message);
     };
-    var checkPath = (path16, originalPath, doThrow) => {
-      if (!isString(path16)) {
+    var checkPath = (path18, originalPath, doThrow) => {
+      if (!isString(path18)) {
         return doThrow(
           `path must be a string, but got \`${originalPath}\``,
           TypeError
         );
       }
-      if (!path16) {
+      if (!path18) {
         return doThrow(`path must not be empty`, TypeError);
       }
-      if (checkPath.isNotRelative(path16)) {
+      if (checkPath.isNotRelative(path18)) {
         const r = "`path.relative()`d";
         return doThrow(
           `path should be a ${r} string, but got "${originalPath}"`,
@@ -4045,7 +4048,7 @@ var require_ignore = __commonJS({
       }
       return true;
     };
-    var isNotRelative = (path16) => REGEX_TEST_INVALID_PATH.test(path16);
+    var isNotRelative = (path18) => REGEX_TEST_INVALID_PATH.test(path18);
     checkPath.isNotRelative = isNotRelative;
     checkPath.convert = (p) => p;
     var Ignore = class {
@@ -4075,19 +4078,19 @@ var require_ignore = __commonJS({
       }
       // @returns {TestResult}
       _test(originalPath, cache, checkUnignored, slices) {
-        const path16 = originalPath && checkPath.convert(originalPath);
+        const path18 = originalPath && checkPath.convert(originalPath);
         checkPath(
-          path16,
+          path18,
           originalPath,
           this._strictPathCheck ? throwError : RETURN_FALSE
         );
-        return this._t(path16, cache, checkUnignored, slices);
+        return this._t(path18, cache, checkUnignored, slices);
       }
-      checkIgnore(path16) {
-        if (!REGEX_TEST_TRAILING_SLASH.test(path16)) {
-          return this.test(path16);
+      checkIgnore(path18) {
+        if (!REGEX_TEST_TRAILING_SLASH.test(path18)) {
+          return this.test(path18);
         }
-        const slices = path16.split(SLASH).filter(Boolean);
+        const slices = path18.split(SLASH).filter(Boolean);
         slices.pop();
         if (slices.length) {
           const parent = this._t(
@@ -4100,18 +4103,18 @@ var require_ignore = __commonJS({
             return parent;
           }
         }
-        return this._rules.test(path16, false, MODE_CHECK_IGNORE);
+        return this._rules.test(path18, false, MODE_CHECK_IGNORE);
       }
-      _t(path16, cache, checkUnignored, slices) {
-        if (path16 in cache) {
-          return cache[path16];
+      _t(path18, cache, checkUnignored, slices) {
+        if (path18 in cache) {
+          return cache[path18];
         }
         if (!slices) {
-          slices = path16.split(SLASH).filter(Boolean);
+          slices = path18.split(SLASH).filter(Boolean);
         }
         slices.pop();
         if (!slices.length) {
-          return cache[path16] = this._rules.test(path16, checkUnignored, MODE_IGNORE);
+          return cache[path18] = this._rules.test(path18, checkUnignored, MODE_IGNORE);
         }
         const parent = this._t(
           slices.join(SLASH) + SLASH,
@@ -4119,29 +4122,29 @@ var require_ignore = __commonJS({
           checkUnignored,
           slices
         );
-        return cache[path16] = parent.ignored ? parent : this._rules.test(path16, checkUnignored, MODE_IGNORE);
+        return cache[path18] = parent.ignored ? parent : this._rules.test(path18, checkUnignored, MODE_IGNORE);
       }
-      ignores(path16) {
-        return this._test(path16, this._ignoreCache, false).ignored;
+      ignores(path18) {
+        return this._test(path18, this._ignoreCache, false).ignored;
       }
       createFilter() {
-        return (path16) => !this.ignores(path16);
+        return (path18) => !this.ignores(path18);
       }
       filter(paths) {
         return makeArray(paths).filter(this.createFilter());
       }
       // @returns {TestResult}
-      test(path16) {
-        return this._test(path16, this._testCache, true);
+      test(path18) {
+        return this._test(path18, this._testCache, true);
       }
     };
     var factory = (options) => new Ignore(options);
-    var isPathValid = (path16) => checkPath(path16 && checkPath.convert(path16), path16, RETURN_FALSE);
+    var isPathValid = (path18) => checkPath(path18 && checkPath.convert(path18), path18, RETURN_FALSE);
     var setupWindows = () => {
       const makePosix = (str) => /^\\\\\?\\/.test(str) || /["<>|\u0000-\u001F]+/u.test(str) ? str : str.replace(/\\/g, "/");
       checkPath.convert = makePosix;
       const REGEX_TEST_WINDOWS_PATH_ABSOLUTE = /^[a-z]:\//i;
-      checkPath.isNotRelative = (path16) => REGEX_TEST_WINDOWS_PATH_ABSOLUTE.test(path16) || isNotRelative(path16);
+      checkPath.isNotRelative = (path18) => REGEX_TEST_WINDOWS_PATH_ABSOLUTE.test(path18) || isNotRelative(path18);
     };
     if (
       // Detect `process` so that it can run in browsers.
@@ -4158,7 +4161,7 @@ var require_ignore = __commonJS({
 
 // bin/qarinah.js
 import process2 from "node:process";
-import path15 from "node:path";
+import path17 from "node:path";
 
 // src/index.js
 init_errors();
@@ -8261,12 +8264,12 @@ function createMcpServer(options = {}) {
   let rootsCache = null;
   let requestSequence = 0;
   const pending = /* @__PURE__ */ new Map();
-  function send(message) {
+  function send2(message) {
     write(message);
   }
   function requestClient(method, params = void 0, timeoutMs = 3e3) {
     const id = `qarinah-server-${++requestSequence}`;
-    send({ jsonrpc: "2.0", id, method, ...params === void 0 ? {} : { params } });
+    send2({ jsonrpc: "2.0", id, method, ...params === void 0 ? {} : { params } });
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
         pending.delete(id);
@@ -8463,7 +8466,7 @@ function createMcpServer(options = {}) {
   }
   async function handle(message) {
     if (!message || typeof message !== "object" || Array.isArray(message) || message.jsonrpc !== "2.0") {
-      send(jsonRpcError(null, -32600, "Invalid JSON-RPC request."));
+      send2(jsonRpcError(null, -32600, "Invalid JSON-RPC request."));
       return;
     }
     if (!Object.hasOwn(message, "method") && Object.hasOwn(message, "id")) {
@@ -8476,7 +8479,7 @@ function createMcpServer(options = {}) {
       return;
     }
     if (typeof message.method !== "string") {
-      if (Object.hasOwn(message, "id")) send(jsonRpcError(message.id, -32600, "Invalid JSON-RPC request."));
+      if (Object.hasOwn(message, "id")) send2(jsonRpcError(message.id, -32600, "Invalid JSON-RPC request."));
       return;
     }
     if (!Object.hasOwn(message, "id")) {
@@ -8484,10 +8487,10 @@ function createMcpServer(options = {}) {
       return;
     }
     try {
-      send(await handleRequest(message));
+      send2(await handleRequest(message));
     } catch (error) {
       const safe = safeError(error);
-      send(jsonRpcError(message.id, -32603, safe.message, { code: safe.code }));
+      send2(jsonRpcError(message.id, -32603, safe.message, { code: safe.code }));
     }
   }
   function close(error = new QarinahError("MCP_CONNECTION_CLOSED", "The MCP connection closed.")) {
@@ -8575,11 +8578,12 @@ async function runMcpServer(options = {}) {
 // src/setup.js
 init_errors();
 import { lstat as lstat9, mkdir as mkdir6, readFile as readFile3 } from "node:fs/promises";
-import path13 from "node:path";
+import path14 from "node:path";
 import { fileURLToPath as fileURLToPath2 } from "node:url";
 
 // src/dashboard.js
 init_canonical();
+import path13 from "node:path";
 init_project_views();
 init_store();
 init_workspace();
@@ -8598,6 +8602,7 @@ function eventSummary(event) {
     title: event.title,
     confidence: event.confidence,
     actor: event.actor,
+    repositoryId: event.repository?.id ?? null,
     sourceId: event.provenance.sourceId,
     hash: event.hash
   };
@@ -8628,9 +8633,22 @@ async function buildMemoryDashboard(options = {}) {
   const savedTokens = baselineTokens === null ? null : Math.max(0, baselineTokens - deliveredTokens);
   const savingsPercent = baselineTokens > 0 ? Math.round(savedTokens / baselineTokens * 1e4) / 100 : null;
   const memoryFootprint = await measureMemoryFootprint({ cwd: workspace.root });
+  const repositoryIds = [...new Set(events.map((event) => event.repository?.id).filter(Boolean))].sort();
+  const latestEvent = events.at(-1) ?? null;
   return deepFreezeJson({
     schemaVersion: "qarinah.memory-dashboard.v2",
     workspaceId: workspace.config.workspaceId,
+    workspace: {
+      name: path13.basename(workspace.root),
+      root: workspace.root,
+      workspaceId: workspace.config.workspaceId,
+      repositoryIds,
+      ledgerPath: ".qarinah/events/events.jsonl",
+      ledgerHeadHash: latestEvent?.hash ?? null,
+      ledgerBytes: memoryFootprint.retained.storageBytes.ledger,
+      lastActivityAt: latestEvent?.timestamp ?? null,
+      eventCount: events.length
+    },
     generatedAt: (options.clock?.() ?? /* @__PURE__ */ new Date()).toISOString(),
     capture: workspace.config.capture,
     totals: {
@@ -8702,10 +8720,31 @@ function paginatedTable({ id, label, headings, rows, pageSize = 10 }) {
 function tableRegion(label, content) {
   return `<div class="table-scroll" role="region" aria-label="${escapeHtml(label)} table" tabindex="0">${content}</div>`;
 }
-function renderMemoryDashboard(data) {
+function renderMemoryDashboard(data, options = {}) {
   const savings = data.contextSavings.status === "measured" ? `${data.contextSavings.savingsPercent}% (${data.contextSavings.savedTokens.toLocaleString()} estimated tokens)` : "Not measured for this workspace";
   const footprint = data.memoryFootprint;
   const imported = footprint.retained.importedSourceBytesKnown ? `${footprint.retained.importedSourceBytes.toLocaleString()} bytes` : "No measured import receipt";
+  const workspace = data.workspace ?? {
+    name: data.workspaceId,
+    root: "",
+    workspaceId: data.workspaceId,
+    repositoryIds: [],
+    ledgerPath: ".qarinah/events/events.jsonl",
+    ledgerHeadHash: null,
+    ledgerBytes: 0,
+    lastActivityAt: null,
+    eventCount: data.totals.events
+  };
+  const projects = Array.isArray(options.projects) ? options.projects : [];
+  const projectNavigation = projects.length > 1 ? `<nav class="project-nav" aria-label="Local Qarinah projects">${projects.map((project) => `<a href="${escapeHtml(project.href)}"${project.workspaceId === workspace.workspaceId ? ' aria-current="page"' : ""}>${escapeHtml(project.name)}<small>${escapeHtml(project.workspaceId)}</small></a>`).join("")}</nav>` : "";
+  const repositoryLabel = workspace.repositoryIds.length > 0 ? workspace.repositoryIds.join(", ") : "No repository identity recorded yet";
+  const liveStatus2 = options.live === true ? '<strong class="live-state"><span aria-hidden="true"></span>Live local ledger</strong>' : '<strong class="snapshot-state">Verified local snapshot</strong>';
+  const liveScript = options.live === true && typeof options.liveStatusPath === "string" ? `
+const qarinahLiveStatusPath=${JSON.stringify(options.liveStatusPath).replaceAll("<", "\\u003c")};
+const qarinahInitialHead=${JSON.stringify(workspace.ledgerHeadHash)};
+const qarinahInitialCount=${workspace.eventCount};
+const qarinahInitialBytes=${workspace.ledgerBytes};
+setInterval(async()=>{try{const response=await fetch(qarinahLiveStatusPath,{cache:"no-store"});if(!response.ok)return;const current=await response.json();if(current.headHash!==qarinahInitialHead||current.eventCount!==qarinahInitialCount||current.logBytes!==qarinahInitialBytes)location.reload();}catch{}},2000);` : "";
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Qarinah memory dashboard</title>
@@ -8726,12 +8765,23 @@ li:first-child{border-top:0}li strong{min-width:0;overflow-wrap:anywhere}li span
 .records{display:grid;gap:12px}.record{border-top:1px solid var(--line);padding-top:15px}.record:first-child{border-top:0;padding-top:0}.record-head{display:flex;gap:18px;align-items:baseline;justify-content:space-between}.record h3{font-size:16px;margin:0}.record p{margin:8px 0}.record small,.record time{color:var(--muted);font-size:12px}.record small code{overflow-wrap:anywhere}
 .pager{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:16px}.pager button{min-width:92px;min-height:42px;padding:8px 13px;border:1px solid var(--line);border-radius:8px;color:var(--text);background:#17212d;font:700 13px/1 system-ui,sans-serif;cursor:pointer}.pager button:hover:not(:disabled){border-color:var(--mint);color:var(--mint)}.pager button:focus-visible{outline:2px solid var(--mint);outline-offset:2px}.pager button:disabled{cursor:not-allowed;opacity:.45}.pager output{min-width:92px;color:var(--muted);font:700 12px/1.2 ui-monospace,monospace;text-align:center}
 .empty{margin:0}.warning{color:var(--warn)}[hidden]{display:none!important}
+.project-nav{display:flex;gap:8px;overflow-x:auto;padding:0 0 16px;scrollbar-width:thin}.project-nav a{flex:0 0 auto;min-width:180px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;color:var(--text);text-decoration:none;background:var(--panel)}.project-nav a[aria-current="page"]{border-color:var(--mint)}.project-nav small{display:block;color:var(--muted);font:11px/1.3 ui-monospace,monospace;margin-top:4px}.source-card{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 22px;margin-top:18px;padding:16px;border:1px solid var(--line);background:var(--panel)}.source-card p{margin:0;min-width:0}.source-card strong{display:block;color:var(--text);font-size:12px}.source-card code{overflow-wrap:anywhere}.live-state,.snapshot-state{display:inline-flex;align-items:center;gap:8px;color:var(--mint)}.live-state span{width:9px;height:9px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 4px rgb(53 224 170 / 14%)}
 @media(max-width:760px){header,main{width:min(100% - 20px,1180px)}header{padding:36px 0 22px}h1{font-size:clamp(34px,12vw,54px)}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.metric{min-width:0;padding:17px}.metric strong{font-size:24px;overflow-wrap:anywhere}main{padding-top:18px}.grid{grid-template-columns:1fr;gap:12px}section,section.wide{grid-column:auto;padding:18px}li{grid-template-columns:1fr}.record-head{display:block}.record-head time{display:block;margin-top:4px}.table-scroll table{min-width:620px}.pager{justify-content:space-between}.pager button{min-width:84px}}
+@media(max-width:600px){.source-card{grid-template-columns:1fr}.project-nav a{min-width:155px}}
 @media(max-width:420px){.metrics{grid-template-columns:1fr}.pager{display:grid;grid-template-columns:1fr 1fr}.pager output{grid-column:1/-1;grid-row:1;min-width:0}.pager button{width:100%}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 </style></head><body>
-<header><div class="eyebrow">Qarinah \xB7 local dashboard</div><h1>Shared memory your team can inspect.</h1>
-<p>Workspace <code>${escapeHtml(data.workspaceId)}</code> \xB7 generated ${escapeHtml(data.generatedAt)} \xB7 ${escapeHtml(data.capture)} capture</p>
+<header>${projectNavigation}<div class="eyebrow">Qarinah \xB7 local dashboard</div><h1>${escapeHtml(workspace.name)} remembers.</h1>
+<p>Shared memory your team can inspect. ${liveStatus2} \xB7 generated ${escapeHtml(data.generatedAt)} \xB7 ${escapeHtml(data.capture)} capture</p>
+<div class="source-card">
+<p><strong>Project root</strong><code>${escapeHtml(workspace.root)}</code></p>
+<p><strong>Workspace identity</strong><code>${escapeHtml(workspace.workspaceId)}</code></p>
+<p><strong>Repository identities</strong>${escapeHtml(repositoryLabel)}</p>
+<p><strong>Authoritative source</strong><code>${escapeHtml(workspace.ledgerPath)}</code></p>
+<p><strong>Ledger head</strong><code>${escapeHtml(workspace.ledgerHeadHash ?? "Empty ledger")}</code></p>
+<p><strong>Ledger bytes</strong>${workspace.ledgerBytes.toLocaleString()}</p>
+<p><strong>Last retained activity</strong>${escapeHtml(workspace.lastActivityAt ?? "No retained activity yet")}</p>
+</div>
 <div class="metrics">
 <div class="metric"><strong>${data.totals.currentDecisions}</strong><span>current decisions</span></div>
 <div class="metric"><strong>${data.totals.supersededDecisions}</strong><span>superseded</span></div>
@@ -8780,6 +8830,7 @@ for (const pageSet of document.querySelectorAll("[data-page-set]")) {
   next.addEventListener("click", () => { if (page + 1 < pageCount) { page += 1; showPage(); } });
   showPage();
 }
+${liveScript}
 </script></body></html>`;
 }
 async function writeMemoryDashboard(options = {}) {
@@ -8798,8 +8849,8 @@ init_workspace();
 var MAX_MANAGED_FILE_BYTES = 512 * 1024;
 var MANAGED_TOML_START = "# qarinah:managed:start";
 var MANAGED_TOML_END = "# qarinah:managed:end";
-var PACKAGE_ROOT = path13.resolve(path13.dirname(fileURLToPath2(import.meta.url)), "..");
-var BIN_PATH = path13.join(PACKAGE_ROOT, "bin", "qarinah.js");
+var PACKAGE_ROOT = path14.resolve(path14.dirname(fileURLToPath2(import.meta.url)), "..");
+var BIN_PATH = path14.join(PACKAGE_ROOT, "bin", "qarinah.js");
 function tomlString(value) {
   return JSON.stringify(String(value));
 }
@@ -8838,10 +8889,10 @@ async function ensureDirectory(candidate, root, label) {
   if (metadata.isSymbolicLink() || !metadata.isDirectory()) {
     throw new QarinahError("SETUP_LINK_REJECTED", `${label} must be a real directory.`);
   }
-  resolveWithin(root, path13.relative(root, candidate));
+  resolveWithin(root, path14.relative(root, candidate));
 }
 async function writeJsonMerged(candidate, root, label, update) {
-  resolveWithin(root, path13.relative(root, candidate));
+  resolveWithin(root, path14.relative(root, candidate));
   const existing = await safeRead(candidate, label);
   let value = {};
   if (existing !== null && existing.trim() !== "") {
@@ -8859,7 +8910,7 @@ async function writeJsonMerged(candidate, root, label, update) {
 `);
 }
 async function writeExactManaged(candidate, root, label, contents) {
-  resolveWithin(root, path13.relative(root, candidate));
+  resolveWithin(root, path14.relative(root, candidate));
   const existing = await safeRead(candidate, label);
   if (existing !== null && existing !== contents) {
     throw new QarinahError("SETUP_CONFLICT", `${label} already exists with different content.`);
@@ -8909,23 +8960,23 @@ async function installSkill(workspace, host, skillName, files) {
   await ensureDirectory(resolveWithin(workspace.root, `.${host}`), workspace.root, `.${host}`);
   await ensureDirectory(resolveWithin(workspace.root, `.${host}`, "skills"), workspace.root, `.${host}/skills`);
   await ensureDirectory(skillRoot, workspace.root, `.${host}/skills/${skillName}`);
-  const sourceRoot = path13.join(PACKAGE_ROOT, "integrations", host, "qarinah", "skills", skillName);
+  const sourceRoot = path14.join(PACKAGE_ROOT, "integrations", host, "qarinah", "skills", skillName);
   for (const relative of files) {
-    const destinationDirectory = path13.dirname(resolveWithin(skillRoot, relative));
+    const destinationDirectory = path14.dirname(resolveWithin(skillRoot, relative));
     if (destinationDirectory !== skillRoot) {
       await ensureDirectory(
         destinationDirectory,
         workspace.root,
-        `.${host}/skills/${skillName}/${path13.relative(skillRoot, destinationDirectory)}`
+        `.${host}/skills/${skillName}/${path14.relative(skillRoot, destinationDirectory)}`
       );
     }
-    const contents = await readFile3(path13.join(sourceRoot, relative), "utf8");
+    const contents = await readFile3(path14.join(sourceRoot, relative), "utf8");
     const destination = resolveWithin(skillRoot, relative);
     const existing = await safeRead(destination, `${host} Qarinah skill`);
     if (existing !== null && existing !== contents) {
       throw new QarinahError(
         "SETUP_CONFLICT",
-        `${path13.relative(workspace.root, destination)} already exists with different content. Preserve it or remove it before setup.`
+        `${path14.relative(workspace.root, destination)} already exists with different content. Preserve it or remove it before setup.`
       );
     }
     if (existing === null) await atomicWriteFile(destination, contents);
@@ -8934,7 +8985,7 @@ async function installSkill(workspace, host, skillName, files) {
 async function installHostSkills(workspace, host) {
   await installSkill(workspace, host, "qarinah-context", [
     "SKILL.md",
-    path13.join("references", "event-contract.md")
+    path14.join("references", "event-contract.md")
   ]);
   await installSkill(workspace, host, "qarinah", ["SKILL.md"]);
 }
@@ -9097,11 +9148,11 @@ Before replaying broad project history, use the Qarinah MCP server for a bounded
   ];
 }
 async function setupWorkspace(options = {}) {
-  const target = path13.resolve(options.cwd ?? process.cwd());
+  const target = path14.resolve(options.cwd ?? process.cwd());
   let workspace;
   let exactConfigExists = false;
   try {
-    await lstat9(path13.join(target, ".qarinah", "config.json"));
+    await lstat9(path14.join(target, ".qarinah", "config.json"));
     exactConfigExists = true;
   } catch (error) {
     if (error?.code !== "ENOENT") throw error;
@@ -9225,7 +9276,7 @@ init_canonical();
 init_errors();
 import { createHash as createHash6 } from "node:crypto";
 import { lstat as lstat10, readFile as readFile4, realpath as realpath8 } from "node:fs/promises";
-import path14 from "node:path";
+import path15 from "node:path";
 init_store();
 init_workspace();
 function latestSnapshot(events) {
@@ -9253,8 +9304,8 @@ async function inspectFile(workspace, file) {
     return { path: file.path, status: "unsafe", expectedHash: file.contentHash ?? file.hash };
   }
   const resolved = await realpath8(absolute);
-  const relative = path14.relative(workspace.root, resolved);
-  if (relative.startsWith("..") || path14.isAbsolute(relative)) {
+  const relative = path15.relative(workspace.root, resolved);
+  if (relative.startsWith("..") || path15.isAbsolute(relative)) {
     throw new QarinahError("PATH_OUTSIDE_WORKSPACE", "A freshness target resolves outside the trusted workspace.");
   }
   if (file.bytes !== void 0 && metadata.size > file.bytes || metadata.size > 4 * 1024 * 1024) {
@@ -9359,6 +9410,149 @@ async function inspectMemoryFreshness(options = {}) {
   });
 }
 
+// src/dashboard-server.js
+import { createServer } from "node:http";
+import path16 from "node:path";
+init_workspace();
+var MAX_PROJECTS = 32;
+var WORKSPACE_ID = /^ws_[0-9a-f]{32}$/u;
+var LOOPBACK_HOST = /^(?:127\.0\.0\.1|localhost)(?::[0-9]+)?$/iu;
+function escapeHtml2(value) {
+  return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
+}
+function projectHref(workspaceId) {
+  return `/project/${encodeURIComponent(workspaceId)}/`;
+}
+async function resolveProjects(cwd, requested) {
+  if (!Array.isArray(requested)) throw new TypeError("workspaces must be an array.");
+  if (requested.length + 1 > MAX_PROJECTS) throw new TypeError(`A live dashboard supports at most ${MAX_PROJECTS} projects.`);
+  const roots = [cwd, ...requested];
+  const byWorkspaceId = /* @__PURE__ */ new Map();
+  for (const candidate of roots) {
+    if (typeof candidate !== "string" || candidate.trim() === "") {
+      throw new TypeError("Each live dashboard project must be a non-empty path.");
+    }
+    const workspace = await loadWorkspace(path16.resolve(cwd, candidate));
+    if (!byWorkspaceId.has(workspace.config.workspaceId)) {
+      byWorkspaceId.set(workspace.config.workspaceId, Object.freeze({
+        name: path16.basename(workspace.root),
+        root: workspace.root,
+        workspaceId: workspace.config.workspaceId,
+        href: projectHref(workspace.config.workspaceId)
+      }));
+    }
+  }
+  return Object.freeze([...byWorkspaceId.values()]);
+}
+async function liveStatus(project) {
+  const workspace = await loadWorkspace(project.root);
+  const ledger = await openSecureReadFile(workspace, ["events", "events.jsonl"]);
+  await ledger.handle.close();
+  const checkpoint = workspace.consent.checkpoint;
+  return Object.freeze({
+    workspaceId: workspace.config.workspaceId,
+    eventCount: checkpoint.eventCount,
+    headHash: checkpoint.headHash,
+    logBytes: ledger.metadata.size,
+    lastActivityAt: checkpoint.updatedAt
+  });
+}
+function renderProjectIndex(projects) {
+  return `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Qarinah local projects</title><style>
+:root{color-scheme:dark;--bg:#090d12;--panel:#101720;--line:#27313c;--text:#edf5f2;--muted:#9aa7b2;--mint:#35e0aa}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 Inter,ui-sans-serif,system-ui,sans-serif}main{width:min(1040px,calc(100% - 28px));margin:auto;padding:56px 0 80px}.eyebrow{color:var(--mint);font:700 12px/1.2 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase}h1{font-size:clamp(36px,7vw,68px);line-height:1;margin:18px 0}p{color:var(--muted);max-width:740px}.projects{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:14px;margin-top:30px}.project{display:block;min-width:0;padding:20px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--text);text-decoration:none}.project:hover,.project:focus-visible{border-color:var(--mint);outline:none}.project h2{margin:0 0 8px;font-size:20px}.project dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 12px;margin:16px 0 0}.project dt{color:var(--muted)}.project dd{margin:0;overflow-wrap:anywhere}.project code{font-size:11px}.live{display:inline-flex;align-items:center;gap:8px;color:var(--mint);font-weight:700}.live::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 4px rgb(53 224 170 / 14%)}@media(max-width:480px){main{padding-top:34px}.project dl{grid-template-columns:1fr}.project dt{margin-top:6px}}
+</style></head><body><main><div class="eyebrow">Qarinah \xB7 local dashboard</div><h1>Your real project memory.</h1><p class="live">Live from authorized local ledgers</p><p>Each project remains a separate Qarinah workspace. This page rereads the project-owned ledger; it does not invent activity or search the rest of your disk.</p><div class="projects">
+${projects.map((project) => `<a class="project" href="${escapeHtml2(project.href)}" data-project="${escapeHtml2(project.workspaceId)}"><h2>${escapeHtml2(project.name)}</h2><div>${escapeHtml2(project.root)}</div><dl><dt>Workspace</dt><dd><code>${escapeHtml2(project.workspaceId)}</code></dd><dt>Events</dt><dd data-events>Loading\u2026</dd><dt>Last activity</dt><dd data-activity>Loading\u2026</dd></dl></a>`).join("")}
+</div></main><script>
+const refresh=async()=>{for(const card of document.querySelectorAll("[data-project]")){try{const id=card.dataset.project;const response=await fetch("/api/status/"+encodeURIComponent(id),{cache:"no-store"});if(!response.ok)continue;const status=await response.json();card.querySelector("[data-events]").textContent=String(status.eventCount);card.querySelector("[data-activity]").textContent=status.lastActivityAt??"No retained activity";}catch{}}};refresh();setInterval(refresh,2000);
+</script></body></html>`;
+}
+function send(response, statusCode, contentType, body, method = "GET") {
+  response.writeHead(statusCode, {
+    "Cache-Control": "no-store",
+    "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+    "Content-Type": contentType,
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+    "Referrer-Policy": "no-referrer",
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY"
+  });
+  if (method !== "HEAD") response.end(body);
+  else response.end();
+}
+async function serveMemoryDashboard(options = {}) {
+  const cwd = path16.resolve(options.cwd ?? process.cwd());
+  const projects = await resolveProjects(cwd, options.workspaces ?? []);
+  const projectById = new Map(projects.map((project) => [project.workspaceId, project]));
+  const port = options.port ?? 8777;
+  if (!Number.isSafeInteger(port) || port < 0 || port > 65535) {
+    throw new TypeError("port must be an integer from 0 to 65535.");
+  }
+  const server = createServer((request, response) => {
+    void (async () => {
+      const method = request.method ?? "GET";
+      if (!LOOPBACK_HOST.test(request.headers.host ?? "")) {
+        send(response, 421, "text/plain; charset=utf-8", "Misdirected request.\n", method);
+        return;
+      }
+      if (method !== "GET" && method !== "HEAD") {
+        response.setHeader("Allow", "GET, HEAD");
+        send(response, 405, "text/plain; charset=utf-8", "Method not allowed.\n", method);
+        return;
+      }
+      const url = new URL(request.url ?? "/", "http://127.0.0.1");
+      if (url.pathname === "/") {
+        send(response, 200, "text/html; charset=utf-8", renderProjectIndex(projects), method);
+        return;
+      }
+      const statusMatch = /^\/api\/status\/(ws_[0-9a-f]{32})$/u.exec(url.pathname);
+      if (statusMatch) {
+        const project = projectById.get(statusMatch[1]);
+        if (!project) {
+          send(response, 404, "application/json; charset=utf-8", '{"error":"not_found"}\n', method);
+          return;
+        }
+        send(response, 200, "application/json; charset=utf-8", `${JSON.stringify(await liveStatus(project))}
+`, method);
+        return;
+      }
+      const projectMatch = /^\/project\/(ws_[0-9a-f]{32})\/$/u.exec(url.pathname);
+      if (projectMatch && WORKSPACE_ID.test(projectMatch[1])) {
+        const project = projectById.get(projectMatch[1]);
+        if (!project) {
+          send(response, 404, "text/plain; charset=utf-8", "Project not found.\n", method);
+          return;
+        }
+        const data = await buildMemoryDashboard({ cwd: project.root });
+        send(response, 200, "text/html; charset=utf-8", renderMemoryDashboard(data, {
+          live: true,
+          liveStatusPath: `/api/status/${project.workspaceId}`,
+          projects
+        }), method);
+        return;
+      }
+      send(response, 404, "text/plain; charset=utf-8", "Not found.\n", method);
+    })().catch(() => {
+      if (!response.headersSent) send(response, 500, "text/plain; charset=utf-8", "Dashboard data could not be read.\n", request.method);
+      else response.destroy();
+    });
+  });
+  await new Promise((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(port, "127.0.0.1", resolve);
+  });
+  const address = server.address();
+  const actualPort = typeof address === "object" && address ? address.port : port;
+  return Object.freeze({
+    url: `http://127.0.0.1:${actualPort}/`,
+    host: "127.0.0.1",
+    port: actualPort,
+    projects,
+    close: () => new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()))
+  });
+}
+
 // bin/qarinah.js
 function option(args, name, fallback = void 0) {
   const index = args.indexOf(name);
@@ -9414,6 +9608,34 @@ function strictValueOptions(args, command, allowedOptions) {
     index += 1;
   }
   return { values, positionals: positionalValues };
+}
+function dashboardOptions(args) {
+  const values = /* @__PURE__ */ new Map();
+  const projects = [];
+  let serve = false;
+  for (let index = 0; index < args.length; index += 1) {
+    const name = args[index];
+    if (name === "--serve") {
+      if (serve) throw new TypeError("dashboard received --serve more than once.");
+      serve = true;
+      continue;
+    }
+    if (!["--output", "--baseline-tokens", "--delivered-tokens", "--port", "--project"].includes(name)) {
+      if (name.startsWith("--")) throw new TypeError(`dashboard does not support ${name}.`);
+      throw new TypeError("dashboard accepts options only.");
+    }
+    if (index === args.length - 1 || args[index + 1].startsWith("--")) throw new TypeError(`${name} requires a value.`);
+    const value = args[index + 1];
+    index += 1;
+    if (name === "--project") {
+      if (projects.length >= 31) throw new TypeError("dashboard supports at most 31 additional --project paths.");
+      projects.push(value);
+      continue;
+    }
+    if (values.has(name)) throw new TypeError(`dashboard received ${name} more than once.`);
+    values.set(name, value);
+  }
+  return { values, projects, serve };
 }
 var RECORD_STDIN_JSON_MAX_BYTES = 128 * 1024;
 var QUERY_STDIN_JSON_MAX_BYTES = 16 * 1024;
@@ -9584,6 +9806,7 @@ Usage:
   qarinah task-pack debugging|code-review|feature-implementation|database-migration|incident-response|release-preparation|security-review [query]
   qarinah freshness
   qarinah dashboard [--output <path>] [--baseline-tokens n --delivered-tokens n]
+  qarinah dashboard --serve [--port 8777] [--project <initialized-project>]...
   qarinah policy [path]
   qarinah trust [path] --capture metadata|content --policy-hash sha256:<digest>
   qarinah untrust
@@ -9648,8 +9871,8 @@ async function run(argv) {
       allowQuery: parsed.flags.has("--allow-query"),
       maxChars: positive("--max-chars"),
       maxItems: positive("--max-items"),
-      backupSources: parsed.values.has("--backup-source") ? [path15.resolve(parsed.values.get("--backup-source"))] : void 0,
-      backupDestination: parsed.values.has("--backup-destination") ? path15.resolve(parsed.values.get("--backup-destination")) : void 0,
+      backupSources: parsed.values.has("--backup-source") ? [path17.resolve(parsed.values.get("--backup-source"))] : void 0,
+      backupDestination: parsed.values.has("--backup-destination") ? path17.resolve(parsed.values.get("--backup-destination")) : void 0,
       backupMaxBytes: positive("--backup-max-bytes"),
       backupMaxFiles: positive("--backup-max-files")
     });
@@ -9814,8 +10037,8 @@ async function run(argv) {
       return Number(value);
     };
     const result = await backupAgentArchives(
-      parsed.positionals.map((source) => path15.resolve(source)),
-      path15.resolve(destination),
+      parsed.positionals.map((source) => path17.resolve(source)),
+      path17.resolve(destination),
       {
         cwd: process2.cwd(),
         maxBytes: integer2("--max-bytes"),
@@ -9938,14 +10161,39 @@ async function run(argv) {
     return;
   }
   if (command === "dashboard") {
-    const parsed = strictValueOptions(args, "dashboard", ["--output", "--baseline-tokens", "--delivered-tokens"]);
-    if (parsed.positionals.length !== 0) throw new TypeError("dashboard accepts options only.");
+    const parsed = dashboardOptions(args);
     const usage = (name) => {
       const value = parsed.values.get(name);
       if (value === void 0) return void 0;
       if (!/^[0-9]+$/.test(value)) throw new TypeError(`${name} must be a non-negative integer.`);
       return Number(value);
     };
+    if (parsed.serve) {
+      if (parsed.values.has("--output") || parsed.values.has("--baseline-tokens") || parsed.values.has("--delivered-tokens")) {
+        throw new TypeError("dashboard --serve cannot be combined with snapshot output or caller-supplied token measurements.");
+      }
+      const portText = parsed.values.get("--port") ?? "8777";
+      if (!/^[0-9]+$/.test(portText)) throw new TypeError("--port must be an integer from 1024 to 65535.");
+      const port = Number(portText);
+      if (port < 1024 || port > 65535) throw new TypeError("--port must be an integer from 1024 to 65535.");
+      const live = await serveMemoryDashboard({ cwd: process2.cwd(), workspaces: parsed.projects, port });
+      process2.stdout.write(`${JSON.stringify({
+        ok: true,
+        live: true,
+        url: live.url,
+        projects: live.projects
+      }, null, 2)}
+`);
+      const close = () => {
+        void live.close().finally(() => process2.exit(0));
+      };
+      process2.once("SIGINT", close);
+      process2.once("SIGTERM", close);
+      return;
+    }
+    if (parsed.values.has("--port") || parsed.projects.length > 0) {
+      throw new TypeError("--port and --project require dashboard --serve.");
+    }
     const result = await writeMemoryDashboard({
       cwd: process2.cwd(),
       output: parsed.values.get("--output"),

@@ -1,3 +1,4 @@
+import path from "node:path";
 import { deepFreezeJson } from "./canonical.js";
 import { measureMemoryFootprint } from "./memory-footprint.js";
 import { buildProjectRecordViews } from "./project-views.js";
@@ -20,6 +21,7 @@ function eventSummary(event) {
     title: event.title,
     confidence: event.confidence,
     actor: event.actor,
+    repositoryId: event.repository?.id ?? null,
     sourceId: event.provenance.sourceId,
     hash: event.hash
   };
@@ -53,9 +55,22 @@ export async function buildMemoryDashboard(options = {}) {
     ? Math.round((savedTokens / baselineTokens) * 10000) / 100
     : null;
   const memoryFootprint = await measureMemoryFootprint({ cwd: workspace.root });
+  const repositoryIds = [...new Set(events.map((event) => event.repository?.id).filter(Boolean))].sort();
+  const latestEvent = events.at(-1) ?? null;
   return deepFreezeJson({
     schemaVersion: "qarinah.memory-dashboard.v2",
     workspaceId: workspace.config.workspaceId,
+    workspace: {
+      name: path.basename(workspace.root),
+      root: workspace.root,
+      workspaceId: workspace.config.workspaceId,
+      repositoryIds,
+      ledgerPath: ".qarinah/events/events.jsonl",
+      ledgerHeadHash: latestEvent?.hash ?? null,
+      ledgerBytes: memoryFootprint.retained.storageBytes.ledger,
+      lastActivityAt: latestEvent?.timestamp ?? null,
+      eventCount: events.length
+    },
     generatedAt: (options.clock?.() ?? new Date()).toISOString(),
     capture: workspace.config.capture,
     totals: {
@@ -139,7 +154,7 @@ function tableRegion(label, content) {
   return `<div class="table-scroll" role="region" aria-label="${escapeHtml(label)} table" tabindex="0">${content}</div>`;
 }
 
-export function renderMemoryDashboard(data) {
+export function renderMemoryDashboard(data, options = {}) {
   const savings = data.contextSavings.status === "measured"
     ? `${data.contextSavings.savingsPercent}% (${data.contextSavings.savedTokens.toLocaleString()} estimated tokens)`
     : "Not measured for this workspace";
@@ -147,6 +162,30 @@ export function renderMemoryDashboard(data) {
   const imported = footprint.retained.importedSourceBytesKnown
     ? `${footprint.retained.importedSourceBytes.toLocaleString()} bytes`
     : "No measured import receipt";
+  const workspace = data.workspace ?? {
+    name: data.workspaceId,
+    root: "",
+    workspaceId: data.workspaceId,
+    repositoryIds: [],
+    ledgerPath: ".qarinah/events/events.jsonl",
+    ledgerHeadHash: null,
+    ledgerBytes: 0,
+    lastActivityAt: null,
+    eventCount: data.totals.events
+  };
+  const projects = Array.isArray(options.projects) ? options.projects : [];
+  const projectNavigation = projects.length > 1
+    ? `<nav class="project-nav" aria-label="Local Qarinah projects">${projects.map((project) => `<a href="${escapeHtml(project.href)}"${project.workspaceId === workspace.workspaceId ? ' aria-current="page"' : ""}>${escapeHtml(project.name)}<small>${escapeHtml(project.workspaceId)}</small></a>`).join("")}</nav>`
+    : "";
+  const repositoryLabel = workspace.repositoryIds.length > 0
+    ? workspace.repositoryIds.join(", ")
+    : "No repository identity recorded yet";
+  const liveStatus = options.live === true
+    ? '<strong class="live-state"><span aria-hidden="true"></span>Live local ledger</strong>'
+    : '<strong class="snapshot-state">Verified local snapshot</strong>';
+  const liveScript = options.live === true && typeof options.liveStatusPath === "string"
+    ? `\nconst qarinahLiveStatusPath=${JSON.stringify(options.liveStatusPath).replaceAll("<", "\\u003c")};\nconst qarinahInitialHead=${JSON.stringify(workspace.ledgerHeadHash)};\nconst qarinahInitialCount=${workspace.eventCount};\nconst qarinahInitialBytes=${workspace.ledgerBytes};\nsetInterval(async()=>{try{const response=await fetch(qarinahLiveStatusPath,{cache:"no-store"});if(!response.ok)return;const current=await response.json();if(current.headHash!==qarinahInitialHead||current.eventCount!==qarinahInitialCount||current.logBytes!==qarinahInitialBytes)location.reload();}catch{}},2000);`
+    : "";
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Qarinah memory dashboard</title>
@@ -167,12 +206,23 @@ li:first-child{border-top:0}li strong{min-width:0;overflow-wrap:anywhere}li span
 .records{display:grid;gap:12px}.record{border-top:1px solid var(--line);padding-top:15px}.record:first-child{border-top:0;padding-top:0}.record-head{display:flex;gap:18px;align-items:baseline;justify-content:space-between}.record h3{font-size:16px;margin:0}.record p{margin:8px 0}.record small,.record time{color:var(--muted);font-size:12px}.record small code{overflow-wrap:anywhere}
 .pager{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:16px}.pager button{min-width:92px;min-height:42px;padding:8px 13px;border:1px solid var(--line);border-radius:8px;color:var(--text);background:#17212d;font:700 13px/1 system-ui,sans-serif;cursor:pointer}.pager button:hover:not(:disabled){border-color:var(--mint);color:var(--mint)}.pager button:focus-visible{outline:2px solid var(--mint);outline-offset:2px}.pager button:disabled{cursor:not-allowed;opacity:.45}.pager output{min-width:92px;color:var(--muted);font:700 12px/1.2 ui-monospace,monospace;text-align:center}
 .empty{margin:0}.warning{color:var(--warn)}[hidden]{display:none!important}
+.project-nav{display:flex;gap:8px;overflow-x:auto;padding:0 0 16px;scrollbar-width:thin}.project-nav a{flex:0 0 auto;min-width:180px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;color:var(--text);text-decoration:none;background:var(--panel)}.project-nav a[aria-current="page"]{border-color:var(--mint)}.project-nav small{display:block;color:var(--muted);font:11px/1.3 ui-monospace,monospace;margin-top:4px}.source-card{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 22px;margin-top:18px;padding:16px;border:1px solid var(--line);background:var(--panel)}.source-card p{margin:0;min-width:0}.source-card strong{display:block;color:var(--text);font-size:12px}.source-card code{overflow-wrap:anywhere}.live-state,.snapshot-state{display:inline-flex;align-items:center;gap:8px;color:var(--mint)}.live-state span{width:9px;height:9px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 4px rgb(53 224 170 / 14%)}
 @media(max-width:760px){header,main{width:min(100% - 20px,1180px)}header{padding:36px 0 22px}h1{font-size:clamp(34px,12vw,54px)}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.metric{min-width:0;padding:17px}.metric strong{font-size:24px;overflow-wrap:anywhere}main{padding-top:18px}.grid{grid-template-columns:1fr;gap:12px}section,section.wide{grid-column:auto;padding:18px}li{grid-template-columns:1fr}.record-head{display:block}.record-head time{display:block;margin-top:4px}.table-scroll table{min-width:620px}.pager{justify-content:space-between}.pager button{min-width:84px}}
+@media(max-width:600px){.source-card{grid-template-columns:1fr}.project-nav a{min-width:155px}}
 @media(max-width:420px){.metrics{grid-template-columns:1fr}.pager{display:grid;grid-template-columns:1fr 1fr}.pager output{grid-column:1/-1;grid-row:1;min-width:0}.pager button{width:100%}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 </style></head><body>
-<header><div class="eyebrow">Qarinah · local dashboard</div><h1>Shared memory your team can inspect.</h1>
-<p>Workspace <code>${escapeHtml(data.workspaceId)}</code> · generated ${escapeHtml(data.generatedAt)} · ${escapeHtml(data.capture)} capture</p>
+<header>${projectNavigation}<div class="eyebrow">Qarinah · local dashboard</div><h1>${escapeHtml(workspace.name)} remembers.</h1>
+<p>Shared memory your team can inspect. ${liveStatus} · generated ${escapeHtml(data.generatedAt)} · ${escapeHtml(data.capture)} capture</p>
+<div class="source-card">
+<p><strong>Project root</strong><code>${escapeHtml(workspace.root)}</code></p>
+<p><strong>Workspace identity</strong><code>${escapeHtml(workspace.workspaceId)}</code></p>
+<p><strong>Repository identities</strong>${escapeHtml(repositoryLabel)}</p>
+<p><strong>Authoritative source</strong><code>${escapeHtml(workspace.ledgerPath)}</code></p>
+<p><strong>Ledger head</strong><code>${escapeHtml(workspace.ledgerHeadHash ?? "Empty ledger")}</code></p>
+<p><strong>Ledger bytes</strong>${workspace.ledgerBytes.toLocaleString()}</p>
+<p><strong>Last retained activity</strong>${escapeHtml(workspace.lastActivityAt ?? "No retained activity yet")}</p>
+</div>
 <div class="metrics">
 <div class="metric"><strong>${data.totals.currentDecisions}</strong><span>current decisions</span></div>
 <div class="metric"><strong>${data.totals.supersededDecisions}</strong><span>superseded</span></div>
@@ -221,6 +271,7 @@ for (const pageSet of document.querySelectorAll("[data-page-set]")) {
   next.addEventListener("click", () => { if (page + 1 < pageCount) { page += 1; showPage(); } });
   showPage();
 }
+${liveScript}
 </script></body></html>`;
 }
 

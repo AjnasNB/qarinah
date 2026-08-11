@@ -632,6 +632,17 @@ export function createCausalReceipt(input: Record<
 export interface QarinahMemoryDashboard {
   schemaVersion: "qarinah.memory-dashboard.v2";
   workspaceId: string;
+  workspace: Readonly<{
+    name: string;
+    root: string;
+    workspaceId: string;
+    repositoryIds: readonly string[];
+    ledgerPath: ".qarinah/events/events.jsonl";
+    ledgerHeadHash: `sha256:${string}` | null;
+    ledgerBytes: number;
+    lastActivityAt: string | null;
+    eventCount: number;
+  }>;
   generatedAt: string;
   capture: "metadata" | "content";
   totals: Record<string, number>;
@@ -665,7 +676,11 @@ export function buildMemoryDashboard(options?: {
   deliveredTokens?: number;
   clock?: () => Date;
 }): Promise<Readonly<QarinahMemoryDashboard>>;
-export function renderMemoryDashboard(data: QarinahMemoryDashboard): string;
+export function renderMemoryDashboard(data: QarinahMemoryDashboard, options?: {
+  live?: boolean;
+  liveStatusPath?: string;
+  projects?: readonly Readonly<{ name: string; root: string; workspaceId: string; href: string }>[];
+}): string;
 export function writeMemoryDashboard(options?: {
   cwd?: string;
   output?: string;
@@ -673,6 +688,17 @@ export function writeMemoryDashboard(options?: {
   deliveredTokens?: number;
   clock?: () => Date;
 }): Promise<Readonly<{ output: string; data: QarinahMemoryDashboard }>>;
+export function serveMemoryDashboard(options?: {
+  cwd?: string;
+  workspaces?: readonly string[];
+  port?: number;
+}): Promise<Readonly<{
+  url: string;
+  host: "127.0.0.1";
+  port: number;
+  projects: readonly Readonly<{ name: string; root: string; workspaceId: string; href: string }>[];
+  close: () => Promise<void>;
+}>>;
 export interface QarinahContextEvaluationCase {
   id?: string;
   requiredDecisionIds?: string[];

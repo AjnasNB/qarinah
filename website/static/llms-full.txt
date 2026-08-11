@@ -37,7 +37,7 @@ This file is a convenience map for tools that choose to read it. It does not con
 - Retrieves evidence with deterministic lexical, typo-tolerant, and one-hop graph signals.
 - Compiles bounded context packs with citations, evidence-coverage metadata, and conflict or supersession visibility.
 - Supports one-command Codex, Claude Code, and Cursor setup, local CLI workflows, MCP diagnostics, and explicitly consent-gated context retrieval.
-- Detects stale project files, compiles separate-authority multi-repository packs, and provides a local memory dashboard.
+- Detects stale project files, compiles separate-authority multi-repository packs, and provides responsive static or live-loopback dashboards sourced from real retained local events.
 - Provides optional reranking adapters, encrypted team bundles, role manifests, signed checkpoints, expanded evaluation, and causal receipts.
 - Exports reviewable Markdown, JSON, typed graph data, and Google Open Knowledge Format Markdown.
 
@@ -166,7 +166,7 @@ Qarinah provides reviewed Claude Code lifecycle hooks and a zero-write MCP serve
 
 ### CLI and MCP
 
-The CLI supports one-command host setup, scanning, integrity checks, deterministic rebuilds, bounded queries, task packs, freshness, dashboards, export, and policy review. The MCP surface is zero-write, accepts only exact opted-in workspace roots, and exposes context retrieval only with an exact consent-policy permit.
+The CLI supports one-command host setup, scanning, integrity checks, deterministic rebuilds, bounded queries, task packs, freshness, static dashboard snapshots, live loopback multi-project dashboards, export, and policy review. Live projects are selected explicitly and keep separate workspace identities. The MCP surface is zero-write, accepts only exact opted-in workspace roots, and exposes context retrieval only with an exact consent-policy permit.
 
 Canonical guide: https://qarinah.io/docs/integrations/
 

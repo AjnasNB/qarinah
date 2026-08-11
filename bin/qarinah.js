@@ -27,6 +27,7 @@ import {
   revokeWorkspaceTrust,
   runMcpServer,
   scanProjectStructure,
+  serveMemoryDashboard,
   setWorkspaceEnabled,
   setupWorkspace,
   verifyStore,
@@ -91,6 +92,35 @@ function strictValueOptions(args, command, allowedOptions) {
     index += 1;
   }
   return { values, positionals: positionalValues };
+}
+
+function dashboardOptions(args) {
+  const values = new Map();
+  const projects = [];
+  let serve = false;
+  for (let index = 0; index < args.length; index += 1) {
+    const name = args[index];
+    if (name === "--serve") {
+      if (serve) throw new TypeError("dashboard received --serve more than once.");
+      serve = true;
+      continue;
+    }
+    if (!["--output", "--baseline-tokens", "--delivered-tokens", "--port", "--project"].includes(name)) {
+      if (name.startsWith("--")) throw new TypeError(`dashboard does not support ${name}.`);
+      throw new TypeError("dashboard accepts options only.");
+    }
+    if (index === args.length - 1 || args[index + 1].startsWith("--")) throw new TypeError(`${name} requires a value.`);
+    const value = args[index + 1];
+    index += 1;
+    if (name === "--project") {
+      if (projects.length >= 31) throw new TypeError("dashboard supports at most 31 additional --project paths.");
+      projects.push(value);
+      continue;
+    }
+    if (values.has(name)) throw new TypeError(`dashboard received ${name} more than once.`);
+    values.set(name, value);
+  }
+  return { values, projects, serve };
 }
 
 const RECORD_STDIN_JSON_MAX_BYTES = 128 * 1024;
@@ -249,6 +279,7 @@ Usage:
   qarinah task-pack debugging|code-review|feature-implementation|database-migration|incident-response|release-preparation|security-review [query]
   qarinah freshness
   qarinah dashboard [--output <path>] [--baseline-tokens n --delivered-tokens n]
+  qarinah dashboard --serve [--port 8777] [--project <initialized-project>]...
   qarinah policy [path]
   qarinah trust [path] --capture metadata|content --policy-hash sha256:<digest>
   qarinah untrust
@@ -594,14 +625,36 @@ async function run(argv) {
     return;
   }
   if (command === "dashboard") {
-    const parsed = strictValueOptions(args, "dashboard", ["--output", "--baseline-tokens", "--delivered-tokens"]);
-    if (parsed.positionals.length !== 0) throw new TypeError("dashboard accepts options only.");
+    const parsed = dashboardOptions(args);
     const usage = (name) => {
       const value = parsed.values.get(name);
       if (value === undefined) return undefined;
       if (!/^[0-9]+$/.test(value)) throw new TypeError(`${name} must be a non-negative integer.`);
       return Number(value);
     };
+    if (parsed.serve) {
+      if (parsed.values.has("--output") || parsed.values.has("--baseline-tokens") || parsed.values.has("--delivered-tokens")) {
+        throw new TypeError("dashboard --serve cannot be combined with snapshot output or caller-supplied token measurements.");
+      }
+      const portText = parsed.values.get("--port") ?? "8777";
+      if (!/^[0-9]+$/.test(portText)) throw new TypeError("--port must be an integer from 1024 to 65535.");
+      const port = Number(portText);
+      if (port < 1024 || port > 65_535) throw new TypeError("--port must be an integer from 1024 to 65535.");
+      const live = await serveMemoryDashboard({ cwd: process.cwd(), workspaces: parsed.projects, port });
+      process.stdout.write(`${JSON.stringify({
+        ok: true,
+        live: true,
+        url: live.url,
+        projects: live.projects
+      }, null, 2)}\n`);
+      const close = () => { void live.close().finally(() => process.exit(0)); };
+      process.once("SIGINT", close);
+      process.once("SIGTERM", close);
+      return;
+    }
+    if (parsed.values.has("--port") || parsed.projects.length > 0) {
+      throw new TypeError("--port and --project require dashboard --serve.");
+    }
     const result = await writeMemoryDashboard({
       cwd: process.cwd(),
       output: parsed.values.get("--output"),

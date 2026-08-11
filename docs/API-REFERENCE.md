@@ -778,7 +778,11 @@ function buildMemoryDashboard(options?: {
   clock?: () => Date;
 }): Promise<Readonly<QarinahMemoryDashboard>>;
 
-function renderMemoryDashboard(data: QarinahMemoryDashboard): string;
+function renderMemoryDashboard(data: QarinahMemoryDashboard, options?: {
+  live?: boolean;
+  liveStatusPath?: string;
+  projects?: readonly { name: string; root: string; workspaceId: string; href: string }[];
+}): string;
 
 function writeMemoryDashboard(options?: {
   cwd?: string;
@@ -787,11 +791,23 @@ function writeMemoryDashboard(options?: {
   deliveredTokens?: number;
   clock?: () => Date;
 }): Promise<Readonly<{ output: string; data: QarinahMemoryDashboard }>>;
+
+function serveMemoryDashboard(options?: {
+  cwd?: string;
+  workspaces?: readonly string[];
+  port?: number;
+}): Promise<Readonly<{
+  url: string;
+  host: "127.0.0.1";
+  port: number;
+  projects: readonly { name: string; root: string; workspaceId: string; href: string }[];
+  close: () => Promise<void>;
+}>>;
 ```
 
-`buildMemoryDashboard` verifies the local ledger and returns a frozen `qarinah.memory-dashboard.v2` view without writing a file. `renderMemoryDashboard` turns a compatible view into self-contained HTML. `writeMemoryDashboard` writes that HTML atomically to `.qarinah/dashboard/index.html` by default.
+`buildMemoryDashboard` verifies the local ledger and returns a frozen `qarinah.memory-dashboard.v2` view without writing a file. Its workspace block identifies the real project root, workspace ID, retained repository IDs, event count, latest activity, and current ledger-head hash. `renderMemoryDashboard` turns a compatible view into self-contained HTML. `writeMemoryDashboard` writes that HTML atomically to `.qarinah/dashboard/index.html` by default. `serveMemoryDashboard` binds only to loopback and rereads one or more explicitly selected, separately authorized local projects; it does not discover or merge workspaces.
 
-The view contains workspace and capture metadata, totals, decisions with explicit reasons/outcomes/alternatives/linked tools, bounded execution flow, tool activity, major changes, explicit conflicts, source-linked events, the latest 100 permitted activity events, affected files from the latest project-structure scan, durable-record paths, and optional caller-supplied context measurements. Both token estimates must be supplied together. The functions do not infer provider billing, run a live server, or modify the authoritative ledger.
+The view contains workspace and capture metadata, totals, decisions with explicit reasons/outcomes/alternatives/linked tools, bounded execution flow, tool activity, major changes, explicit conflicts, source-linked events, the latest 100 permitted activity events, affected files from the latest project-structure scan, durable-record paths, and optional caller-supplied context measurements. Both token estimates must be supplied together. None of these functions infers provider billing or modifies the authoritative ledger; only `serveMemoryDashboard` starts a loopback HTTP server.
 
 `writeProjectOverview(options?)` writes the deterministic beginner-readable overview to `.qarinah/records/OVERVIEW.md` by default and returns both the resolved path and typed overview. `setupWorkspace` now initializes this overview, `DECISIONS.md`, `FLOW.md`, `CHANGES.md`, SQLite, the graph, and the local dashboard in one run.
 
@@ -804,6 +820,7 @@ setupWorkspace
 buildMemoryDashboard
 renderMemoryDashboard
 writeMemoryDashboard
+serveMemoryDashboard
 inspectMemoryFreshness
 TASK_MEMORY_PACKS
 compileTaskMemoryPack

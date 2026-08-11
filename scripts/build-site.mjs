@@ -499,7 +499,7 @@ const docPages = [
     route: "docs/dashboard",
     source: "docs/DASHBOARD.md",
     title: "Local memory dashboard",
-    description: "Generate and interpret Qarinah's local dashboard for decisions, supersession, conflicts, citations, permitted activity, affected files, and measured context savings.",
+    description: "Inspect real local Qarinah activity in responsive static snapshots or a live multi-project loopback dashboard with explicit workspace identity.",
     section: "Operate",
     aliases: ["memory dashboard", "project dashboard", "decision dashboard", "context savings", "agent activity", "affected files"]
   },
@@ -1341,11 +1341,11 @@ function homePage() {
             <p class="eyebrow">Inspect the memory before an agent uses it</p>
             <h2 id="dashboard-proof-title">See the decisions, reasons, flow, evidence, and affected files.</h2>
           </div>
-          <p>This real generated snapshot comes from an initialized Qarinah workspace. It shows the current release decision, explicitly superseded history, cited sources, project files, and an optional caller-supplied context comparison.</p>
+          <p>This real generated snapshot comes from an initialized Qarinah workspace. The live loopback mode rereads actual retained activity, identifies each explicitly selected project, and keeps every workspace ledger separate.</p>
         </div>
         <figure class="what-you-save-figure dashboard-proof-figure">
           <img src="/assets/qarinah-project-memory-dashboard.png" width="1440" height="900" loading="lazy" decoding="async" alt="Qarinah local project-memory dashboard showing one current decision, three superseded decisions, zero conflicts, cited sources, affected files, and a caller-supplied 98.71 percent context comparison.">
-          <figcaption>Generated from the local hash-chained ledger and codebase scan. No fictional dashboard data or hosted account is required.</figcaption>
+          <figcaption>Generated from the local hash-chained ledger and codebase scan. No fictional dashboard data, disk-wide project discovery, or hosted account is required.</figcaption>
         </figure>
         <div class="hero-actions dashboard-proof-actions">
           <a class="btn btn-primary" href="/docs/dashboard/">Open the dashboard guide</a>

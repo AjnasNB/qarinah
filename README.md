@@ -115,7 +115,7 @@ If a native chat later disappears, Qarinah can still retrieve the permitted even
 | Setup | What Qarinah gives you |
 | --- | --- |
 | Personal project | One local cited memory shared by Codex, Claude Code, Cursor, Kimi, Antigravity, CLI tools, and compatible MCP clients |
-| Portable review | Rebuildable SQLite, Markdown, JSON, graph, OKF, and a local static dashboard for inspecting project memory on desktop or mobile |
+| Portable review | Rebuildable SQLite, Markdown, JSON, graph, OKF, and responsive static or live-loopback dashboards for inspecting project memory |
 | Team workspace | Multi-repository relationships, freshness, encrypted bundles, signed checkpoints, membership, and separate authority boundaries |
 | Governed workflow | Optional Maqam memory scopes and disclosure controls without making Maqam a requirement |
 
@@ -325,13 +325,24 @@ Open `.qarinah/dashboard/index.html` in a browser. The dashboard shows:
 
 The generated dashboard adapts to phone, tablet, and desktop widths. Long decision, activity, flow, citation, tool, change, conflict, and file collections paginate independently; wide evidence tables scroll inside their own panel instead of widening the page.
 
+For a live view that rereads actual retained local activity whenever the ledger changes, serve it on loopback:
+
+```sh
+npx qarinah dashboard --serve
+
+# Add other initialized projects explicitly. Qarinah never scans your disk for them.
+npx qarinah dashboard --serve --project ../frontend --project ../api
+```
+
+The project switcher identifies each authorized workspace by project directory, Qarinah workspace ID, and any repository identities actually retained on events. The server binds only to `127.0.0.1`, rejects foreign Host headers, sends no analytics, and does not merge project authority boundaries.
+
 To include a context comparison for a real run, supply both estimates:
 
 ```sh
 npx qarinah dashboard --baseline-tokens 12000 --delivered-tokens 1500
 ```
 
-Those numbers are supplied by the caller; the dashboard does not infer provider billing or manufacture a savings result. It is a static, rebuildable view with no remote scripts or analytics. The hash-chained JSONL ledger remains authoritative, and the separate `qarinah freshness` command checks whether cited files have changed.
+Those numbers are supplied by the caller; the dashboard does not infer provider billing or manufacture a savings result. The static file is a rebuildable snapshot with no remote scripts or analytics. Live mode rereads the same verified project-owned ledger on localhost; it does not invent events. The hash-chained JSONL ledger remains authoritative, and the separate `qarinah freshness` command checks whether cited files have changed.
 
 Measure the three quantities directly:
 
