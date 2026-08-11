@@ -587,6 +587,18 @@ a {
   text-align: center;
 }
 
+.dashboard-proof {
+  border-top: 1px solid var(--q-border-muted);
+}
+
+.dashboard-proof-figure img {
+  background: #08101c;
+}
+
+.dashboard-proof-actions {
+  margin-top: 28px;
+}
+
 .cost-equivalent-table-wrap {
   margin-top: 32px;
   overflow: hidden;

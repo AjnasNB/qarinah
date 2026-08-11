@@ -38,6 +38,7 @@ const required = [
   "assets/qarinah-flow.svg",
   "assets/qarinah-social-preview.png",
   "assets/qarinah-what-you-save.png",
+  "assets/qarinah-project-memory-dashboard.png",
   "site.css",
   "site.js",
   "primer.css",
@@ -324,6 +325,15 @@ for (const costProof of [
 }
 if (home.indexOf('class="front-proof section shell"') > home.indexOf('class="handoff-stage"')) {
   errors.push("Homepage must place the verified claim and cost table directly after the hero, before the setup workflow.");
+}
+for (const dashboardProof of [
+  'class="dashboard-proof section shell"',
+  'src="/assets/qarinah-project-memory-dashboard.png"',
+  "See the decisions, reasons, flow, evidence, and affected files.",
+  'href="/docs/dashboard/"',
+  'href="/docs/interoperability/"'
+]) {
+  if (!home.includes(dashboardProof)) errors.push(`Homepage is missing the real dashboard proof: ${dashboardProof}`);
 }
 if (home.indexOf('<section class="hero">') > home.indexOf('<section class="benchmark-ribbon"')) {
   errors.push("Homepage must lead with the centered product hero before benchmark detail.");

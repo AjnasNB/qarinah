@@ -4,6 +4,10 @@ Qarinah's dashboard is a local, read-only view of the evidence-linked memory alr
 
 The dashboard is not a hosted admin service, an agent-control surface, or a second source of truth. It is a rebuildable static HTML file derived from the authoritative hash-chained JSONL ledger.
 
+![Qarinah local project-memory dashboard showing a current release decision with its reason, superseded decisions, cited sources, affected files, and a caller-supplied context comparison.](../assets/launch/qarinah-project-memory-dashboard.png)
+
+The screenshot above is a generated workspace snapshot, not fictional product UI. It shows the decision history and project structure that were actually present when the dashboard was built.
+
 ## Generate the dashboard
 
 Run these commands from the initialized project root:
@@ -12,6 +16,7 @@ Run these commands from the initialized project root:
 npx qarinah build
 npx qarinah scan
 npx qarinah dashboard
+npx qarinah export okf --output .qarinah/records/qarinah-project.okf.json
 ```
 
 Qarinah writes:
@@ -21,6 +26,8 @@ Qarinah writes:
 ```
 
 Open that file in a browser. It contains its own CSS and does not require a local server, hosted Qarinah account, analytics endpoint, or network connection.
+
+The optional OKF command writes a reviewed portable bundle beside the other derived records. It does not replace the JSONL authority; use it to move an inspectable representation between compatible tools.
 
 `qarinah scan` is optional, but the **Files and systems affected** panel remains empty until the ledger contains a project-structure snapshot.
 

@@ -296,12 +296,19 @@ See [Shared and verifiable team memory](docs/TEAM-MEMORY.md) for commands, APIs,
 
 ## Inspect project memory in the local dashboard
 
+<p align="center">
+  <img src="assets/launch/qarinah-project-memory-dashboard.png" width="100%" alt="Qarinah local project-memory dashboard showing one current decision, three superseded decisions, zero conflicts, cited sources, affected files, and a caller-supplied 98.71 percent context comparison.">
+</p>
+
+This is a real generated snapshot from an initialized Qarinah workspace. The current decision explains why the next stable promotion is held, the superseded cards preserve the earlier record, and every displayed count is derived from the local ledger and project scan.
+
 Generate a read-only HTML snapshot from the verified local ledger:
 
 ```sh
 npx qarinah build
 npx qarinah scan
 npx qarinah dashboard
+npx qarinah export okf --output .qarinah/records/qarinah-project.okf.json
 ```
 
 Open `.qarinah/dashboard/index.html` in a browser. The dashboard shows:
