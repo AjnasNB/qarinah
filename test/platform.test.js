@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { generateKeyPairSync, randomBytes } from "node:crypto";
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, realpath, writeFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import {
@@ -64,6 +64,26 @@ test("one-command setup configures Codex, Claude, Cursor, hooks, skills, and con
   const repeated = await setupWorkspace({ cwd: root, codex: true, claude: true, cursor: true, allowQuery: true });
   assert.equal(repeated.ok, true);
   assert.equal((await readFile(path.join(root, ".codex", "config.toml"), "utf8")).match(/qarinah:managed:start/g).length, 1);
+});
+
+test("setup initializes the exact requested project instead of attaching an initialized parent", async (t) => {
+  const parent = await temporaryDirectory(t);
+  const parentWorkspace = await initializeWorkspace(parent, { capture: "content" });
+  const child = path.join(parent, "child-project");
+  await mkdir(child);
+  await writeFile(path.join(child, "README.md"), "# Child project\n", "utf8");
+
+  const result = await setupWorkspace({ cwd: child, codex: true, capture: "content" });
+  const canonicalChild = await realpath(child);
+
+  assert.equal(result.root, canonicalChild);
+  assert.notEqual(result.workspaceId, parentWorkspace.config.workspaceId);
+  assert.equal(result.projectStructure.captured, true);
+  assert.equal(
+    (await readFile(path.join(child, ".codex", "config.toml"), "utf8")).includes(canonicalChild.replaceAll("\\", "\\\\")),
+    true
+  );
+  assert.equal((await readFile(path.join(child, ".qarinah", "config.json"), "utf8")).includes(result.workspaceId), true);
 });
 
 test("freshness detects changed and missing cited project files", async (t) => {

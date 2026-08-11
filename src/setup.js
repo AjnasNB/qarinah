@@ -254,12 +254,16 @@ Before replaying broad project history, query the Qarinah MCP server for a bound
 export async function setupWorkspace(options = {}) {
   const target = path.resolve(options.cwd ?? process.cwd());
   let workspace;
+  let exactConfigExists = false;
   try {
-    workspace = await loadWorkspace(target);
+    await lstat(path.join(target, ".qarinah", "config.json"));
+    exactConfigExists = true;
   } catch (error) {
-    if (error?.code !== "WORKSPACE_NOT_INITIALIZED") throw error;
-    workspace = await initializeWorkspace(target, { capture: options.capture ?? "metadata" });
+    if (error?.code !== "ENOENT") throw error;
   }
+  workspace = exactConfigExists
+    ? await loadWorkspace(target)
+    : await initializeWorkspace(target, { capture: options.capture ?? "metadata" });
   if (options.allowQuery === true && !workspace.consent?.policyHash) {
     throw new QarinahError("MCP_DISCLOSURE_NOT_AUTHORIZED", "Workspace authorization is required before enabling context.query.");
   }

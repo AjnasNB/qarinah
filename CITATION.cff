@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use Qarinah, please cite the software and its technical white paper."
 title: "Qarinah"
 type: software
-version: 0.1.7
+version: 0.1.8
 license: Apache-2.0
 authors:
   - family-names: "N B"

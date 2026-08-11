@@ -46,7 +46,7 @@ execFileSync("git", ["merge-base", "--is-ancestor", historicalPaperSourceCommit,
 });
 
 assert.equal(release.schemaVersion, "qarinah.benchmark-release.v2");
-assert.equal(packageJson.version, "0.1.7");
+assert.equal(packageJson.version, "0.1.8");
 assert.equal(release.packageVersion, "0.1.6");
 assert.equal(release.paperVersion, "1.3");
 assert.equal(release.status, "release-candidate-locally-verified-not-published");
