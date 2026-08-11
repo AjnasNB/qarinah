@@ -351,6 +351,46 @@ export interface QarinahProjectOverview {
 export const PROJECT_OVERVIEW_SCHEMA_VERSION: "qarinah.project-overview.v1";
 export function buildProjectOverview(options?: { cwd?: string; maxOutcomes?: number }): Promise<QarinahProjectOverview>;
 export function renderProjectOverviewMarkdown(overview: QarinahProjectOverview): string;
+export interface QarinahProjectRecordViews {
+  readonly schemaVersion: "qarinah.project-record-views.v1";
+  readonly workspaceId: string;
+  readonly generatedFrom: Readonly<{ eventCount: number; headHash: string | null }>;
+  readonly decisions: readonly Readonly<{
+    eventId: string;
+    hash: string;
+    timestamp: string;
+    sourceId: string | null;
+    title: string;
+    status: "current" | "superseded";
+    reason: string;
+    outcome: string;
+    alternatives: readonly string[];
+    affected: readonly string[];
+    tools: readonly Readonly<Record<string, unknown>>[];
+  }>[];
+  readonly flow: readonly Readonly<Record<string, unknown>>[];
+  readonly majorChanges: readonly Readonly<Record<string, unknown>>[];
+  readonly projectChanges: null | Readonly<{
+    eventId: string;
+    hash: string;
+    snapshotHash: string;
+    added: readonly string[];
+    changed: readonly string[];
+    deleted: readonly string[];
+    renamed: readonly Readonly<{ from: string; to: string; contentHash: string | null }>[];
+  }>;
+  readonly limits: Readonly<{ decisions: number; flowSteps: number; majorChanges: number }>;
+}
+export const PROJECT_RECORD_VIEWS_SCHEMA_VERSION: "qarinah.project-record-views.v1";
+export function buildProjectRecordViews(events: readonly QarinahEvent[], workspaceId: string): QarinahProjectRecordViews;
+export function renderDecisionsMarkdown(view: QarinahProjectRecordViews): string;
+export function renderFlowMarkdown(view: QarinahProjectRecordViews): string;
+export function renderChangesMarkdown(view: QarinahProjectRecordViews): string;
+export function renderProjectRecordViews(view: QarinahProjectRecordViews): Readonly<{
+  decisions: string;
+  flow: string;
+  changes: string;
+}>;
 export function exportOkf(options?: { cwd?: string; output?: string }): Promise<QarinahOkfExportResult>;
 export const PORTABLE_TOKEN_ESTIMATOR: Readonly<QarinahTokenEstimator & { exact: false }>;
 export function normalizeTokenEstimator(candidate?: QarinahTokenEstimator): Readonly<QarinahTokenEstimator & { exact: boolean }>;
