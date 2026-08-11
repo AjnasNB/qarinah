@@ -71,7 +71,9 @@ The live dashboard automatically compares real local text with the bounded task 
 2. Otherwise, Qarinah counts canonical characters in the verified authoritative JSONL ledger and applies the same estimator.
 3. The delivered side is the estimated token count of the generated task pack shown on that page.
 
-The card displays the exact baseline and delivered estimates, percentage reduction, ratio, and basis. It updates after retained ledger activity changes. This is a local ledger-or-import-to-pack comparison, not a provider bill, cache measurement, lossless archive ratio, or total model-session cost.
+The first context card displays the exact baseline and delivered estimates, percentage reduction, ratio, and basis for **this workspace**. It updates after retained ledger activity changes. This is a local ledger-or-import-to-pack comparison, not a provider bill, cache measurement, lossless archive ratio, or total model-session cost.
+
+A separate card displays the committed **77.81:1 published six-fixture estimate**: 442,113 baseline estimated tokens versus 5,682 Qarinah-pack estimated tokens, or 98.71% less repeated context. It is an evidence-linked benchmark reference, not the measurement for the currently open workspace. A live workspace can therefore show a different truthful ratio, such as 64.96:1, beside the 77.81:1 published result without conflating their scopes.
 
 ### Override the automatic baseline for a snapshot
 
@@ -101,7 +103,7 @@ These values replace the automatic ledger/import baseline for that static snapsh
 | Source citations | Permitted events carrying a source identifier | `provenance.sourceId`, with event ID, timestamp, and hash retained in the dashboard data |
 | Agent activity timeline | The latest 100 permitted events, newest first | Validated ledger events; it is not private chat history or hidden reasoning |
 | Files and systems affected | Paths, detected languages, and content hashes from the latest scan | The latest recorded project-structure snapshot |
-| Context saved | Baseline, delivered, saved, ratio, percentage, and exact comparison basis | Automatically uses a retained compact-import receipt or canonical authoritative-ledger characters; explicit snapshot inputs override it |
+| Context saved | This workspace's baseline, delivered, saved, ratio, percentage, and exact comparison basis, plus the separately labeled published six-fixture reference | Automatically uses a retained compact-import receipt or canonical authoritative-ledger characters; explicit snapshot inputs override it; the published reference is bound to the committed benchmark result |
 | Memory footprint | Retained Qarinah file bytes, canonical ledger characters, compact-import source bytes when known, and the current query-pack identity and estimated size | Measured from verified local files, validated ledger events, import receipts, and a normal bounded context compilation |
 
 The metric strip counts current decisions, superseded decisions, explicit conflicts, distinct cited source IDs, tool events, and the optional context comparison. The complete dashboard data also includes total events, total decisions, flow steps, major changes, and affected-file count under `totals`.

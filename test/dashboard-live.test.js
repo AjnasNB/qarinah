@@ -74,6 +74,9 @@ test("live dashboard reads real events from separate explicitly selected project
   assert.match(projectPage, /Live local ledger/u);
   assert.match(projectPage, /authoritative ledger .* task pack/u);
   assert.doesNotMatch(projectPage, /Not measured for this workspace/u);
+  assert.match(projectPage, /This workspace/u);
+  assert.match(projectPage, /77\.81:1/u);
+  assert.match(projectPage, /Published six-fixture estimate/u);
   assert.match(projectPage, new RegExp(backendWorkspace.config.workspaceId, "u"));
   assert.equal(await requestStatus(live.url, "attacker.example"), 421);
 });
