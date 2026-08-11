@@ -58,7 +58,7 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 - [JavaScript API reference](https://qarinah.io/docs/api/): Public exports, types, functions, and bounded programmatic workflows.
 - [Host integrations](https://qarinah.io/docs/integrations/): Codex, Claude Code, Cursor, CLI, and consent-gated MCP integration guidance.
 - [MCP guide](https://qarinah.io/docs/mcp/): Configure diagnostic-only or explicitly authorized, zero-write context retrieval.
-- [Local memory dashboard](https://qarinah.io/docs/dashboard/): Generate and interpret the read-only project view for decisions, conflicts, citations, activity, affected files, and caller-measured context savings.
+- [Local memory dashboard](https://qarinah.io/docs/dashboard/): Inspect responsive snapshots or live loopback views of real retained activity across explicitly selected, separately identified local projects.
 - [Azure evaluation](https://qarinah.io/docs/azure-evaluation/): Decide when local SQLite is enough and when an explicit Azure AI Search and Blob Storage evaluation may be appropriate.
 - [Team memory](https://qarinah.io/docs/team-memory/): Setup, dashboards, freshness, multi-repository packs, encrypted sync, evaluation, and causal receipts.
 - [Token-efficient context](https://qarinah.io/docs/token-efficient-context/): How Qarinah selects compact evidence without making the complete transcript the prompt.

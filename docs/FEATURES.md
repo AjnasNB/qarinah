@@ -22,7 +22,7 @@ Qarinah is evidence-linked project memory for coding agents. It keeps an inspect
 - Bounded project scanning with typed file, directory, import, link, and unresolved-reference relationships.
 - A rebuildable typed graph and retrieval index derived from the authoritative event record.
 - An optional SQLite WAL and FTS5 read model that remains disposable derived state.
-- A local read-only dashboard for decisions and their reasons, linked tools, bounded execution flow, major changes, conflicts, citations, affected files, and caller-supplied context measurements.
+- Responsive static snapshots and a loopback-only live dashboard for real retained events, project/workspace/repository identity, decisions and reasons, linked tools, bounded execution flow, major changes, conflicts, citations, affected files, and caller-supplied snapshot measurements.
 - A reproducible memory-footprint report that separates imported source bytes, retained local storage, and the bounded pack delivered for one task.
 - Automatically initialized `OVERVIEW.md`, `DECISIONS.md`, `FLOW.md`, and `CHANGES.md` views that can be deleted and regenerated from the verified ledger.
 - Immediate SQLite, graph, index, and Markdown initialization, so a new workspace starts with a complete empty read model instead of a missing database.

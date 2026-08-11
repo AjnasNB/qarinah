@@ -1,3 +1,4 @@
+import path from "node:path";
 import { deepFreezeJson } from "./canonical.js";
 import { measureMemoryFootprint } from "./memory-footprint.js";
 import { buildProjectRecordViews } from "./project-views.js";
@@ -20,6 +21,7 @@ function eventSummary(event) {
     title: event.title,
     confidence: event.confidence,
     actor: event.actor,
+    repositoryId: event.repository?.id ?? null,
     sourceId: event.provenance.sourceId,
     hash: event.hash
   };
@@ -53,9 +55,22 @@ export async function buildMemoryDashboard(options = {}) {
     ? Math.round((savedTokens / baselineTokens) * 10000) / 100
     : null;
   const memoryFootprint = await measureMemoryFootprint({ cwd: workspace.root });
+  const repositoryIds = [...new Set(events.map((event) => event.repository?.id).filter(Boolean))].sort();
+  const latestEvent = events.at(-1) ?? null;
   return deepFreezeJson({
     schemaVersion: "qarinah.memory-dashboard.v2",
     workspaceId: workspace.config.workspaceId,
+    workspace: {
+      name: path.basename(workspace.root),
+      root: workspace.root,
+      workspaceId: workspace.config.workspaceId,
+      repositoryIds,
+      ledgerPath: ".qarinah/events/events.jsonl",
+      ledgerHeadHash: latestEvent?.hash ?? null,
+      ledgerBytes: memoryFootprint.retained.storageBytes.ledger,
+      lastActivityAt: latestEvent?.timestamp ?? null,
+      eventCount: events.length
+    },
     generatedAt: (options.clock?.() ?? new Date()).toISOString(),
     capture: workspace.config.capture,
     totals: {
@@ -115,17 +130,31 @@ function escapeHtml(value) {
     .replaceAll("'", "&#39;");
 }
 
-function list(items, empty) {
-  if (items.length === 0) return `<p class="empty">${escapeHtml(empty)}</p>`;
-  return `<ul>${items.map((item) => `<li><strong>${escapeHtml(item.title)}</strong><span>${escapeHtml(item.timestamp)}</span><code>${escapeHtml(item.eventId)}</code></li>`).join("")}</ul>`;
+function paginationControls(id, label, total, pageSize) {
+  if (total <= pageSize) return "";
+  return `<nav class="pager" data-pager="${escapeHtml(id)}" aria-label="${escapeHtml(label)} pages" hidden><button type="button" data-page-action="previous">Previous</button><output data-page-status aria-live="polite"></output><button type="button" data-page-action="next">Next</button></nav>`;
 }
 
-function decisionList(items, empty) {
+function list(items, empty, { id, label, pageSize = 8 }) {
   if (items.length === 0) return `<p class="empty">${escapeHtml(empty)}</p>`;
-  return `<div class="records">${items.map((item) => `<article class="record"><div class="record-head"><h3>${escapeHtml(item.title)}</h3><time>${escapeHtml(item.timestamp)}</time></div><p><strong>Reason:</strong> ${escapeHtml(item.reason)}</p>${item.outcome ? `<p><strong>Outcome:</strong> ${escapeHtml(item.outcome)}</p>` : ""}${item.alternatives.length ? `<p><strong>Alternatives:</strong> ${escapeHtml(item.alternatives.join("; "))}</p>` : ""}${item.tools.length ? `<p><strong>Tools:</strong> ${item.tools.map((tool) => `<code>${escapeHtml(tool.name)}</code>`).join(" ")}</p>` : ""}<small>Evidence <code>${escapeHtml(item.eventId)}</code> · <code>${escapeHtml(item.hash)}</code></small></article>`).join("")}</div>`;
+  return `<div class="page-set" data-page-set="${escapeHtml(id)}" data-page-size="${pageSize}"><ul>${items.map((item) => `<li data-page-item><strong>${escapeHtml(item.title)}</strong><span>${escapeHtml(item.timestamp)}</span><code>${escapeHtml(item.eventId)}</code></li>`).join("")}</ul>${paginationControls(id, label, items.length, pageSize)}</div>`;
 }
 
-export function renderMemoryDashboard(data) {
+function decisionList(items, empty, { id, label, pageSize = 6 }) {
+  if (items.length === 0) return `<p class="empty">${escapeHtml(empty)}</p>`;
+  return `<div class="page-set" data-page-set="${escapeHtml(id)}" data-page-size="${pageSize}"><div class="records">${items.map((item) => `<article class="record" data-page-item><div class="record-head"><h3>${escapeHtml(item.title)}</h3><time>${escapeHtml(item.timestamp)}</time></div><p><strong>Reason:</strong> ${escapeHtml(item.reason)}</p>${item.outcome ? `<p><strong>Outcome:</strong> ${escapeHtml(item.outcome)}</p>` : ""}${item.alternatives.length ? `<p><strong>Alternatives:</strong> ${escapeHtml(item.alternatives.join("; "))}</p>` : ""}${item.tools.length ? `<p><strong>Tools:</strong> ${item.tools.map((tool) => `<code>${escapeHtml(tool.name)}</code>`).join(" ")}</p>` : ""}<small>Evidence <code>${escapeHtml(item.eventId)}</code> · <code>${escapeHtml(item.hash)}</code></small></article>`).join("")}</div>${paginationControls(id, label, items.length, pageSize)}</div>`;
+}
+
+function paginatedTable({ id, label, headings, rows, pageSize = 10 }) {
+  if (rows.length === 0) return "";
+  return `<div class="page-set" data-page-set="${escapeHtml(id)}" data-page-size="${pageSize}"><div class="table-scroll" role="region" aria-label="${escapeHtml(label)} table" tabindex="0"><table><thead><tr>${headings.map((heading) => `<th scope="col">${escapeHtml(heading)}</th>`).join("")}</tr></thead><tbody>${rows.map((row) => `<tr data-page-item>${row.map((cell) => `<td>${cell}</td>`).join("")}</tr>`).join("")}</tbody></table></div>${paginationControls(id, label, rows.length, pageSize)}</div>`;
+}
+
+function tableRegion(label, content) {
+  return `<div class="table-scroll" role="region" aria-label="${escapeHtml(label)} table" tabindex="0">${content}</div>`;
+}
+
+export function renderMemoryDashboard(data, options = {}) {
   const savings = data.contextSavings.status === "measured"
     ? `${data.contextSavings.savingsPercent}% (${data.contextSavings.savedTokens.toLocaleString()} estimated tokens)`
     : "Not measured for this workspace";
@@ -133,12 +162,37 @@ export function renderMemoryDashboard(data) {
   const imported = footprint.retained.importedSourceBytesKnown
     ? `${footprint.retained.importedSourceBytes.toLocaleString()} bytes`
     : "No measured import receipt";
+  const workspace = data.workspace ?? {
+    name: data.workspaceId,
+    root: "",
+    workspaceId: data.workspaceId,
+    repositoryIds: [],
+    ledgerPath: ".qarinah/events/events.jsonl",
+    ledgerHeadHash: null,
+    ledgerBytes: 0,
+    lastActivityAt: null,
+    eventCount: data.totals.events
+  };
+  const projects = Array.isArray(options.projects) ? options.projects : [];
+  const projectNavigation = projects.length > 1
+    ? `<nav class="project-nav" aria-label="Local Qarinah projects">${projects.map((project) => `<a href="${escapeHtml(project.href)}"${project.workspaceId === workspace.workspaceId ? ' aria-current="page"' : ""}>${escapeHtml(project.name)}<small>${escapeHtml(project.workspaceId)}</small></a>`).join("")}</nav>`
+    : "";
+  const repositoryLabel = workspace.repositoryIds.length > 0
+    ? workspace.repositoryIds.join(", ")
+    : "No repository identity recorded yet";
+  const liveStatus = options.live === true
+    ? '<strong class="live-state"><span aria-hidden="true"></span>Live local ledger</strong>'
+    : '<strong class="snapshot-state">Verified local snapshot</strong>';
+  const liveScript = options.live === true && typeof options.liveStatusPath === "string"
+    ? `\nconst qarinahLiveStatusPath=${JSON.stringify(options.liveStatusPath).replaceAll("<", "\\u003c")};\nconst qarinahInitialHead=${JSON.stringify(workspace.ledgerHeadHash)};\nconst qarinahInitialCount=${workspace.eventCount};\nconst qarinahInitialBytes=${workspace.ledgerBytes};\nsetInterval(async()=>{try{const response=await fetch(qarinahLiveStatusPath,{cache:"no-store"});if(!response.ok)return;const current=await response.json();if(current.headHash!==qarinahInitialHead||current.eventCount!==qarinahInitialCount||current.logBytes!==qarinahInitialBytes)location.reload();}catch{}},2000);`
+    : "";
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Qarinah memory dashboard</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23090d12'/%3E%3Cpath d='M18 18h28v20H31l-9 9v-9h-4z' fill='%2335e0aa'/%3E%3C/svg%3E">
 <style>
 :root{color-scheme:dark;--bg:#090d12;--panel:#101720;--line:#27313c;--text:#edf5f2;--muted:#9aa7b2;--mint:#35e0aa;--warn:#ffc857}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 Inter,ui-sans-serif,system-ui,sans-serif}
+*{box-sizing:border-box}html{scrollbar-gutter:stable}body{margin:0;overflow-x:hidden;background:var(--bg);color:var(--text);font:15px/1.55 Inter,ui-sans-serif,system-ui,sans-serif}
 header,main{width:min(1180px,calc(100% - 32px));margin:auto}header{padding:56px 0 28px;border-bottom:1px solid var(--line)}
 .eyebrow{color:var(--mint);font:700 12px/1.2 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase}
 h1{font-size:clamp(36px,6vw,72px);line-height:.98;max-width:900px;margin:18px 0}p{color:var(--muted)}
@@ -147,13 +201,28 @@ h1{font-size:clamp(36px,6vw,72px);line-height:.98;max-width:900px;margin:18px 0}
 main{padding:26px 0 80px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
 section{background:var(--panel);border:1px solid var(--line);padding:24px;min-width:0}section.wide{grid-column:1/-1}
 h2{font-size:21px;margin:0 0 16px}ul{list-style:none;padding:0;margin:0}li{display:grid;grid-template-columns:1fr auto;gap:6px 18px;padding:13px 0;border-top:1px solid var(--line)}
-li:first-child{border-top:0}li span,li code{color:var(--muted);font-size:12px}li code{grid-column:1/-1;overflow-wrap:anywhere}
-table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:12px;border-top:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-size:12px}
+li:first-child{border-top:0}li strong{min-width:0;overflow-wrap:anywhere}li span,li code{color:var(--muted);font-size:12px}li code{grid-column:1/-1;overflow-wrap:anywhere}
+.table-scroll{max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain;border:1px solid var(--line);scrollbar-width:thin}.table-scroll:focus-visible{outline:2px solid var(--mint);outline-offset:3px}.table-scroll table{min-width:680px;border-collapse:collapse;width:100%}.table-scroll th,.table-scroll td{text-align:left;padding:12px;border-top:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere}.table-scroll thead th{border-top:0}.table-scroll th{color:var(--muted);font-size:12px}
 .records{display:grid;gap:12px}.record{border-top:1px solid var(--line);padding-top:15px}.record:first-child{border-top:0;padding-top:0}.record-head{display:flex;gap:18px;align-items:baseline;justify-content:space-between}.record h3{font-size:16px;margin:0}.record p{margin:8px 0}.record small,.record time{color:var(--muted);font-size:12px}.record small code{overflow-wrap:anywhere}
-.empty{margin:0}.warning{color:var(--warn)}@media(max-width:760px){.grid{grid-template-columns:1fr}section.wide{grid-column:auto}li{grid-template-columns:1fr}.record-head{display:block}}
+.pager{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:16px}.pager button{min-width:92px;min-height:42px;padding:8px 13px;border:1px solid var(--line);border-radius:8px;color:var(--text);background:#17212d;font:700 13px/1 system-ui,sans-serif;cursor:pointer}.pager button:hover:not(:disabled){border-color:var(--mint);color:var(--mint)}.pager button:focus-visible{outline:2px solid var(--mint);outline-offset:2px}.pager button:disabled{cursor:not-allowed;opacity:.45}.pager output{min-width:92px;color:var(--muted);font:700 12px/1.2 ui-monospace,monospace;text-align:center}
+.empty{margin:0}.warning{color:var(--warn)}[hidden]{display:none!important}
+.project-nav{display:flex;gap:8px;overflow-x:auto;padding:0 0 16px;scrollbar-width:thin}.project-nav a{flex:0 0 auto;min-width:180px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;color:var(--text);text-decoration:none;background:var(--panel)}.project-nav a[aria-current="page"]{border-color:var(--mint)}.project-nav small{display:block;color:var(--muted);font:11px/1.3 ui-monospace,monospace;margin-top:4px}.source-card{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 22px;margin-top:18px;padding:16px;border:1px solid var(--line);background:var(--panel)}.source-card p{margin:0;min-width:0}.source-card strong{display:block;color:var(--text);font-size:12px}.source-card code{overflow-wrap:anywhere}.live-state,.snapshot-state{display:inline-flex;align-items:center;gap:8px;color:var(--mint)}.live-state span{width:9px;height:9px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 4px rgb(53 224 170 / 14%)}
+@media(max-width:760px){header,main{width:min(100% - 20px,1180px)}header{padding:36px 0 22px}h1{font-size:clamp(34px,12vw,54px)}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.metric{min-width:0;padding:17px}.metric strong{font-size:24px;overflow-wrap:anywhere}main{padding-top:18px}.grid{grid-template-columns:1fr;gap:12px}section,section.wide{grid-column:auto;padding:18px}li{grid-template-columns:1fr}.record-head{display:block}.record-head time{display:block;margin-top:4px}.table-scroll table{min-width:620px}.pager{justify-content:space-between}.pager button{min-width:84px}}
+@media(max-width:600px){.source-card{grid-template-columns:1fr}.project-nav a{min-width:155px}}
+@media(max-width:420px){.metrics{grid-template-columns:1fr}.pager{display:grid;grid-template-columns:1fr 1fr}.pager output{grid-column:1/-1;grid-row:1;min-width:0}.pager button{width:100%}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 </style></head><body>
-<header><div class="eyebrow">Qarinah · local dashboard</div><h1>Shared memory your team can inspect.</h1>
-<p>Workspace <code>${escapeHtml(data.workspaceId)}</code> · generated ${escapeHtml(data.generatedAt)} · ${escapeHtml(data.capture)} capture</p>
+<header>${projectNavigation}<div class="eyebrow">Qarinah · local dashboard</div><h1>${escapeHtml(workspace.name)} remembers.</h1>
+<p>Shared memory your team can inspect. ${liveStatus} · generated ${escapeHtml(data.generatedAt)} · ${escapeHtml(data.capture)} capture</p>
+<div class="source-card">
+<p><strong>Project root</strong><code>${escapeHtml(workspace.root)}</code></p>
+<p><strong>Workspace identity</strong><code>${escapeHtml(workspace.workspaceId)}</code></p>
+<p><strong>Repository identities</strong>${escapeHtml(repositoryLabel)}</p>
+<p><strong>Authoritative source</strong><code>${escapeHtml(workspace.ledgerPath)}</code></p>
+<p><strong>Ledger head</strong><code>${escapeHtml(workspace.ledgerHeadHash ?? "Empty ledger")}</code></p>
+<p><strong>Ledger bytes</strong>${workspace.ledgerBytes.toLocaleString()}</p>
+<p><strong>Last retained activity</strong>${escapeHtml(workspace.lastActivityAt ?? "No retained activity yet")}</p>
+</div>
 <div class="metrics">
 <div class="metric"><strong>${data.totals.currentDecisions}</strong><span>current decisions</span></div>
 <div class="metric"><strong>${data.totals.supersededDecisions}</strong><span>superseded</span></div>
@@ -163,22 +232,47 @@ table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:12px;bor
 <div class="metric"><strong>${escapeHtml(savings)}</strong><span>context saved</span></div>
 </div></header>
 <main><div class="grid">
-<section><h2>Current decisions and reasons</h2>${decisionList(data.currentDecisions,"No current decisions recorded.")}</section>
-<section><h2>Superseded decisions</h2>${decisionList(data.supersededDecisions,"No superseded decisions.")}</section>
-<section class="wide"><h2>Conflicts requiring attention</h2>${data.conflicts.length === 0 ? '<p class="empty">No recorded conflicts.</p>' : `<table><thead><tr><th>Claim</th><th>Conflicts with</th></tr></thead><tbody>${data.conflicts.map((conflict) => `<tr><td>${escapeHtml(conflict.source.title)}</td><td>${escapeHtml(conflict.target.title)}</td></tr>`).join("")}</tbody></table>`}</section>
-<section class="wide"><h2>Execution flow</h2>${data.executionFlow.length === 0 ? '<p class="empty">No execution steps recorded.</p>' : `<table><thead><tr><th>#</th><th>Kind</th><th>Action</th><th>Tool</th><th>Evidence</th></tr></thead><tbody>${data.executionFlow.map((step) => `<tr><td>${step.sequence}</td><td><code>${escapeHtml(step.kind)}</code></td><td>${escapeHtml(step.title)}</td><td>${step.toolName ? `<code>${escapeHtml(step.toolName)}</code>` : "—"}</td><td><code>${escapeHtml(step.eventId)}</code></td></tr>`).join("")}</tbody></table>`}</section>
-<section><h2>Tools called</h2>${list(data.tools.map((tool) => ({ ...tool, title: `${tool.toolName} · ${tool.kind}` })),"No tool activity recorded.")}</section>
-<section><h2>Major changes</h2>${list(data.majorChanges,"No major changes recorded.")}</section>
-<section><h2>Memory footprint</h2><table><tbody>
+<section><h2>Current decisions and reasons</h2>${decisionList(data.currentDecisions,"No current decisions recorded.",{ id:"current-decisions",label:"Current decisions" })}</section>
+<section><h2>Superseded decisions</h2>${decisionList(data.supersededDecisions,"No superseded decisions.",{ id:"superseded-decisions",label:"Superseded decisions" })}</section>
+<section class="wide"><h2>Conflicts requiring attention</h2>${data.conflicts.length === 0 ? '<p class="empty">No recorded conflicts.</p>' : paginatedTable({ id:"conflicts",label:"Conflicts",headings:["Claim","Conflicts with"],rows:data.conflicts.map((conflict) => [escapeHtml(conflict.source.title),escapeHtml(conflict.target.title)]) })}</section>
+<section class="wide"><h2>Execution flow</h2>${data.executionFlow.length === 0 ? '<p class="empty">No execution steps recorded.</p>' : paginatedTable({ id:"execution-flow",label:"Execution flow",headings:["#","Kind","Action","Tool","Evidence"],rows:data.executionFlow.map((step) => [escapeHtml(step.sequence),`<code>${escapeHtml(step.kind)}</code>`,escapeHtml(step.title),step.toolName ? `<code>${escapeHtml(step.toolName)}</code>` : "—",`<code>${escapeHtml(step.eventId)}</code>`]) })}</section>
+<section><h2>Tools called</h2>${list(data.tools.map((tool) => ({ ...tool, title: `${tool.toolName} · ${tool.kind}` })),"No tool activity recorded.",{ id:"tools",label:"Tool activity" })}</section>
+<section><h2>Major changes</h2>${list(data.majorChanges,"No major changes recorded.",{ id:"major-changes",label:"Major changes" })}</section>
+<section><h2>Memory footprint</h2>${tableRegion("Memory footprint",`<table><tbody>
 <tr><th>Project memory on disk</th><td>${footprint.retained.storageBytes.total.toLocaleString()} bytes</td></tr>
 <tr><th>Measured imported source</th><td>${escapeHtml(imported)}</td></tr>
 <tr><th>Task pack delivered</th><td>${footprint.deliveredPack.estimatedTokens.toLocaleString()} estimated tokens</td></tr>
 <tr><th>Pack identity</th><td><code>${escapeHtml(footprint.deliveredPack.manifestHash)}</code></td></tr>
-</tbody></table><p>Retained project memory and the small task-specific pack are different quantities. The dashboard never presents this as lossless archive compression.</p></section>
-<section><h2>Source citations</h2>${list(data.citations,"No external source citations recorded.")}</section>
-<section><h2>Agent activity timeline</h2>${list(data.activity,"No activity recorded.")}</section>
-<section class="wide"><h2>Files and systems affected</h2>${data.affectedFiles.length === 0 ? '<p class="empty">Run qarinah scan to populate the project map.</p>' : `<table><thead><tr><th>Path</th><th>Language</th><th>Content hash</th></tr></thead><tbody>${data.affectedFiles.map((file) => `<tr><td>${escapeHtml(file.path)}</td><td>${escapeHtml(file.language)}</td><td><code>${escapeHtml(file.contentHash)}</code></td></tr>`).join("")}</tbody></table>`}</section>
-</div></main></body></html>`;
+</tbody></table>`)}<p>Retained project memory and the small task-specific pack are different quantities. The dashboard never presents this as lossless archive compression.</p></section>
+<section><h2>Source citations</h2>${list(data.citations,"No external source citations recorded.",{ id:"citations",label:"Source citations" })}</section>
+<section><h2>Agent activity timeline</h2>${list(data.activity,"No activity recorded.",{ id:"activity",label:"Agent activity" })}</section>
+<section class="wide"><h2>Files and systems affected</h2>${data.affectedFiles.length === 0 ? '<p class="empty">Run qarinah scan to populate the project map.</p>' : paginatedTable({ id:"affected-files",label:"Files and systems affected",headings:["Path","Language","Content hash"],rows:data.affectedFiles.map((file) => [escapeHtml(file.path),escapeHtml(file.language),`<code>${escapeHtml(file.contentHash)}</code>`]) })}</section>
+</div></main><script>
+for (const pageSet of document.querySelectorAll("[data-page-set]")) {
+  const items = [...pageSet.querySelectorAll("[data-page-item]")];
+  const pageSize = Number(pageSet.dataset.pageSize);
+  const pager = pageSet.querySelector("[data-pager]");
+  if (!pager || !Number.isSafeInteger(pageSize) || pageSize < 1) continue;
+  const previous = pager.querySelector('[data-page-action="previous"]');
+  const next = pager.querySelector('[data-page-action="next"]');
+  const status = pager.querySelector("[data-page-status]");
+  let page = 0;
+  const pageCount = Math.ceil(items.length / pageSize);
+  pager.hidden = false;
+  const showPage = () => {
+    const start = page * pageSize;
+    const end = Math.min(start + pageSize, items.length);
+    items.forEach((item, index) => { item.hidden = index < start || index >= end; });
+    previous.disabled = page === 0;
+    next.disabled = page === pageCount - 1;
+    status.textContent = (start + 1) + "–" + end + " of " + items.length;
+  };
+  previous.addEventListener("click", () => { if (page > 0) { page -= 1; showPage(); } });
+  next.addEventListener("click", () => { if (page + 1 < pageCount) { page += 1; showPage(); } });
+  showPage();
+}
+${liveScript}
+</script></body></html>`;
 }
 
 export async function writeMemoryDashboard(options = {}) {

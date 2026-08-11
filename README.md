@@ -115,7 +115,7 @@ If a native chat later disappears, Qarinah can still retrieve the permitted even
 | Setup | What Qarinah gives you |
 | --- | --- |
 | Personal project | One local cited memory shared by Codex, Claude Code, Cursor, Kimi, Antigravity, CLI tools, and compatible MCP clients |
-| Portable review | Rebuildable SQLite, Markdown, JSON, graph, OKF, and a local static dashboard for inspecting project memory on desktop or mobile |
+| Portable review | Rebuildable SQLite, Markdown, JSON, graph, OKF, and responsive static or live-loopback dashboards for inspecting project memory |
 | Team workspace | Multi-repository relationships, freshness, encrypted bundles, signed checkpoints, membership, and separate authority boundaries |
 | Governed workflow | Optional Maqam memory scopes and disclosure controls without making Maqam a requirement |
 
@@ -296,12 +296,19 @@ See [Shared and verifiable team memory](docs/TEAM-MEMORY.md) for commands, APIs,
 
 ## Inspect project memory in the local dashboard
 
+<p align="center">
+  <img src="assets/launch/qarinah-project-memory-dashboard.png" width="100%" alt="Qarinah local project-memory dashboard showing one current decision, three superseded decisions, zero conflicts, cited sources, affected files, and a caller-supplied 98.71 percent context comparison.">
+</p>
+
+This is a real generated snapshot from an initialized Qarinah workspace. The current decision explains why the next stable promotion is held, the superseded cards preserve the earlier record, and every displayed count is derived from the local ledger and project scan.
+
 Generate a read-only HTML snapshot from the verified local ledger:
 
 ```sh
 npx qarinah build
 npx qarinah scan
 npx qarinah dashboard
+npx qarinah export okf --output .qarinah/records/qarinah-project.okf.json
 ```
 
 Open `.qarinah/dashboard/index.html` in a browser. The dashboard shows:
@@ -313,8 +320,21 @@ Open `.qarinah/dashboard/index.html` in a browser. The dashboard shows:
 - source-linked events and their evidence identifiers;
 - the latest 100 permitted activity events;
 - paths, languages, and content hashes from the latest project scan; and
-- an optional measured baseline-versus-delivered context comparison; and
+- an optional measured baseline-versus-delivered context comparison; plus
 - current retained project-memory bytes, measured imported source bytes when available, and the task-pack manifest and estimated size.
+
+The generated dashboard adapts to phone, tablet, and desktop widths. Long decision, activity, flow, citation, tool, change, conflict, and file collections paginate independently; wide evidence tables scroll inside their own panel instead of widening the page.
+
+For a live view that rereads actual retained local activity whenever the ledger changes, serve it on loopback:
+
+```sh
+npx qarinah dashboard --serve
+
+# Add other initialized projects explicitly. Qarinah never scans your disk for them.
+npx qarinah dashboard --serve --project ../frontend --project ../api
+```
+
+The project switcher identifies each authorized workspace by project directory, Qarinah workspace ID, and any repository identities actually retained on events. The server binds only to `127.0.0.1`, rejects foreign Host headers, sends no analytics, and does not merge project authority boundaries.
 
 To include a context comparison for a real run, supply both estimates:
 
@@ -322,7 +342,7 @@ To include a context comparison for a real run, supply both estimates:
 npx qarinah dashboard --baseline-tokens 12000 --delivered-tokens 1500
 ```
 
-Those numbers are supplied by the caller; the dashboard does not infer provider billing or manufacture a savings result. It is a static, rebuildable view with no remote scripts or analytics. The hash-chained JSONL ledger remains authoritative, and the separate `qarinah freshness` command checks whether cited files have changed.
+Those numbers are supplied by the caller; the dashboard does not infer provider billing or manufacture a savings result. The static file is a rebuildable snapshot with no remote scripts or analytics. Live mode rereads the same verified project-owned ledger on localhost; it does not invent events. The hash-chained JSONL ledger remains authoritative, and the separate `qarinah freshness` command checks whether cited files have changed.
 
 Measure the three quantities directly:
 

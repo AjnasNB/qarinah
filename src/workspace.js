@@ -296,7 +296,13 @@ export async function loadWorkspace(start = process.cwd(), options = {}) {
   }
   const provisional = { root: actualRoot, qarinahDir, config, configPath };
   for (const directory of STORAGE_DIRECTORIES) {
-    await secureStoragePath(provisional, [directory], { type: "directory" });
+    // Dashboard storage was introduced after the original workspace layout.
+    // It is derived, optional for reads, and created on the first snapshot
+    // write. If present, it must still pass the normal link/path checks.
+    await secureStoragePath(provisional, [directory], {
+      type: "directory",
+      allowMissing: directory === "dashboard"
+    });
   }
   try {
     await secureStoragePath(provisional, ["events", "events.jsonl"], { type: "file" });

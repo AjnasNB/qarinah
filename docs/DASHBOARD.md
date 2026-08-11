@@ -1,8 +1,12 @@
 # Local memory dashboard
 
-Qarinah's dashboard is a local, read-only view of the evidence-linked memory already retained by one initialized workspace. It helps a developer or team inspect decisions and their recorded reasons, linked tools, execution flow, major changes, conflicts, citations, affected files, and a measured context comparison without opening the raw event ledger by hand.
+Qarinah's dashboard is a local, read-only view of evidence-linked memory already retained by initialized workspaces. It helps a developer or team inspect decisions and their recorded reasons, linked tools, execution flow, major changes, conflicts, citations, affected files, and a measured context comparison without opening the raw event ledger by hand.
 
-The dashboard is not a hosted admin service, an agent-control surface, or a second source of truth. It is a rebuildable static HTML file derived from the authoritative hash-chained JSONL ledger.
+The dashboard is not a hosted admin service, an agent-control surface, or a second source of truth. It can be a rebuildable static HTML snapshot or a loopback-only live view; both are derived from each project's authoritative hash-chained JSONL ledger.
+
+![Qarinah local project-memory dashboard showing a current release decision with its reason, superseded decisions, cited sources, affected files, and a caller-supplied context comparison.](../assets/launch/qarinah-project-memory-dashboard.png)
+
+The screenshot above is a generated workspace snapshot, not fictional product UI. It shows the decision history and project structure that were actually present when the dashboard was built.
 
 ## Generate the dashboard
 
@@ -12,6 +16,7 @@ Run these commands from the initialized project root:
 npx qarinah build
 npx qarinah scan
 npx qarinah dashboard
+npx qarinah export okf --output .qarinah/records/qarinah-project.okf.json
 ```
 
 Qarinah writes:
@@ -22,7 +27,33 @@ Qarinah writes:
 
 Open that file in a browser. It contains its own CSS and does not require a local server, hosted Qarinah account, analytics endpoint, or network connection.
 
+The layout is responsive from narrow phones through desktop screens. Repeated collections paginate independently so moving through files does not move the activity or decision panels. Wide tables stay inside a keyboard-focusable horizontal scroll region, and the page itself does not overflow the viewport. Pagination uses native Previous and Next buttons, announces the visible item range, and leaves the complete static content visible when JavaScript is unavailable.
+
+The optional OKF command writes a reviewed portable bundle beside the other derived records. It does not replace the JSONL authority; use it to move an inspectable representation between compatible tools.
+
 `qarinah scan` is optional, but the **Files and systems affected** panel remains empty until the ledger contains a project-structure snapshot.
+
+### Follow real local usage live
+
+```sh
+npx qarinah dashboard --serve
+```
+
+Open the printed loopback URL. Live mode rereads the verified ledger when the page is requested and checks its event count and head hash every two seconds. When a permitted Codex, Claude Code, Cursor, Kimi, Antigravity, CLI, or MCP integration appends a new event, the open project page reloads from that real retained event. It does not generate sample activity.
+
+The server binds only to `127.0.0.1`, accepts only loopback Host headers, disables caching and framing, and serves no remote scripts. Stop it with Ctrl+C.
+
+### View several projects without mixing them
+
+Pass every additional initialized project explicitly:
+
+```sh
+npx qarinah dashboard --serve \
+  --project ../frontend \
+  --project ../api
+```
+
+The current project is always included. Each project is identified by its directory name, absolute local root, Qarinah workspace ID, and any repository IDs actually present on retained events. The project switcher rereads each ledger separately. Qarinah does not scan the rest of the disk, combine ledgers, transfer trust, or let one project authorize another. Up to 32 explicitly selected projects can be viewed.
 
 ### Choose another output path
 
@@ -50,7 +81,7 @@ These values are caller-supplied measurements. The dashboard does not read a mod
 
 | Panel | What it shows | How it is derived |
 | --- | --- | --- |
-| Workspace header | Workspace ID, generation time, and active capture mode | Exact initialized workspace configuration |
+| Workspace header | Project directory/root, workspace ID, repository IDs, ledger head, last retained activity, generation time, and capture mode | Exact initialized workspace configuration and validated local events |
 | Current decisions | Decision events that have not been explicitly superseded | `decision` events without an incoming `supersedes` relation |
 | Superseded decisions | Historical decisions replaced by a later recorded decision | Targets of explicit `supersedes` relations |
 | Execution flow | A bounded sequence of retained prompts, tools, approvals, decisions, artifacts, summaries, completed turns, and compactions | The latest 500 permitted execution events in ledger order; hidden reasoning is excluded |
@@ -127,7 +158,7 @@ permitted host event or explicit record
   -> validated append to .qarinah/events/events.jsonl
   -> verified ledger read
   -> deterministic dashboard view
-  -> static .qarinah/dashboard/index.html
+  -> static .qarinah/dashboard/index.html or loopback live response
 ```
 
 The ledger remains authoritative. Deleting the generated dashboard does not delete project memory; running `qarinah dashboard` rebuilds it. Editing the generated HTML does not change the ledger, decisions, graph, SQLite read model, or future context packs.
@@ -178,6 +209,21 @@ import { buildMemoryDashboard, renderMemoryDashboard } from "qarinah";
 
 const data = await buildMemoryDashboard({ cwd: process.cwd() });
 const html = renderMemoryDashboard(data);
+```
+
+Serve live local data from the current project and one separately initialized project:
+
+```js
+import { serveMemoryDashboard } from "qarinah";
+
+const live = await serveMemoryDashboard({
+  cwd: process.cwd(),
+  workspaces: ["../api"],
+  port: 8777
+});
+
+console.log(live.url);
+// Later: await live.close();
 ```
 
 The public schema identifier is `qarinah.memory-dashboard.v2`. TypeScript consumers can use the exported `QarinahMemoryDashboard` interface.

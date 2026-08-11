@@ -20,6 +20,12 @@ test("website deployment is bound to exact published Qarinah assets", async () =
   assert.equal(config.assets.html_handling, "auto-trailing-slash");
   assert.equal(config.assets.run_worker_first, true);
   assert.equal(config.compatibility_date, "2026-08-08");
+  assert.equal(config.workers_dev, false);
+  assert.equal(config.preview_urls, false);
+  assert.deepEqual(config.routes, [
+    { pattern: "qarinah.io/*", zone_name: "qarinah.io" },
+    { pattern: "www.qarinah.io/*", zone_name: "qarinah.io" }
+  ]);
 
   assert.doesNotMatch(workflow, /^\s+workflow_run:/m);
   assert.match(workflow, /^\s+workflow_dispatch:/m);
@@ -66,7 +72,18 @@ test("website worker permanently canonicalizes scheme and host before delegating
 
   const redirect = await worker.fetch(new Request("http://qarinah.io/docs?source=search-console"), env);
   assert.equal(redirect.status, 308);
-  assert.equal(redirect.headers.get("location"), "https://qarinah.io/docs?source=search-console");
+  assert.equal(redirect.headers.get("location"), "https://qarinah.io/docs/?source=search-console");
+  assert.equal(delegated, 0);
+
+  const indexRedirect = await worker.fetch(
+    new Request("https://qarinah.io/docs/index.html?source=search-console"),
+    env
+  );
+  assert.equal(indexRedirect.status, 308);
+  assert.equal(
+    indexRedirect.headers.get("location"),
+    "https://qarinah.io/docs/?source=search-console"
+  );
   assert.equal(delegated, 0);
 
   const wwwRedirect = await worker.fetch(

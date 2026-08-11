@@ -3,6 +3,18 @@
   "name": "qarinah",
   "main": "./website/worker.mjs",
   "compatibility_date": "2026-08-08",
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [
+    {
+      "pattern": "qarinah.io/*",
+      "zone_name": "qarinah.io"
+    },
+    {
+      "pattern": "www.qarinah.io/*",
+      "zone_name": "qarinah.io"
+    }
+  ],
   "assets": {
     "directory": "./site-dist",
     "binding": "ASSETS",

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { generateKeyPairSync, randomBytes } from "node:crypto";
-import { mkdir, readFile, realpath, writeFile } from "node:fs/promises";
+import { mkdir, readFile, realpath, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import {
@@ -17,6 +17,7 @@ import {
   initializeWorkspace,
   inspectMemoryFreshness,
   rebuildDerivedState,
+  renderMemoryDashboard,
   rerankContextPack,
   scanProjectStructure,
   setupWorkspace,
@@ -202,11 +203,18 @@ test("dashboard exposes decisions, conflicts, citations, activity, savings, and 
   await writeFile(path.join(root, "README.md"), "# demo\n", "utf8");
   await scanProjectStructure({ cwd: root });
   const dashboard = await buildMemoryDashboard({ cwd: root, baselineTokens: 1000, deliveredTokens: 100 });
+  const canonicalRoot = await realpath(root);
   assert.equal(dashboard.totals.currentDecisions, 1);
   assert.equal(dashboard.totals.supersededDecisions, 1);
   assert.equal(dashboard.totals.conflicts, 1);
   assert.equal(dashboard.contextSavings.savingsPercent, 90);
   assert.equal(dashboard.schemaVersion, "qarinah.memory-dashboard.v2");
+  assert.equal(dashboard.workspace.root, canonicalRoot);
+  assert.equal(dashboard.workspace.name, path.basename(canonicalRoot));
+  assert.equal(dashboard.workspace.eventCount, dashboard.totals.events);
+  assert.equal(dashboard.workspace.ledgerPath, ".qarinah/events/events.jsonl");
+  assert.match(dashboard.workspace.ledgerHeadHash, /^sha256:/u);
+  assert.ok(dashboard.workspace.ledgerBytes > 0);
   assert.equal(dashboard.currentDecisions[0].reason, "Agents need one interoperable, consent-gated retrieval boundary.");
   assert.equal(dashboard.tools[0].toolName, "shell");
   assert.ok(dashboard.executionFlow.some((step) => step.kind === "tool.requested"));
@@ -219,6 +227,30 @@ test("dashboard exposes decisions, conflicts, citations, activity, savings, and 
   assert.match(await readFile(written.output, "utf8"), /Execution flow/);
   assert.match(await readFile(written.output, "utf8"), /Agents need one interoperable/);
   assert.match(await readFile(written.output, "utf8"), /Memory footprint/);
+  const rendered = renderMemoryDashboard({
+    ...dashboard,
+    affectedFiles: Array.from({ length: 11 }, (_, index) => ({
+      path: `src/file-${index}.js`,
+      language: "JavaScript",
+      contentHash: `sha256:${String(index).padStart(64, "0")}`
+    }))
+  });
+  assert.match(rendered, /data-page-set="affected-files" data-page-size="10"/u);
+  assert.match(rendered, /data-pager="affected-files"/u);
+  assert.match(rendered, /class="table-scroll" role="region"/u);
+  assert.match(rendered, /aria-live="polite"/u);
+  assert.doesNotMatch(rendered, /<script\s+src=/u);
+});
+
+test("dashboard upgrades an initialized pre-dashboard workspace without changing its ledger", async (t) => {
+  const root = await contentWorkspace(t);
+  const retained = await appendEvent(eventInput({ title: "Keep existing project memory" }), { cwd: root });
+  await rm(path.join(root, ".qarinah", "dashboard"), { recursive: true, force: true });
+  const data = await buildMemoryDashboard({ cwd: root });
+  assert.equal(data.workspace.eventCount, 1);
+  assert.equal(data.workspace.ledgerHeadHash, retained.hash);
+  const written = await writeMemoryDashboard({ cwd: root });
+  assert.match(await readFile(written.output, "utf8"), /Keep existing project memory/u);
 });
 
 test("causal receipts bind evidence, memory, policy, execution, and observation", () => {

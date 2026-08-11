@@ -38,6 +38,7 @@ const required = [
   "assets/qarinah-flow.svg",
   "assets/qarinah-social-preview.png",
   "assets/qarinah-what-you-save.png",
+  "assets/qarinah-project-memory-dashboard.png",
   "site.css",
   "site.js",
   "primer.css",
@@ -284,6 +285,15 @@ const faq = await readFile(path.join(output, "docs", "faq", "index.html"), "utf8
 const features = await readFile(path.join(output, "docs", "features", "index.html"), "utf8");
 const publicMetricsPage = await readFile(path.join(output, "docs", "public-metrics", "index.html"), "utf8");
 const publicMetrics = JSON.parse(await readFile(path.join(output, "metrics.json"), "utf8"));
+const responsiveCss = await readFile(path.join(output, "site.css"), "utf8");
+for (const responsiveTableRule of [
+  ".cost-equivalent-table-wrap {",
+  "overflow-x: auto;",
+  ".doc-content table {",
+  "overscroll-behavior-inline: contain;"
+]) {
+  if (!responsiveCss.includes(responsiveTableRule)) errors.push(`site.css is missing responsive table behavior: ${responsiveTableRule}`);
+}
 if (home.includes('"@type":"SearchAction"') || home.includes("search_term_string")) {
   errors.push("Homepage must not emit the retired sitelinks-search SearchAction or its crawlable URL template.");
 }
@@ -324,6 +334,15 @@ for (const costProof of [
 }
 if (home.indexOf('class="front-proof section shell"') > home.indexOf('class="handoff-stage"')) {
   errors.push("Homepage must place the verified claim and cost table directly after the hero, before the setup workflow.");
+}
+for (const dashboardProof of [
+  'class="dashboard-proof section shell"',
+  'src="/assets/qarinah-project-memory-dashboard.png"',
+  "See the decisions, reasons, flow, evidence, and affected files.",
+  'href="/docs/dashboard/"',
+  'href="/docs/interoperability/"'
+]) {
+  if (!home.includes(dashboardProof)) errors.push(`Homepage is missing the real dashboard proof: ${dashboardProof}`);
 }
 if (home.indexOf('<section class="hero">') > home.indexOf('<section class="benchmark-ribbon"')) {
   errors.push("Homepage must lead with the centered product hero before benchmark detail.");

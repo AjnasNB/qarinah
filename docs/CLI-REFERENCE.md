@@ -712,6 +712,14 @@ npx qarinah dashboard --baseline-tokens 12000 --delivered-tokens 1500
 
 The dashboard contains current and superseded decisions, explicit conflicts, source-linked events, the latest 100 permitted activity events, affected files from the latest scan, workspace capture mode, and the optional measured comparison. See the [local memory dashboard guide](DASHBOARD.md) for field semantics, population recipes, JavaScript usage, privacy guidance, and troubleshooting.
 
+Serve current local activity and optionally add explicitly selected initialized projects:
+
+```sh
+npx qarinah dashboard --serve [--port 8777] [--project <path>]...
+```
+
+The current project is always included. `--project` can be repeated for up to 31 additional projects. Each project remains a separate workspace and is identified by its directory, workspace ID, and retained repository IDs. The server binds only to `127.0.0.1`; it never discovers projects by scanning the disk. `--output`, `--baseline-tokens`, and `--delivered-tokens` are snapshot-only and cannot be combined with `--serve`.
+
 ## Other team-memory commands
 
 ```sh

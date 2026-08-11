@@ -2,6 +2,8 @@
 
 Publish these only after the exact feature commit is independently reviewed, merged, packaged, and deployed. Replace the placeholders with the final release and documentation URLs.
 
+Use `assets/launch/qarinah-project-memory-dashboard.png` as the launch image. It is a real generated Qarinah dashboard from an initialized workspace, not a mockup. Alt text: "Qarinah local project-memory dashboard showing one current decision, three superseded decisions, zero conflicts, cited sources, affected files, and a caller-supplied 98.71 percent context comparison."
+
 ## LinkedIn
 
 Coding agents forget the project. Qarinah keeps the parts your team decided were worth remembering.
@@ -13,6 +15,8 @@ Everything stays inspectable beside the project. Large exported agent histories 
 Try it: [release URL]
 See the dashboard: [documentation URL]
 
+Image: `assets/launch/qarinah-project-memory-dashboard.png`
+
 ## X
 
 New in Qarinah: a local project-memory dashboard for decisions + reasons, tools, execution flow, changes, evidence, and the next task's cited context pack.
@@ -20,6 +24,8 @@ New in Qarinah: a local project-memory dashboard for decisions + reasons, tools,
 Setup initializes SQLite, graph, records, and Codex/Claude/Cursor/Kimi/Antigravity project connections.
 
 [release URL]
+
+Image: `assets/launch/qarinah-project-memory-dashboard.png`
 
 ## Reddit
 
@@ -33,6 +39,8 @@ I would value feedback on setup friction, missing decision fields, and whether t
 
 [repository URL] · [docs URL]
 
+Suggested image: `assets/launch/qarinah-project-memory-dashboard.png`
+
 ## DEV / Medium opening
 
 **Title:** Give coding agents a project memory you can inspect
@@ -44,4 +52,3 @@ Qarinah's new project-memory workflow initializes a local evidence ledger, SQLit
 ## Short human reply
 
 Appreciate it — the dashboard and cross-agent setup are now the next reviewed release. I’ll share the exact build once the checks finish.
-
