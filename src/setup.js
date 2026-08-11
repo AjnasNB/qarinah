@@ -2,7 +2,9 @@ import { lstat, mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { QarinahError } from "./errors.js";
+import { writeMemoryDashboard } from "./dashboard.js";
 import { rebuildDerivedState } from "./indexer.js";
+import { writeProjectOverview } from "./project-overview.js";
 import { scanProjectStructure } from "./project-structure.js";
 import { verifyStore } from "./store.js";
 import {
@@ -288,6 +290,8 @@ export async function setupWorkspace(options = {}) {
     });
   }
   await rebuildDerivedState(workspace.root);
+  const overview = await writeProjectOverview({ cwd: workspace.root });
+  const dashboard = await writeMemoryDashboard({ cwd: workspace.root });
   const health = await verifyStore(workspace.root, { updateCheckpoint: false });
   return Object.freeze({
     ok: true,
@@ -298,6 +302,8 @@ export async function setupWorkspace(options = {}) {
     targets,
     files,
     projectStructure,
+    overview: overview.output,
+    dashboard: dashboard.output,
     health
   });
 }

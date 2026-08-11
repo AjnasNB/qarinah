@@ -142,9 +142,13 @@ Qarinah is a universal context engine for software projects, built on local-firs
 ├── graph/graph.json          # typed decisions, sources, files, and relations
 ├── index/index.json          # deterministic lexical retrieval index
 ├── index/qarinah.db          # rebuildable SQLite WAL and FTS5 search
-├── records/CONTEXT.md        # rebuildable human-readable view
+├── records/CONTEXT.md        # rebuildable retrieved-memory view
+├── records/OVERVIEW.md       # beginner-readable project summary
+├── records/DECISIONS.md      # decisions, reasons, outcomes, tools, and evidence
+├── records/FLOW.md           # bounded agent and tool execution flow
+├── records/CHANGES.md        # major outcomes and latest scanned changes
 ├── records/okf/              # portable Open Knowledge Format export
-└── dashboard/index.html     # decisions, conflicts, citations, activity, files, and measured savings
+└── dashboard/index.html     # decisions, tools, flow, changes, evidence, and measured savings
 
 .codex/skills/qarinah/        # invoke with $qarinah
 .claude/skills/qarinah/       # invoke with /qarinah <task>
@@ -302,7 +306,9 @@ npx qarinah dashboard
 
 Open `.qarinah/dashboard/index.html` in a browser. The dashboard shows:
 
-- current and explicitly superseded decisions;
+- current and explicitly superseded decisions, including recorded reasons, outcomes, alternatives, linked tools, and evidence hashes;
+- the bounded execution flow and the tools requested or completed in each retained turn;
+- major recorded outcomes and latest scanned file changes;
 - explicit conflicts requiring attention;
 - source-linked events and their evidence identifiers;
 - the latest 100 permitted activity events;
@@ -316,6 +322,8 @@ npx qarinah dashboard --baseline-tokens 12000 --delivered-tokens 1500
 ```
 
 Those numbers are supplied by the caller; the dashboard does not infer provider billing or manufacture a savings result. It is a static, rebuildable view with no remote scripts or analytics. The hash-chained JSONL ledger remains authoritative, and the separate `qarinah freshness` command checks whether cited files have changed.
+
+`qarinah setup` creates the empty SQLite database, relationship graph, readable overview, decision/flow/change records, and dashboard immediately. Later records and scans rebuild the derived views from the verified ledger.
 
 Read the complete [local memory dashboard guide](docs/DASHBOARD.md) for every panel, data lineage, CLI and JavaScript APIs, population recipes, privacy guidance, and troubleshooting.
 

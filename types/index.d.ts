@@ -351,6 +351,11 @@ export interface QarinahProjectOverview {
 export const PROJECT_OVERVIEW_SCHEMA_VERSION: "qarinah.project-overview.v1";
 export function buildProjectOverview(options?: { cwd?: string; maxOutcomes?: number }): Promise<QarinahProjectOverview>;
 export function renderProjectOverviewMarkdown(overview: QarinahProjectOverview): string;
+export function writeProjectOverview(options?: {
+  cwd?: string;
+  output?: string;
+  maxOutcomes?: number;
+}): Promise<Readonly<{ output: string; overview: QarinahProjectOverview }>>;
 export interface QarinahProjectRecordViews {
   readonly schemaVersion: "qarinah.project-record-views.v1";
   readonly workspaceId: string;
@@ -561,7 +566,7 @@ export function createCausalReceipt(input: Record<
   { id: string; hash: `sha256:${string}`; system: string; timestamp: string }
 >): Readonly<Record<string, unknown>>;
 export interface QarinahMemoryDashboard {
-  schemaVersion: "qarinah.memory-dashboard.v1";
+  schemaVersion: "qarinah.memory-dashboard.v2";
   workspaceId: string;
   generatedAt: string;
   capture: "metadata" | "content";
@@ -575,6 +580,15 @@ export interface QarinahMemoryDashboard {
   };
   currentDecisions: Record<string, unknown>[];
   supersededDecisions: Record<string, unknown>[];
+  tools: Record<string, unknown>[];
+  executionFlow: Record<string, unknown>[];
+  majorChanges: Record<string, unknown>[];
+  latestProjectChanges: Record<string, unknown> | null;
+  durableRecords: Readonly<{
+    decisions: ".qarinah/records/DECISIONS.md";
+    flow: ".qarinah/records/FLOW.md";
+    changes: ".qarinah/records/CHANGES.md";
+  }>;
   conflicts: Record<string, unknown>[];
   citations: Record<string, unknown>[];
   activity: Record<string, unknown>[];

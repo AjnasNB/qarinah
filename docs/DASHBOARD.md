@@ -1,6 +1,6 @@
 # Local memory dashboard
 
-Qarinah's dashboard is a local, read-only view of the evidence-linked memory already retained by one initialized workspace. It helps a developer or team inspect current decisions, superseded decisions, explicit conflicts, citations, recent permitted activity, affected files, and a measured context comparison without opening the raw event ledger by hand.
+Qarinah's dashboard is a local, read-only view of the evidence-linked memory already retained by one initialized workspace. It helps a developer or team inspect decisions and their recorded reasons, linked tools, execution flow, major changes, conflicts, citations, affected files, and a measured context comparison without opening the raw event ledger by hand.
 
 The dashboard is not a hosted admin service, an agent-control surface, or a second source of truth. It is a rebuildable static HTML file derived from the authoritative hash-chained JSONL ledger.
 
@@ -53,13 +53,18 @@ These values are caller-supplied measurements. The dashboard does not read a mod
 | Workspace header | Workspace ID, generation time, and active capture mode | Exact initialized workspace configuration |
 | Current decisions | Decision events that have not been explicitly superseded | `decision` events without an incoming `supersedes` relation |
 | Superseded decisions | Historical decisions replaced by a later recorded decision | Targets of explicit `supersedes` relations |
+| Execution flow | A bounded sequence of retained prompts, tools, approvals, decisions, artifacts, summaries, completed turns, and compactions | The latest 500 permitted execution events in ledger order; hidden reasoning is excluded |
+| Tools called | The latest retained tool requests and results | `tool.requested` and `tool.completed` events with session, turn, source, and evidence identity |
+| Major changes | Recorded decisions, artifacts, completed-turn outcomes, and the latest codebase scan | The same reproducible data used for `.qarinah/records/CHANGES.md` |
 | Conflicts requiring attention | Pairs of events recorded as contradictory | Explicit `contradicts` relations; Qarinah does not invent conflicts from wording similarity |
 | Source citations | Permitted events carrying a source identifier | `provenance.sourceId`, with event ID, timestamp, and hash retained in the dashboard data |
 | Agent activity timeline | The latest 100 permitted events, newest first | Validated ledger events; it is not private chat history or hidden reasoning |
 | Files and systems affected | Paths, detected languages, and content hashes from the latest scan | The latest recorded project-structure snapshot |
 | Context saved | Baseline, delivered, saved, and percentage estimates for one comparison | Displayed only when both CLI or API token estimates are supplied |
 
-The metric strip counts current decisions, superseded decisions, explicit conflicts, distinct cited source IDs, and the optional context comparison. The complete dashboard data also includes total events, total decisions, and affected-file count under `totals`.
+The metric strip counts current decisions, superseded decisions, explicit conflicts, distinct cited source IDs, tool events, and the optional context comparison. The complete dashboard data also includes total events, total decisions, flow steps, major changes, and affected-file count under `totals`.
+
+The decision cards use explicit event fields. `data.reason`, `data.outcome`, and `data.alternatives` become the human explanation; tools are linked by the same session and turn or by an explicit event relation. Qarinah never fabricates a reason or exposes hidden chain-of-thought.
 
 ## Populate a useful dashboard
 
@@ -172,7 +177,7 @@ const data = await buildMemoryDashboard({ cwd: process.cwd() });
 const html = renderMemoryDashboard(data);
 ```
 
-The public schema identifier is `qarinah.memory-dashboard.v1`. TypeScript consumers can use the exported `QarinahMemoryDashboard` interface.
+The public schema identifier is `qarinah.memory-dashboard.v2`. TypeScript consumers can use the exported `QarinahMemoryDashboard` interface.
 
 ## Privacy and safe sharing
 

@@ -35,7 +35,12 @@ export {
 } from "./compiler.js";
 export { PROJECT_STRUCTURE_SCHEMA_VERSION, scanProjectStructure } from "./project-structure.js";
 export { AGENT_ARCHIVE_IMPORT_SCHEMA_VERSION, importAgentArchive } from "./archive-import.js";
-export { PROJECT_OVERVIEW_SCHEMA_VERSION, buildProjectOverview, renderProjectOverviewMarkdown } from "./project-overview.js";
+export {
+  PROJECT_OVERVIEW_SCHEMA_VERSION,
+  buildProjectOverview,
+  renderProjectOverviewMarkdown,
+  writeProjectOverview
+} from "./project-overview.js";
 export {
   PROJECT_RECORD_VIEWS_SCHEMA_VERSION,
   buildProjectRecordViews,

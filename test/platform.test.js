@@ -60,6 +60,11 @@ test("one-command setup configures Codex, Claude, Cursor, hooks, skills, and con
   assert.match(await readFile(path.join(root, ".claude", "skills", "qarinah", "SKILL.md"), "utf8"), /\$ARGUMENTS/);
   assert.match(await readFile(path.join(root, ".claude", "settings.json"), "utf8"), /UserPromptSubmit/);
   assert.match(await readFile(path.join(root, ".cursor", "rules", "qarinah.mdc"), "utf8"), /bounded, cited memory pack/);
+  assert.match(await readFile(path.join(root, ".qarinah", "records", "OVERVIEW.md"), "utf8"), /Qarinah project overview/);
+  assert.match(await readFile(path.join(root, ".qarinah", "records", "DECISIONS.md"), "utf8"), /Project decisions/);
+  assert.match(await readFile(path.join(root, ".qarinah", "records", "FLOW.md"), "utf8"), /Project execution flow/);
+  assert.match(await readFile(path.join(root, ".qarinah", "records", "CHANGES.md"), "utf8"), /Major project changes/);
+  assert.match(await readFile(path.join(root, ".qarinah", "dashboard", "index.html"), "utf8"), /Shared memory your team can inspect/);
 
   const repeated = await setupWorkspace({ cwd: root, codex: true, claude: true, cursor: true, allowQuery: true });
   assert.equal(repeated.ok, true);
@@ -162,8 +167,25 @@ test("dashboard exposes decisions, conflicts, citations, activity, savings, and 
   const oldDecision = await appendEvent(eventInput({ title: "Use REST", provenance: { adapter: "test", sourceId: "adr-1" } }), { cwd: root });
   await appendEvent(eventInput({
     title: "Use MCP",
+    sessionId: "session-dashboard",
+    turnId: "turn-dashboard",
+    body: "Use a bounded protocol surface for agent retrieval.",
+    data: {
+      reason: "Agents need one interoperable, consent-gated retrieval boundary.",
+      outcome: "Codex, Claude, and compatible hosts query the same project ledger.",
+      alternatives: ["Maintain a custom transport for every agent"]
+    },
     provenance: { adapter: "test", sourceId: "adr-2" },
     relations: [{ type: "supersedes", target: oldDecision.eventId }]
+  }), { cwd: root });
+  await appendEvent(eventInput({
+    kind: "tool.requested",
+    actor: { type: "agent", id: "codex" },
+    sessionId: "session-dashboard",
+    turnId: "turn-dashboard",
+    title: "Inspect package scripts",
+    body: "",
+    data: { toolName: "shell" }
   }), { cwd: root });
   await appendEvent(eventInput({
     kind: "claim",
@@ -178,8 +200,16 @@ test("dashboard exposes decisions, conflicts, citations, activity, savings, and 
   assert.equal(dashboard.totals.supersededDecisions, 1);
   assert.equal(dashboard.totals.conflicts, 1);
   assert.equal(dashboard.contextSavings.savingsPercent, 90);
+  assert.equal(dashboard.schemaVersion, "qarinah.memory-dashboard.v2");
+  assert.equal(dashboard.currentDecisions[0].reason, "Agents need one interoperable, consent-gated retrieval boundary.");
+  assert.equal(dashboard.tools[0].toolName, "shell");
+  assert.ok(dashboard.executionFlow.some((step) => step.kind === "tool.requested"));
+  assert.ok(dashboard.majorChanges.some((change) => change.title === "Use MCP"));
+  assert.equal(dashboard.durableRecords.decisions, ".qarinah/records/DECISIONS.md");
   const written = await writeMemoryDashboard({ cwd: root, baselineTokens: 1000, deliveredTokens: 100 });
   assert.match(await readFile(written.output, "utf8"), /Shared memory your team can inspect/);
+  assert.match(await readFile(written.output, "utf8"), /Execution flow/);
+  assert.match(await readFile(written.output, "utf8"), /Agents need one interoperable/);
 });
 
 test("causal receipts bind evidence, memory, policy, execution, and observation", () => {

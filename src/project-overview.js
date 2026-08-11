@@ -1,6 +1,6 @@
 import { deepFreezeJson } from "./canonical.js";
 import { readEvents } from "./store.js";
-import { loadWorkspace } from "./workspace.js";
+import { atomicWriteFile, loadWorkspace, resolveWithin } from "./workspace.js";
 
 export const PROJECT_OVERVIEW_SCHEMA_VERSION = "qarinah.project-overview.v1";
 
@@ -137,4 +137,13 @@ export function renderProjectOverviewMarkdown(overview) {
     `- Readable project memory: \`${overview.durableFiles.readableMemory}\``,
     ""
   ].join("\n");
+}
+
+export async function writeProjectOverview(options = {}) {
+  const workspace = await loadWorkspace(options.cwd ?? process.cwd());
+  const overview = await buildProjectOverview({ cwd: workspace.root, ...(options.maxOutcomes === undefined ? {} : { maxOutcomes: options.maxOutcomes }) });
+  const output = options.output ?? ".qarinah/records/OVERVIEW.md";
+  const destination = resolveWithin(workspace.root, output);
+  await atomicWriteFile(destination, `${renderProjectOverviewMarkdown(overview)}\n`);
+  return Object.freeze({ output: destination, overview });
 }

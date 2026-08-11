@@ -755,9 +755,11 @@ function writeMemoryDashboard(options?: {
 }): Promise<Readonly<{ output: string; data: QarinahMemoryDashboard }>>;
 ```
 
-`buildMemoryDashboard` verifies the local ledger and returns a frozen `qarinah.memory-dashboard.v1` view without writing a file. `renderMemoryDashboard` turns a compatible view into self-contained HTML. `writeMemoryDashboard` writes that HTML atomically to `.qarinah/dashboard/index.html` by default.
+`buildMemoryDashboard` verifies the local ledger and returns a frozen `qarinah.memory-dashboard.v2` view without writing a file. `renderMemoryDashboard` turns a compatible view into self-contained HTML. `writeMemoryDashboard` writes that HTML atomically to `.qarinah/dashboard/index.html` by default.
 
-The view contains workspace and capture metadata, totals, current and superseded decisions, explicit conflicts, source-linked events, the latest 100 permitted activity events, affected files from the latest project-structure scan, and optional caller-supplied context measurements. Both token estimates must be supplied together. The functions do not infer provider billing, run a live server, or modify the authoritative ledger.
+The view contains workspace and capture metadata, totals, decisions with explicit reasons/outcomes/alternatives/linked tools, bounded execution flow, tool activity, major changes, explicit conflicts, source-linked events, the latest 100 permitted activity events, affected files from the latest project-structure scan, durable-record paths, and optional caller-supplied context measurements. Both token estimates must be supplied together. The functions do not infer provider billing, run a live server, or modify the authoritative ledger.
+
+`writeProjectOverview(options?)` writes the deterministic beginner-readable overview to `.qarinah/records/OVERVIEW.md` by default and returns both the resolved path and typed overview. `setupWorkspace` now initializes this overview, `DECISIONS.md`, `FLOW.md`, `CHANGES.md`, SQLite, the graph, and the local dashboard in one run.
 
 See the [local memory dashboard guide](DASHBOARD.md) for the complete interface, data lineage, examples, and sharing boundary.
 

@@ -1,4 +1,5 @@
 import { deepFreezeJson } from "./canonical.js";
+import { buildProjectRecordViews } from "./project-views.js";
 import { readEvents } from "./store.js";
 import { atomicWriteFile, loadWorkspace, resolveWithin } from "./workspace.js";
 
@@ -38,6 +39,8 @@ export async function buildMemoryDashboard(options = {}) {
     }
   }
   const decisions = events.filter((event) => event.kind === "decision");
+  const projectRecords = buildProjectRecordViews(events, workspace.config.workspaceId);
+  const tools = events.filter((event) => event.kind === "tool.requested" || event.kind === "tool.completed");
   const latestStructure = [...events].reverse().find((event) => event.data?.projectStructure?.files);
   const baselineTokens = boundedUsage(options.baselineTokens, "baselineTokens");
   const deliveredTokens = boundedUsage(options.deliveredTokens, "deliveredTokens");
@@ -49,7 +52,7 @@ export async function buildMemoryDashboard(options = {}) {
     ? Math.round((savedTokens / baselineTokens) * 10000) / 100
     : null;
   return deepFreezeJson({
-    schemaVersion: "qarinah.memory-dashboard.v1",
+    schemaVersion: "qarinah.memory-dashboard.v2",
     workspaceId: workspace.config.workspaceId,
     generatedAt: (options.clock?.() ?? new Date()).toISOString(),
     capture: workspace.config.capture,
@@ -59,6 +62,9 @@ export async function buildMemoryDashboard(options = {}) {
       currentDecisions: decisions.filter((event) => !superseded.has(event.eventId)).length,
       supersededDecisions: decisions.filter((event) => superseded.has(event.eventId)).length,
       conflicts: conflicts.length,
+      tools: tools.length,
+      flowSteps: projectRecords.flow.length,
+      majorChanges: projectRecords.majorChanges.length,
       citedSources: new Set(events.map((event) => event.provenance.sourceId).filter(Boolean)).size,
       affectedFiles: latestStructure?.data.projectStructure.files.length ?? 0
     },
@@ -69,8 +75,23 @@ export async function buildMemoryDashboard(options = {}) {
       savedTokens,
       savingsPercent
     },
-    currentDecisions: decisions.filter((event) => !superseded.has(event.eventId)).map(eventSummary),
-    supersededDecisions: decisions.filter((event) => superseded.has(event.eventId)).map(eventSummary),
+    currentDecisions: projectRecords.decisions.filter((decision) => decision.status === "current"),
+    supersededDecisions: projectRecords.decisions.filter((decision) => decision.status === "superseded"),
+    tools: tools.slice(-100).reverse().map((event) => ({
+      ...eventSummary(event),
+      sessionId: event.sessionId,
+      turnId: event.turnId,
+      toolName: typeof event.data?.toolName === "string" ? event.data.toolName : event.title,
+      result: event.kind === "tool.completed" ? event.body : ""
+    })),
+    executionFlow: projectRecords.flow,
+    majorChanges: projectRecords.majorChanges,
+    latestProjectChanges: projectRecords.projectChanges,
+    durableRecords: {
+      decisions: ".qarinah/records/DECISIONS.md",
+      flow: ".qarinah/records/FLOW.md",
+      changes: ".qarinah/records/CHANGES.md"
+    },
     conflicts,
     citations: events.filter((event) => event.provenance.sourceId).map(eventSummary),
     activity: events.slice(-100).reverse().map(eventSummary),
@@ -96,6 +117,11 @@ function list(items, empty) {
   return `<ul>${items.map((item) => `<li><strong>${escapeHtml(item.title)}</strong><span>${escapeHtml(item.timestamp)}</span><code>${escapeHtml(item.eventId)}</code></li>`).join("")}</ul>`;
 }
 
+function decisionList(items, empty) {
+  if (items.length === 0) return `<p class="empty">${escapeHtml(empty)}</p>`;
+  return `<div class="records">${items.map((item) => `<article class="record"><div class="record-head"><h3>${escapeHtml(item.title)}</h3><time>${escapeHtml(item.timestamp)}</time></div><p><strong>Reason:</strong> ${escapeHtml(item.reason)}</p>${item.outcome ? `<p><strong>Outcome:</strong> ${escapeHtml(item.outcome)}</p>` : ""}${item.alternatives.length ? `<p><strong>Alternatives:</strong> ${escapeHtml(item.alternatives.join("; "))}</p>` : ""}${item.tools.length ? `<p><strong>Tools:</strong> ${item.tools.map((tool) => `<code>${escapeHtml(tool.name)}</code>`).join(" ")}</p>` : ""}<small>Evidence <code>${escapeHtml(item.eventId)}</code> · <code>${escapeHtml(item.hash)}</code></small></article>`).join("")}</div>`;
+}
+
 export function renderMemoryDashboard(data) {
   const savings = data.contextSavings.status === "measured"
     ? `${data.contextSavings.savingsPercent}% (${data.contextSavings.savedTokens.toLocaleString()} estimated tokens)`
@@ -116,7 +142,8 @@ section{background:var(--panel);border:1px solid var(--line);padding:24px;min-wi
 h2{font-size:21px;margin:0 0 16px}ul{list-style:none;padding:0;margin:0}li{display:grid;grid-template-columns:1fr auto;gap:6px 18px;padding:13px 0;border-top:1px solid var(--line)}
 li:first-child{border-top:0}li span,li code{color:var(--muted);font-size:12px}li code{grid-column:1/-1;overflow-wrap:anywhere}
 table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:12px;border-top:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-size:12px}
-.empty{margin:0}.warning{color:var(--warn)}@media(max-width:760px){.grid{grid-template-columns:1fr}section.wide{grid-column:auto}li{grid-template-columns:1fr}}
+.records{display:grid;gap:12px}.record{border-top:1px solid var(--line);padding-top:15px}.record:first-child{border-top:0;padding-top:0}.record-head{display:flex;gap:18px;align-items:baseline;justify-content:space-between}.record h3{font-size:16px;margin:0}.record p{margin:8px 0}.record small,.record time{color:var(--muted);font-size:12px}.record small code{overflow-wrap:anywhere}
+.empty{margin:0}.warning{color:var(--warn)}@media(max-width:760px){.grid{grid-template-columns:1fr}section.wide{grid-column:auto}li{grid-template-columns:1fr}.record-head{display:block}}
 </style></head><body>
 <header><div class="eyebrow">Qarinah · local dashboard</div><h1>Shared memory your team can inspect.</h1>
 <p>Workspace <code>${escapeHtml(data.workspaceId)}</code> · generated ${escapeHtml(data.generatedAt)} · ${escapeHtml(data.capture)} capture</p>
@@ -125,12 +152,16 @@ table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:12px;bor
 <div class="metric"><strong>${data.totals.supersededDecisions}</strong><span>superseded</span></div>
 <div class="metric"><strong>${data.totals.conflicts}</strong><span>conflicts</span></div>
 <div class="metric"><strong>${data.totals.citedSources}</strong><span>cited sources</span></div>
+<div class="metric"><strong>${data.totals.tools}</strong><span>tool events</span></div>
 <div class="metric"><strong>${escapeHtml(savings)}</strong><span>context saved</span></div>
 </div></header>
 <main><div class="grid">
-<section><h2>Current decisions</h2>${list(data.currentDecisions,"No current decisions recorded.")}</section>
-<section><h2>Superseded decisions</h2>${list(data.supersededDecisions,"No superseded decisions.")}</section>
+<section><h2>Current decisions and reasons</h2>${decisionList(data.currentDecisions,"No current decisions recorded.")}</section>
+<section><h2>Superseded decisions</h2>${decisionList(data.supersededDecisions,"No superseded decisions.")}</section>
 <section class="wide"><h2>Conflicts requiring attention</h2>${data.conflicts.length === 0 ? '<p class="empty">No recorded conflicts.</p>' : `<table><thead><tr><th>Claim</th><th>Conflicts with</th></tr></thead><tbody>${data.conflicts.map((conflict) => `<tr><td>${escapeHtml(conflict.source.title)}</td><td>${escapeHtml(conflict.target.title)}</td></tr>`).join("")}</tbody></table>`}</section>
+<section class="wide"><h2>Execution flow</h2>${data.executionFlow.length === 0 ? '<p class="empty">No execution steps recorded.</p>' : `<table><thead><tr><th>#</th><th>Kind</th><th>Action</th><th>Tool</th><th>Evidence</th></tr></thead><tbody>${data.executionFlow.map((step) => `<tr><td>${step.sequence}</td><td><code>${escapeHtml(step.kind)}</code></td><td>${escapeHtml(step.title)}</td><td>${step.toolName ? `<code>${escapeHtml(step.toolName)}</code>` : "—"}</td><td><code>${escapeHtml(step.eventId)}</code></td></tr>`).join("")}</tbody></table>`}</section>
+<section><h2>Tools called</h2>${list(data.tools.map((tool) => ({ ...tool, title: `${tool.toolName} · ${tool.kind}` })),"No tool activity recorded.")}</section>
+<section><h2>Major changes</h2>${list(data.majorChanges,"No major changes recorded.")}</section>
 <section><h2>Source citations</h2>${list(data.citations,"No external source citations recorded.")}</section>
 <section><h2>Agent activity timeline</h2>${list(data.activity,"No activity recorded.")}</section>
 <section class="wide"><h2>Files and systems affected</h2>${data.affectedFiles.length === 0 ? '<p class="empty">Run qarinah scan to populate the project map.</p>' : `<table><thead><tr><th>Path</th><th>Language</th><th>Content hash</th></tr></thead><tbody>${data.affectedFiles.map((file) => `<tr><td>${escapeHtml(file.path)}</td><td>${escapeHtml(file.language)}</td><td><code>${escapeHtml(file.contentHash)}</code></td></tr>`).join("")}</tbody></table>`}</section>
