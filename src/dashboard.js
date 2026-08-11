@@ -5,6 +5,16 @@ import { buildProjectRecordViews } from "./project-views.js";
 import { readEvents } from "./store.js";
 import { atomicWriteFile, loadWorkspace, resolveWithin } from "./workspace.js";
 
+const PUBLISHED_CONTEXT_BENCHMARK = Object.freeze({
+  scope: "published six-fixture estimate",
+  evidence: "bench/results/benchmark-release-0.1.6.json#six-task-repeated-context",
+  baselineTokens: 442_113,
+  deliveredTokens: 5_682,
+  savedTokens: 436_431,
+  savingsPercent: 98.71,
+  baselineToPackRatio: 77.81
+});
+
 function boundedUsage(value, label) {
   if (value === undefined) return null;
   if (!Number.isSafeInteger(value) || value < 0 || value > 1_000_000_000) {
@@ -99,6 +109,7 @@ export async function buildMemoryDashboard(options = {}) {
       savingsPercent,
       baselineToPackRatio
     },
+    publishedContextBenchmark: PUBLISHED_CONTEXT_BENCHMARK,
     memoryFootprint,
     currentDecisions: projectRecords.decisions.filter((decision) => decision.status === "current"),
     supersededDecisions: projectRecords.decisions.filter((decision) => decision.status === "superseded"),
@@ -163,17 +174,19 @@ function tableRegion(label, content) {
 
 export function renderMemoryDashboard(data, options = {}) {
   const footprint = data.memoryFootprint;
+  const publishedBenchmark = data.publishedContextBenchmark ?? PUBLISHED_CONTEXT_BENCHMARK;
   const savingsBasis = data.contextSavings.source === "caller-supplied"
     ? "supplied baseline → task pack"
     : data.contextSavings.source === "portable-chars-div-4-from-compact-import-receipts"
       ? "import receipt → task pack"
       : "authoritative ledger → task pack";
-  const savingsValue = data.contextSavings.status === "measured" && data.contextSavings.savingsPercent !== null
-    ? `${data.contextSavings.savingsPercent}%`
+  const savingsValue = data.contextSavings.status === "measured" && data.contextSavings.baselineToPackRatio !== null
+    ? `${data.contextSavings.baselineToPackRatio}:1`
     : footprint.deliveredPack.estimatedTokens.toLocaleString();
   const savingsLabel = data.contextSavings.status === "measured" && data.contextSavings.savingsPercent !== null
-    ? `${data.contextSavings.baselineTokens.toLocaleString()} → ${data.contextSavings.deliveredTokens.toLocaleString()} estimated tokens · ${data.contextSavings.baselineToPackRatio}:1 · ${savingsBasis}`
-    : "estimated tokens in current task pack · no retained baseline yet";
+    ? `This workspace · ${data.contextSavings.baselineTokens.toLocaleString()} → ${data.contextSavings.deliveredTokens.toLocaleString()} estimated tokens · ${data.contextSavings.savingsPercent}% less · ${savingsBasis}`
+    : "This workspace · estimated tokens in current task pack · no retained baseline yet";
+  const benchmarkLabel = `Published six-fixture estimate · ${publishedBenchmark.baselineTokens.toLocaleString()} → ${publishedBenchmark.deliveredTokens.toLocaleString()} estimated tokens · ${publishedBenchmark.savingsPercent}% less`;
   const imported = footprint.retained.importedSourceBytesKnown
     ? `${footprint.retained.importedSourceBytes.toLocaleString()} bytes`
     : "Not present; authoritative ledger is the automatic baseline";
@@ -245,6 +258,7 @@ li:first-child{border-top:0}li strong{min-width:0;overflow-wrap:anywhere}li span
 <div class="metric"><strong>${data.totals.citedSources}</strong><span>cited sources</span></div>
 <div class="metric"><strong>${data.totals.tools}</strong><span>tool events</span></div>
 <div class="metric"><strong>${escapeHtml(savingsValue)}</strong><span>${escapeHtml(savingsLabel)}</span></div>
+<div class="metric"><strong>${publishedBenchmark.baselineToPackRatio}:1</strong><span>${escapeHtml(benchmarkLabel)}</span></div>
 </div></header>
 <main><div class="grid">
 <section><h2>Current decisions and reasons</h2>${decisionList(data.currentDecisions,"No current decisions recorded.",{ id:"current-decisions",label:"Current decisions" })}</section>
@@ -259,8 +273,9 @@ li:first-child{border-top:0}li strong{min-width:0;overflow-wrap:anywhere}li span
 <tr><th>Compact-import receipt</th><td>${escapeHtml(imported)}</td></tr>
 <tr><th>Task pack delivered</th><td>${footprint.deliveredPack.estimatedTokens.toLocaleString()} estimated tokens</td></tr>
 ${data.contextSavings.status === "measured" ? `<tr><th>Estimated reduction</th><td>${data.contextSavings.savingsPercent ?? 0}% · ${data.contextSavings.baselineToPackRatio ?? 0}:1 · ${escapeHtml(savingsBasis)}</td></tr>` : ""}
+<tr><th>Published benchmark reference</th><td>${publishedBenchmark.baselineTokens.toLocaleString()} → ${publishedBenchmark.deliveredTokens.toLocaleString()} estimated tokens · ${publishedBenchmark.savingsPercent}% · ${publishedBenchmark.baselineToPackRatio}:1 · ${escapeHtml(publishedBenchmark.scope)}</td></tr>
 <tr><th>Pack identity</th><td><code>${escapeHtml(footprint.deliveredPack.manifestHash)}</code></td></tr>
-</tbody></table>`)}<p>Retained project memory and the small task-specific pack are different quantities. The dashboard never presents this as lossless archive compression.</p></section>
+</tbody></table>`)}<p>The workspace measurement and published six-fixture benchmark are separate comparisons. Retained project memory and the small task-specific pack are different quantities; the dashboard never presents either as lossless archive compression.</p></section>
 <section><h2>Source citations</h2>${list(data.citations,"No external source citations recorded.",{ id:"citations",label:"Source citations" })}</section>
 <section><h2>Agent activity timeline</h2>${list(data.activity,"No activity recorded.",{ id:"activity",label:"Agent activity" })}</section>
 <section class="wide"><h2>Files and systems affected</h2>${data.affectedFiles.length === 0 ? '<p class="empty">Run qarinah scan to populate the project map.</p>' : paginatedTable({ id:"affected-files",label:"Files and systems affected",headings:["Path","Language","Content hash"],rows:data.affectedFiles.map((file) => [escapeHtml(file.path),escapeHtml(file.language),`<code>${escapeHtml(file.contentHash)}</code>`]) })}</section>

@@ -208,6 +208,17 @@ test("dashboard exposes decisions, conflicts, citations, activity, savings, and 
   assert.equal(dashboard.totals.supersededDecisions, 1);
   assert.equal(dashboard.totals.conflicts, 1);
   assert.equal(dashboard.contextSavings.savingsPercent, 90);
+  const benchmarkRelease = JSON.parse(await readFile(new URL("../bench/results/benchmark-release-0.1.6.json", import.meta.url), "utf8"));
+  const benchmarkEvidence = benchmarkRelease.headlineContextResults.find((result) => result.id === "six-task-repeated-context");
+  assert.deepEqual(dashboard.publishedContextBenchmark, {
+    scope: "published six-fixture estimate",
+    evidence: "bench/results/benchmark-release-0.1.6.json#six-task-repeated-context",
+    baselineTokens: benchmarkEvidence.baselineEstimatedTokens,
+    deliveredTokens: benchmarkEvidence.qarinahEstimatedTokens,
+    savedTokens: benchmarkEvidence.baselineEstimatedTokens - benchmarkEvidence.qarinahEstimatedTokens,
+    savingsPercent: 98.71,
+    baselineToPackRatio: 77.81
+  });
   assert.equal(dashboard.schemaVersion, "qarinah.memory-dashboard.v2");
   assert.equal(dashboard.workspace.root, canonicalRoot);
   assert.equal(dashboard.workspace.name, path.basename(canonicalRoot));
@@ -227,6 +238,9 @@ test("dashboard exposes decisions, conflicts, citations, activity, savings, and 
   assert.match(await readFile(written.output, "utf8"), /Execution flow/);
   assert.match(await readFile(written.output, "utf8"), /Agents need one interoperable/);
   assert.match(await readFile(written.output, "utf8"), /Memory footprint/);
+  assert.match(await readFile(written.output, "utf8"), /This workspace · 1,000 → 100 estimated tokens · 90% less/u);
+  assert.match(await readFile(written.output, "utf8"), /77\.81:1/u);
+  assert.match(await readFile(written.output, "utf8"), /Published six-fixture estimate/u);
   const rendered = renderMemoryDashboard({
     ...dashboard,
     affectedFiles: Array.from({ length: 11 }, (_, index) => ({
@@ -239,6 +253,7 @@ test("dashboard exposes decisions, conflicts, citations, activity, savings, and 
   assert.match(rendered, /data-pager="affected-files"/u);
   assert.match(rendered, /class="table-scroll" role="region"/u);
   assert.match(rendered, /aria-live="polite"/u);
+  assert.match(rendered, /The workspace measurement and published six-fixture benchmark are separate comparisons/u);
   assert.doesNotMatch(rendered, /<script\s+src=/u);
 });
 

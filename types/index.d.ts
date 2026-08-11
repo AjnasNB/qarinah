@@ -657,6 +657,15 @@ export interface QarinahMemoryDashboard {
     savingsPercent: number | null;
     baselineToPackRatio: number | null;
   };
+  publishedContextBenchmark: Readonly<{
+    scope: "published six-fixture estimate";
+    evidence: "bench/results/benchmark-release-0.1.6.json#six-task-repeated-context";
+    baselineTokens: 442113;
+    deliveredTokens: 5682;
+    savedTokens: 436431;
+    savingsPercent: 98.71;
+    baselineToPackRatio: 77.81;
+  }>;
   memoryFootprint: QarinahMemoryFootprint;
   currentDecisions: Record<string, unknown>[];
   supersededDecisions: Record<string, unknown>[];
