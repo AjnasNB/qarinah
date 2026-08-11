@@ -356,6 +356,8 @@ export interface QarinahMemoryFootprint {
   readonly query: string;
   readonly retained: Readonly<{
     eventCount: number;
+    ledgerCharacters: number;
+    ledgerEstimatedTokens: number | null;
     importedSourceBytes: number;
     importedSourceBytesKnown: boolean;
     storageBytes: Readonly<Record<"ledger" | "sqlite" | "graph" | "index" | "context" | "overview" | "decisions" | "flow" | "changes" | "dashboard" | "total", number>>;
@@ -369,7 +371,7 @@ export interface QarinahMemoryFootprint {
   }>;
   readonly comparison: Readonly<{
     status: "not-measured" | "measured";
-    source: "caller-supplied" | "portable-chars-div-4-from-compact-import-receipts" | "not-measured";
+    source: "caller-supplied" | "portable-chars-div-4-from-compact-import-receipts" | "portable-chars-div-4-from-authoritative-ledger" | "not-measured";
     baselineTokens: number | null;
     deliveredTokens: number;
     savedTokens: number | null;
@@ -648,10 +650,12 @@ export interface QarinahMemoryDashboard {
   totals: Record<string, number>;
   contextSavings: {
     status: "not-measured" | "measured";
+    source: "caller-supplied" | "portable-chars-div-4-from-compact-import-receipts" | "portable-chars-div-4-from-authoritative-ledger" | "not-measured";
     baselineTokens: number | null;
     deliveredTokens: number | null;
     savedTokens: number | null;
     savingsPercent: number | null;
+    baselineToPackRatio: number | null;
   };
   memoryFootprint: QarinahMemoryFootprint;
   currentDecisions: Record<string, unknown>[];

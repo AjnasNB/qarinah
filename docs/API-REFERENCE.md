@@ -463,7 +463,7 @@ function measureMemoryFootprint(options?: {
 }): Promise<Readonly<QarinahMemoryFootprint>>;
 ```
 
-Reports imported source bytes retained in compact-import receipts, current local storage bytes by view, and the manifest-bound pack delivered for one query. A comparison is present only when the caller provides a baseline or a compact import supplies a reproducible portable estimate. Cost fields are simple flat input-token arithmetic, not provider billing. See [Measure project memory](MEMORY-FOOTPRINT.md).
+Reports canonical authoritative-ledger characters, imported source bytes retained in compact-import receipts, current local storage bytes by view, and the manifest-bound pack delivered for one query. The automatic comparison prefers a compact-import receipt and otherwise uses the verified ledger, both with the portable `ceil(characters / 4)` estimator; a caller-supplied baseline overrides either. Cost fields are simple flat input-token arithmetic, not provider billing. See [Measure project memory](MEMORY-FOOTPRINT.md).
 
 ### `loadIndex(start?, options?)`
 
@@ -807,7 +807,7 @@ function serveMemoryDashboard(options?: {
 
 `buildMemoryDashboard` verifies the local ledger and returns a frozen `qarinah.memory-dashboard.v2` view without writing a file. Its workspace block identifies the real project root, workspace ID, retained repository IDs, event count, latest activity, and current ledger-head hash. `renderMemoryDashboard` turns a compatible view into self-contained HTML. `writeMemoryDashboard` writes that HTML atomically to `.qarinah/dashboard/index.html` by default. `serveMemoryDashboard` binds only to loopback and rereads one or more explicitly selected, separately authorized local projects; it does not discover or merge workspaces.
 
-The view contains workspace and capture metadata, totals, decisions with explicit reasons/outcomes/alternatives/linked tools, bounded execution flow, tool activity, major changes, explicit conflicts, source-linked events, the latest 100 permitted activity events, affected files from the latest project-structure scan, durable-record paths, and optional caller-supplied context measurements. Both token estimates must be supplied together. None of these functions infers provider billing or modifies the authoritative ledger; only `serveMemoryDashboard` starts a loopback HTTP server.
+The view contains workspace and capture metadata, totals, decisions with explicit reasons/outcomes/alternatives/linked tools, bounded execution flow, tool activity, major changes, explicit conflicts, source-linked events, the latest 100 permitted activity events, affected files from the latest project-structure scan, durable-record paths, and an evidence-labeled local context comparison. By default, the comparison uses a retained compact-import receipt when present or canonical characters in the verified authoritative ledger, then compares that portable estimate with the generated task pack. Explicit snapshot token estimates override the automatic basis and must be supplied together. None of these functions infers provider billing or modifies the authoritative ledger; only `serveMemoryDashboard` starts a loopback HTTP server.
 
 `writeProjectOverview(options?)` writes the deterministic beginner-readable overview to `.qarinah/records/OVERVIEW.md` by default and returns both the resolved path and typed overview. `setupWorkspace` now initializes this overview, `DECISIONS.md`, `FLOW.md`, `CHANGES.md`, SQLite, the graph, and the local dashboard in one run.
 

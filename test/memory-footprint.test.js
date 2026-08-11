@@ -3,11 +3,12 @@ import { writeFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import {
+  appendEvent,
   importAgentArchive,
   initializeWorkspace,
   measureMemoryFootprint
 } from "../src/index.js";
-import { temporaryDirectory } from "../test-support/helpers.js";
+import { eventInput, temporaryDirectory } from "../test-support/helpers.js";
 
 test("memory footprint distinguishes retained storage, imported bytes, and the delivered pack", async (t) => {
   const root = await temporaryDirectory(t);
@@ -52,3 +53,17 @@ test("memory footprint accepts an explicit comparable baseline without inventing
   );
 });
 
+test("memory footprint derives a live comparison from the verified authoritative ledger", async (t) => {
+  const root = await temporaryDirectory(t);
+  await initializeWorkspace(root, { capture: "content" });
+  await appendEvent(eventInput({
+    title: "Retain a real project outcome",
+    body: "The live dashboard reads this validated ledger record and compiles a bounded task pack. ".repeat(20)
+  }), { cwd: root });
+  const result = await measureMemoryFootprint({ cwd: root });
+  assert.equal(result.comparison.status, "measured");
+  assert.equal(result.comparison.source, "portable-chars-div-4-from-authoritative-ledger");
+  assert.ok(result.retained.ledgerCharacters > 0);
+  assert.equal(result.comparison.baselineTokens, result.retained.ledgerEstimatedTokens);
+  assert.equal(result.comparison.deliveredTokens, result.deliveredPack.estimatedTokens);
+});

@@ -701,7 +701,8 @@ Rules:
 - `--output` must resolve inside the initialized workspace;
 - baseline and delivered estimates must be supplied together;
 - token estimates must be non-negative integers no greater than `1,000,000,000`;
-- without estimates, context savings is reported as `not-measured`; and
+- without explicit estimates, Qarinah automatically compares a compact-import receipt when present—or otherwise canonical characters in the verified authoritative ledger—with the generated task pack;
+- an empty ledger shows the current task-pack estimate without inventing a baseline; and
 - the generated file is a static derived view, not a writer or hosted control plane.
 
 ```sh
@@ -710,7 +711,7 @@ npx qarinah scan
 npx qarinah dashboard --baseline-tokens 12000 --delivered-tokens 1500
 ```
 
-The dashboard contains current and superseded decisions, explicit conflicts, source-linked events, the latest 100 permitted activity events, affected files from the latest scan, workspace capture mode, and the optional measured comparison. See the [local memory dashboard guide](DASHBOARD.md) for field semantics, population recipes, JavaScript usage, privacy guidance, and troubleshooting.
+The dashboard contains current and superseded decisions, explicit conflicts, source-linked events, the latest 100 permitted activity events, affected files from the latest scan, workspace capture mode, and an evidence-labeled local context comparison. See the [local memory dashboard guide](DASHBOARD.md) for field semantics, population recipes, JavaScript usage, privacy guidance, and troubleshooting.
 
 Serve current local activity and optionally add explicitly selected initialized projects:
 

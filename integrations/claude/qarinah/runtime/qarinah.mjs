@@ -6752,6 +6752,8 @@ async function measureMemoryFootprint(options = {}) {
   const ratePerMillion = optionalRate(options.ratePerMillion);
   const workspace = await loadWorkspace(options.cwd ?? process.cwd());
   const events = await readEvents(workspace);
+  const ledgerCharacters = events.reduce((total, event) => total + canonicalStringify(event).length + 1, 0);
+  const ledgerEstimatedTokens = events.length > 0 ? Math.ceil(ledgerCharacters / 4) : null;
   const storage = {};
   for (const [name, segments] of Object.entries(STORAGE_FILES)) storage[name] = await fileBytes(workspace, segments);
   storage.total = Object.values(storage).reduce((sum, value) => sum + value, 0);
@@ -6765,9 +6767,9 @@ async function measureMemoryFootprint(options = {}) {
   const rendered = renderContextPackMarkdown(pack);
   const renderedBytes = Buffer.byteLength(rendered);
   const deliveredTokens = pack.budget.estimatedTokens;
-  const inferredBaseline = importedBytes > 0 ? Math.ceil(importedBytes / 4) : null;
+  const inferredBaseline = importedBytes > 0 ? Math.ceil(importedBytes / 4) : ledgerEstimatedTokens;
   const selectedBaseline = baselineTokens ?? inferredBaseline;
-  const source = baselineTokens !== void 0 ? "caller-supplied" : inferredBaseline !== null ? "portable-chars-div-4-from-compact-import-receipts" : "not-measured";
+  const source = baselineTokens !== void 0 ? "caller-supplied" : importedBytes > 0 ? "portable-chars-div-4-from-compact-import-receipts" : ledgerEstimatedTokens !== null ? "portable-chars-div-4-from-authoritative-ledger" : "not-measured";
   const savedTokens = selectedBaseline === null ? null : Math.max(0, selectedBaseline - deliveredTokens);
   const reductionPercent = selectedBaseline > 0 ? Math.round(savedTokens / selectedBaseline * 1e4) / 100 : null;
   const ratio = deliveredTokens > 0 && selectedBaseline !== null ? Math.round(selectedBaseline / deliveredTokens * 100) / 100 : null;
@@ -6783,6 +6785,8 @@ async function measureMemoryFootprint(options = {}) {
     query,
     retained: {
       eventCount: events.length,
+      ledgerCharacters,
+      ledgerEstimatedTokens,
       importedSourceBytes: importedBytes,
       importedSourceBytesKnown: importedBytes > 0,
       storageBytes: storage
@@ -6807,6 +6811,7 @@ async function measureMemoryFootprint(options = {}) {
     boundaries: {
       tokenEstimator: "portable ceil(characters / 4)",
       importedBytes: "Available only from retained compact-import receipts; not a claim that all source bytes fit in the pack.",
+      automaticBaseline: "Uses compact-import source bytes when retained; otherwise uses canonical characters in the verified authoritative JSONL ledger. It compares that local text estimate with one generated task pack, not a provider bill or total model session.",
       cost: "Flat uncached input-token arithmetic only; excludes output, reasoning, tools, caching, retrieval, hosting, and fixed fees."
     }
   });
@@ -8625,14 +8630,17 @@ async function buildMemoryDashboard(options = {}) {
   const projectRecords = buildProjectRecordViews(events, workspace.config.workspaceId);
   const tools = events.filter((event) => event.kind === "tool.requested" || event.kind === "tool.completed");
   const latestStructure3 = [...events].reverse().find((event) => event.data?.projectStructure?.files);
-  const baselineTokens = boundedUsage(options.baselineTokens, "baselineTokens");
-  const deliveredTokens = boundedUsage(options.deliveredTokens, "deliveredTokens");
-  if (baselineTokens === null !== (deliveredTokens === null)) {
+  const suppliedBaselineTokens = boundedUsage(options.baselineTokens, "baselineTokens");
+  const suppliedDeliveredTokens = boundedUsage(options.deliveredTokens, "deliveredTokens");
+  if (suppliedBaselineTokens === null !== (suppliedDeliveredTokens === null)) {
     throw new TypeError("baselineTokens and deliveredTokens must be supplied together.");
   }
+  const memoryFootprint = await measureMemoryFootprint({ cwd: workspace.root });
+  const baselineTokens = suppliedBaselineTokens ?? memoryFootprint.comparison.baselineTokens;
+  const deliveredTokens = suppliedDeliveredTokens ?? memoryFootprint.comparison.deliveredTokens;
   const savedTokens = baselineTokens === null ? null : Math.max(0, baselineTokens - deliveredTokens);
   const savingsPercent = baselineTokens > 0 ? Math.round(savedTokens / baselineTokens * 1e4) / 100 : null;
-  const memoryFootprint = await measureMemoryFootprint({ cwd: workspace.root });
+  const baselineToPackRatio = deliveredTokens > 0 && baselineTokens !== null ? Math.round(baselineTokens / deliveredTokens * 100) / 100 : null;
   const repositoryIds = [...new Set(events.map((event) => event.repository?.id).filter(Boolean))].sort();
   const latestEvent = events.at(-1) ?? null;
   return deepFreezeJson({
@@ -8665,10 +8673,12 @@ async function buildMemoryDashboard(options = {}) {
     },
     contextSavings: {
       status: baselineTokens === null ? "not-measured" : "measured",
+      source: suppliedBaselineTokens === null ? memoryFootprint.comparison.source : "caller-supplied",
       baselineTokens,
       deliveredTokens,
       savedTokens,
-      savingsPercent
+      savingsPercent,
+      baselineToPackRatio
     },
     memoryFootprint,
     currentDecisions: projectRecords.decisions.filter((decision) => decision.status === "current"),
@@ -8721,9 +8731,11 @@ function tableRegion(label, content) {
   return `<div class="table-scroll" role="region" aria-label="${escapeHtml(label)} table" tabindex="0">${content}</div>`;
 }
 function renderMemoryDashboard(data, options = {}) {
-  const savings = data.contextSavings.status === "measured" ? `${data.contextSavings.savingsPercent}% (${data.contextSavings.savedTokens.toLocaleString()} estimated tokens)` : "Not measured for this workspace";
   const footprint = data.memoryFootprint;
-  const imported = footprint.retained.importedSourceBytesKnown ? `${footprint.retained.importedSourceBytes.toLocaleString()} bytes` : "No measured import receipt";
+  const savingsBasis = data.contextSavings.source === "caller-supplied" ? "supplied baseline \u2192 task pack" : data.contextSavings.source === "portable-chars-div-4-from-compact-import-receipts" ? "import receipt \u2192 task pack" : "authoritative ledger \u2192 task pack";
+  const savingsValue = data.contextSavings.status === "measured" && data.contextSavings.savingsPercent !== null ? `${data.contextSavings.savingsPercent}%` : footprint.deliveredPack.estimatedTokens.toLocaleString();
+  const savingsLabel = data.contextSavings.status === "measured" && data.contextSavings.savingsPercent !== null ? `${data.contextSavings.baselineTokens.toLocaleString()} \u2192 ${data.contextSavings.deliveredTokens.toLocaleString()} estimated tokens \xB7 ${data.contextSavings.baselineToPackRatio}:1 \xB7 ${savingsBasis}` : "estimated tokens in current task pack \xB7 no retained baseline yet";
+  const imported = footprint.retained.importedSourceBytesKnown ? `${footprint.retained.importedSourceBytes.toLocaleString()} bytes` : "Not present; authoritative ledger is the automatic baseline";
   const workspace = data.workspace ?? {
     name: data.workspaceId,
     root: "",
@@ -8788,7 +8800,7 @@ li:first-child{border-top:0}li strong{min-width:0;overflow-wrap:anywhere}li span
 <div class="metric"><strong>${data.totals.conflicts}</strong><span>conflicts</span></div>
 <div class="metric"><strong>${data.totals.citedSources}</strong><span>cited sources</span></div>
 <div class="metric"><strong>${data.totals.tools}</strong><span>tool events</span></div>
-<div class="metric"><strong>${escapeHtml(savings)}</strong><span>context saved</span></div>
+<div class="metric"><strong>${escapeHtml(savingsValue)}</strong><span>${escapeHtml(savingsLabel)}</span></div>
 </div></header>
 <main><div class="grid">
 <section><h2>Current decisions and reasons</h2>${decisionList(data.currentDecisions, "No current decisions recorded.", { id: "current-decisions", label: "Current decisions" })}</section>
@@ -8799,8 +8811,10 @@ li:first-child{border-top:0}li strong{min-width:0;overflow-wrap:anywhere}li span
 <section><h2>Major changes</h2>${list(data.majorChanges, "No major changes recorded.", { id: "major-changes", label: "Major changes" })}</section>
 <section><h2>Memory footprint</h2>${tableRegion("Memory footprint", `<table><tbody>
 <tr><th>Project memory on disk</th><td>${footprint.retained.storageBytes.total.toLocaleString()} bytes</td></tr>
-<tr><th>Measured imported source</th><td>${escapeHtml(imported)}</td></tr>
+<tr><th>Authoritative ledger text</th><td>${footprint.retained.ledgerCharacters.toLocaleString()} characters \xB7 ${footprint.retained.ledgerEstimatedTokens?.toLocaleString() ?? "no retained baseline"} estimated tokens</td></tr>
+<tr><th>Compact-import receipt</th><td>${escapeHtml(imported)}</td></tr>
 <tr><th>Task pack delivered</th><td>${footprint.deliveredPack.estimatedTokens.toLocaleString()} estimated tokens</td></tr>
+${data.contextSavings.status === "measured" ? `<tr><th>Estimated reduction</th><td>${data.contextSavings.savingsPercent ?? 0}% \xB7 ${data.contextSavings.baselineToPackRatio ?? 0}:1 \xB7 ${escapeHtml(savingsBasis)}</td></tr>` : ""}
 <tr><th>Pack identity</th><td><code>${escapeHtml(footprint.deliveredPack.manifestHash)}</code></td></tr>
 </tbody></table>`)}<p>Retained project memory and the small task-specific pack are different quantities. The dashboard never presents this as lossless archive compression.</p></section>
 <section><h2>Source citations</h2>${list(data.citations, "No external source citations recorded.", { id: "citations", label: "Source citations" })}</section>

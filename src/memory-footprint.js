@@ -1,6 +1,6 @@
 import { lstat } from "node:fs/promises";
 import path from "node:path";
-import { deepFreezeJson } from "./canonical.js";
+import { canonicalStringify, deepFreezeJson } from "./canonical.js";
 import { compileContext, renderContextPackMarkdown } from "./compiler.js";
 import { QarinahError } from "./errors.js";
 import { readEvents } from "./store.js";
@@ -79,6 +79,8 @@ export async function measureMemoryFootprint(options = {}) {
   const ratePerMillion = optionalRate(options.ratePerMillion);
   const workspace = await loadWorkspace(options.cwd ?? process.cwd());
   const events = await readEvents(workspace);
+  const ledgerCharacters = events.reduce((total, event) => total + canonicalStringify(event).length + 1, 0);
+  const ledgerEstimatedTokens = events.length > 0 ? Math.ceil(ledgerCharacters / 4) : null;
   const storage = {};
   for (const [name, segments] of Object.entries(STORAGE_FILES)) storage[name] = await fileBytes(workspace, segments);
   storage.total = Object.values(storage).reduce((sum, value) => sum + value, 0);
@@ -92,10 +94,11 @@ export async function measureMemoryFootprint(options = {}) {
   const rendered = renderContextPackMarkdown(pack);
   const renderedBytes = Buffer.byteLength(rendered);
   const deliveredTokens = pack.budget.estimatedTokens;
-  const inferredBaseline = importedBytes > 0 ? Math.ceil(importedBytes / 4) : null;
+  const inferredBaseline = importedBytes > 0 ? Math.ceil(importedBytes / 4) : ledgerEstimatedTokens;
   const selectedBaseline = baselineTokens ?? inferredBaseline;
   const source = baselineTokens !== undefined ? "caller-supplied"
-    : inferredBaseline !== null ? "portable-chars-div-4-from-compact-import-receipts" : "not-measured";
+    : importedBytes > 0 ? "portable-chars-div-4-from-compact-import-receipts"
+      : ledgerEstimatedTokens !== null ? "portable-chars-div-4-from-authoritative-ledger" : "not-measured";
   const savedTokens = selectedBaseline === null ? null : Math.max(0, selectedBaseline - deliveredTokens);
   const reductionPercent = selectedBaseline > 0 ? Math.round((savedTokens / selectedBaseline) * 10000) / 100 : null;
   const ratio = deliveredTokens > 0 && selectedBaseline !== null ? Math.round((selectedBaseline / deliveredTokens) * 100) / 100 : null;
@@ -111,6 +114,8 @@ export async function measureMemoryFootprint(options = {}) {
     query,
     retained: {
       eventCount: events.length,
+      ledgerCharacters,
+      ledgerEstimatedTokens,
       importedSourceBytes: importedBytes,
       importedSourceBytesKnown: importedBytes > 0,
       storageBytes: storage
@@ -135,6 +140,7 @@ export async function measureMemoryFootprint(options = {}) {
     boundaries: {
       tokenEstimator: "portable ceil(characters / 4)",
       importedBytes: "Available only from retained compact-import receipts; not a claim that all source bytes fit in the pack.",
+      automaticBaseline: "Uses compact-import source bytes when retained; otherwise uses canonical characters in the verified authoritative JSONL ledger. It compares that local text estimate with one generated task pack, not a provider bill or total model session.",
       cost: "Flat uncached input-token arithmetic only; excludes output, reasoning, tools, caching, retrieval, hosting, and fixed fees."
     }
   });

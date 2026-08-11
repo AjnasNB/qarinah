@@ -72,6 +72,8 @@ test("live dashboard reads real events from separate explicitly selected project
   assert.match(projectPage, /team\/frontend/u);
   assert.match(projectPage, /Responsive verification passed/u);
   assert.match(projectPage, /Live local ledger/u);
+  assert.match(projectPage, /authoritative ledger .* task pack/u);
+  assert.doesNotMatch(projectPage, /Not measured for this workspace/u);
   assert.match(projectPage, new RegExp(backendWorkspace.config.workspaceId, "u"));
   assert.equal(await requestStatus(live.url, "attacker.example"), 421);
 });
