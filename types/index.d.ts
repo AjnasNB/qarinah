@@ -304,6 +304,53 @@ export function scanProjectStructure(options?: {
   maxTotalBytes?: number;
   maxDepth?: number;
 }): Promise<QarinahProjectStructureScanResult>;
+export interface QarinahAgentArchiveImportResult {
+  readonly schemaVersion: "qarinah.agent-archive-import.v1";
+  readonly mode: "compact" | "full";
+  readonly formats: readonly ("codex" | "claude" | "portable")[];
+  readonly filesRead: number;
+  readonly sourceBytes: number;
+  readonly recordsSeen: number;
+  readonly visibleItems: number;
+  readonly ignoredRecords: number;
+  readonly sessions: number;
+  readonly importedEvents: number;
+  readonly derived: Readonly<Record<string, unknown>> | null;
+}
+export const AGENT_ARCHIVE_IMPORT_SCHEMA_VERSION: "qarinah.agent-archive-import.v1";
+export function importAgentArchive(source: string, options?: {
+  cwd?: string;
+  format?: "auto" | "codex" | "claude" | "portable";
+  mode?: "compact" | "full";
+  maxBytes?: number;
+  maxFiles?: number;
+  maxRecords?: number;
+  maxLineBytes?: number;
+  rebuild?: boolean;
+}): Promise<QarinahAgentArchiveImportResult>;
+export interface QarinahProjectOverview {
+  readonly schemaVersion: "qarinah.project-overview.v1";
+  readonly workspaceId: string;
+  readonly generatedFrom: Readonly<Record<string, unknown>>;
+  readonly memory: Readonly<{
+    sessions: number;
+    prompts: number;
+    toolRequests: number;
+    toolOutcomes: number;
+    completedTurns: number;
+    decisions: number;
+    summaries: number;
+    approvals: number;
+    firstRecordedAt: string | null;
+    lastRecordedAt: string | null;
+  }>;
+  readonly codebase: Readonly<Record<string, unknown>>;
+  readonly recentOutcomes: readonly Readonly<Record<string, unknown>>[];
+  readonly durableFiles: Readonly<Record<string, string>>;
+}
+export const PROJECT_OVERVIEW_SCHEMA_VERSION: "qarinah.project-overview.v1";
+export function buildProjectOverview(options?: { cwd?: string; maxOutcomes?: number }): Promise<QarinahProjectOverview>;
+export function renderProjectOverviewMarkdown(overview: QarinahProjectOverview): string;
 export function exportOkf(options?: { cwd?: string; output?: string }): Promise<QarinahOkfExportResult>;
 export const PORTABLE_TOKEN_ESTIMATOR: Readonly<QarinahTokenEstimator & { exact: false }>;
 export function normalizeTokenEstimator(candidate?: QarinahTokenEstimator): Readonly<QarinahTokenEstimator & { exact: boolean }>;

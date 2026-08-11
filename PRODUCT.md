@@ -6,11 +6,11 @@ brand
 
 ## Users
 
-Developers and teams using Codex, Claude Code, command-line agents, and compatible MCP clients across real software projects. They need the next coding session to recover relevant decisions and evidence without replaying an entire project history.
+Developers and teams using Codex, Claude Code, Cursor, command-line agents, and compatible MCP clients across real software projects. They need the next coding session to recover relevant decisions and evidence without replaying an entire project history. Some already have large exported agent histories that need to become durable, searchable project memory.
 
 ## Product Purpose
 
-Your project remembers, even when the coding agent changes. Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust. It records permitted project events and explicit decisions, preserves their source identities in a verifiable ledger and graph, and compiles a small cited context pack for the current task. Success means less repeated context, visible provenance, portable project memory, and a clear failure when supporting evidence is absent.
+Your project remembers, even when the coding agent changes. Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust. It records permitted requests, tool outcomes, summaries, decisions, and code relationships; can stream visible Codex, Claude, or portable JSONL exports into cited session memory; preserves source identities in a verifiable ledger, SQLite read model, and graph; and compiles a small cited context pack for the current task. Success means less repeated context, visible provenance, a beginner-readable project overview, portable project memory, and a clear failure when supporting evidence is absent.
 
 ## Brand Personality
 

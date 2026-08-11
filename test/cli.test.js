@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { access, readFile, realpath } from "node:fs/promises";
+import { access, readFile, realpath, writeFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -33,9 +33,9 @@ test("doctor exit codes and trust controls are automation-safe", async (t) => {
   assert.equal((await run(["init", root], repositoryRoot)).code, 0);
 
   const beforeBuild = await run(["doctor"], root);
-  assert.equal(beforeBuild.code, 2);
-  assert.equal(JSON.parse(beforeBuild.stdout).ok, false);
-  assert.equal(JSON.parse(beforeBuild.stdout).derived, "missing");
+  assert.equal(beforeBuild.code, 0, beforeBuild.stderr);
+  assert.equal(JSON.parse(beforeBuild.stdout).ok, true);
+  assert.equal(JSON.parse(beforeBuild.stdout).derived, "current");
 
   assert.equal((await run(["build"], root)).code, 0);
   const healthy = await run(["doctor"], root);
@@ -105,6 +105,29 @@ test("CLI exports deterministic OKF interchange to safe default and explicit pat
   assert.equal((await run(["export", "okf", "--output", "--unknown"], root)).code, 1);
   const unsupported = await run(["export", "json"], root);
   assert.equal(unsupported.code, 1);
+});
+
+test("CLI imports visible agent history and renders a project overview", async (t) => {
+  const root = await temporaryDirectory(t);
+  assert.equal((await run(["init", root, "--capture", "content"], repositoryRoot)).code, 0);
+  const archive = path.join(root, "history.jsonl");
+  await writeFile(archive, [
+    JSON.stringify({ type: "session", sessionId: "cli-import-1", timestamp: "2026-08-11T09:00:00.000Z" }),
+    JSON.stringify({ role: "user", sessionId: "cli-import-1", content: "Map the project and initialize SQLite." }),
+    JSON.stringify({ role: "assistant", sessionId: "cli-import-1", content: "The project graph and SQLite index are ready." }),
+    ""
+  ].join("\n"), "utf8");
+
+  const imported = await run(["import", archive, "--format", "portable", "--mode", "compact"], root);
+  assert.equal(imported.code, 0, imported.stderr);
+  assert.equal(JSON.parse(imported.stdout).importedEvents, 1);
+
+  const overview = await run(["overview", "--format", "json"], root);
+  assert.equal(overview.code, 0, overview.stderr);
+  const result = JSON.parse(overview.stdout);
+  assert.equal(result.memory.sessions, 1);
+  assert.equal(result.memory.summaries, 1);
+  assert.match(result.recentOutcomes[0].excerpt, /SQLite index/);
 });
 
 test("JSON stdin keeps model-controlled record and query text out of shell syntax", async (t) => {

@@ -60,6 +60,8 @@ qarinah record --stdin-json
 qarinah hook codex|claude [--quiet]
 qarinah scan [options]
 qarinah build
+qarinah import <archive-file-or-directory> [options]
+qarinah overview [--format json|markdown]
 qarinah query [text] [options]
 qarinah query --stdin-json
 qarinah context [text] [options]
@@ -404,6 +406,35 @@ npx qarinah rebuild
 The commands are exact aliases. The result reports the workspace ID, event count, head hash, and rebuilt projections, including `.qarinah/index/qarinah.db`.
 
 Use `build` after moving a valid ledger between machines, after deleting a disposable derived view, or when `doctor` reports derived state as missing or stale. It does not repair a corrupt authoritative event chain.
+
+## `import`
+
+Stream an exported coding-agent history into the trusted project memory.
+
+```sh
+qarinah import <archive-file-or-directory> \
+  [--format auto|codex|claude|portable] \
+  [--mode compact|full] \
+  [--max-bytes <integer>] \
+  [--max-files <integer>] \
+  [--max-records <integer>] \
+  [--max-line-bytes <integer>]
+```
+
+The source must be an explicit regular `.jsonl` or `.ndjson` file, or a directory containing those files. Linked files and directories are not followed. `auto` detects supported Codex and Claude records and otherwise applies the portable format.
+
+`compact` is the default. It writes one cited summary per session and is appropriate for large exports. `full` writes each supported visible item separately and requires content-authorized capture. Hidden reasoning and encrypted reasoning blocks are ignored in either mode. The result reports source bytes, files, records, visible items, sessions, newly imported events, formats, and rebuilt-state identity.
+
+## `overview`
+
+Explain the retained project memory and latest codebase map in readable Markdown or JSON.
+
+```sh
+npx qarinah overview
+npx qarinah overview --format json
+```
+
+The overview reports memory counts, latest outcomes with event IDs and hashes, codebase files and directories, languages, observed relationships, changes, and the paths of the authoritative ledger and rebuildable views.
 
 ## `query` and `context`
 

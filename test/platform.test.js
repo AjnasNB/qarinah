@@ -43,6 +43,7 @@ test("one-command setup configures Codex, Claude, Cursor, hooks, skills, and con
   });
   assert.equal(result.ok, true);
   assert.deepEqual(result.targets, ["codex", "claude", "cursor"]);
+  assert.equal(result.projectStructure.captured, true);
   const codexConfig = await readFile(path.join(root, ".codex", "config.toml"), "utf8");
   assert.match(codexConfig, /\[mcp_servers\.qarinah\]/);
   assert.match(codexConfig, /context\.query/);

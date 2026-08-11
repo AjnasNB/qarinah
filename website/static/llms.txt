@@ -16,6 +16,9 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 - [Open-source governed-agent toolkit](https://qarinah.io/articles/open-source-governed-agent-toolkit/): How Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler can compose with established agent, browser, web-data, and document tools.
 - [Getting started](https://qarinah.io/docs/getting-started/): Install Qarinah, opt in one workspace, connect a supported host, and compile a cited context pack.
 - [Features](https://qarinah.io/docs/features/): Complete product capability map for project-owned memory, cited retrieval, integrations, dashboards, team memory, portability, and boundaries.
+- [Project overview](https://qarinah.io/docs/project-overview/): Explain retained work, latest outcomes, codebase areas, languages, relationships, and durable memory files in one page.
+- [Agent archive import](https://qarinah.io/docs/agent-archive-import/): Stream visible Codex, Claude, or portable JSONL histories into compact or full cited project memory.
+- [Private projects](https://qarinah.io/docs/private-projects/): Local storage, explicit consent, redaction, encrypted bundles, signed checkpoints, and authority controls for sensitive work.
 - [Public metrics](https://qarinah.io/docs/public-metrics/): Approved wording, reproducible evidence, launch copy, and statements the benchmark does not support.
 - [Documentation index](https://qarinah.io/docs/): Documentation by task.
 - [npm package](https://www.npmjs.com/package/qarinah): Published `qarinah` package and registry metadata.
@@ -29,6 +32,10 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 - Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler are separate projects by Ajnas N B. The ecosystem guide distinguishes them from third-party tools maintained by their own projects.
 - Cockroach Browser uses Playwright. Cockroach Crawler discloses Trafilatura as the optional quality dependency. The ecosystem guide does not claim that those established projects were created by Qarinah's author.
 - Qarinah's primary workflow is verified handoffs between coding agents.
+- Qarinah initializes a rebuildable SQLite WAL/FTS5 read model, graph, index, and Markdown view when a workspace is initialized.
+- Complete setup records a bounded project-structure graph, and `qarinah overview` explains memory counts, latest outcomes, languages, directories, and relationships.
+- `qarinah import` streams supported visible Codex, Claude, and portable JSONL archives. Compact mode stores one cited summary per session; full mode stores supported visible events in a content-authorized workspace.
+- Qarinah excludes hidden and encrypted reasoning record types from archive import and cannot recover content that was never captured or imported.
 - Qarinah supports reviewed Codex and Claude Code integrations that can use the same explicitly opted-in project record.
 - The published evaluator measured 98.71% less estimated repeated input context in its compared task set: 442,113 estimated input-context tokens became 5,682 while every required target was directly covered in the top five.
 - That compared slice contained 436,431 fewer estimated input-context tokens, and the evaluated full-history baseline contained 77.81 times as many estimated tokens as the compiled Qarinah pack: a 77.81:1 baseline-to-pack ratio.
@@ -41,6 +48,9 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 ## Technical documentation
 
 - [Features](https://qarinah.io/docs/features/): Shipped project-memory, context-compilation, integration, team, export, and verification capabilities.
+- [Project overview](https://qarinah.io/docs/project-overview/): Beginner-readable project memory and codebase summary.
+- [Agent archive import](https://qarinah.io/docs/agent-archive-import/): Large JSONL import modes, limits, portable format, exclusions, and verification.
+- [Private projects](https://qarinah.io/docs/private-projects/): Data-handling controls and legal boundary for NDA-conscious use.
 - [CLI reference](https://qarinah.io/docs/cli/): Every command, option, stdin mode, exit code, and machine-readable output.
 - [JavaScript API reference](https://qarinah.io/docs/api/): Public exports, types, functions, and bounded programmatic workflows.
 - [Host integrations](https://qarinah.io/docs/integrations/): Codex, Claude Code, Cursor, CLI, and consent-gated MCP integration guidance.

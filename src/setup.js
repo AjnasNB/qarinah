@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { QarinahError } from "./errors.js";
 import { rebuildDerivedState } from "./indexer.js";
+import { scanProjectStructure } from "./project-structure.js";
 import { verifyStore } from "./store.js";
 import {
   atomicWriteFile,
@@ -267,6 +268,21 @@ export async function setupWorkspace(options = {}) {
   if (targets.includes("codex")) files.push(...await configureCodex(workspace, options));
   if (targets.includes("claude")) files.push(...await configureClaude(workspace, options));
   if (targets.includes("cursor")) files.push(...await configureCursor(workspace, options));
+  let projectStructure;
+  try {
+    projectStructure = await scanProjectStructure({ cwd: workspace.root });
+  } catch (error) {
+    const boundedScanLimit = error?.code === "PROJECT_SCAN_LIMIT"
+      || (error instanceof TypeError && /^Event exceeds the [0-9]+-byte limit\.$/u.test(error.message));
+    if (!boundedScanLimit) throw error;
+    projectStructure = Object.freeze({
+      captured: false,
+      unchanged: false,
+      reason: "project-scan-limit",
+      message: error.message,
+      nextCommand: "npx qarinah scan --max-files <bounded-count>"
+    });
+  }
   await rebuildDerivedState(workspace.root);
   const health = await verifyStore(workspace.root, { updateCheckpoint: false });
   return Object.freeze({
@@ -277,6 +293,7 @@ export async function setupWorkspace(options = {}) {
     queryEnabled: options.allowQuery === true,
     targets,
     files,
+    projectStructure,
     health
   });
 }

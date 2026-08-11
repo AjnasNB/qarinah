@@ -24,7 +24,7 @@ const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "
 const benchmarkRelease = JSON.parse(await readFile(path.join(root, "bench", "results", "benchmark-release-0.1.6.json"), "utf8"));
 const productVersion = packageJson.version;
 const productPositioning = "Evidence-linked project memory for coding agents.";
-const productExplanation = "Qarinah keeps one compact, cited project memory beside your code, so Codex, Claude Code, Cursor, and compatible tools can continue from verified context instead of starting from zero.";
+const productExplanation = "Qarinah keeps requests, decisions, visible outcomes, tool results, summaries, and a codebase relationship map beside your code, then gives Codex, Claude Code, Cursor, and compatible tools a compact cited handoff instead of making them start from zero.";
 const repeatedContextMetric = benchmarkRelease.headlineContextResults.find((result) => result.id === "six-task-repeated-context");
 if (!repeatedContextMetric
   || repeatedContextMetric.baselineEstimatedTokens !== 442113
@@ -99,6 +99,9 @@ const qarinahFeatures = [
   "Consent-gated MCP context retrieval",
   "Multi-repository memory with separate authority",
   "Freshness checks and a visual memory dashboard",
+  "Streaming Codex, Claude, and portable agent-history import",
+  "Immediate SQLite/FTS5 project search",
+  "Beginner-readable project and outcome overview",
   "Encrypted team bundles and signed checkpoints",
   "Deterministic Markdown, JSON, graph, and OKF exports"
 ];
@@ -138,6 +141,18 @@ const answerEngineQuestions = [
   {
     name: "Does Qarinah have a local memory dashboard?",
     text: "Yes. The qarinah dashboard command generates a local, read-only HTML view of current and superseded decisions, explicit conflicts, citations, recent permitted activity, affected files, and an optional caller-measured context comparison. It is derived from the authoritative ledger and does not grant agent access or execute tools."
+  },
+  {
+    name: "Can Qarinah keep useful context after a native coding-agent chat is deleted?",
+    text: "Yes, for permitted events that Qarinah already captured or visible JSONL history that the operator imported. The retained project ledger, SQLite search, graph, and readable memory stay with the project. Qarinah cannot recover content that was never captured or imported."
+  },
+  {
+    name: "Can Qarinah import a large Codex or Claude history?",
+    text: "Yes. The archive importer streams Codex, Claude, or portable JSONL exports under explicit byte, file, record, line, and session limits. Compact mode keeps one cited outcome summary per session and excludes hidden or encrypted reasoning blocks."
+  },
+  {
+    name: "Can Qarinah support private or NDA projects?",
+    text: "Qarinah supports local storage, metadata-only defaults, explicit content consent, redaction, encrypted team bundles, and signed checkpoints. Those controls can support an NDA-conscious workflow, but the software does not create or replace a legal NDA."
   },
   {
     name: "Is Qarinah open source?",
@@ -399,6 +414,30 @@ const docPages = [
     description: "Explore Qarinah project memory, cited context compilation, agent integrations, local dashboards, team memory, exports, and operating boundaries.",
     section: "Start",
     aliases: ["qarinah features", "project memory features", "coding agent memory capabilities", "context compiler capabilities"]
+  },
+  {
+    route: "docs/project-overview",
+    source: "docs/PROJECT-OVERVIEW.md",
+    title: "Understand a project in one page",
+    description: "See retained work, latest outcomes, codebase areas, languages, relationships, and durable Qarinah files in one readable overview.",
+    section: "Start",
+    aliases: ["project overview", "codebase summary", "project graph", "what happened", "latest outcomes"]
+  },
+  {
+    route: "docs/agent-archive-import",
+    source: "docs/AGENT-ARCHIVE-IMPORT.md",
+    title: "Import old coding-agent history",
+    description: "Stream visible Codex, Claude, or portable JSONL histories into durable cited project memory with compact or full modes.",
+    section: "Connect",
+    aliases: ["codex archive", "claude history", "chat import", "agent export", "large context recovery"]
+  },
+  {
+    route: "docs/private-projects",
+    source: "docs/PRIVATE-PROJECTS.md",
+    title: "Private and NDA projects",
+    description: "Use local storage, explicit consent, redaction, encrypted bundles, signed checkpoints, and authority filters for sensitive projects.",
+    section: "Operate",
+    aliases: ["private code", "nda project", "confidential project", "local agent memory", "data controls"]
   },
   {
     route: "docs/cli",
@@ -1255,6 +1294,45 @@ function homePage() {
             <p>442,113 estimated input-context tokens became 5,682 - 98.71% less repeated context. Every required target was directly covered in the top five in the published fixture.</p>
             <a href="/docs/benchmarks/">Read the method, artifacts, and limits</a>
           </aside>
+        </div>
+      </section>
+
+      <section class="section shell" aria-labelledby="durable-memory-title">
+        <div class="section-heading split-heading">
+          <div>
+            <p class="eyebrow">What the project remembers</p>
+            <h2 id="durable-memory-title">Open a new agent session without losing the work already done.</h2>
+          </div>
+          <p>Qarinah keeps permitted requests, visible outcomes, tool results, summaries, decisions, and code relationships beside the repository. A fresh supported agent receives a small cited handoff, not a blind replay of the complete history.</p>
+        </div>
+        <div class="use-mode-grid">
+          <article class="use-mode-card">
+            <span>Work</span>
+            <h3>What was asked and completed</h3>
+            <p>See user requests, latest outcomes, decisions, approvals, summaries, and tool-result counts with source event IDs and hashes.</p>
+            <a href="/docs/project-overview/">Open the project overview</a>
+          </article>
+          <article class="use-mode-card">
+            <span>Codebase</span>
+            <h3>How the project fits together</h3>
+            <p>Map bounded files, folders, languages, imports, Markdown links, changes, renames, deletions, and unresolved relationships into SQLite and a typed graph.</p>
+            <a href="/docs/project-overview/">See the codebase map</a>
+          </article>
+          <article class="use-mode-card">
+            <span>Recovery</span>
+            <h3>Bring old visible agent history</h3>
+            <p>Stream Codex, Claude, or portable JSONL exports. Compact mode keeps one cited outcome summary per session while excluding hidden and encrypted reasoning blocks.</p>
+            <a href="/docs/agent-archive-import/">Import agent archives</a>
+          </article>
+          <article class="use-mode-card">
+            <span>Private</span>
+            <h3>Keep the operator in control</h3>
+            <p>Use project-local storage, metadata-only defaults, explicit content consent, redaction, encrypted team bundles, signed checkpoints, and disclosure filters.</p>
+            <a href="/docs/private-projects/">Review private-project controls</a>
+          </article>
+        </div>
+        <div class="handoff-stage-copy">
+          ${commandBlock("npx qarinah overview\nnpx qarinah import ./agent-exports --format auto --mode compact", "Understand the project and recover visible history")}
         </div>
       </section>
 
