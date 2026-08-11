@@ -63,7 +63,17 @@ npx qarinah dashboard --output review/qarinah-memory.html
 
 The output must remain inside the initialized workspace. Parent traversal and paths outside the workspace are rejected.
 
-### Add a measured context comparison
+### How the live context comparison is measured
+
+The live dashboard automatically compares real local text with the bounded task pack it just compiled:
+
+1. If the workspace retains a compact-import receipt, its measured imported source bytes are converted with the portable `ceil(characters / 4)` estimator.
+2. Otherwise, Qarinah counts canonical characters in the verified authoritative JSONL ledger and applies the same estimator.
+3. The delivered side is the estimated token count of the generated task pack shown on that page.
+
+The card displays the exact baseline and delivered estimates, percentage reduction, ratio, and basis. It updates after retained ledger activity changes. This is a local ledger-or-import-to-pack comparison, not a provider bill, cache measurement, lossless archive ratio, or total model-session cost.
+
+### Override the automatic baseline for a snapshot
 
 If a real run has a baseline estimate and the delivered Qarinah-pack estimate, supply both:
 
@@ -75,7 +85,7 @@ npx qarinah dashboard \
 
 The dashboard calculates saved estimated tokens and the percentage difference. Both values are required together, must be non-negative integers, and must not exceed `1,000,000,000`.
 
-These values are caller-supplied measurements. The dashboard does not read a model-provider bill, infer cached tokens, or claim that the displayed difference equals total task cost. Without both values it displays **Not measured for this workspace**.
+These values replace the automatic ledger/import baseline for that static snapshot. They are caller-supplied measurements. The dashboard does not read a model-provider bill, infer cached tokens, or claim that the displayed difference equals total task cost.
 
 ## What every panel means
 
@@ -91,8 +101,8 @@ These values are caller-supplied measurements. The dashboard does not read a mod
 | Source citations | Permitted events carrying a source identifier | `provenance.sourceId`, with event ID, timestamp, and hash retained in the dashboard data |
 | Agent activity timeline | The latest 100 permitted events, newest first | Validated ledger events; it is not private chat history or hidden reasoning |
 | Files and systems affected | Paths, detected languages, and content hashes from the latest scan | The latest recorded project-structure snapshot |
-| Context saved | Baseline, delivered, saved, and percentage estimates for one comparison | Displayed only when both CLI or API token estimates are supplied |
-| Memory footprint | Retained Qarinah file bytes, compact-import source bytes when known, and the current query-pack identity and estimated size | Measured from verified local files, import receipts, and a normal bounded context compilation |
+| Context saved | Baseline, delivered, saved, ratio, percentage, and exact comparison basis | Automatically uses a retained compact-import receipt or canonical authoritative-ledger characters; explicit snapshot inputs override it |
+| Memory footprint | Retained Qarinah file bytes, canonical ledger characters, compact-import source bytes when known, and the current query-pack identity and estimated size | Measured from verified local files, validated ledger events, import receipts, and a normal bounded context compilation |
 
 The metric strip counts current decisions, superseded decisions, explicit conflicts, distinct cited source IDs, tool events, and the optional context comparison. The complete dashboard data also includes total events, total decisions, flow steps, major changes, and affected-file count under `totals`.
 
@@ -264,9 +274,9 @@ Run `npx qarinah init .` or the one-command setup from the intended project root
 
 Run `npx qarinah scan`, then regenerate the dashboard.
 
-### Context saved says “Not measured”
+### Context saved shows only the current task-pack size
 
-Pass both `--baseline-tokens` and `--delivered-tokens`. Qarinah deliberately does not manufacture those values.
+The workspace has no retained ledger events yet, so there is no local baseline to compare. Record or import permitted project activity and reload the live page. For a static snapshot, both `--baseline-tokens` and `--delivered-tokens` can provide an explicit comparison instead.
 
 ### A known disagreement does not appear
 

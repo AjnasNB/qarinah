@@ -140,7 +140,7 @@ const answerEngineQuestions = [
   },
   {
     name: "Does Qarinah have a local memory dashboard?",
-    text: "Yes. The qarinah dashboard command generates a local, read-only HTML view of current and superseded decisions, explicit conflicts, citations, recent permitted activity, affected files, and an optional caller-measured context comparison. It is derived from the authoritative ledger and does not grant agent access or execute tools."
+    text: "Yes. The qarinah dashboard command generates a local, read-only HTML view of current and superseded decisions, explicit conflicts, citations, recent permitted activity, affected files, and an evidence-labeled local ledger-or-import-to-pack context estimate. It is derived from the authoritative ledger and does not grant agent access or execute tools."
   },
   {
     name: "Can Qarinah keep useful context after a native coding-agent chat is deleted?",

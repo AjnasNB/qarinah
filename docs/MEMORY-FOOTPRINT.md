@@ -12,7 +12,7 @@ Run:
 npx qarinah footprint "release decisions and failed checks"
 ```
 
-The JSON report includes byte counts for every retained view, the selected pack's character and estimated-token counts, its manifest hash, and the source of any comparison.
+The JSON report includes byte counts for every retained view, canonical character and estimated-token counts for the authoritative ledger, the selected pack's character and estimated-token counts, its manifest hash, and the source of the comparison.
 
 ## Compare a real baseline
 
@@ -26,7 +26,7 @@ npx qarinah footprint "release decisions and failed checks" \
 
 `--rate-per-million` applies simple flat uncached input-token arithmetic. It does not include output, reasoning, tools, retrieval, caching, hosting, subscriptions, or fixed fees.
 
-The portable fallback estimator is `ceil(characters / 4)`. It is useful for reproducible local comparisons, but it is not a provider usage receipt.
+Without an explicit baseline, Qarinah applies the portable `ceil(characters / 4)` estimator to a retained compact-import receipt when present, or otherwise to canonical characters in the verified authoritative ledger. This makes the local comparison reproducible, but it is not a provider usage receipt.
 
 ## What happens to a very large Codex archive?
 
@@ -41,11 +41,10 @@ If the original agent archive is deleted, Qarinah can retrieve only material tha
 
 ## Dashboard
 
-The dashboard's **Memory footprint** panel always shows current on-disk project memory and delivered-pack size. The separate **Context saved** metric appears only when the caller supplies a comparable baseline and delivered value.
+The dashboard's **Memory footprint** panel always shows current on-disk project memory, authoritative-ledger characters, and delivered-pack size. **Context saved** automatically displays the same evidence-labeled import/ledger-to-pack estimate. Explicit baseline and delivered values can override it for a static snapshot.
 
 ```sh
 npx qarinah dashboard
 ```
 
 This separation makes the result inspectable: storage retention, task retrieval, and cost estimation are never presented as one universal compression claim.
-

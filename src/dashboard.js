@@ -45,16 +45,21 @@ export async function buildMemoryDashboard(options = {}) {
   const projectRecords = buildProjectRecordViews(events, workspace.config.workspaceId);
   const tools = events.filter((event) => event.kind === "tool.requested" || event.kind === "tool.completed");
   const latestStructure = [...events].reverse().find((event) => event.data?.projectStructure?.files);
-  const baselineTokens = boundedUsage(options.baselineTokens, "baselineTokens");
-  const deliveredTokens = boundedUsage(options.deliveredTokens, "deliveredTokens");
-  if ((baselineTokens === null) !== (deliveredTokens === null)) {
+  const suppliedBaselineTokens = boundedUsage(options.baselineTokens, "baselineTokens");
+  const suppliedDeliveredTokens = boundedUsage(options.deliveredTokens, "deliveredTokens");
+  if ((suppliedBaselineTokens === null) !== (suppliedDeliveredTokens === null)) {
     throw new TypeError("baselineTokens and deliveredTokens must be supplied together.");
   }
+  const memoryFootprint = await measureMemoryFootprint({ cwd: workspace.root });
+  const baselineTokens = suppliedBaselineTokens ?? memoryFootprint.comparison.baselineTokens;
+  const deliveredTokens = suppliedDeliveredTokens ?? memoryFootprint.comparison.deliveredTokens;
   const savedTokens = baselineTokens === null ? null : Math.max(0, baselineTokens - deliveredTokens);
   const savingsPercent = baselineTokens > 0
     ? Math.round((savedTokens / baselineTokens) * 10000) / 100
     : null;
-  const memoryFootprint = await measureMemoryFootprint({ cwd: workspace.root });
+  const baselineToPackRatio = deliveredTokens > 0 && baselineTokens !== null
+    ? Math.round((baselineTokens / deliveredTokens) * 100) / 100
+    : null;
   const repositoryIds = [...new Set(events.map((event) => event.repository?.id).filter(Boolean))].sort();
   const latestEvent = events.at(-1) ?? null;
   return deepFreezeJson({
@@ -87,10 +92,12 @@ export async function buildMemoryDashboard(options = {}) {
     },
     contextSavings: {
       status: baselineTokens === null ? "not-measured" : "measured",
+      source: suppliedBaselineTokens === null ? memoryFootprint.comparison.source : "caller-supplied",
       baselineTokens,
       deliveredTokens,
       savedTokens,
-      savingsPercent
+      savingsPercent,
+      baselineToPackRatio
     },
     memoryFootprint,
     currentDecisions: projectRecords.decisions.filter((decision) => decision.status === "current"),
@@ -155,13 +162,21 @@ function tableRegion(label, content) {
 }
 
 export function renderMemoryDashboard(data, options = {}) {
-  const savings = data.contextSavings.status === "measured"
-    ? `${data.contextSavings.savingsPercent}% (${data.contextSavings.savedTokens.toLocaleString()} estimated tokens)`
-    : "Not measured for this workspace";
   const footprint = data.memoryFootprint;
+  const savingsBasis = data.contextSavings.source === "caller-supplied"
+    ? "supplied baseline → task pack"
+    : data.contextSavings.source === "portable-chars-div-4-from-compact-import-receipts"
+      ? "import receipt → task pack"
+      : "authoritative ledger → task pack";
+  const savingsValue = data.contextSavings.status === "measured" && data.contextSavings.savingsPercent !== null
+    ? `${data.contextSavings.savingsPercent}%`
+    : footprint.deliveredPack.estimatedTokens.toLocaleString();
+  const savingsLabel = data.contextSavings.status === "measured" && data.contextSavings.savingsPercent !== null
+    ? `${data.contextSavings.baselineTokens.toLocaleString()} → ${data.contextSavings.deliveredTokens.toLocaleString()} estimated tokens · ${data.contextSavings.baselineToPackRatio}:1 · ${savingsBasis}`
+    : "estimated tokens in current task pack · no retained baseline yet";
   const imported = footprint.retained.importedSourceBytesKnown
     ? `${footprint.retained.importedSourceBytes.toLocaleString()} bytes`
-    : "No measured import receipt";
+    : "Not present; authoritative ledger is the automatic baseline";
   const workspace = data.workspace ?? {
     name: data.workspaceId,
     root: "",
@@ -229,7 +244,7 @@ li:first-child{border-top:0}li strong{min-width:0;overflow-wrap:anywhere}li span
 <div class="metric"><strong>${data.totals.conflicts}</strong><span>conflicts</span></div>
 <div class="metric"><strong>${data.totals.citedSources}</strong><span>cited sources</span></div>
 <div class="metric"><strong>${data.totals.tools}</strong><span>tool events</span></div>
-<div class="metric"><strong>${escapeHtml(savings)}</strong><span>context saved</span></div>
+<div class="metric"><strong>${escapeHtml(savingsValue)}</strong><span>${escapeHtml(savingsLabel)}</span></div>
 </div></header>
 <main><div class="grid">
 <section><h2>Current decisions and reasons</h2>${decisionList(data.currentDecisions,"No current decisions recorded.",{ id:"current-decisions",label:"Current decisions" })}</section>
@@ -240,8 +255,10 @@ li:first-child{border-top:0}li strong{min-width:0;overflow-wrap:anywhere}li span
 <section><h2>Major changes</h2>${list(data.majorChanges,"No major changes recorded.",{ id:"major-changes",label:"Major changes" })}</section>
 <section><h2>Memory footprint</h2>${tableRegion("Memory footprint",`<table><tbody>
 <tr><th>Project memory on disk</th><td>${footprint.retained.storageBytes.total.toLocaleString()} bytes</td></tr>
-<tr><th>Measured imported source</th><td>${escapeHtml(imported)}</td></tr>
+<tr><th>Authoritative ledger text</th><td>${footprint.retained.ledgerCharacters.toLocaleString()} characters · ${footprint.retained.ledgerEstimatedTokens?.toLocaleString() ?? "no retained baseline"} estimated tokens</td></tr>
+<tr><th>Compact-import receipt</th><td>${escapeHtml(imported)}</td></tr>
 <tr><th>Task pack delivered</th><td>${footprint.deliveredPack.estimatedTokens.toLocaleString()} estimated tokens</td></tr>
+${data.contextSavings.status === "measured" ? `<tr><th>Estimated reduction</th><td>${data.contextSavings.savingsPercent ?? 0}% · ${data.contextSavings.baselineToPackRatio ?? 0}:1 · ${escapeHtml(savingsBasis)}</td></tr>` : ""}
 <tr><th>Pack identity</th><td><code>${escapeHtml(footprint.deliveredPack.manifestHash)}</code></td></tr>
 </tbody></table>`)}<p>Retained project memory and the small task-specific pack are different quantities. The dashboard never presents this as lossless archive compression.</p></section>
 <section><h2>Source citations</h2>${list(data.citations,"No external source citations recorded.",{ id:"citations",label:"Source citations" })}</section>
