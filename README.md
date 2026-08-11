@@ -313,7 +313,8 @@ Open `.qarinah/dashboard/index.html` in a browser. The dashboard shows:
 - source-linked events and their evidence identifiers;
 - the latest 100 permitted activity events;
 - paths, languages, and content hashes from the latest project scan; and
-- an optional measured baseline-versus-delivered context comparison.
+- an optional measured baseline-versus-delivered context comparison; and
+- current retained project-memory bytes, measured imported source bytes when available, and the task-pack manifest and estimated size.
 
 To include a context comparison for a real run, supply both estimates:
 
@@ -323,11 +324,19 @@ npx qarinah dashboard --baseline-tokens 12000 --delivered-tokens 1500
 
 Those numbers are supplied by the caller; the dashboard does not infer provider billing or manufacture a savings result. It is a static, rebuildable view with no remote scripts or analytics. The hash-chained JSONL ledger remains authoritative, and the separate `qarinah freshness` command checks whether cited files have changed.
 
+Measure the three quantities directly:
+
+```sh
+npx qarinah footprint "release decisions and failed checks"
+```
+
+Qarinah does not claim that a large source archive becomes a lossless few-kilobyte file. It preserves authorized project memory locally and sends a small task-relevant cited pack to the agent. Read [memory-footprint measurement](docs/MEMORY-FOOTPRINT.md) for the exact distinction and [the Azure evaluation](docs/AZURE-EVALUATION.md) before considering a shared remote index.
+
 `qarinah setup` creates the empty SQLite database, relationship graph, readable overview, decision/flow/change records, and dashboard immediately. Later records and scans rebuild the derived views from the verified ledger.
 
 To preserve an exported Codex/Claude/portable JSONL archive on an external drive during setup, add explicit `--backup-source` and `--backup-destination` paths. Qarinah streams only JSONL/NDJSON files, enforces limits, rejects linked paths, verifies SHA-256 digests, writes an external manifest, and records a compact project receipt. See [External agent-archive backup](docs/AGENT-ARCHIVE-BACKUP.md).
 
-Read the complete [local memory dashboard guide](docs/DASHBOARD.md) for every panel, data lineage, CLI and JavaScript APIs, population recipes, privacy guidance, and troubleshooting.
+Read the complete [local memory dashboard guide](docs/DASHBOARD.md) for every panel, data lineage, CLI and JavaScript APIs, population recipes, privacy guidance, and troubleshooting. Release maintainers should also use the [0.5.0 readiness checklist](docs/RELEASE-READINESS-0.5.md).
 
 ## Five-minute proof
 

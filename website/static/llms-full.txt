@@ -31,6 +31,8 @@ This file is a convenience map for tools that choose to read it. It does not con
 - Creates an empty valid SQLite WAL/FTS5 read model, graph, index, and Markdown view during workspace initialization.
 - Maps bounded project files, directories, languages, imports, and documentation links, then renders a beginner-readable overview of retained work and latest outcomes.
 - Streams visible Codex, Claude, and portable JSONL archives under byte, file, record, line, and session limits; compact mode records one cited summary per session.
+- Configures project-local memory for Codex, Claude Code, Cursor, Kimi Code, classic Kimi CLI, and Google Antigravity through reviewed host-specific hooks or MCP files; native capture support is stated separately from project configuration.
+- Copies explicitly selected JSONL/NDJSON exports to an external destination with byte/file ceilings, link rejection, per-file hashes, and a verified manifest.
 - Verifies the append-only event chain before deterministically rebuilding derived SQLite, graph, index, Markdown, and context-pack views.
 - Retrieves evidence with deterministic lexical, typo-tolerant, and one-hop graph signals.
 - Compiles bounded context packs with citations, evidence-coverage metadata, and conflict or supersession visibility.
@@ -172,6 +174,10 @@ Canonical guide: https://qarinah.io/docs/integrations/
 - Complete JavaScript API reference: https://qarinah.io/docs/api/
 - MCP setup and diagnostics: https://qarinah.io/docs/mcp/
 - Local memory dashboard: https://qarinah.io/docs/dashboard/
+- Memory-footprint measurement: https://qarinah.io/docs/memory-footprint/
+- Coding-agent host compatibility: https://qarinah.io/docs/host-compatibility/
+- External archive backup: https://qarinah.io/docs/agent-archive-backup/
+- Azure evaluation: https://qarinah.io/docs/azure-evaluation/
 - Shared team memory: https://qarinah.io/docs/team-memory/
 
 ## Task-oriented use

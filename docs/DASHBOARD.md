@@ -61,10 +61,13 @@ These values are caller-supplied measurements. The dashboard does not read a mod
 | Agent activity timeline | The latest 100 permitted events, newest first | Validated ledger events; it is not private chat history or hidden reasoning |
 | Files and systems affected | Paths, detected languages, and content hashes from the latest scan | The latest recorded project-structure snapshot |
 | Context saved | Baseline, delivered, saved, and percentage estimates for one comparison | Displayed only when both CLI or API token estimates are supplied |
+| Memory footprint | Retained Qarinah file bytes, compact-import source bytes when known, and the current query-pack identity and estimated size | Measured from verified local files, import receipts, and a normal bounded context compilation |
 
 The metric strip counts current decisions, superseded decisions, explicit conflicts, distinct cited source IDs, tool events, and the optional context comparison. The complete dashboard data also includes total events, total decisions, flow steps, major changes, and affected-file count under `totals`.
 
 The decision cards use explicit event fields. `data.reason`, `data.outcome`, and `data.alternatives` become the human explanation; tools are linked by the same session and turn or by an explicit event relation. Qarinah never fabricates a reason or exposes hidden chain-of-thought.
+
+The footprint panel does not call storage reduction “compression.” The original archive, retained project record, and delivered model context serve different purposes. Use `qarinah footprint` for a machine-readable report and read [Measure project memory](MEMORY-FOOTPRINT.md).
 
 ## Populate a useful dashboard
 

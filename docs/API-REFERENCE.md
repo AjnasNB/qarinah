@@ -71,6 +71,8 @@ Invalid JavaScript argument shapes generally throw `TypeError`. Storage, trust, 
 | `GRAPH_SCHEMA_VERSION` | `"qarinah.graph.v2"` |
 | `PROJECT_STRUCTURE_SCHEMA_VERSION` | `"qarinah.project-structure.v1"` |
 | `AGENT_ARCHIVE_IMPORT_SCHEMA_VERSION` | `"qarinah.agent-archive-import.v1"` |
+| `AGENT_ARCHIVE_BACKUP_SCHEMA_VERSION` | `"qarinah.agent-archive-backup.v1"` |
+| `MEMORY_FOOTPRINT_SCHEMA_VERSION` | `"qarinah.memory-footprint.v1"` |
 | `PROJECT_OVERVIEW_SCHEMA_VERSION` | `"qarinah.project-overview.v1"` |
 | `OKF_EXPORT_SCHEMA_VERSION` | `"qarinah.okf-export.v1"` |
 | `OKF_VERSION` | `"0.1"` |
@@ -447,6 +449,21 @@ function renderProjectOverviewMarkdown(
 ```
 
 Combines verified memory counts, latest outcome identities, the latest project-structure snapshot, languages, directories, relationships, changes, and durable file locations. Rendering is deterministic and does not replace the cited source events.
+
+### `measureMemoryFootprint(options?)`
+
+```ts
+function measureMemoryFootprint(options?: {
+  cwd?: string;
+  query?: string;
+  maxChars?: number;
+  maxTokens?: number;
+  baselineTokens?: number;
+  ratePerMillion?: number;
+}): Promise<Readonly<QarinahMemoryFootprint>>;
+```
+
+Reports imported source bytes retained in compact-import receipts, current local storage bytes by view, and the manifest-bound pack delivered for one query. A comparison is present only when the caller provides a baseline or a compact import supplies a reproducible portable estimate. Cost fields are simple flat input-token arithmetic, not provider billing. See [Measure project memory](MEMORY-FOOTPRINT.md).
 
 ### `loadIndex(start?, options?)`
 

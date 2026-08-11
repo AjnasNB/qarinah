@@ -23,6 +23,7 @@ Qarinah is evidence-linked project memory for coding agents. It keeps an inspect
 - A rebuildable typed graph and retrieval index derived from the authoritative event record.
 - An optional SQLite WAL and FTS5 read model that remains disposable derived state.
 - A local read-only dashboard for decisions and their reasons, linked tools, bounded execution flow, major changes, conflicts, citations, affected files, and caller-supplied context measurements.
+- A reproducible memory-footprint report that separates imported source bytes, retained local storage, and the bounded pack delivered for one task.
 - Automatically initialized `OVERVIEW.md`, `DECISIONS.md`, `FLOW.md`, and `CHANGES.md` views that can be deleted and regenerated from the verified ledger.
 - Immediate SQLite, graph, index, and Markdown initialization, so a new workspace starts with a complete empty read model instead of a missing database.
 - A beginner-readable project overview combining memory counts, latest outcomes, codebase areas, languages, relationships, and evidence identities.
@@ -57,4 +58,4 @@ Qarinah is not an autonomous agent runtime, a hosted personalization service, or
 
 Qarinah can support private and NDA-conscious projects with local storage, explicit consent, metadata-only defaults, redaction, encrypted bundles, and signed checkpoints. It does not create or replace a legal NDA. See [private projects](PRIVATE-PROJECTS.md).
 
-Continue with [installation and setup](GETTING-STARTED.md), [project overview](PROJECT-OVERVIEW.md), [agent archive import](AGENT-ARCHIVE-IMPORT.md), [host integrations](HOST-INTEGRATIONS.md), the [CLI reference](CLI-REFERENCE.md), or the [JavaScript and TypeScript API](API-REFERENCE.md).
+Continue with [installation and setup](GETTING-STARTED.md), [project overview](PROJECT-OVERVIEW.md), [agent archive import](AGENT-ARCHIVE-IMPORT.md), [memory-footprint measurement](MEMORY-FOOTPRINT.md), [host compatibility](HOST-COMPATIBILITY.md), the [CLI reference](CLI-REFERENCE.md), or the [JavaScript and TypeScript API](API-REFERENCE.md).

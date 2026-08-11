@@ -461,6 +461,28 @@ npx qarinah overview --format json
 
 The overview reports memory counts, latest outcomes with event IDs and hashes, codebase files and directories, languages, observed relationships, changes, and the paths of the authoritative ledger and rebuildable views.
 
+## `footprint`
+
+Measure retained project memory and the bounded pack selected for one query:
+
+```sh
+qarinah footprint [query] \
+  [--baseline-tokens <non-negative-integer>] \
+  [--rate-per-million <positive-number>] \
+  [--max-chars <integer>] \
+  [--max-tokens <integer>]
+```
+
+The report separates imported source bytes, every known Qarinah storage file, and the current task pack. Compact-import receipts can provide a portable character-based source estimate. An explicit `--baseline-tokens` takes precedence. Cost fields appear only with `--rate-per-million` and use flat uncached input-token arithmetic.
+
+```sh
+npx qarinah footprint "release decisions and failed checks" \
+  --baseline-tokens 12000 \
+  --rate-per-million 3
+```
+
+See [Measure project memory](MEMORY-FOOTPRINT.md) for interpretation and boundaries.
+
 ## `query` and `context`
 
 Compile a bounded, cited `qarinah.context-pack.v2`.
