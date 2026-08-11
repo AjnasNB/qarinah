@@ -86,10 +86,10 @@ function sortJsonValue(value) {
 function sanitizeJsonValue(value, options = {}) {
   const limits = { ...DEFAULT_LIMITS, ...options };
   let nodes = 0;
-  function visit(candidate, path15, depth) {
+  function visit(candidate, path16, depth) {
     nodes += 1;
     if (nodes > limits.maximumNodes) throw new TypeError(`JSON value exceeds ${limits.maximumNodes} nodes.`);
-    if (depth > limits.maximumDepth) throw new TypeError(`JSON value exceeds depth ${limits.maximumDepth} at ${path15}.`);
+    if (depth > limits.maximumDepth) throw new TypeError(`JSON value exceeds depth ${limits.maximumDepth} at ${path16}.`);
     if (candidate === null || typeof candidate === "boolean") return candidate;
     if (typeof candidate === "string") {
       if (candidate.length > limits.maximumStringLength) {
@@ -99,42 +99,42 @@ function sanitizeJsonValue(value, options = {}) {
       return candidate;
     }
     if (typeof candidate === "number") {
-      if (!Number.isFinite(candidate)) throw new TypeError(`${path15} must contain only finite numbers.`);
+      if (!Number.isFinite(candidate)) throw new TypeError(`${path16} must contain only finite numbers.`);
       return Object.is(candidate, -0) ? 0 : candidate;
     }
     if (Array.isArray(candidate)) {
       if (candidate.length > limits.maximumArrayLength) {
-        throw new TypeError(`${path15} exceeds ${limits.maximumArrayLength} array items.`);
+        throw new TypeError(`${path16} exceeds ${limits.maximumArrayLength} array items.`);
       }
       const descriptors2 = Object.getOwnPropertyDescriptors(candidate);
       const allowed = /* @__PURE__ */ new Set(["length", ...Array.from({ length: candidate.length }, (_, index) => String(index))]);
       for (const key of Reflect.ownKeys(descriptors2)) {
-        if (typeof key !== "string" || !allowed.has(key)) throw new TypeError(`${path15} contains an unsupported array property.`);
+        if (typeof key !== "string" || !allowed.has(key)) throw new TypeError(`${path16} contains an unsupported array property.`);
       }
       return Array.from({ length: candidate.length }, (_, index) => {
         const descriptor = descriptors2[String(index)];
         if (!descriptor?.enumerable || !Object.hasOwn(descriptor, "value")) {
-          throw new TypeError(`${path15}[${index}] must be an enumerable data property.`);
+          throw new TypeError(`${path16}[${index}] must be an enumerable data property.`);
         }
-        return visit(descriptor.value, `${path15}[${index}]`, depth + 1);
+        return visit(descriptor.value, `${path16}[${index}]`, depth + 1);
       });
     }
-    if (!candidate || typeof candidate !== "object") throw new TypeError(`${path15} contains an unsupported value.`);
+    if (!candidate || typeof candidate !== "object") throw new TypeError(`${path16} contains an unsupported value.`);
     const prototype = Object.getPrototypeOf(candidate);
     if (prototype !== Object.prototype && prototype !== null) {
-      throw new TypeError(`${path15} must contain only plain records.`);
+      throw new TypeError(`${path16} must contain only plain records.`);
     }
     const descriptors = Object.getOwnPropertyDescriptors(candidate);
     const keys = Reflect.ownKeys(descriptors);
-    if (keys.length > limits.maximumObjectKeys) throw new TypeError(`${path15} exceeds ${limits.maximumObjectKeys} fields.`);
+    if (keys.length > limits.maximumObjectKeys) throw new TypeError(`${path16} exceeds ${limits.maximumObjectKeys} fields.`);
     const result = /* @__PURE__ */ Object.create(null);
     for (const key of keys) {
-      if (typeof key !== "string") throw new TypeError(`${path15} cannot contain symbol keys.`);
+      if (typeof key !== "string") throw new TypeError(`${path16} cannot contain symbol keys.`);
       const descriptor = descriptors[key];
       if (!descriptor.enumerable || !Object.hasOwn(descriptor, "value") || descriptor.value === void 0) {
-        throw new TypeError(`${path15}.${key} must be an enumerable data property with a defined value.`);
+        throw new TypeError(`${path16}.${key} must be an enumerable data property with a defined value.`);
       }
-      result[key] = visit(descriptor.value, `${path15}.${key}`, depth + 1);
+      result[key] = visit(descriptor.value, `${path16}.${key}`, depth + 1);
     }
     return result;
   }
@@ -159,56 +159,56 @@ function snapshotJsonBoundary(value, options = {}) {
   const limits = { ...DEFAULT_LIMITS2, ...options };
   const seen = /* @__PURE__ */ new WeakSet();
   let nodes = 0;
-  function visit(candidate, path15, depth) {
+  function visit(candidate, path16, depth) {
     nodes += 1;
     if (nodes > limits.maximumNodes) throw new TypeError(`${limits.label} exceeds ${limits.maximumNodes} JSON nodes.`);
-    if (depth > limits.maximumDepth) throw new TypeError(`${limits.label} exceeds depth ${limits.maximumDepth} at ${path15}.`);
+    if (depth > limits.maximumDepth) throw new TypeError(`${limits.label} exceeds depth ${limits.maximumDepth} at ${path16}.`);
     if (candidate === null || typeof candidate === "boolean") return candidate;
     if (typeof candidate === "string") {
       if (candidate.length > limits.maximumStringLength) {
-        throw new TypeError(`${path15} exceeds ${limits.maximumStringLength} characters.`);
+        throw new TypeError(`${path16} exceeds ${limits.maximumStringLength} characters.`);
       }
       return candidate;
     }
     if (typeof candidate === "number") {
       if (!Number.isFinite(candidate) || Object.is(candidate, -0)) {
-        throw new TypeError(`${path15} must be a finite JSON number other than negative zero.`);
+        throw new TypeError(`${path16} must be a finite JSON number other than negative zero.`);
       }
       return candidate;
     }
-    if (!candidate || typeof candidate !== "object") throw new TypeError(`${path15} contains a non-JSON value.`);
-    if (seen.has(candidate)) throw new TypeError(`${path15} contains a cyclic or repeated object reference.`);
+    if (!candidate || typeof candidate !== "object") throw new TypeError(`${path16} contains a non-JSON value.`);
+    if (seen.has(candidate)) throw new TypeError(`${path16} contains a cyclic or repeated object reference.`);
     seen.add(candidate);
     if (Array.isArray(candidate)) {
       if (candidate.length > limits.maximumArrayLength) {
-        throw new TypeError(`${path15} exceeds ${limits.maximumArrayLength} array entries.`);
+        throw new TypeError(`${path16} exceeds ${limits.maximumArrayLength} array entries.`);
       }
       const descriptors2 = Object.getOwnPropertyDescriptors(candidate);
       const expected = /* @__PURE__ */ new Set(["length", ...Array.from({ length: candidate.length }, (_, index) => String(index))]);
       for (const key of Reflect.ownKeys(descriptors2)) {
-        if (typeof key !== "string" || !expected.has(key)) throw new TypeError(`${path15} contains an unsupported array property.`);
+        if (typeof key !== "string" || !expected.has(key)) throw new TypeError(`${path16} contains an unsupported array property.`);
       }
       return Array.from({ length: candidate.length }, (_, index) => {
         const descriptor = descriptors2[String(index)];
         if (!descriptor?.enumerable || !Object.hasOwn(descriptor, "value")) {
-          throw new TypeError(`${path15}[${index}] must be an enumerable data property.`);
+          throw new TypeError(`${path16}[${index}] must be an enumerable data property.`);
         }
-        return visit(descriptor.value, `${path15}[${index}]`, depth + 1);
+        return visit(descriptor.value, `${path16}[${index}]`, depth + 1);
       });
     }
     const prototype = Object.getPrototypeOf(candidate);
-    if (prototype !== Object.prototype && prototype !== null) throw new TypeError(`${path15} must be a plain record.`);
+    if (prototype !== Object.prototype && prototype !== null) throw new TypeError(`${path16} must be a plain record.`);
     const descriptors = Object.getOwnPropertyDescriptors(candidate);
     const keys = Reflect.ownKeys(descriptors);
-    if (keys.length > limits.maximumObjectKeys) throw new TypeError(`${path15} exceeds ${limits.maximumObjectKeys} fields.`);
+    if (keys.length > limits.maximumObjectKeys) throw new TypeError(`${path16} exceeds ${limits.maximumObjectKeys} fields.`);
     const result = /* @__PURE__ */ Object.create(null);
     for (const key of keys) {
-      if (typeof key !== "string") throw new TypeError(`${path15} cannot contain symbol keys.`);
+      if (typeof key !== "string") throw new TypeError(`${path16} cannot contain symbol keys.`);
       const descriptor = descriptors[key];
       if (!descriptor.enumerable || !Object.hasOwn(descriptor, "value") || descriptor.value === void 0) {
-        throw new TypeError(`${path15}.${key} must be an enumerable data property with a defined value.`);
+        throw new TypeError(`${path16}.${key} must be an enumerable data property with a defined value.`);
       }
-      result[key] = visit(descriptor.value, `${path15}.${key}`, depth + 1);
+      result[key] = visit(descriptor.value, `${path16}.${key}`, depth + 1);
     }
     return result;
   }
@@ -3996,7 +3996,7 @@ var require_ignore = __commonJS({
       //   path matching.
       // - check `string` either `MODE_IGNORE` or `MODE_CHECK_IGNORE`
       // @returns {TestResult} true if a file is ignored
-      test(path15, checkUnignored, mode) {
+      test(path16, checkUnignored, mode) {
         let ignored = false;
         let unignored = false;
         let matchedRule;
@@ -4005,7 +4005,7 @@ var require_ignore = __commonJS({
           if (unignored === negative && ignored !== unignored || negative && !ignored && !unignored && !checkUnignored) {
             return;
           }
-          const matched = rule[mode].test(path15);
+          const matched = rule[mode].test(path16);
           if (!matched) {
             return;
           }
@@ -4026,17 +4026,17 @@ var require_ignore = __commonJS({
     var throwError = (message, Ctor) => {
       throw new Ctor(message);
     };
-    var checkPath = (path15, originalPath, doThrow) => {
-      if (!isString(path15)) {
+    var checkPath = (path16, originalPath, doThrow) => {
+      if (!isString(path16)) {
         return doThrow(
           `path must be a string, but got \`${originalPath}\``,
           TypeError
         );
       }
-      if (!path15) {
+      if (!path16) {
         return doThrow(`path must not be empty`, TypeError);
       }
-      if (checkPath.isNotRelative(path15)) {
+      if (checkPath.isNotRelative(path16)) {
         const r = "`path.relative()`d";
         return doThrow(
           `path should be a ${r} string, but got "${originalPath}"`,
@@ -4045,7 +4045,7 @@ var require_ignore = __commonJS({
       }
       return true;
     };
-    var isNotRelative = (path15) => REGEX_TEST_INVALID_PATH.test(path15);
+    var isNotRelative = (path16) => REGEX_TEST_INVALID_PATH.test(path16);
     checkPath.isNotRelative = isNotRelative;
     checkPath.convert = (p) => p;
     var Ignore = class {
@@ -4075,19 +4075,19 @@ var require_ignore = __commonJS({
       }
       // @returns {TestResult}
       _test(originalPath, cache, checkUnignored, slices) {
-        const path15 = originalPath && checkPath.convert(originalPath);
+        const path16 = originalPath && checkPath.convert(originalPath);
         checkPath(
-          path15,
+          path16,
           originalPath,
           this._strictPathCheck ? throwError : RETURN_FALSE
         );
-        return this._t(path15, cache, checkUnignored, slices);
+        return this._t(path16, cache, checkUnignored, slices);
       }
-      checkIgnore(path15) {
-        if (!REGEX_TEST_TRAILING_SLASH.test(path15)) {
-          return this.test(path15);
+      checkIgnore(path16) {
+        if (!REGEX_TEST_TRAILING_SLASH.test(path16)) {
+          return this.test(path16);
         }
-        const slices = path15.split(SLASH).filter(Boolean);
+        const slices = path16.split(SLASH).filter(Boolean);
         slices.pop();
         if (slices.length) {
           const parent = this._t(
@@ -4100,18 +4100,18 @@ var require_ignore = __commonJS({
             return parent;
           }
         }
-        return this._rules.test(path15, false, MODE_CHECK_IGNORE);
+        return this._rules.test(path16, false, MODE_CHECK_IGNORE);
       }
-      _t(path15, cache, checkUnignored, slices) {
-        if (path15 in cache) {
-          return cache[path15];
+      _t(path16, cache, checkUnignored, slices) {
+        if (path16 in cache) {
+          return cache[path16];
         }
         if (!slices) {
-          slices = path15.split(SLASH).filter(Boolean);
+          slices = path16.split(SLASH).filter(Boolean);
         }
         slices.pop();
         if (!slices.length) {
-          return cache[path15] = this._rules.test(path15, checkUnignored, MODE_IGNORE);
+          return cache[path16] = this._rules.test(path16, checkUnignored, MODE_IGNORE);
         }
         const parent = this._t(
           slices.join(SLASH) + SLASH,
@@ -4119,29 +4119,29 @@ var require_ignore = __commonJS({
           checkUnignored,
           slices
         );
-        return cache[path15] = parent.ignored ? parent : this._rules.test(path15, checkUnignored, MODE_IGNORE);
+        return cache[path16] = parent.ignored ? parent : this._rules.test(path16, checkUnignored, MODE_IGNORE);
       }
-      ignores(path15) {
-        return this._test(path15, this._ignoreCache, false).ignored;
+      ignores(path16) {
+        return this._test(path16, this._ignoreCache, false).ignored;
       }
       createFilter() {
-        return (path15) => !this.ignores(path15);
+        return (path16) => !this.ignores(path16);
       }
       filter(paths) {
         return makeArray(paths).filter(this.createFilter());
       }
       // @returns {TestResult}
-      test(path15) {
-        return this._test(path15, this._testCache, true);
+      test(path16) {
+        return this._test(path16, this._testCache, true);
       }
     };
     var factory = (options) => new Ignore(options);
-    var isPathValid = (path15) => checkPath(path15 && checkPath.convert(path15), path15, RETURN_FALSE);
+    var isPathValid = (path16) => checkPath(path16 && checkPath.convert(path16), path16, RETURN_FALSE);
     var setupWindows = () => {
       const makePosix = (str) => /^\\\\\?\\/.test(str) || /["<>|\u0000-\u001F]+/u.test(str) ? str : str.replace(/\\/g, "/");
       checkPath.convert = makePosix;
       const REGEX_TEST_WINDOWS_PATH_ABSOLUTE = /^[a-z]:\//i;
-      checkPath.isNotRelative = (path15) => REGEX_TEST_WINDOWS_PATH_ABSOLUTE.test(path15) || isNotRelative(path15);
+      checkPath.isNotRelative = (path16) => REGEX_TEST_WINDOWS_PATH_ABSOLUTE.test(path16) || isNotRelative(path16);
     };
     if (
       // Detect `process` so that it can run in browsers.
@@ -4158,7 +4158,7 @@ var require_ignore = __commonJS({
 
 // bin/qarinah.js
 import process2 from "node:process";
-import path14 from "node:path";
+import path15 from "node:path";
 
 // src/index.js
 init_errors();
@@ -6677,6 +6677,138 @@ async function backupAgentArchives(sources, destination, options = {}) {
   }
 }
 
+// src/memory-footprint.js
+init_canonical();
+import { lstat as lstat7 } from "node:fs/promises";
+import path8 from "node:path";
+init_errors();
+init_store();
+init_workspace();
+var MEMORY_FOOTPRINT_SCHEMA_VERSION = "qarinah.memory-footprint.v1";
+var STORAGE_FILES = Object.freeze({
+  ledger: ["events", "events.jsonl"],
+  sqlite: ["index", "qarinah.db"],
+  graph: ["graph", "graph.json"],
+  index: ["index", "index.json"],
+  context: ["records", "CONTEXT.md"],
+  overview: ["records", "OVERVIEW.md"],
+  decisions: ["records", "DECISIONS.md"],
+  flow: ["records", "FLOW.md"],
+  changes: ["records", "CHANGES.md"],
+  dashboard: ["dashboard", "index.html"]
+});
+function optionalInteger(value, label, minimum, maximum) {
+  if (value === void 0) return void 0;
+  if (!Number.isSafeInteger(value) || value < minimum || value > maximum) {
+    throw new TypeError(`${label} must be an integer from ${minimum} to ${maximum}.`);
+  }
+  return value;
+}
+function optionalRate(value) {
+  if (value === void 0) return null;
+  if (typeof value !== "number" || !Number.isFinite(value) || value <= 0 || value > 1e6) {
+    throw new TypeError("ratePerMillion must be a finite number greater than 0 and no greater than 1000000.");
+  }
+  return value;
+}
+function money(value) {
+  return Math.round(value * 1e6) / 1e6;
+}
+async function fileBytes(workspace, segments) {
+  const candidate = path8.join(workspace.qarinahDir, ...segments);
+  try {
+    const metadata = await lstat7(candidate);
+    if (metadata.isSymbolicLink() || !metadata.isFile() || metadata.nlink !== 1) {
+      throw new QarinahError("STORAGE_LINK_REJECTED", `.qarinah/${segments.join("/")} must be a singly linked regular file.`);
+    }
+    return metadata.size;
+  } catch (error) {
+    if (error?.code === "ENOENT") return 0;
+    throw error;
+  }
+}
+function importedSourceBytes(events) {
+  const files = /* @__PURE__ */ new Map();
+  for (const event of events) {
+    const receipt = event.data?.archiveImport;
+    if (receipt?.mode !== "compact" || typeof receipt.normalizedFileDigest !== "string" || !Number.isSafeInteger(receipt.sourceBytes) || receipt.sourceBytes < 0) continue;
+    files.set(receipt.normalizedFileDigest, receipt.sourceBytes);
+  }
+  return [...files.values()].reduce((sum, value) => sum + value, 0);
+}
+async function measureMemoryFootprint(options = {}) {
+  if (!options || typeof options !== "object" || Array.isArray(options)) throw new TypeError("Memory footprint options must be a record.");
+  const allowed = /* @__PURE__ */ new Set(["cwd", "query", "maxChars", "maxTokens", "baselineTokens", "ratePerMillion"]);
+  const unknown = Object.keys(options).filter((key) => !allowed.has(key));
+  if (unknown.length) throw new TypeError(`Memory footprint options contain unknown field(s): ${unknown.join(", ")}.`);
+  const query = options.query ?? "project decisions outcomes tools changes";
+  if (typeof query !== "string" || query.length > 4096) throw new TypeError("query must be a string up to 4096 characters.");
+  const maxChars = optionalInteger(options.maxChars, "maxChars", 512, 1e6);
+  const maxTokens = optionalInteger(options.maxTokens, "maxTokens", 128, 1e6);
+  const baselineTokens = optionalInteger(options.baselineTokens, "baselineTokens", 0, 1e9);
+  const ratePerMillion = optionalRate(options.ratePerMillion);
+  const workspace = await loadWorkspace(options.cwd ?? process.cwd());
+  const events = await readEvents(workspace);
+  const storage = {};
+  for (const [name, segments] of Object.entries(STORAGE_FILES)) storage[name] = await fileBytes(workspace, segments);
+  storage.total = Object.values(storage).reduce((sum, value) => sum + value, 0);
+  const importedBytes = importedSourceBytes(events);
+  const pack = await compileContext(query, {
+    cwd: workspace.root,
+    minimumCoverage: "any",
+    ...maxChars === void 0 ? {} : { maxChars },
+    ...maxTokens === void 0 ? {} : { maxTokens }
+  });
+  const rendered = renderContextPackMarkdown(pack);
+  const renderedBytes = Buffer.byteLength(rendered);
+  const deliveredTokens = pack.budget.estimatedTokens;
+  const inferredBaseline = importedBytes > 0 ? Math.ceil(importedBytes / 4) : null;
+  const selectedBaseline = baselineTokens ?? inferredBaseline;
+  const source = baselineTokens !== void 0 ? "caller-supplied" : inferredBaseline !== null ? "portable-chars-div-4-from-compact-import-receipts" : "not-measured";
+  const savedTokens = selectedBaseline === null ? null : Math.max(0, selectedBaseline - deliveredTokens);
+  const reductionPercent = selectedBaseline > 0 ? Math.round(savedTokens / selectedBaseline * 1e4) / 100 : null;
+  const ratio = deliveredTokens > 0 && selectedBaseline !== null ? Math.round(selectedBaseline / deliveredTokens * 100) / 100 : null;
+  const costs = ratePerMillion === null || selectedBaseline === null ? null : {
+    ratePerMillion,
+    baseline: money(selectedBaseline / 1e6 * ratePerMillion),
+    delivered: money(deliveredTokens / 1e6 * ratePerMillion),
+    estimatedSaving: money(savedTokens / 1e6 * ratePerMillion)
+  };
+  return deepFreezeJson({
+    schemaVersion: MEMORY_FOOTPRINT_SCHEMA_VERSION,
+    workspaceId: workspace.config.workspaceId,
+    query,
+    retained: {
+      eventCount: events.length,
+      importedSourceBytes: importedBytes,
+      importedSourceBytesKnown: importedBytes > 0,
+      storageBytes: storage
+    },
+    deliveredPack: {
+      itemCount: pack.items.length,
+      usedChars: pack.budget.usedChars,
+      estimatedTokens: deliveredTokens,
+      renderedBytes,
+      manifestHash: pack.manifestHash
+    },
+    comparison: {
+      status: selectedBaseline === null ? "not-measured" : "measured",
+      source,
+      baselineTokens: selectedBaseline,
+      deliveredTokens,
+      savedTokens,
+      reductionPercent,
+      baselineToPackRatio: ratio,
+      costs
+    },
+    boundaries: {
+      tokenEstimator: "portable ceil(characters / 4)",
+      importedBytes: "Available only from retained compact-import receipts; not a claim that all source bytes fit in the pack.",
+      cost: "Flat uncached input-token arithmetic only; excludes output, reasoning, tools, caching, retrieval, hosting, and fixed fees."
+    }
+  });
+}
+
 // src/project-overview.js
 init_canonical();
 init_store();
@@ -6833,8 +6965,8 @@ init_markdown();
 init_store();
 init_workspace();
 import { randomBytes as randomBytes4 } from "node:crypto";
-import { lstat as lstat7, mkdir as mkdir5, readFile as readFile2, readdir as readdir3, realpath as realpath6, rename as rename6, rm as rm6 } from "node:fs/promises";
-import path8 from "node:path";
+import { lstat as lstat8, mkdir as mkdir5, readFile as readFile2, readdir as readdir3, realpath as realpath6, rename as rename6, rm as rm6 } from "node:fs/promises";
+import path9 from "node:path";
 var OKF_VERSION = "0.1";
 var OKF_EXPORT_SCHEMA_VERSION = "qarinah.okf-export.v1";
 var DEFAULT_OUTPUT_SEGMENTS = Object.freeze([".qarinah", "records", "okf"]);
@@ -6848,12 +6980,12 @@ function compareText(left, right) {
   return left < right ? -1 : left > right ? 1 : 0;
 }
 function isWithin4(root, candidate) {
-  const relative = path8.relative(root, candidate);
-  return relative === "" || !relative.startsWith("..") && !path8.isAbsolute(relative);
+  const relative = path9.relative(root, candidate);
+  return relative === "" || !relative.startsWith("..") && !path9.isAbsolute(relative);
 }
 async function optionalLstat(candidate) {
   try {
-    return await lstat7(candidate);
+    return await lstat8(candidate);
   } catch (error) {
     if (error?.code === "ENOENT") return null;
     throw error;
@@ -6881,11 +7013,11 @@ function validateOptions(value) {
 }
 function resolveOutputDirectory(workspace, output) {
   const outputDirectory = output === void 0 ? resolveWithin(workspace.root, ...DEFAULT_OUTPUT_SEGMENTS) : resolveWithin(workspace.root, output);
-  const relative = path8.relative(workspace.root, outputDirectory);
+  const relative = path9.relative(workspace.root, outputDirectory);
   if (relative === "") {
     throw new QarinahError("OKF_OUTPUT_PROTECTED", "The workspace root cannot be replaced by an OKF export.");
   }
-  const segments = relative.split(path8.sep).filter(Boolean);
+  const segments = relative.split(path9.sep).filter(Boolean);
   const normalized = segments.map((segment) => process.platform === "win32" ? segment.toLowerCase() : segment);
   if (normalized[0] === ".git") {
     throw new QarinahError("OKF_OUTPUT_PROTECTED", "An OKF export cannot be written inside .git.");
@@ -6902,13 +7034,13 @@ function resolveOutputDirectory(workspace, output) {
   return outputDirectory;
 }
 async function ensureSafeDirectoryChain(root, directory) {
-  const relative = path8.relative(root, directory);
+  const relative = path9.relative(root, directory);
   if (!isWithin4(root, directory)) {
     throw new QarinahError("PATH_OUTSIDE_WORKSPACE", "OKF output parent escapes the workspace root.");
   }
   let current = root;
-  for (const segment of relative.split(path8.sep).filter(Boolean)) {
-    current = path8.join(current, segment);
+  for (const segment of relative.split(path9.sep).filter(Boolean)) {
+    current = path9.join(current, segment);
     let metadata = await optionalLstat(current);
     if (!metadata) {
       try {
@@ -6916,7 +7048,7 @@ async function ensureSafeDirectoryChain(root, directory) {
       } catch (error) {
         if (error?.code !== "EEXIST") throw error;
       }
-      metadata = await lstat7(current);
+      metadata = await lstat8(current);
     }
     if (metadata.isSymbolicLink()) {
       throw new QarinahError("STORAGE_LINK_REJECTED", "OKF output paths cannot traverse a symbolic link or junction.");
@@ -7185,7 +7317,7 @@ function validateMarker(value, workspaceId, eventFileCount) {
   }
 }
 async function assertRegularFile(candidate, label, maximumBytes = 256 * 1024 * 1024) {
-  const metadata = await lstat7(candidate);
+  const metadata = await lstat8(candidate);
   if (metadata.isSymbolicLink()) {
     throw new QarinahError("STORAGE_LINK_REJECTED", `${label} cannot be a symbolic link or junction.`);
   }
@@ -7212,8 +7344,8 @@ async function assertOwnedOutput(outputDirectory, workspace) {
   if (entries.join("\0") !== [...ROOT_FILES].sort(compareText).join("\0")) {
     throw new QarinahError("OKF_OUTPUT_NOT_OWNED", "Existing OKF output contains unexpected or missing entries.");
   }
-  const eventDirectory = path8.join(outputDirectory, "events");
-  const eventMetadata = await lstat7(eventDirectory);
+  const eventDirectory = path9.join(outputDirectory, "events");
+  const eventMetadata = await lstat8(eventDirectory);
   if (eventMetadata.isSymbolicLink()) {
     throw new QarinahError("STORAGE_LINK_REJECTED", "OKF event directory cannot be a symbolic link or junction.");
   }
@@ -7224,13 +7356,13 @@ async function assertOwnedOutput(outputDirectory, workspace) {
   if (eventFiles.length > MAX_EVENTS2 || eventFiles.some((name) => !EVENT_FILE_PATTERN.test(name))) {
     throw new QarinahError("OKF_OUTPUT_NOT_OWNED", "Existing OKF output contains invalid event concept paths.");
   }
-  await assertRegularFile(path8.join(outputDirectory, EXPORT_MARKER), "OKF ownership marker", 64 * 1024);
-  await assertRegularFile(path8.join(outputDirectory, "index.md"), "OKF root index", 64 * 1024 * 1024);
-  await assertRegularFile(path8.join(outputDirectory, "log.md"), "OKF root log", 64 * 1024 * 1024);
+  await assertRegularFile(path9.join(outputDirectory, EXPORT_MARKER), "OKF ownership marker", 64 * 1024);
+  await assertRegularFile(path9.join(outputDirectory, "index.md"), "OKF root index", 64 * 1024 * 1024);
+  await assertRegularFile(path9.join(outputDirectory, "log.md"), "OKF root log", 64 * 1024 * 1024);
   for (const name of eventFiles) {
-    await assertRegularFile(path8.join(eventDirectory, name), `OKF event concept '${name}'`, 2 * 1024 * 1024);
+    await assertRegularFile(path9.join(eventDirectory, name), `OKF event concept '${name}'`, 2 * 1024 * 1024);
   }
-  const markerText = await readFile2(path8.join(outputDirectory, EXPORT_MARKER), "utf8");
+  const markerText = await readFile2(path9.join(outputDirectory, EXPORT_MARKER), "utf8");
   let marker;
   try {
     marker = JSON.parse(markerText);
@@ -7243,12 +7375,12 @@ async function assertOwnedOutput(outputDirectory, workspace) {
   }
   validateMarker(marker, workspace.config.workspaceId, eventFiles.length);
   const existingFiles = /* @__PURE__ */ new Map([
-    ["index.md", await readFile2(path8.join(outputDirectory, "index.md"), "utf8")],
-    ["log.md", await readFile2(path8.join(outputDirectory, "log.md"), "utf8")]
+    ["index.md", await readFile2(path9.join(outputDirectory, "index.md"), "utf8")],
+    ["log.md", await readFile2(path9.join(outputDirectory, "log.md"), "utf8")]
   ]);
   let totalBytes = Buffer.byteLength(existingFiles.get("index.md")) + Buffer.byteLength(existingFiles.get("log.md"));
   for (const name of eventFiles) {
-    const contents = await readFile2(path8.join(eventDirectory, name), "utf8");
+    const contents = await readFile2(path9.join(eventDirectory, name), "utf8");
     totalBytes += Buffer.byteLength(contents);
     if (totalBytes > 256 * 1024 * 1024) {
       throw new QarinahError("OKF_OUTPUT_NOT_OWNED", "Existing OKF output exceeds its bounded aggregate size.");
@@ -7277,9 +7409,9 @@ async function replaceOutput(stage, outputDirectory, workspace) {
     await renameWithRetry(stage, outputDirectory);
     return;
   }
-  const parent = path8.dirname(outputDirectory);
-  const backup = path8.join(parent, `.${path8.basename(outputDirectory)}.qarinah-okf-backup-${process.pid}-${randomBytes4(8).toString("hex")}`);
-  resolveWithin(workspace.root, path8.relative(workspace.root, backup));
+  const parent = path9.dirname(outputDirectory);
+  const backup = path9.join(parent, `.${path9.basename(outputDirectory)}.qarinah-okf-backup-${process.pid}-${randomBytes4(8).toString("hex")}`);
+  resolveWithin(workspace.root, path9.relative(workspace.root, backup));
   await renameWithRetry(outputDirectory, backup);
   try {
     await renameWithRetry(stage, outputDirectory);
@@ -7298,10 +7430,10 @@ async function replaceOutput(stage, outputDirectory, workspace) {
 }
 async function writeStage(stage, files) {
   await mkdir5(stage, { mode: 448 });
-  await mkdir5(path8.join(stage, "events"), { mode: 448 });
+  await mkdir5(path9.join(stage, "events"), { mode: 448 });
   for (const [relativePath, contents] of [...files.entries()].sort(([left], [right]) => compareText(left, right))) {
     const segments = relativePath.split("/");
-    const destination = path8.join(stage, ...segments);
+    const destination = path9.join(stage, ...segments);
     if (!isWithin4(stage, destination)) throw new QarinahError("PATH_OUTSIDE_WORKSPACE", "Generated OKF path escaped its staging directory.");
     await atomicWriteFile(destination, contents);
   }
@@ -7310,13 +7442,13 @@ async function exportOkf(options = {}) {
   const normalized = validateOptions(options);
   const workspace = await loadWorkspace(normalized.cwd ?? process.cwd());
   const outputDirectory = resolveOutputDirectory(workspace, normalized.output);
-  const parent = path8.dirname(outputDirectory);
+  const parent = path9.dirname(outputDirectory);
   await ensureSafeDirectoryChain(workspace.root, parent);
   await assertOwnedOutput(outputDirectory, workspace);
   const events = await readEvents(workspace.root);
   const { files, manifest } = buildBundle(events, workspace.config.workspaceId);
-  const stage = path8.join(parent, `.${path8.basename(outputDirectory)}.qarinah-okf-stage-${process.pid}-${randomBytes4(8).toString("hex")}`);
-  resolveWithin(workspace.root, path8.relative(workspace.root, stage));
+  const stage = path9.join(parent, `.${path9.basename(outputDirectory)}.qarinah-okf-stage-${process.pid}-${randomBytes4(8).toString("hex")}`);
+  resolveWithin(workspace.root, path9.relative(workspace.root, stage));
   if (await optionalLstat(stage)) throw new QarinahError("OKF_OUTPUT_INVALID", "Generated OKF staging path already exists.");
   try {
     await writeStage(stage, files);
@@ -7334,7 +7466,7 @@ init_errors();
 init_boundary();
 init_store();
 init_workspace();
-import path9 from "node:path";
+import path10 from "node:path";
 var PERMISSION_MODES = /* @__PURE__ */ new Set(["default", "acceptEdits", "plan", "dontAsk", "bypassPermissions"]);
 var EVENT_MAP = Object.freeze({
   SessionStart: { kind: "session.started", title: "Codex session started", actor: { type: "system", id: "codex" } },
@@ -7472,9 +7604,9 @@ function bodyContentEntry(input) {
 function hookPayload(input, workspace) {
   const eventName = input.hook_event_name;
   const mapping = EVENT_MAP[eventName];
-  const requestedCwd = path9.resolve(input.cwd);
-  const relativeCwd = path9.relative(workspace.root, requestedCwd);
-  const workspaceRelativeCwd = relativeCwd === "" || !relativeCwd.startsWith("..") && !path9.isAbsolute(relativeCwd) ? relativeCwd || "." : "[outside-workspace]";
+  const requestedCwd = path10.resolve(input.cwd);
+  const relativeCwd = path10.relative(workspace.root, requestedCwd);
+  const workspaceRelativeCwd = relativeCwd === "" || !relativeCwd.startsWith("..") && !path10.isAbsolute(relativeCwd) ? relativeCwd || "." : "[outside-workspace]";
   const metadata = {
     hookEvent: eventName,
     model: input.model,
@@ -7569,7 +7701,7 @@ init_errors();
 init_boundary();
 init_store();
 init_workspace();
-import path10 from "node:path";
+import path11 from "node:path";
 var PERMISSION_MODES2 = /* @__PURE__ */ new Set(["default", "plan", "acceptEdits", "auto", "dontAsk", "bypassPermissions"]);
 var EFFORT_LEVELS = /* @__PURE__ */ new Set(["low", "medium", "high", "xhigh", "max"]);
 var SESSION_END_REASONS = /* @__PURE__ */ new Set(["clear", "logout", "prompt_input_exit", "other"]);
@@ -7808,9 +7940,9 @@ function bodyContentEntry2(input) {
 function hookPayload2(input, ignoredFieldCount, workspace) {
   const eventName = input.hook_event_name;
   const mapping = EVENT_MAP2[eventName];
-  const requestedCwd = path10.resolve(input.cwd);
-  const relativeCwd = path10.relative(workspace.root, requestedCwd);
-  const workspaceRelativeCwd = relativeCwd === "" || !relativeCwd.startsWith("..") && !path10.isAbsolute(relativeCwd) ? relativeCwd || "." : "[outside-workspace]";
+  const requestedCwd = path11.resolve(input.cwd);
+  const relativeCwd = path11.relative(workspace.root, requestedCwd);
+  const workspaceRelativeCwd = relativeCwd === "" || !relativeCwd.startsWith("..") && !path11.isAbsolute(relativeCwd) ? relativeCwd || "." : "[outside-workspace]";
   const metadata = {
     host: "claude-code",
     hookEvent: eventName,
@@ -7914,7 +8046,7 @@ async function captureClaudeHook(value, options = {}) {
 
 // src/mcp/server.js
 import { realpath as realpath7 } from "node:fs/promises";
-import path11 from "node:path";
+import path12 from "node:path";
 import { fileURLToPath } from "node:url";
 init_errors();
 init_indexer();
@@ -8085,7 +8217,7 @@ function pathFromSelector(value) {
       throw new QarinahError("MCP_WORKSPACE_INVALID", "The MCP workspace selector is not a valid local file URI.");
     }
   }
-  if (!path11.isAbsolute(selector)) {
+  if (!path12.isAbsolute(selector)) {
     throw new QarinahError("MCP_WORKSPACE_INVALID", "The MCP workspace selector must be an absolute local path.");
   }
   return selector;
@@ -8178,8 +8310,8 @@ function createMcpServer(options = {}) {
       try {
         const workspace = await loadWorkspace(candidate.value);
         if (candidate.exact) {
-          const expectedRoot = await realpath7(path11.resolve(candidate.value));
-          if (path11.normalize(workspace.root) !== path11.normalize(expectedRoot)) {
+          const expectedRoot = await realpath7(path12.resolve(candidate.value));
+          if (path12.normalize(workspace.root) !== path12.normalize(expectedRoot)) {
             throw new QarinahError(
               "WORKSPACE_NOT_INITIALIZED",
               "The explicitly selected MCP root is not an initialized Context Ledger workspace."
@@ -8442,8 +8574,8 @@ async function runMcpServer(options = {}) {
 
 // src/setup.js
 init_errors();
-import { lstat as lstat8, mkdir as mkdir6, readFile as readFile3 } from "node:fs/promises";
-import path12 from "node:path";
+import { lstat as lstat9, mkdir as mkdir6, readFile as readFile3 } from "node:fs/promises";
+import path13 from "node:path";
 import { fileURLToPath as fileURLToPath2 } from "node:url";
 
 // src/dashboard.js
@@ -8495,6 +8627,7 @@ async function buildMemoryDashboard(options = {}) {
   }
   const savedTokens = baselineTokens === null ? null : Math.max(0, baselineTokens - deliveredTokens);
   const savingsPercent = baselineTokens > 0 ? Math.round(savedTokens / baselineTokens * 1e4) / 100 : null;
+  const memoryFootprint = await measureMemoryFootprint({ cwd: workspace.root });
   return deepFreezeJson({
     schemaVersion: "qarinah.memory-dashboard.v2",
     workspaceId: workspace.config.workspaceId,
@@ -8519,6 +8652,7 @@ async function buildMemoryDashboard(options = {}) {
       savedTokens,
       savingsPercent
     },
+    memoryFootprint,
     currentDecisions: projectRecords.decisions.filter((decision) => decision.status === "current"),
     supersededDecisions: projectRecords.decisions.filter((decision) => decision.status === "superseded"),
     tools: tools.slice(-100).reverse().map((event) => ({
@@ -8559,6 +8693,8 @@ function decisionList(items, empty) {
 }
 function renderMemoryDashboard(data) {
   const savings = data.contextSavings.status === "measured" ? `${data.contextSavings.savingsPercent}% (${data.contextSavings.savedTokens.toLocaleString()} estimated tokens)` : "Not measured for this workspace";
+  const footprint = data.memoryFootprint;
+  const imported = footprint.retained.importedSourceBytesKnown ? `${footprint.retained.importedSourceBytes.toLocaleString()} bytes` : "No measured import receipt";
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Qarinah memory dashboard</title>
@@ -8595,6 +8731,12 @@ table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:12px;bor
 <section class="wide"><h2>Execution flow</h2>${data.executionFlow.length === 0 ? '<p class="empty">No execution steps recorded.</p>' : `<table><thead><tr><th>#</th><th>Kind</th><th>Action</th><th>Tool</th><th>Evidence</th></tr></thead><tbody>${data.executionFlow.map((step) => `<tr><td>${step.sequence}</td><td><code>${escapeHtml(step.kind)}</code></td><td>${escapeHtml(step.title)}</td><td>${step.toolName ? `<code>${escapeHtml(step.toolName)}</code>` : "\u2014"}</td><td><code>${escapeHtml(step.eventId)}</code></td></tr>`).join("")}</tbody></table>`}</section>
 <section><h2>Tools called</h2>${list(data.tools.map((tool) => ({ ...tool, title: `${tool.toolName} \xB7 ${tool.kind}` })), "No tool activity recorded.")}</section>
 <section><h2>Major changes</h2>${list(data.majorChanges, "No major changes recorded.")}</section>
+<section><h2>Memory footprint</h2><table><tbody>
+<tr><th>Project memory on disk</th><td>${footprint.retained.storageBytes.total.toLocaleString()} bytes</td></tr>
+<tr><th>Measured imported source</th><td>${escapeHtml(imported)}</td></tr>
+<tr><th>Task pack delivered</th><td>${footprint.deliveredPack.estimatedTokens.toLocaleString()} estimated tokens</td></tr>
+<tr><th>Pack identity</th><td><code>${escapeHtml(footprint.deliveredPack.manifestHash)}</code></td></tr>
+</tbody></table><p>Retained project memory and the small task-specific pack are different quantities. The dashboard never presents this as lossless archive compression.</p></section>
 <section><h2>Source citations</h2>${list(data.citations, "No external source citations recorded.")}</section>
 <section><h2>Agent activity timeline</h2>${list(data.activity, "No activity recorded.")}</section>
 <section class="wide"><h2>Files and systems affected</h2>${data.affectedFiles.length === 0 ? '<p class="empty">Run qarinah scan to populate the project map.</p>' : `<table><thead><tr><th>Path</th><th>Language</th><th>Content hash</th></tr></thead><tbody>${data.affectedFiles.map((file) => `<tr><td>${escapeHtml(file.path)}</td><td>${escapeHtml(file.language)}</td><td><code>${escapeHtml(file.contentHash)}</code></td></tr>`).join("")}</tbody></table>`}</section>
@@ -8616,8 +8758,8 @@ init_workspace();
 var MAX_MANAGED_FILE_BYTES = 512 * 1024;
 var MANAGED_TOML_START = "# qarinah:managed:start";
 var MANAGED_TOML_END = "# qarinah:managed:end";
-var PACKAGE_ROOT = path12.resolve(path12.dirname(fileURLToPath2(import.meta.url)), "..");
-var BIN_PATH = path12.join(PACKAGE_ROOT, "bin", "qarinah.js");
+var PACKAGE_ROOT = path13.resolve(path13.dirname(fileURLToPath2(import.meta.url)), "..");
+var BIN_PATH = path13.join(PACKAGE_ROOT, "bin", "qarinah.js");
 function tomlString(value) {
   return JSON.stringify(String(value));
 }
@@ -8629,7 +8771,7 @@ function normalizeTargets(options) {
 async function safeRead(candidate, label) {
   let metadata;
   try {
-    metadata = await lstat8(candidate);
+    metadata = await lstat9(candidate);
   } catch (error) {
     if (error?.code === "ENOENT") return null;
     throw error;
@@ -8645,21 +8787,21 @@ async function safeRead(candidate, label) {
 async function ensureDirectory(candidate, root, label) {
   let metadata;
   try {
-    metadata = await lstat8(candidate);
+    metadata = await lstat9(candidate);
   } catch (error) {
     if (error?.code !== "ENOENT") throw error;
   }
   if (!metadata) {
     await mkdir6(candidate, { recursive: true, mode: 448 });
-    metadata = await lstat8(candidate);
+    metadata = await lstat9(candidate);
   }
   if (metadata.isSymbolicLink() || !metadata.isDirectory()) {
     throw new QarinahError("SETUP_LINK_REJECTED", `${label} must be a real directory.`);
   }
-  resolveWithin(root, path12.relative(root, candidate));
+  resolveWithin(root, path13.relative(root, candidate));
 }
 async function writeJsonMerged(candidate, root, label, update) {
-  resolveWithin(root, path12.relative(root, candidate));
+  resolveWithin(root, path13.relative(root, candidate));
   const existing = await safeRead(candidate, label);
   let value = {};
   if (existing !== null && existing.trim() !== "") {
@@ -8677,7 +8819,7 @@ async function writeJsonMerged(candidate, root, label, update) {
 `);
 }
 async function writeExactManaged(candidate, root, label, contents) {
-  resolveWithin(root, path12.relative(root, candidate));
+  resolveWithin(root, path13.relative(root, candidate));
   const existing = await safeRead(candidate, label);
   if (existing !== null && existing !== contents) {
     throw new QarinahError("SETUP_CONFLICT", `${label} already exists with different content.`);
@@ -8727,23 +8869,23 @@ async function installSkill(workspace, host, skillName, files) {
   await ensureDirectory(resolveWithin(workspace.root, `.${host}`), workspace.root, `.${host}`);
   await ensureDirectory(resolveWithin(workspace.root, `.${host}`, "skills"), workspace.root, `.${host}/skills`);
   await ensureDirectory(skillRoot, workspace.root, `.${host}/skills/${skillName}`);
-  const sourceRoot = path12.join(PACKAGE_ROOT, "integrations", host, "qarinah", "skills", skillName);
+  const sourceRoot = path13.join(PACKAGE_ROOT, "integrations", host, "qarinah", "skills", skillName);
   for (const relative of files) {
-    const destinationDirectory = path12.dirname(resolveWithin(skillRoot, relative));
+    const destinationDirectory = path13.dirname(resolveWithin(skillRoot, relative));
     if (destinationDirectory !== skillRoot) {
       await ensureDirectory(
         destinationDirectory,
         workspace.root,
-        `.${host}/skills/${skillName}/${path12.relative(skillRoot, destinationDirectory)}`
+        `.${host}/skills/${skillName}/${path13.relative(skillRoot, destinationDirectory)}`
       );
     }
-    const contents = await readFile3(path12.join(sourceRoot, relative), "utf8");
+    const contents = await readFile3(path13.join(sourceRoot, relative), "utf8");
     const destination = resolveWithin(skillRoot, relative);
     const existing = await safeRead(destination, `${host} Qarinah skill`);
     if (existing !== null && existing !== contents) {
       throw new QarinahError(
         "SETUP_CONFLICT",
-        `${path12.relative(workspace.root, destination)} already exists with different content. Preserve it or remove it before setup.`
+        `${path13.relative(workspace.root, destination)} already exists with different content. Preserve it or remove it before setup.`
       );
     }
     if (existing === null) await atomicWriteFile(destination, contents);
@@ -8752,7 +8894,7 @@ async function installSkill(workspace, host, skillName, files) {
 async function installHostSkills(workspace, host) {
   await installSkill(workspace, host, "qarinah-context", [
     "SKILL.md",
-    path12.join("references", "event-contract.md")
+    path13.join("references", "event-contract.md")
   ]);
   await installSkill(workspace, host, "qarinah", ["SKILL.md"]);
 }
@@ -8915,11 +9057,11 @@ Before replaying broad project history, use the Qarinah MCP server for a bounded
   ];
 }
 async function setupWorkspace(options = {}) {
-  const target = path12.resolve(options.cwd ?? process.cwd());
+  const target = path13.resolve(options.cwd ?? process.cwd());
   let workspace;
   let exactConfigExists = false;
   try {
-    await lstat8(path12.join(target, ".qarinah", "config.json"));
+    await lstat9(path13.join(target, ".qarinah", "config.json"));
     exactConfigExists = true;
   } catch (error) {
     if (error?.code !== "ENOENT") throw error;
@@ -9042,8 +9184,8 @@ async function compileTaskMemoryPack(task, query = "", options = {}) {
 init_canonical();
 init_errors();
 import { createHash as createHash6 } from "node:crypto";
-import { lstat as lstat9, readFile as readFile4, realpath as realpath8 } from "node:fs/promises";
-import path13 from "node:path";
+import { lstat as lstat10, readFile as readFile4, realpath as realpath8 } from "node:fs/promises";
+import path14 from "node:path";
 init_store();
 init_workspace();
 function latestSnapshot(events) {
@@ -9062,7 +9204,7 @@ async function inspectFile(workspace, file) {
   const absolute = resolveWithin(workspace.root, ...file.path.split("/"));
   let metadata;
   try {
-    metadata = await lstat9(absolute);
+    metadata = await lstat10(absolute);
   } catch (error) {
     if (error?.code === "ENOENT") return { path: file.path, status: "missing", expectedHash: file.contentHash ?? file.hash };
     throw error;
@@ -9071,8 +9213,8 @@ async function inspectFile(workspace, file) {
     return { path: file.path, status: "unsafe", expectedHash: file.contentHash ?? file.hash };
   }
   const resolved = await realpath8(absolute);
-  const relative = path13.relative(workspace.root, resolved);
-  if (relative.startsWith("..") || path13.isAbsolute(relative)) {
+  const relative = path14.relative(workspace.root, resolved);
+  if (relative.startsWith("..") || path14.isAbsolute(relative)) {
     throw new QarinahError("PATH_OUTSIDE_WORKSPACE", "A freshness target resolves outside the trusted workspace.");
   }
   if (file.bytes !== void 0 && metadata.size > file.bytes || metadata.size > 4 * 1024 * 1024) {
@@ -9395,6 +9537,7 @@ Usage:
   qarinah import <archive-file-or-directory> [--format auto|codex|claude|kimi|portable] [--mode compact|full] [--max-bytes n] [--max-files n] [--max-records n] [--max-line-bytes n]
   qarinah backup <archive-file-or-directory>... --destination <external-directory> [--max-bytes n] [--max-files n]
   qarinah overview [--format json|markdown]
+  qarinah footprint [query] [--baseline-tokens n] [--rate-per-million n] [--max-chars n] [--max-tokens n]
   qarinah export okf [--output <path>]
   qarinah query [text] [--format json|markdown|handoff] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp] [--minimum-coverage any|partial|direct] [--minimum-evidence any|partial|direct]
   qarinah query --stdin-json
@@ -9465,8 +9608,8 @@ async function run(argv) {
       allowQuery: parsed.flags.has("--allow-query"),
       maxChars: positive("--max-chars"),
       maxItems: positive("--max-items"),
-      backupSources: parsed.values.has("--backup-source") ? [path14.resolve(parsed.values.get("--backup-source"))] : void 0,
-      backupDestination: parsed.values.has("--backup-destination") ? path14.resolve(parsed.values.get("--backup-destination")) : void 0,
+      backupSources: parsed.values.has("--backup-source") ? [path15.resolve(parsed.values.get("--backup-source"))] : void 0,
+      backupDestination: parsed.values.has("--backup-destination") ? path15.resolve(parsed.values.get("--backup-destination")) : void 0,
       backupMaxBytes: positive("--backup-max-bytes"),
       backupMaxFiles: positive("--backup-max-files")
     });
@@ -9631,8 +9774,8 @@ async function run(argv) {
       return Number(value);
     };
     const result = await backupAgentArchives(
-      parsed.positionals.map((source) => path14.resolve(source)),
-      path14.resolve(destination),
+      parsed.positionals.map((source) => path15.resolve(source)),
+      path15.resolve(destination),
       {
         cwd: process2.cwd(),
         maxBytes: integer2("--max-bytes"),
@@ -9651,6 +9794,31 @@ async function run(argv) {
     const overview = await buildProjectOverview({ cwd: process2.cwd() });
     process2.stdout.write(format === "json" ? `${JSON.stringify(overview, null, 2)}
 ` : renderProjectOverviewMarkdown(overview));
+    return;
+  }
+  if (command === "footprint") {
+    const parsed = strictValueOptions(args, "footprint", ["--baseline-tokens", "--rate-per-million", "--max-chars", "--max-tokens"]);
+    const integer2 = (name) => {
+      const value = parsed.values.get(name);
+      if (value === void 0) return void 0;
+      if (!/^[0-9]+$/u.test(value)) throw new TypeError(`${name} must be a non-negative integer.`);
+      return Number(value);
+    };
+    const rateValue = parsed.values.get("--rate-per-million");
+    const ratePerMillion = rateValue === void 0 ? void 0 : Number(rateValue);
+    if (rateValue !== void 0 && (rateValue.trim() === "" || !Number.isFinite(ratePerMillion) || ratePerMillion <= 0)) {
+      throw new TypeError("--rate-per-million must be a finite number greater than 0.");
+    }
+    const result = await measureMemoryFootprint({
+      cwd: process2.cwd(),
+      query: parsed.positionals.join(" ") || void 0,
+      baselineTokens: integer2("--baseline-tokens"),
+      ratePerMillion,
+      maxChars: integer2("--max-chars"),
+      maxTokens: integer2("--max-tokens")
+    });
+    process2.stdout.write(`${JSON.stringify(result, null, 2)}
+`);
     return;
   }
   if (command === "export") {
