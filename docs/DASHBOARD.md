@@ -27,6 +27,8 @@ Qarinah writes:
 
 Open that file in a browser. It contains its own CSS and does not require a local server, hosted Qarinah account, analytics endpoint, or network connection.
 
+The layout is responsive from narrow phones through desktop screens. Repeated collections paginate independently so moving through files does not move the activity or decision panels. Wide tables stay inside a keyboard-focusable horizontal scroll region, and the page itself does not overflow the viewport. Pagination uses native Previous and Next buttons, announces the visible item range, and leaves the complete static content visible when JavaScript is unavailable.
+
 The optional OKF command writes a reviewed portable bundle beside the other derived records. It does not replace the JSONL authority; use it to move an inspectable representation between compatible tools.
 
 `qarinah scan` is optional, but the **Files and systems affected** panel remains empty until the ledger contains a project-structure snapshot.

@@ -601,7 +601,10 @@ a {
 
 .cost-equivalent-table-wrap {
   margin-top: 32px;
-  overflow: hidden;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
   border: 1px solid var(--q-border);
   border-radius: 10px;
   background: var(--q-canvas);
@@ -1600,8 +1603,12 @@ a {
 }
 
 .doc-content table {
-  display: table;
+  display: block;
   width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
 }
 
 .doc-content table th,
@@ -1919,6 +1926,10 @@ a {
 }
 
 @media (max-width: 560px) {
+  .cost-equivalent-table {
+    min-width: 640px;
+  }
+
   .hero-proof-result {
     flex-direction: column;
     align-items: center;

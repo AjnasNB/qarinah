@@ -320,8 +320,10 @@ Open `.qarinah/dashboard/index.html` in a browser. The dashboard shows:
 - source-linked events and their evidence identifiers;
 - the latest 100 permitted activity events;
 - paths, languages, and content hashes from the latest project scan; and
-- an optional measured baseline-versus-delivered context comparison; and
+- an optional measured baseline-versus-delivered context comparison; plus
 - current retained project-memory bytes, measured imported source bytes when available, and the task-pack manifest and estimated size.
+
+The generated dashboard adapts to phone, tablet, and desktop widths. Long decision, activity, flow, citation, tool, change, conflict, and file collections paginate independently; wide evidence tables scroll inside their own panel instead of widening the page.
 
 To include a context comparison for a real run, supply both estimates:
 

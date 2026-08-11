@@ -17,6 +17,7 @@ import {
   initializeWorkspace,
   inspectMemoryFreshness,
   rebuildDerivedState,
+  renderMemoryDashboard,
   rerankContextPack,
   scanProjectStructure,
   setupWorkspace,
@@ -219,6 +220,19 @@ test("dashboard exposes decisions, conflicts, citations, activity, savings, and 
   assert.match(await readFile(written.output, "utf8"), /Execution flow/);
   assert.match(await readFile(written.output, "utf8"), /Agents need one interoperable/);
   assert.match(await readFile(written.output, "utf8"), /Memory footprint/);
+  const rendered = renderMemoryDashboard({
+    ...dashboard,
+    affectedFiles: Array.from({ length: 11 }, (_, index) => ({
+      path: `src/file-${index}.js`,
+      language: "JavaScript",
+      contentHash: `sha256:${String(index).padStart(64, "0")}`
+    }))
+  });
+  assert.match(rendered, /data-page-set="affected-files" data-page-size="10"/u);
+  assert.match(rendered, /data-pager="affected-files"/u);
+  assert.match(rendered, /class="table-scroll" role="region"/u);
+  assert.match(rendered, /aria-live="polite"/u);
+  assert.doesNotMatch(rendered, /<script\s+src=/u);
 });
 
 test("causal receipts bind evidence, memory, policy, execution, and observation", () => {
