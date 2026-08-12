@@ -13,7 +13,7 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 - [Verified cross-agent handoffs](https://qarinah.io/docs/cross-agent-handoffs/): Switch coding agents and continue a real task with compact, cited project context.
 - [Direct answers](https://qarinah.io/docs/faq/): Concise answers about Qarinah, context reduction, cost boundaries, Codex, Claude Code, privacy, and open-source licensing.
 - [Qarinah alternatives](https://qarinah.io/alternatives/): Product-boundary comparison with Mem0, Letta, LangMem, LangGraph memory, Graphiti, Zep, and native coding-host memory.
-- [Open-source governed-agent toolkit](https://qarinah.io/articles/open-source-governed-agent-toolkit/): How Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler can compose with established agent, browser, web-data, and document tools.
+- [Open-Source Toolkit for Building AI Agents](https://qarinah.io/articles/open-source-governed-agent-toolkit/): A neutral engineering guide to document processing, browser automation, evaluation, computer use, frameworks, vertical agents, memory, governance, and safety.
 - [Getting started](https://qarinah.io/docs/getting-started/): Install Qarinah, opt in one workspace, connect a supported host, and compile a cited context pack.
 - [Features](https://qarinah.io/docs/features/): Complete product capability map for project-owned memory, cited retrieval, integrations, dashboards, team memory, portability, and boundaries.
 - [Project overview](https://qarinah.io/docs/project-overview/): Explain retained work, latest outcomes, codebase areas, languages, relationships, and durable memory files in one page.
@@ -32,8 +32,9 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 - Qarinah is a universal context engine for software projects and an independent local tool; Maqam is an optional governance integration.
 - Qarinah is a local, evidence-linked project-memory compiler for coding agents. It is not a complete autonomous-agent runtime or a general personalization service.
 - The alternatives guide is a representative category comparison, not a performance ranking or a claim that Qarinah is universally better than adjacent products.
-- Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler are separate projects by Ajnas N B. The ecosystem guide distinguishes them from third-party tools maintained by their own projects.
-- Cockroach Browser uses Playwright. Cockroach Crawler discloses Trafilatura as the optional quality dependency. The ecosystem guide does not claim that those established projects were created by Qarinah's author.
+- The toolkit article is an educational category map, not a ranking or product FAQ. It distinguishes orchestration, perception, acquisition, persistence, observation, evaluation, and enforcement.
+- Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler are separate projects by Ajnas N B. All other entries in the toolkit article are independent projects linked to official sources.
+- Cockroach Browser uses Playwright. Cockroach Crawler discloses Trafilatura as an optional quality dependency. Speech-to-text and computer-vision tools are perception components, not memory systems unless another layer persists and retrieves their outputs.
 - Qarinah's primary workflow is verified handoffs between coding agents.
 - Qarinah initializes a rebuildable SQLite WAL/FTS5 read model, graph, index, and Markdown view when a workspace is initialized.
 - Complete setup records a bounded project-structure graph, and `qarinah overview` explains memory counts, latest outcomes, languages, directories, and relationships.

@@ -253,142 +253,323 @@ const alternativeQuestions = [
   }
 ];
 
-const governedToolkitProjects = [
+const governedToolkitCategories = [
   {
-    name: "Qarinah",
-    slug: "qarinah-project-memory",
-    category: "Project memory and context",
-    role: "Keeps an inspectable project-owned record and compiles bounded, cited context packs for supported coding agents.",
-    boundary: "Qarinah does not run the agent loop, execute browser actions, or grant tool authority.",
-    url: "https://qarinah.io/",
-    source: "https://github.com/AjnasNB/qarinah"
+    slug: "document-processing",
+    name: "Document Processing",
+    description: "Turn files into structured representations that an agent can search, chunk, cite, or transform. This is different from crawling websites or operating a browser.",
+    selection: "Compare format coverage, layout and table fidelity, OCR, local deployment, export formats, and how the parser exposes provenance.",
+    tools: [
+      {
+        name: "Docling",
+        slug: "docling",
+        role: "Parses PDF, office documents, images, HTML, and other formats into a unified document representation for export, chunking, and AI workflows.",
+        boundary: "Choose it for document conversion and structure recovery, not site traversal or interactive web tasks.",
+        url: "https://docling-project.github.io/docling/"
+      },
+      {
+        name: "Unstructured",
+        slug: "unstructured",
+        role: "Provides open-source partitioning and preprocessing components for turning varied document formats into elements for downstream AI pipelines.",
+        boundary: "The open-source library is useful for prototyping and self-managed pipelines. Hosted Unstructured products have a different operating surface.",
+        url: "https://docs.unstructured.io/open-source/introduction/overview"
+      }
+    ],
+    adjacent: {
+      title: "Adjacent layer: web acquisition and extraction",
+      description: "These tools fetch or extract web sources before a document-processing stage. They belong beside this category, not inside it.",
+      tools: [
+        {
+          name: "Trafilatura",
+          slug: "trafilatura",
+          role: "Discovers, downloads, and extracts main text, metadata, comments, and links from web documents in Python.",
+          boundary: "It centers on web-page extraction rather than general office-document conversion or browser interaction.",
+          url: "https://trafilatura.readthedocs.io/en/latest/"
+        },
+        {
+          name: "Firecrawl",
+          slug: "firecrawl",
+          role: "Offers scrape, crawl, map, search, browser, and agent surfaces for turning websites into LLM-ready data.",
+          boundary: "Its open-source and managed offerings have different feature and deployment boundaries, which should be evaluated separately.",
+          url: "https://docs.firecrawl.dev/"
+        },
+        {
+          name: "Cockroach Crawler",
+          slug: "cockroach-crawler",
+          role: "Acquires, renders, extracts, and normalizes web evidence under explicit origin, request, byte, redirect, concurrency, and time limits.",
+          boundary: "It is an author-affiliated TypeScript project for governed web acquisition, not a hosted proxy fleet or an access-control bypass. Its optional quality path discloses Trafilatura as a dependency.",
+          url: "https://cockroachcrawler.com/",
+          source: "https://github.com/AjnasNB/cockroach-crawler",
+          authored: true
+        }
+      ]
+    }
   },
   {
-    name: "Maqam",
-    slug: "maqam-action-governance",
-    category: "Registered action governance",
-    role: "Applies policy before registered TypeScript actions, can bind approval to an exact input, and records execution receipts.",
-    boundary: "Maqam governs only calls deliberately routed through its registered gateway. It is not complete enterprise governance or universal interception.",
-    url: "https://maqamagent.com/",
-    source: "https://github.com/AjnasNB/maqam"
+    slug: "browser-automation",
+    name: "Browser Automation",
+    description: "Drive browser engines, pages, selectors, and sessions. Some projects expose deterministic APIs; others add natural-language planning or explicit session boundaries.",
+    selection: "Compare engine support, selector strategy, session ownership, evidence capture, human handoff, and where authorization is enforced.",
+    tools: [
+      {
+        name: "Playwright",
+        slug: "playwright",
+        role: "Automates Chromium, Firefox, and WebKit through one testing and automation API.",
+        boundary: "It is a browser-automation primitive. The host application still owns action authorization, approval, and audit policy.",
+        url: "https://playwright.dev/docs/intro"
+      },
+      {
+        name: "Puppeteer",
+        slug: "puppeteer",
+        role: "Controls Chrome or Firefox through a high-level JavaScript API over DevTools Protocol or WebDriver BiDi.",
+        boundary: "It provides browser control rather than an agent governance or long-term memory layer.",
+        url: "https://pptr.dev/guides/what-is-puppeteer"
+      },
+      {
+        name: "Stagehand",
+        slug: "stagehand",
+        role: "Combines code and natural-language browser automation through act, extract, observe, and agent interfaces.",
+        boundary: "It is useful when AI-assisted interaction authoring is central. Production authority and approval policy remain separate design decisions.",
+        url: "https://docs.stagehand.dev/v3/first-steps/introduction"
+      },
+      {
+        name: "Cockroach Browser",
+        slug: "cockroach-browser",
+        role: "Provides explicit browser sessions, semantic interaction, bounded evidence, and human handoff for browser-capable agents.",
+        boundary: "Cockroach Browser is an author-affiliated project that uses Playwright and Chromium. It adds session authority and evidence boundaries; it is not a browser engine or access-control bypass.",
+        url: "https://cockroachbrowser.com/",
+        source: "https://github.com/AjnasNB/cockroach-browser",
+        authored: true
+      }
+    ]
   },
   {
-    name: "Cockroach Browser",
-    slug: "cockroach-browser-runtime",
-    category: "Authorized browser runtime",
-    role: "Provides explicit browser sessions, semantic interaction, bounded evidence, and human handoff for browser-capable agents.",
-    boundary: "Cockroach Browser uses Playwright and Chromium. It adds session authority and evidence boundaries; it is not a new browser engine and does not bypass access controls.",
-    url: "https://cockroachbrowser.com/",
-    source: "https://github.com/AjnasNB/cockroach-browser"
+    slug: "evaluation-monitoring",
+    name: "Evaluation & Monitoring",
+    description: "Measure what an agent did, whether outputs meet task-specific criteria, and how behavior changes across versions. Tracing and evaluation are related, but they are not the same job.",
+    selection: "Separate telemetry transport, trace storage, human review, offline test sets, online scoring, and regression gates in the evaluation plan.",
+    tools: [
+      {
+        name: "OpenTelemetry",
+        slug: "opentelemetry",
+        role: "Defines vendor-neutral APIs, conventions, and transport for traces, metrics, and logs.",
+        boundary: "OpenTelemetry is instrumentation and telemetry infrastructure, not an observability backend or an agent evaluator by itself.",
+        url: "https://opentelemetry.io/docs/what-is-opentelemetry/"
+      },
+      {
+        name: "Langfuse",
+        slug: "langfuse",
+        role: "Connects LLM and agent tracing with evaluations, datasets, prompt management, experiments, and operational metrics.",
+        boundary: "Its hosted and self-hosted deployment choices should be compared separately from the instrumentation used to send traces.",
+        url: "https://langfuse.com/docs"
+      },
+      {
+        name: "Arize Phoenix",
+        slug: "arize-phoenix",
+        role: "Provides tracing, evaluation, prompt iteration, datasets, and experiments for AI applications, with OpenTelemetry and OpenInference support.",
+        boundary: "It helps inspect and measure behavior; it does not authorize an agent's external actions.",
+        url: "https://github.com/Arize-ai/phoenix"
+      },
+      {
+        name: "Ragas",
+        slug: "ragas",
+        role: "Provides evaluation APIs, metrics, and experiment workflows for AI applications, including retrieval and agent use cases.",
+        boundary: "Metric validity depends on the dataset, rubric, judge configuration, and task. Scores from different protocols are not directly comparable.",
+        url: "https://docs.ragas.io/en/latest/"
+      }
+    ]
   },
   {
-    name: "Cockroach Crawler",
-    slug: "cockroach-crawler-acquisition",
-    category: "Governed web acquisition",
-    role: "Collects, renders, extracts, and normalizes web evidence under explicit origin, request, byte, redirect, concurrency, and time limits.",
-    boundary: "It is not a hosted proxy fleet or an access-control bypass. Its optional quality surface uses Trafilatura as a disclosed dependency.",
-    url: "https://cockroachcrawler.com/",
-    source: "https://github.com/AjnasNB/cockroach-crawler"
+    slug: "computer-use",
+    name: "Computer Use",
+    description: "Let agents perceive and operate desktop or device interfaces. Browser agents are a narrower case; general computer-use systems also need OS integration, execution isolation, and recovery controls.",
+    selection: "Compare supported operating systems, perception method, native API access, sandboxing, confirmation modes, and replayable evidence.",
+    tools: [
+      {
+        name: "Browser Use",
+        slug: "browser-use",
+        role: "Provides an open-source framework for agents that navigate and act on websites, plus optional hosted browser and agent services.",
+        boundary: "It is browser-focused computer use rather than a general desktop automation layer.",
+        url: "https://github.com/browser-use/browser-use"
+      },
+      {
+        name: "Cua",
+        slug: "cua",
+        role: "Provides open-source infrastructure for computer-use agents, including environments and interfaces for operating desktop systems.",
+        boundary: "Environment isolation, model choice, and action policy remain deployment decisions for the adopter.",
+        url: "https://github.com/trycua/cua"
+      },
+      {
+        name: "Microsoft UFO",
+        slug: "microsoft-ufo",
+        role: "Explores Windows-focused agent automation through UI Automation, native APIs, and hybrid GUI interaction.",
+        boundary: "It is a research and open-source project focused on Windows interaction, not an official Windows product feature.",
+        url: "https://github.com/microsoft/UFO"
+      }
+    ]
+  },
+  {
+    slug: "frameworks",
+    name: "Frameworks",
+    description: "Own the agent loop, workflow graph, tool calls, handoffs, or durable execution. A framework can integrate memory, monitoring, and guardrails without replacing those layers.",
+    selection: "Compare control-flow model, supported languages and providers, persistence, human review, tracing, tool contracts, and deployment portability.",
+    tools: [
+      {
+        name: "LangGraph",
+        slug: "langgraph",
+        role: "Provides low-level orchestration for long-running, stateful agents with durable execution and human-in-the-loop control.",
+        boundary: "It owns orchestration. Application-specific memory, authorization, and evaluation still require deliberate architecture.",
+        url: "https://docs.langchain.com/oss/python/langgraph/overview"
+      },
+      {
+        name: "OpenAI Agents SDK",
+        slug: "openai-agents-sdk",
+        role: "Provides an agent loop, tools, handoffs, sessions, tracing, guardrails, and human-in-the-loop patterns for agent applications.",
+        boundary: "It is an agent runtime rather than a complete enterprise governance or document-processing platform.",
+        url: "https://openai.github.io/openai-agents-python/"
+      },
+      {
+        name: "Microsoft Agent Framework",
+        slug: "microsoft-agent-framework",
+        role: "Combines agent abstractions, an agent harness, graph-based workflows, sessions, middleware, memory providers, telemetry, and MCP integration.",
+        boundary: "It is the current Microsoft successor to AutoGen and Semantic Kernel for these agent patterns. Migration and provider boundaries should be checked in the official docs.",
+        url: "https://learn.microsoft.com/en-us/agent-framework/overview/"
+      },
+      {
+        name: "CrewAI",
+        slug: "crewai",
+        role: "Provides Python abstractions for role-based agent crews and event-driven flows.",
+        boundary: "Its open-source framework and managed Agent Management Platform are distinct operating surfaces.",
+        url: "https://docs.crewai.com/"
+      }
+    ]
+  },
+  {
+    slug: "vertical-agents",
+    name: "Vertical Agents",
+    description: "Package an agent around one domain, such as software engineering. These products own more of the task experience than a general framework or primitive.",
+    selection: "Compare task scope, environment isolation, edit and execution authority, human review, supported models, and how results are verified.",
+    tools: [
+      {
+        name: "OpenHands",
+        slug: "openhands",
+        role: "Provides a software-agent SDK, CLI, and local GUI for coding tasks, with separate hosted and enterprise offerings.",
+        boundary: "The open-source core and source-available enterprise directory have different licenses and product boundaries.",
+        url: "https://docs.openhands.dev/overview/introduction"
+      },
+      {
+        name: "mini-SWE-agent",
+        slug: "mini-swe-agent",
+        role: "Provides a compact software-engineering agent and CLI with a deliberately simple control flow and multiple execution environments.",
+        boundary: "Local execution is not isolated by default. Container and other environment choices must be configured for the intended risk level.",
+        url: "https://mini-swe-agent.com/latest/"
+      },
+      {
+        name: "Aider",
+        slug: "aider",
+        role: "Provides AI pair programming in a terminal with repository context, git integration, editing modes, linting, and test workflows.",
+        boundary: "It is a coding product rather than a general multi-domain agent framework.",
+        url: "https://aider.chat/docs/"
+      }
+    ]
+  },
+  {
+    slug: "memory",
+    name: "Memory",
+    description: "Persist and retrieve state across turns, sessions, users, agents, or projects. Memory is not the same as a model's context window, a speech recognizer, or a vision encoder.",
+    selection: "Compare the source of truth, memory scope, write policy, conflict handling, retrieval method, portability, deletion, and provenance.",
+    correction: "Category correction: speech-to-text and computer-vision tools are perception or modality components. They become part of memory only when another system deliberately persists and retrieves their outputs.",
+    tools: [
+      {
+        name: "Mem0",
+        slug: "mem0",
+        role: "Provides managed and self-hosted memory components for retaining user, session, and agent state across interactions.",
+        boundary: "The open-source library and hosted platform have different infrastructure, defaults, and operational responsibilities.",
+        url: "https://docs.mem0.ai/open-source/overview"
+      },
+      {
+        name: "Letta",
+        slug: "letta",
+        role: "Builds stateful agents around persistent memory blocks, conversation history, and archival memory.",
+        boundary: "Letta is a stateful agent platform, so its scope extends beyond a drop-in retrieval store.",
+        url: "https://docs.letta.com/guides/get-started/intro"
+      },
+      {
+        name: "LangMem",
+        slug: "langmem",
+        role: "Provides primitives for extracting, storing, searching, and updating long-term agent memory, with native LangGraph storage integration.",
+        boundary: "It supplies memory APIs and behaviors; the application still chooses storage, write policy, and evidence requirements.",
+        url: "https://github.com/langchain-ai/langmem"
+      },
+      {
+        name: "Qarinah",
+        slug: "qarinah",
+        role: "Keeps an inspectable, project-owned record and compiles bounded, cited context packs for supported coding agents.",
+        boundary: "Qarinah is the author-affiliated project-memory entry in this guide. It does not run the agent loop, execute browser actions, or grant tool authority.",
+        url: "https://qarinah.io/",
+        source: "https://github.com/AjnasNB/qarinah",
+        authored: true
+      }
+    ]
+  },
+  {
+    slug: "governance-safety",
+    name: "Governance & Safety",
+    description: "Constrain authority, validate inputs and outputs, authorize actions, and preserve evidence. Policy engines, LLM guardrails, and action gateways solve different parts of this layer.",
+    selection: "Identify the enforcement point first: application authorization, model input and output, agent traces, or registered side effects. Then test bypass paths and failure behavior.",
+    tools: [
+      {
+        name: "Open Policy Agent",
+        slug: "open-policy-agent",
+        role: "Provides a general-purpose policy engine and Rego language for separating policy decisions from application enforcement.",
+        boundary: "OPA returns decisions over supplied data. The host remains responsible for calling it at every required enforcement point.",
+        url: "https://www.openpolicyagent.org/docs"
+      },
+      {
+        name: "Cedar",
+        slug: "cedar",
+        role: "Provides a policy language and authorizer for principal, action, resource, and context-based authorization decisions.",
+        boundary: "Cedar evaluates authorization policy; the application must build the request and enforce the decision correctly.",
+        url: "https://docs.cedarpolicy.com/"
+      },
+      {
+        name: "NeMo Guardrails",
+        slug: "nemo-guardrails",
+        role: "Provides programmable rails that can inspect and modify LLM application inputs, outputs, retrieval, dialog, and execution flows.",
+        boundary: "It focuses on LLM-application guardrails, not general application authorization or enterprise governance by itself.",
+        url: "https://docs.nvidia.com/nemo/guardrails/latest/home"
+      },
+      {
+        name: "Guardrails AI",
+        slug: "guardrails-ai",
+        role: "Provides validators and structured-output controls for checking LLM inputs and outputs.",
+        boundary: "Validation is one safety layer. It does not automatically govern every external action an agent can perform.",
+        url: "https://github.com/guardrails-ai/guardrails"
+      },
+      {
+        name: "Invariant Guardrails",
+        slug: "invariant-guardrails",
+        role: "Provides rule-based guardrails for agent traces, tool calls, MCP interactions, data flows, and content checks.",
+        boundary: "Coverage depends on which events and calls are routed through the guardrail integration.",
+        url: "https://invariantlabs-ai.github.io/docs/mcp-scan/guardrails-reference/"
+      },
+      {
+        name: "Maqam",
+        slug: "maqam",
+        role: "Applies policy before registered TypeScript actions, can bind approval to an exact input, and records execution receipts.",
+        boundary: "Maqam is the author-affiliated action-governance entry in this guide. It governs calls deliberately routed through its registered gateway; it is not complete enterprise governance or universal interception.",
+        url: "https://maqamagent.com/",
+        source: "https://github.com/AjnasNB/maqam",
+        authored: true
+      }
+    ]
   }
 ];
 
-const governedToolkitPrimitives = [
-  {
-    name: "Playwright",
-    slug: "playwright",
-    category: "Browser automation primitive",
-    role: "Automates Chromium, Firefox, and WebKit through one testing and automation API.",
-    relationship: "Cockroach Browser uses Playwright for browser control and adds its own authorization, evidence, and session contracts.",
-    url: "https://playwright.dev/docs/intro"
-  },
-  {
-    name: "Puppeteer",
-    slug: "puppeteer",
-    category: "Browser automation primitive",
-    role: "Controls Chrome or Firefox through a high-level JavaScript API over DevTools Protocol or WebDriver BiDi.",
-    relationship: "A direct browser-automation choice when host code should own authority, session policy, evidence, and approvals.",
-    url: "https://pptr.dev/guides/what-is-puppeteer"
-  },
-  {
-    name: "Browser Use",
-    slug: "browser-use",
-    category: "Agentic browser framework",
-    role: "Makes websites available to AI agents through an open-source browser-use framework and optional cloud services.",
-    relationship: "A higher-level browser-agent option. Evaluate its agent autonomy and deployment model separately from Cockroach Browser's explicit session boundary.",
-    url: "https://github.com/browser-use/browser-use"
-  },
-  {
-    name: "Stagehand",
-    slug: "stagehand",
-    category: "Agentic browser framework",
-    role: "Combines code and natural-language browser automation through act, extract, observe, and agent interfaces.",
-    relationship: "Useful when AI-assisted interaction authoring is the product center. A host can still add separate action governance where required.",
-    url: "https://docs.stagehand.dev/v3/first-steps/introduction"
-  },
-  {
-    name: "Trafilatura",
-    slug: "trafilatura",
-    category: "Web extraction library",
-    role: "Discovers, downloads, and extracts main text, metadata, comments, and links from web documents in Python.",
-    relationship: "Cockroach Crawler discloses Trafilatura as the optional quality dependency instead of presenting that extraction algorithm as its own.",
-    url: "https://trafilatura.readthedocs.io/en/stable/index.html"
-  },
-  {
-    name: "Firecrawl",
-    slug: "firecrawl",
-    category: "Web data platform",
-    role: "Offers search, scrape, crawl, map, browser, and agent surfaces that return LLM-ready web data.",
-    relationship: "A broader managed or self-hosted web-data platform. Cockroach Crawler is the local TypeScript option when bounded acquisition and attached evidence are the center.",
-    url: "https://docs.firecrawl.dev/introduction"
-  },
-  {
-    name: "Docling",
-    slug: "docling",
-    category: "Document conversion toolkit",
-    role: "Parses formats such as PDF, DOCX, PPTX, HTML, and images into a unified document representation for export, chunking, and AI workflows.",
-    relationship: "A document-ingestion complement or alternative when file conversion is more important than site traversal or interactive browser control.",
-    url: "https://docling-project.github.io/docling/"
-  },
-  {
-    name: "LangGraph",
-    slug: "langgraph",
-    category: "Agent and workflow runtime",
-    role: "Provides low-level orchestration for long-running, stateful agents with durable execution and human-in-the-loop control.",
-    relationship: "Can own the workflow while Qarinah supplies project memory and Maqam governs selected registered effects.",
-    url: "https://docs.langchain.com/oss/javascript/langgraph/overview"
-  },
-  {
-    name: "OpenAI Agents SDK",
-    slug: "openai-agents-sdk",
-    category: "Agent runtime",
-    role: "Provides an agent loop, tools, handoffs, sessions, tracing, guardrails, and human-in-the-loop mechanisms for TypeScript agents.",
-    relationship: "Can build and run the agent while the authored toolkit supplies optional memory, browser, acquisition, and registered-action boundaries.",
-    url: "https://openai.github.io/openai-agents-js/"
-  }
-];
-
-const governedToolkitQuestions = [
-  {
-    name: "Is this one bundled agent platform?",
-    text: "No. Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler are separate open-source projects that can be adopted independently. The other named tools are third-party primitives or integration choices maintained by their own projects."
-  },
-  {
-    name: "Does Cockroach Browser replace Playwright?",
-    text: "No. Cockroach Browser uses Playwright and Chromium. Its separate contribution is an explicit session-authority, evidence, audit, and human-handoff boundary for agent use."
-  },
-  {
-    name: "Does Maqam govern every action an agent can take?",
-    text: "No. Maqam governs only actions deliberately routed through a registered Maqam gateway. Calls that bypass that boundary remain outside its control."
-  },
-  {
-    name: "Are Playwright, Puppeteer, Trafilatura, Firecrawl, Browser Use, Stagehand, LangGraph, OpenAI Agents SDK, or Docling products by Ajnas N B?",
-    text: "No. They are established third-party projects linked to their official documentation. Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler are the projects authored by Ajnas N B discussed in this guide."
-  },
-  {
-    name: "Is this a best-tool ranking?",
-    text: "No. It is a category and composition guide based on documented product boundaries. It contains no matched cross-product benchmark and makes no best, first, or only claim."
-  }
-];
+const governedToolkitTools = governedToolkitCategories.flatMap((category) => [
+  ...category.tools,
+  ...(category.adjacent?.tools ?? [])
+]);
 
 const docPages = [
   {
@@ -660,27 +841,31 @@ const searchEntries = [
   },
   {
     route: "/articles/open-source-governed-agent-toolkit/",
-    title: "An open-source toolkit for governed AI agents",
-    description: "See how Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler compose with established agent, browser, web-data, and document tools.",
+    title: "Open-Source Toolkit for Building AI Agents",
+    description: "A practical category map for document processing, browser automation, evaluation, computer use, frameworks, vertical agents, memory, governance, and safety.",
     headings: [
-      { id: "authored-projects", text: "Four projects, four explicit boundaries" },
-      { id: "established-tools", text: "Established tools stay in their own categories" },
-      { id: "reference-architecture", text: "A reference architecture, not a required bundle" },
-      { id: "questions", text: "Questions about the toolkit boundary" },
-      { id: "method", text: "Authorship, sources, and limits" }
+      { id: "category-model", text: "A category is a job, not a popularity contest" },
+      ...governedToolkitCategories.map((category) => ({ id: category.slug, text: category.name })),
+      { id: "assemble-a-stack", text: "Assemble a stack from boundaries" },
+      { id: "method", text: "Method, authorship, and limits" }
     ],
     keywords: [
-      "open-source governed AI agents",
-      "AI agent governance toolkit",
-      "Qarinah Maqam Cockroach Browser Cockroach Crawler",
-      "Playwright agent governance",
-      "agent memory browser crawler stack"
+      "open-source AI agent toolkit",
+      "AI agent frameworks",
+      "AI agent evaluation and monitoring",
+      "AI agent memory",
+      "AI agent governance and safety",
+      "browser automation for AI agents",
+      "document processing for AI agents"
     ],
-    content: [
-      ...governedToolkitProjects.map((project) => `${project.name}. ${project.category}. ${project.role} ${project.boundary}`),
-      ...governedToolkitPrimitives.map((tool) => `${tool.name}. ${tool.category}. ${tool.role} ${tool.relationship}`),
-      ...governedToolkitQuestions.map((entry) => `${entry.name} ${entry.text}`)
-    ].join(" ")
+    content: governedToolkitCategories.map((category) => [
+      category.name,
+      category.description,
+      category.selection,
+      category.correction,
+      ...category.tools.map((tool) => `${tool.name}. ${tool.role} ${tool.boundary}`),
+      ...(category.adjacent?.tools ?? []).map((tool) => `${tool.name}. ${tool.role} ${tool.boundary}`)
+    ].filter(Boolean).join(" ")).join(" ")
   }
 ];
 
@@ -1027,7 +1212,6 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
       }
     );
   } else if (kind === "toolkit") {
-    const toolkitItems = [...governedToolkitProjects, ...governedToolkitPrimitives];
     graph.push(
       {
         "@type": "Article",
@@ -1041,15 +1225,17 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
         dateModified: toolkitArticleDate,
         author: { "@id": person["@id"] },
         isPartOf: { "@id": `${siteOrigin}/#website` },
-        about: { "@id": `${url}#toolkit-map` }
+        about: { "@id": `${url}#toolkit-map` },
+        articleSection: governedToolkitCategories.map((category) => category.name),
+        keywords: "open-source AI agents, document processing, browser automation, evaluation, monitoring, computer use, agent frameworks, vertical agents, agent memory, governance, safety"
       },
       {
         "@type": "ItemList",
         "@id": `${url}#toolkit-map`,
-        name: "Open-source governed-agent toolkit and established adjacent tools",
+        name: "Open-source tools for building AI agents by engineering category",
         itemListOrder: "https://schema.org/ItemListUnordered",
-        numberOfItems: toolkitItems.length,
-        itemListElement: toolkitItems.map((item, index) => ({
+        numberOfItems: governedToolkitTools.length,
+        itemListElement: governedToolkitTools.map((item, index) => ({
           "@type": "ListItem",
           position: index + 1,
           item: {
@@ -1058,19 +1244,6 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
             description: item.role,
             applicationCategory: "DeveloperApplication",
             url: item.url
-          }
-        }))
-      },
-      {
-        "@type": "FAQPage",
-        "@id": `${url}#faq`,
-        name: "Governed-agent toolkit questions",
-        mainEntity: governedToolkitQuestions.map((entry) => ({
-          "@type": "Question",
-          name: entry.name,
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: entry.text
           }
         }))
       }
@@ -1765,167 +1938,150 @@ function alternativesPage() {
 }
 
 function governedToolkitPage() {
-  const projectCards = governedToolkitProjects.map((project, index) => `
-    <article class="toolkit-project-card" id="${project.slug}">
-      <header>
-        <span>${String(index + 1).padStart(2, "0")}</span>
-        <p>${project.category}</p>
-      </header>
-      <h3>${project.name}</h3>
-      <p>${project.role}</p>
-      <p class="toolkit-boundary"><strong>Boundary:</strong> ${project.boundary}</p>
-      <div class="toolkit-links">
-        <a href="${project.url}" rel="noreferrer">Official site</a>
-        <a href="${project.source}" rel="noreferrer">Source</a>
-      </div>
-    </article>`).join("");
-
-  const categories = [
-    ["Browser automation primitives", "The low-level browser control layer. The host still owns authorization, evidence, and policy.", ["playwright", "puppeteer"]],
-    ["Agentic browser frameworks", "Higher-level browser-agent interfaces for natural-language actions, extraction, and planning.", ["browser-use", "stagehand"]],
-    ["Web and document acquisition", "Tools for web extraction, broader web-data APIs, or document conversion into AI-ready structures.", ["trafilatura", "firecrawl", "docling"]],
-    ["Agent and workflow runtimes", "Frameworks that own the agent loop, workflow state, tools, handoffs, or durable orchestration.", ["langgraph", "openai-agents-sdk"]]
-  ];
-  const categoryMarkup = categories.map(([title, description, slugs], categoryIndex) => {
-    const tools = slugs.map((slug) => governedToolkitPrimitives.find((tool) => tool.slug === slug));
-    return `
-      <section class="toolkit-category" aria-labelledby="toolkit-category-${categoryIndex + 1}">
-        <header>
-          <span>${String(categoryIndex + 1).padStart(2, "0")}</span>
-          <div>
-            <h3 id="toolkit-category-${categoryIndex + 1}">${title}</h3>
-            <p>${description}</p>
-          </div>
-        </header>
-        <div class="toolkit-tool-list">
-          ${tools.map((tool) => `
-            <article id="${tool.slug}">
-              <div>
-                <p>${tool.category}</p>
-                <h4>${tool.name}</h4>
-                <a href="${tool.url}" rel="noreferrer">Official documentation</a>
-              </div>
-              <p>${tool.role}</p>
-              <p><strong>Composition note:</strong> ${tool.relationship}</p>
-            </article>`).join("")}
+  const toolMarkup = (tool) => `
+    <article id="${tool.slug}">
+      <div>
+        <p>${tool.authored ? "Author-affiliated project" : "Independent open-source project"}</p>
+        <h4>${tool.name}</h4>
+        <div class="toolkit-links">
+          <a href="${tool.url}" rel="noreferrer">Official documentation</a>
+          ${tool.source ? `<a href="${tool.source}" rel="noreferrer">Source</a>` : ""}
         </div>
-      </section>`;
-  }).join("");
+      </div>
+      <p>${tool.role}</p>
+      <p><strong>Boundary:</strong> ${tool.boundary}</p>
+    </article>`;
 
-  const questionMarkup = governedToolkitQuestions.map((entry) => `
-    <article>
-      <h3>${entry.name}</h3>
-      <p>${entry.text}</p>
-    </article>`).join("");
+  const categoryMarkup = governedToolkitCategories.map((category, categoryIndex) => `
+    <section class="toolkit-category" id="${category.slug}" aria-labelledby="${category.slug}-title">
+      <header>
+        <span>${String(categoryIndex + 1).padStart(2, "0")}</span>
+        <div>
+          <h3 id="${category.slug}-title">${category.name}</h3>
+          <p>${category.description}</p>
+        </div>
+      </header>
+      <p class="toolkit-selection"><strong>What to compare:</strong> ${category.selection}</p>
+      ${category.correction ? `<p class="toolkit-correction"><strong>${category.correction}</strong></p>` : ""}
+      <div class="toolkit-tool-list">${category.tools.map(toolMarkup).join("")}</div>
+      ${category.adjacent ? `
+        <aside class="toolkit-adjacent" aria-labelledby="${category.slug}-adjacent-title">
+          <div>
+            <p>Connected, but distinct</p>
+            <h4 id="${category.slug}-adjacent-title">${category.adjacent.title}</h4>
+            <p>${category.adjacent.description}</p>
+          </div>
+          <div class="toolkit-tool-list">${category.adjacent.tools.map(toolMarkup).join("")}</div>
+        </aside>` : ""}
+    </section>`).join("");
 
   return layout({
-    title: "An open-source toolkit for governed AI agents",
-    description: "See how Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler compose with established agent, browser, web-data, and document tools.",
+    title: "Open-Source Toolkit for Building AI Agents",
+    description: "A practical category map for document processing, browser automation, evaluation, computer use, frameworks, vertical agents, memory, governance, and safety.",
     canonical: "/articles/open-source-governed-agent-toolkit/",
     kind: "toolkit",
     body: `
       <section class="toolkit-hero">
         <div class="shell toolkit-hero-grid">
           <div>
-            <p class="eyebrow">Open-source governed-agent toolkit</p>
-            <h1>Governed agents need explicit layers.</h1>
-            <p class="toolkit-lede">Qarinah keeps project memory. Maqam governs registered actions. Cockroach Browser provides authorized interactive sessions. Cockroach Crawler acquires bounded web evidence. Established runtimes and primitives can sit around those projects without being relabeled as part of them.</p>
+            <p class="eyebrow">Engineering field guide</p>
+            <h1>Open-Source Toolkit for Building AI Agents.</h1>
+            <p class="toolkit-lede">Agent systems are assembled from layers. A framework runs the loop. Document and browser tools reach information. Evaluation measures behavior. Memory carries state. Governance constrains authority. Choosing a tool starts with naming the job it must own.</p>
             <p class="toolkit-byline">Written by <strong>Ajnas N B</strong> - reviewed <time datetime="2026-08-09">9 August 2026</time></p>
             <div class="comparison-actions">
-              <a class="btn btn-primary btn-large" href="#authored-projects">See the four boundaries</a>
-              <a class="hero-text-link" href="#reference-architecture">View a reference stack</a>
+              <a class="btn btn-primary btn-large" href="#category-model">Learn the category model</a>
+              <a class="hero-text-link" href="#document-processing">Browse the eight categories</a>
             </div>
           </div>
           <aside class="toolkit-disclosure" aria-label="Authorship and comparison disclosure">
-            <p>Authorship disclosure</p>
-            <strong>Four authored projects. Nine established tools.</strong>
-            <p>Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler are projects by Ajnas N B. Every other named project remains the work of its respective maintainers.</p>
-            <p>This is a composition guide, not a ranking, endorsement, or claim of affiliation.</p>
+            <p>How to read this guide</p>
+            <strong>A category map, not a leaderboard.</strong>
+            <p>The list is representative rather than exhaustive. It describes documented jobs and boundaries, with links to maintainers' official sources.</p>
+            <p>Disclosure: Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler are projects by the author. Every other entry is maintained independently.</p>
           </aside>
         </div>
-        <div class="shell toolkit-layer-strip" aria-label="The four authored project boundaries">
-          ${governedToolkitProjects.map((project, index) => `<a href="#${project.slug}"><span>0${index + 1}</span><strong>${project.name}</strong><small>${project.category}</small></a>`).join("")}
+        <div class="shell toolkit-layer-strip" aria-label="Eight AI agent engineering categories">
+          ${governedToolkitCategories.map((category, index) => `<a href="#${category.slug}"><span>${String(index + 1).padStart(2, "0")}</span><strong>${category.name}</strong><small>Category</small></a>`).join("")}
         </div>
       </section>
 
-      <section class="section shell" aria-labelledby="authored-projects">
+      <section class="section shell" aria-labelledby="category-model">
         <div class="section-heading split-heading">
           <div>
-            <p class="eyebrow">The authored project family</p>
-            <h2 id="authored-projects">Four projects, four explicit boundaries.</h2>
+            <p class="eyebrow">Start with system ownership</p>
+            <h2 id="category-model">A category is a job, not a popularity contest.</h2>
           </div>
-          <p>Each project can be adopted on its own. Calling them a toolkit describes how their boundaries can compose; it does not make them one mandatory runtime or one shared license.</p>
+          <p>A useful map asks where a component sits in the execution path, which state it owns, and whether it observes, recommends, or enforces. One project can span several jobs, but that does not make the jobs interchangeable.</p>
         </div>
-        <div class="toolkit-project-grid">${projectCards}</div>
+        <div class="toolkit-project-grid">
+          <article class="toolkit-project-card">
+            <header><span>01</span><p>Runtime ownership</p></header>
+            <h3>Who runs the loop?</h3>
+            <p>Frameworks coordinate models, tools, state, retries, and handoffs. Vertical agents package that machinery around a specific domain and user experience.</p>
+            <p class="toolkit-boundary"><strong>Test:</strong> If the component is removed, does the agent still decide and dispatch its next step?</p>
+          </article>
+          <article class="toolkit-project-card">
+            <header><span>02</span><p>State ownership</p></header>
+            <h3>What persists?</h3>
+            <p>Memory carries selected state across interactions. Perception systems turn audio, images, screens, or documents into signals, but they do not become memory until another layer persists and retrieves those signals.</p>
+            <p class="toolkit-boundary"><strong>Test:</strong> Can the system explain what it stores, who can update it, and how stale or conflicting records are handled?</p>
+          </article>
+          <article class="toolkit-project-card">
+            <header><span>03</span><p>Authority ownership</p></header>
+            <h3>Who can stop an effect?</h3>
+            <p>Monitoring records what happened. Evaluation scores behavior. Governance and safety components sit at enforcement points that can deny, modify, or require approval before something proceeds.</p>
+            <p class="toolkit-boundary"><strong>Test:</strong> What exact path is blocked when policy denies, and what paths can bypass that check?</p>
+          </article>
+          <article class="toolkit-project-card">
+            <header><span>04</span><p>Evidence ownership</p></header>
+            <h3>How will you verify the result?</h3>
+            <p>Logs are not automatically evidence. A useful system binds source inputs, action receipts, evaluation data, and versioned configuration closely enough for another person to reproduce the claim.</p>
+            <p class="toolkit-boundary"><strong>Test:</strong> Can a reviewer trace the result to its source and protocol without relying on the agent's summary?</p>
+          </article>
+        </div>
       </section>
 
-      <section class="section section-alt" aria-labelledby="established-tools">
+      <section class="section section-alt" aria-labelledby="category-map-title">
         <div class="shell">
           <div class="section-heading split-heading">
             <div>
-              <p class="eyebrow">Primitives, frameworks, and adjacent products</p>
-              <h2 id="established-tools">Established tools stay in their own categories.</h2>
+              <p class="eyebrow">Eight engineering categories</p>
+              <h2 id="category-map-title">Choose by responsibility and enforcement point.</h2>
             </div>
-            <p>These projects solve important parts of the stack. They are linked to official documentation and described by product job, not absorbed into the authored project family.</p>
+            <p>Each entry links to an official project source. The notes describe what to compare and where the named component stops, so adjacent products do not get flattened into one generic agent-tools list.</p>
           </div>
           <div class="toolkit-categories">${categoryMarkup}</div>
         </div>
       </section>
 
-      <section class="section shell" aria-labelledby="reference-architecture">
+      <section class="section shell" aria-labelledby="assemble-a-stack">
         <div class="section-heading split-heading">
           <div>
-            <p class="eyebrow">One possible composition</p>
-            <h2 id="reference-architecture">A reference architecture, not a required bundle.</h2>
+            <p class="eyebrow">A practical selection sequence</p>
+            <h2 id="assemble-a-stack">Assemble a stack from boundaries.</h2>
           </div>
-          <p>Start with the layer your system is missing. A production system may use one, several, or none of these projects.</p>
+          <p>Start with the task and risk model, not a logo list. A system may need several categories, and it may use no project from a category when a simpler component is sufficient.</p>
         </div>
         <ol class="toolkit-reference-stack">
-          <li><span>01</span><div><strong>Run the agent or workflow</strong><p>Use LangGraph, OpenAI Agents SDK, or another host to own models, tools, handoffs, and state.</p></div></li>
-          <li><span>02</span><div><strong>Compile project memory when needed</strong><p>Use Qarinah when supported coding agents need one local, cited project record across sessions and hosts.</p></div></li>
-          <li><span>03</span><div><strong>Gate selected effects</strong><p>Route only the actions that require exact-input policy, approval, and receipts through Maqam.</p></div></li>
-          <li><span>04</span><div><strong>Open an authorized browser session</strong><p>Use Cockroach Browser for interactive web work. It uses Playwright rather than replacing the browser automation layer.</p></div></li>
-          <li><span>05</span><div><strong>Acquire bounded web evidence</strong><p>Use Cockroach Crawler for site traversal and evidence records, or start with Trafilatura or Firecrawl when their product center fits better.</p></div></li>
-          <li><span>06</span><div><strong>Convert document-heavy sources</strong><p>Use Docling when PDF, office document, image, and document-structure conversion is the primary ingestion problem.</p></div></li>
+          <li><span>01</span><div><strong>Write the task and threat model</strong><p>Name the environment, data sensitivity, permitted effects, expected failures, and human review points before selecting a runtime.</p></div></li>
+          <li><span>02</span><div><strong>Choose the narrowest runtime that owns the loop</strong><p>Use a framework for custom orchestration or a vertical agent when its domain workflow already matches the job.</p></div></li>
+          <li><span>03</span><div><strong>Add perception and acquisition deliberately</strong><p>Document processing, browser automation, web acquisition, and computer use expose different attack surfaces and need separate permissions.</p></div></li>
+          <li><span>04</span><div><strong>Define memory writes before memory retrieval</strong><p>Specify who may persist state, what provenance is retained, when records expire, and how conflicts or corrections work.</p></div></li>
+          <li><span>05</span><div><strong>Place policy at real enforcement points</strong><p>A policy document is not enforcement. Route each protected action through an authorizer, guardrail, or registered gateway that can fail closed.</p></div></li>
+          <li><span>06</span><div><strong>Evaluate with held inputs and observable traces</strong><p>Keep test data, rubrics, model and tool versions, judge settings, and failure examples so improvements can be checked rather than asserted.</p></div></li>
         </ol>
-      </section>
-
-      <section class="section section-alt" aria-labelledby="questions">
-        <div class="shell">
-          <div class="section-heading split-heading">
-            <div>
-              <p class="eyebrow">Direct answers</p>
-              <h2 id="questions">Questions about the toolkit boundary.</h2>
-            </div>
-            <p>The short answers below match the Article, ItemList, FAQ, and breadcrumb metadata published with this page.</p>
-          </div>
-          <div class="comparison-faq">${questionMarkup}</div>
-        </div>
       </section>
 
       <section class="comparison-method" id="method" aria-labelledby="toolkit-method-title">
         <div class="shell comparison-method-grid">
           <div>
-            <p class="eyebrow">Authorship, sources, and limits</p>
-            <h2 id="toolkit-method-title">Every category points to its official source.</h2>
+            <p class="eyebrow">Method, authorship, and limits</p>
+            <h2 id="toolkit-method-title">Treat the map as a starting point for verification.</h2>
           </div>
           <div>
-            <p>Written by Ajnas N B. Product descriptions were reviewed against official project documentation on 9 August 2026. External projects are not presented as dependencies unless the relationship is explicitly disclosed.</p>
-            <p>Cockroach Browser uses Playwright. Cockroach Crawler's optional quality surface uses Trafilatura. Other composition examples are architectural options, not installed dependencies or endorsements.</p>
-            <p>This page makes no best, first, only, certification, or matched-performance claim. Verify current versions, licenses, deployment models, and guarantees before adoption.</p>
-          </div>
-        </div>
-      </section>
-
-      <section class="section final-cta">
-        <div class="shell final-cta-inner">
-          <div>
-            <p class="eyebrow">Begin with the missing boundary</p>
-            <h2>Use Qarinah when the missing layer is cited project memory.</h2>
-          </div>
-          <div>
-            <a class="btn btn-primary btn-large" href="/docs/getting-started/">Set up Qarinah</a>
-            <a class="text-link" href="/alternatives/">Compare memory approaches</a>
+            <p>Written by Ajnas N B. Descriptions were reviewed against official project documentation on 9 August 2026. Categories describe primary engineering jobs and are not claims of affiliation, endorsement, or matched performance.</p>
+            <p>Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler are projects by the author. Cockroach Browser uses Playwright. Cockroach Crawler's optional quality path uses Trafilatura. All other named projects are maintained independently.</p>
+            <p>Licenses, deployment models, APIs, and product boundaries change. Verify the linked documentation and test the exact version, configuration, data, and enforcement path intended for adoption.</p>
           </div>
         </div>
       </section>`

@@ -447,8 +447,17 @@ if (/Qarinah is (?:the )?(?:best|only)|Qarinah (?:is )?better than|Qarinah outpe
   errors.push("Alternatives page contains an unsupported superiority term.");
 }
 for (const requiredToolkitCopy of [
-  "Governed agents need explicit layers.",
+  "Open-Source Toolkit for Building AI Agents.",
+  "A category is a job, not a popularity contest.",
   "Written by <strong>Ajnas N B</strong>",
+  "Document Processing",
+  "Browser Automation",
+  "Evaluation & Monitoring",
+  "Computer Use",
+  "Frameworks",
+  "Vertical Agents",
+  "Memory",
+  "Governance & Safety",
   "Qarinah",
   "Maqam",
   "Cockroach Browser",
@@ -463,21 +472,31 @@ for (const requiredToolkitCopy of [
   "LangGraph",
   "OpenAI Agents SDK",
   "Docling",
-  "This is a composition guide, not a ranking, endorsement, or claim of affiliation."
+  "OpenTelemetry",
+  "Langfuse",
+  "Arize Phoenix",
+  "Ragas",
+  "Mem0",
+  "Letta",
+  "LangMem",
+  "speech-to-text and computer-vision tools are perception or modality components",
+  "A category map, not a leaderboard."
 ]) {
   if (!toolkit.includes(requiredToolkitCopy)) {
     errors.push(`Governed-agent toolkit page is missing ${requiredToolkitCopy}`);
   }
 }
-for (const schemaType of ['"@type":"Article"', '"@type":"ItemList"', '"@type":"FAQPage"', '"@type":"BreadcrumbList"']) {
+for (const schemaType of ['"@type":"Article"', '"@type":"ItemList"', '"@type":"BreadcrumbList"']) {
   if (!toolkit.includes(schemaType)) errors.push(`Governed-agent toolkit page is missing ${schemaType}`);
 }
-if (!toolkit.includes('"numberOfItems":13')) {
-  errors.push("Governed-agent toolkit ItemList must contain the four authored projects and nine established tools.");
+if (toolkit.includes('"@type":"FAQPage"')) {
+  errors.push("Educational toolkit article must not publish product FAQ structured data.");
 }
-const toolkitQuestionCopy = toolkit.replaceAll("Is this a best-tool ranking?", "");
-if (/(?:Qarinah|Maqam|Cockroach Browser|Cockroach Crawler) (?:is|are) (?:the )?(?:best|first|only)|outperforms? every|universal winner/iu.test(toolkitQuestionCopy)) {
-  errors.push("Governed-agent toolkit page contains a prohibited superiority term outside the explicit FAQ denial.");
+if (!toolkit.includes('"numberOfItems":33')) {
+  errors.push("Educational toolkit ItemList must contain all 33 independently linked entries.");
+}
+if (/(?:Qarinah|Maqam|Cockroach Browser|Cockroach Crawler) (?:is|are) (?:the )?(?:best|first|only)|outperforms? every|universal winner/iu.test(toolkit)) {
+  errors.push("Educational toolkit article contains an unsupported superiority term.");
 }
 const siteCss = await readFile(path.join(output, "site.css"), "utf8");
 if (!siteCss.includes(".toolkit-project-grid")
