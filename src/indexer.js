@@ -1,7 +1,9 @@
 import path from "node:path";
+import { throwIfAborted, validateAbortSignal } from "./abort.js";
 import { canonicalStringify, deepFreezeJson, sha256 } from "./canonical.js";
 import { QarinahError } from "./errors.js";
 import { markdownDataBlock, markdownInline } from "./markdown.js";
+import { buildLinkedProjectMemory, writeLinkedProjectMemoryProjection } from "./linked-memory.js";
 import { buildProjectRecordViews, renderProjectRecordViews } from "./project-views.js";
 import { readEvents } from "./store.js";
 import {
@@ -263,8 +265,7 @@ export function buildDerivedState(events, workspaceId) {
   const averageDocumentLength = projections.length === 0
     ? 0
     : projections.reduce((total, event) => total + event.documentLength, 0) / projections.length;
-  return deepFreezeJson({
-    index: {
+  const index = {
       schemaVersion: INDEX_SCHEMA_VERSION,
       workspaceId,
       eventCount: projections.length,
@@ -274,8 +275,8 @@ export function buildDerivedState(events, workspaceId) {
       documentFrequency,
       averageDocumentLength,
       adjacency
-    },
-    graph: {
+    };
+  const graph = {
       schemaVersion: GRAPH_SCHEMA_VERSION,
       workspaceId,
       eventCount: projections.length,
@@ -283,7 +284,12 @@ export function buildDerivedState(events, workspaceId) {
       projectStructure,
       nodes,
       edges: coalescedEdges
-    }
+    };
+  const linkedMemory = buildLinkedProjectMemory(events, workspaceId);
+  return deepFreezeJson({
+    index,
+    graph,
+    linkedMemory
   });
 }
 
@@ -342,9 +348,12 @@ function markdownFor(events, workspaceId, headHash) {
   return `${lines.join("\n")}\n`;
 }
 
-export async function rebuildDerivedState(start = process.cwd()) {
+export async function rebuildDerivedState(start = process.cwd(), options = {}) {
+  const signal = validateAbortSignal(options.signal);
+  throwIfAborted(signal);
   const workspace = await loadWorkspace(start);
-  const events = await readEvents(workspace);
+  const events = await readEvents(workspace, { signal });
+  throwIfAborted(signal);
   const derived = buildDerivedState(events, workspace.config.workspaceId);
   const indexPath = await secureStoragePath(workspace, ["index", "index.json"], { type: "file", allowMissing: true });
   const graphPath = await secureStoragePath(workspace, ["graph", "graph.json"], { type: "file", allowMissing: true });
@@ -353,6 +362,9 @@ export async function rebuildDerivedState(start = process.cwd()) {
   const flowPath = await secureStoragePath(workspace, ["records", "FLOW.md"], { type: "file", allowMissing: true });
   const changesPath = await secureStoragePath(workspace, ["records", "CHANGES.md"], { type: "file", allowMissing: true });
   const recordViews = renderProjectRecordViews(buildProjectRecordViews(events, workspace.config.workspaceId));
+  // Honor cancellation before replacing any derived file. Once replacement
+  // starts, finish the coherent set rather than introducing partial output.
+  throwIfAborted(signal);
   await atomicWriteFile(
     indexPath,
     `${canonicalStringify(derived.index)}\n`
@@ -361,6 +373,7 @@ export async function rebuildDerivedState(start = process.cwd()) {
     graphPath,
     `${canonicalStringify(derived.graph)}\n`
   );
+  await writeLinkedProjectMemoryProjection(workspace, derived.linkedMemory);
   await atomicWriteFile(
     markdownPath,
     markdownFor(events, workspace.config.workspaceId, derived.index.headHash)
@@ -373,6 +386,7 @@ export async function rebuildDerivedState(start = process.cwd()) {
     workspaceId: workspace.config.workspaceId,
     eventCount: events.length,
     headHash: derived.index.headHash,
+    linkedMemory: derived.linkedMemory.statistics,
     readModel
   });
 }
@@ -441,6 +455,11 @@ export async function loadIndex(start = process.cwd(), options = {}) {
       ["graph", "graph.json"],
       Math.min(256 * 1024 * 1024, workspace.config.maxLogBytes * 4)
     );
+    const linkedMemory = await readBoundedIndex(
+      workspace,
+      ["graph", "linked-memory.json"],
+      Math.min(256 * 1024 * 1024, workspace.config.maxLogBytes * 6)
+    );
     const markdown = (await readBoundedFile(
       workspace,
       ["records", "CONTEXT.md"],
@@ -468,6 +487,7 @@ export async function loadIndex(start = process.cwd(), options = {}) {
     )).toString("utf8");
     persistedViewsCurrent = persistedViewsCurrent
       && canonicalStringify(graph) === canonicalStringify(expected.graph)
+      && canonicalStringify(linkedMemory) === canonicalStringify(expected.linkedMemory)
       && markdown === markdownFor(events, workspace.config.workspaceId, expected.index.headHash)
       && decisions === expectedRecordViews.decisions
       && flow === expectedRecordViews.flow

@@ -248,6 +248,7 @@ Qarinah is intentionally small, local, and inspectable:
 | Durable memory | Append-only canonical JSONL events, SHA-256 content and chain hashes, temporal validity, repository identity, machine-local checkpoints, and renewable write locks |
 | Fast local reads | Disposable SQLite WAL database with FTS5, schema migrations, typed tables, and a complete ledger-derived rebuild path |
 | Project graph | Typed event, evidence, repository, dependency, module, Markdown-link, citation, conflict, supersession, file, rename, change, and deletion edges |
+| Linked project memory | A bounded temporal view that joins admitted memories to the latest explicit repository scan, computes deterministic repository importance, and exposes the exact local, linked, and structural basis for every ranked result |
 | Retrieval | SQLite FTS5, BM25, typo tolerance, graph traversal, reciprocal-rank fusion, time and freshness filters, host-owned authority scopes, repository isolation, conflict/supersession handling, and diversity |
 | Context compiler | Complete-output character and token budgets, explicit output headroom, evidence-coverage gates, deterministic citations, and reproducible manifests |
 | Human-readable views | Rebuildable Markdown, JSON, graph, index, and Google OKF 0.1 Draft exports |
@@ -353,6 +354,8 @@ npx qarinah footprint "release decisions and failed checks"
 Qarinah does not claim that a large source archive becomes a lossless few-kilobyte file. It preserves authorized project memory locally and sends a small task-relevant cited pack to the agent. Read [memory-footprint measurement](docs/MEMORY-FOOTPRINT.md) for the exact distinction and [the Azure evaluation](docs/AZURE-EVALUATION.md) before considering a shared remote index.
 
 `qarinah setup` creates the empty SQLite database, relationship graph, readable overview, decision/flow/change records, and dashboard immediately. Later records and scans rebuild the derived views from the verified ledger.
+
+JavaScript callers can pass an `AbortSignal` to `appendEvent`, `readEvents`, and `rebuildDerivedState`. A cancelled writer-lock wait makes no durable change; once an append has crossed its irreversible log boundary, Qarinah finishes the matching identity and checkpoint metadata so the ledger remains recoverable.
 
 To preserve an exported Codex/Claude/portable JSONL archive on an external drive during setup, add explicit `--backup-source` and `--backup-destination` paths. Qarinah streams only JSONL/NDJSON files, enforces limits, rejects linked paths, verifies SHA-256 digests, writes an external manifest, and records a compact project receipt. See [External agent-archive backup](docs/AGENT-ARCHIVE-BACKUP.md).
 
@@ -520,10 +523,13 @@ Content-mode redaction cannot prove that arbitrary tool output contains no secre
 | `qarinah hook codex\|claude` | Normalize one supported host lifecycle event from stdin |
 | `qarinah scan` | Record a bounded project structure snapshot |
 | `qarinah build` | Verify and rebuild graph, index, and Markdown |
+| `qarinah map` | Search admitted memory and the repository map with temporal, repository, scope, and node-type filters |
 | `qarinah query` | Compile a coverage-aware, cited, budgeted context pack |
 | `qarinah export okf` | Build a deterministic Markdown interoperability bundle |
 | `qarinah doctor` / `qarinah status` | Verify integrity or inspect current state |
 | `qarinah untrust` | Revoke local capture permission without deleting project files |
+
+See [Linked project memory](docs/LINKED-PROJECT-MEMORY.md) for the ranking formula, access boundary, graph coverage limits, JavaScript API, and live dashboard endpoints.
 
 ## Benchmarks
 

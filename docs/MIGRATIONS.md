@@ -33,3 +33,9 @@ Qarinah graph schema `qarinah.graph.v2` keeps every v1 event node and relation e
 The event chain is unchanged. Run `qarinah build` to regenerate `graph/graph.json`, `index/index.json`, and `records/CONTEXT.md` from the verified log. A project structure does not appear until a trusted user explicitly runs `qarinah scan`.
 
 `qarinah scan` does not claim compiler or language-server equivalence. Version 1 records a bounded filesystem snapshot and conservative ECMAScript/TypeScript module and Markdown-link observations with exact source spans. Deeper AST symbol extraction remains separately versioned work.
+
+## Linked project memory v1
+
+Qarinah now derives `.qarinah/graph/linked-memory.json` alongside the existing graph, index, SQLite, and Markdown views. This is an additive, disposable `qarinah.linked-project-memory.v1` projection; the authoritative JSONL event contract is unchanged. Run `qarinah build` to create or repair it. Consumers can use `qarinah map` or the exported JavaScript APIs without migrating the ledger.
+
+Large valid ledgers remain supported. The linked view selects a deterministic bounded event and relation window and reports omitted coverage rather than rejecting a ledger that is valid under the existing store limits. Query consumers should inspect coverage, especially `authorityComplete`, before treating a scoped result set as complete.

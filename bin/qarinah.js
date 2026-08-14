@@ -20,6 +20,7 @@ import {
   loadIndex,
   loadWorkspace,
   measureMemoryFootprint,
+  queryLinkedProjectMemory,
   readEvents,
   rebuildDerivedState,
   renderProjectOverviewMarkdown,
@@ -277,6 +278,7 @@ Usage:
   qarinah query [text] [--format json|markdown|handoff] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp] [--minimum-coverage any|partial|direct] [--minimum-evidence any|partial|direct]
   qarinah query --stdin-json
   qarinah task-pack debugging|code-review|feature-implementation|database-migration|incident-response|release-preparation|security-review [query]
+  qarinah map [query] [--limit n] [--type memory,file,concept,directory,reference] [--repository id,...] [--scope id,...] [--as-of timestamp]
   qarinah freshness
   qarinah dashboard [--output <path>] [--baseline-tokens n --delivered-tokens n]
   qarinah dashboard --serve [--port 8777] [--project <initialized-project>]...
@@ -617,6 +619,28 @@ async function run(argv) {
     if (args.some((value) => value.startsWith("--"))) throw new TypeError("task-pack accepts a task name and optional query text only.");
     const pack = await compileTaskMemoryPack(task, values.slice(1).join(" "), { cwd: process.cwd() });
     process.stdout.write(`${JSON.stringify(pack, null, 2)}\n`);
+    return;
+  }
+  if (command === "map") {
+    const parsed = strictValueOptions(args, "map", ["--limit", "--type", "--repository", "--scope", "--as-of"]);
+    const limitText = parsed.values.get("--limit");
+    if (limitText !== undefined && (!/^[0-9]+$/u.test(limitText) || Number(limitText) < 1 || Number(limitText) > 100)) {
+      throw new TypeError("--limit must be an integer from 1 to 100.");
+    }
+    const typeText = parsed.values.get("--type");
+    const types = typeText === undefined ? undefined : typeText.split(",").map((value) => value.trim()).filter(Boolean);
+    const selectors = (name) => parsed.values.has(name)
+      ? parsed.values.get(name).split(",").map((value) => value.trim()).filter(Boolean)
+      : undefined;
+    const result = await queryLinkedProjectMemory(parsed.positionals.join(" "), {
+      cwd: process.cwd(),
+      limit: limitText === undefined ? undefined : Number(limitText),
+      types,
+      repositoryIds: selectors("--repository"),
+      authorityScopes: selectors("--scope"),
+      asOf: parsed.values.get("--as-of")
+    });
+    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
     return;
   }
   if (command === "freshness") {

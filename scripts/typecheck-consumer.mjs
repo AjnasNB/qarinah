@@ -56,12 +56,19 @@ try {
   await writeFile(path.join(temporaryDirectory, "consumer.ts"), [
     "import {",
     "  appendCockroachBrowserOutcome,",
+    "  appendEvent,",
     "  createCockroachBrowserMemorySink,",
     "  cockroachSourceRecordToAcquisitionEventInput,",
     "  createProductLoopProvenanceSink,",
     "  ingestCockroachSourceRecord,",
     "  importAgentArchive,",
     "  buildProjectOverview,",
+    "  buildLinkedProjectMemory,",
+    "  loadLinkedProjectMemory,",
+    "  queryLinkedProjectMemory,",
+    "  rankLinkedProjectMemory,",
+    "  readEvents,",
+    "  rebuildDerivedState,",
     "  renderProjectOverviewMarkdown,",
     "  initializeWorkspace,",
     "  inspectWorkspacePolicy,",
@@ -82,7 +89,9 @@ try {
     "  type QarinahCapturePolicy,",
     "  type QarinahOkfExportResult,",
     "  type QarinahAgentArchiveImportResult,",
-    "  type QarinahProjectOverview",
+    "  type QarinahProjectOverview,",
+    "  type QarinahLinkedProjectMemory,",
+    "  type QarinahLinkedProjectQuery",
     "} from \"qarinah\";",
     "import type { QarinahBrowserSink as PublicCockroachBrowserSink } from \"cockroach-browser/qarinah\";",
     "import { captureCodexHook } from \"qarinah/codex\";",
@@ -96,6 +105,18 @@ try {
     "const projectOverview: Promise<QarinahProjectOverview> = buildProjectOverview();",
     "void projectOverview;",
     "void renderProjectOverviewMarkdown;",
+    "void buildLinkedProjectMemory;",
+    "void loadLinkedProjectMemory;",
+    "void rankLinkedProjectMemory;",
+    "const linkedQuery: Promise<QarinahLinkedProjectQuery> = queryLinkedProjectMemory('release policy', { persist: false, updateCheckpoint: false });",
+    "const linkedCoverage: Promise<boolean> = linkedQuery.then((result) => result.coverage.projectionComplete && result.coverage.authorityComplete);",
+    "void linkedCoverage;",
+    "const linkedMemory: QarinahLinkedProjectMemory | null = null;",
+    "void linkedMemory;",
+    "const cancellation = new AbortController();",
+    "void appendEvent({ kind: 'decision', title: 'cancel-safe append' }, { signal: cancellation.signal });",
+    "void readEvents('.', { signal: cancellation.signal });",
+    "void rebuildDerivedState('.', { signal: cancellation.signal });",
     "const requestedPolicy: Promise<QarinahCapturePolicy> = inspectWorkspacePolicy();",
     "void requestedPolicy;",
     "void approveWorkspaceTrust;",
@@ -206,6 +227,16 @@ try {
     path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "cockroach-browser-memory.schema.json"),
     "utf8"
   );
+  assert.equal(
+    installedPackage.exports["./schemas/linked-project-memory.json"],
+    "./schemas/linked-project-memory.schema.json"
+  );
+  assert.equal(
+    installedPackage.exports["./schemas/linked-project-query.json"],
+    "./schemas/linked-project-query.schema.json"
+  );
+  await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "linked-project-memory.schema.json"), "utf8");
+  await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "linked-project-query.schema.json"), "utf8");
   process.stdout.write("Exact cockroach-browser@0.1.0 TypeScript and registry-integrity contract passed.\n");
 } finally {
   await rm(temporaryDirectory, { recursive: true, force: true });

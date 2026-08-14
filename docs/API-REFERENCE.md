@@ -293,11 +293,12 @@ function appendEvent(
     clock?: () => Date;
     randomUUID?: () => string;
     idempotent?: boolean;
+    signal?: AbortSignal;
   }
 ): Promise<QarinahEvent>;
 ```
 
-Appends one event under the renewable writer lock after verifying workspace trust, the log tail, the machine checkpoint, limits, capture policy, and event identity.
+Appends one event under the renewable writer lock after verifying workspace trust, the log tail, the machine checkpoint, limits, capture policy, and event identity. `signal` can cancel before or while waiting for the writer lock. Cancellation is checked again immediately before the irreversible log append; after that append begins, Qarinah completes its event-ID and trust-checkpoint metadata so the ledger remains recoverable.
 
 ```js
 const event = await appendEvent({
@@ -319,11 +320,12 @@ function readEvents(
   options?: {
     skipCheckpoint?: boolean;
     updateCheckpoint?: boolean;
+    signal?: AbortSignal;
   }
 ): Promise<QarinahEvent[]>;
 ```
 
-Reads and verifies the bounded canonical log. Normal application reads should not skip checkpoint verification.
+Reads and verifies the bounded canonical log. Normal application reads should not skip checkpoint verification. `signal` cancels a pending checkpoint-lock wait and is checked before any checkpoint reconciliation.
 
 ### `verifyStore(start?, options?)`
 
@@ -359,17 +361,20 @@ function buildDerivedState(
 
 Purely derives the versioned graph and local retrieval index from already validated events.
 
-### `rebuildDerivedState(start?)`
+### `rebuildDerivedState(start?, options?)`
 
 ```ts
-function rebuildDerivedState(start?: string): Promise<{
+function rebuildDerivedState(
+  start?: string,
+  options?: { signal?: AbortSignal }
+): Promise<{
   workspaceId: string;
   eventCount: number;
   headHash: string | null;
 }>;
 ```
 
-Verifies the canonical record and atomically replaces deterministic graph, index, Markdown, event-ID, and SQLite projections.
+Verifies the canonical record and atomically replaces deterministic graph, index, Markdown, event-ID, and SQLite projections. `signal` can cancel lock waiting and derivation before replacement starts. Once the replacement set begins, Qarinah completes it rather than intentionally leaving a partially cancelled set.
 
 ### SQLite read-model APIs
 
@@ -677,6 +682,62 @@ Records a bounded structural snapshot under the trusted root. It respects ignore
 
 The associated schema is exported as `qarinah/schemas/project-structure.json`.
 
+## Linked project memory
+
+```ts
+const LINKED_PROJECT_MEMORY_SCHEMA_VERSION: "qarinah.linked-project-memory.v1";
+const LINKED_PROJECT_QUERY_SCHEMA_VERSION: "qarinah.linked-project-query.v1";
+
+function buildLinkedProjectMemory(
+  events: QarinahEvent[],
+  workspaceId: string,
+  options?: {
+    asOf?: string;
+    authorityScopes?: string[];
+    repositoryIds?: string[];
+  }
+): QarinahLinkedProjectMemory;
+
+function rankLinkedProjectMemory(
+  memory: QarinahLinkedProjectMemory,
+  query?: string,
+  options?: {
+    limit?: number;
+    asOf?: string;
+    types?: QarinahLinkedProjectNodeType[];
+    authorityScopes?: string[];
+    repositoryIds?: string[];
+  }
+): QarinahLinkedProjectQuery;
+
+function loadLinkedProjectMemory(start?: string, options?: {
+  rebuild?: boolean;
+  persist?: boolean;
+  updateCheckpoint?: boolean;
+}): Promise<Readonly<{
+  workspace: QarinahWorkspace;
+  memory: QarinahLinkedProjectMemory;
+}>>;
+
+function queryLinkedProjectMemory(query?: string, options?: {
+  cwd?: string;
+  rebuild?: boolean;
+  persist?: boolean;
+  updateCheckpoint?: boolean;
+  limit?: number;
+  asOf?: string;
+  types?: QarinahLinkedProjectNodeType[];
+  authorityScopes?: string[];
+  repositoryIds?: string[];
+}): Promise<QarinahLinkedProjectQuery>;
+```
+
+The projection is derived from verified events and the latest strictly validated project-structure snapshot. Supplying `asOf`, `authorityScopes`, or `repositoryIds` to `buildLinkedProjectMemory` applies those admission boundaries before the bounded event window. `queryLinkedProjectMemory` always uses that query-local selection, so future, restricted, or other-repository events cannot consume slots that would otherwise hold admitted evidence. Ranking is deterministic and exposes its local, one-hop linked, and structural score components. Admission, temporal status, supersession, conflict, degree, concept counts, and structural importance are projected from the admitted as-of subgraph; excluded evidence cannot contribute to returned metadata or scores.
+
+The projection carries explicit coverage for bounded event, relation, file-reference, and source-profile processing. In every query, `projectedEvents` counts admitted as-of event nodes, `omittedEvents` counts events outside the bounded source window, and `sourceEvents` is their conservative sum. `projectionComplete` is false when any event, relation, or file-reference projection was truncated. The query reports `authorityComplete: false` when a selector cannot be evaluated completely from a bounded source-profile set. A missing result is exhaustive only when both flags are `true`. `persist: false` derives and verifies the view in memory without writing its projection; `updateCheckpoint: false` also leaves the machine-local verification checkpoint unchanged. The loopback dashboard uses both options for read-only HTTP requests.
+
+The strict contracts are exported as `qarinah/schemas/linked-project-memory.json` and `qarinah/schemas/linked-project-query.json`. See [Linked project memory](LINKED-PROJECT-MEMORY.md) for CLI examples, formula details, limits, and privacy guidance.
+
 ## OKF export
 
 ### `exportOkf(options?)`
@@ -805,9 +866,9 @@ function serveMemoryDashboard(options?: {
 }>>;
 ```
 
-`buildMemoryDashboard` verifies the local ledger and returns a frozen `qarinah.memory-dashboard.v2` view without writing a file. Its workspace block identifies the real project root, workspace ID, retained repository IDs, event count, latest activity, and current ledger-head hash. `renderMemoryDashboard` turns a compatible view into self-contained HTML. `writeMemoryDashboard` writes that HTML atomically to `.qarinah/dashboard/index.html` by default. `serveMemoryDashboard` binds only to loopback and rereads one or more explicitly selected, separately authorized local projects; it does not discover or merge workspaces.
+`buildMemoryDashboard` verifies the local ledger and returns a frozen `qarinah.memory-dashboard.v2` view without writing a file. Its workspace block identifies the real project root, workspace ID, retained repository IDs, event count, latest activity, and current ledger-head hash. `renderMemoryDashboard` turns a compatible view into self-contained HTML. `writeMemoryDashboard` writes that HTML atomically to `.qarinah/dashboard/index.html` by default. `serveMemoryDashboard` binds only to loopback and rereads one or more explicitly selected, separately authorized local projects; it does not discover or merge workspaces. Its `/api/graph/<workspace-id>` and `/api/search/<workspace-id>` routes are read-only and do not update the ledger, projection, or verification checkpoint.
 
-The view contains workspace and capture metadata, totals, decisions with explicit reasons/outcomes/alternatives/linked tools, bounded execution flow, tool activity, major changes, explicit conflicts, source-linked events, the latest 100 permitted activity events, affected files from the latest project-structure scan, durable-record paths, and an evidence-labeled local context comparison. By default, the comparison uses a retained compact-import receipt when present or canonical characters in the verified authoritative ledger, then compares that portable estimate with the generated task pack. Explicit snapshot token estimates override the automatic basis and must be supplied together. None of these functions infers provider billing or modifies the authoritative ledger; only `serveMemoryDashboard` starts a loopback HTTP server.
+The view contains workspace and capture metadata, totals, decisions with explicit reasons/outcomes/alternatives/linked tools, bounded execution flow, tool activity, major changes, explicit conflicts, source-linked events, the latest 100 permitted activity events, affected files from the latest project-structure scan, an accessible linked-memory graph, durable-record paths, and an evidence-labeled local context comparison. Live ranked search shows its exact score basis and can return admitted nodes omitted from the compact visual graph. By default, the comparison uses a retained compact-import receipt when present or canonical characters in the verified authoritative ledger, then compares that portable estimate with the generated task pack. Explicit snapshot token estimates override the automatic basis and must be supplied together. None of these functions infers provider billing or modifies the authoritative ledger; only `serveMemoryDashboard` starts a loopback HTTP server.
 
 `writeProjectOverview(options?)` writes the deterministic beginner-readable overview to `.qarinah/records/OVERVIEW.md` by default and returns both the resolved path and typed overview. `setupWorkspace` now initializes this overview, `DECISIONS.md`, `FLOW.md`, `CHANGES.md`, SQLite, the graph, and the local dashboard in one run.
 

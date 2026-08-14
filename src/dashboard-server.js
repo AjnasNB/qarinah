@@ -1,6 +1,7 @@
 import { createServer } from "node:http";
 import path from "node:path";
 import { buildMemoryDashboard, renderMemoryDashboard } from "./dashboard.js";
+import { queryLinkedProjectMemory } from "./linked-memory.js";
 import { loadWorkspace, openSecureReadFile } from "./workspace.js";
 
 const MAX_PROJECTS = 32;
@@ -117,6 +118,46 @@ export async function serveMemoryDashboard(options = {}) {
         send(response, 200, "application/json; charset=utf-8", `${JSON.stringify(await liveStatus(project))}\n`, method);
         return;
       }
+      const graphMatch = /^\/api\/graph\/(ws_[0-9a-f]{32})$/u.exec(url.pathname);
+      if (graphMatch) {
+        const project = projectById.get(graphMatch[1]);
+        if (!project) {
+          send(response, 404, "application/json; charset=utf-8", '{"error":"not_found"}\n', method);
+          return;
+        }
+        const data = await buildMemoryDashboard({ cwd: project.root });
+        send(response, 200, "application/json; charset=utf-8", `${JSON.stringify(data.linkedGraph)}\n`, method);
+        return;
+      }
+      const searchMatch = /^\/api\/search\/(ws_[0-9a-f]{32})$/u.exec(url.pathname);
+      if (searchMatch) {
+        const project = projectById.get(searchMatch[1]);
+        if (!project) {
+          send(response, 404, "application/json; charset=utf-8", '{"error":"not_found"}\n', method);
+          return;
+        }
+        const query = url.searchParams.get("q") ?? "";
+        const limitText = url.searchParams.get("limit") ?? "20";
+        const typeText = url.searchParams.get("type");
+        if (query.length > 4_096 || !/^[0-9]+$/u.test(limitText) || Number(limitText) < 1 || Number(limitText) > 100) {
+          send(response, 400, "application/json; charset=utf-8", '{"error":"invalid_query"}\n', method);
+          return;
+        }
+        const types = typeText === null ? undefined : typeText.split(",").filter(Boolean);
+        if (types?.some((type) => !["memory", "file", "directory", "concept", "reference"].includes(type))) {
+          send(response, 400, "application/json; charset=utf-8", '{"error":"invalid_type"}\n', method);
+          return;
+        }
+        const result = await queryLinkedProjectMemory(query, {
+          cwd: project.root,
+          limit: Number(limitText),
+          types,
+          persist: false,
+          updateCheckpoint: false
+        });
+        send(response, 200, "application/json; charset=utf-8", `${JSON.stringify(result)}\n`, method);
+        return;
+      }
       const projectMatch = /^\/project\/(ws_[0-9a-f]{32})\/$/u.exec(url.pathname);
       if (projectMatch && WORKSPACE_ID.test(projectMatch[1])) {
         const project = projectById.get(projectMatch[1]);
@@ -128,6 +169,7 @@ export async function serveMemoryDashboard(options = {}) {
         send(response, 200, "text/html; charset=utf-8", renderMemoryDashboard(data, {
           live: true,
           liveStatusPath: `/api/status/${project.workspaceId}`,
+          searchPath: `/api/search/${project.workspaceId}`,
           projects
         }), method);
         return;

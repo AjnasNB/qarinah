@@ -220,6 +220,8 @@ export const OKF_VERSION: "0.1";
 export const CONFIG_SCHEMA_VERSION: "qarinah.config.v1";
 export const INDEX_SCHEMA_VERSION: "qarinah.index.v2";
 export const GRAPH_SCHEMA_VERSION: "qarinah.graph.v2";
+export const LINKED_PROJECT_MEMORY_SCHEMA_VERSION: "qarinah.linked-project-memory.v1";
+export const LINKED_PROJECT_QUERY_SCHEMA_VERSION: "qarinah.linked-project-query.v1";
 export const PROJECT_STRUCTURE_SCHEMA_VERSION: "qarinah.project-structure.v1";
 export const SQLITE_READ_MODEL_SCHEMA_VERSION: 1;
 export const SQLITE_READ_MODEL_FILENAME: "qarinah.db";
@@ -236,17 +238,17 @@ export function resolveWithin(root: string, ...segments: string[]): string;
 export function secureStoragePath(workspace: QarinahWorkspace, segments: string[], options?: { allowMissing?: boolean; type?: "file" | "directory" }): Promise<string>;
 export function createEventEnvelope(input: QarinahEventInput, options: { workspaceId: string; previousHash?: string | null; maximumEventBytes?: number; clock?: () => Date; randomUUID?: () => string }): QarinahEvent;
 export function validateStoredEvent(value: unknown, options?: { expectedPreviousHash?: string | null; workspaceId?: string; maximumEventBytes?: number }): QarinahEvent;
-export function appendEvent(input: QarinahEventInput, options?: { cwd?: string; workspace?: QarinahWorkspace; capture?: "metadata" | "content"; clock?: () => Date; randomUUID?: () => string; idempotent?: boolean }): Promise<QarinahEvent>;
+export function appendEvent(input: QarinahEventInput, options?: { cwd?: string; workspace?: QarinahWorkspace; capture?: "metadata" | "content"; clock?: () => Date; randomUUID?: () => string; idempotent?: boolean; signal?: AbortSignal }): Promise<QarinahEvent>;
 export function inspectWorkspacePolicy(start?: string): Promise<QarinahCapturePolicy>;
 export function approveWorkspaceTrust(start: string | undefined, expectedCapture: "metadata" | "content", expectedPolicyHash: `sha256:${string}`): Promise<{ root: string; workspaceId: string; capture: "metadata" | "content"; policyHash: `sha256:${string}`; trusted: true; eventCount: number; headHash: string | null }>;
-export function readEvents(workspaceOrStart?: QarinahWorkspace | string, options?: { skipCheckpoint?: boolean; updateCheckpoint?: boolean }): Promise<QarinahEvent[]>;
+export function readEvents(workspaceOrStart?: QarinahWorkspace | string, options?: { skipCheckpoint?: boolean; updateCheckpoint?: boolean; signal?: AbortSignal }): Promise<QarinahEvent[]>;
 export function verifyStore(start?: string, options?: { updateCheckpoint?: boolean; includeRoot?: boolean }): Promise<{ ok: true; workspaceId: string; eventCount: number; headHash: string | null; capture: string; root?: string }>;
-export function rebuildDerivedState(start?: string): Promise<{ workspaceId: string; eventCount: number; headHash: string | null; readModel: Readonly<Record<string, unknown>> }>;
+export function rebuildDerivedState(start?: string, options?: { signal?: AbortSignal }): Promise<{ workspaceId: string; eventCount: number; headHash: string | null; linkedMemory: Readonly<Record<string, number>>; readModel: Readonly<Record<string, unknown>> }>;
 export function rebuildSqliteReadModel(workspace: QarinahWorkspace, events: QarinahEvent[], derived: { index: unknown; graph: unknown }): Promise<Readonly<Record<string, unknown>>>;
 export function inspectSqliteReadModel(workspace: QarinahWorkspace): Promise<Readonly<Record<string, unknown>>>;
 export function querySqliteReadModel(workspace: QarinahWorkspace, query: string, options?: { headHash?: string | null; limit?: number }): Promise<Readonly<{ schemaVersion: number; candidates: Array<{ eventId: string; rank: number }> }>>;
 export function loadIndex(start?: string, options?: { rebuild?: boolean; updateCheckpoint?: boolean; inMemory?: boolean }): Promise<{ workspace: QarinahWorkspace; index: unknown }>;
-export function buildDerivedState(events: QarinahEvent[], workspaceId: string): { index: unknown; graph: unknown };
+export function buildDerivedState(events: QarinahEvent[], workspaceId: string): { index: unknown; graph: unknown; linkedMemory: QarinahLinkedProjectMemory };
 export function tokenize(value: unknown): string[];
 export function compileContext(query?: string, options?: {
   cwd?: string;
@@ -393,6 +395,8 @@ export function measureMemoryFootprint(options?: {
   maxTokens?: number;
   baselineTokens?: number;
   ratePerMillion?: number;
+  inMemory?: boolean;
+  updateCheckpoint?: boolean;
 }): Promise<Readonly<QarinahMemoryFootprint>>;
 export interface QarinahProjectOverview {
   readonly schemaVersion: "qarinah.project-overview.v1";
@@ -502,6 +506,176 @@ export function rerankContextPack(
 ): Promise<QarinahContextPack & {
   semanticRerank?: { adapter: string; candidateCount: number; scoredCount: number; authority: "rerank-only" };
 }>;
+export type QarinahLinkedProjectNodeType = "memory" | "file" | "directory" | "concept" | "reference";
+export interface QarinahLinkedProjectSourceProfile {
+  readonly sourceNodeId: string;
+  readonly sourceEventId: string | null;
+  readonly evidenceHash: `sha256:${string}` | null;
+  readonly contentHash: `sha256:${string}` | null;
+  readonly classification: "public" | "workspace" | "restricted" | "derived";
+  readonly disclosureScopes: readonly string[];
+  readonly repositoryId: string | null;
+  readonly validFrom: string | null;
+  readonly validUntil: string | null;
+  readonly expiresAt: string | null;
+}
+export interface QarinahLinkedProjectNode {
+  readonly id: string;
+  readonly type: QarinahLinkedProjectNodeType;
+  readonly kind: string;
+  readonly label: string;
+  readonly path: string | null;
+  readonly language: string | null;
+  readonly timestamp: string | null;
+  readonly validFrom: string | null;
+  readonly validUntil: string | null;
+  readonly expiresAt: string | null;
+  readonly confidence: QarinahConfidence;
+  readonly status: "current" | "superseded";
+  readonly supersededBy: readonly string[];
+  readonly conflicted: boolean;
+  readonly repositoryId: string | null;
+  readonly disclosureScopes: readonly string[];
+  readonly classification: "public" | "workspace" | "restricted" | "derived";
+  readonly sourceProfiles: readonly QarinahLinkedProjectSourceProfile[];
+  readonly sourceProfileCount?: number;
+  readonly sourceProfilesTruncated?: boolean;
+  readonly sourceEventId: string | null;
+  readonly evidenceHash: `sha256:${string}` | null;
+  readonly contentHash: `sha256:${string}` | null;
+  readonly documentFrequency?: number;
+  readonly terms: readonly Readonly<{ term: string; count: number }>[];
+  readonly signature: readonly Readonly<{ term: string; weight: number }>[];
+  readonly importance: number;
+  readonly repositoryRank: number;
+  readonly incoming: number;
+  readonly outgoing: number;
+}
+export interface QarinahLinkedProjectEdge {
+  readonly source: string;
+  readonly type: string;
+  readonly target: string;
+  readonly sourceEventId: string | null;
+  readonly evidenceHash: `sha256:${string}` | null;
+  readonly confidence: QarinahConfidence;
+  readonly weight: number;
+  readonly occurrenceCount: number;
+}
+export interface QarinahLinkedProjectMemory {
+  readonly schemaVersion: "qarinah.linked-project-memory.v1";
+  readonly workspaceId: string;
+  readonly eventCount: number;
+  readonly headHash: `sha256:${string}` | null;
+  readonly source: Readonly<{
+    ledger: ".qarinah/events/events.jsonl";
+    projectSnapshotHash: `sha256:${string}` | null;
+    projectSourceEventId: string | null;
+  }>;
+  readonly coverage: Readonly<{
+    sourceEvents: number;
+    projectedEvents: number;
+    omittedEvents: number;
+    sourceRelations: number;
+    projectedRelations: number;
+    omittedRelations: number;
+    sourceFileReferences: number;
+    projectedFileReferences: number;
+    omittedFileReferences: number;
+    complete: boolean;
+  }>;
+  readonly statistics: Readonly<Record<"nodes" | "edges" | "memories" | "files" | "directories" | "concepts" | "conflicts" | "superseded", number>>;
+  readonly timeline: readonly string[];
+  readonly repositoryMap: Readonly<{
+    method: "bounded-link-rank-v1";
+    iterations: 24;
+    damping: 0.85;
+    entries: readonly Readonly<{
+      id: string;
+      path: string;
+      language: string;
+      contentHash: `sha256:${string}` | null;
+      rank: number;
+      incoming: number;
+      outgoing: number;
+      dependencies: readonly string[];
+      dependents: readonly string[];
+    }>[];
+    entrypoints: readonly string[];
+  }>;
+  readonly nodes: readonly QarinahLinkedProjectNode[];
+  readonly edges: readonly QarinahLinkedProjectEdge[];
+  readonly manifestHash: `sha256:${string}`;
+}
+export interface QarinahLinkedProjectQuery {
+  readonly schemaVersion: "qarinah.linked-project-query.v1";
+  readonly workspaceId: string;
+  readonly sourceManifestHash: `sha256:${string}`;
+  readonly sourceHeadHash: `sha256:${string}` | null;
+  readonly query: string;
+  readonly asOf: string;
+  readonly requestedTypes: readonly QarinahLinkedProjectNodeType[];
+  readonly authorityScopes: readonly string[];
+  readonly repositoryIds: readonly string[];
+  readonly filters: Readonly<{ excluded: number }>;
+  readonly coverage: Readonly<{
+    queryTerms: readonly string[];
+    matchedTerms: readonly string[];
+    ratio: number;
+    status: "browse" | "direct" | "partial" | "none";
+    sourceEvents: number;
+    projectedEvents: number;
+    omittedEvents: number;
+    projectionComplete: boolean;
+    authorityComplete: boolean;
+  }>;
+  readonly items: readonly Readonly<{
+    rank: number;
+    score: number;
+    basis: Readonly<{
+      localSemantic: number;
+      linkedEvidence: number;
+      structuralImportance: number;
+      formula: string;
+    }>;
+    node: QarinahLinkedProjectNode;
+    statusAtAsOf: "current" | "superseded";
+    evidence: Readonly<{
+      sourceEventId: string | null;
+      hash: `sha256:${string}` | null;
+      contentHash: `sha256:${string}` | null;
+    }>;
+    neighbors: readonly string[];
+  }>[];
+  readonly manifestHash: `sha256:${string}`;
+}
+export function buildLinkedProjectMemory(events: QarinahEvent[], workspaceId: string, options?: {
+  asOf?: string;
+  authorityScopes?: string[];
+  repositoryIds?: string[];
+}): QarinahLinkedProjectMemory;
+export function loadLinkedProjectMemory(start?: string, options?: {
+  rebuild?: boolean;
+  persist?: boolean;
+  updateCheckpoint?: boolean;
+}): Promise<Readonly<{ workspace: QarinahWorkspace; memory: QarinahLinkedProjectMemory }>>;
+export function rankLinkedProjectMemory(memory: QarinahLinkedProjectMemory, query?: string, options?: {
+  limit?: number;
+  asOf?: string;
+  types?: QarinahLinkedProjectNodeType[];
+  authorityScopes?: string[];
+  repositoryIds?: string[];
+}): QarinahLinkedProjectQuery;
+export function queryLinkedProjectMemory(query?: string, options?: {
+  cwd?: string;
+  rebuild?: boolean;
+  persist?: boolean;
+  updateCheckpoint?: boolean;
+  limit?: number;
+  asOf?: string;
+  types?: QarinahLinkedProjectNodeType[];
+  authorityScopes?: string[];
+  repositoryIds?: string[];
+}): Promise<QarinahLinkedProjectQuery>;
 export function compileFederatedContext(query: string, options: {
   workspaces: Array<{
     cwd: string;
@@ -673,6 +847,31 @@ export interface QarinahMemoryDashboard {
   citations: Record<string, unknown>[];
   activity: Record<string, unknown>[];
   affectedFiles: Record<string, unknown>[];
+  linkedGraph: Readonly<{
+    schemaVersion: "qarinah.linked-project-memory.v1";
+    manifestHash: `sha256:${string}`;
+    statistics: Readonly<Record<string, number>>;
+    nodes: readonly Readonly<{
+      id: string;
+      type: QarinahLinkedProjectNodeType;
+      kind: string;
+      label: string;
+      path: string | null;
+      timestamp: string | null;
+      confidence: QarinahConfidence;
+      status: "current" | "superseded";
+      conflicted: boolean;
+      importance: number;
+      repositoryRank: number;
+      incoming: number;
+      outgoing: number;
+      sourceEventId: string | null;
+      evidenceHash: `sha256:${string}` | null;
+      contentHash: `sha256:${string}` | null;
+      terms: readonly string[];
+    }>[];
+    edges: readonly QarinahLinkedProjectEdge[];
+  }>;
 }
 export function buildMemoryDashboard(options?: {
   cwd?: string;

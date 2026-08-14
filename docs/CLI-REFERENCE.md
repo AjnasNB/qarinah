@@ -62,6 +62,7 @@ qarinah scan [options]
 qarinah build
 qarinah import <archive-file-or-directory> [options]
 qarinah overview [--format json|markdown]
+qarinah map [query] [--limit n] [--type memory,file,concept,directory,reference] [--repository id,...] [--scope id,...] [--as-of timestamp]
 qarinah query [text] [options]
 qarinah query --stdin-json
 qarinah context [text] [options]
@@ -393,6 +394,25 @@ The result includes:
 - optional `changes` containing added, changed, deleted, and renamed paths
 
 If a new snapshot is captured, the CLI rebuilds derived state before returning.
+
+## `map`
+
+Search the bounded linked-memory and repository-map projection.
+
+```sh
+qarinah map [query] \
+  [--limit <1-100>] \
+  [--type <memory,file,concept,directory,reference>] \
+  [--repository <id,...>] \
+  [--scope <id,...>] \
+  [--as-of <timestamp>]
+```
+
+`--type`, `--repository`, and `--scope` accept comma-separated values. `--as-of` applies temporal validity and supersession at the supplied canonical timestamp. Restricted records require a matching disclosure scope. Repository selectors exclude identified records from other repositories. Results include evidence identities and the exact `localSemantic`, `linkedEvidence`, and `structuralImportance` score components. In coverage, `projectedEvents` counts admitted as-of event nodes, `omittedEvents` counts events outside the bounded source window, and `sourceEvents` is their conservative sum. `projectionComplete` and `authorityComplete` are separate. Treat an absent match as exhaustive only when both flags are `true`.
+
+Admission is applied before the event window is bounded. A future, restricted, or other-repository event therefore cannot consume a slot that would otherwise hold an admitted event.
+
+Run `qarinah scan` before `map` when file and directory results are required. The linked view remains disposable derived state and `qarinah build` can regenerate it from the verified event record.
 
 ## `build` and `rebuild`
 

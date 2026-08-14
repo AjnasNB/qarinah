@@ -3,6 +3,7 @@ import { constants } from "node:fs";
 import { lstat, mkdir, open, readdir, rename, rm, rmdir, utimes } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { abortableDelay, throwIfAborted, validateAbortSignal } from "./abort.js";
 import { canonicalStringify, sha256 } from "./canonical.js";
 import { isReviewedMetadataEventInput } from "./capture-policy.js";
 import {
@@ -436,13 +437,16 @@ async function rebuildTrustedEventIdProjection(workspace) {
   });
 }
 
-export async function acquireWorkspaceWriteLock(workspace) {
+export async function acquireWorkspaceWriteLock(workspace, options = {}) {
+  const signal = validateAbortSignal(options.signal);
+  throwIfAborted(signal);
   const locksDirectory = await secureStoragePath(workspace, ["locks"], { type: "directory" });
   const lockPath = resolveWithin(locksDirectory, "append.lock");
   const ownerToken = randomUUID();
   const ownerName = `owner-${ownerToken}.json`;
   const ownerPath = resolveWithin(lockPath, ownerName);
   for (let attempt = 0; attempt < 200; attempt += 1) {
+    throwIfAborted(signal);
     try {
       await mkdir(lockPath);
       try {
@@ -537,6 +541,7 @@ export async function acquireWorkspaceWriteLock(workspace) {
         if (Date.now() - heartbeatMtime > LOCK_STALE_MS && !locallyAlive) {
           const latest = owner ? await lstat(owner.ownerPath) : await lstat(lockPath);
           if (latest.mtimeMs !== heartbeatMtime) continue;
+          throwIfAborted(signal);
           const stalePath = resolveWithin(locksDirectory, `append.lock.stale-${ownerToken}-${attempt}`);
           await rename(lockPath, stalePath);
           await rm(stalePath, { recursive: true, force: true });
@@ -546,7 +551,7 @@ export async function acquireWorkspaceWriteLock(workspace) {
         if (!["ENOENT", "EEXIST"].includes(inspectionError?.code)
           && !isTransientWindowsLockError(inspectionError)) throw inspectionError;
       }
-      await delay(25 + Math.min(attempt, 20) * 5);
+      await abortableDelay(25 + Math.min(attempt, 20) * 5, signal);
     }
   }
   throw new QarinahError("STORE_BUSY", "Timed out waiting for the Context Ledger append lock.");
@@ -669,6 +674,8 @@ function workspaceRootLocator(value, label) {
 }
 
 async function readEventsFromWorkspace(workspace, options = {}) {
+  const signal = validateAbortSignal(options.signal);
+  throwIfAborted(signal);
   let opened;
   try {
     opened = await openSecureReadFile(workspace, ["events", "events.jsonl"]);
@@ -690,6 +697,7 @@ async function readEventsFromWorkspace(workspace, options = {}) {
   } finally {
     await opened.handle.close();
   }
+  throwIfAborted(signal);
   if (contents !== "" && !contents.endsWith("\n")) {
     throw new QarinahError("EVENT_LOG_NON_CANONICAL", "Event log must end with a newline.");
   }
@@ -726,6 +734,7 @@ async function readEventsFromWorkspace(workspace, options = {}) {
     }
   }
   if (options.skipCheckpoint !== true) {
+    throwIfAborted(signal);
     await reconcileCheckpoint(workspace, events, opened.metadata.size, { updateCheckpoint: options.updateCheckpoint !== false });
   }
   if (options.includeLogMetadata === true) {
@@ -740,17 +749,20 @@ async function readEventsFromWorkspace(workspace, options = {}) {
 }
 
 export async function readEvents(workspaceOrStart = process.cwd(), options = {}) {
+  const signal = validateAbortSignal(options.signal);
+  throwIfAborted(signal);
   const start = typeof workspaceOrStart === "string"
     ? workspaceOrStart
     : workspaceRootLocator(workspaceOrStart, "workspace");
   let workspace = await loadWorkspace(start);
   if (options.updateCheckpoint === false || options.skipCheckpoint === true) {
-    return readEventsFromWorkspace(workspace, options);
+    return readEventsFromWorkspace(workspace, { ...options, signal });
   }
-  const release = await acquireWorkspaceWriteLock(workspace);
+  const release = await acquireWorkspaceWriteLock(workspace, { signal });
   try {
+    throwIfAborted(signal);
     workspace = await loadWorkspace(workspace.root);
-    return await readEventsFromWorkspace(workspace, options);
+    return await readEventsFromWorkspace(workspace, { ...options, signal });
   } finally {
     await release();
   }
@@ -850,13 +862,17 @@ function createCapturedEvent(input, workspace, previousHash, options, capture, r
 }
 
 export async function appendEvent(input, options = {}) {
+  const signal = validateAbortSignal(options.signal);
+  throwIfAborted(signal);
   const start = options.workspace
     ? workspaceRootLocator(options.workspace, "options.workspace")
     : (options.cwd || process.cwd());
   let workspace = await loadWorkspace(start);
   await injectStoreFault(options, "after-initial-workspace-load", { workspaceId: workspace.config.workspaceId });
-  const release = await acquireWorkspaceWriteLock(workspace);
+  throwIfAborted(signal);
+  const release = await acquireWorkspaceWriteLock(workspace, { signal });
   try {
+    throwIfAborted(signal);
     // The portable policy may have changed while this append waited for the
     // lock. Reload both config and its machine-local permit before deciding
     // whether content or a reviewed metadata projection is authorized.
@@ -866,7 +882,8 @@ export async function appendEvent(input, options = {}) {
     let head = await readHeadEvent(workspace);
     let consent = await readWorkspaceConsent(workspace.root, workspace.config);
     if (head.size !== consent.checkpoint.logBytes || (head.event?.hash ?? null) !== consent.checkpoint.headHash) {
-      await readEventsFromWorkspace(workspace);
+      throwIfAborted(signal);
+      await readEventsFromWorkspace(workspace, { signal });
       head = await readHeadEvent(workspace);
       consent = await readWorkspaceConsent(workspace.root, workspace.config);
     }
@@ -875,6 +892,7 @@ export async function appendEvent(input, options = {}) {
       trustedProjection = await loadTrustedEventIdManifest(workspace, consent.checkpoint);
     } catch (error) {
       if (!["ENOENT", "EVENT_ID_INDEX_INVALID", "EVENT_ID_INDEX_MISMATCH"].includes(error?.code)) throw error;
+      throwIfAborted(signal);
       ({ head, consent, trustedProjection } = await rebuildTrustedEventIdProjection(workspace));
     }
     const previousHash = head.event?.hash ?? null;
@@ -884,6 +902,7 @@ export async function appendEvent(input, options = {}) {
       existing = await loadIndexedEvent(workspace, trustedProjection.manifest, event.eventId);
     } catch (error) {
       if (!["ENOENT", "EVENT_ID_INDEX_INVALID", "EVENT_ID_INDEX_MISMATCH"].includes(error?.code)) throw error;
+      throwIfAborted(signal);
       ({ head, consent, trustedProjection } = await rebuildTrustedEventIdProjection(workspace));
       event = createCapturedEvent(
         { ...input, eventId: event.eventId, timestamp: event.timestamp },
@@ -925,6 +944,9 @@ export async function appendEvent(input, options = {}) {
       if (confirmedHead.size !== head.size || (confirmedHead.event?.hash ?? null) !== (head.event?.hash ?? null)) {
         throw new QarinahError("STORAGE_RACE_DETECTED", "The authoritative event log head changed between verification and append.");
       }
+      // Cancellation is honored until the first irreversible append. Once the
+      // log changes, recovery metadata must finish so the ledger stays usable.
+      throwIfAborted(signal);
       await opened.handle.writeFile(line, "utf8");
       await opened.handle.sync();
       const finalStat = await opened.handle.stat({ bigint: true });

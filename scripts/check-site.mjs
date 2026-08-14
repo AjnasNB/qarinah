@@ -423,10 +423,10 @@ for (const launchDirectoryMarkup of [
 }
 for (const requiredAlternative of [
   "Qarinah alternatives and coding-agent memory comparison",
-  "Mem0",
+  "Application personalization memory",
   "Letta",
   "LangMem and LangGraph memory",
-  "Graphiti and Zep",
+  "General temporal knowledge graph",
   "GitHub Copilot Memory",
   "Claude Code memory",
   "Cursor Memories",
@@ -442,7 +442,7 @@ if (!alternatives.includes('"@type":"ItemList"')
   || !alternatives.includes('"@type":"FAQPage"')) {
   errors.push("Alternatives page is missing unordered comparison or answer-oriented structured data.");
 }
-const alternativesClaimCopy = alternatives.replaceAll("Is Qarinah better than Mem0, Letta, LangMem, or Graphiti?", "");
+const alternativesClaimCopy = alternatives.replaceAll("Is Qarinah better than every adjacent memory category?", "");
 if (/Qarinah is (?:the )?(?:best|only)|Qarinah (?:is )?better than|Qarinah outperforms?/iu.test(alternativesClaimCopy)) {
   errors.push("Alternatives page contains an unsupported superiority term.");
 }

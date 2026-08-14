@@ -101,6 +101,8 @@ These values replace the automatic ledger/import baseline for that static snapsh
 | Source citations | Permitted events carrying a source identifier | `provenance.sourceId`, with event ID, timestamp, and hash retained in the dashboard data |
 | Agent activity timeline | The latest 100 permitted events, newest first | Validated ledger events; it is not private chat history or hidden reasoning |
 | Files and systems affected | Paths, detected languages, and content hashes from the latest scan | The latest recorded project-structure snapshot |
+| Linked project memory | A compact relationship graph, accessible result list, and selected-node details for admitted memories, files, directories, concepts, and references | A bounded query-local projection of verified events and the latest strictly validated project scan |
+| Ranked project-memory search | Results that may extend beyond the compact visual graph, with local, linked, and structural score components | Read-only `GET /api/search/<workspace-id>` over the current admitted as-of graph |
 | Context saved | Baseline, delivered, saved, ratio, percentage, and exact comparison basis | Automatically uses a retained compact-import receipt or canonical authoritative-ledger characters; explicit snapshot inputs override it |
 | Memory footprint | Retained Qarinah file bytes, canonical ledger characters, compact-import source bytes when known, and the current query-pack identity and estimated size | Measured from verified local files, validated ledger events, import receipts, and a normal bounded context compilation |
 
@@ -109,6 +111,8 @@ The metric strip counts current decisions, superseded decisions, explicit confli
 The decision cards use explicit event fields. `data.reason`, `data.outcome`, and `data.alternatives` become the human explanation; tools are linked by the same session and turn or by an explicit event relation. Qarinah never fabricates a reason or exposes hidden chain-of-thought.
 
 The footprint panel does not call storage reduction “compression.” The original archive, retained project record, and delivered model context serve different purposes. Use `qarinah footprint` for a machine-readable report and read [Measure project memory](MEMORY-FOOTPRINT.md).
+
+The live server also provides `GET /api/graph/<workspace-id>` and `GET /api/search/<workspace-id>?q=<query>&type=<node-type>&limit=<n>`. Both routes are bounded and read-only: they do not append events, rewrite derived files, or advance the machine-local checkpoint. The visual graph has a text-list alternative, and selection remains visible in both views.
 
 ## Populate a useful dashboard
 

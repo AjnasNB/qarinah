@@ -1,5 +1,6 @@
 import path from "node:path";
 import { deepFreezeJson } from "./canonical.js";
+import { buildLinkedProjectMemory, rankLinkedProjectMemory } from "./linked-memory.js";
 import { measureMemoryFootprint } from "./memory-footprint.js";
 import { buildProjectRecordViews } from "./project-views.js";
 import { readEvents } from "./store.js";
@@ -27,9 +28,57 @@ function eventSummary(event) {
   };
 }
 
+export function compactLinkedGraph(memory) {
+  const typeLimits = { memory: 36, file: 48, concept: 40, directory: 20, reference: 12 };
+  const admitted = rankLinkedProjectMemory(memory, "", { limit: 100 });
+  const selected = [];
+  for (const type of Object.keys(typeLimits)) {
+    selected.push(...admitted.items.map((item) => item.node)
+      .filter((node) => node.type === type)
+      .sort((left, right) => right.importance - left.importance || left.id.localeCompare(right.id))
+      .slice(0, typeLimits[type]));
+  }
+  const selectedIds = new Set(selected.map((node) => node.id));
+  const edges = memory.edges
+    .filter((edge) => selectedIds.has(edge.source) && selectedIds.has(edge.target))
+    .sort((left, right) => right.weight - left.weight || `${left.source}\0${left.target}`.localeCompare(`${right.source}\0${right.target}`))
+    .slice(0, 420);
+  return {
+    schemaVersion: memory.schemaVersion,
+    manifestHash: admitted.sourceManifestHash,
+    statistics: {
+      ...memory.statistics,
+      rankedCandidates: admitted.items.length,
+      selectedNodes: selected.length,
+      renderedEdges: edges.length
+    },
+    nodes: selected.map((node) => ({
+      id: node.id,
+      type: node.type,
+      kind: node.kind,
+      label: node.label,
+      path: node.path,
+      timestamp: node.timestamp,
+      confidence: node.confidence,
+      status: node.status,
+      conflicted: node.conflicted,
+      importance: node.importance,
+      repositoryRank: node.repositoryRank,
+      incoming: node.incoming,
+      outgoing: node.outgoing,
+      sourceEventId: node.sourceEventId,
+      evidenceHash: node.evidenceHash,
+      contentHash: node.contentHash,
+      terms: node.signature.slice(0, 12).map((entry) => entry.term)
+    })),
+    edges
+  };
+}
+
 export async function buildMemoryDashboard(options = {}) {
   const workspace = await loadWorkspace(options.cwd ?? process.cwd());
   const events = await readEvents(workspace, { updateCheckpoint: false });
+  const generatedAt = (options.clock?.() ?? new Date()).toISOString();
   const byId = new Map(events.map((event) => [event.eventId, event]));
   const superseded = new Set();
   const conflicts = [];
@@ -50,7 +99,7 @@ export async function buildMemoryDashboard(options = {}) {
   if ((suppliedBaselineTokens === null) !== (suppliedDeliveredTokens === null)) {
     throw new TypeError("baselineTokens and deliveredTokens must be supplied together.");
   }
-  const memoryFootprint = await measureMemoryFootprint({ cwd: workspace.root });
+  const memoryFootprint = await measureMemoryFootprint({ cwd: workspace.root, inMemory: true, updateCheckpoint: false });
   const baselineTokens = suppliedBaselineTokens ?? memoryFootprint.comparison.baselineTokens;
   const deliveredTokens = suppliedDeliveredTokens ?? memoryFootprint.comparison.deliveredTokens;
   const savedTokens = baselineTokens === null ? null : Math.max(0, baselineTokens - deliveredTokens);
@@ -62,6 +111,7 @@ export async function buildMemoryDashboard(options = {}) {
     : null;
   const repositoryIds = [...new Set(events.map((event) => event.repository?.id).filter(Boolean))].sort();
   const latestEvent = events.at(-1) ?? null;
+  const linkedMemory = buildLinkedProjectMemory(events, workspace.config.workspaceId, { asOf: generatedAt });
   return deepFreezeJson({
     schemaVersion: "qarinah.memory-dashboard.v2",
     workspaceId: workspace.config.workspaceId,
@@ -76,7 +126,7 @@ export async function buildMemoryDashboard(options = {}) {
       lastActivityAt: latestEvent?.timestamp ?? null,
       eventCount: events.length
     },
-    generatedAt: (options.clock?.() ?? new Date()).toISOString(),
+    generatedAt,
     capture: workspace.config.capture,
     totals: {
       events: events.length,
@@ -88,7 +138,10 @@ export async function buildMemoryDashboard(options = {}) {
       flowSteps: projectRecords.flow.length,
       majorChanges: projectRecords.majorChanges.length,
       citedSources: new Set(events.map((event) => event.provenance.sourceId).filter(Boolean)).size,
-      affectedFiles: latestStructure?.data.projectStructure.files.length ?? 0
+      affectedFiles: latestStructure?.data.projectStructure.files.length ?? 0,
+      graphNodes: linkedMemory.statistics.nodes,
+      graphEdges: linkedMemory.statistics.edges,
+      graphConcepts: linkedMemory.statistics.concepts
     },
     contextSavings: {
       status: baselineTokens === null ? "not-measured" : "measured",
@@ -124,7 +177,8 @@ export async function buildMemoryDashboard(options = {}) {
       path: file.path,
       contentHash: file.contentHash,
       language: file.language
-    }))
+    })),
+    linkedGraph: compactLinkedGraph(linkedMemory)
   });
 }
 
@@ -201,6 +255,10 @@ export function renderMemoryDashboard(data, options = {}) {
   const liveScript = options.live === true && typeof options.liveStatusPath === "string"
     ? `\nconst qarinahLiveStatusPath=${JSON.stringify(options.liveStatusPath).replaceAll("<", "\\u003c")};\nconst qarinahInitialHead=${JSON.stringify(workspace.ledgerHeadHash)};\nconst qarinahInitialCount=${workspace.eventCount};\nconst qarinahInitialBytes=${workspace.ledgerBytes};\nsetInterval(async()=>{try{const response=await fetch(qarinahLiveStatusPath,{cache:"no-store"});if(!response.ok)return;const current=await response.json();if(current.headHash!==qarinahInitialHead||current.eventCount!==qarinahInitialCount||current.logBytes!==qarinahInitialBytes)location.reload();}catch{}},2000);`
     : "";
+  const linkedGraphJson = JSON.stringify(data.linkedGraph)
+    .replaceAll("<", "\\u003c")
+    .replaceAll("\u2028", "\\u2028")
+    .replaceAll("\u2029", "\\u2029");
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Qarinah memory dashboard</title>
@@ -222,8 +280,10 @@ li:first-child{border-top:0}li strong{min-width:0;overflow-wrap:anywhere}li span
 .pager{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:16px}.pager button{min-width:92px;min-height:42px;padding:8px 13px;border:1px solid var(--line);border-radius:8px;color:var(--text);background:#17212d;font:700 13px/1 system-ui,sans-serif;cursor:pointer}.pager button:hover:not(:disabled){border-color:var(--mint);color:var(--mint)}.pager button:focus-visible{outline:2px solid var(--mint);outline-offset:2px}.pager button:disabled{cursor:not-allowed;opacity:.45}.pager output{min-width:92px;color:var(--muted);font:700 12px/1.2 ui-monospace,monospace;text-align:center}
 .empty{margin:0}.warning{color:var(--warn)}[hidden]{display:none!important}
 .project-nav{display:flex;gap:8px;overflow-x:auto;padding:0 0 16px;scrollbar-width:thin}.project-nav a{flex:0 0 auto;min-width:180px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;color:var(--text);text-decoration:none;background:var(--panel)}.project-nav a[aria-current="page"]{border-color:var(--mint)}.project-nav small{display:block;color:var(--muted);font:11px/1.3 ui-monospace,monospace;margin-top:4px}.source-card{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 22px;margin-top:18px;padding:16px;border:1px solid var(--line);background:var(--panel)}.source-card p{margin:0;min-width:0}.source-card strong{display:block;color:var(--text);font-size:12px}.source-card code{overflow-wrap:anywhere}.live-state,.snapshot-state{display:inline-flex;align-items:center;gap:8px;color:var(--mint)}.live-state span{width:9px;height:9px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 4px rgb(53 224 170 / 14%)}
+.graph-toolbar{display:grid;grid-template-columns:minmax(220px,1fr) 190px auto;gap:10px;align-items:end;margin-bottom:14px}.graph-toolbar label{display:grid;gap:6px;color:var(--muted);font-size:12px}.graph-toolbar input,.graph-toolbar select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:8px;background:#0b1118;color:var(--text);padding:9px 12px;font:inherit}.graph-toolbar input:focus-visible,.graph-toolbar select:focus-visible{outline:2px solid var(--mint);outline-offset:2px}.graph-summary{color:var(--muted);font:12px/1.35 ui-monospace,monospace}.graph-shell{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(240px,.7fr);gap:14px}.graph-canvas{display:block;width:100%;height:auto;min-height:420px;border:1px solid var(--line);background:#0b1118}.graph-canvas line{stroke:#31404d;stroke-width:1;vector-effect:non-scaling-stroke}.graph-node{cursor:pointer}.graph-node circle{stroke:#090d12;stroke-width:2;vector-effect:non-scaling-stroke}.graph-node:focus-visible circle,.graph-node[data-selected="true"] circle{stroke:var(--text);stroke-width:3}.graph-node[data-conflict="true"] circle{stroke:var(--warn);stroke-width:3}.graph-details{border:1px solid var(--line);padding:16px;min-width:0}.graph-details h3{margin:0 0 8px;font-size:18px;overflow-wrap:anywhere}.graph-details dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:7px 11px;margin:14px 0}.graph-details dt{color:var(--muted)}.graph-details dd{margin:0;overflow-wrap:anywhere}.graph-results{display:grid;gap:6px;max-height:235px;overflow:auto;list-style:none;margin:8px 0 0;padding:0 3px 0 0}.graph-results li{display:block;padding:0;border:0}.graph-results button{display:grid;gap:2px;width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:7px;background:#0b1118;color:var(--text);text-align:left;cursor:pointer}.graph-results button:hover,.graph-results button:focus-visible,.graph-results button[data-selected="true"]{border-color:var(--mint);outline:none}.graph-results small{color:var(--muted)}.graph-legend{display:flex;flex-wrap:wrap;gap:10px 16px;margin:10px 0 0;color:var(--muted);font-size:12px}.graph-legend span{display:inline-flex;align-items:center;gap:6px}.graph-legend i{width:10px;height:10px;border-radius:50%;background:var(--legend)}
 @media(max-width:760px){header,main{width:min(100% - 20px,1180px)}header{padding:36px 0 22px}h1{font-size:clamp(34px,12vw,54px)}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.metric{min-width:0;padding:17px}.metric strong{font-size:24px;overflow-wrap:anywhere}main{padding-top:18px}.grid{grid-template-columns:1fr;gap:12px}section,section.wide{grid-column:auto;padding:18px}li{grid-template-columns:1fr}.record-head{display:block}.record-head time{display:block;margin-top:4px}.table-scroll table{min-width:620px}.pager{justify-content:space-between}.pager button{min-width:84px}}
-@media(max-width:600px){.source-card{grid-template-columns:1fr}.project-nav a{min-width:155px}}
+@media(max-width:900px){.graph-shell{grid-template-columns:1fr}.graph-canvas{min-height:330px}.graph-details{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}.graph-details h3,.graph-details>p{grid-column:1/-1}}
+@media(max-width:600px){.source-card{grid-template-columns:1fr}.project-nav a{min-width:155px}.graph-toolbar{grid-template-columns:1fr}.graph-shell,.graph-details{display:block}.graph-canvas{min-height:270px}.graph-results{margin-top:14px}}
 @media(max-width:420px){.metrics{grid-template-columns:1fr}.pager{display:grid;grid-template-columns:1fr 1fr}.pager output{grid-column:1/-1;grid-row:1;min-width:0}.pager button{width:100%}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 </style></head><body>
@@ -247,6 +307,11 @@ li:first-child{border-top:0}li strong{min-width:0;overflow-wrap:anywhere}li span
 <div class="metric"><strong>${escapeHtml(savingsValue)}</strong><span>${escapeHtml(savingsLabel)}</span></div>
 </div></header>
 <main><div class="grid">
+<section class="wide"><h2>Linked project memory</h2><p>Explore current memories, concepts, files, and their evidence-backed relationships. Repository rank comes from the retained project-link graph; search scores expose their exact basis.</p>
+<div class="graph-toolbar"><label>Ranked project-memory search<input type="search" data-graph-search data-search-path="${escapeHtml(options.searchPath ?? "")}" maxlength="256" placeholder="Try release policy or src/index.js"></label><label>Node type<select data-graph-type><option value="all">All node types</option><option value="memory">Memories</option><option value="file">Files</option><option value="concept">Concepts</option><option value="directory">Directories</option><option value="reference">References</option></select></label><output class="graph-summary" data-graph-summary aria-live="polite"></output></div>
+<div class="graph-shell"><svg class="graph-canvas" data-linked-graph viewBox="0 0 1040 560" role="img" aria-label="Interactive linked project-memory graph"><g data-graph-edges></g><g data-graph-nodes></g></svg><aside class="graph-details" aria-live="polite"><div><h3 data-graph-title>Choose a node</h3><p data-graph-description>Click a point or a result to inspect its type, rank, connections, and evidence identity.</p><dl><dt>Type</dt><dd data-graph-detail="type">-</dd><dt>Status</dt><dd data-graph-detail="status">-</dd><dt>Importance</dt><dd data-graph-detail="importance">-</dd><dt>Connections</dt><dd data-graph-detail="connections">-</dd><dt>Score basis</dt><dd data-graph-detail="basis">Browse rank</dd><dt>Evidence</dt><dd data-graph-detail="evidence">-</dd></dl></div><div><strong>Visible or ranked results</strong><ol class="graph-results" data-graph-results aria-label="Linked project-memory results"></ol></div></aside></div>
+<div class="graph-legend"><span><i style="--legend:#35e0aa"></i>Memory</span><span><i style="--legend:#65a7ff"></i>File</span><span><i style="--legend:#d197ff"></i>Concept</span><span><i style="--legend:#ffc857"></i>Directory</span><span><i style="--legend:#9aa7b2"></i>Reference</span></div>
+<p><small>Showing ${data.linkedGraph.nodes.length.toLocaleString()} selected nodes and ${data.linkedGraph.edges.length.toLocaleString()} relationships from ${data.linkedGraph.statistics.nodes.toLocaleString()} admitted source-projection nodes; ${data.linkedGraph.statistics.rankedCandidates.toLocaleString()} top-ranked candidates were evaluated. Source manifest: <code>${escapeHtml(data.linkedGraph.manifestHash)}</code></small></p></section>
 <section><h2>Current decisions and reasons</h2>${decisionList(data.currentDecisions,"No current decisions recorded.",{ id:"current-decisions",label:"Current decisions" })}</section>
 <section><h2>Superseded decisions</h2>${decisionList(data.supersededDecisions,"No superseded decisions.",{ id:"superseded-decisions",label:"Superseded decisions" })}</section>
 <section class="wide"><h2>Conflicts requiring attention</h2>${data.conflicts.length === 0 ? '<p class="empty">No recorded conflicts.</p>' : paginatedTable({ id:"conflicts",label:"Conflicts",headings:["Claim","Conflicts with"],rows:data.conflicts.map((conflict) => [escapeHtml(conflict.source.title),escapeHtml(conflict.target.title)]) })}</section>
@@ -264,7 +329,97 @@ ${data.contextSavings.status === "measured" ? `<tr><th>Estimated reduction</th><
 <section><h2>Source citations</h2>${list(data.citations,"No external source citations recorded.",{ id:"citations",label:"Source citations" })}</section>
 <section><h2>Agent activity timeline</h2>${list(data.activity,"No activity recorded.",{ id:"activity",label:"Agent activity" })}</section>
 <section class="wide"><h2>Files and systems affected</h2>${data.affectedFiles.length === 0 ? '<p class="empty">Run qarinah scan to populate the project map.</p>' : paginatedTable({ id:"affected-files",label:"Files and systems affected",headings:["Path","Language","Content hash"],rows:data.affectedFiles.map((file) => [escapeHtml(file.path),escapeHtml(file.language),`<code>${escapeHtml(file.contentHash)}</code>`]) })}</section>
-</div></main><script>
+</div></main><script type="application/json" id="qarinah-linked-graph">${linkedGraphJson}</script><script>
+const qarinahGraph=JSON.parse(document.getElementById("qarinah-linked-graph").textContent);
+const qarinahGraphSvg=document.querySelector("[data-linked-graph]");
+const qarinahGraphEdges=document.querySelector("[data-graph-edges]");
+const qarinahGraphNodes=document.querySelector("[data-graph-nodes]");
+const qarinahGraphSearch=document.querySelector("[data-graph-search]");
+const qarinahGraphType=document.querySelector("[data-graph-type]");
+const qarinahGraphSummary=document.querySelector("[data-graph-summary]");
+const qarinahGraphResults=document.querySelector("[data-graph-results]");
+const qarinahGraphNodeById=new Map(qarinahGraph.nodes.map((node)=>[node.id,node]));
+const qarinahGraphNeighbors=new Map(qarinahGraph.nodes.map((node)=>[node.id,new Set()]));
+for(const edge of qarinahGraph.edges){qarinahGraphNeighbors.get(edge.source)?.add(edge.target);qarinahGraphNeighbors.get(edge.target)?.add(edge.source)}
+const qarinahGraphColors={memory:"#35e0aa",file:"#65a7ff",concept:"#d197ff",directory:"#ffc857",reference:"#9aa7b2"};
+let qarinahSelectedNode=null;
+const qarinahSvgElement=(name)=>document.createElementNS("http://www.w3.org/2000/svg",name);
+const qarinahNodeText=(node)=>[node.label,node.path,node.kind,...node.terms].filter(Boolean).join(" ").toLowerCase();
+const qarinahShowNode=(node,basis=null,score=null)=>{
+  qarinahSelectedNode=node.id;
+  document.querySelector("[data-graph-title]").textContent=node.label;
+  document.querySelector("[data-graph-description]").textContent=node.path??node.kind;
+  document.querySelector('[data-graph-detail="type"]').textContent=node.type+" | "+node.kind;
+  document.querySelector('[data-graph-detail="status"]').textContent=node.status+(node.conflicted?" | conflict recorded":"");
+  document.querySelector('[data-graph-detail="importance"]').textContent=node.importance.toFixed(4)+(node.type==="file"?" | repository "+node.repositoryRank.toFixed(4):"");
+  document.querySelector('[data-graph-detail="connections"]').textContent=node.incoming+" incoming | "+node.outgoing+" outgoing";
+  document.querySelector('[data-graph-detail="basis"]').textContent=basis
+    ? basis.formula+" | local "+basis.localSemantic.toFixed(4)+" | linked "+basis.linkedEvidence.toFixed(4)+" | structural "+basis.structuralImportance.toFixed(4)+(score===null?"":" | score "+score.toFixed(4))
+    : "Structural browse rank";
+  document.querySelector('[data-graph-detail="evidence"]').textContent=node.evidenceHash??node.contentHash??"Derived concept; inspect linked sources";
+  document.querySelectorAll(".graph-node,.graph-results button").forEach((entry)=>{entry.dataset.selected=String(entry.dataset.nodeId===node.id)});
+};
+const qarinahRenderButtons=(entries,ranked=false)=>{
+  qarinahGraphResults.textContent="";
+  for(const entry of entries){
+    const node=ranked?entry.node:entry;
+    const item=document.createElement("li");
+    const button=document.createElement("button");
+    button.dataset.nodeId=node.id;
+    button.dataset.selected=String(node.id===qarinahSelectedNode);
+    const strong=document.createElement("strong");
+    strong.textContent=node.label;
+    const small=document.createElement("small");
+    small.textContent=ranked
+      ? node.type+" | score "+entry.score.toFixed(4)+" | "+entry.basis.formula
+      : node.type+" | importance "+node.importance.toFixed(3);
+    button.append(strong,small);
+    button.addEventListener("click",()=>qarinahShowNode(node,ranked?entry.basis:null,ranked?entry.score:null));
+    item.append(button);
+    qarinahGraphResults.append(item);
+  }
+};
+const qarinahRenderGraph=()=>{
+  const query=qarinahGraphSearch.value.trim().toLowerCase();
+  const type=qarinahGraphType.value;
+  const direct=new Set(qarinahGraph.nodes.filter((node)=>(type==="all"||node.type===type)&&(!query||qarinahNodeText(node).includes(query))).map((node)=>node.id));
+  const expanded=new Set(direct);
+  if(query){for(const id of direct){for(const neighbor of qarinahGraphNeighbors.get(id)??[])if(type==="all"||qarinahGraphNodeById.get(neighbor)?.type===type)expanded.add(neighbor)}}
+  const visible=qarinahGraph.nodes.filter((node)=>expanded.has(node.id)).sort((left,right)=>right.importance-left.importance||left.id.localeCompare(right.id)).slice(0,80);
+  const visibleIds=new Set(visible.map((node)=>node.id));
+  const types=["memory","file","concept","directory","reference"].filter((candidate)=>visible.some((node)=>node.type===candidate));
+  const positions=new Map();
+  types.forEach((candidate,band)=>{const group=visible.filter((node)=>node.type===candidate);group.forEach((node,row)=>{const x=types.length===1?520:70+band*(900/(types.length-1));const y=35+(group.length===1?245:row*(490/(group.length-1)));positions.set(node.id,{x,y})})});
+  qarinahGraphEdges.textContent="";
+  for(const edge of qarinahGraph.edges){const source=positions.get(edge.source),target=positions.get(edge.target);if(!source||!target)continue;const line=qarinahSvgElement("line");line.setAttribute("x1",source.x);line.setAttribute("y1",source.y);line.setAttribute("x2",target.x);line.setAttribute("y2",target.y);line.setAttribute("opacity",String(Math.max(.18,Math.min(.82,edge.weight))));const title=qarinahSvgElement("title");title.textContent=edge.type;line.append(title);qarinahGraphEdges.append(line)}
+  qarinahGraphNodes.textContent="";
+  for(const node of visible){const point=positions.get(node.id);const group=qarinahSvgElement("g");group.classList.add("graph-node");group.dataset.nodeId=node.id;group.dataset.conflict=String(node.conflicted);group.dataset.selected=String(node.id===qarinahSelectedNode);group.setAttribute("transform","translate("+point.x+" "+point.y+")");group.setAttribute("tabindex","0");group.setAttribute("role","button");group.setAttribute("aria-label",node.type+": "+node.label);const circle=qarinahSvgElement("circle");circle.setAttribute("r",String(6+node.importance*8));circle.setAttribute("fill",qarinahGraphColors[node.type]);const title=qarinahSvgElement("title");title.textContent=node.label+" | "+node.type;group.append(circle,title);const activate=()=>qarinahShowNode(node);group.addEventListener("click",activate);group.addEventListener("keydown",(event)=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();activate()}});qarinahGraphNodes.append(group)}
+  qarinahRenderButtons(visible);
+  qarinahGraphSummary.textContent=visible.length+" visual nodes | "+qarinahGraph.edges.filter((edge)=>visibleIds.has(edge.source)&&visibleIds.has(edge.target)).length+" links";
+  if(qarinahSelectedNode&&visibleIds.has(qarinahSelectedNode))qarinahShowNode(qarinahGraphNodeById.get(qarinahSelectedNode));
+};
+let qarinahSearchVersion=0;
+const qarinahRunRankedSearch=async()=>{
+  const query=qarinahGraphSearch.value.trim();
+  const searchPath=qarinahGraphSearch.dataset.searchPath;
+  const version=++qarinahSearchVersion;
+  if(!searchPath||!query)return;
+  const parameters=new URLSearchParams({q:query,limit:"40"});
+  if(qarinahGraphType.value!=="all")parameters.set("type",qarinahGraphType.value);
+  try{
+    const response=await fetch(searchPath+"?"+parameters.toString(),{cache:"no-store"});
+    if(!response.ok)throw new Error("search failed");
+    const result=await response.json();
+    if(version!==qarinahSearchVersion)return;
+    qarinahRenderButtons(result.items,true);
+    const completeness=result.coverage.projectionComplete&&result.coverage.authorityComplete?"":" | bounded source coverage";
+    qarinahGraphSummary.textContent=result.items.length+" ranked results | "+result.coverage.status+" term coverage"+completeness;
+  }catch{
+    if(version===qarinahSearchVersion)qarinahGraphSummary.textContent="Ranked search unavailable; showing the local visual filter.";
+  }
+};
+const qarinahRefresh=()=>{qarinahRenderGraph();void qarinahRunRankedSearch()};
+qarinahGraphSearch.addEventListener("input",qarinahRefresh);qarinahGraphType.addEventListener("change",qarinahRefresh);qarinahRenderGraph();
 for (const pageSet of document.querySelectorAll("[data-page-set]")) {
   const items = [...pageSet.querySelectorAll("[data-page-item]")];
   const pageSize = Number(pageSet.dataset.pageSize);
