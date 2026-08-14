@@ -172,14 +172,14 @@ const alternativeSystems = [
     sources: [{ label: "Qarinah source", url: github }]
   },
   {
-    name: "Mem0",
-    slug: "mem0",
+    name: "Application personalization memory",
+    slug: "application-personalization-memory",
     category: "Personalization and agent memory",
     primaryJob: "Provide user-, session-, and agent-level memory for applications through managed or self-hosted operation.",
     overlap: "Long-term memory extraction, storage, retrieval, and use in agent applications.",
-    boundary: "Mem0 addresses broader application personalization. Qarinah foregrounds a local software-project ledger, source identities, conflicts, supersession, and deterministic cited packs.",
+    boundary: "This category addresses broader application personalization. Qarinah foregrounds a local software-project ledger, source identities, conflicts, supersession, and deterministic cited packs.",
     fit: "An application needs reusable personalized memory for users or agents beyond a software repository workflow.",
-    sources: [{ label: "Mem0 source", url: "https://github.com/mem0ai/mem0" }]
+    sources: []
   },
   {
     name: "Letta",
@@ -205,14 +205,14 @@ const alternativeSystems = [
     ]
   },
   {
-    name: "Graphiti and Zep",
-    slug: "graphiti-zep",
+    name: "General temporal knowledge graph",
+    slug: "general-temporal-knowledge-graph",
     category: "Temporal context graph",
     primaryJob: "Represent evolving entities and facts in a temporal graph with episode provenance and hybrid retrieval.",
     overlap: "Temporal state, provenance, graph relationships, and retrieval over changing knowledge.",
-    boundary: "Graphiti targets general evolving knowledge and graph infrastructure. Qarinah targets repository and coding-work evidence stored with the project.",
+    boundary: "This category targets general evolving knowledge and graph infrastructure. Qarinah targets repository and coding-work evidence stored with the project.",
     fit: "An application needs a general temporal knowledge graph across people, entities, events, or business facts.",
-    sources: [{ label: "Graphiti source", url: "https://github.com/getzep/graphiti" }]
+    sources: []
   },
   {
     name: "Native coding-host memory",
@@ -236,7 +236,7 @@ const alternativeQuestions = [
     text: "Qarinah is a local, evidence-linked project-memory compiler for coding agents. It preserves permitted software-project history in an inspectable ledger and compiles bounded cited context packs for supported hosts."
   },
   {
-    name: "Is Qarinah better than Mem0, Letta, LangMem, or Graphiti?",
+    name: "Is Qarinah better than every adjacent memory category?",
     text: "There is no universal winner because these products solve different jobs. Qarinah emphasizes repository-owned, cross-host project evidence; the alternatives may emphasize personalization, a complete agent runtime, programmable application memory, or a general temporal graph."
   },
   {
@@ -638,7 +638,7 @@ const searchEntries = [
   {
     route: "/alternatives/",
     title: "Qarinah alternatives and coding-agent memory comparison",
-    description: "Compare Qarinah with Mem0, Letta, LangMem, LangGraph memory, Graphiti, Zep, and native coding-host memory by product boundary.",
+    description: "Compare Qarinah with application personalization, stateful-agent, programmable-memory, temporal-graph, and native coding-host approaches by product boundary.",
     headings: [
       { id: "choose-by-job", text: "Start with the job you need done" },
       { id: "comparison", text: "Compare the operating boundaries" },
@@ -648,10 +648,10 @@ const searchEntries = [
     ],
     keywords: [
       "Qarinah alternatives",
-      "Qarinah vs Mem0",
+      "Qarinah vs application memory",
       "Qarinah vs Letta",
       "Qarinah vs LangMem",
-      "Qarinah vs Graphiti",
+      "Qarinah vs temporal knowledge graphs",
       "coding agent memory comparison",
       "project memory for coding agents",
       "cross-agent memory"
@@ -991,7 +991,7 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
           "@type": "SoftwareApplication",
           name: system.name,
           applicationCategory: "DeveloperApplication",
-          url: system.sources[0].url
+          url: system.sources[0]?.url ?? `${siteOrigin}/alternatives/#${system.slug}`
         }))
       },
       {
@@ -1008,7 +1008,7 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
             name: system.name,
             description: system.primaryJob,
             applicationCategory: "DeveloperApplication",
-            url: system.sources[0].url
+            url: system.sources[0]?.url ?? `${siteOrigin}/alternatives/#${system.slug}`
           }
         }))
       },
@@ -1585,8 +1585,8 @@ function alternativesPage() {
     },
     {
       need: "Personalized user or agent memory inside an application",
-      system: "Mem0",
-      href: "#mem0"
+      system: "Application personalization memory",
+      href: "#application-personalization-memory"
     },
     {
       need: "A complete stateful-agent runtime with integrated memory",
@@ -1600,8 +1600,8 @@ function alternativesPage() {
     },
     {
       need: "A general temporal knowledge graph for evolving facts",
-      system: "Graphiti and Zep",
-      href: "#graphiti-zep"
+      system: "General temporal knowledge graph",
+      href: "#general-temporal-knowledge-graph"
     },
     {
       need: "Memory integrated directly into one coding assistant",
@@ -1661,7 +1661,7 @@ function alternativesPage() {
 
   return layout({
     title: "Qarinah alternatives and coding-agent memory comparison",
-    description: "Compare Qarinah with Mem0, Letta, LangMem, LangGraph memory, Graphiti, Zep, GitHub Copilot Memory, Claude Code memory, and Cursor Memories by product boundary.",
+    description: "Compare Qarinah with personalization, stateful-agent, programmable-memory, temporal-graph, and native coding-host approaches by product boundary.",
     active: "alternatives",
     canonical: "/alternatives/",
     kind: "alternatives",

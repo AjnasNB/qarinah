@@ -8,6 +8,7 @@ Qarinah is evidence-linked project memory for coding agents. It keeps an inspect
 - Stable event identities, content hashes, and chain verification for detectable edits, deletions, truncation, duplicates, and broken continuity.
 - Explicit workspace initialization, machine-local trust, and metadata-only capture by default.
 - Configurable content capture, redaction, retention, size, repository, time, and disclosure boundaries.
+- Abortable public append, verified-read, and derived-rebuild waits, with cancellation honored before the first irreversible write and coherent recovery metadata completed after commit begins.
 
 ## Cited context compilation
 
@@ -20,9 +21,10 @@ Qarinah is evidence-linked project memory for coding agents. It keeps an inspect
 ## Project structure and derived views
 
 - Bounded project scanning with typed file, directory, import, link, and unresolved-reference relationships.
+- A bounded linked-memory projection that joins admitted temporal memory with the latest verified project scan, ranks repository structure, and returns the local, linked, and structural basis for each result.
 - A rebuildable typed graph and retrieval index derived from the authoritative event record.
 - An optional SQLite WAL and FTS5 read model that remains disposable derived state.
-- Responsive static snapshots and a loopback-only live dashboard for real retained events, project/workspace/repository identity, decisions and reasons, linked tools, bounded execution flow, major changes, conflicts, citations, affected files, and an automatic evidence-labeled ledger/import-to-pack context estimate.
+- Responsive static snapshots and a loopback-only live dashboard for real retained events, project/workspace/repository identity, decisions and reasons, linked tools, bounded execution flow, major changes, conflicts, citations, affected files, an accessible relationship graph, read-only ranked search, and an automatic evidence-labeled ledger/import-to-pack context estimate.
 - A reproducible memory-footprint report that separates imported source bytes, retained local storage, and the bounded pack delivered for one task.
 - Automatically initialized `OVERVIEW.md`, `DECISIONS.md`, `FLOW.md`, and `CHANGES.md` views that can be deleted and regenerated from the verified ledger.
 - Immediate SQLite, graph, index, and Markdown initialization, so a new workspace starts with a complete empty read model instead of a missing database.

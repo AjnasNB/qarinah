@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qarinah.io/schemas/linked-project-query.schema.json",
+  "title": "Qarinah linked project query result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "workspaceId",
+    "sourceManifestHash",
+    "sourceHeadHash",
+    "query",
+    "asOf",
+    "requestedTypes",
+    "authorityScopes",
+    "repositoryIds",
+    "filters",
+    "coverage",
+    "items",
+    "manifestHash"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "qarinah.linked-project-query.v1" },
+    "workspaceId": { "type": "string", "pattern": "^ws_[0-9a-f]{32}$" },
+    "sourceManifestHash": { "$ref": "#/$defs/hash" },
+    "sourceHeadHash": { "oneOf": [{ "$ref": "#/$defs/hash" }, { "type": "null" }] },
+    "query": { "type": "string", "maxLength": 4096 },
+    "asOf": { "type": "string", "format": "date-time" },
+    "requestedTypes": {
+      "type": "array",
+      "items": { "enum": ["memory", "file", "directory", "concept", "reference"] },
+      "uniqueItems": true
+    },
+    "authorityScopes": { "type": "array", "maxItems": 64, "items": { "type": "string" }, "uniqueItems": true },
+    "repositoryIds": { "type": "array", "maxItems": 64, "items": { "type": "string" }, "uniqueItems": true },
+    "filters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["excluded"],
+      "properties": { "excluded": { "type": "integer", "minimum": 0 } }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "queryTerms", "matchedTerms", "ratio", "status", "sourceEvents", "projectedEvents", "omittedEvents",
+        "projectionComplete", "authorityComplete"
+      ],
+      "properties": {
+        "queryTerms": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "matchedTerms": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "ratio": { "type": "number", "minimum": 0, "maximum": 1 },
+        "status": { "enum": ["browse", "direct", "partial", "none"] },
+        "sourceEvents": { "type": "integer", "minimum": 0 },
+        "projectedEvents": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "omittedEvents": { "type": "integer", "minimum": 0 },
+        "projectionComplete": { "type": "boolean" },
+        "authorityComplete": { "type": "boolean" }
+      }
+    },
+    "items": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rank", "score", "basis", "node", "statusAtAsOf", "evidence", "neighbors"],
+        "properties": {
+          "rank": { "type": "integer", "minimum": 1 },
+          "score": { "type": "number", "minimum": 0, "maximum": 1 },
+          "basis": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["localSemantic", "linkedEvidence", "structuralImportance", "formula"],
+            "properties": {
+              "localSemantic": { "type": "number", "minimum": 0, "maximum": 1 },
+              "linkedEvidence": { "type": "number", "minimum": 0, "maximum": 1 },
+              "structuralImportance": { "type": "number", "minimum": 0, "maximum": 1 },
+              "formula": { "type": "string" }
+            }
+          },
+          "node": { "$ref": "linked-project-memory.schema.json#/$defs/node" },
+          "statusAtAsOf": { "enum": ["current", "superseded"] },
+          "evidence": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["sourceEventId", "hash", "contentHash"],
+            "properties": {
+              "sourceEventId": { "type": ["string", "null"] },
+              "hash": { "oneOf": [{ "$ref": "#/$defs/hash" }, { "type": "null" }] },
+              "contentHash": { "oneOf": [{ "$ref": "#/$defs/hash" }, { "type": "null" }] }
+            }
+          },
+          "neighbors": { "type": "array", "maxItems": 20, "items": { "type": "string" } }
+        }
+      }
+    },
+    "manifestHash": { "$ref": "#/$defs/hash" }
+  },
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  }
+}

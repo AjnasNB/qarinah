@@ -76,6 +76,14 @@ export { createMcpServer, runMcpServer } from "./mcp/server.js";
 export { setupWorkspace } from "./setup.js";
 export { TASK_MEMORY_PACKS, compileTaskMemoryPack } from "./task-packs.js";
 export { rerankContextPack } from "./semantic.js";
+export {
+  LINKED_PROJECT_MEMORY_SCHEMA_VERSION,
+  LINKED_PROJECT_QUERY_SCHEMA_VERSION,
+  buildLinkedProjectMemory,
+  loadLinkedProjectMemory,
+  queryLinkedProjectMemory,
+  rankLinkedProjectMemory
+} from "./linked-memory.js";
 export { compileFederatedContext } from "./federation.js";
 export { inspectMemoryFreshness } from "./freshness.js";
 export {

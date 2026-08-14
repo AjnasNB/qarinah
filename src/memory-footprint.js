@@ -68,9 +68,11 @@ function importedSourceBytes(events) {
 
 export async function measureMemoryFootprint(options = {}) {
   if (!options || typeof options !== "object" || Array.isArray(options)) throw new TypeError("Memory footprint options must be a record.");
-  const allowed = new Set(["cwd", "query", "maxChars", "maxTokens", "baselineTokens", "ratePerMillion"]);
+  const allowed = new Set(["cwd", "query", "maxChars", "maxTokens", "baselineTokens", "ratePerMillion", "inMemory", "updateCheckpoint"]);
   const unknown = Object.keys(options).filter((key) => !allowed.has(key));
   if (unknown.length) throw new TypeError(`Memory footprint options contain unknown field(s): ${unknown.join(", ")}.`);
+  if (options.inMemory !== undefined && typeof options.inMemory !== "boolean") throw new TypeError("inMemory must be a boolean.");
+  if (options.updateCheckpoint !== undefined && typeof options.updateCheckpoint !== "boolean") throw new TypeError("updateCheckpoint must be a boolean.");
   const query = options.query ?? "project decisions outcomes tools changes";
   if (typeof query !== "string" || query.length > 4_096) throw new TypeError("query must be a string up to 4096 characters.");
   const maxChars = optionalInteger(options.maxChars, "maxChars", 512, 1_000_000);
@@ -78,7 +80,7 @@ export async function measureMemoryFootprint(options = {}) {
   const baselineTokens = optionalInteger(options.baselineTokens, "baselineTokens", 0, 1_000_000_000);
   const ratePerMillion = optionalRate(options.ratePerMillion);
   const workspace = await loadWorkspace(options.cwd ?? process.cwd());
-  const events = await readEvents(workspace);
+  const events = await readEvents(workspace, { updateCheckpoint: options.updateCheckpoint !== false });
   const ledgerCharacters = events.reduce((total, event) => total + canonicalStringify(event).length + 1, 0);
   const ledgerEstimatedTokens = events.length > 0 ? Math.ceil(ledgerCharacters / 4) : null;
   const storage = {};
@@ -88,6 +90,8 @@ export async function measureMemoryFootprint(options = {}) {
   const pack = await compileContext(query, {
     cwd: workspace.root,
     minimumCoverage: "any",
+    inMemory: options.inMemory === true,
+    updateCheckpoint: options.updateCheckpoint,
     ...(maxChars === undefined ? {} : { maxChars }),
     ...(maxTokens === undefined ? {} : { maxTokens })
   });

@@ -52,7 +52,7 @@ This file is a convenience map for tools that choose to read it. It does not con
 - Local host hooks may not observe every specialized or hosted tool path.
 - Retention classification and expiry filtering do not physically rewrite the append-only event history.
 - Published benchmark estimates are not provider billing receipts and do not include output, tools, caching, or fixed provider charges.
-- Qarinah does not claim to be universally better than Mem0, Letta, LangMem, Graphiti, Zep, or native coding-host memory. These systems own different product boundaries.
+- Qarinah does not claim to be universally better than adjacent personalization, stateful-agent, programmable-memory, temporal-graph, or native coding-host categories. These systems own different product boundaries.
 
 ## Alternatives and product boundaries
 
@@ -61,10 +61,10 @@ Canonical comparison: https://qarinah.io/alternatives/
 The comparison is a representative category guide based on public product documentation reviewed on 8 August 2026. It is not a performance ranking and does not claim to enumerate every memory library or hosted wrapper.
 
 - Qarinah: a local, evidence-linked project-memory compiler that preserves permitted software-project history and compiles bounded cited packs for supported coding hosts.
-- Mem0: broader user-, session-, and agent-level application memory with managed and self-hosted operation.
+- Application personalization memory: broader user-, session-, and agent-level application memory with managed and self-hosted operation.
 - Letta: a stateful-agent platform whose runtime includes memory blocks, tools, and agent APIs.
 - LangMem and LangGraph memory: programmable memory and persistence for LangGraph and custom agent systems.
-- Graphiti and Zep: a general temporal context-graph approach for evolving entities, facts, episode provenance, and hybrid retrieval.
+- General temporal knowledge graphs: evolving entities, facts, episode provenance, and hybrid retrieval across application domains.
 - GitHub Copilot Memory, Claude Code memory, and Cursor Memories: native memory integrated inside each coding product.
 
 Compare source ownership, host portability, evidence and supersession, runtime scope, model or infrastructure dependencies, and whether derived memory can be rebuilt independently. Do not compare unrelated benchmark numbers as if they share a task, corpus, or scorer.

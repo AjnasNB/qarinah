@@ -86,10 +86,10 @@ function sortJsonValue(value) {
 function sanitizeJsonValue(value, options = {}) {
   const limits = { ...DEFAULT_LIMITS, ...options };
   let nodes = 0;
-  function visit(candidate, path18, depth) {
+  function visit(candidate, path19, depth) {
     nodes += 1;
     if (nodes > limits.maximumNodes) throw new TypeError(`JSON value exceeds ${limits.maximumNodes} nodes.`);
-    if (depth > limits.maximumDepth) throw new TypeError(`JSON value exceeds depth ${limits.maximumDepth} at ${path18}.`);
+    if (depth > limits.maximumDepth) throw new TypeError(`JSON value exceeds depth ${limits.maximumDepth} at ${path19}.`);
     if (candidate === null || typeof candidate === "boolean") return candidate;
     if (typeof candidate === "string") {
       if (candidate.length > limits.maximumStringLength) {
@@ -99,42 +99,42 @@ function sanitizeJsonValue(value, options = {}) {
       return candidate;
     }
     if (typeof candidate === "number") {
-      if (!Number.isFinite(candidate)) throw new TypeError(`${path18} must contain only finite numbers.`);
+      if (!Number.isFinite(candidate)) throw new TypeError(`${path19} must contain only finite numbers.`);
       return Object.is(candidate, -0) ? 0 : candidate;
     }
     if (Array.isArray(candidate)) {
       if (candidate.length > limits.maximumArrayLength) {
-        throw new TypeError(`${path18} exceeds ${limits.maximumArrayLength} array items.`);
+        throw new TypeError(`${path19} exceeds ${limits.maximumArrayLength} array items.`);
       }
       const descriptors2 = Object.getOwnPropertyDescriptors(candidate);
       const allowed = /* @__PURE__ */ new Set(["length", ...Array.from({ length: candidate.length }, (_, index) => String(index))]);
       for (const key of Reflect.ownKeys(descriptors2)) {
-        if (typeof key !== "string" || !allowed.has(key)) throw new TypeError(`${path18} contains an unsupported array property.`);
+        if (typeof key !== "string" || !allowed.has(key)) throw new TypeError(`${path19} contains an unsupported array property.`);
       }
       return Array.from({ length: candidate.length }, (_, index) => {
         const descriptor = descriptors2[String(index)];
         if (!descriptor?.enumerable || !Object.hasOwn(descriptor, "value")) {
-          throw new TypeError(`${path18}[${index}] must be an enumerable data property.`);
+          throw new TypeError(`${path19}[${index}] must be an enumerable data property.`);
         }
-        return visit(descriptor.value, `${path18}[${index}]`, depth + 1);
+        return visit(descriptor.value, `${path19}[${index}]`, depth + 1);
       });
     }
-    if (!candidate || typeof candidate !== "object") throw new TypeError(`${path18} contains an unsupported value.`);
+    if (!candidate || typeof candidate !== "object") throw new TypeError(`${path19} contains an unsupported value.`);
     const prototype = Object.getPrototypeOf(candidate);
     if (prototype !== Object.prototype && prototype !== null) {
-      throw new TypeError(`${path18} must contain only plain records.`);
+      throw new TypeError(`${path19} must contain only plain records.`);
     }
     const descriptors = Object.getOwnPropertyDescriptors(candidate);
     const keys = Reflect.ownKeys(descriptors);
-    if (keys.length > limits.maximumObjectKeys) throw new TypeError(`${path18} exceeds ${limits.maximumObjectKeys} fields.`);
+    if (keys.length > limits.maximumObjectKeys) throw new TypeError(`${path19} exceeds ${limits.maximumObjectKeys} fields.`);
     const result = /* @__PURE__ */ Object.create(null);
     for (const key of keys) {
-      if (typeof key !== "string") throw new TypeError(`${path18} cannot contain symbol keys.`);
+      if (typeof key !== "string") throw new TypeError(`${path19} cannot contain symbol keys.`);
       const descriptor = descriptors[key];
       if (!descriptor.enumerable || !Object.hasOwn(descriptor, "value") || descriptor.value === void 0) {
-        throw new TypeError(`${path18}.${key} must be an enumerable data property with a defined value.`);
+        throw new TypeError(`${path19}.${key} must be an enumerable data property with a defined value.`);
       }
-      result[key] = visit(descriptor.value, `${path18}.${key}`, depth + 1);
+      result[key] = visit(descriptor.value, `${path19}.${key}`, depth + 1);
     }
     return result;
   }
@@ -159,56 +159,56 @@ function snapshotJsonBoundary(value, options = {}) {
   const limits = { ...DEFAULT_LIMITS2, ...options };
   const seen = /* @__PURE__ */ new WeakSet();
   let nodes = 0;
-  function visit(candidate, path18, depth) {
+  function visit(candidate, path19, depth) {
     nodes += 1;
     if (nodes > limits.maximumNodes) throw new TypeError(`${limits.label} exceeds ${limits.maximumNodes} JSON nodes.`);
-    if (depth > limits.maximumDepth) throw new TypeError(`${limits.label} exceeds depth ${limits.maximumDepth} at ${path18}.`);
+    if (depth > limits.maximumDepth) throw new TypeError(`${limits.label} exceeds depth ${limits.maximumDepth} at ${path19}.`);
     if (candidate === null || typeof candidate === "boolean") return candidate;
     if (typeof candidate === "string") {
       if (candidate.length > limits.maximumStringLength) {
-        throw new TypeError(`${path18} exceeds ${limits.maximumStringLength} characters.`);
+        throw new TypeError(`${path19} exceeds ${limits.maximumStringLength} characters.`);
       }
       return candidate;
     }
     if (typeof candidate === "number") {
       if (!Number.isFinite(candidate) || Object.is(candidate, -0)) {
-        throw new TypeError(`${path18} must be a finite JSON number other than negative zero.`);
+        throw new TypeError(`${path19} must be a finite JSON number other than negative zero.`);
       }
       return candidate;
     }
-    if (!candidate || typeof candidate !== "object") throw new TypeError(`${path18} contains a non-JSON value.`);
-    if (seen.has(candidate)) throw new TypeError(`${path18} contains a cyclic or repeated object reference.`);
+    if (!candidate || typeof candidate !== "object") throw new TypeError(`${path19} contains a non-JSON value.`);
+    if (seen.has(candidate)) throw new TypeError(`${path19} contains a cyclic or repeated object reference.`);
     seen.add(candidate);
     if (Array.isArray(candidate)) {
       if (candidate.length > limits.maximumArrayLength) {
-        throw new TypeError(`${path18} exceeds ${limits.maximumArrayLength} array entries.`);
+        throw new TypeError(`${path19} exceeds ${limits.maximumArrayLength} array entries.`);
       }
       const descriptors2 = Object.getOwnPropertyDescriptors(candidate);
       const expected = /* @__PURE__ */ new Set(["length", ...Array.from({ length: candidate.length }, (_, index) => String(index))]);
       for (const key of Reflect.ownKeys(descriptors2)) {
-        if (typeof key !== "string" || !expected.has(key)) throw new TypeError(`${path18} contains an unsupported array property.`);
+        if (typeof key !== "string" || !expected.has(key)) throw new TypeError(`${path19} contains an unsupported array property.`);
       }
       return Array.from({ length: candidate.length }, (_, index) => {
         const descriptor = descriptors2[String(index)];
         if (!descriptor?.enumerable || !Object.hasOwn(descriptor, "value")) {
-          throw new TypeError(`${path18}[${index}] must be an enumerable data property.`);
+          throw new TypeError(`${path19}[${index}] must be an enumerable data property.`);
         }
-        return visit(descriptor.value, `${path18}[${index}]`, depth + 1);
+        return visit(descriptor.value, `${path19}[${index}]`, depth + 1);
       });
     }
     const prototype = Object.getPrototypeOf(candidate);
-    if (prototype !== Object.prototype && prototype !== null) throw new TypeError(`${path18} must be a plain record.`);
+    if (prototype !== Object.prototype && prototype !== null) throw new TypeError(`${path19} must be a plain record.`);
     const descriptors = Object.getOwnPropertyDescriptors(candidate);
     const keys = Reflect.ownKeys(descriptors);
-    if (keys.length > limits.maximumObjectKeys) throw new TypeError(`${path18} exceeds ${limits.maximumObjectKeys} fields.`);
+    if (keys.length > limits.maximumObjectKeys) throw new TypeError(`${path19} exceeds ${limits.maximumObjectKeys} fields.`);
     const result = /* @__PURE__ */ Object.create(null);
     for (const key of keys) {
-      if (typeof key !== "string") throw new TypeError(`${path18} cannot contain symbol keys.`);
+      if (typeof key !== "string") throw new TypeError(`${path19} cannot contain symbol keys.`);
       const descriptor = descriptors[key];
       if (!descriptor.enumerable || !Object.hasOwn(descriptor, "value") || descriptor.value === void 0) {
-        throw new TypeError(`${path18}.${key} must be an enumerable data property with a defined value.`);
+        throw new TypeError(`${path19}.${key} must be an enumerable data property with a defined value.`);
       }
-      result[key] = visit(descriptor.value, `${path18}.${key}`, depth + 1);
+      result[key] = visit(descriptor.value, `${path19}.${key}`, depth + 1);
     }
     return result;
   }
@@ -709,6 +709,47 @@ var init_errors = __esm({
         if (details !== void 0) this.details = details;
       }
     };
+  }
+});
+
+// src/abort.js
+function abortReason(signal) {
+  try {
+    signal.throwIfAborted();
+  } catch (error) {
+    return error;
+  }
+  return new DOMException("This operation was aborted", "AbortError");
+}
+function validateAbortSignal(signal) {
+  if (signal === void 0) return void 0;
+  if (!signal || typeof signal !== "object" || typeof signal.aborted !== "boolean" || typeof signal.addEventListener !== "function" || typeof signal.removeEventListener !== "function" || typeof signal.throwIfAborted !== "function") {
+    throw new TypeError("signal must be an AbortSignal.");
+  }
+  return signal;
+}
+function throwIfAborted(signal) {
+  if (signal !== void 0) signal.throwIfAborted();
+}
+function abortableDelay(milliseconds, signal) {
+  if (signal === void 0) return new Promise((resolve) => setTimeout(resolve, milliseconds));
+  throwIfAborted(signal);
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      signal.removeEventListener("abort", onAbort);
+      resolve();
+    }, milliseconds);
+    const onAbort = () => {
+      clearTimeout(timeout);
+      signal.removeEventListener("abort", onAbort);
+      reject(abortReason(signal));
+    };
+    signal.addEventListener("abort", onAbort, { once: true });
+    if (signal.aborted) onAbort();
+  });
+}
+var init_abort = __esm({
+  "src/abort.js"() {
   }
 });
 
@@ -1215,6 +1256,2167 @@ var init_markdown = __esm({
   }
 });
 
+// node_modules/ignore/index.js
+var require_ignore = __commonJS({
+  "node_modules/ignore/index.js"(exports, module) {
+    function makeArray(subject) {
+      return Array.isArray(subject) ? subject : [subject];
+    }
+    var UNDEFINED = void 0;
+    var EMPTY = "";
+    var SPACE = " ";
+    var ESCAPE = "\\";
+    var REGEX_TEST_BLANK_LINE = /^\s+$/;
+    var REGEX_INVALID_TRAILING_BACKSLASH = /(?:[^\\]|^)\\$/;
+    var REGEX_REPLACE_LEADING_EXCAPED_EXCLAMATION = /^\\!/;
+    var REGEX_REPLACE_LEADING_EXCAPED_HASH = /^\\#/;
+    var REGEX_SPLITALL_CRLF = /\r?\n/g;
+    var REGEX_TEST_INVALID_PATH = /^\.{0,2}\/|^\.{1,2}$/;
+    var REGEX_TEST_TRAILING_SLASH = /\/$/;
+    var SLASH = "/";
+    var TMP_KEY_IGNORE = "node-ignore";
+    if (typeof Symbol !== "undefined") {
+      TMP_KEY_IGNORE = /* @__PURE__ */ Symbol.for("node-ignore");
+    }
+    var KEY_IGNORE = TMP_KEY_IGNORE;
+    var define = (object, key, value) => {
+      Object.defineProperty(object, key, { value });
+      return value;
+    };
+    var REGEX_REGEXP_RANGE = /([0-z])-([0-z])/g;
+    var RETURN_FALSE = () => false;
+    var sanitizeRange = (range) => range.replace(
+      REGEX_REGEXP_RANGE,
+      (match, from, to) => from.charCodeAt(0) <= to.charCodeAt(0) ? match : EMPTY
+    );
+    var negateRange = (range) => range.startsWith("!") || range.startsWith("\\^") ? `^${range.slice(range[0] === "!" ? 1 : 2)}` : range;
+    var cleanRangeBackSlash = (slashes) => {
+      const { length } = slashes;
+      return slashes.slice(0, length - length % 2);
+    };
+    var REPLACERS = [
+      [
+        // Remove BOM
+        // TODO:
+        // Other similar zero-width characters?
+        /^\uFEFF/,
+        () => EMPTY
+      ],
+      // > Trailing spaces are ignored unless they are quoted with backslash ("\")
+      [
+        // (a\ ) -> (a )
+        // (a  ) -> (a)
+        // (a ) -> (a)
+        // (a \ ) -> (a  )
+        /((?:\\\\)*?)(\\?\s+)$/,
+        (_, m1, m2) => m1 + (m2.indexOf("\\") === 0 ? SPACE : EMPTY)
+      ],
+      // Replace (\ ) with ' '
+      // (\ ) -> ' '
+      // (\\ ) -> '\\ '
+      // (\\\ ) -> '\\ '
+      [
+        /(\\+?)\s/g,
+        (_, m1) => {
+          const { length } = m1;
+          return m1.slice(0, length - length % 2) + SPACE;
+        }
+      ],
+      // Escape metacharacters
+      // which is written down by users but means special for regular expressions.
+      // > There are 12 characters with special meanings:
+      // > - the backslash \,
+      // > - the caret ^,
+      // > - the dollar sign $,
+      // > - the period or dot .,
+      // > - the vertical bar or pipe symbol |,
+      // > - the question mark ?,
+      // > - the asterisk or star *,
+      // > - the plus sign +,
+      // > - the opening parenthesis (,
+      // > - the closing parenthesis ),
+      // > - and the opening square bracket [,
+      // > - the opening curly brace {,
+      // > These special characters are often called "metacharacters".
+      [
+        /[\\$.|*+(){^]/g,
+        (match) => `\\${match}`
+      ],
+      [
+        // > a question mark (?) matches a single character
+        /(?!\\)\?/g,
+        () => "[^/]"
+      ],
+      // leading slash
+      [
+        // > A leading slash matches the beginning of the pathname.
+        // > For example, "/*.c" matches "cat-file.c" but not "mozilla-sha1/sha1.c".
+        // A leading slash matches the beginning of the pathname
+        /^\//,
+        () => "^"
+      ],
+      // replace special metacharacter slash after the leading slash
+      [
+        /\//g,
+        () => "\\/"
+      ],
+      [
+        // > A leading "**" followed by a slash means match in all directories.
+        // > For example, "**/foo" matches file or directory "foo" anywhere,
+        // > the same as pattern "foo".
+        // > "**/foo/bar" matches file or directory "bar" anywhere that is directly
+        // >   under directory "foo".
+        // Notice that the '*'s have been replaced as '\\*'
+        /^\^*(?:\\\*\\\*\\\/)+/,
+        // '**/foo' <-> 'foo'
+        () => "^(?:.*\\/)?"
+      ],
+      // starting
+      [
+        // there will be no leading '/'
+        //   (which has been replaced by section "leading slash")
+        // If starts with '**', adding a '^' to the regular expression also works
+        /^(?=[^^])/,
+        function startingReplacer() {
+          return !/\/(?!$)/.test(this) ? "(?:^|\\/)" : "^";
+        }
+      ],
+      // two globstars
+      [
+        // Use lookahead assertions so that we could match more than one `'/**'`
+        /\\\/\\\*\\\*(?=\\\/|$)/g,
+        // Zero, one or several directories
+        // should not use '*', or it will be replaced by the next replacer
+        // Check if it is not the last `'/**'`
+        (_, index, str) => index + 6 < str.length ? "(?:\\/[^\\/]+)*" : "\\/.+"
+      ],
+      // normal intermediate wildcards
+      [
+        // Never replace escaped '*'
+        // ignore rule '\*' will match the path '*'
+        // 'abc.*/' -> go
+        // 'abc.*'  -> skip this rule,
+        //    coz trailing single wildcard will be handed by [trailing wildcard]
+        /(^|[^\\]+)(\\\*)+(?=.+)/g,
+        // '*.js' matches '.js'
+        // '*.js' doesn't match 'abc'
+        (_, p1, p2) => {
+          const unescaped = p2.replace(/\\\*/g, "[^\\/]*");
+          return p1 + unescaped;
+        }
+      ],
+      [
+        // unescape, revert step 3 except for back slash
+        // For example, if a user escape a '\\*',
+        // after step 3, the result will be '\\\\\\*'
+        /\\\\\\(?=[$.|*+(){^])/g,
+        () => ESCAPE
+      ],
+      [
+        // '\\\\' -> '\\'
+        /\\\\/g,
+        () => ESCAPE
+      ],
+      [
+        // > The range notation, e.g. [a-zA-Z],
+        // > can be used to match one of the characters in a range.
+        // `\` is escaped by step 3
+        /(\\)?\[([^\]/]*?)(\\*)($|\])/g,
+        (match, leadEscape, range, endEscape, close) => leadEscape === ESCAPE ? `\\[${range}${cleanRangeBackSlash(endEscape)}${close}` : close === "]" ? endEscape.length % 2 === 0 ? `[${negateRange(sanitizeRange(range))}${endEscape}]` : "[]" : "[]"
+      ],
+      // ending
+      [
+        // 'js' will not match 'js.'
+        // 'ab' will not match 'abc'
+        /(?:[^*])$/,
+        // WTF!
+        // https://git-scm.com/docs/gitignore
+        // changes in [2.22.1](https://git-scm.com/docs/gitignore/2.22.1)
+        // which re-fixes #24, #38
+        // > If there is a separator at the end of the pattern then the pattern
+        // > will only match directories, otherwise the pattern can match both
+        // > files and directories.
+        // 'js*' will not match 'a.js'
+        // 'js/' will not match 'a.js'
+        // 'js' will match 'a.js' and 'a.js/'
+        (match) => /\/$/.test(match) ? `${match}$` : `${match}(?=$|\\/$)`
+      ]
+    ];
+    var REGEX_REPLACE_TRAILING_WILDCARD = /(^|\\\/)?\\\*$/;
+    var MODE_IGNORE = "regex";
+    var MODE_CHECK_IGNORE = "checkRegex";
+    var UNDERSCORE = "_";
+    var TRAILING_WILD_CARD_REPLACERS = {
+      [MODE_IGNORE](_, p1) {
+        const prefix = p1 ? `${p1}[^/]+` : "[^/]*";
+        return `${prefix}(?=$|\\/$)`;
+      },
+      [MODE_CHECK_IGNORE](_, p1) {
+        const prefix = p1 ? `${p1}[^/]*` : "[^/]*";
+        return `${prefix}(?=$|\\/$)`;
+      }
+    };
+    var makeRegexPrefix = (pattern) => REPLACERS.reduce(
+      (prev, [matcher, replacer]) => prev.replace(matcher, replacer.bind(pattern)),
+      pattern
+    );
+    var isString = (subject) => typeof subject === "string";
+    var checkPattern = (pattern) => pattern && isString(pattern) && !REGEX_TEST_BLANK_LINE.test(pattern) && !REGEX_INVALID_TRAILING_BACKSLASH.test(pattern) && pattern.indexOf("#") !== 0;
+    var splitPattern = (pattern) => pattern.split(REGEX_SPLITALL_CRLF).filter(Boolean);
+    var IgnoreRule = class {
+      constructor(pattern, mark, body, ignoreCase, negative, prefix) {
+        this.pattern = pattern;
+        this.mark = mark;
+        this.negative = negative;
+        define(this, "body", body);
+        define(this, "ignoreCase", ignoreCase);
+        define(this, "regexPrefix", prefix);
+      }
+      get regex() {
+        const key = UNDERSCORE + MODE_IGNORE;
+        if (this[key]) {
+          return this[key];
+        }
+        return this._make(MODE_IGNORE, key);
+      }
+      get checkRegex() {
+        const key = UNDERSCORE + MODE_CHECK_IGNORE;
+        if (this[key]) {
+          return this[key];
+        }
+        return this._make(MODE_CHECK_IGNORE, key);
+      }
+      _make(mode, key) {
+        const str = this.regexPrefix.replace(
+          REGEX_REPLACE_TRAILING_WILDCARD,
+          // It does not need to bind pattern
+          TRAILING_WILD_CARD_REPLACERS[mode]
+        );
+        const regex = this.ignoreCase ? new RegExp(str, "i") : new RegExp(str);
+        return define(this, key, regex);
+      }
+    };
+    var createRule = ({
+      pattern,
+      mark
+    }, ignoreCase) => {
+      let negative = false;
+      let body = pattern;
+      if (body.indexOf("!") === 0) {
+        negative = true;
+        body = body.substr(1);
+      }
+      body = body.replace(REGEX_REPLACE_LEADING_EXCAPED_EXCLAMATION, "!").replace(REGEX_REPLACE_LEADING_EXCAPED_HASH, "#");
+      const regexPrefix = makeRegexPrefix(body);
+      return new IgnoreRule(
+        pattern,
+        mark,
+        body,
+        ignoreCase,
+        negative,
+        regexPrefix
+      );
+    };
+    var RuleManager = class {
+      constructor(ignoreCase) {
+        this._ignoreCase = ignoreCase;
+        this._rules = [];
+      }
+      _add(pattern) {
+        if (pattern && pattern[KEY_IGNORE]) {
+          this._rules = this._rules.concat(pattern._rules._rules);
+          this._added = true;
+          return;
+        }
+        if (isString(pattern)) {
+          pattern = {
+            pattern
+          };
+        }
+        if (checkPattern(pattern.pattern)) {
+          const rule = createRule(pattern, this._ignoreCase);
+          this._added = true;
+          this._rules.push(rule);
+        }
+      }
+      // @param {Array<string> | string | Ignore} pattern
+      add(pattern) {
+        this._added = false;
+        makeArray(
+          isString(pattern) ? splitPattern(pattern) : pattern
+        ).forEach(this._add, this);
+        return this._added;
+      }
+      // Test one single path without recursively checking parent directories
+      //
+      // - checkUnignored `boolean` whether should check if the path is unignored,
+      //   setting `checkUnignored` to `false` could reduce additional
+      //   path matching.
+      // - check `string` either `MODE_IGNORE` or `MODE_CHECK_IGNORE`
+      // @returns {TestResult} true if a file is ignored
+      test(path19, checkUnignored, mode) {
+        let ignored = false;
+        let unignored = false;
+        let matchedRule;
+        this._rules.forEach((rule) => {
+          const { negative } = rule;
+          if (unignored === negative && ignored !== unignored || negative && !ignored && !unignored && !checkUnignored) {
+            return;
+          }
+          const matched = rule[mode].test(path19);
+          if (!matched) {
+            return;
+          }
+          ignored = !negative;
+          unignored = negative;
+          matchedRule = negative ? UNDEFINED : rule;
+        });
+        const ret = {
+          ignored,
+          unignored
+        };
+        if (matchedRule) {
+          ret.rule = matchedRule;
+        }
+        return ret;
+      }
+    };
+    var throwError = (message, Ctor) => {
+      throw new Ctor(message);
+    };
+    var checkPath = (path19, originalPath, doThrow) => {
+      if (!isString(path19)) {
+        return doThrow(
+          `path must be a string, but got \`${originalPath}\``,
+          TypeError
+        );
+      }
+      if (!path19) {
+        return doThrow(`path must not be empty`, TypeError);
+      }
+      if (checkPath.isNotRelative(path19)) {
+        const r = "`path.relative()`d";
+        return doThrow(
+          `path should be a ${r} string, but got "${originalPath}"`,
+          RangeError
+        );
+      }
+      return true;
+    };
+    var isNotRelative = (path19) => REGEX_TEST_INVALID_PATH.test(path19);
+    checkPath.isNotRelative = isNotRelative;
+    checkPath.convert = (p) => p;
+    var Ignore = class {
+      constructor({
+        ignorecase = true,
+        ignoreCase = ignorecase,
+        allowRelativePaths = false
+      } = {}) {
+        define(this, KEY_IGNORE, true);
+        this._rules = new RuleManager(ignoreCase);
+        this._strictPathCheck = !allowRelativePaths;
+        this._initCache();
+      }
+      _initCache() {
+        this._ignoreCache = /* @__PURE__ */ Object.create(null);
+        this._testCache = /* @__PURE__ */ Object.create(null);
+      }
+      add(pattern) {
+        if (this._rules.add(pattern)) {
+          this._initCache();
+        }
+        return this;
+      }
+      // legacy
+      addPattern(pattern) {
+        return this.add(pattern);
+      }
+      // @returns {TestResult}
+      _test(originalPath, cache, checkUnignored, slices) {
+        const path19 = originalPath && checkPath.convert(originalPath);
+        checkPath(
+          path19,
+          originalPath,
+          this._strictPathCheck ? throwError : RETURN_FALSE
+        );
+        return this._t(path19, cache, checkUnignored, slices);
+      }
+      checkIgnore(path19) {
+        if (!REGEX_TEST_TRAILING_SLASH.test(path19)) {
+          return this.test(path19);
+        }
+        const slices = path19.split(SLASH).filter(Boolean);
+        slices.pop();
+        if (slices.length) {
+          const parent = this._t(
+            slices.join(SLASH) + SLASH,
+            this._testCache,
+            true,
+            slices
+          );
+          if (parent.ignored) {
+            return parent;
+          }
+        }
+        return this._rules.test(path19, false, MODE_CHECK_IGNORE);
+      }
+      _t(path19, cache, checkUnignored, slices) {
+        if (path19 in cache) {
+          return cache[path19];
+        }
+        if (!slices) {
+          slices = path19.split(SLASH).filter(Boolean);
+        }
+        slices.pop();
+        if (!slices.length) {
+          return cache[path19] = this._rules.test(path19, checkUnignored, MODE_IGNORE);
+        }
+        const parent = this._t(
+          slices.join(SLASH) + SLASH,
+          cache,
+          checkUnignored,
+          slices
+        );
+        return cache[path19] = parent.ignored ? parent : this._rules.test(path19, checkUnignored, MODE_IGNORE);
+      }
+      ignores(path19) {
+        return this._test(path19, this._ignoreCache, false).ignored;
+      }
+      createFilter() {
+        return (path19) => !this.ignores(path19);
+      }
+      filter(paths) {
+        return makeArray(paths).filter(this.createFilter());
+      }
+      // @returns {TestResult}
+      test(path19) {
+        return this._test(path19, this._testCache, true);
+      }
+    };
+    var factory = (options) => new Ignore(options);
+    var isPathValid = (path19) => checkPath(path19 && checkPath.convert(path19), path19, RETURN_FALSE);
+    var setupWindows = () => {
+      const makePosix = (str) => /^\\\\\?\\/.test(str) || /["<>|\u0000-\u001F]+/u.test(str) ? str : str.replace(/\\/g, "/");
+      checkPath.convert = makePosix;
+      const REGEX_TEST_WINDOWS_PATH_ABSOLUTE = /^[a-z]:\//i;
+      checkPath.isNotRelative = (path19) => REGEX_TEST_WINDOWS_PATH_ABSOLUTE.test(path19) || isNotRelative(path19);
+    };
+    if (
+      // Detect `process` so that it can run in browsers.
+      typeof process !== "undefined" && process.platform === "win32"
+    ) {
+      setupWindows();
+    }
+    module.exports = factory;
+    factory.default = factory;
+    module.exports.isPathValid = isPathValid;
+    define(module.exports, /* @__PURE__ */ Symbol.for("setupWindows"), setupWindows);
+  }
+});
+
+// src/project-structure.js
+import { lstat as lstat2, readFile, readdir, realpath as realpath2 } from "node:fs/promises";
+import { createHash as createHash3 } from "node:crypto";
+import path2 from "node:path";
+function boundedInteger(value, fallback, minimum, maximum, label) {
+  const candidate = value ?? fallback;
+  if (!Number.isSafeInteger(candidate) || candidate < minimum || candidate > maximum) {
+    throw new TypeError(`${label} must be an integer from ${minimum} to ${maximum}.`);
+  }
+  return candidate;
+}
+function scanOptions(options = {}) {
+  if (!options || typeof options !== "object" || Array.isArray(options)) {
+    throw new TypeError("Project structure scan options must be a record.");
+  }
+  const allowed = /* @__PURE__ */ new Set(["cwd", "maxFiles", "maxFileBytes", "maxTotalBytes", "maxDepth"]);
+  const unknown = Object.keys(options).filter((key) => !allowed.has(key));
+  if (unknown.length) throw new TypeError(`Project structure scan options contain unknown field(s): ${unknown.join(", ")}.`);
+  return Object.freeze({
+    cwd: options.cwd,
+    maxFiles: boundedInteger(options.maxFiles, DEFAULT_MAX_FILES, 1, 5e3, "maxFiles"),
+    maxFileBytes: boundedInteger(options.maxFileBytes, DEFAULT_MAX_FILE_BYTES, 1024, 4 * 1024 * 1024, "maxFileBytes"),
+    maxTotalBytes: boundedInteger(options.maxTotalBytes, DEFAULT_MAX_TOTAL_BYTES, 1024, 128 * 1024 * 1024, "maxTotalBytes"),
+    maxDepth: boundedInteger(options.maxDepth, DEFAULT_MAX_DEPTH, 1, 64, "maxDepth")
+  });
+}
+function portablePath(root, absolute) {
+  const relative = path2.relative(root, absolute);
+  if (relative === "") return ".";
+  if (relative.startsWith("..") || path2.isAbsolute(relative)) {
+    throw new QarinahError("PATH_OUTSIDE_WORKSPACE", "Project structure path escaped the trusted workspace root.");
+  }
+  const portable = relative.split(path2.sep).join("/");
+  if (portable.length > MAX_PATH_CHARS) {
+    throw new QarinahError("PROJECT_PATH_TOO_LONG", `Project path exceeds ${MAX_PATH_CHARS} characters.`);
+  }
+  return portable;
+}
+function isCandidateFile(name) {
+  return SOURCE_FILENAMES.has(name) || SOURCE_EXTENSIONS.has(path2.extname(name).toLowerCase());
+}
+function languageFor(filePath) {
+  const extension = path2.extname(filePath).toLowerCase();
+  const languages = {
+    ".cjs": "javascript",
+    ".js": "javascript",
+    ".jsx": "javascript",
+    ".mjs": "javascript",
+    ".ts": "typescript",
+    ".tsx": "typescript",
+    ".md": "markdown",
+    ".json": "json",
+    ".jsonc": "jsonc",
+    ".py": "python",
+    ".rs": "rust",
+    ".java": "java",
+    ".kt": "kotlin",
+    ".rb": "ruby",
+    ".css": "css",
+    ".html": "html",
+    ".svelte": "svelte",
+    ".vue": "vue",
+    ".yaml": "yaml",
+    ".yml": "yaml",
+    ".toml": "toml",
+    ".sql": "sql",
+    ".xml": "xml",
+    ".sh": "shell"
+  };
+  return languages[extension] ?? "text";
+}
+function nodeId(type, value) {
+  return `project:${type}:${sha256(value).slice("sha256:".length, "sha256:".length + 32)}`;
+}
+function exactKeys(value, keys) {
+  return value && typeof value === "object" && !Array.isArray(value) && Object.keys(value).sort().join("\0") === [...keys].sort().join("\0");
+}
+function validStoredPath(value) {
+  return typeof value === "string" && value.length >= 1 && value.length <= MAX_PATH_CHARS && !value.includes("\0") && !path2.posix.isAbsolute(value) && value !== ".." && !value.startsWith("../") && path2.posix.normalize(value) === value;
+}
+function validHash(value, nullable = false) {
+  return nullable && value === null || typeof value === "string" && /^sha256:[0-9a-f]{64}$/u.test(value);
+}
+function validInteger(value, minimum, maximum = Number.MAX_SAFE_INTEGER) {
+  return Number.isSafeInteger(value) && value >= minimum && value <= maximum;
+}
+function validateProjectStructureSnapshot(structure) {
+  if (!exactKeys(structure, [
+    "schemaVersion",
+    "adapter",
+    "root",
+    "limits",
+    "directoryCount",
+    "fileCount",
+    "totalBytes",
+    "directories",
+    "files",
+    "snapshotHash",
+    "changes"
+  ])) return false;
+  if (structure.schemaVersion !== PROJECT_STRUCTURE_SCHEMA_VERSION || !exactKeys(structure.adapter, ["id", "version"]) || structure.adapter.id !== "qarinah.project-structure" || structure.adapter.version !== "1" || structure.root !== "." || !exactKeys(structure.limits, ["maxFiles", "maxFileBytes", "maxTotalBytes", "maxDepth"]) || !validInteger(structure.limits.maxFiles, 1, 5e3) || !validInteger(structure.limits.maxFileBytes, 1024, 4 * 1024 * 1024) || !validInteger(structure.limits.maxTotalBytes, 1024, 128 * 1024 * 1024) || !validInteger(structure.limits.maxDepth, 1, 64) || !Array.isArray(structure.directories) || structure.directories.length < 1 || structure.directories.length > 1e4 || !Array.isArray(structure.files) || structure.files.length > structure.limits.maxFiles || structure.directoryCount !== structure.directories.length || structure.fileCount !== structure.files.length || !validInteger(structure.totalBytes, 0, structure.limits.maxTotalBytes) || !validHash(structure.snapshotHash)) return false;
+  const directoryPaths = /* @__PURE__ */ new Set();
+  const directoryIds = /* @__PURE__ */ new Set();
+  for (const directory of structure.directories) {
+    if (!exactKeys(directory, ["id", "path"]) || !validStoredPath(directory.path) || directory.id !== nodeId("directory", directory.path) || directoryPaths.has(directory.path) || directoryIds.has(directory.id)) return false;
+    directoryPaths.add(directory.path);
+    directoryIds.add(directory.id);
+  }
+  if (!directoryPaths.has(".")) return false;
+  const filePaths = /* @__PURE__ */ new Set();
+  const fileIds = /* @__PURE__ */ new Set();
+  let observedBytes = 0;
+  for (const file of structure.files) {
+    if (!exactKeys(file, ["id", "path", "language", "size", "contentHash", "skipped", "references"]) || !validStoredPath(file.path) || file.path === "." || file.id !== nodeId("file", file.path) || filePaths.has(file.path) || fileIds.has(file.id) || typeof file.language !== "string" || file.language.length < 1 || file.language.length > 32 || !validInteger(file.size, 0) || !validHash(file.contentHash, true) || ![null, "binary", "oversized"].includes(file.skipped) || !Array.isArray(file.references) || file.references.length > 4096) return false;
+    if (file.skipped !== "oversized") observedBytes += file.size;
+    filePaths.add(file.path);
+    fileIds.add(file.id);
+    for (const reference of file.references) {
+      if (!exactKeys(reference, ["type", "specifier", "span", "confidence", "extractor", "target"]) || !["imports", "links"].includes(reference.type) || typeof reference.specifier !== "string" || reference.specifier.length < 1 || reference.specifier.length > 512 || reference.confidence !== "extracted" || typeof reference.extractor !== "string" || reference.extractor.length < 1 || reference.extractor.length > 128 || reference.target !== null && !validStoredPath(reference.target) || !exactKeys(reference.span, ["start", "end", "line", "column"]) || !validInteger(reference.span.start, 0) || !validInteger(reference.span.end, reference.span.start) || !validInteger(reference.span.line, 1) || !validInteger(reference.span.column, 1)) return false;
+    }
+  }
+  if (observedBytes !== structure.totalBytes) return false;
+  if (!exactKeys(structure.changes, ["added", "changed", "deleted", "renamed"]) || ![structure.changes.added, structure.changes.changed, structure.changes.deleted].every((values) => Array.isArray(values) && values.every(validStoredPath)) || !Array.isArray(structure.changes.renamed) || structure.changes.renamed.some((entry) => !exactKeys(entry, ["from", "to", "contentHash"]) || !validStoredPath(entry.from) || !validStoredPath(entry.to) || !validHash(entry.contentHash))) return false;
+  const core = {
+    schemaVersion: structure.schemaVersion,
+    adapter: structure.adapter,
+    root: structure.root,
+    limits: structure.limits,
+    directoryCount: structure.directoryCount,
+    fileCount: structure.fileCount,
+    totalBytes: structure.totalBytes,
+    directories: structure.directories,
+    files: structure.files
+  };
+  return sha256(canonicalStringify(core)) === structure.snapshotHash;
+}
+function hashBytes(bytes) {
+  return `sha256:${createHash3("sha256").update(bytes).digest("hex")}`;
+}
+function spanAt(text, start, length) {
+  const before = text.slice(0, start);
+  const lines = before.split("\n");
+  return Object.freeze({
+    start,
+    end: start + length,
+    line: lines.length,
+    column: lines.at(-1).length + 1
+  });
+}
+function extractedReference(type, specifier, start, text, extractor) {
+  return Object.freeze({
+    type,
+    specifier,
+    span: spanAt(text, start, specifier.length),
+    confidence: "extracted",
+    extractor
+  });
+}
+function sourceReferences(text, language) {
+  const references = [];
+  const seen = /* @__PURE__ */ new Set();
+  const addMatches = (pattern, type, extractor) => {
+    for (const match of text.matchAll(pattern)) {
+      const specifier = match[1];
+      const offset = match.index + match[0].indexOf(specifier);
+      const key = `${type}\0${offset}\0${specifier}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        references.push(extractedReference(type, specifier, offset, text, extractor));
+      }
+    }
+  };
+  if (["javascript", "typescript"].includes(language)) {
+    addMatches(/\b(?:import|export)\s+(?:[^"'\n]*?\s+from\s*)?["']([^"'\n]+)["']/g, "imports", "qarinah.ecmascript-module-lexical.v1");
+    addMatches(/\brequire\s*\(\s*["']([^"'\n]+)["']\s*\)/g, "imports", "qarinah.ecmascript-module-lexical.v1");
+    addMatches(/\bimport\s*\(\s*["']([^"'\n]+)["']\s*\)/g, "imports", "qarinah.ecmascript-module-lexical.v1");
+  }
+  if (language === "markdown") {
+    addMatches(/\[[^\]\n]*\]\((?!https?:|mailto:|#)([^)\s#?]+)(?:[?#][^)]*)?\)/g, "links", "qarinah.markdown-link.v1");
+  }
+  return references.sort((left, right) => left.span.start - right.span.start || left.specifier.localeCompare(right.specifier));
+}
+function looksBinary(bytes) {
+  const sample = bytes.subarray(0, Math.min(bytes.length, 8192));
+  if (sample.includes(0)) return true;
+  let controls = 0;
+  for (const value of sample) {
+    if (value < 9 || value > 13 && value < 32) controls += 1;
+  }
+  return sample.length > 0 && controls / sample.length > 0.03;
+}
+function resolveReference(fromPath, specifier, filesByPath) {
+  if (!specifier.startsWith(".")) return null;
+  const base = path2.posix.normalize(path2.posix.join(path2.posix.dirname(fromPath), specifier));
+  if (base === ".." || base.startsWith("../") || path2.posix.isAbsolute(base)) return null;
+  const candidates = [base];
+  if (!path2.posix.extname(base)) {
+    for (const extension of RESOLUTION_EXTENSIONS) candidates.push(`${base}${extension}`);
+    for (const extension of RESOLUTION_EXTENSIONS) candidates.push(`${base}/index${extension}`);
+  }
+  return candidates.find((candidate) => filesByPath.has(candidate)) ?? null;
+}
+async function assertReadableWorkspaceEntry(workspace, absolute) {
+  const metadata = await lstat2(absolute);
+  if (metadata.isSymbolicLink()) return null;
+  const resolved = await realpath2(absolute);
+  portablePath(workspace.root, resolved);
+  return metadata;
+}
+async function loadIgnoreMatcher(workspace) {
+  const matcher = (0, import_ignore.default)();
+  for (const name of [".gitignore", ".qarinahignore"]) {
+    const absolute = path2.join(workspace.root, name);
+    try {
+      const metadata = await assertReadableWorkspaceEntry(workspace, absolute);
+      if (!metadata?.isFile() || metadata.size > MAX_IGNORE_BYTES) continue;
+      matcher.add(await readFile(absolute, "utf8"));
+    } catch (error) {
+      if (error?.code !== "ENOENT") throw error;
+    }
+  }
+  return matcher;
+}
+async function collectStructure(workspace, options) {
+  const ignoreMatcher = await loadIgnoreMatcher(workspace);
+  const directories = [];
+  const files = [];
+  let totalBytes = 0;
+  async function walk(absoluteDirectory, depth) {
+    if (depth > options.maxDepth) {
+      throw new QarinahError("PROJECT_SCAN_LIMIT", `Project structure exceeds maxDepth ${options.maxDepth}.`);
+    }
+    const directoryPath = portablePath(workspace.root, absoluteDirectory);
+    directories.push(Object.freeze({ id: nodeId("directory", directoryPath), path: directoryPath }));
+    const entries = (await readdir(absoluteDirectory, { withFileTypes: true })).sort((left, right) => left.name.localeCompare(right.name));
+    for (const entry of entries) {
+      if (entry.name.includes("\0")) continue;
+      const absolute = path2.join(absoluteDirectory, entry.name);
+      const metadata = await assertReadableWorkspaceEntry(workspace, absolute);
+      if (!metadata) continue;
+      const entryPath = portablePath(workspace.root, absolute);
+      if (metadata.isDirectory()) {
+        if (EXCLUDED_DIRECTORIES.has(entry.name)) continue;
+        if (entry.name.startsWith(".") && !HIDDEN_DIRECTORY_ALLOWLIST.has(entry.name)) continue;
+        if (ignoreMatcher.ignores(`${entryPath}/`)) continue;
+        await walk(absolute, depth + 1);
+        continue;
+      }
+      if (!metadata.isFile() || entry.name.startsWith(".") || ignoreMatcher.ignores(entryPath) || !isCandidateFile(entry.name)) continue;
+      if (files.length >= options.maxFiles) {
+        throw new QarinahError("PROJECT_SCAN_LIMIT", `Project structure exceeds maxFiles ${options.maxFiles}.`);
+      }
+      const filePath = entryPath;
+      if (metadata.size > options.maxFileBytes) {
+        files.push(Object.freeze({
+          id: nodeId("file", filePath),
+          path: filePath,
+          language: languageFor(filePath),
+          size: metadata.size,
+          contentHash: null,
+          skipped: "oversized",
+          references: []
+        }));
+        continue;
+      }
+      if (totalBytes + metadata.size > options.maxTotalBytes) {
+        throw new QarinahError("PROJECT_SCAN_LIMIT", `Project structure exceeds maxTotalBytes ${options.maxTotalBytes}.`);
+      }
+      const bytes = await readFile(absolute);
+      totalBytes += bytes.length;
+      const contentHash = hashBytes(bytes);
+      const language = languageFor(filePath);
+      if (looksBinary(bytes)) {
+        files.push(Object.freeze({
+          id: nodeId("file", filePath),
+          path: filePath,
+          language,
+          size: bytes.length,
+          contentHash,
+          skipped: "binary",
+          references: []
+        }));
+        continue;
+      }
+      const text = bytes.toString("utf8");
+      files.push(Object.freeze({
+        id: nodeId("file", filePath),
+        path: filePath,
+        language,
+        size: bytes.length,
+        contentHash,
+        skipped: null,
+        references: sourceReferences(text, language)
+      }));
+    }
+  }
+  await walk(workspace.root, 0);
+  const filesByPath = new Map(files.map((file) => [file.path, file]));
+  const resolvedFiles = files.map((file) => Object.freeze({
+    ...file,
+    references: file.references.map((reference) => Object.freeze({
+      ...reference,
+      target: resolveReference(file.path, reference.specifier, filesByPath)
+    }))
+  }));
+  directories.sort((left, right) => left.path.localeCompare(right.path));
+  resolvedFiles.sort((left, right) => left.path.localeCompare(right.path));
+  return Object.freeze({ directories, files: resolvedFiles, totalBytes });
+}
+function structureChanges(previous, current) {
+  if (!previous) {
+    return Object.freeze({ added: current.files.map((file) => file.path), changed: [], deleted: [], renamed: [] });
+  }
+  const oldByPath = new Map(previous.files.map((file) => [file.path, file]));
+  const newByPath = new Map(current.files.map((file) => [file.path, file]));
+  const changed = current.files.filter((file) => oldByPath.has(file.path) && oldByPath.get(file.path).contentHash !== file.contentHash).map((file) => file.path);
+  const addedCandidates = current.files.filter((file) => !oldByPath.has(file.path));
+  const deletedCandidates = previous.files.filter((file) => !newByPath.has(file.path));
+  const deletedByHash = /* @__PURE__ */ new Map();
+  for (const file of deletedCandidates) {
+    if (!file.contentHash) continue;
+    const values = deletedByHash.get(file.contentHash) ?? [];
+    values.push(file);
+    deletedByHash.set(file.contentHash, values);
+  }
+  const renamed = [];
+  const renamedFrom = /* @__PURE__ */ new Set();
+  const renamedTo = /* @__PURE__ */ new Set();
+  for (const file of addedCandidates) {
+    const matches = file.contentHash ? deletedByHash.get(file.contentHash) ?? [] : [];
+    if (matches.length !== 1) continue;
+    const source = matches[0];
+    if (renamedFrom.has(source.path)) continue;
+    renamedFrom.add(source.path);
+    renamedTo.add(file.path);
+    renamed.push(Object.freeze({ from: source.path, to: file.path, contentHash: file.contentHash }));
+  }
+  return Object.freeze({
+    added: addedCandidates.map((file) => file.path).filter((value) => !renamedTo.has(value)).sort(),
+    changed: changed.sort(),
+    deleted: deletedCandidates.map((file) => file.path).filter((value) => !renamedFrom.has(value)).sort(),
+    renamed: renamed.sort((left, right) => `${left.from}\0${left.to}`.localeCompare(`${right.from}\0${right.to}`))
+  });
+}
+function latestProjectStructure(events) {
+  for (let index = events.length - 1; index >= 0; index -= 1) {
+    const candidate = events[index].data?.projectStructure;
+    if (validateProjectStructureSnapshot(candidate)) {
+      return { event: events[index], structure: candidate };
+    }
+  }
+  return null;
+}
+function snapshotBody(structure) {
+  const changed = structure.changes;
+  const paths = structure.files.slice(0, 200).map((file) => `- ${file.path}`).join("\n");
+  return [
+    `Observed ${structure.fileCount} files and ${structure.directoryCount} directories.`,
+    `Changes: ${changed.added.length} added, ${changed.changed.length} changed, ${changed.deleted.length} deleted, ${changed.renamed.length} renamed.`,
+    "",
+    "Indexed paths:",
+    paths,
+    structure.files.length > 200 ? `- [${structure.files.length - 200} additional paths omitted from this searchable summary]` : ""
+  ].filter((line, index, values) => line !== "" || values[index - 1] !== "").join("\n");
+}
+async function scanProjectStructure(rawOptions = {}) {
+  const options = scanOptions(rawOptions);
+  const workspace = await loadWorkspace(options.cwd ?? process.cwd());
+  const events = await readEvents(workspace);
+  const previous = latestProjectStructure(events);
+  const collected = await collectStructure(workspace, options);
+  const core = {
+    schemaVersion: PROJECT_STRUCTURE_SCHEMA_VERSION,
+    adapter: Object.freeze({ id: "qarinah.project-structure", version: "1" }),
+    root: ".",
+    limits: Object.freeze({
+      maxFiles: options.maxFiles,
+      maxFileBytes: options.maxFileBytes,
+      maxTotalBytes: options.maxTotalBytes,
+      maxDepth: options.maxDepth
+    }),
+    directoryCount: collected.directories.length,
+    fileCount: collected.files.length,
+    totalBytes: collected.totalBytes,
+    directories: collected.directories,
+    files: collected.files
+  };
+  const snapshotHash = sha256(canonicalStringify(core));
+  if (previous?.structure.snapshotHash === snapshotHash) {
+    return Object.freeze({
+      captured: false,
+      unchanged: true,
+      eventId: previous.event.eventId,
+      snapshotHash,
+      fileCount: core.fileCount,
+      directoryCount: core.directoryCount
+    });
+  }
+  const projectStructure = Object.freeze({
+    ...core,
+    snapshotHash,
+    changes: structureChanges(previous?.structure ?? null, core)
+  });
+  const payload = {
+    kind: "artifact",
+    actor: { type: "tool", id: "qarinah-project-structure" },
+    title: "Project structure snapshot",
+    body: workspace.config.capture === "content" ? snapshotBody(projectStructure) : "",
+    data: { projectStructure },
+    confidence: "extracted",
+    relations: previous ? [{ type: "supersedes", target: previous.event.eventId }] : [],
+    provenance: { adapter: "qarinah-project-structure", sourceId: snapshotHash },
+    retention: { class: "project", expiresAt: null }
+  };
+  const eventInput = workspace.config.capture === "metadata" ? reviewMetadataEventInput(payload) : payload;
+  const event = await appendEvent(eventInput, { workspace, capture: workspace.config.capture });
+  return Object.freeze({
+    captured: true,
+    unchanged: false,
+    eventId: event.eventId,
+    hash: event.hash,
+    snapshotHash,
+    fileCount: core.fileCount,
+    directoryCount: core.directoryCount,
+    changes: projectStructure.changes
+  });
+}
+var import_ignore, PROJECT_STRUCTURE_SCHEMA_VERSION, DEFAULT_MAX_FILES, DEFAULT_MAX_FILE_BYTES, DEFAULT_MAX_TOTAL_BYTES, DEFAULT_MAX_DEPTH, MAX_PATH_CHARS, SOURCE_EXTENSIONS, SOURCE_FILENAMES, EXCLUDED_DIRECTORIES, HIDDEN_DIRECTORY_ALLOWLIST, RESOLUTION_EXTENSIONS, MAX_IGNORE_BYTES;
+var init_project_structure = __esm({
+  "src/project-structure.js"() {
+    import_ignore = __toESM(require_ignore(), 1);
+    init_capture_policy();
+    init_canonical();
+    init_errors();
+    init_store();
+    init_workspace();
+    PROJECT_STRUCTURE_SCHEMA_VERSION = "qarinah.project-structure.v1";
+    DEFAULT_MAX_FILES = 750;
+    DEFAULT_MAX_FILE_BYTES = 512 * 1024;
+    DEFAULT_MAX_TOTAL_BYTES = 16 * 1024 * 1024;
+    DEFAULT_MAX_DEPTH = 24;
+    MAX_PATH_CHARS = 512;
+    SOURCE_EXTENSIONS = /* @__PURE__ */ new Set([
+      ".cjs",
+      ".css",
+      ".html",
+      ".java",
+      ".js",
+      ".json",
+      ".jsonc",
+      ".jsx",
+      ".kt",
+      ".md",
+      ".mjs",
+      ".py",
+      ".rb",
+      ".rs",
+      ".sh",
+      ".sql",
+      ".svelte",
+      ".toml",
+      ".ts",
+      ".tsx",
+      ".vue",
+      ".xml",
+      ".yaml",
+      ".yml"
+    ]);
+    SOURCE_FILENAMES = /* @__PURE__ */ new Set([
+      "Dockerfile",
+      "LICENSE",
+      "Makefile",
+      "Procfile",
+      "README",
+      "SECURITY"
+    ]);
+    EXCLUDED_DIRECTORIES = /* @__PURE__ */ new Set([
+      ".git",
+      ".next",
+      ".nuxt",
+      ".qarinah",
+      ".svelte-kit",
+      ".turbo",
+      ".wrangler",
+      "build",
+      "coverage",
+      "dist",
+      "node_modules",
+      "out",
+      "target",
+      "temp",
+      "tmp",
+      "vendor"
+    ]);
+    HIDDEN_DIRECTORY_ALLOWLIST = /* @__PURE__ */ new Set([".github"]);
+    RESOLUTION_EXTENSIONS = Object.freeze([".js", ".mjs", ".cjs", ".jsx", ".ts", ".tsx", ".json"]);
+    MAX_IGNORE_BYTES = 1024 * 1024;
+  }
+});
+
+// src/linked-memory.js
+import path3 from "node:path";
+function round(value, digits = 8) {
+  const scale = 10 ** digits;
+  return Math.round(value * scale) / scale;
+}
+function boundedInteger2(value, fallback, minimum, maximum, label) {
+  const candidate = value ?? fallback;
+  if (!Number.isSafeInteger(candidate) || candidate < minimum || candidate > maximum) {
+    throw new TypeError(`${label} must be an integer from ${minimum} to ${maximum}.`);
+  }
+  return candidate;
+}
+function canonicalTimestamp(value, label) {
+  if (typeof value !== "string" || value.length > 64) throw new TypeError(`${label} must be an ISO timestamp.`);
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime()) || date.toISOString() !== value) {
+    throw new TypeError(`${label} must be a canonical ISO timestamp.`);
+  }
+  return value;
+}
+function splitIdentifier(value) {
+  return String(value).normalize("NFKC").replace(/([\p{Ll}\p{N}])([\p{Lu}])/gu, "$1 $2").replace(/[._/\\:#@-]+/gu, " ").toLowerCase();
+}
+function lexemes(value) {
+  return (splitIdentifier(value).match(/[\p{L}\p{N}][\p{L}\p{N}_-]{1,63}/gu) ?? []).filter((term) => !STOP_WORDS.has(term));
+}
+function dataText(value, output = [], depth = 0) {
+  if (depth > 3 || output.length >= 256 || value === null || value === void 0) return output;
+  if (["string", "number", "boolean"].includes(typeof value)) {
+    output.push(String(value).slice(0, 4096));
+    return output;
+  }
+  if (Array.isArray(value)) {
+    for (const entry of value.slice(0, 64)) dataText(entry, output, depth + 1);
+    return output;
+  }
+  if (typeof value === "object") {
+    for (const [key, entry] of Object.entries(value).slice(0, 64)) {
+      if (key === "projectStructure") continue;
+      output.push(key);
+      dataText(entry, output, depth + 1);
+    }
+  }
+  return output;
+}
+function termCounts(value) {
+  const counts = /* @__PURE__ */ new Map();
+  for (const term of lexemes(value)) counts.set(term, (counts.get(term) ?? 0) + 1);
+  return counts;
+}
+function nodeId2(type, value) {
+  return `memory:${type}:${sha256(value).slice(7, 39)}`;
+}
+function latestProjectStructure2(events) {
+  for (let index = events.length - 1; index >= 0; index -= 1) {
+    const structure = events[index]?.data?.projectStructure;
+    if (validateProjectStructureSnapshot(structure)) {
+      return { event: events[index], structure };
+    }
+  }
+  return null;
+}
+function edgeKey(edge) {
+  return `${edge.source}\0${edge.type}\0${edge.target}`;
+}
+function addEdge(edges, seen, edge) {
+  if (edge.source === edge.target) return;
+  const key = edgeKey(edge);
+  const existing = seen.get(key);
+  if (existing !== void 0) {
+    const current = edges[existing];
+    edges[existing] = { ...current, occurrenceCount: (current.occurrenceCount ?? 1) + 1 };
+    return;
+  }
+  seen.set(key, edges.length);
+  edges.push({ ...edge, occurrenceCount: 1 });
+}
+function confidenceWeight(confidence) {
+  return { extracted: 0.72, inferred: 0.58, claimed: 0.48, verified: 1 }[confidence] ?? 0.4;
+}
+function repositoryRanks(fileNodes, edges) {
+  const ids = fileNodes.map((node) => node.id).sort();
+  if (ids.length === 0) return /* @__PURE__ */ new Map();
+  const idSet = new Set(ids);
+  const outgoing = new Map(ids.map((id) => [id, []]));
+  for (const edge of edges) {
+    if (!idSet.has(edge.source) || !idSet.has(edge.target)) continue;
+    if (!(/* @__PURE__ */ new Set(["imports", "links", "references"])).has(edge.type)) continue;
+    outgoing.get(edge.source).push(edge.target);
+  }
+  for (const targets of outgoing.values()) targets.sort();
+  let ranks = new Map(ids.map((id) => [id, 1 / ids.length]));
+  for (let iteration = 0; iteration < PAGE_RANK_ITERATIONS; iteration += 1) {
+    const next = new Map(ids.map((id) => [id, (1 - PAGE_RANK_DAMPING) / ids.length]));
+    let dangling = 0;
+    for (const id of ids) {
+      const targets = outgoing.get(id);
+      const rank = ranks.get(id);
+      if (targets.length === 0) {
+        dangling += rank;
+        continue;
+      }
+      const share = PAGE_RANK_DAMPING * rank / targets.length;
+      for (const target of targets) next.set(target, next.get(target) + share);
+    }
+    const danglingShare = PAGE_RANK_DAMPING * dangling / ids.length;
+    for (const id of ids) next.set(id, next.get(id) + danglingShare);
+    ranks = next;
+  }
+  const maximum = Math.max(...ranks.values(), 1);
+  return new Map([...ranks].map(([id, rank]) => [id, round(rank / maximum)]));
+}
+function sparseSignatures(nodes) {
+  const documentFrequency = /* @__PURE__ */ new Map();
+  const countsById = /* @__PURE__ */ new Map();
+  const termsById = /* @__PURE__ */ new Map();
+  for (const node of nodes) {
+    const counts = new Map([...termCounts(node.searchText)].sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0])).slice(0, MAX_LEXICAL_TERMS_PER_NODE));
+    countsById.set(node.id, counts);
+    termsById.set(node.id, [...counts].map(([term, count]) => ({ term, count })));
+    for (const term of counts.keys()) documentFrequency.set(term, (documentFrequency.get(term) ?? 0) + 1);
+  }
+  const documentCount = Math.max(nodes.length, 1);
+  const signatures = /* @__PURE__ */ new Map();
+  for (const node of nodes) {
+    const weighted = [...countsById.get(node.id)].map(([term, count]) => {
+      const inverseDocumentFrequency = Math.log(1 + (documentCount + 1) / ((documentFrequency.get(term) ?? 0) + 1));
+      return { term, value: (1 + Math.log(count)) * inverseDocumentFrequency };
+    }).sort((left, right) => right.value - left.value || left.term.localeCompare(right.term)).slice(0, MAX_TERMS_PER_NODE);
+    const magnitude = Math.sqrt(weighted.reduce((sum, entry) => sum + entry.value ** 2, 0)) || 1;
+    signatures.set(node.id, weighted.map((entry) => ({ term: entry.term, weight: round(entry.value / magnitude, 6) })));
+  }
+  return { signatures, termsById, documentFrequency, documentCount };
+}
+function signaturesFromTerms(nodes) {
+  const documentFrequency = /* @__PURE__ */ new Map();
+  for (const node of nodes) {
+    for (const entry of node.terms ?? []) {
+      documentFrequency.set(entry.term, (documentFrequency.get(entry.term) ?? 0) + 1);
+    }
+  }
+  const documentCount = Math.max(nodes.length, 1);
+  const signatures = /* @__PURE__ */ new Map();
+  for (const node of nodes) {
+    const weighted = (node.terms ?? []).map((entry) => {
+      const inverseDocumentFrequency = Math.log(1 + (documentCount + 1) / ((documentFrequency.get(entry.term) ?? 0) + 1));
+      return { term: entry.term, value: (1 + Math.log(entry.count)) * inverseDocumentFrequency };
+    }).sort((left, right) => right.value - left.value || left.term.localeCompare(right.term)).slice(0, MAX_TERMS_PER_NODE);
+    const magnitude = Math.sqrt(weighted.reduce((sum, entry) => sum + entry.value ** 2, 0)) || 1;
+    signatures.set(node.id, weighted.map((entry) => ({ term: entry.term, weight: round(entry.value / magnitude, 6) })));
+  }
+  return signatures;
+}
+function normalizedDegrees(nodes, edges) {
+  const degrees = new Map(nodes.map((node) => [node.id, { incoming: 0, outgoing: 0 }]));
+  for (const edge of edges) {
+    if (degrees.has(edge.source)) degrees.get(edge.source).outgoing += 1;
+    if (degrees.has(edge.target)) degrees.get(edge.target).incoming += 1;
+  }
+  const maximum = Math.max(1, ...[...degrees.values()].map((entry) => entry.incoming + entry.outgoing));
+  return new Map([...degrees].map(([id, entry]) => [id, {
+    ...entry,
+    normalized: round((entry.incoming + entry.outgoing) / maximum)
+  }]));
+}
+function activeAt(node, asOf) {
+  if (node.timestamp === null) return node.type === "concept";
+  if (node.timestamp > asOf || node.validFrom > asOf) return false;
+  if (node.validUntil !== null && node.validUntil <= asOf) return false;
+  if (node.expiresAt !== null && node.expiresAt <= asOf) return false;
+  return true;
+}
+function normalizedSelectors(value, label) {
+  if (value === void 0) return [];
+  const list2 = typeof value === "string" ? [value] : value;
+  if (!Array.isArray(list2) || list2.length > 64 || list2.some((entry) => typeof entry !== "string" || entry.length < 1 || entry.length > 256)) {
+    throw new TypeError(`${label} must contain at most 64 non-empty strings up to 256 characters.`);
+  }
+  if (new Set(list2).size !== list2.length) throw new TypeError(`${label} cannot contain duplicates.`);
+  return [...list2].sort();
+}
+function normalizedRankRequest(query, options = {}) {
+  if (!options || typeof options !== "object" || Array.isArray(options)) {
+    throw new TypeError("options must be an object.");
+  }
+  if (typeof query !== "string" || query.length > MAX_QUERY_CHARS) {
+    throw new TypeError(`query must be a string up to ${MAX_QUERY_CHARS} characters.`);
+  }
+  const limit = boundedInteger2(options.limit, DEFAULT_LIMIT, 1, MAX_LIMIT, "limit");
+  const asOf = canonicalTimestamp(options.asOf ?? (/* @__PURE__ */ new Date()).toISOString(), "asOf");
+  let allowedTypes = null;
+  if (options.types !== void 0) {
+    if (!Array.isArray(options.types) || options.types.length < 1 || options.types.length > 5) {
+      throw new TypeError("types must contain one or more supported linked-memory node types.");
+    }
+    allowedTypes = new Set(options.types);
+    if (allowedTypes.size !== options.types.length || [...allowedTypes].some((type) => !["memory", "file", "directory", "concept", "reference"].includes(type))) {
+      throw new TypeError("types must contain one or more supported linked-memory node types.");
+    }
+  }
+  const authorityScopes = normalizedSelectors(options.authorityScopes, "authorityScopes");
+  const repositoryIds = normalizedSelectors(options.repositoryIds, "repositoryIds");
+  return Object.freeze({ limit, asOf, allowedTypes, authorityScopes, repositoryIds });
+}
+function profileActiveAt(profile, asOf) {
+  if (profile.validFrom !== null && profile.validFrom > asOf) return false;
+  if (profile.validUntil !== null && profile.validUntil <= asOf) return false;
+  if (profile.expiresAt !== null && profile.expiresAt <= asOf) return false;
+  return true;
+}
+function admittedProfile(profile, selectors, asOf) {
+  if (!profileActiveAt(profile, asOf)) return false;
+  if (profile.classification === "restricted" && !profile.disclosureScopes.some((scope) => selectors.authorityScopes.includes(scope))) return false;
+  return selectors.repositoryIds.length === 0 || profile.repositoryId === null || selectors.repositoryIds.includes(profile.repositoryId);
+}
+function admittedNode(node, selectors, asOf) {
+  if (node.sourceProfiles.length > 0) {
+    return node.sourceProfiles.some((profile) => admittedProfile(profile, selectors, asOf));
+  }
+  if (node.classification === "restricted" && !node.disclosureScopes.some((scope) => selectors.authorityScopes.includes(scope))) return false;
+  return selectors.repositoryIds.length === 0 || node.repositoryId === null || selectors.repositoryIds.includes(node.repositoryId);
+}
+function eventActiveAt(event, asOf) {
+  const validFrom = event.temporal?.validFrom ?? event.timestamp;
+  if (event.timestamp > asOf || validFrom > asOf) return false;
+  if (event.temporal?.validUntil !== null && event.temporal?.validUntil !== void 0 && event.temporal.validUntil <= asOf) return false;
+  if (event.retention?.expiresAt !== null && event.retention?.expiresAt !== void 0 && event.retention.expiresAt <= asOf) return false;
+  return true;
+}
+function selectProjectionEvents(events, options) {
+  if (options.asOf === void 0 && options.authorityScopes === void 0 && options.repositoryIds === void 0) {
+    return events;
+  }
+  const asOf = canonicalTimestamp(options.asOf ?? (/* @__PURE__ */ new Date()).toISOString(), "asOf");
+  const selectors = {
+    authorityScopes: normalizedSelectors(options.authorityScopes, "authorityScopes"),
+    repositoryIds: normalizedSelectors(options.repositoryIds, "repositoryIds")
+  };
+  return events.filter((event) => {
+    if (!eventActiveAt(event, asOf)) return false;
+    if (event.disclosure?.classification === "restricted" && !(event.disclosure.scopes ?? []).some((scope) => selectors.authorityScopes.includes(scope))) return false;
+    return selectors.repositoryIds.length === 0 || event.repository?.id === void 0 || event.repository?.id === null || selectors.repositoryIds.includes(event.repository.id);
+  });
+}
+function buildLinkedProjectMemory(events, workspaceId, options = {}) {
+  if (!Array.isArray(events)) throw new TypeError("events must be an array of verified Qarinah events.");
+  if (!WORKSPACE_ID.test(workspaceId)) throw new TypeError("workspaceId is invalid.");
+  const sourceEvents = selectProjectionEvents(events, options);
+  const sourceEventIds = new Set(sourceEvents.map((event) => event.eventId));
+  const currentStructure = latestProjectStructure2(sourceEvents);
+  const sourcePositions = new Map(sourceEvents.map((event, index) => [event.eventId, index]));
+  let projectedEvents = sourceEvents.slice(-MAX_GRAPH_EVENTS);
+  if (currentStructure && !projectedEvents.some((event) => event.eventId === currentStructure.event.eventId)) {
+    projectedEvents = [currentStructure.event, ...projectedEvents.slice(1)].sort((left, right) => sourcePositions.get(left.eventId) - sourcePositions.get(right.eventId));
+  }
+  const projectedEventIds = new Set(projectedEvents.map((event) => event.eventId));
+  const sourceRelationCount = sourceEvents.reduce((sum, event) => sum + event.relations.length, 0);
+  let remainingRelations = MAX_GRAPH_RELATIONS;
+  const selectedRelations = /* @__PURE__ */ new Map();
+  for (let index = projectedEvents.length - 1; index >= 0; index -= 1) {
+    const event = projectedEvents[index];
+    const relations = [];
+    for (const relation of event.relations) {
+      if (sourceEventIds.has(relation.target) && !projectedEventIds.has(relation.target) || remainingRelations === 0) {
+        continue;
+      }
+      relations.push(relation);
+      remainingRelations -= 1;
+    }
+    selectedRelations.set(event.eventId, relations);
+  }
+  projectedEvents = projectedEvents.map((event) => {
+    const relations = selectedRelations.get(event.eventId);
+    return relations.length === event.relations.length ? event : { ...event, relations };
+  });
+  events = projectedEvents;
+  let remainingFileReferences = MAX_GRAPH_FILE_REFERENCES;
+  let projectedFileReferenceCount = 0;
+  const projectedStructure = currentStructure ? {
+    ...currentStructure.structure,
+    files: currentStructure.structure.files.map((file) => {
+      const references = file.references.slice(0, Math.min(MAX_GRAPH_REFERENCES_PER_FILE, remainingFileReferences));
+      remainingFileReferences -= references.length;
+      projectedFileReferenceCount += references.length;
+      return references.length === file.references.length ? file : { ...file, references };
+    })
+  } : null;
+  const sourceFileReferenceCount = currentStructure?.structure.files.reduce((sum, file) => sum + file.references.length, 0) ?? 0;
+  const relationCount = events.reduce((sum, event) => sum + event.relations.length, 0);
+  const structuralReferenceCount = projectedFileReferenceCount;
+  const structuralNodeCount = (currentStructure?.structure.directories.length ?? 0) + (currentStructure?.structure.files.length ?? 0);
+  const nodeUpperBound = events.length + relationCount + structuralReferenceCount + structuralNodeCount + MAX_CONCEPTS;
+  const edgeUpperBound = relationCount + Math.max(0, events.length - 1) + structuralNodeCount + structuralReferenceCount + MAX_ABOUT_EDGES_PER_NODE * (events.length + relationCount + structuralReferenceCount + (currentStructure?.structure.files.length ?? 0));
+  if (nodeUpperBound > MAX_GRAPH_NODES || edgeUpperBound > MAX_GRAPH_EDGES) {
+    throw new QarinahError("LINKED_MEMORY_LIMIT", "Linked project memory exceeds its deterministic node or edge budget.", {
+      nodeUpperBound,
+      edgeUpperBound,
+      maxNodes: MAX_GRAPH_NODES,
+      maxEdges: MAX_GRAPH_EDGES
+    });
+  }
+  const nodes = [];
+  const edges = [];
+  const edgesSeen = /* @__PURE__ */ new Map();
+  const nodesById = /* @__PURE__ */ new Map();
+  const superseded = /* @__PURE__ */ new Set();
+  const supersededBy = /* @__PURE__ */ new Map();
+  const conflicted = /* @__PURE__ */ new Set();
+  for (const event of events) {
+    for (const relation of event.relations) {
+      if (relation.type === "supersedes") {
+        superseded.add(relation.target);
+        const sources = supersededBy.get(relation.target) ?? [];
+        sources.push(event.eventId);
+        supersededBy.set(relation.target, sources);
+      }
+      if (relation.type === "contradicts") {
+        conflicted.add(event.eventId);
+        conflicted.add(relation.target);
+      }
+    }
+  }
+  for (const event of events) {
+    const node = {
+      id: event.eventId,
+      type: "memory",
+      kind: event.kind,
+      label: event.title,
+      path: null,
+      language: null,
+      timestamp: event.timestamp,
+      validFrom: event.temporal?.validFrom ?? event.timestamp,
+      validUntil: event.temporal?.validUntil ?? null,
+      expiresAt: event.retention?.expiresAt ?? null,
+      confidence: event.confidence ?? "extracted",
+      status: superseded.has(event.eventId) ? "superseded" : "current",
+      supersededBy: [...supersededBy.get(event.eventId) ?? []].sort(),
+      conflicted: conflicted.has(event.eventId),
+      repositoryId: event.repository?.id ?? null,
+      disclosureScopes: event.disclosure?.scopes ?? [],
+      classification: event.disclosure?.classification ?? "workspace",
+      sourceProfiles: [],
+      sourceEventId: event.eventId,
+      evidenceHash: event.hash,
+      contentHash: event.provenance?.contentHash ?? null,
+      searchText: [event.title, event.body, ...dataText(event.data)].join("\n")
+    };
+    nodes.push(node);
+    nodesById.set(node.id, node);
+  }
+  const pendingRelations = [];
+  for (const event of events) {
+    for (const relation of event.relations) {
+      pendingRelations.push({ event, relation });
+    }
+  }
+  const timeline = [...events].sort((left, right) => left.timestamp.localeCompare(right.timestamp) || left.eventId.localeCompare(right.eventId));
+  for (let index = 1; index < timeline.length; index += 1) {
+    addEdge(edges, edgesSeen, {
+      source: timeline[index - 1].eventId,
+      type: "precedes",
+      target: timeline[index].eventId,
+      sourceEventId: timeline[index].eventId,
+      evidenceHash: timeline[index].hash,
+      confidence: "extracted",
+      weight: 0.35
+    });
+  }
+  if (currentStructure) {
+    const { event } = currentStructure;
+    const structure = projectedStructure;
+    const directories = new Map(structure.directories.map((directory) => [directory.path, directory.id]));
+    const files = new Map(structure.files.map((file) => [file.path, file.id]));
+    for (const directory of structure.directories) {
+      const node = {
+        id: directory.id,
+        type: "directory",
+        kind: "project.directory",
+        label: directory.path === "." ? "project root" : path3.posix.basename(directory.path),
+        path: directory.path,
+        language: null,
+        timestamp: event.timestamp,
+        validFrom: event.timestamp,
+        validUntil: null,
+        expiresAt: null,
+        confidence: "extracted",
+        status: "current",
+        supersededBy: [],
+        conflicted: false,
+        repositoryId: event.repository?.id ?? null,
+        disclosureScopes: event.disclosure?.scopes ?? [],
+        classification: event.disclosure?.classification ?? "workspace",
+        sourceProfiles: [],
+        sourceEventId: event.eventId,
+        evidenceHash: event.hash,
+        contentHash: null,
+        searchText: `directory ${directory.path}`
+      };
+      nodes.push(node);
+      nodesById.set(node.id, node);
+      if (directory.path !== ".") {
+        const parentPath = path3.posix.dirname(directory.path) || ".";
+        const parentId = directories.get(parentPath);
+        if (parentId) addEdge(edges, edgesSeen, {
+          source: parentId,
+          type: "contains",
+          target: directory.id,
+          sourceEventId: event.eventId,
+          evidenceHash: event.hash,
+          confidence: "extracted",
+          weight: 0.7
+        });
+      }
+    }
+    for (const file of structure.files) {
+      const referenceText = file.references.map((reference) => `${reference.type} ${reference.specifier} ${reference.target ?? ""}`).join("\n");
+      const node = {
+        id: file.id,
+        type: "file",
+        kind: "project.file",
+        label: path3.posix.basename(file.path),
+        path: file.path,
+        language: file.language,
+        timestamp: event.timestamp,
+        validFrom: event.timestamp,
+        validUntil: null,
+        expiresAt: null,
+        confidence: "extracted",
+        status: "current",
+        supersededBy: [],
+        conflicted: false,
+        repositoryId: event.repository?.id ?? null,
+        disclosureScopes: event.disclosure?.scopes ?? [],
+        classification: event.disclosure?.classification ?? "workspace",
+        sourceProfiles: [],
+        sourceEventId: event.eventId,
+        evidenceHash: event.hash,
+        contentHash: file.contentHash,
+        searchText: `file ${file.path} ${file.language} ${referenceText}`
+      };
+      nodes.push(node);
+      nodesById.set(node.id, node);
+      const parentPath = path3.posix.dirname(file.path) || ".";
+      const parentId = directories.get(parentPath);
+      if (parentId) addEdge(edges, edgesSeen, {
+        source: parentId,
+        type: "contains",
+        target: file.id,
+        sourceEventId: event.eventId,
+        evidenceHash: event.hash,
+        confidence: "extracted",
+        weight: 0.7
+      });
+      for (const reference of file.references) {
+        let targetId = reference.target ? files.get(reference.target) : null;
+        if (!targetId) {
+          targetId = nodeId2(reference.target ? "unresolved" : "external", `${reference.type}:${reference.specifier}`);
+          if (!nodesById.has(targetId)) {
+            const referenceNode = {
+              id: targetId,
+              type: "reference",
+              kind: reference.target ? "project.unresolved" : "project.external",
+              label: reference.specifier,
+              path: reference.target ?? null,
+              language: null,
+              timestamp: event.timestamp,
+              validFrom: event.timestamp,
+              validUntil: null,
+              expiresAt: null,
+              confidence: reference.confidence,
+              status: "current",
+              supersededBy: [],
+              conflicted: false,
+              repositoryId: event.repository?.id ?? null,
+              disclosureScopes: event.disclosure?.scopes ?? [],
+              classification: event.disclosure?.classification ?? "workspace",
+              sourceProfiles: [],
+              sourceEventId: event.eventId,
+              evidenceHash: event.hash,
+              contentHash: null,
+              searchText: `${reference.type} ${reference.specifier} ${reference.target ?? ""}`
+            };
+            nodes.push(referenceNode);
+            nodesById.set(targetId, referenceNode);
+          }
+        }
+        addEdge(edges, edgesSeen, {
+          source: file.id,
+          type: reference.type,
+          target: targetId,
+          sourceEventId: event.eventId,
+          evidenceHash: event.hash,
+          confidence: reference.confidence,
+          weight: 0.9
+        });
+      }
+    }
+    const rootId = directories.get(".");
+    if (rootId) addEdge(edges, edgesSeen, {
+      source: event.eventId,
+      type: "produced",
+      target: rootId,
+      sourceEventId: event.eventId,
+      evidenceHash: event.hash,
+      confidence: "extracted",
+      weight: 1
+    });
+  }
+  const pendingByTarget = /* @__PURE__ */ new Map();
+  for (const pending of pendingRelations) {
+    if (nodesById.has(pending.relation.target)) continue;
+    const entries = pendingByTarget.get(pending.relation.target) ?? [];
+    entries.push(pending);
+    pendingByTarget.set(pending.relation.target, entries);
+  }
+  const relationTargetIds = /* @__PURE__ */ new Map();
+  for (const [target, entries] of pendingByTarget) {
+    if (nodesById.has(target)) continue;
+    const referenceId = nodeId2("relation-reference", target);
+    const profiles = entries.map(({ event }) => ({
+      sourceNodeId: event.eventId,
+      sourceEventId: event.eventId,
+      evidenceHash: event.hash,
+      contentHash: event.provenance?.contentHash ?? null,
+      classification: event.disclosure?.classification ?? "workspace",
+      disclosureScopes: [...event.disclosure?.scopes ?? []].sort(),
+      repositoryId: event.repository?.id ?? null,
+      validFrom: event.temporal?.validFrom ?? event.timestamp,
+      validUntil: event.temporal?.validUntil ?? null,
+      expiresAt: event.retention?.expiresAt ?? null
+    })).sort((left, right) => left.sourceNodeId.localeCompare(right.sourceNodeId));
+    const boundedProfiles = profiles.slice(0, MAX_CONCEPT_SOURCE_PROFILES);
+    const repositories = new Set(profiles.map((profile) => profile.repositoryId));
+    const scopes = [...new Set(profiles.flatMap((profile) => profile.disclosureScopes))].sort();
+    const first = entries.slice().sort((left, right) => left.event.timestamp.localeCompare(right.event.timestamp))[0].event;
+    const reference = {
+      id: referenceId,
+      type: "reference",
+      kind: "external-reference",
+      label: target,
+      path: null,
+      language: null,
+      timestamp: first.timestamp,
+      validFrom: first.temporal?.validFrom ?? first.timestamp,
+      validUntil: null,
+      expiresAt: null,
+      confidence: "extracted",
+      status: "current",
+      supersededBy: [],
+      conflicted: false,
+      repositoryId: repositories.size === 1 ? [...repositories][0] : null,
+      disclosureScopes: scopes,
+      classification: effectiveConceptClassification(profiles),
+      sourceProfiles: boundedProfiles,
+      sourceProfileCount: profiles.length,
+      sourceProfilesTruncated: profiles.length > boundedProfiles.length,
+      sourceEventId: first.eventId,
+      evidenceHash: first.hash,
+      contentHash: null,
+      searchText: target
+    };
+    nodes.push(reference);
+    nodesById.set(reference.id, reference);
+    relationTargetIds.set(target, reference.id);
+  }
+  for (const { event, relation } of pendingRelations) {
+    const target = nodesById.has(relation.target) ? relation.target : relationTargetIds.get(relation.target);
+    if (!target) continue;
+    addEdge(edges, edgesSeen, {
+      source: event.eventId,
+      type: relation.type,
+      target,
+      sourceEventId: event.eventId,
+      evidenceHash: event.hash,
+      confidence: event.confidence ?? "extracted",
+      weight: 1
+    });
+  }
+  const semanticDocuments = nodes.filter((node) => node.type !== "directory");
+  const { signatures, termsById, documentFrequency, documentCount } = sparseSignatures(semanticDocuments);
+  const concepts = [...documentFrequency].filter(([, count]) => count >= (documentCount >= 4 ? 2 : 1)).map(([term, count]) => ({
+    term,
+    count,
+    score: count * (1 + Math.log(1 + documentCount / count))
+  })).sort((left, right) => right.score - left.score || right.count - left.count || left.term.localeCompare(right.term)).slice(0, MAX_CONCEPTS);
+  const conceptIdByTerm = /* @__PURE__ */ new Map();
+  for (const concept of concepts) {
+    const id = nodeId2("concept", concept.term);
+    if (nodesById.has(id)) {
+      throw new QarinahError("LINKED_MEMORY_ID_COLLISION", "Linked project memory produced a duplicate internal node identity.");
+    }
+    conceptIdByTerm.set(concept.term, id);
+    const sourceProfiles = [];
+    for (const source of semanticDocuments) {
+      if (!(termsById.get(source.id) ?? []).some((entry) => entry.term === concept.term)) continue;
+      const profile = {
+        sourceNodeId: source.id,
+        sourceEventId: source.sourceEventId,
+        evidenceHash: source.evidenceHash,
+        contentHash: source.contentHash,
+        classification: source.classification,
+        disclosureScopes: [...source.disclosureScopes].sort(),
+        repositoryId: source.repositoryId,
+        validFrom: source.validFrom,
+        validUntil: source.validUntil,
+        expiresAt: source.expiresAt
+      };
+      sourceProfiles.push(profile);
+    }
+    sourceProfiles.sort((left, right) => Number(left.classification === "restricted") - Number(right.classification === "restricted") || String(left.validFrom).localeCompare(String(right.validFrom)) || String(left.repositoryId).localeCompare(String(right.repositoryId)) || left.sourceNodeId.localeCompare(right.sourceNodeId));
+    const boundedSourceProfiles = sourceProfiles.slice(0, MAX_CONCEPT_SOURCE_PROFILES);
+    const node = {
+      id,
+      type: "concept",
+      kind: "semantic.concept",
+      label: concept.term,
+      path: null,
+      language: null,
+      timestamp: null,
+      validFrom: null,
+      validUntil: null,
+      expiresAt: null,
+      confidence: "extracted",
+      status: "current",
+      supersededBy: [],
+      conflicted: false,
+      repositoryId: null,
+      disclosureScopes: [],
+      classification: "derived",
+      sourceProfiles: boundedSourceProfiles,
+      sourceProfileCount: sourceProfiles.length,
+      sourceProfilesTruncated: sourceProfiles.length > boundedSourceProfiles.length,
+      sourceEventId: null,
+      evidenceHash: null,
+      contentHash: null,
+      searchText: concept.term,
+      documentFrequency: concept.count
+    };
+    nodes.push(node);
+    nodesById.set(id, node);
+    signatures.set(id, [{ term: concept.term, weight: 1 }]);
+    termsById.set(id, [{ term: concept.term, count: 1 }]);
+  }
+  for (const node of semanticDocuments) {
+    for (const entry of (signatures.get(node.id) ?? []).filter((entry2) => conceptIdByTerm.has(entry2.term)).slice(0, MAX_ABOUT_EDGES_PER_NODE)) {
+      addEdge(edges, edgesSeen, {
+        source: node.id,
+        type: "about",
+        target: conceptIdByTerm.get(entry.term),
+        sourceEventId: node.sourceEventId,
+        evidenceHash: node.evidenceHash,
+        confidence: "extracted",
+        weight: entry.weight
+      });
+    }
+  }
+  const ranks = repositoryRanks(nodes.filter((node) => node.type === "file"), edges);
+  const degrees = normalizedDegrees(nodes, edges);
+  const eventTimes = events.map((event) => Date.parse(event.timestamp));
+  const minimumTime = eventTimes.length ? Math.min(...eventTimes) : 0;
+  const maximumTime = eventTimes.length ? Math.max(...eventTimes) : 0;
+  const timeSpan = Math.max(1, maximumTime - minimumTime);
+  const finalizedNodes = nodes.map((node) => {
+    const degree = degrees.get(node.id) ?? { incoming: 0, outgoing: 0, normalized: 0 };
+    const repositoryRank = ranks.get(node.id) ?? 0;
+    const recency = node.timestamp === null ? 0 : (Date.parse(node.timestamp) - minimumTime) / timeSpan;
+    const importance = node.type === "file" ? 0.75 * repositoryRank + 0.25 * degree.normalized : node.type === "concept" ? Math.min(1, (node.documentFrequency ?? 0) / Math.max(1, documentCount)) : node.type === "memory" ? 0.45 * degree.normalized + 0.3 * recency + 0.25 * confidenceWeight(node.confidence) : 0.35 * degree.normalized;
+    const { searchText: _searchText, ...publicNode } = node;
+    return {
+      ...publicNode,
+      terms: termsById.get(node.id) ?? [],
+      signature: signatures.get(node.id) ?? [],
+      importance: round(Math.min(1, importance)),
+      repositoryRank,
+      incoming: degree.incoming,
+      outgoing: degree.outgoing
+    };
+  }).sort((left, right) => left.id.localeCompare(right.id));
+  if (new Set(finalizedNodes.map((node) => node.id)).size !== finalizedNodes.length) {
+    throw new QarinahError("LINKED_MEMORY_ID_COLLISION", "Linked project memory produced duplicate node identities.");
+  }
+  const finalizedEdges = edges.map((edge) => ({ ...edge, weight: round(edge.weight) })).sort((left, right) => edgeKey(left).localeCompare(edgeKey(right)));
+  const filesById = new Map(finalizedNodes.filter((node) => node.type === "file").map((node) => [node.id, node]));
+  const dependenciesById = new Map([...filesById.keys()].map((id) => [id, []]));
+  const dependentsById = new Map([...filesById.keys()].map((id) => [id, []]));
+  for (const edge of finalizedEdges) {
+    if (!filesById.has(edge.source) || !filesById.has(edge.target)) continue;
+    if (!["imports", "links", "references"].includes(edge.type)) continue;
+    dependenciesById.get(edge.source).push(filesById.get(edge.target).path);
+    dependentsById.get(edge.target).push(filesById.get(edge.source).path);
+  }
+  const repositoryEntries = [...filesById.values()].map((node) => ({
+    id: node.id,
+    path: node.path,
+    language: node.language,
+    contentHash: node.contentHash,
+    rank: node.repositoryRank,
+    incoming: node.incoming,
+    outgoing: node.outgoing,
+    dependencies: [...new Set(dependenciesById.get(node.id))].sort(),
+    dependents: [...new Set(dependentsById.get(node.id))].sort()
+  })).sort((left, right) => right.rank - left.rank || right.incoming - left.incoming || left.path.localeCompare(right.path));
+  const headHash = sourceEvents.at(-1)?.hash ?? null;
+  const core = {
+    schemaVersion: LINKED_PROJECT_MEMORY_SCHEMA_VERSION,
+    workspaceId,
+    eventCount: sourceEvents.length,
+    headHash,
+    source: {
+      ledger: ".qarinah/events/events.jsonl",
+      projectSnapshotHash: currentStructure?.structure.snapshotHash ?? null,
+      projectSourceEventId: currentStructure?.event.eventId ?? null
+    },
+    coverage: {
+      sourceEvents: sourceEvents.length,
+      projectedEvents: events.length,
+      omittedEvents: sourceEvents.length - events.length,
+      sourceRelations: sourceRelationCount,
+      projectedRelations: relationCount,
+      omittedRelations: sourceRelationCount - relationCount,
+      sourceFileReferences: sourceFileReferenceCount,
+      projectedFileReferences: projectedFileReferenceCount,
+      omittedFileReferences: sourceFileReferenceCount - projectedFileReferenceCount,
+      complete: sourceEvents.length === events.length && sourceRelationCount === relationCount && sourceFileReferenceCount === projectedFileReferenceCount
+    },
+    statistics: {
+      nodes: finalizedNodes.length,
+      edges: finalizedEdges.length,
+      memories: finalizedNodes.filter((node) => node.type === "memory").length,
+      files: repositoryEntries.length,
+      directories: finalizedNodes.filter((node) => node.type === "directory").length,
+      concepts: finalizedNodes.filter((node) => node.type === "concept").length,
+      conflicts: finalizedNodes.filter((node) => node.conflicted).length,
+      superseded: finalizedNodes.filter((node) => node.status === "superseded").length
+    },
+    timeline: timeline.map((event) => event.eventId),
+    repositoryMap: {
+      method: "bounded-link-rank-v1",
+      iterations: PAGE_RANK_ITERATIONS,
+      damping: PAGE_RANK_DAMPING,
+      entries: repositoryEntries,
+      entrypoints: repositoryEntries.slice(0, 20).map((entry) => entry.id)
+    },
+    nodes: finalizedNodes,
+    edges: finalizedEdges
+  };
+  const memory = { ...core, manifestHash: sha256(core) };
+  if (Buffer.byteLength(canonicalStringify(memory), "utf8") > MAX_PROJECTION_BYTES) {
+    throw new QarinahError("LINKED_MEMORY_LIMIT", "Linked project memory exceeds its serialized byte budget.");
+  }
+  return deepFreezeJson(memory);
+}
+function vectorScore(signature, queryTerms) {
+  if (queryTerms.size === 0 || signature.length === 0) return 0;
+  let sum = 0;
+  for (const entry of signature) if (queryTerms.has(entry.term)) sum += entry.weight;
+  return Math.min(1, sum / Math.sqrt(queryTerms.size));
+}
+function effectiveConceptClassification(profiles) {
+  if (profiles.some((profile) => profile.classification === "restricted")) return "restricted";
+  if (profiles.some((profile) => profile.classification === "workspace")) return "workspace";
+  if (profiles.some((profile) => profile.classification === "public")) return "public";
+  return "derived";
+}
+function profileBoundNode(node, selectors, asOf) {
+  if (node.sourceProfiles.length === 0) return activeAt(node, asOf) && admittedNode(node, selectors, asOf) ? node : null;
+  if (node.sourceProfilesTruncated === true) return null;
+  const profiles = node.sourceProfiles.filter((profile) => admittedProfile(profile, selectors, asOf));
+  if (profiles.length === 0) return null;
+  const repositories = new Set(profiles.map((profile) => profile.repositoryId));
+  const scopes = [...new Set(profiles.flatMap((profile) => profile.disclosureScopes))].sort();
+  const first = profiles.slice().sort((left, right) => String(left.validFrom).localeCompare(String(right.validFrom)) || left.sourceNodeId.localeCompare(right.sourceNodeId))[0];
+  return {
+    ...node,
+    timestamp: first.validFrom,
+    validFrom: first.validFrom,
+    validUntil: profiles.some((profile) => profile.validUntil === null) ? null : profiles.map((profile) => profile.validUntil).sort().at(-1),
+    expiresAt: profiles.some((profile) => profile.expiresAt === null) ? null : profiles.map((profile) => profile.expiresAt).sort().at(-1),
+    repositoryId: repositories.size === 1 ? [...repositories][0] : null,
+    disclosureScopes: scopes,
+    classification: effectiveConceptClassification(profiles),
+    sourceProfiles: profiles,
+    sourceProfileCount: profiles.length,
+    sourceProfilesTruncated: false,
+    sourceEventId: first.sourceEventId,
+    evidenceHash: first.evidenceHash,
+    contentHash: first.contentHash
+  };
+}
+function buildAdmittedConcepts(sourceNodes, sourceSignatures) {
+  const sourcesByTerm = /* @__PURE__ */ new Map();
+  for (const source of sourceNodes) {
+    for (const entry of source.terms ?? []) {
+      const sources = sourcesByTerm.get(entry.term) ?? [];
+      sources.push(source);
+      sourcesByTerm.set(entry.term, sources);
+    }
+  }
+  const documentCount = Math.max(sourceNodes.length, 1);
+  const selected3 = [...sourcesByTerm].map(([term, sources]) => ({
+    term,
+    sources,
+    score: sources.length * (1 + Math.log(1 + documentCount / sources.length))
+  })).filter((entry) => entry.sources.length >= (sourceNodes.length >= 4 ? 2 : 1)).sort((left, right) => right.score - left.score || right.sources.length - left.sources.length || left.term.localeCompare(right.term)).slice(0, MAX_CONCEPTS);
+  const conceptByTerm = /* @__PURE__ */ new Map();
+  const concepts = selected3.map((entry) => {
+    const allProfiles = entry.sources.map((source) => ({
+      sourceNodeId: source.id,
+      sourceEventId: source.sourceEventId,
+      evidenceHash: source.evidenceHash,
+      contentHash: source.contentHash,
+      classification: source.classification,
+      disclosureScopes: [...source.disclosureScopes].sort(),
+      repositoryId: source.repositoryId,
+      validFrom: source.validFrom,
+      validUntil: source.validUntil,
+      expiresAt: source.expiresAt
+    })).sort((left, right) => left.sourceNodeId.localeCompare(right.sourceNodeId));
+    const sourceProfiles = allProfiles.slice(0, MAX_CONCEPT_SOURCE_PROFILES);
+    const scopes = [...new Set(allProfiles.flatMap((profile) => profile.disclosureScopes))].sort();
+    const repositories = new Set(allProfiles.map((profile) => profile.repositoryId));
+    const concept = {
+      id: nodeId2("concept", entry.term),
+      type: "concept",
+      kind: "semantic.concept",
+      label: entry.term,
+      path: null,
+      language: null,
+      timestamp: null,
+      validFrom: null,
+      validUntil: null,
+      expiresAt: null,
+      confidence: "extracted",
+      status: "current",
+      supersededBy: [],
+      conflicted: false,
+      repositoryId: repositories.size === 1 ? [...repositories][0] : null,
+      disclosureScopes: scopes,
+      classification: effectiveConceptClassification(allProfiles),
+      sourceProfiles,
+      sourceProfileCount: allProfiles.length,
+      sourceProfilesTruncated: allProfiles.length > sourceProfiles.length,
+      sourceEventId: null,
+      evidenceHash: null,
+      contentHash: null,
+      documentFrequency: entry.sources.length,
+      terms: [{ term: entry.term, count: 1 }],
+      signature: [{ term: entry.term, weight: 1 }]
+    };
+    conceptByTerm.set(entry.term, concept);
+    return concept;
+  });
+  const edges = [];
+  for (const source of sourceNodes) {
+    for (const entry of (sourceSignatures.get(source.id) ?? []).filter((candidate) => conceptByTerm.has(candidate.term)).slice(0, MAX_ABOUT_EDGES_PER_NODE)) {
+      edges.push({
+        source: source.id,
+        type: "about",
+        target: conceptByTerm.get(entry.term).id,
+        sourceEventId: source.sourceEventId,
+        evidenceHash: source.evidenceHash,
+        confidence: "extracted",
+        weight: entry.weight,
+        occurrenceCount: 1
+      });
+    }
+  }
+  return { concepts, edges };
+}
+function projectQueryNode(node, metadata) {
+  const projected = {
+    id: node.id,
+    type: node.type,
+    kind: node.kind,
+    label: node.label,
+    path: node.path,
+    language: node.language,
+    timestamp: node.timestamp,
+    validFrom: node.validFrom,
+    validUntil: node.validUntil,
+    expiresAt: node.expiresAt,
+    confidence: node.confidence,
+    status: "current",
+    supersededBy: [],
+    conflicted: metadata.conflicted,
+    repositoryId: node.repositoryId,
+    disclosureScopes: [...node.disclosureScopes],
+    classification: node.classification,
+    sourceProfiles: node.sourceProfiles,
+    sourceEventId: node.sourceEventId,
+    evidenceHash: node.evidenceHash,
+    contentHash: node.contentHash,
+    terms: metadata.terms,
+    signature: metadata.signature,
+    importance: metadata.importance,
+    repositoryRank: metadata.repositoryRank,
+    incoming: metadata.incoming,
+    outgoing: metadata.outgoing
+  };
+  if (node.sourceProfiles.length > 0) {
+    projected.sourceProfileCount = node.sourceProfileCount;
+    projected.sourceProfilesTruncated = node.sourceProfilesTruncated;
+  }
+  if (node.type === "concept") {
+    projected.documentFrequency = node.documentFrequency;
+  }
+  return projected;
+}
+function rankLinkedProjectMemory(memory, query = "", options = {}) {
+  if (!memory || memory.schemaVersion !== LINKED_PROJECT_MEMORY_SCHEMA_VERSION) {
+    throw new TypeError("memory must be a linked project memory v1 projection.");
+  }
+  if (!Array.isArray(memory.nodes) || memory.nodes.length > MAX_GRAPH_NODES || !Array.isArray(memory.edges) || memory.edges.length > MAX_GRAPH_EDGES) {
+    throw new QarinahError("LINKED_MEMORY_LIMIT", "Linked project memory exceeds its deterministic query budget.");
+  }
+  const { limit, asOf, allowedTypes, authorityScopes, repositoryIds } = normalizedRankRequest(query, options);
+  const selectors = { authorityScopes, repositoryIds };
+  const queryTerms = new Set(lexemes(query));
+  const admittedActiveBase = memory.nodes.filter((node) => node.type !== "concept").map((node) => profileBoundNode(node, selectors, asOf)).filter((node) => node !== null);
+  const authorityComplete = !memory.nodes.some((node) => node.type !== "concept" && node.sourceProfilesTruncated === true);
+  const admittedActiveBaseIds = new Set(admittedActiveBase.map((node) => node.id));
+  const supersededAt = (node) => node.supersededBy.some((sourceId) => admittedActiveBaseIds.has(sourceId));
+  const currentBase = admittedActiveBase.filter((node) => !supersededAt(node));
+  const currentBaseIds = new Set(currentBase.map((node) => node.id));
+  const semanticSources = currentBase.filter((node) => node.type !== "directory");
+  const sourceSignatures = signaturesFromTerms(semanticSources);
+  const localConcepts = buildAdmittedConcepts(semanticSources, sourceSignatures);
+  const localNodes = [...currentBase, ...localConcepts.concepts];
+  const localNodeIds = new Set(localNodes.map((node) => node.id));
+  const localEdges = memory.edges.filter((edge) => edge.type !== "about" && currentBaseIds.has(edge.source) && currentBaseIds.has(edge.target));
+  localEdges.push(...localConcepts.edges);
+  localEdges.sort((left, right) => edgeKey(left).localeCompare(edgeKey(right)));
+  const nodeById = new Map(localNodes.map((node) => [node.id, node]));
+  const adjacencySets = new Map(localNodes.map((node) => [node.id, /* @__PURE__ */ new Set()]));
+  const conflicted = /* @__PURE__ */ new Set();
+  for (const edge of localEdges) {
+    if (!localNodeIds.has(edge.source) || !localNodeIds.has(edge.target)) continue;
+    adjacencySets.get(edge.source).add(edge.target);
+    adjacencySets.get(edge.target).add(edge.source);
+    if (edge.type === "contradicts") {
+      conflicted.add(edge.source);
+      conflicted.add(edge.target);
+    }
+  }
+  const adjacency = new Map([...adjacencySets].map(([id, neighbors]) => [id, [...neighbors].sort()]));
+  const degrees = normalizedDegrees(localNodes, localEdges);
+  const localRepositoryRanks = repositoryRanks(currentBase.filter((node) => node.type === "file"), localEdges);
+  const times = currentBase.map((node) => node.timestamp === null ? null : Date.parse(node.timestamp)).filter(Number.isFinite);
+  const minimumTime = times.length ? Math.min(...times) : 0;
+  const maximumTime = times.length ? Math.max(...times) : 0;
+  const timeSpan = Math.max(1, maximumTime - minimumTime);
+  const signatures = new Map(sourceSignatures);
+  for (const concept of localConcepts.concepts) signatures.set(concept.id, concept.signature);
+  const metadata = new Map(localNodes.map((node) => {
+    const degree = degrees.get(node.id) ?? { incoming: 0, outgoing: 0, normalized: 0 };
+    const repositoryRank = localRepositoryRanks.get(node.id) ?? 0;
+    const recency = node.timestamp === null ? 0 : (Date.parse(node.timestamp) - minimumTime) / timeSpan;
+    const importance = node.type === "file" ? 0.75 * repositoryRank + 0.25 * degree.normalized : node.type === "concept" ? Math.min(1, node.documentFrequency / Math.max(1, semanticSources.length)) : node.type === "memory" ? 0.45 * degree.normalized + 0.3 * recency + 0.25 * confidenceWeight(node.confidence) : 0.35 * degree.normalized;
+    return [node.id, {
+      terms: node.terms ?? [],
+      signature: signatures.get(node.id) ?? [],
+      importance: round(Math.min(1, importance)),
+      repositoryRank: round(repositoryRank),
+      incoming: degree.incoming,
+      outgoing: degree.outgoing,
+      conflicted: conflicted.has(node.id)
+    }];
+  }));
+  const scored = [];
+  for (const node of localNodes) {
+    if (allowedTypes && !allowedTypes.has(node.type)) continue;
+    const nodeMetadata = metadata.get(node.id);
+    const local = vectorScore(nodeMetadata.signature, queryTerms);
+    let graph = 0;
+    if (queryTerms.size > 0) {
+      for (const neighborId of adjacency.get(node.id) ?? []) {
+        graph = Math.max(graph, vectorScore(metadata.get(neighborId)?.signature ?? [], queryTerms));
+      }
+    }
+    const importance = nodeMetadata.importance;
+    const score = queryTerms.size === 0 ? importance : 0.72 * local + 0.18 * graph + 0.1 * importance;
+    if (queryTerms.size > 0 && local === 0 && graph === 0) continue;
+    scored.push({ node, score: round(score), local: round(local), graph: round(graph), importance: round(importance) });
+  }
+  scored.sort((left, right) => right.score - left.score || right.local - left.local || right.importance - left.importance || left.node.id.localeCompare(right.node.id));
+  const items = scored.slice(0, limit).map((entry, index) => {
+    const statusAtAsOf = "current";
+    const node = projectQueryNode(entry.node, metadata.get(entry.node.id));
+    return {
+      rank: index + 1,
+      score: entry.score,
+      basis: {
+        localSemantic: entry.local,
+        linkedEvidence: entry.graph,
+        structuralImportance: entry.importance,
+        formula: queryTerms.size === 0 ? "structural-importance" : "0.72*local + 0.18*linked + 0.10*importance"
+      },
+      node,
+      statusAtAsOf,
+      evidence: {
+        sourceEventId: entry.node.sourceEventId,
+        hash: entry.node.evidenceHash,
+        contentHash: entry.node.contentHash
+      },
+      neighbors: (adjacency.get(entry.node.id) ?? []).slice(0, 20)
+    };
+  });
+  const matchedTerms = /* @__PURE__ */ new Set();
+  for (const item of items) {
+    for (const entry of item.node.signature) if (queryTerms.has(entry.term)) matchedTerms.add(entry.term);
+  }
+  const sourceView = {
+    workspaceId: memory.workspaceId,
+    asOf,
+    nodes: localNodes.map((node) => ({ id: node.id, evidenceHash: node.evidenceHash, contentHash: node.contentHash })).sort((left, right) => left.id.localeCompare(right.id)),
+    edges: localEdges.map((edge) => ({ source: edge.source, type: edge.type, target: edge.target }))
+  };
+  const latestSource = admittedActiveBase.filter((node) => node.type === "memory").sort((left, right) => right.timestamp.localeCompare(left.timestamp) || right.id.localeCompare(left.id))[0];
+  const projectedEvents = admittedActiveBase.filter((node) => node.type === "memory").length;
+  const omittedEvents = memory.coverage.omittedEvents;
+  const core = {
+    schemaVersion: LINKED_PROJECT_QUERY_SCHEMA_VERSION,
+    workspaceId: memory.workspaceId,
+    sourceManifestHash: sha256(sourceView),
+    sourceHeadHash: latestSource?.evidenceHash ?? null,
+    query,
+    asOf,
+    requestedTypes: allowedTypes ? [...allowedTypes].sort() : [],
+    authorityScopes,
+    repositoryIds,
+    filters: {
+      excluded: admittedActiveBase.length - currentBase.length
+    },
+    coverage: {
+      queryTerms: [...queryTerms].sort(),
+      matchedTerms: [...matchedTerms].sort(),
+      ratio: queryTerms.size === 0 ? 1 : round(matchedTerms.size / queryTerms.size),
+      status: queryTerms.size === 0 ? "browse" : matchedTerms.size === queryTerms.size ? "direct" : matchedTerms.size > 0 ? "partial" : "none",
+      sourceEvents: projectedEvents + omittedEvents,
+      projectedEvents,
+      omittedEvents,
+      projectionComplete: memory.coverage.complete,
+      authorityComplete
+    },
+    items
+  };
+  return deepFreezeJson({ ...core, manifestHash: sha256(core) });
+}
+async function readProjection(workspace, maximumBytes) {
+  const opened = await openSecureReadFile(workspace, ["graph", "linked-memory.json"]);
+  if (opened.metadata.size > maximumBytes) {
+    await opened.handle.close();
+    throw new QarinahError("LINKED_MEMORY_INVALID", "Linked project memory exceeds its bounded size.");
+  }
+  try {
+    const contents = await opened.handle.readFile();
+    if (contents.length !== opened.metadata.size) {
+      throw new QarinahError("LINKED_MEMORY_INVALID", "Linked project memory changed while it was being read.");
+    }
+    return JSON.parse(contents.toString("utf8"));
+  } catch (error) {
+    if (error instanceof QarinahError) throw error;
+    throw new QarinahError("LINKED_MEMORY_INVALID", "Linked project memory is not valid JSON.", { cause: error.message });
+  } finally {
+    await opened.handle.close();
+  }
+}
+async function writeLinkedProjectMemoryProjection(workspace, memory) {
+  const serialized = `${canonicalStringify(memory)}
+`;
+  const maximumBytes = Math.min(MAX_PROJECTION_BYTES, workspace.config.maxLogBytes * 6);
+  if (Buffer.byteLength(serialized, "utf8") > maximumBytes) {
+    throw new QarinahError("LINKED_MEMORY_LIMIT", "Linked project memory exceeds the workspace projection byte budget.");
+  }
+  const output = await secureStoragePath(workspace, ["graph", "linked-memory.json"], { type: "file", allowMissing: true });
+  await atomicWriteFile(output, serialized);
+  return output;
+}
+async function ensureLinkedProjectMemoryProjection(workspace, expected, rebuild) {
+  const maximumBytes = Math.min(MAX_PROJECTION_BYTES, workspace.config.maxLogBytes * 6);
+  let persisted;
+  try {
+    persisted = await readProjection(workspace, maximumBytes);
+  } catch (error) {
+    if (error?.code !== "ENOENT" || rebuild === false) throw error;
+  }
+  if (persisted !== void 0 && canonicalStringify(persisted) !== canonicalStringify(expected)) {
+    if (rebuild === false) {
+      throw new QarinahError("LINKED_MEMORY_STALE", "Persisted linked project memory does not match the verified event log.");
+    }
+    persisted = void 0;
+  }
+  if (persisted === void 0) await writeLinkedProjectMemoryProjection(workspace, expected);
+}
+async function queryLinkedProjectMemory(query = "", options = {}) {
+  const request = normalizedRankRequest(query, options);
+  const workspace = await loadWorkspace(options.cwd ?? process.cwd());
+  const events = await readEvents(workspace, { updateCheckpoint: options.updateCheckpoint !== false });
+  const memory = buildLinkedProjectMemory(events, workspace.config.workspaceId, {
+    asOf: request.asOf,
+    authorityScopes: request.authorityScopes,
+    repositoryIds: request.repositoryIds
+  });
+  const result = rankLinkedProjectMemory(memory, query, {
+    ...options,
+    asOf: request.asOf,
+    authorityScopes: request.authorityScopes,
+    repositoryIds: request.repositoryIds
+  });
+  if (options.persist !== false) {
+    const globalMemory = buildLinkedProjectMemory(events, workspace.config.workspaceId);
+    await ensureLinkedProjectMemoryProjection(workspace, globalMemory, options.rebuild);
+  }
+  return result;
+}
+var LINKED_PROJECT_MEMORY_SCHEMA_VERSION, LINKED_PROJECT_QUERY_SCHEMA_VERSION, WORKSPACE_ID, DEFAULT_LIMIT, MAX_LIMIT, MAX_QUERY_CHARS, MAX_CONCEPTS, MAX_TERMS_PER_NODE, MAX_LEXICAL_TERMS_PER_NODE, MAX_ABOUT_EDGES_PER_NODE, MAX_CONCEPT_SOURCE_PROFILES, MAX_GRAPH_EVENTS, MAX_GRAPH_RELATIONS, MAX_GRAPH_FILE_REFERENCES, MAX_GRAPH_REFERENCES_PER_FILE, MAX_GRAPH_NODES, MAX_GRAPH_EDGES, MAX_PROJECTION_BYTES, PAGE_RANK_ITERATIONS, PAGE_RANK_DAMPING, STOP_WORDS;
+var init_linked_memory = __esm({
+  "src/linked-memory.js"() {
+    init_canonical();
+    init_errors();
+    init_project_structure();
+    init_store();
+    init_workspace();
+    LINKED_PROJECT_MEMORY_SCHEMA_VERSION = "qarinah.linked-project-memory.v1";
+    LINKED_PROJECT_QUERY_SCHEMA_VERSION = "qarinah.linked-project-query.v1";
+    WORKSPACE_ID = /^ws_[0-9a-f]{32}$/u;
+    DEFAULT_LIMIT = 20;
+    MAX_LIMIT = 100;
+    MAX_QUERY_CHARS = 4096;
+    MAX_CONCEPTS = 64;
+    MAX_TERMS_PER_NODE = 64;
+    MAX_LEXICAL_TERMS_PER_NODE = 128;
+    MAX_ABOUT_EDGES_PER_NODE = 6;
+    MAX_CONCEPT_SOURCE_PROFILES = 512;
+    MAX_GRAPH_EVENTS = 1e4;
+    MAX_GRAPH_RELATIONS = 2e4;
+    MAX_GRAPH_FILE_REFERENCES = 2e4;
+    MAX_GRAPH_REFERENCES_PER_FILE = 64;
+    MAX_GRAPH_NODES = 75e3;
+    MAX_GRAPH_EDGES = 45e4;
+    MAX_PROJECTION_BYTES = 128 * 1024 * 1024;
+    PAGE_RANK_ITERATIONS = 24;
+    PAGE_RANK_DAMPING = 0.85;
+    STOP_WORDS = /* @__PURE__ */ new Set([
+      "about",
+      "after",
+      "again",
+      "also",
+      "and",
+      "are",
+      "because",
+      "before",
+      "been",
+      "being",
+      "between",
+      "both",
+      "but",
+      "can",
+      "could",
+      "does",
+      "each",
+      "for",
+      "from",
+      "have",
+      "into",
+      "its",
+      "more",
+      "not",
+      "only",
+      "other",
+      "our",
+      "over",
+      "same",
+      "should",
+      "than",
+      "that",
+      "the",
+      "their",
+      "then",
+      "there",
+      "these",
+      "they",
+      "this",
+      "through",
+      "under",
+      "use",
+      "used",
+      "using",
+      "was",
+      "were",
+      "what",
+      "when",
+      "where",
+      "which",
+      "while",
+      "will",
+      "with",
+      "would"
+    ]);
+  }
+});
+
 // src/project-views.js
 function boundedText(value, fallback = "") {
   if (typeof value !== "string") return fallback;
@@ -1460,7 +3662,7 @@ var init_project_views = __esm({
 // src/sqlite-read-model.js
 import { randomBytes as randomBytes2 } from "node:crypto";
 import { rm as rm2, rename as rename2 } from "node:fs/promises";
-import path2 from "node:path";
+import path4 from "node:path";
 import { pathToFileURL } from "node:url";
 async function importSqliteWithoutExperimentalWarning() {
   const originalEmitWarning = process.emitWarning;
@@ -1662,7 +3864,7 @@ async function rebuildSqliteReadModel(workspace, events, derived) {
     type: "file",
     allowMissing: true
   });
-  const temporary = path2.join(path2.dirname(destination), `.${SQLITE_READ_MODEL_FILENAME}.${process.pid}.${randomBytes2(6).toString("hex")}.tmp`);
+  const temporary = path4.join(path4.dirname(destination), `.${SQLITE_READ_MODEL_FILENAME}.${process.pid}.${randomBytes2(6).toString("hex")}.tmp`);
   let database;
   try {
     database = new DatabaseSync(temporary, { enableForeignKeyConstraints: true, allowExtension: false, timeout: 5e3 });
@@ -1925,12 +4127,12 @@ __export(indexer_exports, {
   rebuildDerivedState: () => rebuildDerivedState,
   tokenize: () => tokenize
 });
-import path3 from "node:path";
+import path5 from "node:path";
 function tokenize(value) {
-  return [...new Set(lexemes(value))].filter((token) => !STOP_WORDS.has(token)).sort();
+  return [...new Set(lexemes2(value))].filter((token) => !STOP_WORDS2.has(token)).sort();
 }
-function lexemes(value) {
-  return (String(value).normalize("NFKC").toLowerCase().match(/[\p{L}\p{N}][\p{L}\p{N}_-]{1,63}/gu) || []).filter((token) => !STOP_WORDS.has(token));
+function lexemes2(value) {
+  return (String(value).normalize("NFKC").toLowerCase().match(/[\p{L}\p{N}][\p{L}\p{N}_-]{1,63}/gu) || []).filter((token) => !STOP_WORDS2.has(token));
 }
 function frequencyTable(values) {
   const frequencies = /* @__PURE__ */ Object.create(null);
@@ -1959,7 +4161,7 @@ function searchableText(event) {
 ${event.body}
 ${selectedData.join("\n")}`;
 }
-function latestProjectStructure(events) {
+function latestProjectStructure3(events) {
   for (let index = events.length - 1; index >= 0; index -= 1) {
     const structure = events[index].data?.projectStructure;
     if (structure?.schemaVersion === "qarinah.project-structure.v1" && Array.isArray(structure.directories) && Array.isArray(structure.files)) {
@@ -1972,7 +4174,7 @@ function projectNodeId(type, value) {
   return `project:${type}:${sha256(value).slice("sha256:".length, "sha256:".length + 32)}`;
 }
 function appendProjectGraph(events, nodes, edges) {
-  const current = latestProjectStructure(events);
+  const current = latestProjectStructure3(events);
   if (!current) return null;
   const { sourceEventId, structure } = current;
   const directoryIds = new Map(structure.directories.map((directory) => [directory.path, directory.id]));
@@ -1987,7 +4189,7 @@ function appendProjectGraph(events, nodes, edges) {
       sourceEventId
     });
     if (directory.path !== ".") {
-      const parent = path3.posix.dirname(directory.path);
+      const parent = path5.posix.dirname(directory.path);
       const parentId = directoryIds.get(parent === "" ? "." : parent);
       if (parentId) edges.push({ source: parentId, type: "contains", target: directory.id, confidence: "extracted", sourceEventId });
     }
@@ -2004,7 +4206,7 @@ function appendProjectGraph(events, nodes, edges) {
       confidence: "extracted",
       sourceEventId
     });
-    const parent = path3.posix.dirname(file.path);
+    const parent = path5.posix.dirname(file.path);
     const parentId = directoryIds.get(parent === "" ? "." : parent);
     if (parentId) edges.push({ source: parentId, type: "contains", target: file.id, confidence: "extracted", sourceEventId });
     for (const reference of file.references) {
@@ -2048,7 +4250,7 @@ function appendProjectGraph(events, nodes, edges) {
 }
 function eventProjection(event) {
   const searchable = searchableText(event);
-  const eventLexemes = lexemes(searchable);
+  const eventLexemes = lexemes2(searchable);
   return Object.freeze({
     eventId: event.eventId,
     timestamp: event.timestamp,
@@ -2146,27 +4348,31 @@ function buildDerivedState(events, workspaceId) {
   coalescedEdges.sort((left, right) => `${left.source}\0${left.type}\0${left.target}`.localeCompare(`${right.source}\0${right.type}\0${right.target}`));
   const headHash = events.at(-1)?.hash ?? null;
   const averageDocumentLength = projections.length === 0 ? 0 : projections.reduce((total, event) => total + event.documentLength, 0) / projections.length;
+  const index = {
+    schemaVersion: INDEX_SCHEMA_VERSION,
+    workspaceId,
+    eventCount: projections.length,
+    headHash,
+    events: projections,
+    postings,
+    documentFrequency,
+    averageDocumentLength,
+    adjacency
+  };
+  const graph = {
+    schemaVersion: GRAPH_SCHEMA_VERSION,
+    workspaceId,
+    eventCount: projections.length,
+    headHash,
+    projectStructure,
+    nodes,
+    edges: coalescedEdges
+  };
+  const linkedMemory = buildLinkedProjectMemory(events, workspaceId);
   return deepFreezeJson({
-    index: {
-      schemaVersion: INDEX_SCHEMA_VERSION,
-      workspaceId,
-      eventCount: projections.length,
-      headHash,
-      events: projections,
-      postings,
-      documentFrequency,
-      averageDocumentLength,
-      adjacency
-    },
-    graph: {
-      schemaVersion: GRAPH_SCHEMA_VERSION,
-      workspaceId,
-      eventCount: projections.length,
-      headHash,
-      projectStructure,
-      nodes,
-      edges: coalescedEdges
-    }
+    index,
+    graph,
+    linkedMemory
   });
 }
 function markdownFor(events, workspaceId, headHash) {
@@ -2198,7 +4404,7 @@ function markdownFor(events, workspaceId, headHash) {
     }
     lines.push("");
   }
-  const current = latestProjectStructure(events);
+  const current = latestProjectStructure3(events);
   if (current) {
     const structure = current.structure;
     lines.push("## Current project structure");
@@ -2221,9 +4427,12 @@ function markdownFor(events, workspaceId, headHash) {
   return `${lines.join("\n")}
 `;
 }
-async function rebuildDerivedState(start = process.cwd()) {
+async function rebuildDerivedState(start = process.cwd(), options = {}) {
+  const signal = validateAbortSignal(options.signal);
+  throwIfAborted(signal);
   const workspace = await loadWorkspace(start);
-  const events = await readEvents(workspace);
+  const events = await readEvents(workspace, { signal });
+  throwIfAborted(signal);
   const derived = buildDerivedState(events, workspace.config.workspaceId);
   const indexPath = await secureStoragePath(workspace, ["index", "index.json"], { type: "file", allowMissing: true });
   const graphPath = await secureStoragePath(workspace, ["graph", "graph.json"], { type: "file", allowMissing: true });
@@ -2232,6 +4441,7 @@ async function rebuildDerivedState(start = process.cwd()) {
   const flowPath = await secureStoragePath(workspace, ["records", "FLOW.md"], { type: "file", allowMissing: true });
   const changesPath = await secureStoragePath(workspace, ["records", "CHANGES.md"], { type: "file", allowMissing: true });
   const recordViews = renderProjectRecordViews(buildProjectRecordViews(events, workspace.config.workspaceId));
+  throwIfAborted(signal);
   await atomicWriteFile(
     indexPath,
     `${canonicalStringify(derived.index)}
@@ -2242,6 +4452,7 @@ async function rebuildDerivedState(start = process.cwd()) {
     `${canonicalStringify(derived.graph)}
 `
   );
+  await writeLinkedProjectMemoryProjection(workspace, derived.linkedMemory);
   await atomicWriteFile(
     markdownPath,
     markdownFor(events, workspace.config.workspaceId, derived.index.headHash)
@@ -2254,6 +4465,7 @@ async function rebuildDerivedState(start = process.cwd()) {
     workspaceId: workspace.config.workspaceId,
     eventCount: events.length,
     headHash: derived.index.headHash,
+    linkedMemory: derived.linkedMemory.statistics,
     readModel
   });
 }
@@ -2319,6 +4531,11 @@ async function loadIndex(start = process.cwd(), options = {}) {
       ["graph", "graph.json"],
       Math.min(256 * 1024 * 1024, workspace.config.maxLogBytes * 4)
     );
+    const linkedMemory = await readBoundedIndex(
+      workspace,
+      ["graph", "linked-memory.json"],
+      Math.min(256 * 1024 * 1024, workspace.config.maxLogBytes * 6)
+    );
     const markdown = (await readBoundedFile(
       workspace,
       ["records", "CONTEXT.md"],
@@ -2344,7 +4561,7 @@ async function loadIndex(start = process.cwd(), options = {}) {
       Math.min(16 * 1024 * 1024, workspace.config.maxLogBytes),
       "Derived changes record"
     )).toString("utf8");
-    persistedViewsCurrent = persistedViewsCurrent && canonicalStringify(graph) === canonicalStringify(expected.graph) && markdown === markdownFor(events, workspace.config.workspaceId, expected.index.headHash) && decisions === expectedRecordViews.decisions && flow === expectedRecordViews.flow && changes === expectedRecordViews.changes;
+    persistedViewsCurrent = persistedViewsCurrent && canonicalStringify(graph) === canonicalStringify(expected.graph) && canonicalStringify(linkedMemory) === canonicalStringify(expected.linkedMemory) && markdown === markdownFor(events, workspace.config.workspaceId, expected.index.headHash) && decisions === expectedRecordViews.decisions && flow === expectedRecordViews.flow && changes === expectedRecordViews.changes;
   } catch (error) {
     if (error?.code !== "ENOENT") throw error;
     persistedViewsCurrent = false;
@@ -2364,19 +4581,21 @@ async function loadIndex(start = process.cwd(), options = {}) {
   }
   return Object.freeze({ workspace, index: expected.index });
 }
-var INDEX_SCHEMA_VERSION, GRAPH_SCHEMA_VERSION, STOP_WORDS;
+var INDEX_SCHEMA_VERSION, GRAPH_SCHEMA_VERSION, STOP_WORDS2;
 var init_indexer = __esm({
   "src/indexer.js"() {
+    init_abort();
     init_canonical();
     init_errors();
     init_markdown();
+    init_linked_memory();
     init_project_views();
     init_store();
     init_sqlite_read_model();
     init_workspace();
     INDEX_SCHEMA_VERSION = "qarinah.index.v2";
     GRAPH_SCHEMA_VERSION = "qarinah.graph.v2";
-    STOP_WORDS = /* @__PURE__ */ new Set([
+    STOP_WORDS2 = /* @__PURE__ */ new Set([
       "a",
       "an",
       "and",
@@ -2409,15 +4628,15 @@ var init_indexer = __esm({
 // src/workspace.js
 import { randomBytes as randomBytes3 } from "node:crypto";
 import { constants as constants2 } from "node:fs";
-import { access, lstat as lstat2, mkdir as mkdir2, open as open2, realpath as realpath2, rename as rename3, rm as rm3 } from "node:fs/promises";
-import path4 from "node:path";
+import { access, lstat as lstat3, mkdir as mkdir2, open as open2, realpath as realpath3, rename as rename3, rm as rm3 } from "node:fs/promises";
+import path6 from "node:path";
 function isWithin2(root, candidate) {
-  const relative = path4.relative(root, candidate);
-  return relative === "" || !relative.startsWith("..") && !path4.isAbsolute(relative);
+  const relative = path6.relative(root, candidate);
+  return relative === "" || !relative.startsWith("..") && !path6.isAbsolute(relative);
 }
 function resolveWithin(root, ...segments) {
-  const candidate = path4.resolve(root, ...segments);
-  if (!isWithin2(path4.resolve(root), candidate)) {
+  const candidate = path6.resolve(root, ...segments);
+  if (!isWithin2(path6.resolve(root), candidate)) {
     throw new QarinahError("PATH_OUTSIDE_WORKSPACE", "Resolved path escapes the Context Ledger workspace.", { candidate });
   }
   return candidate;
@@ -2433,7 +4652,7 @@ async function exists(candidate) {
 async function safeLstat(candidate, label, { allowMissing = false } = {}) {
   let metadata;
   try {
-    metadata = await lstat2(candidate);
+    metadata = await lstat3(candidate);
   } catch (error) {
     if (allowMissing && error?.code === "ENOENT") return null;
     throw error;
@@ -2445,14 +4664,14 @@ async function ensureSafeDirectory(candidate, root, label) {
   const existing = await safeLstat(candidate, label, { allowMissing: true });
   if (!existing) await mkdir2(candidate, { recursive: false, mode: 448 });
   else if (!existing.isDirectory()) throw new QarinahError("WORKSPACE_INVALID", `${label} must be a directory.`);
-  const actual = await realpath2(candidate);
+  const actual = await realpath3(candidate);
   if (!isWithin2(root, actual)) throw new QarinahError("PATH_OUTSIDE_WORKSPACE", `${label} resolves outside the workspace root.`);
   return actual;
 }
 async function atomicWriteFile(destination, contents, options = {}) {
-  const directory = path4.dirname(destination);
+  const directory = path6.dirname(destination);
   await mkdir2(directory, { recursive: true });
-  const temporary = path4.join(directory, `.${path4.basename(destination)}.${process.pid}.${randomBytes3(6).toString("hex")}.tmp`);
+  const temporary = path6.join(directory, `.${path6.basename(destination)}.${process.pid}.${randomBytes3(6).toString("hex")}.tmp`);
   try {
     const handle = await open2(temporary, "wx", 384);
     try {
@@ -2483,7 +4702,7 @@ async function secureStoragePath(workspace, segments, options = {}) {
   const candidate = resolveWithin(workspace.qarinahDir, ...segments);
   let current = workspace.qarinahDir;
   for (let index = 0; index < segments.length; index += 1) {
-    current = path4.join(current, segments[index]);
+    current = path6.join(current, segments[index]);
     const final = index === segments.length - 1;
     const metadata = await safeLstat(current, `.qarinah/${segments.slice(0, index + 1).join("/")}`, {
       allowMissing: final && options.allowMissing === true
@@ -2501,7 +4720,7 @@ async function secureStoragePath(workspace, segments, options = {}) {
     if (final && options.type === "file" && metadata.nlink !== 1) {
       throw new QarinahError("STORAGE_LINK_REJECTED", `.qarinah/${segments.join("/")} cannot have multiple filesystem links.`);
     }
-    const actual = await realpath2(current);
+    const actual = await realpath3(current);
     if (!isWithin2(workspace.qarinahDir, actual)) {
       throw new QarinahError("PATH_OUTSIDE_WORKSPACE", `.qarinah/${segments.slice(0, index + 1).join("/")} resolves outside the workspace.`);
     }
@@ -2514,14 +4733,14 @@ async function verifyOpenedStorageFile(workspace, segments, candidate, handle) {
   if (!opened.isFile() || opened.nlink !== 1n) {
     throw new QarinahError("STORAGE_LINK_REJECTED", `${label} is not a singly linked regular file.`);
   }
-  const named = await lstat2(candidate, { bigint: true });
+  const named = await lstat3(candidate, { bigint: true });
   if (named.isSymbolicLink() || !named.isFile() || named.nlink !== 1n) {
     throw new QarinahError("STORAGE_LINK_REJECTED", `${label} changed to a linked or non-regular file.`);
   }
   if (opened.dev !== named.dev || opened.ino !== named.ino) {
     throw new QarinahError("STORAGE_RACE_DETECTED", `${label} changed while it was being opened.`);
   }
-  const actual = await realpath2(candidate);
+  const actual = await realpath3(candidate);
   if (!isWithin2(workspace.qarinahDir, actual)) {
     throw new QarinahError("PATH_OUTSIDE_WORKSPACE", `${label} resolves outside the workspace.`);
   }
@@ -2580,9 +4799,9 @@ function validateConfig(raw) {
   return Object.freeze({ ...config });
 }
 async function initializeWorkspace(target = process.cwd(), options = {}) {
-  const requestedRoot = path4.resolve(target);
+  const requestedRoot = path6.resolve(target);
   await mkdir2(requestedRoot, { recursive: true });
-  const root = await realpath2(requestedRoot);
+  const root = await realpath3(requestedRoot);
   const requestedQarinahDir = resolveWithin(root, ".qarinah");
   const qarinahDir = await ensureSafeDirectory(requestedQarinahDir, root, ".qarinah");
   const configPath = resolveWithin(qarinahDir, "config.json");
@@ -2637,14 +4856,14 @@ async function initializeWorkspace(target = process.cwd(), options = {}) {
 async function findWorkspaceRoot(start = process.cwd()) {
   let current;
   try {
-    current = await realpath2(path4.resolve(start));
+    current = await realpath3(path6.resolve(start));
   } catch {
     return null;
   }
   for (let depth = 0; depth < 64; depth += 1) {
-    const configPath = path4.join(current, ".qarinah", "config.json");
+    const configPath = path6.join(current, ".qarinah", "config.json");
     if (await exists(configPath)) return current;
-    const parent = path4.dirname(current);
+    const parent = path6.dirname(current);
     if (parent === current) return null;
     current = parent;
   }
@@ -2653,11 +4872,11 @@ async function findWorkspaceRoot(start = process.cwd()) {
 async function loadWorkspace(start = process.cwd(), options = {}) {
   const root = await findWorkspaceRoot(start);
   if (!root) throw new QarinahError("WORKSPACE_NOT_INITIALIZED", "No enabled Context Ledger workspace was found. Run `qarinah init` first.");
-  const actualRoot = await realpath2(root);
+  const actualRoot = await realpath3(root);
   const requestedQarinahDir = resolveWithin(actualRoot, ".qarinah");
   const qarinahLinkStat = await safeLstat(requestedQarinahDir, ".qarinah");
   if (!qarinahLinkStat.isDirectory()) throw new QarinahError("WORKSPACE_INVALID", ".qarinah must be a directory.");
-  const qarinahDir = await realpath2(requestedQarinahDir);
+  const qarinahDir = await realpath3(requestedQarinahDir);
   if (!isWithin2(actualRoot, qarinahDir)) {
     throw new QarinahError("PATH_OUTSIDE_WORKSPACE", ".qarinah resolves outside the workspace root.", { qarinahDir });
   }
@@ -2727,7 +4946,7 @@ async function setWorkspaceEnabled(start, enabled) {
 }
 async function revokeWorkspaceTrust(start = process.cwd()) {
   const located = await findWorkspaceRoot(start);
-  const root = await realpath2(path4.resolve(located ?? start));
+  const root = await realpath3(path6.resolve(located ?? start));
   const revocation = await revokeWorkspaceConsent(root);
   return Object.freeze({
     root,
@@ -2770,7 +4989,7 @@ __export(store_exports, {
 });
 import { randomUUID as randomUUID2 } from "node:crypto";
 import { constants as constants3 } from "node:fs";
-import { lstat as lstat3, mkdir as mkdir3, open as open3, readdir, rename as rename4, rm as rm4, rmdir, utimes } from "node:fs/promises";
+import { lstat as lstat4, mkdir as mkdir3, open as open3, readdir as readdir2, rename as rename4, rm as rm4, rmdir, utimes } from "node:fs/promises";
 import os2 from "node:os";
 async function injectStoreFault(options, point, details = {}) {
   const injector = options?.__testFaultInjector;
@@ -2794,7 +5013,7 @@ function processIsAlive(pid) {
   }
 }
 async function inspectLockOwner(lockPath) {
-  const names = (await readdir(lockPath)).filter((name) => OWNER_NAME_PATTERN.test(name));
+  const names = (await readdir2(lockPath)).filter((name) => OWNER_NAME_PATTERN.test(name));
   if (names.length !== 1) return null;
   const ownerPath = resolveWithin(lockPath, names[0]);
   const flags = constants3.O_RDONLY | (Number.isInteger(constants3.O_NOFOLLOW) ? constants3.O_NOFOLLOW : 0);
@@ -2803,7 +5022,7 @@ async function inspectLockOwner(lockPath) {
   let value;
   try {
     const opened = await handle.stat({ bigint: true });
-    const named = await lstat3(ownerPath, { bigint: true });
+    const named = await lstat4(ownerPath, { bigint: true });
     if (named.isSymbolicLink() || !named.isFile() || named.nlink !== 1n || !opened.isFile() || opened.nlink !== 1n || opened.dev !== named.dev || opened.ino !== named.ino) {
       throw new QarinahError("STORAGE_LINK_REJECTED", ".qarinah/locks/append.lock owner must be one singly linked regular file.");
     }
@@ -3104,13 +5323,16 @@ async function rebuildTrustedEventIdProjection(workspace) {
     trustedProjection: projection
   });
 }
-async function acquireWorkspaceWriteLock(workspace) {
+async function acquireWorkspaceWriteLock(workspace, options = {}) {
+  const signal = validateAbortSignal(options.signal);
+  throwIfAborted(signal);
   const locksDirectory = await secureStoragePath(workspace, ["locks"], { type: "directory" });
   const lockPath = resolveWithin(locksDirectory, "append.lock");
   const ownerToken = randomUUID2();
   const ownerName = `owner-${ownerToken}.json`;
   const ownerPath = resolveWithin(lockPath, ownerName);
   for (let attempt = 0; attempt < 200; attempt += 1) {
+    throwIfAborted(signal);
     try {
       await mkdir3(lockPath);
       try {
@@ -3176,7 +5398,7 @@ async function acquireWorkspaceWriteLock(workspace) {
           }
         }
         if (!moved) throw moveError;
-        const releasedNames = await readdir(releasedPath);
+        const releasedNames = await readdir2(releasedPath);
         const releasedOwner = await inspectLockOwner(releasedPath);
         if (releasedNames.length !== 1 || releasedNames[0] !== ownerName || !releasedOwner?.value || releasedOwner.value.ownerToken !== ownerToken) {
           throw new QarinahError("STORE_LOCK_LOST", "Refusing to remove a released append lock with unexpected contents.");
@@ -3191,15 +5413,16 @@ async function acquireWorkspaceWriteLock(workspace) {
     } catch (error) {
       if (error?.code !== "EEXIST") throw error;
       try {
-        const metadata = await lstat3(lockPath);
+        const metadata = await lstat4(lockPath);
         if (metadata.isSymbolicLink()) throw new QarinahError("STORAGE_LINK_REJECTED", ".qarinah/locks/append.lock cannot be a symbolic link or junction.");
         if (!metadata.isDirectory()) throw new QarinahError("WORKSPACE_INVALID", ".qarinah/locks/append.lock must be a directory.");
         const owner = await inspectLockOwner(lockPath);
         const heartbeatMtime = owner?.metadata?.mtimeMs ?? metadata.mtimeMs;
         const locallyAlive = owner?.value?.hostname === HOSTNAME && processIsAlive(owner.value.pid);
         if (Date.now() - heartbeatMtime > LOCK_STALE_MS && !locallyAlive) {
-          const latest = owner ? await lstat3(owner.ownerPath) : await lstat3(lockPath);
+          const latest = owner ? await lstat4(owner.ownerPath) : await lstat4(lockPath);
           if (latest.mtimeMs !== heartbeatMtime) continue;
+          throwIfAborted(signal);
           const stalePath = resolveWithin(locksDirectory, `append.lock.stale-${ownerToken}-${attempt}`);
           await rename4(lockPath, stalePath);
           await rm4(stalePath, { recursive: true, force: true });
@@ -3208,7 +5431,7 @@ async function acquireWorkspaceWriteLock(workspace) {
       } catch (inspectionError) {
         if (!["ENOENT", "EEXIST"].includes(inspectionError?.code) && !isTransientWindowsLockError(inspectionError)) throw inspectionError;
       }
-      await delay2(25 + Math.min(attempt, 20) * 5);
+      await abortableDelay(25 + Math.min(attempt, 20) * 5, signal);
     }
   }
   throw new QarinahError("STORE_BUSY", "Timed out waiting for the Context Ledger append lock.");
@@ -3322,6 +5545,8 @@ function workspaceRootLocator(value, label) {
   return descriptor.value;
 }
 async function readEventsFromWorkspace(workspace, options = {}) {
+  const signal = validateAbortSignal(options.signal);
+  throwIfAborted(signal);
   let opened;
   try {
     opened = await openSecureReadFile(workspace, ["events", "events.jsonl"]);
@@ -3343,6 +5568,7 @@ async function readEventsFromWorkspace(workspace, options = {}) {
   } finally {
     await opened.handle.close();
   }
+  throwIfAborted(signal);
   if (contents !== "" && !contents.endsWith("\n")) {
     throw new QarinahError("EVENT_LOG_NON_CANONICAL", "Event log must end with a newline.");
   }
@@ -3379,6 +5605,7 @@ async function readEventsFromWorkspace(workspace, options = {}) {
     }
   }
   if (options.skipCheckpoint !== true) {
+    throwIfAborted(signal);
     await reconcileCheckpoint(workspace, events, opened.metadata.size, { updateCheckpoint: options.updateCheckpoint !== false });
   }
   if (options.includeLogMetadata === true) {
@@ -3392,15 +5619,18 @@ async function readEventsFromWorkspace(workspace, options = {}) {
   return events;
 }
 async function readEvents(workspaceOrStart = process.cwd(), options = {}) {
+  const signal = validateAbortSignal(options.signal);
+  throwIfAborted(signal);
   const start = typeof workspaceOrStart === "string" ? workspaceOrStart : workspaceRootLocator(workspaceOrStart, "workspace");
   let workspace = await loadWorkspace(start);
   if (options.updateCheckpoint === false || options.skipCheckpoint === true) {
-    return readEventsFromWorkspace(workspace, options);
+    return readEventsFromWorkspace(workspace, { ...options, signal });
   }
-  const release = await acquireWorkspaceWriteLock(workspace);
+  const release = await acquireWorkspaceWriteLock(workspace, { signal });
   try {
+    throwIfAborted(signal);
     workspace = await loadWorkspace(workspace.root);
-    return await readEventsFromWorkspace(workspace, options);
+    return await readEventsFromWorkspace(workspace, { ...options, signal });
   } finally {
     await release();
   }
@@ -3493,18 +5723,23 @@ function createCapturedEvent(input, workspace, previousHash, options, capture, r
   });
 }
 async function appendEvent(input, options = {}) {
+  const signal = validateAbortSignal(options.signal);
+  throwIfAborted(signal);
   const start = options.workspace ? workspaceRootLocator(options.workspace, "options.workspace") : options.cwd || process.cwd();
   let workspace = await loadWorkspace(start);
   await injectStoreFault(options, "after-initial-workspace-load", { workspaceId: workspace.config.workspaceId });
-  const release = await acquireWorkspaceWriteLock(workspace);
+  throwIfAborted(signal);
+  const release = await acquireWorkspaceWriteLock(workspace, { signal });
   try {
+    throwIfAborted(signal);
     workspace = await loadWorkspace(workspace.root);
     const capture = captureMode(options.capture, workspace);
     const reviewedMetadata = capture === "metadata" && isReviewedMetadataEventInput(input);
     let head = await readHeadEvent(workspace);
     let consent = await readWorkspaceConsent(workspace.root, workspace.config);
     if (head.size !== consent.checkpoint.logBytes || (head.event?.hash ?? null) !== consent.checkpoint.headHash) {
-      await readEventsFromWorkspace(workspace);
+      throwIfAborted(signal);
+      await readEventsFromWorkspace(workspace, { signal });
       head = await readHeadEvent(workspace);
       consent = await readWorkspaceConsent(workspace.root, workspace.config);
     }
@@ -3513,6 +5748,7 @@ async function appendEvent(input, options = {}) {
       trustedProjection = await loadTrustedEventIdManifest(workspace, consent.checkpoint);
     } catch (error) {
       if (!["ENOENT", "EVENT_ID_INDEX_INVALID", "EVENT_ID_INDEX_MISMATCH"].includes(error?.code)) throw error;
+      throwIfAborted(signal);
       ({ head, consent, trustedProjection } = await rebuildTrustedEventIdProjection(workspace));
     }
     const previousHash = head.event?.hash ?? null;
@@ -3522,6 +5758,7 @@ async function appendEvent(input, options = {}) {
       existing = await loadIndexedEvent(workspace, trustedProjection.manifest, event.eventId);
     } catch (error) {
       if (!["ENOENT", "EVENT_ID_INDEX_INVALID", "EVENT_ID_INDEX_MISMATCH"].includes(error?.code)) throw error;
+      throwIfAborted(signal);
       ({ head, consent, trustedProjection } = await rebuildTrustedEventIdProjection(workspace));
       event = createCapturedEvent(
         { ...input, eventId: event.eventId, timestamp: event.timestamp },
@@ -3564,6 +5801,7 @@ async function appendEvent(input, options = {}) {
       if (confirmedHead.size !== head.size || (confirmedHead.event?.hash ?? null) !== (head.event?.hash ?? null)) {
         throw new QarinahError("STORAGE_RACE_DETECTED", "The authoritative event log head changed between verification and append.");
       }
+      throwIfAborted(signal);
       await opened.handle.writeFile(line, "utf8");
       await opened.handle.sync();
       const finalStat = await opened.handle.stat({ bigint: true });
@@ -3678,6 +5916,7 @@ async function approveWorkspaceTrust(start = process.cwd(), expectedCapture, exp
 var MAX_EVENTS, LOCK_STALE_MS, LOCK_HEARTBEAT_MS, LOCK_RELEASE_RETRIES, LOCK_OWNER_MAX_BYTES, HOSTNAME, OWNER_NAME_PATTERN, EVENT_ID_INDEX_SCHEMA_VERSION, EVENT_ID_BUCKET_SCHEMA_VERSION, EVENT_ID_BUCKET_PATTERN, EVENT_ID_PATTERN2, HASH_PATTERN3, EVENT_ID_MANIFEST_MAX_BYTES, EVENT_ID_BUCKET_MAX_BYTES;
 var init_store = __esm({
   "src/store.js"() {
+    init_abort();
     init_canonical();
     init_capture_policy();
     init_consent();
@@ -3701,467 +5940,9 @@ var init_store = __esm({
   }
 });
 
-// node_modules/ignore/index.js
-var require_ignore = __commonJS({
-  "node_modules/ignore/index.js"(exports, module) {
-    function makeArray(subject) {
-      return Array.isArray(subject) ? subject : [subject];
-    }
-    var UNDEFINED = void 0;
-    var EMPTY = "";
-    var SPACE = " ";
-    var ESCAPE = "\\";
-    var REGEX_TEST_BLANK_LINE = /^\s+$/;
-    var REGEX_INVALID_TRAILING_BACKSLASH = /(?:[^\\]|^)\\$/;
-    var REGEX_REPLACE_LEADING_EXCAPED_EXCLAMATION = /^\\!/;
-    var REGEX_REPLACE_LEADING_EXCAPED_HASH = /^\\#/;
-    var REGEX_SPLITALL_CRLF = /\r?\n/g;
-    var REGEX_TEST_INVALID_PATH = /^\.{0,2}\/|^\.{1,2}$/;
-    var REGEX_TEST_TRAILING_SLASH = /\/$/;
-    var SLASH = "/";
-    var TMP_KEY_IGNORE = "node-ignore";
-    if (typeof Symbol !== "undefined") {
-      TMP_KEY_IGNORE = /* @__PURE__ */ Symbol.for("node-ignore");
-    }
-    var KEY_IGNORE = TMP_KEY_IGNORE;
-    var define = (object, key, value) => {
-      Object.defineProperty(object, key, { value });
-      return value;
-    };
-    var REGEX_REGEXP_RANGE = /([0-z])-([0-z])/g;
-    var RETURN_FALSE = () => false;
-    var sanitizeRange = (range) => range.replace(
-      REGEX_REGEXP_RANGE,
-      (match, from, to) => from.charCodeAt(0) <= to.charCodeAt(0) ? match : EMPTY
-    );
-    var negateRange = (range) => range.startsWith("!") || range.startsWith("\\^") ? `^${range.slice(range[0] === "!" ? 1 : 2)}` : range;
-    var cleanRangeBackSlash = (slashes) => {
-      const { length } = slashes;
-      return slashes.slice(0, length - length % 2);
-    };
-    var REPLACERS = [
-      [
-        // Remove BOM
-        // TODO:
-        // Other similar zero-width characters?
-        /^\uFEFF/,
-        () => EMPTY
-      ],
-      // > Trailing spaces are ignored unless they are quoted with backslash ("\")
-      [
-        // (a\ ) -> (a )
-        // (a  ) -> (a)
-        // (a ) -> (a)
-        // (a \ ) -> (a  )
-        /((?:\\\\)*?)(\\?\s+)$/,
-        (_, m1, m2) => m1 + (m2.indexOf("\\") === 0 ? SPACE : EMPTY)
-      ],
-      // Replace (\ ) with ' '
-      // (\ ) -> ' '
-      // (\\ ) -> '\\ '
-      // (\\\ ) -> '\\ '
-      [
-        /(\\+?)\s/g,
-        (_, m1) => {
-          const { length } = m1;
-          return m1.slice(0, length - length % 2) + SPACE;
-        }
-      ],
-      // Escape metacharacters
-      // which is written down by users but means special for regular expressions.
-      // > There are 12 characters with special meanings:
-      // > - the backslash \,
-      // > - the caret ^,
-      // > - the dollar sign $,
-      // > - the period or dot .,
-      // > - the vertical bar or pipe symbol |,
-      // > - the question mark ?,
-      // > - the asterisk or star *,
-      // > - the plus sign +,
-      // > - the opening parenthesis (,
-      // > - the closing parenthesis ),
-      // > - and the opening square bracket [,
-      // > - the opening curly brace {,
-      // > These special characters are often called "metacharacters".
-      [
-        /[\\$.|*+(){^]/g,
-        (match) => `\\${match}`
-      ],
-      [
-        // > a question mark (?) matches a single character
-        /(?!\\)\?/g,
-        () => "[^/]"
-      ],
-      // leading slash
-      [
-        // > A leading slash matches the beginning of the pathname.
-        // > For example, "/*.c" matches "cat-file.c" but not "mozilla-sha1/sha1.c".
-        // A leading slash matches the beginning of the pathname
-        /^\//,
-        () => "^"
-      ],
-      // replace special metacharacter slash after the leading slash
-      [
-        /\//g,
-        () => "\\/"
-      ],
-      [
-        // > A leading "**" followed by a slash means match in all directories.
-        // > For example, "**/foo" matches file or directory "foo" anywhere,
-        // > the same as pattern "foo".
-        // > "**/foo/bar" matches file or directory "bar" anywhere that is directly
-        // >   under directory "foo".
-        // Notice that the '*'s have been replaced as '\\*'
-        /^\^*(?:\\\*\\\*\\\/)+/,
-        // '**/foo' <-> 'foo'
-        () => "^(?:.*\\/)?"
-      ],
-      // starting
-      [
-        // there will be no leading '/'
-        //   (which has been replaced by section "leading slash")
-        // If starts with '**', adding a '^' to the regular expression also works
-        /^(?=[^^])/,
-        function startingReplacer() {
-          return !/\/(?!$)/.test(this) ? "(?:^|\\/)" : "^";
-        }
-      ],
-      // two globstars
-      [
-        // Use lookahead assertions so that we could match more than one `'/**'`
-        /\\\/\\\*\\\*(?=\\\/|$)/g,
-        // Zero, one or several directories
-        // should not use '*', or it will be replaced by the next replacer
-        // Check if it is not the last `'/**'`
-        (_, index, str) => index + 6 < str.length ? "(?:\\/[^\\/]+)*" : "\\/.+"
-      ],
-      // normal intermediate wildcards
-      [
-        // Never replace escaped '*'
-        // ignore rule '\*' will match the path '*'
-        // 'abc.*/' -> go
-        // 'abc.*'  -> skip this rule,
-        //    coz trailing single wildcard will be handed by [trailing wildcard]
-        /(^|[^\\]+)(\\\*)+(?=.+)/g,
-        // '*.js' matches '.js'
-        // '*.js' doesn't match 'abc'
-        (_, p1, p2) => {
-          const unescaped = p2.replace(/\\\*/g, "[^\\/]*");
-          return p1 + unescaped;
-        }
-      ],
-      [
-        // unescape, revert step 3 except for back slash
-        // For example, if a user escape a '\\*',
-        // after step 3, the result will be '\\\\\\*'
-        /\\\\\\(?=[$.|*+(){^])/g,
-        () => ESCAPE
-      ],
-      [
-        // '\\\\' -> '\\'
-        /\\\\/g,
-        () => ESCAPE
-      ],
-      [
-        // > The range notation, e.g. [a-zA-Z],
-        // > can be used to match one of the characters in a range.
-        // `\` is escaped by step 3
-        /(\\)?\[([^\]/]*?)(\\*)($|\])/g,
-        (match, leadEscape, range, endEscape, close) => leadEscape === ESCAPE ? `\\[${range}${cleanRangeBackSlash(endEscape)}${close}` : close === "]" ? endEscape.length % 2 === 0 ? `[${negateRange(sanitizeRange(range))}${endEscape}]` : "[]" : "[]"
-      ],
-      // ending
-      [
-        // 'js' will not match 'js.'
-        // 'ab' will not match 'abc'
-        /(?:[^*])$/,
-        // WTF!
-        // https://git-scm.com/docs/gitignore
-        // changes in [2.22.1](https://git-scm.com/docs/gitignore/2.22.1)
-        // which re-fixes #24, #38
-        // > If there is a separator at the end of the pattern then the pattern
-        // > will only match directories, otherwise the pattern can match both
-        // > files and directories.
-        // 'js*' will not match 'a.js'
-        // 'js/' will not match 'a.js'
-        // 'js' will match 'a.js' and 'a.js/'
-        (match) => /\/$/.test(match) ? `${match}$` : `${match}(?=$|\\/$)`
-      ]
-    ];
-    var REGEX_REPLACE_TRAILING_WILDCARD = /(^|\\\/)?\\\*$/;
-    var MODE_IGNORE = "regex";
-    var MODE_CHECK_IGNORE = "checkRegex";
-    var UNDERSCORE = "_";
-    var TRAILING_WILD_CARD_REPLACERS = {
-      [MODE_IGNORE](_, p1) {
-        const prefix = p1 ? `${p1}[^/]+` : "[^/]*";
-        return `${prefix}(?=$|\\/$)`;
-      },
-      [MODE_CHECK_IGNORE](_, p1) {
-        const prefix = p1 ? `${p1}[^/]*` : "[^/]*";
-        return `${prefix}(?=$|\\/$)`;
-      }
-    };
-    var makeRegexPrefix = (pattern) => REPLACERS.reduce(
-      (prev, [matcher, replacer]) => prev.replace(matcher, replacer.bind(pattern)),
-      pattern
-    );
-    var isString = (subject) => typeof subject === "string";
-    var checkPattern = (pattern) => pattern && isString(pattern) && !REGEX_TEST_BLANK_LINE.test(pattern) && !REGEX_INVALID_TRAILING_BACKSLASH.test(pattern) && pattern.indexOf("#") !== 0;
-    var splitPattern = (pattern) => pattern.split(REGEX_SPLITALL_CRLF).filter(Boolean);
-    var IgnoreRule = class {
-      constructor(pattern, mark, body, ignoreCase, negative, prefix) {
-        this.pattern = pattern;
-        this.mark = mark;
-        this.negative = negative;
-        define(this, "body", body);
-        define(this, "ignoreCase", ignoreCase);
-        define(this, "regexPrefix", prefix);
-      }
-      get regex() {
-        const key = UNDERSCORE + MODE_IGNORE;
-        if (this[key]) {
-          return this[key];
-        }
-        return this._make(MODE_IGNORE, key);
-      }
-      get checkRegex() {
-        const key = UNDERSCORE + MODE_CHECK_IGNORE;
-        if (this[key]) {
-          return this[key];
-        }
-        return this._make(MODE_CHECK_IGNORE, key);
-      }
-      _make(mode, key) {
-        const str = this.regexPrefix.replace(
-          REGEX_REPLACE_TRAILING_WILDCARD,
-          // It does not need to bind pattern
-          TRAILING_WILD_CARD_REPLACERS[mode]
-        );
-        const regex = this.ignoreCase ? new RegExp(str, "i") : new RegExp(str);
-        return define(this, key, regex);
-      }
-    };
-    var createRule = ({
-      pattern,
-      mark
-    }, ignoreCase) => {
-      let negative = false;
-      let body = pattern;
-      if (body.indexOf("!") === 0) {
-        negative = true;
-        body = body.substr(1);
-      }
-      body = body.replace(REGEX_REPLACE_LEADING_EXCAPED_EXCLAMATION, "!").replace(REGEX_REPLACE_LEADING_EXCAPED_HASH, "#");
-      const regexPrefix = makeRegexPrefix(body);
-      return new IgnoreRule(
-        pattern,
-        mark,
-        body,
-        ignoreCase,
-        negative,
-        regexPrefix
-      );
-    };
-    var RuleManager = class {
-      constructor(ignoreCase) {
-        this._ignoreCase = ignoreCase;
-        this._rules = [];
-      }
-      _add(pattern) {
-        if (pattern && pattern[KEY_IGNORE]) {
-          this._rules = this._rules.concat(pattern._rules._rules);
-          this._added = true;
-          return;
-        }
-        if (isString(pattern)) {
-          pattern = {
-            pattern
-          };
-        }
-        if (checkPattern(pattern.pattern)) {
-          const rule = createRule(pattern, this._ignoreCase);
-          this._added = true;
-          this._rules.push(rule);
-        }
-      }
-      // @param {Array<string> | string | Ignore} pattern
-      add(pattern) {
-        this._added = false;
-        makeArray(
-          isString(pattern) ? splitPattern(pattern) : pattern
-        ).forEach(this._add, this);
-        return this._added;
-      }
-      // Test one single path without recursively checking parent directories
-      //
-      // - checkUnignored `boolean` whether should check if the path is unignored,
-      //   setting `checkUnignored` to `false` could reduce additional
-      //   path matching.
-      // - check `string` either `MODE_IGNORE` or `MODE_CHECK_IGNORE`
-      // @returns {TestResult} true if a file is ignored
-      test(path18, checkUnignored, mode) {
-        let ignored = false;
-        let unignored = false;
-        let matchedRule;
-        this._rules.forEach((rule) => {
-          const { negative } = rule;
-          if (unignored === negative && ignored !== unignored || negative && !ignored && !unignored && !checkUnignored) {
-            return;
-          }
-          const matched = rule[mode].test(path18);
-          if (!matched) {
-            return;
-          }
-          ignored = !negative;
-          unignored = negative;
-          matchedRule = negative ? UNDEFINED : rule;
-        });
-        const ret = {
-          ignored,
-          unignored
-        };
-        if (matchedRule) {
-          ret.rule = matchedRule;
-        }
-        return ret;
-      }
-    };
-    var throwError = (message, Ctor) => {
-      throw new Ctor(message);
-    };
-    var checkPath = (path18, originalPath, doThrow) => {
-      if (!isString(path18)) {
-        return doThrow(
-          `path must be a string, but got \`${originalPath}\``,
-          TypeError
-        );
-      }
-      if (!path18) {
-        return doThrow(`path must not be empty`, TypeError);
-      }
-      if (checkPath.isNotRelative(path18)) {
-        const r = "`path.relative()`d";
-        return doThrow(
-          `path should be a ${r} string, but got "${originalPath}"`,
-          RangeError
-        );
-      }
-      return true;
-    };
-    var isNotRelative = (path18) => REGEX_TEST_INVALID_PATH.test(path18);
-    checkPath.isNotRelative = isNotRelative;
-    checkPath.convert = (p) => p;
-    var Ignore = class {
-      constructor({
-        ignorecase = true,
-        ignoreCase = ignorecase,
-        allowRelativePaths = false
-      } = {}) {
-        define(this, KEY_IGNORE, true);
-        this._rules = new RuleManager(ignoreCase);
-        this._strictPathCheck = !allowRelativePaths;
-        this._initCache();
-      }
-      _initCache() {
-        this._ignoreCache = /* @__PURE__ */ Object.create(null);
-        this._testCache = /* @__PURE__ */ Object.create(null);
-      }
-      add(pattern) {
-        if (this._rules.add(pattern)) {
-          this._initCache();
-        }
-        return this;
-      }
-      // legacy
-      addPattern(pattern) {
-        return this.add(pattern);
-      }
-      // @returns {TestResult}
-      _test(originalPath, cache, checkUnignored, slices) {
-        const path18 = originalPath && checkPath.convert(originalPath);
-        checkPath(
-          path18,
-          originalPath,
-          this._strictPathCheck ? throwError : RETURN_FALSE
-        );
-        return this._t(path18, cache, checkUnignored, slices);
-      }
-      checkIgnore(path18) {
-        if (!REGEX_TEST_TRAILING_SLASH.test(path18)) {
-          return this.test(path18);
-        }
-        const slices = path18.split(SLASH).filter(Boolean);
-        slices.pop();
-        if (slices.length) {
-          const parent = this._t(
-            slices.join(SLASH) + SLASH,
-            this._testCache,
-            true,
-            slices
-          );
-          if (parent.ignored) {
-            return parent;
-          }
-        }
-        return this._rules.test(path18, false, MODE_CHECK_IGNORE);
-      }
-      _t(path18, cache, checkUnignored, slices) {
-        if (path18 in cache) {
-          return cache[path18];
-        }
-        if (!slices) {
-          slices = path18.split(SLASH).filter(Boolean);
-        }
-        slices.pop();
-        if (!slices.length) {
-          return cache[path18] = this._rules.test(path18, checkUnignored, MODE_IGNORE);
-        }
-        const parent = this._t(
-          slices.join(SLASH) + SLASH,
-          cache,
-          checkUnignored,
-          slices
-        );
-        return cache[path18] = parent.ignored ? parent : this._rules.test(path18, checkUnignored, MODE_IGNORE);
-      }
-      ignores(path18) {
-        return this._test(path18, this._ignoreCache, false).ignored;
-      }
-      createFilter() {
-        return (path18) => !this.ignores(path18);
-      }
-      filter(paths) {
-        return makeArray(paths).filter(this.createFilter());
-      }
-      // @returns {TestResult}
-      test(path18) {
-        return this._test(path18, this._testCache, true);
-      }
-    };
-    var factory = (options) => new Ignore(options);
-    var isPathValid = (path18) => checkPath(path18 && checkPath.convert(path18), path18, RETURN_FALSE);
-    var setupWindows = () => {
-      const makePosix = (str) => /^\\\\\?\\/.test(str) || /["<>|\u0000-\u001F]+/u.test(str) ? str : str.replace(/\\/g, "/");
-      checkPath.convert = makePosix;
-      const REGEX_TEST_WINDOWS_PATH_ABSOLUTE = /^[a-z]:\//i;
-      checkPath.isNotRelative = (path18) => REGEX_TEST_WINDOWS_PATH_ABSOLUTE.test(path18) || isNotRelative(path18);
-    };
-    if (
-      // Detect `process` so that it can run in browsers.
-      typeof process !== "undefined" && process.platform === "win32"
-    ) {
-      setupWindows();
-    }
-    module.exports = factory;
-    factory.default = factory;
-    module.exports.isPathValid = isPathValid;
-    define(module.exports, /* @__PURE__ */ Symbol.for("setupWindows"), setupWindows);
-  }
-});
-
 // bin/qarinah.js
 import process2 from "node:process";
-import path17 from "node:path";
+import path18 from "node:path";
 
 // src/index.js
 init_errors();
@@ -4312,7 +6093,7 @@ function authorityScores(index, candidateIds, scopes, asOf) {
   }
   return scores;
 }
-function normalizedSelectors(value, label) {
+function normalizedSelectors2(value, label) {
   if (value === void 0) return [];
   const list2 = typeof value === "string" ? [value] : value;
   if (!Array.isArray(list2) || list2.length > 64 || list2.some((entry) => typeof entry !== "string" || entry.length < 1 || entry.length > 256)) {
@@ -4422,8 +6203,8 @@ function resolveContextAdmission(index, options = {}) {
     throw new TypeError("asOf is required so retrieval remains time-explicit and deterministic.");
   }
   const asOf = canonicalIsoTimestamp(options.asOf, "asOf");
-  const authorityScopes = normalizedSelectors(options.authorityScopes ?? options.authorityScope, "authorityScopes");
-  const repositoryIds = normalizedSelectors(options.repositoryIds, "repositoryIds");
+  const authorityScopes = normalizedSelectors2(options.authorityScopes ?? options.authorityScope, "authorityScopes");
+  const repositoryIds = normalizedSelectors2(options.repositoryIds, "repositoryIds");
   const eligibleEventIds = [];
   const excludedEventIds = [];
   const exclusions = [];
@@ -5364,438 +7145,8 @@ function renderContextPackMarkdown(pack) {
 `;
 }
 
-// src/project-structure.js
-var import_ignore = __toESM(require_ignore(), 1);
-init_capture_policy();
-init_canonical();
-init_errors();
-init_store();
-init_workspace();
-import { lstat as lstat4, readFile, readdir as readdir2, realpath as realpath3 } from "node:fs/promises";
-import { createHash as createHash3 } from "node:crypto";
-import path5 from "node:path";
-var PROJECT_STRUCTURE_SCHEMA_VERSION = "qarinah.project-structure.v1";
-var DEFAULT_MAX_FILES = 750;
-var DEFAULT_MAX_FILE_BYTES = 512 * 1024;
-var DEFAULT_MAX_TOTAL_BYTES = 16 * 1024 * 1024;
-var DEFAULT_MAX_DEPTH = 24;
-var MAX_PATH_CHARS = 512;
-var SOURCE_EXTENSIONS = /* @__PURE__ */ new Set([
-  ".cjs",
-  ".css",
-  ".html",
-  ".java",
-  ".js",
-  ".json",
-  ".jsonc",
-  ".jsx",
-  ".kt",
-  ".md",
-  ".mjs",
-  ".py",
-  ".rb",
-  ".rs",
-  ".sh",
-  ".sql",
-  ".svelte",
-  ".toml",
-  ".ts",
-  ".tsx",
-  ".vue",
-  ".xml",
-  ".yaml",
-  ".yml"
-]);
-var SOURCE_FILENAMES = /* @__PURE__ */ new Set([
-  "Dockerfile",
-  "LICENSE",
-  "Makefile",
-  "Procfile",
-  "README",
-  "SECURITY"
-]);
-var EXCLUDED_DIRECTORIES = /* @__PURE__ */ new Set([
-  ".git",
-  ".next",
-  ".nuxt",
-  ".qarinah",
-  ".svelte-kit",
-  ".turbo",
-  ".wrangler",
-  "build",
-  "coverage",
-  "dist",
-  "node_modules",
-  "out",
-  "target",
-  "temp",
-  "tmp",
-  "vendor"
-]);
-var HIDDEN_DIRECTORY_ALLOWLIST = /* @__PURE__ */ new Set([".github"]);
-var RESOLUTION_EXTENSIONS = Object.freeze([".js", ".mjs", ".cjs", ".jsx", ".ts", ".tsx", ".json"]);
-var MAX_IGNORE_BYTES = 1024 * 1024;
-function boundedInteger(value, fallback, minimum, maximum, label) {
-  const candidate = value ?? fallback;
-  if (!Number.isSafeInteger(candidate) || candidate < minimum || candidate > maximum) {
-    throw new TypeError(`${label} must be an integer from ${minimum} to ${maximum}.`);
-  }
-  return candidate;
-}
-function scanOptions(options = {}) {
-  if (!options || typeof options !== "object" || Array.isArray(options)) {
-    throw new TypeError("Project structure scan options must be a record.");
-  }
-  const allowed = /* @__PURE__ */ new Set(["cwd", "maxFiles", "maxFileBytes", "maxTotalBytes", "maxDepth"]);
-  const unknown = Object.keys(options).filter((key) => !allowed.has(key));
-  if (unknown.length) throw new TypeError(`Project structure scan options contain unknown field(s): ${unknown.join(", ")}.`);
-  return Object.freeze({
-    cwd: options.cwd,
-    maxFiles: boundedInteger(options.maxFiles, DEFAULT_MAX_FILES, 1, 5e3, "maxFiles"),
-    maxFileBytes: boundedInteger(options.maxFileBytes, DEFAULT_MAX_FILE_BYTES, 1024, 4 * 1024 * 1024, "maxFileBytes"),
-    maxTotalBytes: boundedInteger(options.maxTotalBytes, DEFAULT_MAX_TOTAL_BYTES, 1024, 128 * 1024 * 1024, "maxTotalBytes"),
-    maxDepth: boundedInteger(options.maxDepth, DEFAULT_MAX_DEPTH, 1, 64, "maxDepth")
-  });
-}
-function portablePath(root, absolute) {
-  const relative = path5.relative(root, absolute);
-  if (relative === "") return ".";
-  if (relative.startsWith("..") || path5.isAbsolute(relative)) {
-    throw new QarinahError("PATH_OUTSIDE_WORKSPACE", "Project structure path escaped the trusted workspace root.");
-  }
-  const portable = relative.split(path5.sep).join("/");
-  if (portable.length > MAX_PATH_CHARS) {
-    throw new QarinahError("PROJECT_PATH_TOO_LONG", `Project path exceeds ${MAX_PATH_CHARS} characters.`);
-  }
-  return portable;
-}
-function isCandidateFile(name) {
-  return SOURCE_FILENAMES.has(name) || SOURCE_EXTENSIONS.has(path5.extname(name).toLowerCase());
-}
-function languageFor(filePath) {
-  const extension = path5.extname(filePath).toLowerCase();
-  const languages = {
-    ".cjs": "javascript",
-    ".js": "javascript",
-    ".jsx": "javascript",
-    ".mjs": "javascript",
-    ".ts": "typescript",
-    ".tsx": "typescript",
-    ".md": "markdown",
-    ".json": "json",
-    ".jsonc": "jsonc",
-    ".py": "python",
-    ".rs": "rust",
-    ".java": "java",
-    ".kt": "kotlin",
-    ".rb": "ruby",
-    ".css": "css",
-    ".html": "html",
-    ".svelte": "svelte",
-    ".vue": "vue",
-    ".yaml": "yaml",
-    ".yml": "yaml",
-    ".toml": "toml",
-    ".sql": "sql",
-    ".xml": "xml",
-    ".sh": "shell"
-  };
-  return languages[extension] ?? "text";
-}
-function nodeId(type, value) {
-  return `project:${type}:${sha256(value).slice("sha256:".length, "sha256:".length + 32)}`;
-}
-function hashBytes(bytes) {
-  return `sha256:${createHash3("sha256").update(bytes).digest("hex")}`;
-}
-function spanAt(text, start, length) {
-  const before = text.slice(0, start);
-  const lines = before.split("\n");
-  return Object.freeze({
-    start,
-    end: start + length,
-    line: lines.length,
-    column: lines.at(-1).length + 1
-  });
-}
-function extractedReference(type, specifier, start, text, extractor) {
-  return Object.freeze({
-    type,
-    specifier,
-    span: spanAt(text, start, specifier.length),
-    confidence: "extracted",
-    extractor
-  });
-}
-function sourceReferences(text, language) {
-  const references = [];
-  const seen = /* @__PURE__ */ new Set();
-  const addMatches = (pattern, type, extractor) => {
-    for (const match of text.matchAll(pattern)) {
-      const specifier = match[1];
-      const offset = match.index + match[0].indexOf(specifier);
-      const key = `${type}\0${offset}\0${specifier}`;
-      if (!seen.has(key)) {
-        seen.add(key);
-        references.push(extractedReference(type, specifier, offset, text, extractor));
-      }
-    }
-  };
-  if (["javascript", "typescript"].includes(language)) {
-    addMatches(/\b(?:import|export)\s+(?:[^"'\n]*?\s+from\s*)?["']([^"'\n]+)["']/g, "imports", "qarinah.ecmascript-module-lexical.v1");
-    addMatches(/\brequire\s*\(\s*["']([^"'\n]+)["']\s*\)/g, "imports", "qarinah.ecmascript-module-lexical.v1");
-    addMatches(/\bimport\s*\(\s*["']([^"'\n]+)["']\s*\)/g, "imports", "qarinah.ecmascript-module-lexical.v1");
-  }
-  if (language === "markdown") {
-    addMatches(/\[[^\]\n]*\]\((?!https?:|mailto:|#)([^)\s#?]+)(?:[?#][^)]*)?\)/g, "links", "qarinah.markdown-link.v1");
-  }
-  return references.sort((left, right) => left.span.start - right.span.start || left.specifier.localeCompare(right.specifier));
-}
-function looksBinary(bytes) {
-  const sample = bytes.subarray(0, Math.min(bytes.length, 8192));
-  if (sample.includes(0)) return true;
-  let controls = 0;
-  for (const value of sample) {
-    if (value < 9 || value > 13 && value < 32) controls += 1;
-  }
-  return sample.length > 0 && controls / sample.length > 0.03;
-}
-function resolveReference(fromPath, specifier, filesByPath) {
-  if (!specifier.startsWith(".")) return null;
-  const base = path5.posix.normalize(path5.posix.join(path5.posix.dirname(fromPath), specifier));
-  if (base === ".." || base.startsWith("../") || path5.posix.isAbsolute(base)) return null;
-  const candidates = [base];
-  if (!path5.posix.extname(base)) {
-    for (const extension of RESOLUTION_EXTENSIONS) candidates.push(`${base}${extension}`);
-    for (const extension of RESOLUTION_EXTENSIONS) candidates.push(`${base}/index${extension}`);
-  }
-  return candidates.find((candidate) => filesByPath.has(candidate)) ?? null;
-}
-async function assertReadableWorkspaceEntry(workspace, absolute) {
-  const metadata = await lstat4(absolute);
-  if (metadata.isSymbolicLink()) return null;
-  const resolved = await realpath3(absolute);
-  portablePath(workspace.root, resolved);
-  return metadata;
-}
-async function loadIgnoreMatcher(workspace) {
-  const matcher = (0, import_ignore.default)();
-  for (const name of [".gitignore", ".qarinahignore"]) {
-    const absolute = path5.join(workspace.root, name);
-    try {
-      const metadata = await assertReadableWorkspaceEntry(workspace, absolute);
-      if (!metadata?.isFile() || metadata.size > MAX_IGNORE_BYTES) continue;
-      matcher.add(await readFile(absolute, "utf8"));
-    } catch (error) {
-      if (error?.code !== "ENOENT") throw error;
-    }
-  }
-  return matcher;
-}
-async function collectStructure(workspace, options) {
-  const ignoreMatcher = await loadIgnoreMatcher(workspace);
-  const directories = [];
-  const files = [];
-  let totalBytes = 0;
-  async function walk(absoluteDirectory, depth) {
-    if (depth > options.maxDepth) {
-      throw new QarinahError("PROJECT_SCAN_LIMIT", `Project structure exceeds maxDepth ${options.maxDepth}.`);
-    }
-    const directoryPath = portablePath(workspace.root, absoluteDirectory);
-    directories.push(Object.freeze({ id: nodeId("directory", directoryPath), path: directoryPath }));
-    const entries = (await readdir2(absoluteDirectory, { withFileTypes: true })).sort((left, right) => left.name.localeCompare(right.name));
-    for (const entry of entries) {
-      if (entry.name.includes("\0")) continue;
-      const absolute = path5.join(absoluteDirectory, entry.name);
-      const metadata = await assertReadableWorkspaceEntry(workspace, absolute);
-      if (!metadata) continue;
-      const entryPath = portablePath(workspace.root, absolute);
-      if (metadata.isDirectory()) {
-        if (EXCLUDED_DIRECTORIES.has(entry.name)) continue;
-        if (entry.name.startsWith(".") && !HIDDEN_DIRECTORY_ALLOWLIST.has(entry.name)) continue;
-        if (ignoreMatcher.ignores(`${entryPath}/`)) continue;
-        await walk(absolute, depth + 1);
-        continue;
-      }
-      if (!metadata.isFile() || entry.name.startsWith(".") || ignoreMatcher.ignores(entryPath) || !isCandidateFile(entry.name)) continue;
-      if (files.length >= options.maxFiles) {
-        throw new QarinahError("PROJECT_SCAN_LIMIT", `Project structure exceeds maxFiles ${options.maxFiles}.`);
-      }
-      const filePath = entryPath;
-      if (metadata.size > options.maxFileBytes) {
-        files.push(Object.freeze({
-          id: nodeId("file", filePath),
-          path: filePath,
-          language: languageFor(filePath),
-          size: metadata.size,
-          contentHash: null,
-          skipped: "oversized",
-          references: []
-        }));
-        continue;
-      }
-      if (totalBytes + metadata.size > options.maxTotalBytes) {
-        throw new QarinahError("PROJECT_SCAN_LIMIT", `Project structure exceeds maxTotalBytes ${options.maxTotalBytes}.`);
-      }
-      const bytes = await readFile(absolute);
-      totalBytes += bytes.length;
-      const contentHash = hashBytes(bytes);
-      const language = languageFor(filePath);
-      if (looksBinary(bytes)) {
-        files.push(Object.freeze({
-          id: nodeId("file", filePath),
-          path: filePath,
-          language,
-          size: bytes.length,
-          contentHash,
-          skipped: "binary",
-          references: []
-        }));
-        continue;
-      }
-      const text = bytes.toString("utf8");
-      files.push(Object.freeze({
-        id: nodeId("file", filePath),
-        path: filePath,
-        language,
-        size: bytes.length,
-        contentHash,
-        skipped: null,
-        references: sourceReferences(text, language)
-      }));
-    }
-  }
-  await walk(workspace.root, 0);
-  const filesByPath = new Map(files.map((file) => [file.path, file]));
-  const resolvedFiles = files.map((file) => Object.freeze({
-    ...file,
-    references: file.references.map((reference) => Object.freeze({
-      ...reference,
-      target: resolveReference(file.path, reference.specifier, filesByPath)
-    }))
-  }));
-  directories.sort((left, right) => left.path.localeCompare(right.path));
-  resolvedFiles.sort((left, right) => left.path.localeCompare(right.path));
-  return Object.freeze({ directories, files: resolvedFiles, totalBytes });
-}
-function structureChanges(previous, current) {
-  if (!previous) {
-    return Object.freeze({ added: current.files.map((file) => file.path), changed: [], deleted: [], renamed: [] });
-  }
-  const oldByPath = new Map(previous.files.map((file) => [file.path, file]));
-  const newByPath = new Map(current.files.map((file) => [file.path, file]));
-  const changed = current.files.filter((file) => oldByPath.has(file.path) && oldByPath.get(file.path).contentHash !== file.contentHash).map((file) => file.path);
-  const addedCandidates = current.files.filter((file) => !oldByPath.has(file.path));
-  const deletedCandidates = previous.files.filter((file) => !newByPath.has(file.path));
-  const deletedByHash = /* @__PURE__ */ new Map();
-  for (const file of deletedCandidates) {
-    if (!file.contentHash) continue;
-    const values = deletedByHash.get(file.contentHash) ?? [];
-    values.push(file);
-    deletedByHash.set(file.contentHash, values);
-  }
-  const renamed = [];
-  const renamedFrom = /* @__PURE__ */ new Set();
-  const renamedTo = /* @__PURE__ */ new Set();
-  for (const file of addedCandidates) {
-    const matches = file.contentHash ? deletedByHash.get(file.contentHash) ?? [] : [];
-    if (matches.length !== 1) continue;
-    const source = matches[0];
-    if (renamedFrom.has(source.path)) continue;
-    renamedFrom.add(source.path);
-    renamedTo.add(file.path);
-    renamed.push(Object.freeze({ from: source.path, to: file.path, contentHash: file.contentHash }));
-  }
-  return Object.freeze({
-    added: addedCandidates.map((file) => file.path).filter((value) => !renamedTo.has(value)).sort(),
-    changed: changed.sort(),
-    deleted: deletedCandidates.map((file) => file.path).filter((value) => !renamedFrom.has(value)).sort(),
-    renamed: renamed.sort((left, right) => `${left.from}\0${left.to}`.localeCompare(`${right.from}\0${right.to}`))
-  });
-}
-function latestProjectStructure2(events) {
-  for (let index = events.length - 1; index >= 0; index -= 1) {
-    const candidate = events[index].data?.projectStructure;
-    if (candidate?.schemaVersion === PROJECT_STRUCTURE_SCHEMA_VERSION && Array.isArray(candidate.files)) {
-      return { event: events[index], structure: candidate };
-    }
-  }
-  return null;
-}
-function snapshotBody(structure) {
-  const changed = structure.changes;
-  const paths = structure.files.slice(0, 200).map((file) => `- ${file.path}`).join("\n");
-  return [
-    `Observed ${structure.fileCount} files and ${structure.directoryCount} directories.`,
-    `Changes: ${changed.added.length} added, ${changed.changed.length} changed, ${changed.deleted.length} deleted, ${changed.renamed.length} renamed.`,
-    "",
-    "Indexed paths:",
-    paths,
-    structure.files.length > 200 ? `- [${structure.files.length - 200} additional paths omitted from this searchable summary]` : ""
-  ].filter((line, index, values) => line !== "" || values[index - 1] !== "").join("\n");
-}
-async function scanProjectStructure(rawOptions = {}) {
-  const options = scanOptions(rawOptions);
-  const workspace = await loadWorkspace(options.cwd ?? process.cwd());
-  const events = await readEvents(workspace);
-  const previous = latestProjectStructure2(events);
-  const collected = await collectStructure(workspace, options);
-  const core = {
-    schemaVersion: PROJECT_STRUCTURE_SCHEMA_VERSION,
-    adapter: Object.freeze({ id: "qarinah.project-structure", version: "1" }),
-    root: ".",
-    limits: Object.freeze({
-      maxFiles: options.maxFiles,
-      maxFileBytes: options.maxFileBytes,
-      maxTotalBytes: options.maxTotalBytes,
-      maxDepth: options.maxDepth
-    }),
-    directoryCount: collected.directories.length,
-    fileCount: collected.files.length,
-    totalBytes: collected.totalBytes,
-    directories: collected.directories,
-    files: collected.files
-  };
-  const snapshotHash = sha256(canonicalStringify(core));
-  if (previous?.structure.snapshotHash === snapshotHash) {
-    return Object.freeze({
-      captured: false,
-      unchanged: true,
-      eventId: previous.event.eventId,
-      snapshotHash,
-      fileCount: core.fileCount,
-      directoryCount: core.directoryCount
-    });
-  }
-  const projectStructure = Object.freeze({
-    ...core,
-    snapshotHash,
-    changes: structureChanges(previous?.structure ?? null, core)
-  });
-  const payload = {
-    kind: "artifact",
-    actor: { type: "tool", id: "qarinah-project-structure" },
-    title: "Project structure snapshot",
-    body: workspace.config.capture === "content" ? snapshotBody(projectStructure) : "",
-    data: { projectStructure },
-    confidence: "extracted",
-    relations: previous ? [{ type: "supersedes", target: previous.event.eventId }] : [],
-    provenance: { adapter: "qarinah-project-structure", sourceId: snapshotHash },
-    retention: { class: "project", expiresAt: null }
-  };
-  const eventInput = workspace.config.capture === "metadata" ? reviewMetadataEventInput(payload) : payload;
-  const event = await appendEvent(eventInput, { workspace, capture: workspace.config.capture });
-  return Object.freeze({
-    captured: true,
-    unchanged: false,
-    eventId: event.eventId,
-    hash: event.hash,
-    snapshotHash,
-    fileCount: core.fileCount,
-    directoryCount: core.directoryCount,
-    changes: projectStructure.changes
-  });
-}
+// src/index.js
+init_project_structure();
 
 // src/archive-import.js
 init_canonical();
@@ -5803,7 +7154,7 @@ init_errors();
 import { createHash as createHash4 } from "node:crypto";
 import { createReadStream } from "node:fs";
 import { lstat as lstat5, opendir, realpath as realpath4 } from "node:fs/promises";
-import path6 from "node:path";
+import path7 from "node:path";
 
 // src/hooks/capture-content.js
 init_canonical();
@@ -5888,7 +7239,7 @@ var MAX_SESSIONS_PER_FILE = 5e4;
 var MAX_ARCHIVE_DEPTH = 64;
 var MAX_SUMMARY_EXCERPTS = 3;
 var MAX_TERM_KEYS = 2e4;
-var STOP_WORDS2 = /* @__PURE__ */ new Set([
+var STOP_WORDS3 = /* @__PURE__ */ new Set([
   "about",
   "after",
   "again",
@@ -5939,7 +7290,7 @@ var PRIVATE_CONTENT_TYPES = /* @__PURE__ */ new Set([
   "redacted_thinking",
   "thinking"
 ]);
-function boundedInteger2(value, fallback, minimum, maximum, name) {
+function boundedInteger3(value, fallback, minimum, maximum, name) {
   if (value === void 0) return fallback;
   if (!Number.isSafeInteger(value) || value < minimum || value > maximum) {
     throw new TypeError(`${name} must be an integer from ${minimum} to ${maximum}.`);
@@ -6137,7 +7488,7 @@ function addTerms(aggregate, text) {
   if (!text || aggregate.terms.size >= MAX_TERM_KEYS) return;
   const words = text.normalize("NFKC").toLowerCase().match(/[\p{L}\p{N}][\p{L}\p{N}_-]{2,63}/gu) ?? [];
   for (const word of words) {
-    if (STOP_WORDS2.has(word)) continue;
+    if (STOP_WORDS3.has(word)) continue;
     aggregate.terms.set(word, (aggregate.terms.get(word) ?? 0) + 1);
     if (aggregate.terms.size >= MAX_TERM_KEYS) break;
   }
@@ -6238,7 +7589,7 @@ function fullEventInput(item, identity, workspace, ordinal, format) {
   };
 }
 async function archiveFiles(source, limits) {
-  const requested = path6.resolve(source);
+  const requested = path7.resolve(source);
   const requestedStat = await lstat5(requested);
   if (requestedStat.isSymbolicLink()) throw new QarinahError("ARCHIVE_LINK_REJECTED", "Archive source cannot be a symbolic link.");
   const resolved = await realpath4(requested);
@@ -6250,7 +7601,7 @@ async function archiveFiles(source, limits) {
     const metadata = await lstat5(candidate);
     if (metadata.isSymbolicLink() || !metadata.isFile()) return;
     if (metadata.nlink !== 1) throw new QarinahError("ARCHIVE_LINK_REJECTED", "Archive files must be singly linked regular files.");
-    if (!ARCHIVE_EXTENSIONS.has(path6.extname(candidate).toLowerCase())) return;
+    if (!ARCHIVE_EXTENSIONS.has(path7.extname(candidate).toLowerCase())) return;
     totalBytes += metadata.size;
     if (files.length + 1 > limits.maxFiles) throw new QarinahError("ARCHIVE_LIMIT_EXCEEDED", "Archive contains more files than allowed.");
     if (totalBytes > limits.maxBytes) throw new QarinahError("ARCHIVE_LIMIT_EXCEEDED", "Archive exceeds the configured byte limit.");
@@ -6265,7 +7616,7 @@ async function archiveFiles(source, limits) {
     for await (const entry of handle) entries.push(entry);
     entries.sort((left, right) => left.name.localeCompare(right.name));
     for (const entry of entries) {
-      const candidate = path6.join(directory, entry.name);
+      const candidate = path7.join(directory, entry.name);
       if (entry.isSymbolicLink()) continue;
       if (entry.isDirectory()) await walk(candidate, depth + 1);
       else if (entry.isFile()) await addFile(candidate);
@@ -6316,10 +7667,10 @@ async function importAgentArchive(source, options = {}) {
   if (!ALLOWED_FORMATS.has(format)) throw new TypeError("format must be auto, codex, claude, kimi, or portable.");
   if (!ALLOWED_MODES.has(mode)) throw new TypeError("mode must be compact or full.");
   const limits = {
-    maxBytes: boundedInteger2(options.maxBytes, DEFAULT_MAX_BYTES, 1, 1024 * 1024 * 1024 * 1024, "maxBytes"),
-    maxFiles: boundedInteger2(options.maxFiles, DEFAULT_MAX_FILES2, 1, 1e6, "maxFiles"),
-    maxRecords: boundedInteger2(options.maxRecords, DEFAULT_MAX_RECORDS, 1, 1e8, "maxRecords"),
-    maxLineBytes: boundedInteger2(options.maxLineBytes, DEFAULT_MAX_LINE_BYTES, 1024, 64 * 1024 * 1024, "maxLineBytes")
+    maxBytes: boundedInteger3(options.maxBytes, DEFAULT_MAX_BYTES, 1, 1024 * 1024 * 1024 * 1024, "maxBytes"),
+    maxFiles: boundedInteger3(options.maxFiles, DEFAULT_MAX_FILES2, 1, 1e6, "maxFiles"),
+    maxRecords: boundedInteger3(options.maxRecords, DEFAULT_MAX_RECORDS, 1, 1e8, "maxRecords"),
+    maxLineBytes: boundedInteger3(options.maxLineBytes, DEFAULT_MAX_LINE_BYTES, 1024, 64 * 1024 * 1024, "maxLineBytes")
   };
   const workspace = await loadWorkspace(options.cwd ?? process.cwd());
   if (mode === "full" && workspace.config.capture !== "content") {
@@ -6466,7 +7817,7 @@ init_indexer();
 import { createHash as createHash5 } from "node:crypto";
 import { createReadStream as createReadStream2, createWriteStream } from "node:fs";
 import { lstat as lstat6, mkdir as mkdir4, opendir as opendir2, realpath as realpath5, rename as rename5, rm as rm5 } from "node:fs/promises";
-import path7 from "node:path";
+import path8 from "node:path";
 import { Readable, Transform } from "node:stream";
 import { pipeline } from "node:stream/promises";
 var AGENT_ARCHIVE_BACKUP_SCHEMA_VERSION = "qarinah.agent-archive-backup.v1";
@@ -6474,7 +7825,7 @@ var EXTENSIONS = /* @__PURE__ */ new Set([".jsonl", ".ndjson"]);
 var DEFAULT_MAX_BYTES2 = 100 * 1024 * 1024 * 1024;
 var DEFAULT_MAX_FILES3 = 1e5;
 var MAX_DEPTH = 64;
-function boundedInteger3(value, fallback, label, maximum) {
+function boundedInteger4(value, fallback, label, maximum) {
   const selected3 = value ?? fallback;
   if (!Number.isSafeInteger(selected3) || selected3 < 1 || selected3 > maximum) {
     throw new TypeError(`${label} must be an integer from 1 to ${maximum}.`);
@@ -6482,18 +7833,18 @@ function boundedInteger3(value, fallback, label, maximum) {
   return selected3;
 }
 function isWithin3(root, candidate) {
-  const relative = path7.relative(root, candidate);
-  return relative === "" || !relative.startsWith("..") && !path7.isAbsolute(relative);
+  const relative = path8.relative(root, candidate);
+  return relative === "" || !relative.startsWith("..") && !path8.isAbsolute(relative);
 }
 function safeName(value) {
   const cleaned = value.normalize("NFKC").replaceAll(/[^a-zA-Z0-9._-]+/gu, "-").replaceAll(/^-+|-+$/gu, "");
   return cleaned.slice(0, 80) || "archive";
 }
 async function inspectSource(source, limits, sourceIndex) {
-  if (typeof source !== "string" || source.trim() === "" || !path7.isAbsolute(source)) {
+  if (typeof source !== "string" || source.trim() === "" || !path8.isAbsolute(source)) {
     throw new TypeError("Every backup source must be an explicit absolute path.");
   }
-  const requested = path7.resolve(source);
+  const requested = path8.resolve(source);
   const requestedStat = await lstat6(requested);
   if (requestedStat.isSymbolicLink()) throw new QarinahError("BACKUP_LINK_REJECTED", "Backup sources cannot be symbolic links or junctions.");
   const root = await realpath5(requested);
@@ -6505,7 +7856,7 @@ async function inspectSource(source, limits, sourceIndex) {
     const metadata = await lstat6(candidate);
     if (metadata.isSymbolicLink()) throw new QarinahError("BACKUP_LINK_REJECTED", "Backup source trees cannot contain symbolic links or junctions.");
     if (!metadata.isFile() || metadata.nlink !== 1) throw new QarinahError("BACKUP_SOURCE_INVALID", "Backup sources must contain singly linked regular files.");
-    if (!EXTENSIONS.has(path7.extname(candidate).toLowerCase())) return;
+    if (!EXTENSIONS.has(path8.extname(candidate).toLowerCase())) return;
     totalBytes += metadata.size;
     if (files.length + 1 > limits.maxFiles) throw new QarinahError("BACKUP_LIMIT_EXCEEDED", "Backup contains more files than allowed.");
     if (totalBytes > limits.maxBytes) throw new QarinahError("BACKUP_LIMIT_EXCEEDED", "Backup exceeds the configured byte limit.");
@@ -6520,35 +7871,35 @@ async function inspectSource(source, limits, sourceIndex) {
     for await (const entry of handle) entries.push(entry);
     entries.sort((left, right) => left.name.localeCompare(right.name));
     for (const entry of entries) {
-      const candidate = path7.join(directory, entry.name);
-      const relative = path7.join(relativeDirectory, entry.name);
+      const candidate = path8.join(directory, entry.name);
+      const relative = path8.join(relativeDirectory, entry.name);
       if (entry.isSymbolicLink()) throw new QarinahError("BACKUP_LINK_REJECTED", "Backup source trees cannot contain symbolic links or junctions.");
       if (entry.isDirectory()) await walk(candidate, relative, depth + 1);
       else if (entry.isFile()) await addFile(candidate, relative);
     }
   }
-  if (rootStat.isFile()) await addFile(root, path7.basename(root));
+  if (rootStat.isFile()) await addFile(root, path8.basename(root));
   else if (rootStat.isDirectory()) await walk(root);
   else throw new QarinahError("BACKUP_SOURCE_INVALID", "Backup source must be a regular file or directory.");
   return {
     root,
-    label: safeName(path7.basename(root)),
+    label: safeName(path8.basename(root)),
     sourceId: sha256(root),
     files,
     totalBytes
   };
 }
 async function prepareDestination(destination, sources) {
-  if (typeof destination !== "string" || destination.trim() === "" || !path7.isAbsolute(destination)) {
+  if (typeof destination !== "string" || destination.trim() === "" || !path8.isAbsolute(destination)) {
     throw new TypeError("backup destination must be an explicit absolute path.");
   }
-  const requested = path7.resolve(destination);
+  const requested = path8.resolve(destination);
   for (const source of sources) {
     if (isWithin3(source.root, requested) || isWithin3(requested, source.root)) {
       throw new QarinahError("BACKUP_PATH_OVERLAP", "Backup source and destination must not contain one another.");
     }
   }
-  const parent = await realpath5(path7.dirname(requested));
+  const parent = await realpath5(path8.dirname(requested));
   const parentStat = await lstat6(parent);
   if (parentStat.isSymbolicLink() || !parentStat.isDirectory()) {
     throw new QarinahError("BACKUP_DESTINATION_INVALID", "Backup destination parent must be a real directory.");
@@ -6561,8 +7912,8 @@ async function prepareDestination(destination, sources) {
   return realpath5(requested);
 }
 async function copyVerified(file, destination, state, limits) {
-  const target = path7.join(destination, `source-${file.sourceIndex + 1}`, file.relativePath);
-  await mkdir4(path7.dirname(target), { recursive: true, mode: 448 });
+  const target = path8.join(destination, `source-${file.sourceIndex + 1}`, file.relativePath);
+  await mkdir4(path8.dirname(target), { recursive: true, mode: 448 });
   const temporary = `${target}.partial`;
   const digest = createHash5("sha256");
   let copied = 0;
@@ -6597,8 +7948,8 @@ async function backupAgentArchives(sources, destination, options = {}) {
     throw new TypeError("sources must contain from 1 to 32 explicit absolute paths.");
   }
   const limits = {
-    maxBytes: boundedInteger3(options.maxBytes, DEFAULT_MAX_BYTES2, "maxBytes", 1024 * 1024 * 1024 * 1024),
-    maxFiles: boundedInteger3(options.maxFiles, DEFAULT_MAX_FILES3, "maxFiles", 1e6)
+    maxBytes: boundedInteger4(options.maxBytes, DEFAULT_MAX_BYTES2, "maxBytes", 1024 * 1024 * 1024 * 1024),
+    maxFiles: boundedInteger4(options.maxFiles, DEFAULT_MAX_FILES3, "maxFiles", 1e6)
   };
   const inspected = [];
   let totalFiles = 0;
@@ -6615,7 +7966,7 @@ async function backupAgentArchives(sources, destination, options = {}) {
   if (totalFiles === 0) throw new QarinahError("BACKUP_EMPTY", "No JSONL or NDJSON files were found in the explicit sources.");
   const createdAt = (options.clock?.() ?? /* @__PURE__ */ new Date()).toISOString();
   const suffix = sha256(inspected.map((source) => source.sourceId).join("\n")).slice(7, 19);
-  const root = await prepareDestination(path7.join(destination, `qarinah-agent-archive-${createdAt.replaceAll(/[:.]/gu, "-")}-${suffix}`), inspected);
+  const root = await prepareDestination(path8.join(destination, `qarinah-agent-archive-${createdAt.replaceAll(/[:.]/gu, "-")}-${suffix}`), inspected);
   const state = { copiedBytes: 0 };
   try {
     const files = [];
@@ -6631,7 +7982,7 @@ async function backupAgentArchives(sources, destination, options = {}) {
     };
     const manifestHash = sha256(canonicalStringify(core));
     const manifest = { ...core, manifestHash };
-    const manifestPath = path7.join(root, "manifest.json");
+    const manifestPath = path8.join(root, "manifest.json");
     const temporary = `${manifestPath}.partial`;
     await pipeline(
       Readable.from([`${JSON.stringify(manifest, null, 2)}
@@ -6654,7 +8005,7 @@ async function backupAgentArchives(sources, destination, options = {}) {
             fileCount: files.length,
             totalBytes: state.copiedBytes,
             manifestHash,
-            backupName: path7.basename(root)
+            backupName: path8.basename(root)
           }
         },
         confidence: "verified",
@@ -6683,7 +8034,7 @@ async function backupAgentArchives(sources, destination, options = {}) {
 // src/memory-footprint.js
 init_canonical();
 import { lstat as lstat7 } from "node:fs/promises";
-import path8 from "node:path";
+import path9 from "node:path";
 init_errors();
 init_store();
 init_workspace();
@@ -6718,7 +8069,7 @@ function money(value) {
   return Math.round(value * 1e6) / 1e6;
 }
 async function fileBytes(workspace, segments) {
-  const candidate = path8.join(workspace.qarinahDir, ...segments);
+  const candidate = path9.join(workspace.qarinahDir, ...segments);
   try {
     const metadata = await lstat7(candidate);
     if (metadata.isSymbolicLink() || !metadata.isFile() || metadata.nlink !== 1) {
@@ -6741,9 +8092,11 @@ function importedSourceBytes(events) {
 }
 async function measureMemoryFootprint(options = {}) {
   if (!options || typeof options !== "object" || Array.isArray(options)) throw new TypeError("Memory footprint options must be a record.");
-  const allowed = /* @__PURE__ */ new Set(["cwd", "query", "maxChars", "maxTokens", "baselineTokens", "ratePerMillion"]);
+  const allowed = /* @__PURE__ */ new Set(["cwd", "query", "maxChars", "maxTokens", "baselineTokens", "ratePerMillion", "inMemory", "updateCheckpoint"]);
   const unknown = Object.keys(options).filter((key) => !allowed.has(key));
   if (unknown.length) throw new TypeError(`Memory footprint options contain unknown field(s): ${unknown.join(", ")}.`);
+  if (options.inMemory !== void 0 && typeof options.inMemory !== "boolean") throw new TypeError("inMemory must be a boolean.");
+  if (options.updateCheckpoint !== void 0 && typeof options.updateCheckpoint !== "boolean") throw new TypeError("updateCheckpoint must be a boolean.");
   const query = options.query ?? "project decisions outcomes tools changes";
   if (typeof query !== "string" || query.length > 4096) throw new TypeError("query must be a string up to 4096 characters.");
   const maxChars = optionalInteger(options.maxChars, "maxChars", 512, 1e6);
@@ -6751,7 +8104,7 @@ async function measureMemoryFootprint(options = {}) {
   const baselineTokens = optionalInteger(options.baselineTokens, "baselineTokens", 0, 1e9);
   const ratePerMillion = optionalRate(options.ratePerMillion);
   const workspace = await loadWorkspace(options.cwd ?? process.cwd());
-  const events = await readEvents(workspace);
+  const events = await readEvents(workspace, { updateCheckpoint: options.updateCheckpoint !== false });
   const ledgerCharacters = events.reduce((total, event) => total + canonicalStringify(event).length + 1, 0);
   const ledgerEstimatedTokens = events.length > 0 ? Math.ceil(ledgerCharacters / 4) : null;
   const storage = {};
@@ -6761,6 +8114,8 @@ async function measureMemoryFootprint(options = {}) {
   const pack = await compileContext(query, {
     cwd: workspace.root,
     minimumCoverage: "any",
+    inMemory: options.inMemory === true,
+    updateCheckpoint: options.updateCheckpoint,
     ...maxChars === void 0 ? {} : { maxChars },
     ...maxTokens === void 0 ? {} : { maxTokens }
   });
@@ -6974,7 +8329,7 @@ init_store();
 init_workspace();
 import { randomBytes as randomBytes4 } from "node:crypto";
 import { lstat as lstat8, mkdir as mkdir5, readFile as readFile2, readdir as readdir3, realpath as realpath6, rename as rename6, rm as rm6 } from "node:fs/promises";
-import path9 from "node:path";
+import path10 from "node:path";
 var OKF_VERSION = "0.1";
 var OKF_EXPORT_SCHEMA_VERSION = "qarinah.okf-export.v1";
 var DEFAULT_OUTPUT_SEGMENTS = Object.freeze([".qarinah", "records", "okf"]);
@@ -6988,8 +8343,8 @@ function compareText(left, right) {
   return left < right ? -1 : left > right ? 1 : 0;
 }
 function isWithin4(root, candidate) {
-  const relative = path9.relative(root, candidate);
-  return relative === "" || !relative.startsWith("..") && !path9.isAbsolute(relative);
+  const relative = path10.relative(root, candidate);
+  return relative === "" || !relative.startsWith("..") && !path10.isAbsolute(relative);
 }
 async function optionalLstat(candidate) {
   try {
@@ -7021,11 +8376,11 @@ function validateOptions(value) {
 }
 function resolveOutputDirectory(workspace, output) {
   const outputDirectory = output === void 0 ? resolveWithin(workspace.root, ...DEFAULT_OUTPUT_SEGMENTS) : resolveWithin(workspace.root, output);
-  const relative = path9.relative(workspace.root, outputDirectory);
+  const relative = path10.relative(workspace.root, outputDirectory);
   if (relative === "") {
     throw new QarinahError("OKF_OUTPUT_PROTECTED", "The workspace root cannot be replaced by an OKF export.");
   }
-  const segments = relative.split(path9.sep).filter(Boolean);
+  const segments = relative.split(path10.sep).filter(Boolean);
   const normalized = segments.map((segment) => process.platform === "win32" ? segment.toLowerCase() : segment);
   if (normalized[0] === ".git") {
     throw new QarinahError("OKF_OUTPUT_PROTECTED", "An OKF export cannot be written inside .git.");
@@ -7042,13 +8397,13 @@ function resolveOutputDirectory(workspace, output) {
   return outputDirectory;
 }
 async function ensureSafeDirectoryChain(root, directory) {
-  const relative = path9.relative(root, directory);
+  const relative = path10.relative(root, directory);
   if (!isWithin4(root, directory)) {
     throw new QarinahError("PATH_OUTSIDE_WORKSPACE", "OKF output parent escapes the workspace root.");
   }
   let current = root;
-  for (const segment of relative.split(path9.sep).filter(Boolean)) {
-    current = path9.join(current, segment);
+  for (const segment of relative.split(path10.sep).filter(Boolean)) {
+    current = path10.join(current, segment);
     let metadata = await optionalLstat(current);
     if (!metadata) {
       try {
@@ -7352,7 +8707,7 @@ async function assertOwnedOutput(outputDirectory, workspace) {
   if (entries.join("\0") !== [...ROOT_FILES].sort(compareText).join("\0")) {
     throw new QarinahError("OKF_OUTPUT_NOT_OWNED", "Existing OKF output contains unexpected or missing entries.");
   }
-  const eventDirectory = path9.join(outputDirectory, "events");
+  const eventDirectory = path10.join(outputDirectory, "events");
   const eventMetadata = await lstat8(eventDirectory);
   if (eventMetadata.isSymbolicLink()) {
     throw new QarinahError("STORAGE_LINK_REJECTED", "OKF event directory cannot be a symbolic link or junction.");
@@ -7364,13 +8719,13 @@ async function assertOwnedOutput(outputDirectory, workspace) {
   if (eventFiles.length > MAX_EVENTS2 || eventFiles.some((name) => !EVENT_FILE_PATTERN.test(name))) {
     throw new QarinahError("OKF_OUTPUT_NOT_OWNED", "Existing OKF output contains invalid event concept paths.");
   }
-  await assertRegularFile(path9.join(outputDirectory, EXPORT_MARKER), "OKF ownership marker", 64 * 1024);
-  await assertRegularFile(path9.join(outputDirectory, "index.md"), "OKF root index", 64 * 1024 * 1024);
-  await assertRegularFile(path9.join(outputDirectory, "log.md"), "OKF root log", 64 * 1024 * 1024);
+  await assertRegularFile(path10.join(outputDirectory, EXPORT_MARKER), "OKF ownership marker", 64 * 1024);
+  await assertRegularFile(path10.join(outputDirectory, "index.md"), "OKF root index", 64 * 1024 * 1024);
+  await assertRegularFile(path10.join(outputDirectory, "log.md"), "OKF root log", 64 * 1024 * 1024);
   for (const name of eventFiles) {
-    await assertRegularFile(path9.join(eventDirectory, name), `OKF event concept '${name}'`, 2 * 1024 * 1024);
+    await assertRegularFile(path10.join(eventDirectory, name), `OKF event concept '${name}'`, 2 * 1024 * 1024);
   }
-  const markerText = await readFile2(path9.join(outputDirectory, EXPORT_MARKER), "utf8");
+  const markerText = await readFile2(path10.join(outputDirectory, EXPORT_MARKER), "utf8");
   let marker;
   try {
     marker = JSON.parse(markerText);
@@ -7383,12 +8738,12 @@ async function assertOwnedOutput(outputDirectory, workspace) {
   }
   validateMarker(marker, workspace.config.workspaceId, eventFiles.length);
   const existingFiles = /* @__PURE__ */ new Map([
-    ["index.md", await readFile2(path9.join(outputDirectory, "index.md"), "utf8")],
-    ["log.md", await readFile2(path9.join(outputDirectory, "log.md"), "utf8")]
+    ["index.md", await readFile2(path10.join(outputDirectory, "index.md"), "utf8")],
+    ["log.md", await readFile2(path10.join(outputDirectory, "log.md"), "utf8")]
   ]);
   let totalBytes = Buffer.byteLength(existingFiles.get("index.md")) + Buffer.byteLength(existingFiles.get("log.md"));
   for (const name of eventFiles) {
-    const contents = await readFile2(path9.join(eventDirectory, name), "utf8");
+    const contents = await readFile2(path10.join(eventDirectory, name), "utf8");
     totalBytes += Buffer.byteLength(contents);
     if (totalBytes > 256 * 1024 * 1024) {
       throw new QarinahError("OKF_OUTPUT_NOT_OWNED", "Existing OKF output exceeds its bounded aggregate size.");
@@ -7417,9 +8772,9 @@ async function replaceOutput(stage, outputDirectory, workspace) {
     await renameWithRetry(stage, outputDirectory);
     return;
   }
-  const parent = path9.dirname(outputDirectory);
-  const backup = path9.join(parent, `.${path9.basename(outputDirectory)}.qarinah-okf-backup-${process.pid}-${randomBytes4(8).toString("hex")}`);
-  resolveWithin(workspace.root, path9.relative(workspace.root, backup));
+  const parent = path10.dirname(outputDirectory);
+  const backup = path10.join(parent, `.${path10.basename(outputDirectory)}.qarinah-okf-backup-${process.pid}-${randomBytes4(8).toString("hex")}`);
+  resolveWithin(workspace.root, path10.relative(workspace.root, backup));
   await renameWithRetry(outputDirectory, backup);
   try {
     await renameWithRetry(stage, outputDirectory);
@@ -7438,10 +8793,10 @@ async function replaceOutput(stage, outputDirectory, workspace) {
 }
 async function writeStage(stage, files) {
   await mkdir5(stage, { mode: 448 });
-  await mkdir5(path9.join(stage, "events"), { mode: 448 });
+  await mkdir5(path10.join(stage, "events"), { mode: 448 });
   for (const [relativePath, contents] of [...files.entries()].sort(([left], [right]) => compareText(left, right))) {
     const segments = relativePath.split("/");
-    const destination = path9.join(stage, ...segments);
+    const destination = path10.join(stage, ...segments);
     if (!isWithin4(stage, destination)) throw new QarinahError("PATH_OUTSIDE_WORKSPACE", "Generated OKF path escaped its staging directory.");
     await atomicWriteFile(destination, contents);
   }
@@ -7450,13 +8805,13 @@ async function exportOkf(options = {}) {
   const normalized = validateOptions(options);
   const workspace = await loadWorkspace(normalized.cwd ?? process.cwd());
   const outputDirectory = resolveOutputDirectory(workspace, normalized.output);
-  const parent = path9.dirname(outputDirectory);
+  const parent = path10.dirname(outputDirectory);
   await ensureSafeDirectoryChain(workspace.root, parent);
   await assertOwnedOutput(outputDirectory, workspace);
   const events = await readEvents(workspace.root);
   const { files, manifest } = buildBundle(events, workspace.config.workspaceId);
-  const stage = path9.join(parent, `.${path9.basename(outputDirectory)}.qarinah-okf-stage-${process.pid}-${randomBytes4(8).toString("hex")}`);
-  resolveWithin(workspace.root, path9.relative(workspace.root, stage));
+  const stage = path10.join(parent, `.${path10.basename(outputDirectory)}.qarinah-okf-stage-${process.pid}-${randomBytes4(8).toString("hex")}`);
+  resolveWithin(workspace.root, path10.relative(workspace.root, stage));
   if (await optionalLstat(stage)) throw new QarinahError("OKF_OUTPUT_INVALID", "Generated OKF staging path already exists.");
   try {
     await writeStage(stage, files);
@@ -7474,7 +8829,7 @@ init_errors();
 init_boundary();
 init_store();
 init_workspace();
-import path10 from "node:path";
+import path11 from "node:path";
 var PERMISSION_MODES = /* @__PURE__ */ new Set(["default", "acceptEdits", "plan", "dontAsk", "bypassPermissions"]);
 var EVENT_MAP = Object.freeze({
   SessionStart: { kind: "session.started", title: "Codex session started", actor: { type: "system", id: "codex" } },
@@ -7612,9 +8967,9 @@ function bodyContentEntry(input) {
 function hookPayload(input, workspace) {
   const eventName = input.hook_event_name;
   const mapping = EVENT_MAP[eventName];
-  const requestedCwd = path10.resolve(input.cwd);
-  const relativeCwd = path10.relative(workspace.root, requestedCwd);
-  const workspaceRelativeCwd = relativeCwd === "" || !relativeCwd.startsWith("..") && !path10.isAbsolute(relativeCwd) ? relativeCwd || "." : "[outside-workspace]";
+  const requestedCwd = path11.resolve(input.cwd);
+  const relativeCwd = path11.relative(workspace.root, requestedCwd);
+  const workspaceRelativeCwd = relativeCwd === "" || !relativeCwd.startsWith("..") && !path11.isAbsolute(relativeCwd) ? relativeCwd || "." : "[outside-workspace]";
   const metadata = {
     hookEvent: eventName,
     model: input.model,
@@ -7709,7 +9064,7 @@ init_errors();
 init_boundary();
 init_store();
 init_workspace();
-import path11 from "node:path";
+import path12 from "node:path";
 var PERMISSION_MODES2 = /* @__PURE__ */ new Set(["default", "plan", "acceptEdits", "auto", "dontAsk", "bypassPermissions"]);
 var EFFORT_LEVELS = /* @__PURE__ */ new Set(["low", "medium", "high", "xhigh", "max"]);
 var SESSION_END_REASONS = /* @__PURE__ */ new Set(["clear", "logout", "prompt_input_exit", "other"]);
@@ -7948,9 +9303,9 @@ function bodyContentEntry2(input) {
 function hookPayload2(input, ignoredFieldCount, workspace) {
   const eventName = input.hook_event_name;
   const mapping = EVENT_MAP2[eventName];
-  const requestedCwd = path11.resolve(input.cwd);
-  const relativeCwd = path11.relative(workspace.root, requestedCwd);
-  const workspaceRelativeCwd = relativeCwd === "" || !relativeCwd.startsWith("..") && !path11.isAbsolute(relativeCwd) ? relativeCwd || "." : "[outside-workspace]";
+  const requestedCwd = path12.resolve(input.cwd);
+  const relativeCwd = path12.relative(workspace.root, requestedCwd);
+  const workspaceRelativeCwd = relativeCwd === "" || !relativeCwd.startsWith("..") && !path12.isAbsolute(relativeCwd) ? relativeCwd || "." : "[outside-workspace]";
   const metadata = {
     host: "claude-code",
     hookEvent: eventName,
@@ -8054,7 +9409,7 @@ async function captureClaudeHook(value, options = {}) {
 
 // src/mcp/server.js
 import { realpath as realpath7 } from "node:fs/promises";
-import path12 from "node:path";
+import path13 from "node:path";
 import { fileURLToPath } from "node:url";
 init_errors();
 init_indexer();
@@ -8225,7 +9580,7 @@ function pathFromSelector(value) {
       throw new QarinahError("MCP_WORKSPACE_INVALID", "The MCP workspace selector is not a valid local file URI.");
     }
   }
-  if (!path12.isAbsolute(selector)) {
+  if (!path13.isAbsolute(selector)) {
     throw new QarinahError("MCP_WORKSPACE_INVALID", "The MCP workspace selector must be an absolute local path.");
   }
   return selector;
@@ -8318,8 +9673,8 @@ function createMcpServer(options = {}) {
       try {
         const workspace = await loadWorkspace(candidate.value);
         if (candidate.exact) {
-          const expectedRoot = await realpath7(path12.resolve(candidate.value));
-          if (path12.normalize(workspace.root) !== path12.normalize(expectedRoot)) {
+          const expectedRoot = await realpath7(path13.resolve(candidate.value));
+          if (path13.normalize(workspace.root) !== path13.normalize(expectedRoot)) {
             throw new QarinahError(
               "WORKSPACE_NOT_INITIALIZED",
               "The explicitly selected MCP root is not an initialized Context Ledger workspace."
@@ -8583,12 +9938,13 @@ async function runMcpServer(options = {}) {
 // src/setup.js
 init_errors();
 import { lstat as lstat9, mkdir as mkdir6, readFile as readFile3 } from "node:fs/promises";
-import path14 from "node:path";
+import path15 from "node:path";
 import { fileURLToPath as fileURLToPath2 } from "node:url";
 
 // src/dashboard.js
 init_canonical();
-import path13 from "node:path";
+init_linked_memory();
+import path14 from "node:path";
 init_project_views();
 init_store();
 init_workspace();
@@ -8612,9 +9968,50 @@ function eventSummary(event) {
     hash: event.hash
   };
 }
+function compactLinkedGraph(memory) {
+  const typeLimits = { memory: 36, file: 48, concept: 40, directory: 20, reference: 12 };
+  const admitted = rankLinkedProjectMemory(memory, "", { limit: 100 });
+  const selected3 = [];
+  for (const type of Object.keys(typeLimits)) {
+    selected3.push(...admitted.items.map((item) => item.node).filter((node) => node.type === type).sort((left, right) => right.importance - left.importance || left.id.localeCompare(right.id)).slice(0, typeLimits[type]));
+  }
+  const selectedIds = new Set(selected3.map((node) => node.id));
+  const edges = memory.edges.filter((edge) => selectedIds.has(edge.source) && selectedIds.has(edge.target)).sort((left, right) => right.weight - left.weight || `${left.source}\0${left.target}`.localeCompare(`${right.source}\0${right.target}`)).slice(0, 420);
+  return {
+    schemaVersion: memory.schemaVersion,
+    manifestHash: admitted.sourceManifestHash,
+    statistics: {
+      ...memory.statistics,
+      rankedCandidates: admitted.items.length,
+      selectedNodes: selected3.length,
+      renderedEdges: edges.length
+    },
+    nodes: selected3.map((node) => ({
+      id: node.id,
+      type: node.type,
+      kind: node.kind,
+      label: node.label,
+      path: node.path,
+      timestamp: node.timestamp,
+      confidence: node.confidence,
+      status: node.status,
+      conflicted: node.conflicted,
+      importance: node.importance,
+      repositoryRank: node.repositoryRank,
+      incoming: node.incoming,
+      outgoing: node.outgoing,
+      sourceEventId: node.sourceEventId,
+      evidenceHash: node.evidenceHash,
+      contentHash: node.contentHash,
+      terms: node.signature.slice(0, 12).map((entry) => entry.term)
+    })),
+    edges
+  };
+}
 async function buildMemoryDashboard(options = {}) {
   const workspace = await loadWorkspace(options.cwd ?? process.cwd());
   const events = await readEvents(workspace, { updateCheckpoint: false });
+  const generatedAt = (options.clock?.() ?? /* @__PURE__ */ new Date()).toISOString();
   const byId = new Map(events.map((event) => [event.eventId, event]));
   const superseded = /* @__PURE__ */ new Set();
   const conflicts = [];
@@ -8635,7 +10032,7 @@ async function buildMemoryDashboard(options = {}) {
   if (suppliedBaselineTokens === null !== (suppliedDeliveredTokens === null)) {
     throw new TypeError("baselineTokens and deliveredTokens must be supplied together.");
   }
-  const memoryFootprint = await measureMemoryFootprint({ cwd: workspace.root });
+  const memoryFootprint = await measureMemoryFootprint({ cwd: workspace.root, inMemory: true, updateCheckpoint: false });
   const baselineTokens = suppliedBaselineTokens ?? memoryFootprint.comparison.baselineTokens;
   const deliveredTokens = suppliedDeliveredTokens ?? memoryFootprint.comparison.deliveredTokens;
   const savedTokens = baselineTokens === null ? null : Math.max(0, baselineTokens - deliveredTokens);
@@ -8643,11 +10040,12 @@ async function buildMemoryDashboard(options = {}) {
   const baselineToPackRatio = deliveredTokens > 0 && baselineTokens !== null ? Math.round(baselineTokens / deliveredTokens * 100) / 100 : null;
   const repositoryIds = [...new Set(events.map((event) => event.repository?.id).filter(Boolean))].sort();
   const latestEvent = events.at(-1) ?? null;
+  const linkedMemory = buildLinkedProjectMemory(events, workspace.config.workspaceId, { asOf: generatedAt });
   return deepFreezeJson({
     schemaVersion: "qarinah.memory-dashboard.v2",
     workspaceId: workspace.config.workspaceId,
     workspace: {
-      name: path13.basename(workspace.root),
+      name: path14.basename(workspace.root),
       root: workspace.root,
       workspaceId: workspace.config.workspaceId,
       repositoryIds,
@@ -8657,7 +10055,7 @@ async function buildMemoryDashboard(options = {}) {
       lastActivityAt: latestEvent?.timestamp ?? null,
       eventCount: events.length
     },
-    generatedAt: (options.clock?.() ?? /* @__PURE__ */ new Date()).toISOString(),
+    generatedAt,
     capture: workspace.config.capture,
     totals: {
       events: events.length,
@@ -8669,7 +10067,10 @@ async function buildMemoryDashboard(options = {}) {
       flowSteps: projectRecords.flow.length,
       majorChanges: projectRecords.majorChanges.length,
       citedSources: new Set(events.map((event) => event.provenance.sourceId).filter(Boolean)).size,
-      affectedFiles: latestStructure3?.data.projectStructure.files.length ?? 0
+      affectedFiles: latestStructure3?.data.projectStructure.files.length ?? 0,
+      graphNodes: linkedMemory.statistics.nodes,
+      graphEdges: linkedMemory.statistics.edges,
+      graphConcepts: linkedMemory.statistics.concepts
     },
     contextSavings: {
       status: baselineTokens === null ? "not-measured" : "measured",
@@ -8705,7 +10106,8 @@ async function buildMemoryDashboard(options = {}) {
       path: file.path,
       contentHash: file.contentHash,
       language: file.language
-    }))
+    })),
+    linkedGraph: compactLinkedGraph(linkedMemory)
   });
 }
 function escapeHtml(value) {
@@ -8757,6 +10159,7 @@ const qarinahInitialHead=${JSON.stringify(workspace.ledgerHeadHash)};
 const qarinahInitialCount=${workspace.eventCount};
 const qarinahInitialBytes=${workspace.ledgerBytes};
 setInterval(async()=>{try{const response=await fetch(qarinahLiveStatusPath,{cache:"no-store"});if(!response.ok)return;const current=await response.json();if(current.headHash!==qarinahInitialHead||current.eventCount!==qarinahInitialCount||current.logBytes!==qarinahInitialBytes)location.reload();}catch{}},2000);` : "";
+  const linkedGraphJson = JSON.stringify(data.linkedGraph).replaceAll("<", "\\u003c").replaceAll("\u2028", "\\u2028").replaceAll("\u2029", "\\u2029");
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Qarinah memory dashboard</title>
@@ -8778,8 +10181,10 @@ li:first-child{border-top:0}li strong{min-width:0;overflow-wrap:anywhere}li span
 .pager{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:16px}.pager button{min-width:92px;min-height:42px;padding:8px 13px;border:1px solid var(--line);border-radius:8px;color:var(--text);background:#17212d;font:700 13px/1 system-ui,sans-serif;cursor:pointer}.pager button:hover:not(:disabled){border-color:var(--mint);color:var(--mint)}.pager button:focus-visible{outline:2px solid var(--mint);outline-offset:2px}.pager button:disabled{cursor:not-allowed;opacity:.45}.pager output{min-width:92px;color:var(--muted);font:700 12px/1.2 ui-monospace,monospace;text-align:center}
 .empty{margin:0}.warning{color:var(--warn)}[hidden]{display:none!important}
 .project-nav{display:flex;gap:8px;overflow-x:auto;padding:0 0 16px;scrollbar-width:thin}.project-nav a{flex:0 0 auto;min-width:180px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;color:var(--text);text-decoration:none;background:var(--panel)}.project-nav a[aria-current="page"]{border-color:var(--mint)}.project-nav small{display:block;color:var(--muted);font:11px/1.3 ui-monospace,monospace;margin-top:4px}.source-card{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 22px;margin-top:18px;padding:16px;border:1px solid var(--line);background:var(--panel)}.source-card p{margin:0;min-width:0}.source-card strong{display:block;color:var(--text);font-size:12px}.source-card code{overflow-wrap:anywhere}.live-state,.snapshot-state{display:inline-flex;align-items:center;gap:8px;color:var(--mint)}.live-state span{width:9px;height:9px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 4px rgb(53 224 170 / 14%)}
+.graph-toolbar{display:grid;grid-template-columns:minmax(220px,1fr) 190px auto;gap:10px;align-items:end;margin-bottom:14px}.graph-toolbar label{display:grid;gap:6px;color:var(--muted);font-size:12px}.graph-toolbar input,.graph-toolbar select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:8px;background:#0b1118;color:var(--text);padding:9px 12px;font:inherit}.graph-toolbar input:focus-visible,.graph-toolbar select:focus-visible{outline:2px solid var(--mint);outline-offset:2px}.graph-summary{color:var(--muted);font:12px/1.35 ui-monospace,monospace}.graph-shell{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(240px,.7fr);gap:14px}.graph-canvas{display:block;width:100%;height:auto;min-height:420px;border:1px solid var(--line);background:#0b1118}.graph-canvas line{stroke:#31404d;stroke-width:1;vector-effect:non-scaling-stroke}.graph-node{cursor:pointer}.graph-node circle{stroke:#090d12;stroke-width:2;vector-effect:non-scaling-stroke}.graph-node:focus-visible circle,.graph-node[data-selected="true"] circle{stroke:var(--text);stroke-width:3}.graph-node[data-conflict="true"] circle{stroke:var(--warn);stroke-width:3}.graph-details{border:1px solid var(--line);padding:16px;min-width:0}.graph-details h3{margin:0 0 8px;font-size:18px;overflow-wrap:anywhere}.graph-details dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:7px 11px;margin:14px 0}.graph-details dt{color:var(--muted)}.graph-details dd{margin:0;overflow-wrap:anywhere}.graph-results{display:grid;gap:6px;max-height:235px;overflow:auto;list-style:none;margin:8px 0 0;padding:0 3px 0 0}.graph-results li{display:block;padding:0;border:0}.graph-results button{display:grid;gap:2px;width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:7px;background:#0b1118;color:var(--text);text-align:left;cursor:pointer}.graph-results button:hover,.graph-results button:focus-visible,.graph-results button[data-selected="true"]{border-color:var(--mint);outline:none}.graph-results small{color:var(--muted)}.graph-legend{display:flex;flex-wrap:wrap;gap:10px 16px;margin:10px 0 0;color:var(--muted);font-size:12px}.graph-legend span{display:inline-flex;align-items:center;gap:6px}.graph-legend i{width:10px;height:10px;border-radius:50%;background:var(--legend)}
 @media(max-width:760px){header,main{width:min(100% - 20px,1180px)}header{padding:36px 0 22px}h1{font-size:clamp(34px,12vw,54px)}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.metric{min-width:0;padding:17px}.metric strong{font-size:24px;overflow-wrap:anywhere}main{padding-top:18px}.grid{grid-template-columns:1fr;gap:12px}section,section.wide{grid-column:auto;padding:18px}li{grid-template-columns:1fr}.record-head{display:block}.record-head time{display:block;margin-top:4px}.table-scroll table{min-width:620px}.pager{justify-content:space-between}.pager button{min-width:84px}}
-@media(max-width:600px){.source-card{grid-template-columns:1fr}.project-nav a{min-width:155px}}
+@media(max-width:900px){.graph-shell{grid-template-columns:1fr}.graph-canvas{min-height:330px}.graph-details{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}.graph-details h3,.graph-details>p{grid-column:1/-1}}
+@media(max-width:600px){.source-card{grid-template-columns:1fr}.project-nav a{min-width:155px}.graph-toolbar{grid-template-columns:1fr}.graph-shell,.graph-details{display:block}.graph-canvas{min-height:270px}.graph-results{margin-top:14px}}
 @media(max-width:420px){.metrics{grid-template-columns:1fr}.pager{display:grid;grid-template-columns:1fr 1fr}.pager output{grid-column:1/-1;grid-row:1;min-width:0}.pager button{width:100%}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 </style></head><body>
@@ -8803,6 +10208,11 @@ li:first-child{border-top:0}li strong{min-width:0;overflow-wrap:anywhere}li span
 <div class="metric"><strong>${escapeHtml(savingsValue)}</strong><span>${escapeHtml(savingsLabel)}</span></div>
 </div></header>
 <main><div class="grid">
+<section class="wide"><h2>Linked project memory</h2><p>Explore current memories, concepts, files, and their evidence-backed relationships. Repository rank comes from the retained project-link graph; search scores expose their exact basis.</p>
+<div class="graph-toolbar"><label>Ranked project-memory search<input type="search" data-graph-search data-search-path="${escapeHtml(options.searchPath ?? "")}" maxlength="256" placeholder="Try release policy or src/index.js"></label><label>Node type<select data-graph-type><option value="all">All node types</option><option value="memory">Memories</option><option value="file">Files</option><option value="concept">Concepts</option><option value="directory">Directories</option><option value="reference">References</option></select></label><output class="graph-summary" data-graph-summary aria-live="polite"></output></div>
+<div class="graph-shell"><svg class="graph-canvas" data-linked-graph viewBox="0 0 1040 560" role="img" aria-label="Interactive linked project-memory graph"><g data-graph-edges></g><g data-graph-nodes></g></svg><aside class="graph-details" aria-live="polite"><div><h3 data-graph-title>Choose a node</h3><p data-graph-description>Click a point or a result to inspect its type, rank, connections, and evidence identity.</p><dl><dt>Type</dt><dd data-graph-detail="type">-</dd><dt>Status</dt><dd data-graph-detail="status">-</dd><dt>Importance</dt><dd data-graph-detail="importance">-</dd><dt>Connections</dt><dd data-graph-detail="connections">-</dd><dt>Score basis</dt><dd data-graph-detail="basis">Browse rank</dd><dt>Evidence</dt><dd data-graph-detail="evidence">-</dd></dl></div><div><strong>Visible or ranked results</strong><ol class="graph-results" data-graph-results aria-label="Linked project-memory results"></ol></div></aside></div>
+<div class="graph-legend"><span><i style="--legend:#35e0aa"></i>Memory</span><span><i style="--legend:#65a7ff"></i>File</span><span><i style="--legend:#d197ff"></i>Concept</span><span><i style="--legend:#ffc857"></i>Directory</span><span><i style="--legend:#9aa7b2"></i>Reference</span></div>
+<p><small>Showing ${data.linkedGraph.nodes.length.toLocaleString()} selected nodes and ${data.linkedGraph.edges.length.toLocaleString()} relationships from ${data.linkedGraph.statistics.nodes.toLocaleString()} admitted source-projection nodes; ${data.linkedGraph.statistics.rankedCandidates.toLocaleString()} top-ranked candidates were evaluated. Source manifest: <code>${escapeHtml(data.linkedGraph.manifestHash)}</code></small></p></section>
 <section><h2>Current decisions and reasons</h2>${decisionList(data.currentDecisions, "No current decisions recorded.", { id: "current-decisions", label: "Current decisions" })}</section>
 <section><h2>Superseded decisions</h2>${decisionList(data.supersededDecisions, "No superseded decisions.", { id: "superseded-decisions", label: "Superseded decisions" })}</section>
 <section class="wide"><h2>Conflicts requiring attention</h2>${data.conflicts.length === 0 ? '<p class="empty">No recorded conflicts.</p>' : paginatedTable({ id: "conflicts", label: "Conflicts", headings: ["Claim", "Conflicts with"], rows: data.conflicts.map((conflict) => [escapeHtml(conflict.source.title), escapeHtml(conflict.target.title)]) })}</section>
@@ -8820,7 +10230,97 @@ ${data.contextSavings.status === "measured" ? `<tr><th>Estimated reduction</th><
 <section><h2>Source citations</h2>${list(data.citations, "No external source citations recorded.", { id: "citations", label: "Source citations" })}</section>
 <section><h2>Agent activity timeline</h2>${list(data.activity, "No activity recorded.", { id: "activity", label: "Agent activity" })}</section>
 <section class="wide"><h2>Files and systems affected</h2>${data.affectedFiles.length === 0 ? '<p class="empty">Run qarinah scan to populate the project map.</p>' : paginatedTable({ id: "affected-files", label: "Files and systems affected", headings: ["Path", "Language", "Content hash"], rows: data.affectedFiles.map((file) => [escapeHtml(file.path), escapeHtml(file.language), `<code>${escapeHtml(file.contentHash)}</code>`]) })}</section>
-</div></main><script>
+</div></main><script type="application/json" id="qarinah-linked-graph">${linkedGraphJson}</script><script>
+const qarinahGraph=JSON.parse(document.getElementById("qarinah-linked-graph").textContent);
+const qarinahGraphSvg=document.querySelector("[data-linked-graph]");
+const qarinahGraphEdges=document.querySelector("[data-graph-edges]");
+const qarinahGraphNodes=document.querySelector("[data-graph-nodes]");
+const qarinahGraphSearch=document.querySelector("[data-graph-search]");
+const qarinahGraphType=document.querySelector("[data-graph-type]");
+const qarinahGraphSummary=document.querySelector("[data-graph-summary]");
+const qarinahGraphResults=document.querySelector("[data-graph-results]");
+const qarinahGraphNodeById=new Map(qarinahGraph.nodes.map((node)=>[node.id,node]));
+const qarinahGraphNeighbors=new Map(qarinahGraph.nodes.map((node)=>[node.id,new Set()]));
+for(const edge of qarinahGraph.edges){qarinahGraphNeighbors.get(edge.source)?.add(edge.target);qarinahGraphNeighbors.get(edge.target)?.add(edge.source)}
+const qarinahGraphColors={memory:"#35e0aa",file:"#65a7ff",concept:"#d197ff",directory:"#ffc857",reference:"#9aa7b2"};
+let qarinahSelectedNode=null;
+const qarinahSvgElement=(name)=>document.createElementNS("http://www.w3.org/2000/svg",name);
+const qarinahNodeText=(node)=>[node.label,node.path,node.kind,...node.terms].filter(Boolean).join(" ").toLowerCase();
+const qarinahShowNode=(node,basis=null,score=null)=>{
+  qarinahSelectedNode=node.id;
+  document.querySelector("[data-graph-title]").textContent=node.label;
+  document.querySelector("[data-graph-description]").textContent=node.path??node.kind;
+  document.querySelector('[data-graph-detail="type"]').textContent=node.type+" | "+node.kind;
+  document.querySelector('[data-graph-detail="status"]').textContent=node.status+(node.conflicted?" | conflict recorded":"");
+  document.querySelector('[data-graph-detail="importance"]').textContent=node.importance.toFixed(4)+(node.type==="file"?" | repository "+node.repositoryRank.toFixed(4):"");
+  document.querySelector('[data-graph-detail="connections"]').textContent=node.incoming+" incoming | "+node.outgoing+" outgoing";
+  document.querySelector('[data-graph-detail="basis"]').textContent=basis
+    ? basis.formula+" | local "+basis.localSemantic.toFixed(4)+" | linked "+basis.linkedEvidence.toFixed(4)+" | structural "+basis.structuralImportance.toFixed(4)+(score===null?"":" | score "+score.toFixed(4))
+    : "Structural browse rank";
+  document.querySelector('[data-graph-detail="evidence"]').textContent=node.evidenceHash??node.contentHash??"Derived concept; inspect linked sources";
+  document.querySelectorAll(".graph-node,.graph-results button").forEach((entry)=>{entry.dataset.selected=String(entry.dataset.nodeId===node.id)});
+};
+const qarinahRenderButtons=(entries,ranked=false)=>{
+  qarinahGraphResults.textContent="";
+  for(const entry of entries){
+    const node=ranked?entry.node:entry;
+    const item=document.createElement("li");
+    const button=document.createElement("button");
+    button.dataset.nodeId=node.id;
+    button.dataset.selected=String(node.id===qarinahSelectedNode);
+    const strong=document.createElement("strong");
+    strong.textContent=node.label;
+    const small=document.createElement("small");
+    small.textContent=ranked
+      ? node.type+" | score "+entry.score.toFixed(4)+" | "+entry.basis.formula
+      : node.type+" | importance "+node.importance.toFixed(3);
+    button.append(strong,small);
+    button.addEventListener("click",()=>qarinahShowNode(node,ranked?entry.basis:null,ranked?entry.score:null));
+    item.append(button);
+    qarinahGraphResults.append(item);
+  }
+};
+const qarinahRenderGraph=()=>{
+  const query=qarinahGraphSearch.value.trim().toLowerCase();
+  const type=qarinahGraphType.value;
+  const direct=new Set(qarinahGraph.nodes.filter((node)=>(type==="all"||node.type===type)&&(!query||qarinahNodeText(node).includes(query))).map((node)=>node.id));
+  const expanded=new Set(direct);
+  if(query){for(const id of direct){for(const neighbor of qarinahGraphNeighbors.get(id)??[])if(type==="all"||qarinahGraphNodeById.get(neighbor)?.type===type)expanded.add(neighbor)}}
+  const visible=qarinahGraph.nodes.filter((node)=>expanded.has(node.id)).sort((left,right)=>right.importance-left.importance||left.id.localeCompare(right.id)).slice(0,80);
+  const visibleIds=new Set(visible.map((node)=>node.id));
+  const types=["memory","file","concept","directory","reference"].filter((candidate)=>visible.some((node)=>node.type===candidate));
+  const positions=new Map();
+  types.forEach((candidate,band)=>{const group=visible.filter((node)=>node.type===candidate);group.forEach((node,row)=>{const x=types.length===1?520:70+band*(900/(types.length-1));const y=35+(group.length===1?245:row*(490/(group.length-1)));positions.set(node.id,{x,y})})});
+  qarinahGraphEdges.textContent="";
+  for(const edge of qarinahGraph.edges){const source=positions.get(edge.source),target=positions.get(edge.target);if(!source||!target)continue;const line=qarinahSvgElement("line");line.setAttribute("x1",source.x);line.setAttribute("y1",source.y);line.setAttribute("x2",target.x);line.setAttribute("y2",target.y);line.setAttribute("opacity",String(Math.max(.18,Math.min(.82,edge.weight))));const title=qarinahSvgElement("title");title.textContent=edge.type;line.append(title);qarinahGraphEdges.append(line)}
+  qarinahGraphNodes.textContent="";
+  for(const node of visible){const point=positions.get(node.id);const group=qarinahSvgElement("g");group.classList.add("graph-node");group.dataset.nodeId=node.id;group.dataset.conflict=String(node.conflicted);group.dataset.selected=String(node.id===qarinahSelectedNode);group.setAttribute("transform","translate("+point.x+" "+point.y+")");group.setAttribute("tabindex","0");group.setAttribute("role","button");group.setAttribute("aria-label",node.type+": "+node.label);const circle=qarinahSvgElement("circle");circle.setAttribute("r",String(6+node.importance*8));circle.setAttribute("fill",qarinahGraphColors[node.type]);const title=qarinahSvgElement("title");title.textContent=node.label+" | "+node.type;group.append(circle,title);const activate=()=>qarinahShowNode(node);group.addEventListener("click",activate);group.addEventListener("keydown",(event)=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();activate()}});qarinahGraphNodes.append(group)}
+  qarinahRenderButtons(visible);
+  qarinahGraphSummary.textContent=visible.length+" visual nodes | "+qarinahGraph.edges.filter((edge)=>visibleIds.has(edge.source)&&visibleIds.has(edge.target)).length+" links";
+  if(qarinahSelectedNode&&visibleIds.has(qarinahSelectedNode))qarinahShowNode(qarinahGraphNodeById.get(qarinahSelectedNode));
+};
+let qarinahSearchVersion=0;
+const qarinahRunRankedSearch=async()=>{
+  const query=qarinahGraphSearch.value.trim();
+  const searchPath=qarinahGraphSearch.dataset.searchPath;
+  const version=++qarinahSearchVersion;
+  if(!searchPath||!query)return;
+  const parameters=new URLSearchParams({q:query,limit:"40"});
+  if(qarinahGraphType.value!=="all")parameters.set("type",qarinahGraphType.value);
+  try{
+    const response=await fetch(searchPath+"?"+parameters.toString(),{cache:"no-store"});
+    if(!response.ok)throw new Error("search failed");
+    const result=await response.json();
+    if(version!==qarinahSearchVersion)return;
+    qarinahRenderButtons(result.items,true);
+    const completeness=result.coverage.projectionComplete&&result.coverage.authorityComplete?"":" | bounded source coverage";
+    qarinahGraphSummary.textContent=result.items.length+" ranked results | "+result.coverage.status+" term coverage"+completeness;
+  }catch{
+    if(version===qarinahSearchVersion)qarinahGraphSummary.textContent="Ranked search unavailable; showing the local visual filter.";
+  }
+};
+const qarinahRefresh=()=>{qarinahRenderGraph();void qarinahRunRankedSearch()};
+qarinahGraphSearch.addEventListener("input",qarinahRefresh);qarinahGraphType.addEventListener("change",qarinahRefresh);qarinahRenderGraph();
 for (const pageSet of document.querySelectorAll("[data-page-set]")) {
   const items = [...pageSet.querySelectorAll("[data-page-item]")];
   const pageSize = Number(pageSet.dataset.pageSize);
@@ -8858,13 +10358,14 @@ async function writeMemoryDashboard(options = {}) {
 
 // src/setup.js
 init_indexer();
+init_project_structure();
 init_store();
 init_workspace();
 var MAX_MANAGED_FILE_BYTES = 512 * 1024;
 var MANAGED_TOML_START = "# qarinah:managed:start";
 var MANAGED_TOML_END = "# qarinah:managed:end";
-var PACKAGE_ROOT = path14.resolve(path14.dirname(fileURLToPath2(import.meta.url)), "..");
-var BIN_PATH = path14.join(PACKAGE_ROOT, "bin", "qarinah.js");
+var PACKAGE_ROOT = path15.resolve(path15.dirname(fileURLToPath2(import.meta.url)), "..");
+var BIN_PATH = path15.join(PACKAGE_ROOT, "bin", "qarinah.js");
 function tomlString(value) {
   return JSON.stringify(String(value));
 }
@@ -8903,10 +10404,10 @@ async function ensureDirectory(candidate, root, label) {
   if (metadata.isSymbolicLink() || !metadata.isDirectory()) {
     throw new QarinahError("SETUP_LINK_REJECTED", `${label} must be a real directory.`);
   }
-  resolveWithin(root, path14.relative(root, candidate));
+  resolveWithin(root, path15.relative(root, candidate));
 }
 async function writeJsonMerged(candidate, root, label, update) {
-  resolveWithin(root, path14.relative(root, candidate));
+  resolveWithin(root, path15.relative(root, candidate));
   const existing = await safeRead(candidate, label);
   let value = {};
   if (existing !== null && existing.trim() !== "") {
@@ -8924,7 +10425,7 @@ async function writeJsonMerged(candidate, root, label, update) {
 `);
 }
 async function writeExactManaged(candidate, root, label, contents) {
-  resolveWithin(root, path14.relative(root, candidate));
+  resolveWithin(root, path15.relative(root, candidate));
   const existing = await safeRead(candidate, label);
   if (existing !== null && existing !== contents) {
     throw new QarinahError("SETUP_CONFLICT", `${label} already exists with different content.`);
@@ -8974,23 +10475,23 @@ async function installSkill(workspace, host, skillName, files) {
   await ensureDirectory(resolveWithin(workspace.root, `.${host}`), workspace.root, `.${host}`);
   await ensureDirectory(resolveWithin(workspace.root, `.${host}`, "skills"), workspace.root, `.${host}/skills`);
   await ensureDirectory(skillRoot, workspace.root, `.${host}/skills/${skillName}`);
-  const sourceRoot = path14.join(PACKAGE_ROOT, "integrations", host, "qarinah", "skills", skillName);
+  const sourceRoot = path15.join(PACKAGE_ROOT, "integrations", host, "qarinah", "skills", skillName);
   for (const relative of files) {
-    const destinationDirectory = path14.dirname(resolveWithin(skillRoot, relative));
+    const destinationDirectory = path15.dirname(resolveWithin(skillRoot, relative));
     if (destinationDirectory !== skillRoot) {
       await ensureDirectory(
         destinationDirectory,
         workspace.root,
-        `.${host}/skills/${skillName}/${path14.relative(skillRoot, destinationDirectory)}`
+        `.${host}/skills/${skillName}/${path15.relative(skillRoot, destinationDirectory)}`
       );
     }
-    const contents = await readFile3(path14.join(sourceRoot, relative), "utf8");
+    const contents = await readFile3(path15.join(sourceRoot, relative), "utf8");
     const destination = resolveWithin(skillRoot, relative);
     const existing = await safeRead(destination, `${host} Qarinah skill`);
     if (existing !== null && existing !== contents) {
       throw new QarinahError(
         "SETUP_CONFLICT",
-        `${path14.relative(workspace.root, destination)} already exists with different content. Preserve it or remove it before setup.`
+        `${path15.relative(workspace.root, destination)} already exists with different content. Preserve it or remove it before setup.`
       );
     }
     if (existing === null) await atomicWriteFile(destination, contents);
@@ -8999,7 +10500,7 @@ async function installSkill(workspace, host, skillName, files) {
 async function installHostSkills(workspace, host) {
   await installSkill(workspace, host, "qarinah-context", [
     "SKILL.md",
-    path14.join("references", "event-contract.md")
+    path15.join("references", "event-contract.md")
   ]);
   await installSkill(workspace, host, "qarinah", ["SKILL.md"]);
 }
@@ -9162,11 +10663,11 @@ Before replaying broad project history, use the Qarinah MCP server for a bounded
   ];
 }
 async function setupWorkspace(options = {}) {
-  const target = path14.resolve(options.cwd ?? process.cwd());
+  const target = path15.resolve(options.cwd ?? process.cwd());
   let workspace;
   let exactConfigExists = false;
   try {
-    await lstat9(path14.join(target, ".qarinah", "config.json"));
+    await lstat9(path15.join(target, ".qarinah", "config.json"));
     exactConfigExists = true;
   } catch (error) {
     if (error?.code !== "ENOENT") throw error;
@@ -9285,14 +10786,18 @@ async function compileTaskMemoryPack(task, query = "", options = {}) {
   });
 }
 
+// src/index.js
+init_linked_memory();
+
 // src/freshness.js
 init_canonical();
 init_errors();
-import { createHash as createHash6 } from "node:crypto";
-import { lstat as lstat10, readFile as readFile4, realpath as realpath8 } from "node:fs/promises";
-import path15 from "node:path";
+init_project_structure();
 init_store();
 init_workspace();
+import { createHash as createHash6 } from "node:crypto";
+import { lstat as lstat10, readFile as readFile4, realpath as realpath8 } from "node:fs/promises";
+import path16 from "node:path";
 function latestSnapshot(events) {
   for (let index = events.length - 1; index >= 0; index -= 1) {
     const snapshot = events[index].data?.projectStructure;
@@ -9318,8 +10823,8 @@ async function inspectFile(workspace, file) {
     return { path: file.path, status: "unsafe", expectedHash: file.contentHash ?? file.hash };
   }
   const resolved = await realpath8(absolute);
-  const relative = path15.relative(workspace.root, resolved);
-  if (relative.startsWith("..") || path15.isAbsolute(relative)) {
+  const relative = path16.relative(workspace.root, resolved);
+  if (relative.startsWith("..") || path16.isAbsolute(relative)) {
     throw new QarinahError("PATH_OUTSIDE_WORKSPACE", "A freshness target resolves outside the trusted workspace.");
   }
   if (file.bytes !== void 0 && metadata.size > file.bytes || metadata.size > 4 * 1024 * 1024) {
@@ -9426,10 +10931,11 @@ async function inspectMemoryFreshness(options = {}) {
 
 // src/dashboard-server.js
 import { createServer } from "node:http";
-import path16 from "node:path";
+import path17 from "node:path";
+init_linked_memory();
 init_workspace();
 var MAX_PROJECTS = 32;
-var WORKSPACE_ID = /^ws_[0-9a-f]{32}$/u;
+var WORKSPACE_ID2 = /^ws_[0-9a-f]{32}$/u;
 var LOOPBACK_HOST = /^(?:127\.0\.0\.1|localhost)(?::[0-9]+)?$/iu;
 function escapeHtml2(value) {
   return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
@@ -9446,10 +10952,10 @@ async function resolveProjects(cwd, requested) {
     if (typeof candidate !== "string" || candidate.trim() === "") {
       throw new TypeError("Each live dashboard project must be a non-empty path.");
     }
-    const workspace = await loadWorkspace(path16.resolve(cwd, candidate));
+    const workspace = await loadWorkspace(path17.resolve(cwd, candidate));
     if (!byWorkspaceId.has(workspace.config.workspaceId)) {
       byWorkspaceId.set(workspace.config.workspaceId, Object.freeze({
-        name: path16.basename(workspace.root),
+        name: path17.basename(workspace.root),
         root: workspace.root,
         workspaceId: workspace.config.workspaceId,
         href: projectHref(workspace.config.workspaceId)
@@ -9496,7 +11002,7 @@ function send(response, statusCode, contentType, body, method = "GET") {
   else response.end();
 }
 async function serveMemoryDashboard(options = {}) {
-  const cwd = path16.resolve(options.cwd ?? process.cwd());
+  const cwd = path17.resolve(options.cwd ?? process.cwd());
   const projects = await resolveProjects(cwd, options.workspaces ?? []);
   const projectById = new Map(projects.map((project) => [project.workspaceId, project]));
   const port = options.port ?? 8777;
@@ -9531,8 +11037,50 @@ async function serveMemoryDashboard(options = {}) {
 `, method);
         return;
       }
+      const graphMatch = /^\/api\/graph\/(ws_[0-9a-f]{32})$/u.exec(url.pathname);
+      if (graphMatch) {
+        const project = projectById.get(graphMatch[1]);
+        if (!project) {
+          send(response, 404, "application/json; charset=utf-8", '{"error":"not_found"}\n', method);
+          return;
+        }
+        const data = await buildMemoryDashboard({ cwd: project.root });
+        send(response, 200, "application/json; charset=utf-8", `${JSON.stringify(data.linkedGraph)}
+`, method);
+        return;
+      }
+      const searchMatch = /^\/api\/search\/(ws_[0-9a-f]{32})$/u.exec(url.pathname);
+      if (searchMatch) {
+        const project = projectById.get(searchMatch[1]);
+        if (!project) {
+          send(response, 404, "application/json; charset=utf-8", '{"error":"not_found"}\n', method);
+          return;
+        }
+        const query = url.searchParams.get("q") ?? "";
+        const limitText = url.searchParams.get("limit") ?? "20";
+        const typeText = url.searchParams.get("type");
+        if (query.length > 4096 || !/^[0-9]+$/u.test(limitText) || Number(limitText) < 1 || Number(limitText) > 100) {
+          send(response, 400, "application/json; charset=utf-8", '{"error":"invalid_query"}\n', method);
+          return;
+        }
+        const types = typeText === null ? void 0 : typeText.split(",").filter(Boolean);
+        if (types?.some((type) => !["memory", "file", "directory", "concept", "reference"].includes(type))) {
+          send(response, 400, "application/json; charset=utf-8", '{"error":"invalid_type"}\n', method);
+          return;
+        }
+        const result = await queryLinkedProjectMemory(query, {
+          cwd: project.root,
+          limit: Number(limitText),
+          types,
+          persist: false,
+          updateCheckpoint: false
+        });
+        send(response, 200, "application/json; charset=utf-8", `${JSON.stringify(result)}
+`, method);
+        return;
+      }
       const projectMatch = /^\/project\/(ws_[0-9a-f]{32})\/$/u.exec(url.pathname);
-      if (projectMatch && WORKSPACE_ID.test(projectMatch[1])) {
+      if (projectMatch && WORKSPACE_ID2.test(projectMatch[1])) {
         const project = projectById.get(projectMatch[1]);
         if (!project) {
           send(response, 404, "text/plain; charset=utf-8", "Project not found.\n", method);
@@ -9542,6 +11090,7 @@ async function serveMemoryDashboard(options = {}) {
         send(response, 200, "text/html; charset=utf-8", renderMemoryDashboard(data, {
           live: true,
           liveStatusPath: `/api/status/${project.workspaceId}`,
+          searchPath: `/api/search/${project.workspaceId}`,
           projects
         }), method);
         return;
@@ -9818,6 +11367,7 @@ Usage:
   qarinah query [text] [--format json|markdown|handoff] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp] [--minimum-coverage any|partial|direct] [--minimum-evidence any|partial|direct]
   qarinah query --stdin-json
   qarinah task-pack debugging|code-review|feature-implementation|database-migration|incident-response|release-preparation|security-review [query]
+  qarinah map [query] [--limit n] [--type memory,file,concept,directory,reference] [--repository id,...] [--scope id,...] [--as-of timestamp]
   qarinah freshness
   qarinah dashboard [--output <path>] [--baseline-tokens n --delivered-tokens n]
   qarinah dashboard --serve [--port 8777] [--project <initialized-project>]...
@@ -9885,8 +11435,8 @@ async function run(argv) {
       allowQuery: parsed.flags.has("--allow-query"),
       maxChars: positive("--max-chars"),
       maxItems: positive("--max-items"),
-      backupSources: parsed.values.has("--backup-source") ? [path17.resolve(parsed.values.get("--backup-source"))] : void 0,
-      backupDestination: parsed.values.has("--backup-destination") ? path17.resolve(parsed.values.get("--backup-destination")) : void 0,
+      backupSources: parsed.values.has("--backup-source") ? [path18.resolve(parsed.values.get("--backup-source"))] : void 0,
+      backupDestination: parsed.values.has("--backup-destination") ? path18.resolve(parsed.values.get("--backup-destination")) : void 0,
       backupMaxBytes: positive("--backup-max-bytes"),
       backupMaxFiles: positive("--backup-max-files")
     });
@@ -10051,8 +11601,8 @@ async function run(argv) {
       return Number(value);
     };
     const result = await backupAgentArchives(
-      parsed.positionals.map((source) => path17.resolve(source)),
-      path17.resolve(destination),
+      parsed.positionals.map((source) => path18.resolve(source)),
+      path18.resolve(destination),
       {
         cwd: process2.cwd(),
         maxBytes: integer2("--max-bytes"),
@@ -10165,6 +11715,27 @@ async function run(argv) {
     if (args.some((value) => value.startsWith("--"))) throw new TypeError("task-pack accepts a task name and optional query text only.");
     const pack = await compileTaskMemoryPack(task, values.slice(1).join(" "), { cwd: process2.cwd() });
     process2.stdout.write(`${JSON.stringify(pack, null, 2)}
+`);
+    return;
+  }
+  if (command === "map") {
+    const parsed = strictValueOptions(args, "map", ["--limit", "--type", "--repository", "--scope", "--as-of"]);
+    const limitText = parsed.values.get("--limit");
+    if (limitText !== void 0 && (!/^[0-9]+$/u.test(limitText) || Number(limitText) < 1 || Number(limitText) > 100)) {
+      throw new TypeError("--limit must be an integer from 1 to 100.");
+    }
+    const typeText = parsed.values.get("--type");
+    const types = typeText === void 0 ? void 0 : typeText.split(",").map((value) => value.trim()).filter(Boolean);
+    const selectors = (name) => parsed.values.has(name) ? parsed.values.get(name).split(",").map((value) => value.trim()).filter(Boolean) : void 0;
+    const result = await queryLinkedProjectMemory(parsed.positionals.join(" "), {
+      cwd: process2.cwd(),
+      limit: limitText === void 0 ? void 0 : Number(limitText),
+      types,
+      repositoryIds: selectors("--repository"),
+      authorityScopes: selectors("--scope"),
+      asOf: parsed.values.get("--as-of")
+    });
+    process2.stdout.write(`${JSON.stringify(result, null, 2)}
 `);
     return;
   }

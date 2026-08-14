@@ -90,6 +90,105 @@ function nodeId(type, value) {
   return `project:${type}:${sha256(value).slice("sha256:".length, "sha256:".length + 32)}`;
 }
 
+function exactKeys(value, keys) {
+  return value && typeof value === "object" && !Array.isArray(value)
+    && Object.keys(value).sort().join("\0") === [...keys].sort().join("\0");
+}
+
+function validStoredPath(value) {
+  return typeof value === "string" && value.length >= 1 && value.length <= MAX_PATH_CHARS
+    && !value.includes("\0") && !path.posix.isAbsolute(value)
+    && value !== ".." && !value.startsWith("../") && path.posix.normalize(value) === value;
+}
+
+function validHash(value, nullable = false) {
+  return (nullable && value === null) || (typeof value === "string" && /^sha256:[0-9a-f]{64}$/u.test(value));
+}
+
+function validInteger(value, minimum, maximum = Number.MAX_SAFE_INTEGER) {
+  return Number.isSafeInteger(value) && value >= minimum && value <= maximum;
+}
+
+export function validateProjectStructureSnapshot(structure) {
+  if (!exactKeys(structure, [
+    "schemaVersion", "adapter", "root", "limits", "directoryCount", "fileCount", "totalBytes",
+    "directories", "files", "snapshotHash", "changes"
+  ])) return false;
+  if (structure.schemaVersion !== PROJECT_STRUCTURE_SCHEMA_VERSION
+    || !exactKeys(structure.adapter, ["id", "version"])
+    || structure.adapter.id !== "qarinah.project-structure"
+    || structure.adapter.version !== "1"
+    || structure.root !== "."
+    || !exactKeys(structure.limits, ["maxFiles", "maxFileBytes", "maxTotalBytes", "maxDepth"])
+    || !validInteger(structure.limits.maxFiles, 1, 5_000)
+    || !validInteger(structure.limits.maxFileBytes, 1_024, 4 * 1024 * 1024)
+    || !validInteger(structure.limits.maxTotalBytes, 1_024, 128 * 1024 * 1024)
+    || !validInteger(structure.limits.maxDepth, 1, 64)
+    || !Array.isArray(structure.directories) || structure.directories.length < 1 || structure.directories.length > 10_000
+    || !Array.isArray(structure.files) || structure.files.length > structure.limits.maxFiles
+    || structure.directoryCount !== structure.directories.length
+    || structure.fileCount !== structure.files.length
+    || !validInteger(structure.totalBytes, 0, structure.limits.maxTotalBytes)
+    || !validHash(structure.snapshotHash)) return false;
+  const directoryPaths = new Set();
+  const directoryIds = new Set();
+  for (const directory of structure.directories) {
+    if (!exactKeys(directory, ["id", "path"]) || !validStoredPath(directory.path)
+      || directory.id !== nodeId("directory", directory.path)
+      || directoryPaths.has(directory.path) || directoryIds.has(directory.id)) return false;
+    directoryPaths.add(directory.path);
+    directoryIds.add(directory.id);
+  }
+  if (!directoryPaths.has(".")) return false;
+  const filePaths = new Set();
+  const fileIds = new Set();
+  let observedBytes = 0;
+  for (const file of structure.files) {
+    if (!exactKeys(file, ["id", "path", "language", "size", "contentHash", "skipped", "references"])
+      || !validStoredPath(file.path) || file.path === "."
+      || file.id !== nodeId("file", file.path)
+      || filePaths.has(file.path) || fileIds.has(file.id)
+      || typeof file.language !== "string" || file.language.length < 1 || file.language.length > 32
+      || !validInteger(file.size, 0)
+      || !validHash(file.contentHash, true)
+      || ![null, "binary", "oversized"].includes(file.skipped)
+      || !Array.isArray(file.references) || file.references.length > 4_096) return false;
+    if (file.skipped !== "oversized") observedBytes += file.size;
+    filePaths.add(file.path);
+    fileIds.add(file.id);
+    for (const reference of file.references) {
+      if (!exactKeys(reference, ["type", "specifier", "span", "confidence", "extractor", "target"])
+        || !["imports", "links"].includes(reference.type)
+        || typeof reference.specifier !== "string" || reference.specifier.length < 1 || reference.specifier.length > 512
+        || reference.confidence !== "extracted"
+        || typeof reference.extractor !== "string" || reference.extractor.length < 1 || reference.extractor.length > 128
+        || (reference.target !== null && !validStoredPath(reference.target))
+        || !exactKeys(reference.span, ["start", "end", "line", "column"])
+        || !validInteger(reference.span.start, 0) || !validInteger(reference.span.end, reference.span.start)
+        || !validInteger(reference.span.line, 1) || !validInteger(reference.span.column, 1)) return false;
+    }
+  }
+  if (observedBytes !== structure.totalBytes) return false;
+  if (!exactKeys(structure.changes, ["added", "changed", "deleted", "renamed"])
+    || ![structure.changes.added, structure.changes.changed, structure.changes.deleted].every((values) => (
+      Array.isArray(values) && values.every(validStoredPath)
+    )) || !Array.isArray(structure.changes.renamed)
+    || structure.changes.renamed.some((entry) => !exactKeys(entry, ["from", "to", "contentHash"])
+      || !validStoredPath(entry.from) || !validStoredPath(entry.to) || !validHash(entry.contentHash))) return false;
+  const core = {
+    schemaVersion: structure.schemaVersion,
+    adapter: structure.adapter,
+    root: structure.root,
+    limits: structure.limits,
+    directoryCount: structure.directoryCount,
+    fileCount: structure.fileCount,
+    totalBytes: structure.totalBytes,
+    directories: structure.directories,
+    files: structure.files
+  };
+  return sha256(canonicalStringify(core)) === structure.snapshotHash;
+}
+
 function hashBytes(bytes) {
   return `sha256:${createHash("sha256").update(bytes).digest("hex")}`;
 }
@@ -301,7 +400,7 @@ function structureChanges(previous, current) {
 function latestProjectStructure(events) {
   for (let index = events.length - 1; index >= 0; index -= 1) {
     const candidate = events[index].data?.projectStructure;
-    if (candidate?.schemaVersion === PROJECT_STRUCTURE_SCHEMA_VERSION && Array.isArray(candidate.files)) {
+    if (validateProjectStructureSnapshot(candidate)) {
       return { event: events[index], structure: candidate };
     }
   }

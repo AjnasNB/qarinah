@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qarinah.io/schemas/linked-project-memory.schema.json",
+  "title": "Qarinah linked project memory",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "workspaceId",
+    "eventCount",
+    "headHash",
+    "source",
+    "coverage",
+    "statistics",
+    "timeline",
+    "repositoryMap",
+    "nodes",
+    "edges",
+    "manifestHash"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "qarinah.linked-project-memory.v1" },
+    "workspaceId": { "type": "string", "pattern": "^ws_[0-9a-f]{32}$" },
+    "eventCount": { "type": "integer", "minimum": 0 },
+    "headHash": { "$ref": "#/$defs/nullableHash" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ledger", "projectSnapshotHash", "projectSourceEventId"],
+      "properties": {
+        "ledger": { "const": ".qarinah/events/events.jsonl" },
+        "projectSnapshotHash": { "$ref": "#/$defs/nullableHash" },
+        "projectSourceEventId": { "type": ["string", "null"] }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceEvents", "projectedEvents", "omittedEvents", "sourceRelations", "projectedRelations",
+        "omittedRelations", "sourceFileReferences", "projectedFileReferences", "omittedFileReferences", "complete"
+      ],
+      "properties": {
+        "sourceEvents": { "type": "integer", "minimum": 0 },
+        "projectedEvents": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "omittedEvents": { "type": "integer", "minimum": 0 },
+        "sourceRelations": { "type": "integer", "minimum": 0 },
+        "projectedRelations": { "type": "integer", "minimum": 0, "maximum": 20000 },
+        "omittedRelations": { "type": "integer", "minimum": 0 },
+        "sourceFileReferences": { "type": "integer", "minimum": 0 },
+        "projectedFileReferences": { "type": "integer", "minimum": 0, "maximum": 20000 },
+        "omittedFileReferences": { "type": "integer", "minimum": 0 },
+        "complete": { "type": "boolean" }
+      }
+    },
+    "statistics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nodes", "edges", "memories", "files", "directories", "concepts", "conflicts", "superseded"],
+      "properties": {
+        "nodes": { "type": "integer", "minimum": 0 },
+        "edges": { "type": "integer", "minimum": 0 },
+        "memories": { "type": "integer", "minimum": 0 },
+        "files": { "type": "integer", "minimum": 0 },
+        "directories": { "type": "integer", "minimum": 0 },
+        "concepts": { "type": "integer", "minimum": 0 },
+        "conflicts": { "type": "integer", "minimum": 0 },
+        "superseded": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "timeline": { "type": "array", "items": { "type": "string" } },
+    "repositoryMap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "iterations", "damping", "entries", "entrypoints"],
+      "properties": {
+        "method": { "const": "bounded-link-rank-v1" },
+        "iterations": { "const": 24 },
+        "damping": { "const": 0.85 },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "path", "language", "contentHash", "rank", "incoming", "outgoing", "dependencies", "dependents"],
+            "properties": {
+              "id": { "type": "string" },
+              "path": { "type": "string" },
+              "language": { "type": "string" },
+              "contentHash": { "$ref": "#/$defs/nullableHash" },
+              "rank": { "type": "number", "minimum": 0, "maximum": 1 },
+              "incoming": { "type": "integer", "minimum": 0 },
+              "outgoing": { "type": "integer", "minimum": 0 },
+              "dependencies": { "type": "array", "items": { "type": "string" } },
+              "dependents": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "entrypoints": { "type": "array", "items": { "type": "string" }, "maxItems": 20 }
+      }
+    },
+    "nodes": { "type": "array", "items": { "$ref": "#/$defs/node" } },
+    "edges": { "type": "array", "items": { "$ref": "#/$defs/edge" } },
+    "manifestHash": { "$ref": "#/$defs/hash" }
+  },
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "nullableHash": { "oneOf": [{ "$ref": "#/$defs/hash" }, { "type": "null" }] },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id", "type", "kind", "label", "path", "language", "timestamp", "validFrom", "validUntil",
+        "expiresAt", "confidence", "status", "supersededBy", "conflicted", "repositoryId", "disclosureScopes", "classification", "sourceProfiles", "sourceEventId", "evidenceHash",
+        "contentHash", "terms", "signature", "importance", "repositoryRank", "incoming", "outgoing"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "enum": ["memory", "file", "directory", "concept", "reference"] },
+        "kind": { "type": "string" },
+        "label": { "type": "string" },
+        "path": { "type": ["string", "null"] },
+        "language": { "type": ["string", "null"] },
+        "timestamp": { "type": ["string", "null"] },
+        "validFrom": { "type": ["string", "null"] },
+        "validUntil": { "type": ["string", "null"] },
+        "expiresAt": { "type": ["string", "null"] },
+        "confidence": { "enum": ["extracted", "inferred", "claimed", "verified"] },
+        "status": { "enum": ["current", "superseded"] },
+        "supersededBy": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "conflicted": { "type": "boolean" },
+        "repositoryId": { "type": ["string", "null"] },
+        "disclosureScopes": { "type": "array", "maxItems": 64, "items": { "type": "string" }, "uniqueItems": true },
+        "classification": { "enum": ["public", "workspace", "restricted", "derived"] },
+        "sourceProfiles": {
+          "type": "array",
+          "maxItems": 512,
+          "items": { "$ref": "#/$defs/sourceProfile" }
+        },
+        "sourceProfileCount": { "type": "integer", "minimum": 1 },
+        "sourceProfilesTruncated": { "type": "boolean" },
+        "sourceEventId": { "type": ["string", "null"] },
+        "evidenceHash": { "$ref": "#/$defs/nullableHash" },
+        "contentHash": { "$ref": "#/$defs/nullableHash" },
+        "documentFrequency": { "type": "integer", "minimum": 1 },
+        "terms": {
+          "type": "array",
+          "maxItems": 128,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["term", "count"],
+            "properties": {
+              "term": { "type": "string" },
+              "count": { "type": "integer", "minimum": 1 }
+            }
+          }
+        },
+        "signature": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["term", "weight"],
+            "properties": {
+              "term": { "type": "string" },
+              "weight": { "type": "number", "minimum": 0, "maximum": 1 }
+            }
+          }
+        },
+        "importance": { "type": "number", "minimum": 0, "maximum": 1 },
+        "repositoryRank": { "type": "number", "minimum": 0, "maximum": 1 },
+        "incoming": { "type": "integer", "minimum": 0 },
+        "outgoing": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "sourceProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceNodeId", "sourceEventId", "evidenceHash", "contentHash", "classification", "disclosureScopes",
+        "repositoryId", "validFrom", "validUntil", "expiresAt"
+      ],
+      "properties": {
+        "sourceNodeId": { "type": "string" },
+        "sourceEventId": { "type": ["string", "null"] },
+        "evidenceHash": { "$ref": "#/$defs/nullableHash" },
+        "contentHash": { "$ref": "#/$defs/nullableHash" },
+        "classification": { "enum": ["public", "workspace", "restricted", "derived"] },
+        "disclosureScopes": { "type": "array", "maxItems": 64, "items": { "type": "string" }, "uniqueItems": true },
+        "repositoryId": { "type": ["string", "null"] },
+        "validFrom": { "type": ["string", "null"] },
+        "validUntil": { "type": ["string", "null"] },
+        "expiresAt": { "type": ["string", "null"] }
+      }
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "type", "target", "sourceEventId", "evidenceHash", "confidence", "weight", "occurrenceCount"],
+      "properties": {
+        "source": { "type": "string" },
+        "type": { "type": "string" },
+        "target": { "type": "string" },
+        "sourceEventId": { "type": ["string", "null"] },
+        "evidenceHash": { "$ref": "#/$defs/nullableHash" },
+        "confidence": { "enum": ["extracted", "inferred", "claimed", "verified"] },
+        "weight": { "type": "number", "minimum": 0, "maximum": 1 },
+        "occurrenceCount": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}

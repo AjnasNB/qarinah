@@ -41,7 +41,9 @@
     "./schemas/team-manifest.json": "./schemas/team-manifest.schema.json",
     "./schemas/causal-receipt.json": "./schemas/causal-receipt.schema.json",
     "./schemas/federated-context.json": "./schemas/federated-context.schema.json",
-    "./schemas/memory-attachment.json": "./schemas/memory-attachment.schema.json"
+    "./schemas/memory-attachment.json": "./schemas/memory-attachment.schema.json",
+    "./schemas/linked-project-memory.json": "./schemas/linked-project-memory.schema.json",
+    "./schemas/linked-project-query.json": "./schemas/linked-project-query.schema.json"
   },
   "files": [
     "bin/",
@@ -99,6 +101,7 @@
     "docs/DASHBOARD.md",
     "docs/SQLITE-READ-MODEL.md",
     "docs/TEMPORAL-AUTHORITY.md",
+    "docs/LINKED-PROJECT-MEMORY.md",
     "bench/fixtures/software-task-scenarios.mjs",
     "bench/research/",
     "bench/results/",
