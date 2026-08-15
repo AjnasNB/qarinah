@@ -6,7 +6,7 @@
     "role": "maintainer",
     "name": "Ajnas N B",
     "email": "ajnasnb@gmail.com",
-    "description": "I am an independent Indian open-source maintainer building Qarinah and its public integrations. I started Qarinah after repeatedly seeing coding agents lose project decisions, replay large histories, and hand work between tools without durable evidence. I maintain the implementation, releases, benchmarks, documentation, and community roadmap. This grant will support public, Apache-2.0 work only; it will not fund any private enterprise repository.",
+    "description": "I am an independent Indian open-source maintainer and the primary maintainer of Qarinah. I built it after repeatedly watching coding agents lose project decisions, replay large histories, and hand work between tools without durable evidence. I design and maintain the implementation, releases, evaluations, documentation, security process, and community roadmap. My goal is to make reliable, portable project memory a shared open-infrastructure primitive that developers can run locally, inspect, extend, and integrate without depending on a hosted memory account.",
     "webpageUrl": {
       "url": "https://github.com/AjnasNB"
     }
@@ -15,7 +15,7 @@
     {
       "guid": "qarinah",
       "name": "Qarinah",
-      "description": "Qarinah is an Apache-2.0 project-memory layer for coding agents. It records evidence-linked project events, builds compact and verifiable read models, and lets tools retrieve cited context instead of repeatedly replaying entire histories. The public project ships an npm package, CLI, MCP transport, schemas, a local dashboard, cross-agent adapters, reproducible evaluations, and signed releases. Maqam, Cockroach Crawler, and Cockroach Browser will be used only as public interoperability and integration targets for this grant.",
+      "description": "Qarinah is Apache-2.0, local-first project-memory infrastructure for coding agents. It retains permitted project events in an append-only, hash-chained JSONL ledger and builds deterministic SQLite/FTS5, graph, Markdown, and dashboard views that can be deleted and rebuilt from that authority. Its CLI, JavaScript API, and consent-gated MCP transport compile bounded context packs with citations, provenance, freshness, authority, and coverage information instead of replaying an entire project history. The public project also includes cross-agent setup, archive import and backup, schemas, interoperability formats, a responsive local dashboard, reproducible evaluations, and security and privacy documentation. This grant will strengthen its security, interoperability, cross-platform releases, independent reproducibility, beginner onboarding, contributor path, and long-term maintenance capacity.",
       "webpageUrl": {
         "url": "https://qarinah.io"
       },
@@ -44,8 +44,7 @@
       {
         "guid": "grant-bank-transfer",
         "type": "bank",
-        "address": "",
-        "description": "Bank-transfer details will be provided privately to the grant administrator after approval. No financial account details are published in this manifest."
+        "description": "Bank-transfer details will be provided directly to the grant administrator after approval. No financial account details are published in this manifest."
       }
     ],
     "plans": [
@@ -53,7 +52,7 @@
         "guid": "qarinah-six-month-public-roadmap",
         "status": "active",
         "name": "Qarinah six-month public reliability and adoption roadmap",
-        "description": "Six-month public roadmap: M1 implementation plan; M2 interoperability spec and fixtures; M3 Linux/macOS/Windows releases; M4 independent security/privacy review and fixes; M5 independent benchmark reproduction and beginner demo; M6 contributor bounties, security-response commitments, and outcomes report. Budget: INR 240k maintainer/release work; INR 120k security review; INR 60k each for benchmarks, onboarding, bounties, and infrastructure. All outputs public; private enterprise work excluded.",
+        "description": "Six-month, outcome-based public roadmap. M1 — Baseline and participation: publish the funded roadmap as tracked issues with acceptance criteria; document the release, security, privacy, and benchmark baselines; improve the contribution guide; and publish the first community progress update. M2 — Interoperability: publish a versioned specification, schemas, conformance fixtures, and compatibility tests for the event ledger, context packs, CLI, JavaScript API, and MCP integrations. M3 — Reproducible releases: verify clean installs and pinned-package interoperability on Linux, macOS, and Windows; document the release process; and publish CI and artifact receipts that an external maintainer can reproduce. M4 — Independent security and privacy review: commission an external assessment, triage every finding, remediate confirmed issues, and publish an appropriate report or advisory with the resulting security-response process. M5 — Independent evidence and onboarding: commission reproduction of the scoped public benchmarks; publish methods, results, limitations, and machine-readable receipts; and release a beginner-focused demo repository and installation path. M6 — Community and sustainability: complete small contributor bounties, publish maintenance and incident-response playbooks with response targets, hold a second public community review, and publish final outcomes and spending reports. Budget: INR 240,000 for maintainer engineering, specifications, and release work; INR 120,000 for the independent security and privacy assessment; INR 60,000 for cross-platform and reproducible-release infrastructure; INR 60,000 for independent benchmark reproduction; INR 60,000 for beginner onboarding and the demo repository; INR 30,000 for contributor bounties; and INR 30,000 for maintenance and security-response capacity. Success means an external contributor can install Qarinah on all three supported desktop operating systems, verify the public specification and release evidence, reproduce the published benchmark fixtures, follow a documented security path, and make a first contribution. All funded deliverables, reports, specifications, fixtures, and code will be public.",
         "amount": 600000,
         "currency": "INR",
         "frequency": "one-time",
