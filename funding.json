@@ -1,0 +1,66 @@
+{
+  "$schema": "https://fundingjson.org/schema/v1.1.0.json",
+  "version": "v1.1.0",
+  "entity": {
+    "type": "individual",
+    "role": "maintainer",
+    "name": "Ajnas N B",
+    "email": "ajnasnb@gmail.com",
+    "description": "I am an independent Indian open-source maintainer building Qarinah and its public integrations. I started Qarinah after repeatedly seeing coding agents lose project decisions, replay large histories, and hand work between tools without durable evidence. I maintain the implementation, releases, benchmarks, documentation, and community roadmap. This grant will support public, Apache-2.0 work only; it will not fund any private enterprise repository.",
+    "webpageUrl": {
+      "url": "https://github.com/AjnasNB"
+    }
+  },
+  "projects": [
+    {
+      "guid": "qarinah",
+      "name": "Qarinah",
+      "description": "Qarinah is an Apache-2.0 project-memory layer for coding agents. It records evidence-linked project events, builds compact and verifiable read models, and lets tools retrieve cited context instead of repeatedly replaying entire histories. The public project ships an npm package, CLI, MCP transport, schemas, a local dashboard, cross-agent adapters, reproducible evaluations, and signed releases. Maqam, Cockroach Crawler, and Cockroach Browser will be used only as public interoperability and integration targets for this grant.",
+      "webpageUrl": {
+        "url": "https://qarinah.io"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/AjnasNB/qarinah"
+      },
+      "licenses": [
+        "spdx:Apache-2.0"
+      ],
+      "tags": [
+        "developer-tools",
+        "ai-agents",
+        "project-memory",
+        "context-management",
+        "local-first",
+        "interoperability",
+        "privacy",
+        "security",
+        "developer-infrastructure",
+        "open-source"
+      ]
+    }
+  ],
+  "funding": {
+    "channels": [
+      {
+        "guid": "grant-bank-transfer",
+        "type": "bank",
+        "address": "",
+        "description": "Bank-transfer details will be provided privately to the grant administrator after approval. No financial account details are published in this manifest."
+      }
+    ],
+    "plans": [
+      {
+        "guid": "qarinah-six-month-public-roadmap",
+        "status": "active",
+        "name": "Qarinah six-month public reliability and adoption roadmap",
+        "description": "Six-month public roadmap: M1 implementation plan; M2 interoperability spec and fixtures; M3 Linux/macOS/Windows releases; M4 independent security/privacy review and fixes; M5 independent benchmark reproduction and beginner demo; M6 contributor bounties, security-response commitments, and outcomes report. Budget: INR 240k maintainer/release work; INR 120k security review; INR 60k each for benchmarks, onboarding, bounties, and infrastructure. All outputs public; private enterprise work excluded.",
+        "amount": 600000,
+        "currency": "INR",
+        "frequency": "one-time",
+        "channels": [
+          "grant-bank-transfer"
+        ]
+      }
+    ]
+  }
+}
