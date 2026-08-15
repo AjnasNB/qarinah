@@ -3,7 +3,7 @@
   "@type": "SoftwareSourceCode",
   "name": "Qarinah",
   "description": "Evidence-linked local project memory for coding agents with deterministic retrieval, cited context packs, temporal authority, and verifiable handoffs.",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "license": "https://spdx.org/licenses/Apache-2.0",
   "codeRepository": "https://github.com/AjnasNB/qarinah",
   "issueTracker": "https://github.com/AjnasNB/qarinah/issues",
