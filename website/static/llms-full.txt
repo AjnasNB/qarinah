@@ -10,7 +10,7 @@ This file is a convenience map for tools that choose to read it. It does not con
 
 - Name: Qarinah
 - Package: `qarinah`
-- Current release: `0.1.8`
+- Current release: `0.1.9`
 - Website: https://qarinah.io/
 - npm: https://www.npmjs.com/package/qarinah
 - Source: https://github.com/AjnasNB/qarinah

@@ -226,7 +226,7 @@ export const PROJECT_STRUCTURE_SCHEMA_VERSION: "qarinah.project-structure.v1";
 export const SQLITE_READ_MODEL_SCHEMA_VERSION: 1;
 export const SQLITE_READ_MODEL_FILENAME: "qarinah.db";
 export const MEMORY_ATTACHMENT_SCHEMA_VERSION: "qarinah.memory-attachment.v1";
-export const QARINAH_VERSION: "0.1.8";
+export const QARINAH_VERSION: "0.1.9";
 export const EVENT_KINDS: readonly QarinahEventKind[];
 export const RELATION_TYPES: readonly QarinahRelationType[];
 export function initializeWorkspace(target?: string, options?: { capture?: "metadata" | "content" }): Promise<QarinahWorkspace>;
