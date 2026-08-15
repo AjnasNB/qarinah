@@ -414,11 +414,20 @@ for (const launchDirectoryMarkup of [
   'href="https://fazier.com/launches/qarinah.io" target="_blank"',
   'src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=launched&amp;theme=light"',
   'width="120" alt="Fazier badge"',
+  'href="https://launchnest.io/p/qarinah" target="_blank"',
+  'src="https://launchnest.io/badge/qarinah.svg?variant=listed"',
+  'alt="Qarinah on LaunchNest" width="220" height="56"',
   'href="https://tinystartups.com/startup/qarinah"',
   "Tiny Startups"
 ]) {
   if (!home.includes(launchDirectoryMarkup)) {
     errors.push(`Homepage launch recognition is missing ${launchDirectoryMarkup}`);
+  }
+}
+const headerPolicy = await readFile(path.join(output, "_headers"), "utf8");
+for (const imageOrigin of ["https://launchnest.io", "https://fazier.com", "https://statics.startupbase.io"]) {
+  if (!headerPolicy.includes(imageOrigin)) {
+    errors.push(`Site image policy is missing launch-directory origin ${imageOrigin}`);
   }
 }
 for (const requiredAlternative of [
