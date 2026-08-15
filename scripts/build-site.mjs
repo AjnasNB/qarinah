@@ -860,6 +860,9 @@ function footer() {
           <a class="launchnest-badge" href="https://launchnest.io/p/qarinah" target="_blank">
             <img src="https://launchnest.io/badge/qarinah.svg?variant=listed" alt="Qarinah on LaunchNest" width="220" height="56">
           </a>
+          <a class="producthunt-badge" href="https://www.producthunt.com/products/qarinah?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-qarinah" target="_blank" rel="noreferrer">
+            <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1218378&amp;theme=light&amp;t=1786794111466" alt="Qarinah on Product Hunt" width="250" height="54">
+          </a>
           <a class="tiny-startups-link" href="https://tinystartups.com/startup/qarinah" rel="noreferrer">
             <span>Listed on</span>
             <strong>Tiny Startups</strong>

@@ -417,6 +417,9 @@ for (const launchDirectoryMarkup of [
   'href="https://launchnest.io/p/qarinah" target="_blank"',
   'src="https://launchnest.io/badge/qarinah.svg?variant=listed"',
   'alt="Qarinah on LaunchNest" width="220" height="56"',
+  'href="https://www.producthunt.com/products/qarinah?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-qarinah"',
+  'src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1218378&amp;theme=light&amp;t=1786794111466"',
+  'alt="Qarinah on Product Hunt" width="250" height="54"',
   'href="https://tinystartups.com/startup/qarinah"',
   "Tiny Startups"
 ]) {
@@ -425,7 +428,7 @@ for (const launchDirectoryMarkup of [
   }
 }
 const headerPolicy = await readFile(path.join(output, "_headers"), "utf8");
-for (const imageOrigin of ["https://launchnest.io", "https://fazier.com", "https://statics.startupbase.io"]) {
+for (const imageOrigin of ["https://api.producthunt.com", "https://launchnest.io", "https://fazier.com", "https://statics.startupbase.io"]) {
   if (!headerPolicy.includes(imageOrigin)) {
     errors.push(`Site image policy is missing launch-directory origin ${imageOrigin}`);
   }
