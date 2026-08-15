@@ -857,6 +857,9 @@ function footer() {
             <img src="https://statics.startupbase.io/site/badges/launched-on-sb-dark.svg" alt="Launched on StartupBase" height="55">
           </a>
           <a href="https://fazier.com/launches/qarinah.io" target="_blank"><img src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=launched&amp;theme=light" width="120" alt="Fazier badge" /></a>
+          <a class="launchnest-badge" href="https://launchnest.io/p/qarinah" target="_blank">
+            <img src="https://launchnest.io/badge/qarinah.svg?variant=listed" alt="Qarinah on LaunchNest" width="220" height="56">
+          </a>
           <a class="tiny-startups-link" href="https://tinystartups.com/startup/qarinah" rel="noreferrer">
             <span>Listed on</span>
             <strong>Tiny Startups</strong>
