@@ -1677,6 +1677,7 @@ a {
 .startupbase-badge,
 .launch-recognition-links > a[href^="https://fazier.com/"],
 .launchnest-badge,
+.producthunt-badge,
 .tiny-startups-link {
   display: inline-flex;
   flex: 0 0 auto;
@@ -1693,10 +1694,20 @@ a {
   overflow: hidden;
 }
 
+.producthunt-badge {
+  overflow: hidden;
+}
+
 .launchnest-badge img {
   display: block;
   width: 220px;
   height: 56px;
+}
+
+.producthunt-badge img {
+  display: block;
+  width: 250px;
+  height: 54px;
 }
 
 .startupbase-badge img {
@@ -1742,6 +1753,7 @@ a {
 .startupbase-badge:hover,
 .launch-recognition-links > a[href^="https://fazier.com/"]:hover,
 .launchnest-badge:hover,
+.producthunt-badge:hover,
 .tiny-startups-link:hover {
   filter: brightness(1.08);
 }
@@ -1749,6 +1761,7 @@ a {
 .startupbase-badge:focus-visible,
 .launch-recognition-links > a[href^="https://fazier.com/"]:focus-visible,
 .launchnest-badge:focus-visible,
+.producthunt-badge:focus-visible,
 .tiny-startups-link:focus-visible {
   outline: 3px solid color-mix(in srgb, var(--q-accent) 45%, transparent);
   outline-offset: 3px;
