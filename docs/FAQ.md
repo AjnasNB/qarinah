@@ -6,7 +6,7 @@ Qarinah is the evidence-linked cross-agent context engine for software projects.
 
 It is also a universal context engine for software projects: it selects bounded, complete records from retained project memory before a host constructs the next model request.
 
-Qarinah works as an independent local tool for one developer and one repository. Team memory, encrypted exchange, and optional Maqam-governed disclosure build on that same project-owned record; they are not required for the personal workflow.
+Qarinah works as an independent local tool for one developer and one repository. Team memory, encrypted exchange, and optional Maqam policy or approval controls build on that same project-owned record; they are not required for the personal workflow.
 
 ## How do I switch coding agents without starting over?
 
@@ -84,7 +84,7 @@ Qarinah does not call an embedding API and does not claim arbitrary semantic equ
 
 Supported event classes include prompts, tool requests, tool completions, approvals, artifacts, sources, claims, decisions, summaries, compactions, subagents, completed turns, and failed turns when a supported host adapter delivers them.
 
-Users and governed workflows can also append explicit records. Qarinah does not infer every cognitive decision automatically.
+Users and connected workflows can also append explicit records. Qarinah does not infer every cognitive decision automatically.
 
 ## Does Qarinah capture hidden reasoning or private transcripts?
 

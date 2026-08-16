@@ -13,7 +13,7 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 - [Verified cross-agent handoffs](https://qarinah.io/docs/cross-agent-handoffs/): Switch coding agents and continue a real task with compact, cited project context.
 - [Direct answers](https://qarinah.io/docs/faq/): Concise answers about Qarinah, context reduction, cost boundaries, Codex, Claude Code, privacy, and open-source licensing.
 - [Qarinah alternatives](https://qarinah.io/alternatives/): Product-boundary comparison across personalization, stateful-agent, programmable-memory, temporal-graph, and native coding-host approaches.
-- [Open-source governed-agent toolkit](https://qarinah.io/articles/open-source-governed-agent-toolkit/): How Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler can compose with established agent, browser, web-data, and document tools.
+- [Open-source agent memory stack](https://qarinah.io/articles/open-source-agent-memory-stack/): How Qarinah, Cockroach Browser, and Cockroach Crawler compose for agent memory, web discovery, and interactive work, with Maqam as an optional approval add-on.
 - [Getting started](https://qarinah.io/docs/getting-started/): Install Qarinah, opt in one workspace, connect a supported host, and compile a cited context pack.
 - [Features](https://qarinah.io/docs/features/): Complete product capability map for project-owned memory, cited retrieval, integrations, dashboards, team memory, portability, and boundaries.
 - [Project overview](https://qarinah.io/docs/project-overview/): Explain retained work, latest outcomes, codebase areas, languages, relationships, and durable memory files in one page.

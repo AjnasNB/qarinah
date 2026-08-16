@@ -97,11 +97,12 @@ npx qarinah dashboard --serve
 
 The **Linked project memory** panel provides:
 
-- a responsive native SVG relationship graph;
+- a responsive native SVG relationship graph with a deterministic circular layout;
+- pointer and touch dragging for moving crowded nodes, plus one-click layout reset;
 - memory, file, concept, directory, and reference filters;
 - read-only ranked search with a local visual-filter fallback;
 - node details for importance, repository rank, connection counts, status, and evidence identity;
-- an accessible result list alongside the visual graph;
+- an accessible keyboard-operable result list alongside the visual graph;
 - a bounded projection so large repositories do not produce an unbounded browser payload.
 
 Live mode also exposes read-only loopback endpoints for explicitly selected workspaces:

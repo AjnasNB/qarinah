@@ -7,7 +7,7 @@ const output = path.join(root, "site-dist");
 const required = [
   "index.html",
   "alternatives/index.html",
-  "articles/open-source-governed-agent-toolkit/index.html",
+  "articles/open-source-agent-memory-stack/index.html",
   "docs/index.html",
   "docs/cross-agent-handoffs/index.html",
   "docs/getting-started/index.html",
@@ -226,6 +226,13 @@ for (const [source, destination] of slashlessDirectoryAliases) {
     errors.push(`_redirects is missing permanent canonicalization ${source} -> ${destination}`);
   }
 }
+if (!redirectRules.some(([source, destination, status]) =>
+  source === "/articles/open-source-governed-agent-toolkit/"
+  && destination === "/articles/open-source-agent-memory-stack/"
+  && ["301", "308"].includes(status)
+)) {
+  errors.push("_redirects is missing the permanent legacy article redirect.");
+}
 
 const searchIndex = JSON.parse(await readFile(path.join(output, "search-index.json"), "utf8"));
 const indexedRoutes = new Set(searchIndex.map((entry) => entry.route));
@@ -243,8 +250,8 @@ for (const route of availableRoutes) {
 if (!indexedRoutes.has("/alternatives/")) {
   errors.push("search-index.json is missing /alternatives/");
 }
-if (!indexedRoutes.has("/articles/open-source-governed-agent-toolkit/")) {
-  errors.push("search-index.json is missing /articles/open-source-governed-agent-toolkit/");
+if (!indexedRoutes.has("/articles/open-source-agent-memory-stack/")) {
+  errors.push("search-index.json is missing /articles/open-source-agent-memory-stack/");
 }
 if (!searchIndex.every((entry) =>
   entry.title
@@ -269,7 +276,7 @@ for (const canonicalResource of [
   "https://qarinah.io/docs/public-metrics/",
   "https://qarinah.io/metrics.json",
   "https://qarinah.io/alternatives/",
-  "https://qarinah.io/articles/open-source-governed-agent-toolkit/",
+  "https://qarinah.io/articles/open-source-agent-memory-stack/",
   "https://www.npmjs.com/package/qarinah",
   "https://github.com/AjnasNB/qarinah",
   "https://doi.org/10.5281/zenodo.21547684"
@@ -279,7 +286,7 @@ for (const canonicalResource of [
 
 const home = await readFile(path.join(output, "index.html"), "utf8");
 const alternatives = await readFile(path.join(output, "alternatives", "index.html"), "utf8");
-const toolkit = await readFile(path.join(output, "articles", "open-source-governed-agent-toolkit", "index.html"), "utf8");
+const toolkit = await readFile(path.join(output, "articles", "open-source-agent-memory-stack", "index.html"), "utf8");
 const paper = await readFile(path.join(output, "paper", "index.html"), "utf8");
 const faq = await readFile(path.join(output, "docs", "faq", "index.html"), "utf8");
 const features = await readFile(path.join(output, "docs", "features", "index.html"), "utf8");
@@ -459,13 +466,13 @@ if (/Qarinah is (?:the )?(?:best|only)|Qarinah (?:is )?better than|Qarinah outpe
   errors.push("Alternatives page contains an unsupported superiority term.");
 }
 for (const requiredToolkitCopy of [
-  "Governed agents need explicit layers.",
+  "Give agents memory, web reach, and a browser.",
   "Written by <strong>Ajnas N B</strong>",
   "Qarinah",
   "Maqam",
   "Cockroach Browser",
   "Cockroach Crawler",
-  "Cockroach Browser uses Playwright",
+  "Add Maqam only when a workflow also needs policy or human approval.",
   "Playwright",
   "Puppeteer",
   "Trafilatura",
@@ -478,24 +485,27 @@ for (const requiredToolkitCopy of [
   "This is a composition guide, not a ranking, endorsement, or claim of affiliation."
 ]) {
   if (!toolkit.includes(requiredToolkitCopy)) {
-    errors.push(`Governed-agent toolkit page is missing ${requiredToolkitCopy}`);
+    errors.push(`Agent memory stack page is missing ${requiredToolkitCopy}`);
   }
 }
 for (const schemaType of ['"@type":"Article"', '"@type":"ItemList"', '"@type":"FAQPage"', '"@type":"BreadcrumbList"']) {
-  if (!toolkit.includes(schemaType)) errors.push(`Governed-agent toolkit page is missing ${schemaType}`);
+  if (!toolkit.includes(schemaType)) errors.push(`Agent memory stack page is missing ${schemaType}`);
 }
 if (!toolkit.includes('"numberOfItems":13')) {
-  errors.push("Governed-agent toolkit ItemList must contain the four authored projects and nine established tools.");
+  errors.push("Agent memory stack ItemList must contain the four authored projects and nine established tools.");
 }
 const toolkitQuestionCopy = toolkit.replaceAll("Is this a best-tool ranking?", "");
 if (/(?:Qarinah|Maqam|Cockroach Browser|Cockroach Crawler) (?:is|are) (?:the )?(?:best|first|only)|outperforms? every|universal winner/iu.test(toolkitQuestionCopy)) {
-  errors.push("Governed-agent toolkit page contains a prohibited superiority term outside the explicit FAQ denial.");
+  errors.push("Agent memory stack page contains a prohibited superiority term outside the explicit FAQ denial.");
+}
+if (/governed[- ]agent|governance-ready|Maqam governs/iu.test(toolkit)) {
+  errors.push("Agent memory stack page must keep Maqam optional and avoid governance-first product positioning.");
 }
 const siteCss = await readFile(path.join(output, "site.css"), "utf8");
 if (!siteCss.includes(".toolkit-project-grid")
   || !siteCss.includes("@media (max-width: 720px)")
   || !siteCss.includes(".toolkit-tool-list article")) {
-  errors.push("Governed-agent toolkit page is missing its responsive layout contract.");
+  errors.push("Agent memory stack page is missing its responsive layout contract.");
 }
 if (!faq.includes('"@type":"FAQPage"') || !faq.includes('"mainEntity"')) {
   errors.push("FAQ is missing answer-oriented structured data.");
