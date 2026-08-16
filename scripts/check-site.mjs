@@ -311,6 +311,14 @@ for (const responsiveTableRule of [
 ]) {
   if (!responsiveCss.includes(responsiveTableRule)) errors.push(`site.css is missing responsive table behavior: ${responsiveTableRule}`);
 }
+for (const responsiveHeroRule of [
+  ".hero-context-proof {",
+  "grid-template-columns: auto minmax(0, 1fr);",
+  ".hero-copy {\n    text-align: center;",
+  "grid-template-columns: 1fr;\n    gap: 10px;\n    padding: 20px 16px;\n    text-align: center;"
+]) {
+  if (!responsiveCss.includes(responsiveHeroRule)) errors.push(`site.css is missing centered responsive hero proof: ${responsiveHeroRule}`);
+}
 if (home.includes('"@type":"SearchAction"') || home.includes("search_term_string")) {
   errors.push("Homepage must not emit the retired sitelinks-search SearchAction or its crawlable URL template.");
 }
@@ -329,6 +337,9 @@ if (!home.includes("What coding agents and developers need to know.") || !home.i
 for (const worktreeHeroProof of [
   "One memory system for every Git worktree.",
   "Project memory for parallel coding-agent work",
+  'class="hero-context-proof"',
+  "98.71%",
+  "442,113 baseline tokens &rarr; 5,682 cited-pack tokens in the published six-fixture evaluation",
   "one repository · two isolated ledgers",
   "branch + commit in snapshot hash",
   'href="/articles/git-worktree-context-for-coding-agents/"'
@@ -444,7 +455,7 @@ for (const launchDirectoryMarkup of [
   'href="https://startupbase.io/products/qarinah?utm_source=startupbase&amp;utm_medium=badge&amp;utm_campaign=launch-badge-dark"',
   'src="https://statics.startupbase.io/site/badges/launched-on-sb-dark.svg"',
   'alt="Launched on StartupBase" height="55"',
-  'href="https://fazier.com/launches/qarinah.io" target="_blank"',
+  'href="https://fazier.com/launches/qarinah" target="_blank"',
   'src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=launched&amp;theme=light"',
   'width="120" alt="Fazier badge"',
   'href="https://launchnest.io/p/qarinah" target="_blank"',
