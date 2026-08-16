@@ -714,32 +714,105 @@ var init_errors = __esm({
 
 // src/git-worktrees.js
 import { createHash as createHash2 } from "node:crypto";
-import { execFile } from "node:child_process";
-import { access, lstat, realpath } from "node:fs/promises";
+import { access, lstat, readFile, readdir, realpath } from "node:fs/promises";
 import path from "node:path";
-import { promisify } from "node:util";
 function stableId(prefix, value) {
   const digest = createHash2("sha256").update(value, "utf8").digest("hex").slice(0, 32);
   return `${prefix}_${digest}`;
 }
-async function git(cwd, args, options = {}) {
+async function optionalMetadata(target) {
   try {
-    const result = await execFileAsync("git", args, {
-      cwd,
-      encoding: "utf8",
-      windowsHide: true,
-      timeout: 15e3,
-      maxBuffer: MAX_GIT_OUTPUT_BYTES
-    });
-    return options.trim === false ? result.stdout : result.stdout.trim();
+    return await lstat(target);
   } catch (error) {
-    if (options.optional === true) return null;
+    if (error?.code === "ENOENT" || error?.code === "ENOTDIR") return null;
     throw error;
   }
 }
-async function canonicalGitPath(cwd, value) {
-  const absolute = path.isAbsolute(value) ? value : path.resolve(cwd, value);
-  return realpath(absolute);
+async function readGitText(target, optional = false) {
+  try {
+    const metadata = await lstat(target);
+    if (metadata.isSymbolicLink() || !metadata.isFile() || metadata.size > MAX_GIT_METADATA_BYTES) {
+      if (optional) return null;
+      throw new TypeError(`Git metadata is not a bounded regular file: ${path.basename(target)}`);
+    }
+    return (await readFile(target, "utf8")).trim();
+  } catch (error) {
+    if (optional && (error?.code === "ENOENT" || error?.code === "ENOTDIR")) return null;
+    throw error;
+  }
+}
+async function findWorktreeRoot(start) {
+  let current;
+  try {
+    current = await realpath(path.resolve(start));
+  } catch {
+    return null;
+  }
+  const startMetadata = await optionalMetadata(current);
+  if (!startMetadata?.isDirectory()) return null;
+  while (true) {
+    const marker = await optionalMetadata(path.join(current, ".git"));
+    if (marker?.isDirectory() || marker?.isFile()) return current;
+    const parent = path.dirname(current);
+    if (parent === current) return null;
+    current = parent;
+  }
+}
+async function resolveGitDirectories(root) {
+  const marker = path.join(root, ".git");
+  const metadata = await optionalMetadata(marker);
+  if (metadata?.isDirectory()) {
+    const gitDir2 = await realpath(marker);
+    return { gitDir: gitDir2, commonDir: gitDir2, linked: false };
+  }
+  if (!metadata?.isFile() || metadata.isSymbolicLink()) return null;
+  const pointer = await readGitText(marker);
+  const match = /^gitdir: (.+)$/u.exec(pointer);
+  if (!match) return null;
+  const gitDir = await realpath(path.resolve(root, match[1]));
+  const commonPointer = await readGitText(path.join(gitDir, "commondir"), true);
+  const commonDir = commonPointer ? await realpath(path.resolve(gitDir, commonPointer)) : gitDir;
+  return { gitDir, commonDir, linked: gitDir !== commonDir };
+}
+async function resolveLooseReference(gitDir, commonDir, reference) {
+  for (const base of gitDir === commonDir ? [commonDir] : [gitDir, commonDir]) {
+    const value = await readGitText(path.join(base, ...reference.split("/")), true);
+    if (value && COMMIT.test(value)) return value;
+  }
+  const packed = await readGitText(path.join(commonDir, "packed-refs"), true);
+  if (!packed) return null;
+  for (const line of packed.split(/\r?\n/u)) {
+    if (line.startsWith("#") || line.startsWith("^") || line.trim() === "") continue;
+    const separator = line.indexOf(" ");
+    if (separator === -1) continue;
+    const commit = line.slice(0, separator);
+    if (line.slice(separator + 1) === reference && COMMIT.test(commit)) return commit;
+  }
+  return null;
+}
+async function headState(gitDir, commonDir) {
+  const head = await readGitText(path.join(gitDir, "HEAD"), true);
+  if (!head) return { branch: null, commit: null, detached: true };
+  if (COMMIT.test(head)) return { branch: null, commit: head, detached: true };
+  const match = /^ref: (refs\/heads\/(.+))$/u.exec(head);
+  if (!match) return { branch: null, commit: null, detached: true };
+  return {
+    branch: match[2],
+    commit: await resolveLooseReference(gitDir, commonDir, match[1]),
+    detached: false
+  };
+}
+async function inspectResolvedWorktree(root) {
+  const directories = await resolveGitDirectories(root);
+  if (!directories) return null;
+  const head = await headState(directories.gitDir, directories.commonDir);
+  return {
+    root,
+    ...directories,
+    ...head,
+    repositoryId: stableId("repo", `common-dir\0${directories.commonDir}`),
+    worktreeId: stableId("wt", root)
+  };
 }
 async function exactWorkspaceInitialized(root) {
   const config = path.join(root, ".qarinah", "config.json");
@@ -752,96 +825,92 @@ async function exactWorkspaceInitialized(root) {
     return false;
   }
 }
-async function repositoryIdentity(cwd, commonDir) {
-  const rootsText = await git(cwd, ["rev-list", "--max-parents=0", "HEAD"], { optional: true });
-  const roots = (rootsText ?? "").split(/\r?\n/u).filter((value) => COMMIT.test(value)).sort();
-  const basis = roots.length > 0 ? `root-commits\0${roots.join("\0")}` : `common-dir\0${commonDir}`;
-  return stableId("repo", basis);
-}
-function parseWorktreeRecords(output) {
-  const records = output.split("\0\0").filter(Boolean);
-  if (records.length > MAX_WORKTREES) {
-    throw new RangeError(`Git reports more than the supported ${MAX_WORKTREES} worktrees.`);
-  }
-  return records.map((record2) => {
-    const fields = record2.split("\0").filter(Boolean);
-    const parsed = { worktree: null, head: null, branch: null, detached: false, bare: false, prunable: false };
-    for (const field of fields) {
-      const separator = field.indexOf(" ");
-      const key = separator === -1 ? field : field.slice(0, separator);
-      const value = separator === -1 ? "" : field.slice(separator + 1);
-      if (key === "worktree") parsed.worktree = value;
-      else if (key === "HEAD") parsed.head = value;
-      else if (key === "branch") parsed.branch = value.startsWith("refs/heads/") ? value.slice("refs/heads/".length) : value;
-      else if (key === "detached") parsed.detached = true;
-      else if (key === "bare") parsed.bare = true;
-      else if (key === "prunable") parsed.prunable = true;
-    }
-    return parsed;
+function publicWorktree(worktree, extra = {}) {
+  return Object.freeze({
+    schemaVersion: "qarinah.git-worktree.v1",
+    repositoryId: worktree.repositoryId,
+    worktreeId: worktree.worktreeId,
+    root: worktree.root,
+    branch: worktree.branch,
+    commit: worktree.commit,
+    detached: worktree.detached,
+    linked: worktree.linked,
+    ...extra
   });
 }
 async function inspectGitWorktree(start = process.cwd()) {
-  const cwd = await realpath(path.resolve(start));
-  const rootText = await git(cwd, ["rev-parse", "--show-toplevel"], { optional: true });
-  if (!rootText) return null;
-  const root = await canonicalGitPath(cwd, rootText);
-  const commonText = await git(root, ["rev-parse", "--git-common-dir"]);
-  const gitDirText = await git(root, ["rev-parse", "--git-dir"]);
-  const commonDir = await canonicalGitPath(root, commonText);
-  const gitDir = await canonicalGitPath(root, gitDirText);
-  const commitText = await git(root, ["rev-parse", "--verify", "HEAD"], { optional: true });
-  const commit = commitText && COMMIT.test(commitText) ? commitText : null;
-  const branch = await git(root, ["symbolic-ref", "--quiet", "--short", "HEAD"], { optional: true });
-  const repositoryId = await repositoryIdentity(root, commonDir);
-  return Object.freeze({
-    schemaVersion: "qarinah.git-worktree.v1",
-    repositoryId,
-    worktreeId: stableId("wt", root),
-    root,
-    branch: branch || null,
-    commit,
-    detached: branch === null,
-    linked: gitDir !== commonDir
-  });
+  const root = await findWorktreeRoot(start);
+  if (!root) return null;
+  const inspected = await inspectResolvedWorktree(root);
+  return inspected ? publicWorktree(inspected) : null;
+}
+async function mainWorktreeRoot(commonDir) {
+  if (path.basename(commonDir) !== ".git") return null;
+  const candidate = path.dirname(commonDir);
+  try {
+    const resolved = await resolveGitDirectories(candidate);
+    return resolved?.commonDir === commonDir ? candidate : null;
+  } catch {
+    return null;
+  }
+}
+async function linkedWorktreeRoots(commonDir) {
+  const directory = path.join(commonDir, "worktrees");
+  let entries;
+  try {
+    entries = await readdir(directory, { withFileTypes: true });
+  } catch (error) {
+    if (error?.code === "ENOENT") return [];
+    throw error;
+  }
+  const worktreeDirectories = entries.filter((entry) => entry.isDirectory() && !entry.isSymbolicLink());
+  if (worktreeDirectories.length > MAX_WORKTREES) {
+    throw new RangeError(`Git reports more than the supported ${MAX_WORKTREES} worktrees.`);
+  }
+  const roots = [];
+  for (const entry of worktreeDirectories) {
+    const pointer = await readGitText(path.join(directory, entry.name, "gitdir"), true);
+    if (!pointer) continue;
+    try {
+      const marker = await realpath(path.resolve(directory, entry.name, pointer));
+      roots.push(await realpath(path.dirname(marker)));
+    } catch {
+    }
+  }
+  return roots;
 }
 async function listGitWorktrees(start = process.cwd()) {
-  const current = await inspectGitWorktree(start);
+  const currentRoot = await findWorktreeRoot(start);
+  if (!currentRoot) return Object.freeze([]);
+  const current = await inspectResolvedWorktree(currentRoot);
   if (!current) return Object.freeze([]);
-  const output = await git(current.root, ["worktree", "list", "--porcelain", "-z"], { trim: false });
-  const parsed = parseWorktreeRecords(output);
-  const commonDirectoryText = await git(current.root, ["rev-parse", "--git-common-dir"]);
-  const commonDirectory = await canonicalGitPath(current.root, commonDirectoryText);
+  const candidates = /* @__PURE__ */ new Set([currentRoot]);
+  const main = await mainWorktreeRoot(current.commonDir);
+  if (main) candidates.add(main);
+  for (const root of await linkedWorktreeRoots(current.commonDir)) candidates.add(root);
+  if (candidates.size > MAX_WORKTREES) {
+    throw new RangeError(`Git reports more than the supported ${MAX_WORKTREES} worktrees.`);
+  }
   const results = [];
-  for (const record2 of parsed) {
-    if (!record2.worktree || record2.bare || record2.prunable) continue;
-    let root;
+  for (const root of candidates) {
+    let inspected;
     try {
-      root = await realpath(path.resolve(record2.worktree));
+      inspected = await inspectResolvedWorktree(root);
     } catch {
       continue;
     }
-    const gitDirectoryText = await git(root, ["rev-parse", "--git-dir"]);
-    const gitDirectory = await canonicalGitPath(root, gitDirectoryText);
-    results.push(Object.freeze({
-      schemaVersion: "qarinah.git-worktree.v1",
-      repositoryId: current.repositoryId,
-      worktreeId: stableId("wt", root),
-      root,
-      branch: record2.branch,
-      commit: record2.head && COMMIT.test(record2.head) ? record2.head : null,
-      detached: record2.detached,
-      linked: gitDirectory !== commonDirectory,
-      current: root === current.root,
+    if (!inspected || inspected.commonDir !== current.commonDir) continue;
+    results.push(publicWorktree(inspected, {
+      current: root === currentRoot,
       initialized: await exactWorkspaceInitialized(root)
     }));
   }
   return Object.freeze(results.sort((left, right) => left.root.localeCompare(right.root)));
 }
-var execFileAsync, MAX_GIT_OUTPUT_BYTES, MAX_WORKTREES, COMMIT;
+var MAX_GIT_METADATA_BYTES, MAX_WORKTREES, COMMIT;
 var init_git_worktrees = __esm({
   "src/git-worktrees.js"() {
-    execFileAsync = promisify(execFile);
-    MAX_GIT_OUTPUT_BYTES = 1024 * 1024;
+    MAX_GIT_METADATA_BYTES = 64 * 1024;
     MAX_WORKTREES = 64;
     COMMIT = /^[0-9a-f]{40}$/u;
   }
@@ -1850,7 +1919,7 @@ var require_ignore = __commonJS({
 });
 
 // src/project-structure.js
-import { lstat as lstat3, readFile, readdir, realpath as realpath3 } from "node:fs/promises";
+import { lstat as lstat3, readFile as readFile2, readdir as readdir2, realpath as realpath3 } from "node:fs/promises";
 import { createHash as createHash4 } from "node:crypto";
 import path3 from "node:path";
 function boundedInteger(value, fallback, minimum, maximum, label) {
@@ -2082,7 +2151,7 @@ async function loadIgnoreMatcher(workspace) {
     try {
       const metadata = await assertReadableWorkspaceEntry(workspace, absolute);
       if (!metadata?.isFile() || metadata.size > MAX_IGNORE_BYTES) continue;
-      matcher.add(await readFile(absolute, "utf8"));
+      matcher.add(await readFile2(absolute, "utf8"));
     } catch (error) {
       if (error?.code !== "ENOENT") throw error;
     }
@@ -2100,7 +2169,7 @@ async function collectStructure(workspace, options) {
     }
     const directoryPath = portablePath(workspace.root, absoluteDirectory);
     directories.push(Object.freeze({ id: nodeId("directory", directoryPath), path: directoryPath }));
-    const entries = (await readdir(absoluteDirectory, { withFileTypes: true })).sort((left, right) => left.name.localeCompare(right.name));
+    const entries = (await readdir2(absoluteDirectory, { withFileTypes: true })).sort((left, right) => left.name.localeCompare(right.name));
     for (const entry of entries) {
       if (entry.name.includes("\0")) continue;
       const absolute = path3.join(absoluteDirectory, entry.name);
@@ -2134,7 +2203,7 @@ async function collectStructure(workspace, options) {
       if (totalBytes + metadata.size > options.maxTotalBytes) {
         throw new QarinahError("PROJECT_SCAN_LIMIT", `Project structure exceeds maxTotalBytes ${options.maxTotalBytes}.`);
       }
-      const bytes = await readFile(absolute);
+      const bytes = await readFile2(absolute);
       totalBytes += bytes.length;
       const contentHash = hashBytes(bytes);
       const language = languageFor(filePath);
@@ -5216,7 +5285,7 @@ __export(store_exports, {
 });
 import { randomUUID as randomUUID2 } from "node:crypto";
 import { constants as constants3 } from "node:fs";
-import { lstat as lstat5, mkdir as mkdir3, open as open3, readdir as readdir2, rename as rename4, rm as rm4, rmdir, utimes } from "node:fs/promises";
+import { lstat as lstat5, mkdir as mkdir3, open as open3, readdir as readdir3, rename as rename4, rm as rm4, rmdir, utimes } from "node:fs/promises";
 import os2 from "node:os";
 async function injectStoreFault(options, point, details = {}) {
   const injector = options?.__testFaultInjector;
@@ -5240,7 +5309,7 @@ function processIsAlive(pid) {
   }
 }
 async function inspectLockOwner(lockPath) {
-  const names = (await readdir2(lockPath)).filter((name) => OWNER_NAME_PATTERN.test(name));
+  const names = (await readdir3(lockPath)).filter((name) => OWNER_NAME_PATTERN.test(name));
   if (names.length !== 1) return null;
   const ownerPath = resolveWithin(lockPath, names[0]);
   const flags = constants3.O_RDONLY | (Number.isInteger(constants3.O_NOFOLLOW) ? constants3.O_NOFOLLOW : 0);
@@ -5625,7 +5694,7 @@ async function acquireWorkspaceWriteLock(workspace, options = {}) {
           }
         }
         if (!moved) throw moveError;
-        const releasedNames = await readdir2(releasedPath);
+        const releasedNames = await readdir3(releasedPath);
         const releasedOwner = await inspectLockOwner(releasedPath);
         if (releasedNames.length !== 1 || releasedNames[0] !== ownerName || !releasedOwner?.value || releasedOwner.value.ownerToken !== ownerToken) {
           throw new QarinahError("STORE_LOCK_LOST", "Refusing to remove a released append lock with unexpected contents.");
@@ -8558,7 +8627,7 @@ init_markdown();
 init_store();
 init_workspace();
 import { randomBytes as randomBytes4 } from "node:crypto";
-import { lstat as lstat9, mkdir as mkdir5, readFile as readFile2, readdir as readdir3, realpath as realpath7, rename as rename6, rm as rm6 } from "node:fs/promises";
+import { lstat as lstat9, mkdir as mkdir5, readFile as readFile3, readdir as readdir4, realpath as realpath7, rename as rename6, rm as rm6 } from "node:fs/promises";
 import path11 from "node:path";
 var OKF_VERSION = "0.1";
 var OKF_EXPORT_SCHEMA_VERSION = "qarinah.okf-export.v1";
@@ -8933,7 +9002,7 @@ async function assertOwnedOutput(outputDirectory, workspace) {
   if (!isWithin4(workspace.root, actual)) {
     throw new QarinahError("PATH_OUTSIDE_WORKSPACE", "Existing OKF output resolves outside the workspace root.");
   }
-  const entries = (await readdir3(outputDirectory)).sort(compareText);
+  const entries = (await readdir4(outputDirectory)).sort(compareText);
   if (entries.join("\0") !== [...ROOT_FILES].sort(compareText).join("\0")) {
     throw new QarinahError("OKF_OUTPUT_NOT_OWNED", "Existing OKF output contains unexpected or missing entries.");
   }
@@ -8945,7 +9014,7 @@ async function assertOwnedOutput(outputDirectory, workspace) {
   if (!eventMetadata.isDirectory()) {
     throw new QarinahError("OKF_OUTPUT_NOT_OWNED", "OKF events must be stored in a directory.");
   }
-  const eventFiles = (await readdir3(eventDirectory)).sort(compareText);
+  const eventFiles = (await readdir4(eventDirectory)).sort(compareText);
   if (eventFiles.length > MAX_EVENTS2 || eventFiles.some((name) => !EVENT_FILE_PATTERN.test(name))) {
     throw new QarinahError("OKF_OUTPUT_NOT_OWNED", "Existing OKF output contains invalid event concept paths.");
   }
@@ -8955,7 +9024,7 @@ async function assertOwnedOutput(outputDirectory, workspace) {
   for (const name of eventFiles) {
     await assertRegularFile(path11.join(eventDirectory, name), `OKF event concept '${name}'`, 2 * 1024 * 1024);
   }
-  const markerText = await readFile2(path11.join(outputDirectory, EXPORT_MARKER), "utf8");
+  const markerText = await readFile3(path11.join(outputDirectory, EXPORT_MARKER), "utf8");
   let marker;
   try {
     marker = JSON.parse(markerText);
@@ -8968,12 +9037,12 @@ async function assertOwnedOutput(outputDirectory, workspace) {
   }
   validateMarker(marker, workspace.config.workspaceId, eventFiles.length);
   const existingFiles = /* @__PURE__ */ new Map([
-    ["index.md", await readFile2(path11.join(outputDirectory, "index.md"), "utf8")],
-    ["log.md", await readFile2(path11.join(outputDirectory, "log.md"), "utf8")]
+    ["index.md", await readFile3(path11.join(outputDirectory, "index.md"), "utf8")],
+    ["log.md", await readFile3(path11.join(outputDirectory, "log.md"), "utf8")]
   ]);
   let totalBytes = Buffer.byteLength(existingFiles.get("index.md")) + Buffer.byteLength(existingFiles.get("log.md"));
   for (const name of eventFiles) {
-    const contents = await readFile2(path11.join(eventDirectory, name), "utf8");
+    const contents = await readFile3(path11.join(eventDirectory, name), "utf8");
     totalBytes += Buffer.byteLength(contents);
     if (totalBytes > 256 * 1024 * 1024) {
       throw new QarinahError("OKF_OUTPUT_NOT_OWNED", "Existing OKF output exceeds its bounded aggregate size.");
@@ -10167,7 +10236,7 @@ async function runMcpServer(options = {}) {
 
 // src/setup.js
 init_errors();
-import { lstat as lstat10, mkdir as mkdir6, readFile as readFile3 } from "node:fs/promises";
+import { lstat as lstat10, mkdir as mkdir6, readFile as readFile4 } from "node:fs/promises";
 import path16 from "node:path";
 import { fileURLToPath as fileURLToPath2 } from "node:url";
 
@@ -10631,7 +10700,7 @@ async function safeRead(candidate, label) {
   if (metadata.size > MAX_MANAGED_FILE_BYTES) {
     throw new QarinahError("SETUP_FILE_TOO_LARGE", `${label} exceeds ${MAX_MANAGED_FILE_BYTES} bytes.`);
   }
-  return readFile3(candidate, "utf8");
+  return readFile4(candidate, "utf8");
 }
 async function ensureDirectory(candidate, root, label) {
   let metadata;
@@ -10728,7 +10797,7 @@ async function installSkill(workspace, host, skillName, files) {
         `.${host}/skills/${skillName}/${path16.relative(skillRoot, destinationDirectory)}`
       );
     }
-    const contents = await readFile3(path16.join(sourceRoot, relative), "utf8");
+    const contents = await readFile4(path16.join(sourceRoot, relative), "utf8");
     const destination = resolveWithin(skillRoot, relative);
     const existing = await safeRead(destination, `${host} Qarinah skill`);
     if (existing !== null && existing !== contents) {
@@ -11039,7 +11108,7 @@ init_project_structure();
 init_store();
 init_workspace();
 import { createHash as createHash7 } from "node:crypto";
-import { lstat as lstat11, readFile as readFile4, realpath as realpath9 } from "node:fs/promises";
+import { lstat as lstat11, readFile as readFile5, realpath as realpath9 } from "node:fs/promises";
 import path17 from "node:path";
 function latestSnapshot(events) {
   for (let index = events.length - 1; index >= 0; index -= 1) {
@@ -11079,7 +11148,7 @@ async function inspectFile(workspace, file) {
       reason: "size-changed"
     };
   }
-  const observedHash = hashBytes2(await readFile4(resolved));
+  const observedHash = hashBytes2(await readFile5(resolved));
   const expectedHash = file.contentHash ?? file.hash;
   return observedHash === expectedHash ? { path: file.path, status: "current", expectedHash, observedHash } : { path: file.path, status: "changed", expectedHash, observedHash, reason: "content-changed" };
 }

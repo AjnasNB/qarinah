@@ -5,7 +5,7 @@ Qarinah 0.2.0 makes Git worktrees a first-class project-memory boundary.
 ## Highlights
 
 - Each initialized checkout receives a stable worktree identity, its own workspace identity, and its own append-only ledger.
-- Related checkouts share a repository identity derived from Git root commits without retaining a remote URL or credentials.
+- Related checkouts share a repository identity derived from their canonical Git common directory without retaining a remote URL or credentials.
 - Project snapshots bind the current branch and commit into the snapshot hash.
 - `qarinah worktrees` discovers initialized siblings without silently initializing them.
 - `qarinah dashboard --serve --worktrees` opens separately identified worktree ledgers in one grouped local dashboard.

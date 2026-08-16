@@ -1,11 +1,8 @@
 import { createHash } from "node:crypto";
-import { execFile } from "node:child_process";
-import { access, lstat, realpath } from "node:fs/promises";
+import { access, lstat, readFile, readdir, realpath } from "node:fs/promises";
 import path from "node:path";
-import { promisify } from "node:util";
 
-const execFileAsync = promisify(execFile);
-const MAX_GIT_OUTPUT_BYTES = 1024 * 1024;
+const MAX_GIT_METADATA_BYTES = 64 * 1024;
 const MAX_WORKTREES = 64;
 const COMMIT = /^[0-9a-f]{40}$/u;
 
@@ -14,25 +11,107 @@ function stableId(prefix, value) {
   return `${prefix}_${digest}`;
 }
 
-async function git(cwd, args, options = {}) {
+async function optionalMetadata(target) {
   try {
-    const result = await execFileAsync("git", args, {
-      cwd,
-      encoding: "utf8",
-      windowsHide: true,
-      timeout: 15_000,
-      maxBuffer: MAX_GIT_OUTPUT_BYTES
-    });
-    return options.trim === false ? result.stdout : result.stdout.trim();
+    return await lstat(target);
   } catch (error) {
-    if (options.optional === true) return null;
+    if (error?.code === "ENOENT" || error?.code === "ENOTDIR") return null;
     throw error;
   }
 }
 
-async function canonicalGitPath(cwd, value) {
-  const absolute = path.isAbsolute(value) ? value : path.resolve(cwd, value);
-  return realpath(absolute);
+async function readGitText(target, optional = false) {
+  try {
+    const metadata = await lstat(target);
+    if (metadata.isSymbolicLink() || !metadata.isFile() || metadata.size > MAX_GIT_METADATA_BYTES) {
+      if (optional) return null;
+      throw new TypeError(`Git metadata is not a bounded regular file: ${path.basename(target)}`);
+    }
+    return (await readFile(target, "utf8")).trim();
+  } catch (error) {
+    if (optional && (error?.code === "ENOENT" || error?.code === "ENOTDIR")) return null;
+    throw error;
+  }
+}
+
+async function findWorktreeRoot(start) {
+  let current;
+  try {
+    current = await realpath(path.resolve(start));
+  } catch {
+    return null;
+  }
+  const startMetadata = await optionalMetadata(current);
+  if (!startMetadata?.isDirectory()) return null;
+  while (true) {
+    const marker = await optionalMetadata(path.join(current, ".git"));
+    if (marker?.isDirectory() || marker?.isFile()) return current;
+    const parent = path.dirname(current);
+    if (parent === current) return null;
+    current = parent;
+  }
+}
+
+async function resolveGitDirectories(root) {
+  const marker = path.join(root, ".git");
+  const metadata = await optionalMetadata(marker);
+  if (metadata?.isDirectory()) {
+    const gitDir = await realpath(marker);
+    return { gitDir, commonDir: gitDir, linked: false };
+  }
+  if (!metadata?.isFile() || metadata.isSymbolicLink()) return null;
+  const pointer = await readGitText(marker);
+  const match = /^gitdir: (.+)$/u.exec(pointer);
+  if (!match) return null;
+  const gitDir = await realpath(path.resolve(root, match[1]));
+  const commonPointer = await readGitText(path.join(gitDir, "commondir"), true);
+  const commonDir = commonPointer
+    ? await realpath(path.resolve(gitDir, commonPointer))
+    : gitDir;
+  return { gitDir, commonDir, linked: gitDir !== commonDir };
+}
+
+async function resolveLooseReference(gitDir, commonDir, reference) {
+  for (const base of gitDir === commonDir ? [commonDir] : [gitDir, commonDir]) {
+    const value = await readGitText(path.join(base, ...reference.split("/")), true);
+    if (value && COMMIT.test(value)) return value;
+  }
+  const packed = await readGitText(path.join(commonDir, "packed-refs"), true);
+  if (!packed) return null;
+  for (const line of packed.split(/\r?\n/u)) {
+    if (line.startsWith("#") || line.startsWith("^") || line.trim() === "") continue;
+    const separator = line.indexOf(" ");
+    if (separator === -1) continue;
+    const commit = line.slice(0, separator);
+    if (line.slice(separator + 1) === reference && COMMIT.test(commit)) return commit;
+  }
+  return null;
+}
+
+async function headState(gitDir, commonDir) {
+  const head = await readGitText(path.join(gitDir, "HEAD"), true);
+  if (!head) return { branch: null, commit: null, detached: true };
+  if (COMMIT.test(head)) return { branch: null, commit: head, detached: true };
+  const match = /^ref: (refs\/heads\/(.+))$/u.exec(head);
+  if (!match) return { branch: null, commit: null, detached: true };
+  return {
+    branch: match[2],
+    commit: await resolveLooseReference(gitDir, commonDir, match[1]),
+    detached: false
+  };
+}
+
+async function inspectResolvedWorktree(root) {
+  const directories = await resolveGitDirectories(root);
+  if (!directories) return null;
+  const head = await headState(directories.gitDir, directories.commonDir);
+  return {
+    root,
+    ...directories,
+    ...head,
+    repositoryId: stableId("repo", `common-dir\0${directories.commonDir}`),
+    worktreeId: stableId("wt", root)
+  };
 }
 
 async function exactWorkspaceInitialized(root) {
@@ -47,89 +126,88 @@ async function exactWorkspaceInitialized(root) {
   }
 }
 
-async function repositoryIdentity(cwd, commonDir) {
-  const rootsText = await git(cwd, ["rev-list", "--max-parents=0", "HEAD"], { optional: true });
-  const roots = (rootsText ?? "").split(/\r?\n/u).filter((value) => COMMIT.test(value)).sort();
-  const basis = roots.length > 0 ? `root-commits\0${roots.join("\0")}` : `common-dir\0${commonDir}`;
-  return stableId("repo", basis);
-}
-
-function parseWorktreeRecords(output) {
-  const records = output.split("\0\0").filter(Boolean);
-  if (records.length > MAX_WORKTREES) {
-    throw new RangeError(`Git reports more than the supported ${MAX_WORKTREES} worktrees.`);
-  }
-  return records.map((record) => {
-    const fields = record.split("\0").filter(Boolean);
-    const parsed = { worktree: null, head: null, branch: null, detached: false, bare: false, prunable: false };
-    for (const field of fields) {
-      const separator = field.indexOf(" ");
-      const key = separator === -1 ? field : field.slice(0, separator);
-      const value = separator === -1 ? "" : field.slice(separator + 1);
-      if (key === "worktree") parsed.worktree = value;
-      else if (key === "HEAD") parsed.head = value;
-      else if (key === "branch") parsed.branch = value.startsWith("refs/heads/") ? value.slice("refs/heads/".length) : value;
-      else if (key === "detached") parsed.detached = true;
-      else if (key === "bare") parsed.bare = true;
-      else if (key === "prunable") parsed.prunable = true;
-    }
-    return parsed;
+function publicWorktree(worktree, extra = {}) {
+  return Object.freeze({
+    schemaVersion: "qarinah.git-worktree.v1",
+    repositoryId: worktree.repositoryId,
+    worktreeId: worktree.worktreeId,
+    root: worktree.root,
+    branch: worktree.branch,
+    commit: worktree.commit,
+    detached: worktree.detached,
+    linked: worktree.linked,
+    ...extra
   });
 }
 
 export async function inspectGitWorktree(start = process.cwd()) {
-  const cwd = await realpath(path.resolve(start));
-  const rootText = await git(cwd, ["rev-parse", "--show-toplevel"], { optional: true });
-  if (!rootText) return null;
-  const root = await canonicalGitPath(cwd, rootText);
-  const commonText = await git(root, ["rev-parse", "--git-common-dir"]);
-  const gitDirText = await git(root, ["rev-parse", "--git-dir"]);
-  const commonDir = await canonicalGitPath(root, commonText);
-  const gitDir = await canonicalGitPath(root, gitDirText);
-  const commitText = await git(root, ["rev-parse", "--verify", "HEAD"], { optional: true });
-  const commit = commitText && COMMIT.test(commitText) ? commitText : null;
-  const branch = await git(root, ["symbolic-ref", "--quiet", "--short", "HEAD"], { optional: true });
-  const repositoryId = await repositoryIdentity(root, commonDir);
-  return Object.freeze({
-    schemaVersion: "qarinah.git-worktree.v1",
-    repositoryId,
-    worktreeId: stableId("wt", root),
-    root,
-    branch: branch || null,
-    commit,
-    detached: branch === null,
-    linked: gitDir !== commonDir
-  });
+  const root = await findWorktreeRoot(start);
+  if (!root) return null;
+  const inspected = await inspectResolvedWorktree(root);
+  return inspected ? publicWorktree(inspected) : null;
+}
+
+async function mainWorktreeRoot(commonDir) {
+  if (path.basename(commonDir) !== ".git") return null;
+  const candidate = path.dirname(commonDir);
+  try {
+    const resolved = await resolveGitDirectories(candidate);
+    return resolved?.commonDir === commonDir ? candidate : null;
+  } catch {
+    return null;
+  }
+}
+
+async function linkedWorktreeRoots(commonDir) {
+  const directory = path.join(commonDir, "worktrees");
+  let entries;
+  try {
+    entries = await readdir(directory, { withFileTypes: true });
+  } catch (error) {
+    if (error?.code === "ENOENT") return [];
+    throw error;
+  }
+  const worktreeDirectories = entries.filter((entry) => entry.isDirectory() && !entry.isSymbolicLink());
+  if (worktreeDirectories.length > MAX_WORKTREES) {
+    throw new RangeError(`Git reports more than the supported ${MAX_WORKTREES} worktrees.`);
+  }
+  const roots = [];
+  for (const entry of worktreeDirectories) {
+    const pointer = await readGitText(path.join(directory, entry.name, "gitdir"), true);
+    if (!pointer) continue;
+    try {
+      const marker = await realpath(path.resolve(directory, entry.name, pointer));
+      roots.push(await realpath(path.dirname(marker)));
+    } catch {
+      // Missing worktrees are prunable Git metadata and are not active context roots.
+    }
+  }
+  return roots;
 }
 
 export async function listGitWorktrees(start = process.cwd()) {
-  const current = await inspectGitWorktree(start);
+  const currentRoot = await findWorktreeRoot(start);
+  if (!currentRoot) return Object.freeze([]);
+  const current = await inspectResolvedWorktree(currentRoot);
   if (!current) return Object.freeze([]);
-  const output = await git(current.root, ["worktree", "list", "--porcelain", "-z"], { trim: false });
-  const parsed = parseWorktreeRecords(output);
-  const commonDirectoryText = await git(current.root, ["rev-parse", "--git-common-dir"]);
-  const commonDirectory = await canonicalGitPath(current.root, commonDirectoryText);
+  const candidates = new Set([currentRoot]);
+  const main = await mainWorktreeRoot(current.commonDir);
+  if (main) candidates.add(main);
+  for (const root of await linkedWorktreeRoots(current.commonDir)) candidates.add(root);
+  if (candidates.size > MAX_WORKTREES) {
+    throw new RangeError(`Git reports more than the supported ${MAX_WORKTREES} worktrees.`);
+  }
   const results = [];
-  for (const record of parsed) {
-    if (!record.worktree || record.bare || record.prunable) continue;
-    let root;
+  for (const root of candidates) {
+    let inspected;
     try {
-      root = await realpath(path.resolve(record.worktree));
+      inspected = await inspectResolvedWorktree(root);
     } catch {
       continue;
     }
-    const gitDirectoryText = await git(root, ["rev-parse", "--git-dir"]);
-    const gitDirectory = await canonicalGitPath(root, gitDirectoryText);
-    results.push(Object.freeze({
-      schemaVersion: "qarinah.git-worktree.v1",
-      repositoryId: current.repositoryId,
-      worktreeId: stableId("wt", root),
-      root,
-      branch: record.branch,
-      commit: record.head && COMMIT.test(record.head) ? record.head : null,
-      detached: record.detached,
-      linked: gitDirectory !== commonDirectory,
-      current: root === current.root,
+    if (!inspected || inspected.commonDir !== current.commonDir) continue;
+    results.push(publicWorktree(inspected, {
+      current: root === currentRoot,
       initialized: await exactWorkspaceInitialized(root)
     }));
   }
