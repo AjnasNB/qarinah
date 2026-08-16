@@ -256,12 +256,12 @@ function normalizedRankRequest(query, options = {}) {
   const asOf = canonicalTimestamp(options.asOf ?? new Date().toISOString(), "asOf");
   let allowedTypes = null;
   if (options.types !== undefined) {
-    if (!Array.isArray(options.types) || options.types.length < 1 || options.types.length > 5) {
+    if (!Array.isArray(options.types) || options.types.length < 1 || options.types.length > 6) {
       throw new TypeError("types must contain one or more supported linked-memory node types.");
     }
     allowedTypes = new Set(options.types);
     if (allowedTypes.size !== options.types.length
-      || [...allowedTypes].some((type) => !["memory", "file", "directory", "concept", "reference"].includes(type))) {
+      || [...allowedTypes].some((type) => !["memory", "file", "directory", "concept", "reference", "worktree"].includes(type))) {
       throw new TypeError("types must contain one or more supported linked-memory node types.");
     }
   }
@@ -374,7 +374,9 @@ export function buildLinkedProjectMemory(events, workspaceId, options = {}) {
   const sourceFileReferenceCount = currentStructure?.structure.files.reduce((sum, file) => sum + file.references.length, 0) ?? 0;
   const relationCount = events.reduce((sum, event) => sum + event.relations.length, 0);
   const structuralReferenceCount = projectedFileReferenceCount;
-  const structuralNodeCount = (currentStructure?.structure.directories.length ?? 0) + (currentStructure?.structure.files.length ?? 0);
+  const structuralNodeCount = (currentStructure?.structure.directories.length ?? 0)
+    + (currentStructure?.structure.files.length ?? 0)
+    + (currentStructure?.structure.worktree ? 1 : 0);
   const nodeUpperBound = events.length + relationCount + structuralReferenceCount + structuralNodeCount + MAX_CONCEPTS;
   const edgeUpperBound = relationCount + Math.max(0, events.length - 1) + structuralNodeCount + structuralReferenceCount
     + MAX_ABOUT_EDGES_PER_NODE * (events.length + relationCount + structuralReferenceCount + (currentStructure?.structure.files.length ?? 0));
@@ -459,6 +461,35 @@ export function buildLinkedProjectMemory(events, workspaceId, options = {}) {
     const structure = projectedStructure;
     const directories = new Map(structure.directories.map((directory) => [directory.path, directory.id]));
     const files = new Map(structure.files.map((file) => [file.path, file.id]));
+    if (structure.worktree) {
+      const worktree = structure.worktree;
+      const worktreeNode = {
+        id: worktree.worktreeId,
+        type: "worktree",
+        kind: "project.worktree",
+        label: worktree.branch ?? `detached ${worktree.commit?.slice(0, 8) ?? "unborn"}`,
+        path: null,
+        language: null,
+        timestamp: event.timestamp,
+        validFrom: event.timestamp,
+        validUntil: null,
+        expiresAt: null,
+        confidence: "verified",
+        status: "current",
+        supersededBy: [],
+        conflicted: false,
+        repositoryId: worktree.repositoryId,
+        disclosureScopes: event.disclosure?.scopes ?? [],
+        classification: event.disclosure?.classification ?? "workspace",
+        sourceProfiles: [],
+        sourceEventId: event.eventId,
+        evidenceHash: event.hash,
+        contentHash: sha256(worktree.commit ?? worktree.worktreeId),
+        searchText: `git worktree ${worktree.branch ?? "detached"} ${worktree.commit ?? "unborn"} ${worktree.linked ? "linked" : "primary"}`
+      };
+      nodes.push(worktreeNode);
+      nodesById.set(worktreeNode.id, worktreeNode);
+    }
     for (const directory of structure.directories) {
       const node = {
         id: directory.id,
@@ -574,6 +605,10 @@ export function buildLinkedProjectMemory(events, workspaceId, options = {}) {
       }
     }
     const rootId = directories.get(".");
+    if (rootId && structure.worktree) addEdge(edges, edgesSeen, {
+      source: structure.worktree.worktreeId, type: "contains", target: rootId, sourceEventId: event.eventId,
+      evidenceHash: event.hash, confidence: "verified", weight: 1
+    });
     if (rootId) addEdge(edges, edgesSeen, {
       source: event.eventId, type: "produced", target: rootId, sourceEventId: event.eventId,
       evidenceHash: event.hash, confidence: "extracted", weight: 1

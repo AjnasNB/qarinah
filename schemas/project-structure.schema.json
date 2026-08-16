@@ -6,17 +6,23 @@
   "additionalProperties": false,
   "required": ["schemaVersion", "adapter", "root", "limits", "directoryCount", "fileCount", "totalBytes", "directories", "files", "snapshotHash", "changes"],
   "properties": {
-    "schemaVersion": { "const": "qarinah.project-structure.v1" },
+    "schemaVersion": { "enum": ["qarinah.project-structure.v1", "qarinah.project-structure.v2"] },
     "adapter": {
       "type": "object",
       "additionalProperties": false,
       "required": ["id", "version"],
       "properties": {
         "id": { "const": "qarinah.project-structure" },
-        "version": { "const": "1" }
+        "version": { "enum": ["1", "2"] }
       }
     },
     "root": { "const": "." },
+    "worktree": {
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/worktree" }
+      ]
+    },
     "limits": {
       "type": "object",
       "additionalProperties": false,
@@ -44,9 +50,36 @@
     "snapshotHash": { "$ref": "#/$defs/hash" },
     "changes": { "$ref": "#/$defs/changes" }
   },
+  "allOf": [
+    {
+      "if": { "properties": { "schemaVersion": { "const": "qarinah.project-structure.v2" } } },
+      "then": {
+        "required": ["worktree"],
+        "properties": { "adapter": { "properties": { "version": { "const": "2" } } } }
+      },
+      "else": {
+        "not": { "required": ["worktree"] },
+        "properties": { "adapter": { "properties": { "version": { "const": "1" } } } }
+      }
+    }
+  ],
   "$defs": {
     "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
     "path": { "type": "string", "minLength": 1, "maxLength": 512 },
+    "worktree": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "repositoryId", "worktreeId", "branch", "commit", "detached", "linked"],
+      "properties": {
+        "schemaVersion": { "const": "qarinah.git-worktree.v1" },
+        "repositoryId": { "type": "string", "pattern": "^repo_[0-9a-f]{32}$" },
+        "worktreeId": { "type": "string", "pattern": "^wt_[0-9a-f]{32}$" },
+        "branch": { "type": ["string", "null"], "minLength": 1, "maxLength": 255 },
+        "commit": { "type": ["string", "null"], "pattern": "^[0-9a-f]{40}$" },
+        "detached": { "type": "boolean" },
+        "linked": { "type": "boolean" }
+      }
+    },
     "directory": {
       "type": "object",
       "additionalProperties": false,

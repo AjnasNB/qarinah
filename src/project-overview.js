@@ -1,4 +1,5 @@
 import { deepFreezeJson } from "./canonical.js";
+import { validateProjectStructureSnapshot } from "./project-structure.js";
 import { readEvents } from "./store.js";
 import { atomicWriteFile, loadWorkspace, resolveWithin } from "./workspace.js";
 
@@ -7,7 +8,7 @@ export const PROJECT_OVERVIEW_SCHEMA_VERSION = "qarinah.project-overview.v1";
 function latestStructure(events) {
   for (let index = events.length - 1; index >= 0; index -= 1) {
     const structure = events[index].data?.projectStructure;
-    if (structure?.schemaVersion === "qarinah.project-structure.v1") return { event: events[index], structure };
+    if (validateProjectStructureSnapshot(structure)) return { event: events[index], structure };
   }
   return null;
 }

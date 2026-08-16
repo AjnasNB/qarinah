@@ -1,5 +1,13 @@
 # Migrations
 
+## Project structure v1 to v2 and Git worktrees
+
+Qarinah now emits `qarinah.project-structure.v2`. Version 2 adds a nullable `worktree` field containing a non-secret repository group ID, worktree ID, branch, commit, and primary/linked status. The snapshot hash covers this metadata, so a task pack can prove which checkout produced the file graph. Qarinah continues to validate and read historical v1 snapshots; the authoritative event schema and existing ledgers do not change.
+
+Every Git worktree keeps its own `.qarinah` directory, event chain, consent record, and derived files. Qarinah never replaces those directories with links or shares a writable ledger across concurrent checkouts. `qarinah worktrees` discovers the repository group, and `qarinah dashboard --serve --worktrees` opens every initialized sibling worktree in one local view.
+
+Linked-memory consumers must accept the additive `worktree` node type. Run `qarinah scan` and `qarinah build` in an initialized worktree to write a v2 snapshot and regenerate both graph projections.
+
 ## Cockroach Browser metadata-outcome boundary
 
 The `cockroach.browser-memory.v1` receiving API is additive and does not change `qarinah.event.v1` or existing workspaces. No ledger migration or rebuild is required. New consumers may pass a passive `createCockroachBrowserMemorySink()` to the public Cockroach Browser Qarinah recorder.

@@ -4,6 +4,7 @@ import { canonicalStringify, deepFreezeJson, sha256 } from "./canonical.js";
 import { QarinahError } from "./errors.js";
 import { markdownDataBlock, markdownInline } from "./markdown.js";
 import { buildLinkedProjectMemory, writeLinkedProjectMemoryProjection } from "./linked-memory.js";
+import { validateProjectStructureSnapshot } from "./project-structure.js";
 import { buildProjectRecordViews, renderProjectRecordViews } from "./project-views.js";
 import { readEvents } from "./store.js";
 import {
@@ -46,7 +47,7 @@ function searchableText(event) {
     }
   }
   const structure = event.data?.projectStructure;
-  if (structure?.schemaVersion === "qarinah.project-structure.v1" && Array.isArray(structure.files)) {
+  if (validateProjectStructureSnapshot(structure)) {
     for (const file of structure.files) {
       if (typeof file?.path === "string") selectedData.push(`project file ${file.path} ${file.language ?? ""}`);
       if (Array.isArray(file?.references)) {
@@ -62,9 +63,7 @@ function searchableText(event) {
 function latestProjectStructure(events) {
   for (let index = events.length - 1; index >= 0; index -= 1) {
     const structure = events[index].data?.projectStructure;
-    if (structure?.schemaVersion === "qarinah.project-structure.v1"
-      && Array.isArray(structure.directories)
-      && Array.isArray(structure.files)) {
+    if (validateProjectStructureSnapshot(structure)) {
       return Object.freeze({ sourceEventId: events[index].eventId, structure });
     }
   }
@@ -82,6 +81,19 @@ function appendProjectGraph(events, nodes, edges) {
   const directoryIds = new Map(structure.directories.map((directory) => [directory.path, directory.id]));
   const fileIds = new Map(structure.files.map((file) => [file.path, file.id]));
   const moduleNodes = new Map();
+  if (structure.worktree) {
+    nodes.push({
+      id: structure.worktree.worktreeId,
+      type: "project.worktree",
+      repositoryId: structure.worktree.repositoryId,
+      branch: structure.worktree.branch,
+      commit: structure.worktree.commit,
+      detached: structure.worktree.detached,
+      linked: structure.worktree.linked,
+      confidence: "verified",
+      sourceEventId
+    });
+  }
   for (const directory of structure.directories) {
     nodes.push({
       id: directory.id,
@@ -141,11 +153,19 @@ function appendProjectGraph(events, nodes, edges) {
     }
   }
   const rootId = directoryIds.get(".");
+  if (rootId && structure.worktree) edges.push({
+    source: structure.worktree.worktreeId,
+    type: "contains",
+    target: rootId,
+    confidence: "verified",
+    sourceEventId
+  });
   if (rootId) edges.push({ source: sourceEventId, type: "produced", target: rootId, confidence: "extracted", sourceEventId });
   return Object.freeze({
     schemaVersion: structure.schemaVersion,
     sourceEventId,
     snapshotHash: structure.snapshotHash,
+    worktree: structure.worktree ?? null,
     directoryCount: structure.directoryCount,
     fileCount: structure.fileCount
   });

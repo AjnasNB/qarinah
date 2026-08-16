@@ -1,5 +1,7 @@
 # Linked project memory
 
+Git worktrees are first-class graph nodes. A v2 project scan records the current branch and commit in the snapshot hash, creates a `worktree` node, and links it to the scanned project root. This makes branch context searchable without merging or sharing the separate authoritative ledgers owned by each checkout.
+
 Qarinah can build one evidence-linked view that connects retained project memories with the latest explicit repository scan. The view is designed for a developer who needs to answer three related questions without replaying an entire history:
 
 1. Which current memory records are relevant to this task?

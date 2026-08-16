@@ -1,5 +1,13 @@
 # JavaScript and TypeScript API reference
 
+## Git worktree identity
+
+```ts
+import { inspectGitWorktree, listGitWorktrees } from "qarinah";
+```
+
+`inspectGitWorktree(start?)` returns the canonical current checkout identity or `null` outside Git. `listGitWorktrees(start?)` returns the bounded sibling set with branch, commit, primary/linked status, and exact-root Qarinah initialization status. Remote URLs and credentials are never collected. Loaded `QarinahWorkspace` values also expose nullable `worktree` metadata derived at read time; portable workspace config remains unchanged.
+
 Qarinah is an ESM package. The public implementation is exported from `qarinah`; host adapters and MCP also have narrow subpath exports.
 
 ```js

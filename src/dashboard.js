@@ -29,7 +29,7 @@ function eventSummary(event) {
 }
 
 export function compactLinkedGraph(memory) {
-  const typeLimits = { memory: 36, file: 48, concept: 40, directory: 20, reference: 12 };
+  const typeLimits = { worktree: 8, memory: 36, file: 48, concept: 40, directory: 20, reference: 12 };
   const admitted = rankLinkedProjectMemory(memory, "", { limit: 100 });
   const selected = [];
   for (const type of Object.keys(typeLimits)) {
@@ -119,6 +119,7 @@ export async function buildMemoryDashboard(options = {}) {
       name: path.basename(workspace.root),
       root: workspace.root,
       workspaceId: workspace.config.workspaceId,
+      worktree: workspace.worktree,
       repositoryIds,
       ledgerPath: ".qarinah/events/events.jsonl",
       ledgerHeadHash: latestEvent?.hash ?? null,
@@ -235,6 +236,7 @@ export function renderMemoryDashboard(data, options = {}) {
     name: data.workspaceId,
     root: "",
     workspaceId: data.workspaceId,
+    worktree: null,
     repositoryIds: [],
     ledgerPath: ".qarinah/events/events.jsonl",
     ledgerHeadHash: null,
@@ -244,7 +246,7 @@ export function renderMemoryDashboard(data, options = {}) {
   };
   const projects = Array.isArray(options.projects) ? options.projects : [];
   const projectNavigation = projects.length > 1
-    ? `<nav class="project-nav" aria-label="Local Qarinah projects">${projects.map((project) => `<a href="${escapeHtml(project.href)}"${project.workspaceId === workspace.workspaceId ? ' aria-current="page"' : ""}>${escapeHtml(project.name)}<small>${escapeHtml(project.workspaceId)}</small></a>`).join("")}</nav>`
+    ? `<nav class="project-nav" aria-label="Local Qarinah worktrees">${projects.map((project) => `<a href="${escapeHtml(project.href)}"${project.workspaceId === workspace.workspaceId ? ' aria-current="page"' : ""}>${escapeHtml(project.branch ?? project.name)}<small>${escapeHtml(project.commit?.slice(0, 10) ?? project.workspaceId)}</small></a>`).join("")}</nav>`
     : "";
   const repositoryLabel = workspace.repositoryIds.length > 0
     ? workspace.repositoryIds.join(", ")
@@ -293,6 +295,9 @@ li:first-child{border-top:0}li strong{min-width:0;overflow-wrap:anywhere}li span
 <div class="source-card">
 <p><strong>Project root</strong><code>${escapeHtml(workspace.root)}</code></p>
 <p><strong>Workspace identity</strong><code>${escapeHtml(workspace.workspaceId)}</code></p>
+<p><strong>Git worktree</strong>${workspace.worktree ? `${escapeHtml(workspace.worktree.branch ?? "detached HEAD")} · <code>${escapeHtml(workspace.worktree.commit?.slice(0, 12) ?? "unborn")}</code>` : "Not a Git worktree"}</p>
+<p><strong>Worktree identity</strong><code>${escapeHtml(workspace.worktree?.worktreeId ?? "Not available")}</code></p>
+<p><strong>Repository group</strong><code>${escapeHtml(workspace.worktree?.repositoryId ?? "Not available")}</code></p>
 <p><strong>Repository identities</strong>${escapeHtml(repositoryLabel)}</p>
 <p><strong>Authoritative source</strong><code>${escapeHtml(workspace.ledgerPath)}</code></p>
 <p><strong>Ledger head</strong><code>${escapeHtml(workspace.ledgerHeadHash ?? "Empty ledger")}</code></p>
@@ -308,10 +313,10 @@ li:first-child{border-top:0}li strong{min-width:0;overflow-wrap:anywhere}li span
 <div class="metric"><strong>${escapeHtml(savingsValue)}</strong><span>${escapeHtml(savingsLabel)}</span></div>
 </div></header>
 <main><div class="grid">
-<section class="wide"><h2>Linked project memory</h2><p>Explore current memories, concepts, files, and their evidence-backed relationships in a circular project map. Drag nodes to untangle a cluster, click any point for its source identity, or run ranked search to see the exact score basis.</p>
-<div class="graph-toolbar"><label>Ranked project-memory search<input type="search" data-graph-search data-search-path="${escapeHtml(options.searchPath ?? "")}" maxlength="256" placeholder="Try release policy or src/index.js"></label><label>Node type<select data-graph-type><option value="all">All node types</option><option value="memory">Memories</option><option value="file">Files</option><option value="concept">Concepts</option><option value="directory">Directories</option><option value="reference">References</option></select></label><button class="graph-reset" type="button" data-graph-reset>Reset map</button><output class="graph-summary" data-graph-summary aria-live="polite"></output></div>
+<section class="wide"><h2>Worktree context graph</h2><p>Explore the active Git worktree, current memories, concepts, files, and their evidence-backed relationships in a circular project map. Drag nodes to untangle a cluster, click any point for its source identity, or run ranked search to see the exact score basis.</p>
+<div class="graph-toolbar"><label>Ranked project-memory search<input type="search" data-graph-search data-search-path="${escapeHtml(options.searchPath ?? "")}" maxlength="256" placeholder="Try a branch, decision, or src/index.js"></label><label>Node type<select data-graph-type><option value="all">All node types</option><option value="worktree">Git worktrees</option><option value="memory">Memories</option><option value="file">Files</option><option value="concept">Concepts</option><option value="directory">Directories</option><option value="reference">References</option></select></label><button class="graph-reset" type="button" data-graph-reset>Reset map</button><output class="graph-summary" data-graph-summary aria-live="polite"></output></div>
 <div class="graph-shell"><svg class="graph-canvas" data-linked-graph viewBox="0 0 1040 560" role="img" aria-label="Interactive linked project-memory graph"><g data-graph-edges></g><g data-graph-nodes></g></svg><aside class="graph-details" aria-live="polite"><div><h3 data-graph-title>Choose a node</h3><p data-graph-description>Click a point or a result to inspect its type, rank, connections, and evidence identity.</p><dl><dt>Type</dt><dd data-graph-detail="type">-</dd><dt>Status</dt><dd data-graph-detail="status">-</dd><dt>Importance</dt><dd data-graph-detail="importance">-</dd><dt>Connections</dt><dd data-graph-detail="connections">-</dd><dt>Score basis</dt><dd data-graph-detail="basis">Browse rank</dd><dt>Evidence</dt><dd data-graph-detail="evidence">-</dd></dl></div><div><strong>Visible or ranked results</strong><ol class="graph-results" data-graph-results aria-label="Linked project-memory results"></ol></div></aside></div>
-<div class="graph-legend"><span><i style="--legend:#35e0aa"></i>Memory</span><span><i style="--legend:#65a7ff"></i>File</span><span><i style="--legend:#d197ff"></i>Concept</span><span><i style="--legend:#ffc857"></i>Directory</span><span><i style="--legend:#9aa7b2"></i>Reference</span></div>
+<div class="graph-legend"><span><i style="--legend:#ff7a90"></i>Git worktree</span><span><i style="--legend:#35e0aa"></i>Memory</span><span><i style="--legend:#65a7ff"></i>File</span><span><i style="--legend:#d197ff"></i>Concept</span><span><i style="--legend:#ffc857"></i>Directory</span><span><i style="--legend:#9aa7b2"></i>Reference</span></div>
 <p><small>Showing ${data.linkedGraph.nodes.length.toLocaleString()} selected nodes and ${data.linkedGraph.edges.length.toLocaleString()} relationships from ${data.linkedGraph.statistics.nodes.toLocaleString()} admitted source-projection nodes; ${data.linkedGraph.statistics.rankedCandidates.toLocaleString()} top-ranked candidates were evaluated. Source manifest: <code>${escapeHtml(data.linkedGraph.manifestHash)}</code></small></p></section>
 <section><h2>Current decisions and reasons</h2>${decisionList(data.currentDecisions,"No current decisions recorded.",{ id:"current-decisions",label:"Current decisions" })}</section>
 <section><h2>Superseded decisions</h2>${decisionList(data.supersededDecisions,"No superseded decisions.",{ id:"superseded-decisions",label:"Superseded decisions" })}</section>
@@ -343,7 +348,7 @@ const qarinahGraphResults=document.querySelector("[data-graph-results]");
 const qarinahGraphNodeById=new Map(qarinahGraph.nodes.map((node)=>[node.id,node]));
 const qarinahGraphNeighbors=new Map(qarinahGraph.nodes.map((node)=>[node.id,new Set()]));
 for(const edge of qarinahGraph.edges){qarinahGraphNeighbors.get(edge.source)?.add(edge.target);qarinahGraphNeighbors.get(edge.target)?.add(edge.source)}
-const qarinahGraphColors={memory:"#35e0aa",file:"#65a7ff",concept:"#d197ff",directory:"#ffc857",reference:"#9aa7b2"};
+const qarinahGraphColors={worktree:"#ff7a90",memory:"#35e0aa",file:"#65a7ff",concept:"#d197ff",directory:"#ffc857",reference:"#9aa7b2"};
 let qarinahSelectedNode=null;
 const qarinahPositionOverrides=new Map();
 let qarinahActiveDrag=null;
@@ -391,7 +396,7 @@ const qarinahRenderGraph=()=>{
   if(query){for(const id of direct){for(const neighbor of qarinahGraphNeighbors.get(id)??[])if(type==="all"||qarinahGraphNodeById.get(neighbor)?.type===type)expanded.add(neighbor)}}
   const visible=qarinahGraph.nodes.filter((node)=>expanded.has(node.id)).sort((left,right)=>right.importance-left.importance||left.id.localeCompare(right.id)).slice(0,80);
   const visibleIds=new Set(visible.map((node)=>node.id));
-  const types=["memory","file","concept","directory","reference"].filter((candidate)=>visible.some((node)=>node.type===candidate));
+  const types=["worktree","memory","file","concept","directory","reference"].filter((candidate)=>visible.some((node)=>node.type===candidate));
   const positions=new Map();
   const center={x:520,y:280};
   types.forEach((candidate,ring)=>{const group=visible.filter((node)=>node.type===candidate);const radius=group.length===1&&types.length===1?0:70+ring*(205/Math.max(1,types.length-1));const offset=(ring%2)*Math.PI/Math.max(1,group.length);group.forEach((node,index)=>{const angle=-Math.PI/2+offset+(Math.PI*2*index/Math.max(1,group.length));const natural={x:Math.max(22,Math.min(1018,center.x+Math.cos(angle)*radius)),y:Math.max(22,Math.min(538,center.y+Math.sin(angle)*radius))};positions.set(node.id,qarinahPositionOverrides.get(node.id)??natural)})});

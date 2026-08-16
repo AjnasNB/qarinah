@@ -1,5 +1,21 @@
 # CLI reference
 
+## Git worktrees
+
+```bash
+npx qarinah worktrees
+```
+
+Lists up to 64 live Git worktrees for the current repository. Each entry includes the repository group ID, worktree ID, canonical root, branch, commit, linked/detached state, and whether that exact checkout has its own initialized Qarinah ledger. Remote URLs and credentials are never included.
+
+To open every initialized sibling worktree in one local dashboard:
+
+```bash
+npx qarinah dashboard --serve --worktrees
+```
+
+Each card still reads a separate project-owned ledger. Use repeated `--project <path>` when you want to add initialized workspaces from unrelated repositories explicitly.
+
 Qarinah ships one executable, `qarinah`, from the `qarinah` npm package. The CLI is a local interface to the same workspace, event, graph, retrieval, export, hook, and MCP implementations exposed by the JavaScript API.
 
 ## Requirements and invocation
@@ -736,10 +752,10 @@ The dashboard contains current and superseded decisions, explicit conflicts, sou
 Serve current local activity and optionally add explicitly selected initialized projects:
 
 ```sh
-npx qarinah dashboard --serve [--port 8777] [--project <path>]...
+npx qarinah dashboard --serve [--port 8777] [--worktrees] [--project <path>]...
 ```
 
-The current project is always included. `--project` can be repeated for up to 31 additional projects. Each project remains a separate workspace and is identified by its directory, workspace ID, and retained repository IDs. The server binds only to `127.0.0.1`; it never discovers projects by scanning the disk. `--output`, `--baseline-tokens`, and `--delivered-tokens` are snapshot-only and cannot be combined with `--serve`.
+The current project is always included. `--project` can be repeated for up to 31 additional projects. `--worktrees` asks Git for initialized sibling checkouts; it does not search unrelated directories. Each project remains a separate workspace and is identified by its directory, workspace ID, and retained repository IDs. The server binds only to `127.0.0.1`. `--output`, `--baseline-tokens`, and `--delivered-tokens` are snapshot-only and cannot be combined with `--serve`.
 
 ## Other team-memory commands
 

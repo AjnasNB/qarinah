@@ -2,6 +2,7 @@ import { createServer } from "node:http";
 import path from "node:path";
 import { buildMemoryDashboard, renderMemoryDashboard } from "./dashboard.js";
 import { queryLinkedProjectMemory } from "./linked-memory.js";
+import { listGitWorktrees } from "./git-worktrees.js";
 import { loadWorkspace, openSecureReadFile } from "./workspace.js";
 
 const MAX_PROJECTS = 32;
@@ -21,10 +22,14 @@ function projectHref(workspaceId) {
   return `/project/${encodeURIComponent(workspaceId)}/`;
 }
 
-async function resolveProjects(cwd, requested) {
+async function resolveProjects(cwd, requested, includeWorktrees) {
   if (!Array.isArray(requested)) throw new TypeError("workspaces must be an array.");
   if (requested.length + 1 > MAX_PROJECTS) throw new TypeError(`A live dashboard supports at most ${MAX_PROJECTS} projects.`);
-  const roots = [cwd, ...requested];
+  const discovered = includeWorktrees
+    ? (await listGitWorktrees(cwd)).filter((entry) => entry.initialized && !entry.current).map((entry) => entry.root)
+    : [];
+  const roots = [cwd, ...requested, ...discovered];
+  if (roots.length > MAX_PROJECTS) throw new TypeError(`A live dashboard supports at most ${MAX_PROJECTS} projects.`);
   const byWorkspaceId = new Map();
   for (const candidate of roots) {
     if (typeof candidate !== "string" || candidate.trim() === "") {
@@ -36,6 +41,11 @@ async function resolveProjects(cwd, requested) {
         name: path.basename(workspace.root),
         root: workspace.root,
         workspaceId: workspace.config.workspaceId,
+        repositoryId: workspace.worktree?.repositoryId ?? null,
+        worktreeId: workspace.worktree?.worktreeId ?? null,
+        branch: workspace.worktree?.branch ?? null,
+        commit: workspace.worktree?.commit ?? null,
+        linked: workspace.worktree?.linked ?? false,
         href: projectHref(workspace.config.workspaceId)
       }));
     }
@@ -62,8 +72,8 @@ function renderProjectIndex(projects) {
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Qarinah local projects</title><style>
 :root{color-scheme:dark;--bg:#090d12;--panel:#101720;--line:#27313c;--text:#edf5f2;--muted:#9aa7b2;--mint:#35e0aa}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 Inter,ui-sans-serif,system-ui,sans-serif}main{width:min(1040px,calc(100% - 28px));margin:auto;padding:56px 0 80px}.eyebrow{color:var(--mint);font:700 12px/1.2 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase}h1{font-size:clamp(36px,7vw,68px);line-height:1;margin:18px 0}p{color:var(--muted);max-width:740px}.projects{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:14px;margin-top:30px}.project{display:block;min-width:0;padding:20px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--text);text-decoration:none}.project:hover,.project:focus-visible{border-color:var(--mint);outline:none}.project h2{margin:0 0 8px;font-size:20px}.project dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 12px;margin:16px 0 0}.project dt{color:var(--muted)}.project dd{margin:0;overflow-wrap:anywhere}.project code{font-size:11px}.live{display:inline-flex;align-items:center;gap:8px;color:var(--mint);font-weight:700}.live::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 4px rgb(53 224 170 / 14%)}@media(max-width:480px){main{padding-top:34px}.project dl{grid-template-columns:1fr}.project dt{margin-top:6px}}
-</style></head><body><main><div class="eyebrow">Qarinah · local dashboard</div><h1>Your real project memory.</h1><p class="live">Live from authorized local ledgers</p><p>Each project remains a separate Qarinah workspace. This page rereads the project-owned ledger; it does not invent activity or search the rest of your disk.</p><div class="projects">
-${projects.map((project) => `<a class="project" href="${escapeHtml(project.href)}" data-project="${escapeHtml(project.workspaceId)}"><h2>${escapeHtml(project.name)}</h2><div>${escapeHtml(project.root)}</div><dl><dt>Workspace</dt><dd><code>${escapeHtml(project.workspaceId)}</code></dd><dt>Events</dt><dd data-events>Loading…</dd><dt>Last activity</dt><dd data-activity>Loading…</dd></dl></a>`).join("")}
+</style></head><body><main><div class="eyebrow">Qarinah · local dashboard</div><h1>Your worktrees remember.</h1><p class="live">Live from authorized local ledgers</p><p>One repository can contain several isolated worktree ledgers. Qarinah groups them without sharing writable storage, so parallel branches remain understandable and independently verifiable.</p><div class="projects">
+${projects.map((project) => `<a class="project" href="${escapeHtml(project.href)}" data-project="${escapeHtml(project.workspaceId)}"><h2>${escapeHtml(project.branch ?? project.name)}</h2><div>${escapeHtml(project.root)}</div><dl><dt>Repository</dt><dd><code>${escapeHtml(project.repositoryId ?? "not-git")}</code></dd><dt>Worktree</dt><dd><code>${escapeHtml(project.worktreeId ?? "not-git")}</code></dd><dt>Commit</dt><dd><code>${escapeHtml(project.commit?.slice(0, 12) ?? "unborn")}</code></dd><dt>Workspace</dt><dd><code>${escapeHtml(project.workspaceId)}</code></dd><dt>Events</dt><dd data-events>Loading…</dd><dt>Last activity</dt><dd data-activity>Loading…</dd></dl></a>`).join("")}
 </div></main><script>
 const refresh=async()=>{for(const card of document.querySelectorAll("[data-project]")){try{const id=card.dataset.project;const response=await fetch("/api/status/"+encodeURIComponent(id),{cache:"no-store"});if(!response.ok)continue;const status=await response.json();card.querySelector("[data-events]").textContent=String(status.eventCount);card.querySelector("[data-activity]").textContent=status.lastActivityAt??"No retained activity";}catch{}}};refresh();setInterval(refresh,2000);
 </script></body></html>`;
@@ -85,7 +95,10 @@ function send(response, statusCode, contentType, body, method = "GET") {
 
 export async function serveMemoryDashboard(options = {}) {
   const cwd = path.resolve(options.cwd ?? process.cwd());
-  const projects = await resolveProjects(cwd, options.workspaces ?? []);
+  if (options.includeWorktrees !== undefined && typeof options.includeWorktrees !== "boolean") {
+    throw new TypeError("includeWorktrees must be a boolean.");
+  }
+  const projects = await resolveProjects(cwd, options.workspaces ?? [], options.includeWorktrees === true);
   const projectById = new Map(projects.map((project) => [project.workspaceId, project]));
   const port = options.port ?? 8777;
   if (!Number.isSafeInteger(port) || port < 0 || port > 65_535) {
@@ -144,7 +157,7 @@ export async function serveMemoryDashboard(options = {}) {
           return;
         }
         const types = typeText === null ? undefined : typeText.split(",").filter(Boolean);
-        if (types?.some((type) => !["memory", "file", "directory", "concept", "reference"].includes(type))) {
+        if (types?.some((type) => !["memory", "file", "directory", "concept", "reference", "worktree"].includes(type))) {
           send(response, 400, "application/json; charset=utf-8", '{"error":"invalid_type"}\n', method);
           return;
         }

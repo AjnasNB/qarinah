@@ -116,7 +116,7 @@
       ],
       "properties": {
         "id": { "type": "string" },
-        "type": { "enum": ["memory", "file", "directory", "concept", "reference"] },
+        "type": { "enum": ["memory", "file", "directory", "concept", "reference", "worktree"] },
         "kind": { "type": "string" },
         "label": { "type": "string" },
         "path": { "type": ["string", "null"] },
