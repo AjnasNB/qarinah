@@ -77,7 +77,7 @@ Invalid JavaScript argument shapes generally throw `TypeError`. Storage, trust, 
 | `CONFIG_SCHEMA_VERSION` | `"qarinah.config.v1"` |
 | `INDEX_SCHEMA_VERSION` | `"qarinah.index.v2"` |
 | `GRAPH_SCHEMA_VERSION` | `"qarinah.graph.v2"` |
-| `PROJECT_STRUCTURE_SCHEMA_VERSION` | `"qarinah.project-structure.v1"` |
+| `PROJECT_STRUCTURE_SCHEMA_VERSION` | `"qarinah.project-structure.v2"` |
 | `AGENT_ARCHIVE_IMPORT_SCHEMA_VERSION` | `"qarinah.agent-archive-import.v1"` |
 | `AGENT_ARCHIVE_BACKUP_SCHEMA_VERSION` | `"qarinah.agent-archive-backup.v1"` |
 | `MEMORY_FOOTPRINT_SCHEMA_VERSION` | `"qarinah.memory-footprint.v1"` |

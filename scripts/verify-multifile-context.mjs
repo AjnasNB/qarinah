@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
-const evidencePackageVersion = "0.1.6";
+const evidencePackageVersion = packageJson.version;
 const result = JSON.parse(await readFile(
   path.join(root, "bench", "results", `multifile-context-${evidencePackageVersion}.json`),
   "utf8"
