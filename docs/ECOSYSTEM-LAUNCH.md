@@ -1,4 +1,4 @@
-# Governed agent stack: public release and launch plan
+# Developer agent stack: public release and launch plan
 
 Last verified: 2026-07-22.
 
@@ -11,11 +11,11 @@ This is the coordinated public plan for Qarinah, Maqam, Cockroach Crawler, and P
 Do not run four same-week launches. Launch one working end-to-end system, then use focused follow-ups to explain the component that solved each part.
 
 - **Qarinah remembers:** permitted events, decisions, sources, conflicts, and project structure become small cited context packs.
-- **Maqam governs:** registered tool calls pass policy and exact input-bound, one-use approval before dispatch.
+- **Maqam is optional:** connect policy and human approval only when a workflow needs them.
 - **Cockroach Crawler gathers:** bounded public-source records enter through explicit provider and network policies.
 - **ProductLoop orchestrates:** workflows connect the packages without silently merging their contracts or ledgers.
 
-Qarinah is the new launch wedge. Maqam is the trust boundary. The crawler and ProductLoop make the proof concrete. The long-term product may become a cross-platform agent control plane, but the current public claim is a governed developer stack, not an agentic operating system.
+Qarinah is the launch wedge: one worktree-aware project memory and cited context graph across coding agents. Cockroach Crawler and Cockroach Browser are independent web tools that can supply cited source and session outcomes. Maqam remains a separate optional approval connection. The public claim is a composable developer stack, not one required bundle or an agentic operating system.
 
 ## Verified release state
 
@@ -72,7 +72,7 @@ Build one 60-90 second terminal-led demo against public release artifacts:
 5. ProductLoop completes the workflow and links its receipt to the recorded evidence.
 6. A fresh Codex or Claude Code task asks for the decision and receives a small pack with event IDs and hashes instead of the entire project history.
 
-The demo must use deterministic fixtures or safe temporary files. Show real terminal output. State that direct operating-system calls outside registered adapters are not governed.
+The demo must use deterministic fixtures or safe temporary files. Show real terminal output, separate worktree ledgers, the shared repository identity, and the exact snapshot, event, and graph hashes.
 
 Acceptance evidence:
 
@@ -106,7 +106,7 @@ For every package, the release record must bind name, version, registry, dist-ta
 
 ### Phase 2 - developer launch
 
-Ship the public repository/npm proof first. Then publish one Show HN submission for the runnable governed-stack demo, with Qarinah as the new capability and Maqam as the control boundary.
+Ship the public repository/npm proof first. Then publish one Show HN submission for the runnable worktree-context demo, with Qarinah as the new capability and the crawler, browser, and Maqam listed only as optional integrations.
 
 [Hacker News currently asks](https://news.ycombinator.com/newsguidelines.html) authors not to post generated or AI-edited text. The maintainer must write the final title, submission, and comments personally. Use these only as facts to express in your own words:
 
@@ -124,7 +124,7 @@ During the next seven days, publish different useful artifacts rather than the s
 
 | Audience | Useful artifact | Request |
 | --- | --- | --- |
-| Node.js and TypeScript developers | Five-minute governed-tool example | Reproduce install and type failures |
+| Node.js and TypeScript developers | Five-minute worktree-memory example | Reproduce install and type failures |
 | AI-agent builders | Qarinah context-pack fixture and host adapters | Test one real project and report missing evidence |
 | Application security | Exact approval mutation/replay suite and threat boundaries | Review a specific control or bypass |
 | Open-source maintainers | Deterministic Markdown/OKF record and rebuild proof | Review portability and contribution workflow |
@@ -140,7 +140,7 @@ Suggested draft fields, which the maintainer should verify before posting:
 
 - **Name:** Qarinah
 - **Tagline:** Less context. More proof.
-- **Description:** Local-first agent memory that turns permitted project activity into small, cited context packs. Works with Codex and Claude Code, keeps an inspectable event chain, and composes with Maqam governance, bounded research, and ProductLoop workflows.
+- **Description:** Worktree-aware project memory that turns permitted project activity into small, cited context packs. Works with Codex and Claude Code, keeps an inspectable event chain, and composes with optional approval, research, and publishing tools when a team needs them.
 - **Topics:** Developer Tools, Artificial Intelligence, Open Source
 - **Pricing:** Free
 - **Primary URL:** the live product/docs page, not an article
@@ -151,9 +151,9 @@ Prepare a 240x240 mark, at least three 1270x760 gallery images, a public YouTube
 
 Apply with one company story, not four package descriptions. The concise pitch is:
 
-> We are building the governance and memory control plane for AI agents. It gives teams exact action approvals, source-linked evidence, and compact verified context across agent hosts and workflow runtimes.
+> We are building portable project memory for coding agents. It gives parallel Git worktrees isolated ledgers, one repository context graph, cited retrieval, and compact verified handoffs across agent hosts.
 
-Describe the current wedge as developer infrastructure for governing consequential agent tools and retaining trustworthy project context. Describe the longer path as cross-platform mediation only as a roadmap, with explicit acknowledgement that full operating-system control requires separately reviewed process, filesystem, network, identity, secret, and device boundaries.
+Describe the current wedge as developer infrastructure for retaining and retrieving trustworthy project context across agents, sessions, repositories, and Git worktrees. Describe Maqam policy and approval as a separate optional product connection rather than Qarinah's default category.
 
 Before submitting, collect:
 
@@ -202,7 +202,7 @@ Record a baseline immediately before launch, then snapshots at 24 hours, 7 days,
 | --- | --- | --- |
 | Reach | Qualified repository visits and demo views | Identify which channel reaches builders |
 | Evaluation | Clean installs and demo starts | 20 independent starts |
-| Activation | Successful first cited pack plus governed action | 10 independent completions |
+| Activation | Successful first cited pack plus grouped worktree dashboard | 10 independent completions |
 | Retention | A second task or project within 14 days | 5 returning users |
 | Depth | A real adapter, case study, or production-shaped workflow | 3 concrete workflows |
 | Community | External issues, reproductions, and merged contributions | 3 substantive contributors |

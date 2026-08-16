@@ -41,9 +41,9 @@ The complete channel copy, media assignments, and claims gate are in [`docs/laun
 ## Community launch
 
 - Prepare a concise Show HN post, technical article, architecture diagram, reproducible benchmark, security model, and contributor issues.
-- Coordinate the four packages through the [ecosystem launch plan](ECOSYSTEM-LAUNCH.md); do not announce them as four unrelated products.
+- Launch Qarinah as a complete independent worktree-context product. Link the crawler, browser, and Maqam only where their optional interoperability is relevant.
 - Offer copy-paste install, verification, and uninstall instructions.
-- Keep browser automation as a separately governed experimental capability until denial, approval, and DOM-race suites pass.
+- Keep browser automation, web crawling, and approval controls in their own product boundaries; do not make them prerequisites for Qarinah.
 - Respond to technical feedback with fixtures and evidence instead of unsupported claims.
 
 ## Positioning
@@ -56,7 +56,7 @@ Use:
 - "Qarinah - less context. More proof."
 - "Small cited context packs instead of entire transcripts."
 - "Local-first and no Qarinah API key."
-- "Maqam governs. Cockroach gathers. Qarinah remembers. ProductLoop orchestrates."
+- "Qarinah remembers the project and the worktree. Optional tools can browse, crawl, approve, or orchestrate around it."
 - "98.71% fewer estimated context tokens than full-history replay," with the identical-source, top-five/direct-coverage, and `ceil(characters / 4)` details available in the linked methodology.
 - "The evaluated full-history baseline contained 77.81 times as many estimated input-context tokens as the Qarinah path," or "77.81:1 baseline-to-pack ratio."
 - "At a flat $3 per million uncached input tokens, the aggregate compared context slice estimates $1.326339 versus $0.017046 - $1.309293 saved per repeat," only as a transparent translation of the committed estimate.

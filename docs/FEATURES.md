@@ -2,6 +2,14 @@
 
 Qarinah is evidence-linked project memory for coding agents. It keeps an inspectable record beside a software project and compiles bounded, cited context packs for Codex, Claude Code, Cursor, CLI workflows, and compatible MCP clients.
 
+## Git worktrees as first-class context
+
+- Every initialized worktree owns a separate `.qarinah` ledger, consent record, SQLite view, graph, and generated Markdown.
+- `qarinah worktrees` identifies linked checkouts without collecting remote URLs or credentials.
+- Project-structure v2 binds the repository group, worktree, branch, and commit into the snapshot hash.
+- `qarinah dashboard --serve --worktrees` groups initialized sibling checkouts in one responsive local view while keeping their writable stores isolated.
+- Worktree nodes participate in the same temporal, disclosure-aware graph and ranked search as files, decisions, concepts, and cited references.
+
 ## Project-owned memory
 
 - A canonical, append-only JSONL event record stored with the project.

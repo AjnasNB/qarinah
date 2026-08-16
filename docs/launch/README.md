@@ -23,7 +23,7 @@ Equivalent fixture-bound proof: 436,431 fewer estimated input-context tokens and
 - developers repeatedly re-explaining a codebase to Codex or Claude Code;
 - teams that need decisions, approvals, sources, and tool outcomes to remain verifiable;
 - maintainers who want a Git-diffable Markdown/OKF view instead of an opaque memory database; and
-- governance-sensitive workflows that need explicit capture and disclosure boundaries.
+- teams that optionally need stricter capture, disclosure, policy, or human-approval boundaries.
 
 ## First proof after release
 
