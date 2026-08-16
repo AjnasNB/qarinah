@@ -1,7 +1,7 @@
 {
   "name": "qarinah",
   "version": "0.2.0",
-  "description": "Worktree-aware project memory and cited context graphs for coding agents, with reproducible context-reduction evidence.",
+  "description": "Worktree-aware project memory and cited context graphs for coding agents, with 98.71% less estimated repeated context in the published benchmark.",
   "license": "Apache-2.0",
   "author": "Ajnas NB",
   "mcpName": "io.github.AjnasNB/qarinah",
