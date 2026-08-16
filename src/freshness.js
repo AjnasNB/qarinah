@@ -3,14 +3,14 @@ import { lstat, readFile, realpath } from "node:fs/promises";
 import path from "node:path";
 import { deepFreezeJson } from "./canonical.js";
 import { QarinahError } from "./errors.js";
-import { PROJECT_STRUCTURE_SCHEMA_VERSION } from "./project-structure.js";
+import { validateProjectStructureSnapshot } from "./project-structure.js";
 import { readEvents } from "./store.js";
 import { loadWorkspace, resolveWithin } from "./workspace.js";
 
 function latestSnapshot(events) {
   for (let index = events.length - 1; index >= 0; index -= 1) {
     const snapshot = events[index].data?.projectStructure;
-    if (snapshot?.schemaVersion === PROJECT_STRUCTURE_SCHEMA_VERSION && Array.isArray(snapshot.files)) {
+    if (validateProjectStructureSnapshot(snapshot)) {
       return { eventId: events[index].eventId, snapshot };
     }
   }

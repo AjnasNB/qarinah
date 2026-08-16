@@ -28,7 +28,7 @@
     "asOf": { "type": "string", "format": "date-time" },
     "requestedTypes": {
       "type": "array",
-      "items": { "enum": ["memory", "file", "directory", "concept", "reference"] },
+      "items": { "enum": ["memory", "file", "directory", "concept", "reference", "worktree"] },
       "uniqueItems": true
     },
     "authorityScopes": { "type": "array", "maxItems": 64, "items": { "type": "string" }, "uniqueItems": true },

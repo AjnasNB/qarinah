@@ -17,14 +17,16 @@ const historicalPaperPdfs = new Map([
   ["Qarinah-Technical-White-Paper-v1.2.pdf", "/paper/Qarinah-Technical-White-Paper-v1.2.pdf"],
   ["Qarinah-Technical-White-Paper-v1.3.pdf", "/paper/Qarinah-Technical-White-Paper-v1.3.pdf"]
 ]);
-const releaseDate = "2026-08-08";
+const releaseDate = "2026-08-16";
+const paperPublishedDate = "2026-08-08";
 const publicMetricsUpdatedDate = "2026-08-10";
 const toolkitArticleDate = "2026-08-16";
+const worktreeArticleDate = "2026-08-16";
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 const benchmarkRelease = JSON.parse(await readFile(path.join(root, "bench", "results", "benchmark-release-0.1.6.json"), "utf8"));
 const productVersion = packageJson.version;
-const productPositioning = "Evidence-linked project memory for coding agents.";
-const productExplanation = "Qarinah keeps requests, decisions, visible outcomes, tool results, summaries, and a codebase relationship map beside your code, then gives Codex, Claude Code, Cursor, and compatible tools a compact cited handoff instead of making them start from zero.";
+const productPositioning = "Worktree-aware project memory and cited context graphs for coding agents.";
+const productExplanation = "Qarinah gives every Git checkout an isolated evidence-linked ledger, groups sibling worktrees into one repository context graph, and gives Codex, Claude Code, Cursor, and compatible tools a compact cited handoff for the branch and task in front of them.";
 const repeatedContextMetric = benchmarkRelease.headlineContextResults.find((result) => result.id === "six-task-repeated-context");
 if (!repeatedContextMetric
   || repeatedContextMetric.baselineEstimatedTokens !== 442113
@@ -90,6 +92,7 @@ const publicMetrics = {
   methodology: `${siteOrigin}/docs/benchmarks/`
 };
 const qarinahFeatures = [
+  "First-class Git worktree context with isolated ledgers",
   "Verified handoffs between coding agents",
   "Local append-only project memory",
   "Evidence-linked cited context packs",
@@ -109,6 +112,10 @@ const answerEngineQuestions = [
   {
     name: "What is Qarinah?",
     text: `${productPositioning} ${productExplanation}`
+  },
+  {
+    name: "Does Qarinah understand Git worktrees?",
+    text: "Yes. Every initialized checkout keeps its own ledger and consent record. Qarinah derives a shared repository identity, binds branch and commit context into the project snapshot hash, adds the worktree to the context graph, and can open all initialized siblings in one local dashboard."
   },
   {
     name: "How do I switch coding agents without starting over?",
@@ -504,6 +511,14 @@ const docPages = [
     aliases: ["memory dashboard", "project dashboard", "decision dashboard", "context savings", "agent activity", "affected files"]
   },
   {
+    route: "docs/worktree-context",
+    source: "docs/WORKTREE-CONTEXT.md",
+    title: "Git worktree context",
+    description: "Keep isolated project memory per Git checkout and inspect sibling worktrees in one branch-and-commit-aware context graph.",
+    section: "Operate",
+    aliases: ["git worktree memory", "parallel agents", "branch context", "worktree graph", "isolated ledgers"]
+  },
+  {
     route: "docs/memory-footprint",
     source: "docs/MEMORY-FOOTPRINT.md",
     title: "Measure retained and delivered project memory",
@@ -629,11 +644,24 @@ const routesBySource = new Map(docPages.map((page) => [page.source.replaceAll("\
 const searchEntries = [
   {
     route: "/",
-    title: "Qarinah - Local Project Memory and Context Compiler for Coding Agents",
+    title: "Qarinah - Git Worktree Memory and Context Graphs for Coding Agents",
     description: productPositioning,
     headings: [],
-    keywords: ["coding agent memory", "project memory", "context compiler", "token-efficient context"],
-    content: "Qarinah keeps a local evidence-linked project record and compiles the small cited context pack needed for the current coding task."
+    keywords: ["git worktree memory", "coding agent memory", "project memory", "context graph", "token-efficient context"],
+    content: "Qarinah keeps an isolated evidence-linked project record per Git checkout, groups sibling worktrees, and compiles the small cited context pack needed for the current coding task."
+  },
+  {
+    route: "/articles/git-worktree-context-for-coding-agents/",
+    title: "Why every coding-agent worktree needs its own memory",
+    description: "See how Qarinah keeps parallel Git worktrees isolated while joining their branch, commit, files, decisions, and hashes in one local context graph.",
+    headings: [
+      { id: "why-worktrees", text: "A worktree is a context boundary" },
+      { id: "how-it-works", text: "Separate ledgers, one repository graph" },
+      { id: "proof", text: "What the graph and hashes prove" },
+      { id: "start", text: "Set up the worktrees you want to remember" }
+    ],
+    keywords: ["Git worktree memory", "coding agents in parallel", "branch context graph", "Codex worktrees", "Claude Code worktrees"],
+    content: "Parallel coding agents can work in different Git worktrees without sharing one writable memory store. Qarinah records each checkout independently, derives a shared repository group, and exposes branch-aware cited retrieval and a local visual graph."
   },
   {
     route: "/alternatives/",
@@ -698,6 +726,7 @@ await cp(path.join(root, "assets", "architecture", "qarinah-flow.svg"), path.joi
 await cp(path.join(root, "assets", "launch", "qarinah-social-preview.png"), path.join(output, "assets", "qarinah-social-preview.png"));
 await cp(path.join(root, "assets", "launch", "qarinah-what-you-save.png"), path.join(output, "assets", "qarinah-what-you-save.png"));
 await cp(path.join(root, "assets", "launch", "qarinah-project-memory-dashboard.png"), path.join(output, "assets", "qarinah-project-memory-dashboard.png"));
+await cp(path.join(root, "assets", "launch", "qarinah-worktree-context-graph.png"), path.join(output, "assets", "qarinah-worktree-context-graph.png"));
 for (const filename of [
   "Qarinah-Technical-White-Paper-v1.2.pdf",
   "Qarinah-Technical-White-Paper-v1.3.pdf",
@@ -829,6 +858,7 @@ function footer() {
           <strong>Build</strong>
           <a href="/docs/features/">Features</a>
           <a href="/docs/getting-started/">Install and get started</a>
+          <a href="/docs/worktree-context/">Git worktree context</a>
           <a href="/docs/cli/">CLI reference</a>
           <a href="/docs/api/">JavaScript API</a>
           <a href="/docs/integrations/">Integrations</a>
@@ -836,6 +866,7 @@ function footer() {
         <div>
           <strong>Verify</strong>
           <a href="/docs/faq/">Direct answers</a>
+          <a href="/articles/git-worktree-context-for-coding-agents/">Worktree context article</a>
           <a href="/articles/open-source-agent-memory-stack/">Agent memory stack</a>
           <a href="/alternatives/">Compare approaches</a>
           <a href="/docs/benchmarks/">Benchmarks</a>
@@ -962,12 +993,12 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
       description,
       url,
       inLanguage: "en",
-      dateCreated: releaseDate,
-      dateModified: releaseDate,
+      dateCreated: paperPublishedDate,
+      dateModified: paperPublishedDate,
       version: paperVersion,
       identifier: doi,
       creativeWorkStatus: "Published",
-      datePublished: releaseDate,
+      datePublished: paperPublishedDate,
       license: "https://www.apache.org/licenses/LICENSE-2.0",
       author: { "@id": person["@id"] },
       contributor: {
@@ -981,6 +1012,26 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
       },
       sameAs: [doi],
       isPartOf: { "@id": `${siteOrigin}/#website` }
+    });
+  } else if (kind === "worktree-article") {
+    graph.push({
+      "@type": "Article",
+      "@id": `${url}#article`,
+      headline: title,
+      description,
+      url,
+      mainEntityOfPage: url,
+      inLanguage: "en",
+      datePublished: worktreeArticleDate,
+      dateModified: worktreeArticleDate,
+      author: { "@id": person["@id"] },
+      isPartOf: { "@id": `${siteOrigin}/#website` },
+      about: [
+        { "@type": "Thing", name: "Git worktrees" },
+        { "@type": "Thing", name: "Coding-agent project memory" },
+        { "@type": "Thing", name: "Evidence-linked context graphs" }
+      ],
+      image: `${siteOrigin}/assets/qarinah-worktree-context-graph.png`
     });
   } else if (kind === "alternatives") {
     graph.push(
@@ -1261,8 +1312,8 @@ function commandBlock(command, label = "Terminal") {
 
 function homePage() {
   return layout({
-    title: "Qarinah - 98.71% Less Repeated Coding-Agent Context",
-    description: "Qarinah compiled 442,113 estimated repeated-project-context tokens into 5,682 cited tokens in six committed software-task fixtures - 98.71% less, with public evidence and explicit limits.",
+    title: "Qarinah - One Memory System for Every Git Worktree",
+    description: "Qarinah keeps isolated project memory per Git checkout, groups sibling worktrees in one context graph, and compiles cited context for coding agents.",
     active: "home",
     canonical: "/",
     kind: "home",
@@ -1270,15 +1321,24 @@ function homePage() {
       <section class="hero">
         <div class="shell hero-grid">
           <div class="hero-copy">
-            <p class="eyebrow">Measured project memory for coding agents</p>
-            <h1>Send 98.71% less repeated project context. Keep the proof.</h1>
-            <p class="hero-lede">In six committed software-task fixtures, the full-history baseline contained 77.81&times; as many estimated input tokens as Qarinah's cited packs: 442,113 versus 5,682, with every required target directly covered in the top five.</p>
+            <p class="eyebrow">Project memory for parallel coding-agent work</p>
+            <h1>One memory system for every Git worktree.</h1>
+            <p class="hero-lede">Give each checkout its own evidence-linked ledger. Qarinah groups sibling worktrees into one branch-and-commit-aware context graph, then gives each coding agent the cited files, decisions, outcomes, and history relevant to its task.</p>
             <div class="hero-actions">
-              <a class="btn btn-primary btn-large" href="/docs/getting-started/">Set up one project</a>
-              <a class="hero-text-link" href="/docs/benchmarks/">Verify the 98.71% result</a>
+              <a class="btn btn-primary btn-large" href="/docs/getting-started/">Set up this worktree</a>
+              <a class="hero-text-link" href="/articles/git-worktree-context-for-coding-agents/">See how the graph works</a>
             </div>
-            <a class="hero-evidence-link" href="/metrics.json">Open the machine-readable metrics and claim boundaries</a>
+            <a class="hero-evidence-link" href="/docs/benchmarks/">Also verified: 98.71% less estimated repeated context in the published six-fixture benchmark</a>
           </div>
+          <aside class="worktree-hero-map" aria-label="How Qarinah groups isolated Git worktree memory">
+            <div class="worktree-map-header"><span>LOCAL CONTEXT GRAPH</span><strong>one repository · two isolated ledgers</strong></div>
+            <div class="worktree-repository"><small>repository group</small><strong>Qarinah project</strong><code>repo_27c94f…</code></div>
+            <div class="worktree-branches">
+              <article><span>main</span><strong>release context</strong><code>639ee4787a</code><small>own ledger · own consent</small></article>
+              <article><span>feature/worktree-context</span><strong>graph implementation</strong><code>3d1619c910</code><small>own ledger · own consent</small></article>
+            </div>
+            <div class="worktree-map-footer"><span>branch + commit in snapshot hash</span><span>files + decisions in cited graph</span></div>
+          </aside>
         </div>
       </section>
 
@@ -1319,10 +1379,10 @@ function homePage() {
       <section class="handoff-stage" aria-labelledby="handoff-stage-title">
         <div class="shell handoff-stage-grid">
           <div class="handoff-stage-copy">
-            <p class="eyebrow">One project record</p>
-            <h2 id="handoff-stage-title">Set it up once. Continue from any supported agent.</h2>
-            <p>Qarinah keeps the durable record beside the repository. Every supported host queries the same cited decisions, outcomes, conflicts, and superseded context.</p>
-            ${commandBlock("npx qarinah setup . --codex --claude --cursor --capture content --allow-query", "One-time project setup")}
+            <p class="eyebrow">One repository, precise checkout context</p>
+            <h2 id="handoff-stage-title">Initialize the worktrees that should remember.</h2>
+            <p>Run setup inside each active checkout. Every supported host in that checkout queries its cited decisions and outcomes; the grouped dashboard shows initialized siblings without sharing their writable stores.</p>
+            ${commandBlock("npx qarinah setup . --codex --claude --cursor --capture content --allow-query\nnpx qarinah worktrees\nnpx qarinah dashboard --serve --worktrees", "Set up and inspect worktree memory")}
             <div class="host-shortcuts" aria-label="Qarinah host commands">
               <span><strong>Codex</strong><code>$qarinah</code></span>
               <span><strong>Claude Code</strong><code>/qarinah &lt;task&gt;</code></span>
@@ -1344,18 +1404,18 @@ function homePage() {
       <section class="dashboard-proof section shell" aria-labelledby="dashboard-proof-title">
         <div class="section-heading split-heading">
           <div>
-            <p class="eyebrow">Inspect the memory before an agent uses it</p>
-            <h2 id="dashboard-proof-title">See the decisions, reasons, flow, evidence, and affected files.</h2>
+            <p class="eyebrow">A real worktree context graph</p>
+            <h2 id="dashboard-proof-title">See the branch, files, decisions, relationships, and hashes together.</h2>
           </div>
-          <p>This real generated snapshot comes from an initialized Qarinah workspace. The live loopback mode rereads actual retained activity, identifies each explicitly selected project, and keeps every workspace ledger separate.</p>
+          <p>This generated screenshot comes from two initialized Git worktrees in one real demo repository. Each checkout owns a separate ledger; the local dashboard groups their repository identity and lets a developer inspect each branch-specific graph.</p>
         </div>
         <figure class="what-you-save-figure dashboard-proof-figure">
-          <img src="/assets/qarinah-project-memory-dashboard.png" width="1440" height="900" loading="lazy" decoding="async" alt="Qarinah local project-memory dashboard showing one current decision, three superseded decisions, zero conflicts, cited sources, affected files, and a caller-supplied 98.71 percent context comparison.">
-          <figcaption>Generated from the local hash-chained ledger and codebase scan. No fictional dashboard data, disk-wide project discovery, or hosted account is required.</figcaption>
+          <img src="/assets/qarinah-worktree-context-graph.png" width="1265" height="712" loading="lazy" decoding="async" alt="Qarinah local worktree context graph showing the feature worktree node, files, memories, concepts, evidence relationships, ranked results, and the selected node's evidence hash.">
+          <figcaption>Generated from real local CLI setup, retained decisions, a project-structure v2 scan, and the hash-chained ledger. No fictional graph data or hosted account is involved.</figcaption>
         </figure>
         <div class="hero-actions dashboard-proof-actions">
-          <a class="btn btn-primary" href="/docs/dashboard/">Open the dashboard guide</a>
-          <a class="hero-text-link" href="/docs/interoperability/">Export a reviewed OKF bundle</a>
+          <a class="btn btn-primary" href="/docs/worktree-context/">Open the worktree guide</a>
+          <a class="hero-text-link" href="/docs/dashboard/">Run the local dashboard</a>
         </div>
       </section>
 
@@ -1445,8 +1505,8 @@ function homePage() {
         <div class="use-mode-grid">
           <article class="use-mode-card">
             <span>Personal</span>
-            <h3>One developer, many coding agents</h3>
-            <p>Initialize one repository and let Codex, Claude Code, Cursor, CLI tools, and compatible MCP clients query the same cited project memory.</p>
+            <h3>One developer, many agents and worktrees</h3>
+            <p>Give each checkout an isolated memory, then let Codex, Claude Code, Cursor, CLI tools, and compatible MCP clients retrieve the right cited branch context.</p>
             <a href="/docs/getting-started/">Set up one project</a>
           </article>
           <article class="use-mode-card">
@@ -1549,7 +1609,7 @@ function homePage() {
             <article class="feature-card">
               <span class="feature-index">01</span>
               <h3>What is Qarinah?</h3>
-              <p>The evidence-linked cross-agent context engine for software projects.</p>
+              <p>Worktree-aware project memory and cited context graphs for coding agents.</p>
             </article>
             <article class="feature-card">
               <span class="feature-index">02</span>
@@ -1569,8 +1629,8 @@ function homePage() {
       <section class="section final-cta">
         <div class="shell final-cta-inner">
           <div>
-            <p class="eyebrow">One universal context layer</p>
-            <h2>Switch agents. Keep the decisions, outcomes, and proof.</h2>
+            <p class="eyebrow">One worktree-aware context layer</p>
+            <h2>Switch agents or branches. Keep the decisions, outcomes, and proof.</h2>
           </div>
           <div>
             <a class="btn btn-primary btn-large" href="/docs/getting-started/">Start in five minutes</a>
@@ -1938,6 +1998,84 @@ function agentStackPage() {
   });
 }
 
+function worktreeContextArticlePage() {
+  return layout({
+    title: "Why every coding-agent worktree needs its own memory",
+    description: "See how Qarinah keeps parallel Git worktrees isolated while joining their branch, commit, files, decisions, and hashes in one local context graph.",
+    canonical: "/articles/git-worktree-context-for-coding-agents/",
+    kind: "worktree-article",
+    body: `
+      <article>
+        <header class="toolkit-hero">
+          <div class="shell toolkit-hero-grid">
+            <div>
+              <p class="eyebrow">Git worktrees + coding agents</p>
+              <h1>Parallel code needs precise memory.</h1>
+              <p class="toolkit-lede">Two worktrees can belong to the same repository while containing different source, decisions, tests, and unfinished work. Qarinah keeps their writable memory separate and joins their identities in one local context graph.</p>
+              <p class="toolkit-byline">Written by <strong>Ajnas N B</strong> - published <time datetime="2026-08-16">16 August 2026</time></p>
+              <div class="comparison-actions">
+                <a class="btn btn-primary btn-large" href="/docs/getting-started/">Set up a worktree</a>
+                <a class="hero-text-link" href="/docs/worktree-context/">Read the technical guide</a>
+              </div>
+            </div>
+            <aside class="toolkit-disclosure" aria-label="Worktree storage model">
+              <p>Storage model</p>
+              <strong>One repository group. One ledger per checkout.</strong>
+              <p>No symlinked ledgers. No shared writable database. No remote URL or credential collection.</p>
+              <p>Branch and commit context are covered by the project snapshot hash.</p>
+            </aside>
+          </div>
+        </header>
+
+        <section class="section shell" id="why-worktrees" aria-labelledby="why-worktrees-title">
+          <div class="section-heading split-heading">
+            <div><p class="eyebrow">The problem</p><h2 id="why-worktrees-title">A worktree is a context boundary.</h2></div>
+            <p>When two agents work in parallel, a decision that is current on one branch may be wrong on another. A single mutable memory store can flatten those differences or race with both writers.</p>
+          </div>
+          <div class="feature-grid">
+            <article class="feature-card feature-card-wide"><span class="feature-index">01</span><h3>Keep writes isolated</h3><p>Every initialized checkout owns its event chain, consent, SQLite view, graph, Markdown, JSON, dashboard, and export projections.</p></article>
+            <article class="feature-card"><span class="feature-index">02</span><h3>Keep the repository connection</h3><p>A non-secret repository ID groups linked worktrees without exposing a remote URL or sharing writable storage.</p></article>
+            <article class="feature-card"><span class="feature-index">03</span><h3>Bind context to source</h3><p>The branch, commit, and worktree identity are part of project-structure v2 and its deterministic snapshot hash.</p></article>
+          </div>
+        </section>
+
+        <section class="section section-alt" id="how-it-works" aria-labelledby="how-it-works-title">
+          <div class="shell workflow-grid">
+            <div>
+              <p class="eyebrow">The workflow</p>
+              <h2 id="how-it-works-title">Separate ledgers, one repository graph.</h2>
+              <ol class="steps">
+                <li><span>1</span><div><strong>Initialize the active checkout</strong><p>Setup binds Qarinah to the exact requested root; it never silently attaches a sibling or parent.</p></div></li>
+                <li><span>2</span><div><strong>Record visible work</strong><p>Retain permitted decisions, outcomes, summaries, tool results, and source relationships in that checkout.</p></div></li>
+                <li><span>3</span><div><strong>Scan the current branch</strong><p>Project-structure v2 maps bounded files and relationships and includes the current Git worktree metadata in its hash.</p></div></li>
+                <li><span>4</span><div><strong>Open initialized siblings</strong><p>The loopback dashboard asks Git for live worktrees and groups only the checkouts with exact-root Qarinah configuration.</p></div></li>
+              </ol>
+            </div>
+            <div>${commandBlock("npx qarinah setup . --capture content --allow-query\nnpx qarinah scan\nnpx qarinah build\nnpx qarinah worktrees\nnpx qarinah dashboard --serve --worktrees", "Worktree-aware project memory")}</div>
+          </div>
+        </section>
+
+        <section class="dashboard-proof section shell" id="proof" aria-labelledby="worktree-proof-title">
+          <div class="section-heading split-heading">
+            <div><p class="eyebrow">Generated proof</p><h2 id="worktree-proof-title">The worktree is a node, not a label pasted onto a screenshot.</h2></div>
+            <p>This image was captured from a real two-worktree demo using the release code. The selected node exposes its kind, current status, importance, connections, ranking basis, and event evidence hash.</p>
+          </div>
+          <figure class="what-you-save-figure dashboard-proof-figure">
+            <img src="/assets/qarinah-worktree-context-graph.png" width="1265" height="712" loading="lazy" decoding="async" alt="Qarinah worktree context graph with the feature worktree selected and its evidence-linked files, memories, concepts, and ranked results visible.">
+            <figcaption>Real local data from branch <code>feature/worktree-context</code>. The demo repository and ledgers were created only for this public capture.</figcaption>
+          </figure>
+        </section>
+
+        <section class="section section-alt" id="start" aria-labelledby="worktree-start-title">
+          <div class="shell final-cta-inner">
+            <div><p class="eyebrow">Start locally</p><h2 id="worktree-start-title">Give each active checkout the context it actually owns.</h2></div>
+            <div><a class="btn btn-primary btn-large" href="/docs/getting-started/">Open the setup guide</a><a class="text-link" href="/docs/worktree-context/">Inspect identities and hashes</a><a class="text-link" href="/docs/benchmarks/">Verify the separate context benchmark</a></div>
+          </div>
+        </section>
+      </article>`
+  });
+}
+
 function docsIndex() {
   const cards = docPages.filter((page) => page.route !== "paper").map((page, index) => `
     <a class="doc-card" href="/${page.route}/">
@@ -2138,6 +2276,9 @@ await writeFile(path.join(alternativesDestination, "index.html"), alternativesPa
 const toolkitDestination = path.join(output, "articles", "open-source-agent-memory-stack");
 await mkdir(toolkitDestination, { recursive: true });
 await writeFile(path.join(toolkitDestination, "index.html"), agentStackPage());
+const worktreeArticleDestination = path.join(output, "articles", "git-worktree-context-for-coding-agents");
+await mkdir(worktreeArticleDestination, { recursive: true });
+await writeFile(path.join(worktreeArticleDestination, "index.html"), worktreeContextArticlePage());
 await mkdir(path.join(output, "docs"), { recursive: true });
 await writeFile(path.join(output, "docs", "index.html"), docsIndex());
 
@@ -2156,6 +2297,7 @@ await writeFile(path.join(output, "metrics.json"), `${JSON.stringify(publicMetri
 const sitemapRoutes = [
   "/",
   "/alternatives/",
+  "/articles/git-worktree-context-for-coding-agents/",
   "/articles/open-source-agent-memory-stack/",
   "/docs/",
   "/search/",

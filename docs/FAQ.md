@@ -148,7 +148,7 @@ Installing models or using external AI providers remains outside Qarinah's respo
 
 ## Which Node.js versions are supported?
 
-Qarinah 0.1.9 supports maintained Node.js 22, 24, and 26 releases:
+Qarinah 0.2.0 supports maintained Node.js 22, 24, and 26 releases:
 
 ```sh
 node --version
@@ -294,7 +294,7 @@ npm run evaluate:context
 npm run benchmark
 ```
 
-See [BENCHMARKS.md](BENCHMARKS.md), [software-task results](../bench/results/software-task-context-0.1.1.json), [long-document results](../bench/results/long-document-context-0.1.1.json), and the [40/50/100-file project-context result](../bench/results/multifile-context-0.1.6.json).
+See [BENCHMARKS.md](BENCHMARKS.md), [software-task results](../bench/results/software-task-context-0.1.1.json), [long-document results](../bench/results/long-document-context-0.1.1.json), and the [current 40/50/100-file project-context result](../bench/results/multifile-context-0.2.0.json). The historical [0.1.6 result](../bench/results/multifile-context-0.1.6.json) remains available unchanged.
 
 ## Where should I start?
 

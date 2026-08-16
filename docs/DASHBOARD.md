@@ -1,5 +1,7 @@
 # Local memory dashboard
 
+Inside a Git repository, `npx qarinah dashboard --serve --worktrees` discovers every initialized sibling checkout automatically. The project index shows their shared repository identity and each branch, commit, workspace, event count, and last retained activity. Every worktree still owns a separate ledger and consent record.
+
 Qarinah's dashboard is a local, read-only view of evidence-linked memory already retained by initialized workspaces. It helps a developer or team inspect decisions and their recorded reasons, linked tools, execution flow, major changes, conflicts, citations, affected files, and a measured context comparison without opening the raw event ledger by hand.
 
 The dashboard is not a hosted admin service, an agent-control surface, or a second source of truth. It can be a rebuildable static HTML snapshot or a loopback-only live view; both are derived from each project's authoritative hash-chained JSONL ledger.

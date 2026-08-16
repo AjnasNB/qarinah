@@ -1,5 +1,6 @@
 import { deepFreezeJson } from "./canonical.js";
 import { markdownDataBlock, markdownInline, markdownSafeText } from "./markdown.js";
+import { validateProjectStructureSnapshot } from "./project-structure.js";
 
 export const PROJECT_RECORD_VIEWS_SCHEMA_VERSION = "qarinah.project-record-views.v1";
 
@@ -75,7 +76,7 @@ function flowStep(event, sequence) {
 function latestStructure(events) {
   for (let index = events.length - 1; index >= 0; index -= 1) {
     const structure = events[index].data?.projectStructure;
-    if (structure?.schemaVersion === "qarinah.project-structure.v1") return { event: events[index], structure };
+    if (validateProjectStructureSnapshot(structure)) return { event: events[index], structure };
   }
   return null;
 }

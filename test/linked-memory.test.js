@@ -243,7 +243,7 @@ test("the loopback dashboard exposes a bounded graph and an evidence-linked sear
   assert.equal(head.status, 200);
   assert.equal(await readFile(persistedGraphPath, "utf8"), persistedBefore, "dashboard GET and HEAD must not persist derived state");
   const html = await fetch(`${live.url}project/${workspace.config.workspaceId}/`).then((response) => response.text());
-  assert.match(html, /Linked project memory/u);
+  assert.match(html, /Worktree context graph/u);
   assert.match(html, /data-linked-graph/u);
   assert.match(html, /data-graph-search/u);
   assert.match(html, /data-graph-reset/u);

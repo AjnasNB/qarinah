@@ -37,7 +37,8 @@ test("project structure scan records a bounded source observation and materializ
 
   const [event] = await readEvents(root);
   const structure = event.data.projectStructure;
-  assert.equal(structure.schemaVersion, "qarinah.project-structure.v1");
+  assert.equal(structure.schemaVersion, "qarinah.project-structure.v2");
+  assert.equal(structure.worktree, null);
   assert.equal(structure.files.some((file) => file.path.includes("node_modules")), false);
   assert.equal(structure.files.some((file) => file.path === ".hidden.js"), false);
   assert.equal(structure.files.some((file) => file.path === "ignored.js"), false);

@@ -18,6 +18,7 @@ import {
   inspectWorkspacePolicy,
   importAgentArchive,
   loadIndex,
+  listGitWorktrees,
   loadWorkspace,
   measureMemoryFootprint,
   queryLinkedProjectMemory,
@@ -99,11 +100,17 @@ function dashboardOptions(args) {
   const values = new Map();
   const projects = [];
   let serve = false;
+  let worktrees = false;
   for (let index = 0; index < args.length; index += 1) {
     const name = args[index];
     if (name === "--serve") {
       if (serve) throw new TypeError("dashboard received --serve more than once.");
       serve = true;
+      continue;
+    }
+    if (name === "--worktrees") {
+      if (worktrees) throw new TypeError("dashboard received --worktrees more than once.");
+      worktrees = true;
       continue;
     }
     if (!["--output", "--baseline-tokens", "--delivered-tokens", "--port", "--project"].includes(name)) {
@@ -121,7 +128,7 @@ function dashboardOptions(args) {
     if (values.has(name)) throw new TypeError(`dashboard received ${name} more than once.`);
     values.set(name, value);
   }
-  return { values, projects, serve };
+  return { values, projects, serve, worktrees };
 }
 
 const RECORD_STDIN_JSON_MAX_BYTES = 128 * 1024;
@@ -278,10 +285,11 @@ Usage:
   qarinah query [text] [--format json|markdown|handoff] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp] [--minimum-coverage any|partial|direct] [--minimum-evidence any|partial|direct]
   qarinah query --stdin-json
   qarinah task-pack debugging|code-review|feature-implementation|database-migration|incident-response|release-preparation|security-review [query]
-  qarinah map [query] [--limit n] [--type memory,file,concept,directory,reference] [--repository id,...] [--scope id,...] [--as-of timestamp]
+  qarinah map [query] [--limit n] [--type memory,file,concept,directory,reference,worktree] [--repository id,...] [--scope id,...] [--as-of timestamp]
+  qarinah worktrees
   qarinah freshness
   qarinah dashboard [--output <path>] [--baseline-tokens n --delivered-tokens n]
-  qarinah dashboard --serve [--port 8777] [--project <initialized-project>]...
+  qarinah dashboard --serve [--port 8777] [--worktrees] [--project <initialized-project>]...
   qarinah policy [path]
   qarinah trust [path] --capture metadata|content --policy-hash sha256:<digest>
   qarinah untrust
@@ -648,6 +656,17 @@ async function run(argv) {
     process.stdout.write(`${JSON.stringify(await inspectMemoryFreshness({ cwd: process.cwd() }), null, 2)}\n`);
     return;
   }
+  if (command === "worktrees") {
+    if (args.length !== 0) throw new TypeError("worktrees accepts no arguments.");
+    const worktrees = await listGitWorktrees(process.cwd());
+    process.stdout.write(`${JSON.stringify({
+      ok: true,
+      repositoryId: worktrees[0]?.repositoryId ?? null,
+      currentWorktreeId: worktrees.find((entry) => entry.current)?.worktreeId ?? null,
+      worktrees
+    }, null, 2)}\n`);
+    return;
+  }
   if (command === "dashboard") {
     const parsed = dashboardOptions(args);
     const usage = (name) => {
@@ -664,7 +683,9 @@ async function run(argv) {
       if (!/^[0-9]+$/.test(portText)) throw new TypeError("--port must be an integer from 1024 to 65535.");
       const port = Number(portText);
       if (port < 1024 || port > 65_535) throw new TypeError("--port must be an integer from 1024 to 65535.");
-      const live = await serveMemoryDashboard({ cwd: process.cwd(), workspaces: parsed.projects, port });
+      const live = await serveMemoryDashboard({
+        cwd: process.cwd(), workspaces: parsed.projects, includeWorktrees: parsed.worktrees, port
+      });
       process.stdout.write(`${JSON.stringify({
         ok: true,
         live: true,
@@ -676,8 +697,8 @@ async function run(argv) {
       process.once("SIGTERM", close);
       return;
     }
-    if (parsed.values.has("--port") || parsed.projects.length > 0) {
-      throw new TypeError("--port and --project require dashboard --serve.");
+    if (parsed.values.has("--port") || parsed.projects.length > 0 || parsed.worktrees) {
+      throw new TypeError("--port, --project, and --worktrees require dashboard --serve.");
     }
     const result = await writeMemoryDashboard({
       cwd: process.cwd(),

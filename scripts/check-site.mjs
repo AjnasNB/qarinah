@@ -7,6 +7,7 @@ const output = path.join(root, "site-dist");
 const required = [
   "index.html",
   "alternatives/index.html",
+  "articles/git-worktree-context-for-coding-agents/index.html",
   "articles/open-source-agent-memory-stack/index.html",
   "docs/index.html",
   "docs/cross-agent-handoffs/index.html",
@@ -17,6 +18,7 @@ const required = [
   "docs/integrations/index.html",
   "docs/mcp/index.html",
   "docs/team-memory/index.html",
+  "docs/worktree-context/index.html",
   "docs/token-efficient-context/index.html",
   "docs/recipes/index.html",
   "docs/architecture/index.html",
@@ -39,6 +41,7 @@ const required = [
   "assets/qarinah-social-preview.png",
   "assets/qarinah-what-you-save.png",
   "assets/qarinah-project-memory-dashboard.png",
+  "assets/qarinah-worktree-context-graph.png",
   "site.css",
   "site.js",
   "primer.css",
@@ -53,6 +56,11 @@ const required = [
 
 for (const file of required) {
   await access(path.join(output, file));
+}
+
+const worktreeGraphSignature = await readFile(path.join(output, "assets/qarinah-worktree-context-graph.png"));
+if (!worktreeGraphSignature.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) {
+  throw new Error("Worktree graph screenshot must contain PNG bytes that match its public media type.");
 }
 
 const htmlFiles = [];
@@ -276,6 +284,7 @@ for (const canonicalResource of [
   "https://qarinah.io/docs/public-metrics/",
   "https://qarinah.io/metrics.json",
   "https://qarinah.io/alternatives/",
+  "https://qarinah.io/articles/git-worktree-context-for-coding-agents/",
   "https://qarinah.io/articles/open-source-agent-memory-stack/",
   "https://www.npmjs.com/package/qarinah",
   "https://github.com/AjnasNB/qarinah",
@@ -286,6 +295,7 @@ for (const canonicalResource of [
 
 const home = await readFile(path.join(output, "index.html"), "utf8");
 const alternatives = await readFile(path.join(output, "alternatives", "index.html"), "utf8");
+const worktreeArticle = await readFile(path.join(output, "articles", "git-worktree-context-for-coding-agents", "index.html"), "utf8");
 const toolkit = await readFile(path.join(output, "articles", "open-source-agent-memory-stack", "index.html"), "utf8");
 const paper = await readFile(path.join(output, "paper", "index.html"), "utf8");
 const faq = await readFile(path.join(output, "docs", "faq", "index.html"), "utf8");
@@ -316,10 +326,14 @@ for (const benchmarkProof of ["98.7148%", "98.75%", "89.05%", "Measured, reprodu
 if (!home.includes("What coding agents and developers need to know.") || !home.includes('href="/docs/faq/"')) {
   errors.push("Homepage is missing the direct answer-engine surface.");
 }
-if (!home.includes("Send 98.71% less repeated project context. Keep the proof.")
-  || !home.includes("Verify the 98.71% result")
-  || !home.includes('href="/metrics.json"')) {
-  errors.push("Homepage is missing the outcome-first metric and evidence workflow.");
+for (const worktreeHeroProof of [
+  "One memory system for every Git worktree.",
+  "Project memory for parallel coding-agent work",
+  "one repository · two isolated ledgers",
+  "branch + commit in snapshot hash",
+  'href="/articles/git-worktree-context-for-coding-agents/"'
+]) {
+  if (!home.includes(worktreeHeroProof)) errors.push(`Homepage is missing the worktree-first product story: ${worktreeHeroProof}`);
 }
 for (const costProof of [
   "98.71% less repeated context. A 77.81:1 baseline-to-pack ratio.",
@@ -344,20 +358,19 @@ if (home.indexOf('class="front-proof section shell"') > home.indexOf('class="han
 }
 for (const dashboardProof of [
   'class="dashboard-proof section shell"',
-  'src="/assets/qarinah-project-memory-dashboard.png"',
-  "See the decisions, reasons, flow, evidence, and affected files.",
-  'href="/docs/dashboard/"',
-  'href="/docs/interoperability/"'
+  'src="/assets/qarinah-worktree-context-graph.png"',
+  "See the branch, files, decisions, relationships, and hashes together.",
+  'href="/docs/worktree-context/"',
+  'href="/docs/dashboard/"'
 ]) {
   if (!home.includes(dashboardProof)) errors.push(`Homepage is missing the real dashboard proof: ${dashboardProof}`);
 }
 if (home.indexOf('<section class="hero">') > home.indexOf('<section class="benchmark-ribbon"')) {
   errors.push("Homepage must lead with the centered product hero before benchmark detail.");
 }
-if (!home.includes("Evidence-linked project memory for coding agents.") || !home.includes("continue from verified context instead of starting from zero")) {
-  if (!home.includes("Measured project memory for coding agents") || !home.includes("every required target directly covered in the top five")) {
-    errors.push("Homepage is missing the cross-agent category or benchmark scope.");
-  }
+if (!home.includes("Worktree-aware project memory and cited context graphs for coding agents.")
+  || !home.includes("98.71% less estimated repeated context in the published six-fixture benchmark")) {
+  errors.push("Homepage is missing the worktree-aware category or the separate benchmark scope.");
 }
 if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
   || publicMetrics.updatedAt !== "2026-08-10"
@@ -411,8 +424,21 @@ for (const capability of [
 }
 if (!features.includes('"@type":"CollectionPage"')
   || !features.includes('"@type":"ItemList"')
-  || !features.includes('"numberOfItems":14')) {
+  || !features.includes('"numberOfItems":15')) {
   errors.push("Features page is missing its visible capability collection structured data.");
+}
+for (const requiredWorktreeArticleCopy of [
+  "Why every coding-agent worktree needs its own memory",
+  "Parallel code needs precise memory.",
+  "A worktree is a context boundary.",
+  "Separate ledgers, one repository graph.",
+  'src="/assets/qarinah-worktree-context-graph.png"',
+  "npx qarinah dashboard --serve --worktrees",
+  '"@type":"Article"'
+]) {
+  if (!worktreeArticle.includes(requiredWorktreeArticleCopy)) {
+    errors.push(`Worktree context article is missing ${requiredWorktreeArticleCopy}`);
+  }
 }
 for (const launchDirectoryMarkup of [
   'href="https://startupbase.io/products/qarinah?utm_source=startupbase&amp;utm_medium=badge&amp;utm_campaign=launch-badge-dark"',

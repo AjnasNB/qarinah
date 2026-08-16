@@ -4,6 +4,7 @@ import { QarinahError } from "./errors.js";
 import { loadIndex } from "./indexer.js";
 import { markdownDataBlock, markdownInline, markdownSafeText } from "./markdown.js";
 import { rankContextEvents } from "./retrieval.js";
+import { validateProjectStructureSnapshot } from "./project-structure.js";
 import { querySqliteReadModel } from "./sqlite-read-model.js";
 import {
   createTokenBudget,
@@ -33,7 +34,7 @@ function normalizedQueryTerms(query) {
 
 function projectStructureExcerpt(event, query, maximum) {
   const structure = event.data?.projectStructure;
-  if (structure?.schemaVersion !== "qarinah.project-structure.v1" || !Array.isArray(structure.files)) {
+  if (!validateProjectStructureSnapshot(structure)) {
     return null;
   }
   const terms = normalizedQueryTerms(query);

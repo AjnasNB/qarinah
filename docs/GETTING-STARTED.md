@@ -6,6 +6,16 @@ Its primary job is verified handoffs between coding agents: start a task in one 
 
 Qarinah gives an agent a small, cited slice of project memory instead of replaying the full retained history. The record stays in the project and the generated SQLite index, graph, Markdown, JSON, dashboard, and OKF views can be rebuilt from it.
 
+If the repository uses Git worktrees, run setup inside each checkout that should remember its own activity. Qarinah keeps those ledgers isolated and can group the initialized siblings later:
+
+```sh
+npx qarinah setup . --capture content --allow-query
+npx qarinah worktrees
+npx qarinah dashboard --serve --worktrees
+```
+
+The setup command never silently initializes sibling worktrees. This prevents parallel branches from writing to the same ledger while still giving the dashboard a shared repository view.
+
 For the supported hosts, the quickest complete setup is:
 
 ```sh

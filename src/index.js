@@ -8,6 +8,7 @@ export {
 } from "./contracts.js";
 export { QarinahError } from "./errors.js";
 export { QARINAH_VERSION } from "./version.js";
+export { inspectGitWorktree, listGitWorktrees } from "./git-worktrees.js";
 export { appendEvent, approveWorkspaceTrust, inspectWorkspacePolicy, readEvents, verifyStore } from "./store.js";
 export {
   CONFIG_SCHEMA_VERSION,

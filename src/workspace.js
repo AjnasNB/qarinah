@@ -10,6 +10,7 @@ import {
   updateWorkspaceEnabledConsent
 } from "./consent.js";
 import { QarinahError } from "./errors.js";
+import { inspectGitWorktree } from "./git-worktrees.js";
 
 export const CONFIG_SCHEMA_VERSION = "qarinah.config.v1";
 const CONFIG_KEYS = new Set([
@@ -314,7 +315,8 @@ export async function loadWorkspace(start = process.cwd(), options = {}) {
     await secureStoragePath(provisional, [directory, filename], { type: "file", allowMissing: true });
   }
   const consent = options.skipConsent === true ? null : await readWorkspaceConsent(actualRoot, config);
-  return Object.freeze({ ...provisional, consent });
+  const worktree = await inspectGitWorktree(actualRoot);
+  return Object.freeze({ ...provisional, consent, worktree });
 }
 
 export async function setWorkspaceEnabled(start, enabled) {

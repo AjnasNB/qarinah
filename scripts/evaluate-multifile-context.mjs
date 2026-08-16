@@ -19,7 +19,7 @@ import {
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const packageJson = JSON.parse(await readFile(path.join(repositoryRoot, "package.json"), "utf8"));
-const evidencePackageVersion = "0.1.6";
+const evidencePackageVersion = packageJson.version;
 const resultPath = path.join(repositoryRoot, "bench", "results", `multifile-context-${evidencePackageVersion}.json`);
 const writeResult = process.argv.includes("--write");
 const fileCounts = Object.freeze([40, 50, 100]);

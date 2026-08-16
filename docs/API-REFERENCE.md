@@ -1,5 +1,13 @@
 # JavaScript and TypeScript API reference
 
+## Git worktree identity
+
+```ts
+import { inspectGitWorktree, listGitWorktrees } from "qarinah";
+```
+
+`inspectGitWorktree(start?)` returns the canonical current checkout identity or `null` outside Git. `listGitWorktrees(start?)` returns the bounded sibling set with branch, commit, primary/linked status, and exact-root Qarinah initialization status. Remote URLs and credentials are never collected. Loaded `QarinahWorkspace` values also expose nullable `worktree` metadata derived at read time; portable workspace config remains unchanged.
+
 Qarinah is an ESM package. The public implementation is exported from `qarinah`; host adapters and MCP also have narrow subpath exports.
 
 ```js
@@ -18,7 +26,7 @@ import { captureClaudeHook } from "qarinah/claude";
 import { createMcpServer, runMcpServer } from "qarinah/mcp";
 ```
 
-The declarations shipped in `types/index.d.ts`, `types/codex.d.ts`, `types/claude.d.ts`, and `types/mcp.d.ts` are the exact compile-time contract for version 0.1.9. JSON Schemas are available through package exports such as `qarinah/schemas/event.json`.
+The declarations shipped in `types/index.d.ts`, `types/codex.d.ts`, `types/claude.d.ts`, and `types/mcp.d.ts` are the exact compile-time contract for version 0.2.0. JSON Schemas are available through package exports such as `qarinah/schemas/event.json`.
 
 ## Runtime boundary
 
@@ -61,15 +69,15 @@ Invalid JavaScript argument shapes generally throw `TypeError`. Storage, trust, 
 
 ## Version and contract constants
 
-| Export | Value in 0.1.9 |
+| Export | Value in 0.2.0 |
 | --- | --- |
-| `QARINAH_VERSION` | `"0.1.9"` |
+| `QARINAH_VERSION` | `"0.2.0"` |
 | `EVENT_SCHEMA_VERSION` | `"qarinah.event.v1"` |
 | `CONTEXT_PACK_SCHEMA_VERSION` | `"qarinah.context-pack.v2"` |
 | `CONFIG_SCHEMA_VERSION` | `"qarinah.config.v1"` |
 | `INDEX_SCHEMA_VERSION` | `"qarinah.index.v2"` |
 | `GRAPH_SCHEMA_VERSION` | `"qarinah.graph.v2"` |
-| `PROJECT_STRUCTURE_SCHEMA_VERSION` | `"qarinah.project-structure.v1"` |
+| `PROJECT_STRUCTURE_SCHEMA_VERSION` | `"qarinah.project-structure.v2"` |
 | `AGENT_ARCHIVE_IMPORT_SCHEMA_VERSION` | `"qarinah.agent-archive-import.v1"` |
 | `AGENT_ARCHIVE_BACKUP_SCHEMA_VERSION` | `"qarinah.agent-archive-backup.v1"` |
 | `MEMORY_FOOTPRINT_SCHEMA_VERSION` | `"qarinah.memory-footprint.v1"` |

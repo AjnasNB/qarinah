@@ -10,6 +10,10 @@ Do not publish these drafts until the gates in [../LAUNCH.md](../LAUNCH.md) are 
 
 **Category:** Evidence-linked project memory that stays with your code.
 
+**Worktree launch headline:** One memory system for every Git worktree.
+
+**Worktree launch description:** Give every checkout its own evidence-linked ledger, then inspect initialized siblings in one branch-and-commit-aware context graph. Qarinah keeps writable worktree memory isolated, binds Git context into the project snapshot hash, and compiles cited task packs for Codex, Claude Code, Cursor, Kimi, Antigravity, CLI tools, and compatible MCP clients.
+
 **Tagline:** Switch agents. Keep the decisions, outcomes, and proof.
 
 **Proof tagline:** Nearly 99% less repeated project context. Every selected memory points back to its source.
@@ -28,7 +32,7 @@ Do not publish these drafts until the gates in [../LAUNCH.md](../LAUNCH.md) are 
 
 **npm description:** Project memory that follows your code across agents, with cited handoffs and 98.71% less estimated repeated context in its published benchmark.
 
-**Short:** Qarinah is a universal context engine for software projects. It records permitted activity and explicit decisions in an evidence-linked ledger, then compiles a small cited handoff for the next agent. Maqam is an optional governance integration, not a requirement.
+**Short:** Qarinah is a worktree-aware context system for software projects. It records permitted activity and explicit decisions in an evidence-linked ledger, then compiles a small cited handoff for the next agent. Maqam is an optional approval integration, not a requirement.
 
 ## Show HN fact sheet - rewrite personally
 

@@ -8,7 +8,8 @@ import { QarinahError } from "./errors.js";
 import { appendEvent, readEvents } from "./store.js";
 import { loadWorkspace } from "./workspace.js";
 
-export const PROJECT_STRUCTURE_SCHEMA_VERSION = "qarinah.project-structure.v1";
+export const PROJECT_STRUCTURE_SCHEMA_VERSION = "qarinah.project-structure.v2";
+const LEGACY_PROJECT_STRUCTURE_SCHEMA_VERSION = "qarinah.project-structure.v1";
 
 const DEFAULT_MAX_FILES = 750;
 const DEFAULT_MAX_FILE_BYTES = 512 * 1024;
@@ -110,14 +111,18 @@ function validInteger(value, minimum, maximum = Number.MAX_SAFE_INTEGER) {
 }
 
 export function validateProjectStructureSnapshot(structure) {
-  if (!exactKeys(structure, [
+  const versionOne = structure?.schemaVersion === LEGACY_PROJECT_STRUCTURE_SCHEMA_VERSION;
+  const versionTwo = structure?.schemaVersion === PROJECT_STRUCTURE_SCHEMA_VERSION;
+  if (!versionOne && !versionTwo) return false;
+  const keys = [
     "schemaVersion", "adapter", "root", "limits", "directoryCount", "fileCount", "totalBytes",
     "directories", "files", "snapshotHash", "changes"
-  ])) return false;
-  if (structure.schemaVersion !== PROJECT_STRUCTURE_SCHEMA_VERSION
-    || !exactKeys(structure.adapter, ["id", "version"])
+  ];
+  if (versionTwo) keys.splice(3, 0, "worktree");
+  if (!exactKeys(structure, keys)) return false;
+  if (!exactKeys(structure.adapter, ["id", "version"])
     || structure.adapter.id !== "qarinah.project-structure"
-    || structure.adapter.version !== "1"
+    || structure.adapter.version !== (versionTwo ? "2" : "1")
     || structure.root !== "."
     || !exactKeys(structure.limits, ["maxFiles", "maxFileBytes", "maxTotalBytes", "maxDepth"])
     || !validInteger(structure.limits.maxFiles, 1, 5_000)
@@ -130,6 +135,19 @@ export function validateProjectStructureSnapshot(structure) {
     || structure.fileCount !== structure.files.length
     || !validInteger(structure.totalBytes, 0, structure.limits.maxTotalBytes)
     || !validHash(structure.snapshotHash)) return false;
+  if (versionTwo && structure.worktree !== null) {
+    if (!exactKeys(structure.worktree, [
+      "schemaVersion", "repositoryId", "worktreeId", "branch", "commit", "detached", "linked"
+    ]) || structure.worktree.schemaVersion !== "qarinah.git-worktree.v1"
+      || !/^repo_[0-9a-f]{32}$/u.test(structure.worktree.repositoryId)
+      || !/^wt_[0-9a-f]{32}$/u.test(structure.worktree.worktreeId)
+      || (structure.worktree.branch !== null && (
+        typeof structure.worktree.branch !== "string" || structure.worktree.branch.length < 1 || structure.worktree.branch.length > 255
+      ))
+      || (structure.worktree.commit !== null && !/^[0-9a-f]{40}$/u.test(structure.worktree.commit))
+      || typeof structure.worktree.detached !== "boolean"
+      || typeof structure.worktree.linked !== "boolean") return false;
+  }
   const directoryPaths = new Set();
   const directoryIds = new Set();
   for (const directory of structure.directories) {
@@ -179,6 +197,7 @@ export function validateProjectStructureSnapshot(structure) {
     schemaVersion: structure.schemaVersion,
     adapter: structure.adapter,
     root: structure.root,
+    ...(versionTwo ? { worktree: structure.worktree } : {}),
     limits: structure.limits,
     directoryCount: structure.directoryCount,
     fileCount: structure.fileCount,
@@ -428,8 +447,17 @@ export async function scanProjectStructure(rawOptions = {}) {
   const collected = await collectStructure(workspace, options);
   const core = {
     schemaVersion: PROJECT_STRUCTURE_SCHEMA_VERSION,
-    adapter: Object.freeze({ id: "qarinah.project-structure", version: "1" }),
+    adapter: Object.freeze({ id: "qarinah.project-structure", version: "2" }),
     root: ".",
+    worktree: workspace.worktree ? Object.freeze({
+      schemaVersion: workspace.worktree.schemaVersion,
+      repositoryId: workspace.worktree.repositoryId,
+      worktreeId: workspace.worktree.worktreeId,
+      branch: workspace.worktree.branch,
+      commit: workspace.worktree.commit,
+      detached: workspace.worktree.detached,
+      linked: workspace.worktree.linked
+    }) : null,
     limits: Object.freeze({
       maxFiles: options.maxFiles,
       maxFileBytes: options.maxFileBytes,
@@ -450,7 +478,8 @@ export async function scanProjectStructure(rawOptions = {}) {
       eventId: previous.event.eventId,
       snapshotHash,
       fileCount: core.fileCount,
-      directoryCount: core.directoryCount
+      directoryCount: core.directoryCount,
+      worktree: core.worktree
     });
   }
   const projectStructure = Object.freeze({
@@ -479,6 +508,7 @@ export async function scanProjectStructure(rawOptions = {}) {
     snapshotHash,
     fileCount: core.fileCount,
     directoryCount: core.directoryCount,
+    worktree: core.worktree,
     changes: projectStructure.changes
   });
 }

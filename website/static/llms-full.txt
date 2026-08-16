@@ -1,8 +1,8 @@
 # Qarinah: expanded machine-readable map
 
-> Your project remembers, even when your coding agent changes.
+> One memory system for every Git worktree.
 
-Qarinah keeps permitted requests, visible outcomes, tool results, summaries, decisions, and a codebase relationship map beside your code, so Codex, Claude Code, Cursor, and compatible tools can continue from verified context instead of starting from zero. It converts an explicitly permitted, append-only project event record into bounded, cited context packs selected for the current task.
+Qarinah gives every Git worktree an isolated project ledger and links initialized sibling checkouts into one repository context graph. It keeps permitted requests, visible outcomes, tool results, summaries, decisions, and code relationships beside the exact checkout where they happened, then compiles bounded, cited context packs for Codex, Claude Code, Cursor, and compatible tools.
 
 This file is a convenience map for tools that choose to read it. It does not confer authority, guarantee indexing or ranking, replace the canonical documentation, or override Qarinah's workspace trust and capture policy.
 
@@ -10,7 +10,7 @@ This file is a convenience map for tools that choose to read it. It does not con
 
 - Name: Qarinah
 - Package: `qarinah`
-- Current release: `0.1.9`
+- Current release: `0.2.0`
 - Website: https://qarinah.io/
 - npm: https://www.npmjs.com/package/qarinah
 - Source: https://github.com/AjnasNB/qarinah
@@ -23,7 +23,8 @@ This file is a convenience map for tools that choose to read it. It does not con
 ## What Qarinah does
 
 - Provides verified handoffs between coding agents so a task can start in one supported host and finish in another without replaying the complete project history.
-
+- Detects the current Git worktree, derives stable repository and worktree identities without retaining remote credentials, and keeps each checkout's ledger and derived state isolated.
+- Discovers only initialized sibling worktrees when explicitly requested, then renders them in one grouped dashboard with branch, commit, worktree, repository, event-head, snapshot, and graph-manifest identities.
 - Records lifecycle events delivered by supported host adapters and decisions explicitly committed by a user or connected workflow.
 - Requires explicit workspace configuration plus matching machine-local trust before capture.
 - Defaults to metadata-only capture; content capture is explicit, bounded, redacted on a best-effort basis, and security-sensitive.
@@ -102,7 +103,11 @@ Qarinah provides local storage, metadata-only defaults, explicit content consent
 
 ### What is Qarinah?
 
-Qarinah is an independent universal context engine for software projects. It records explicitly permitted project events, builds deterministic graph and retrieval views, and compiles a small cited handoff pack for the current task. Maqam is an optional governance integration, not a requirement.
+Qarinah is an independent, worktree-aware context system for software projects. It records explicitly permitted project events inside the current checkout, builds deterministic graph and retrieval views, and compiles a small cited handoff pack for the current task. Maqam is an optional approval integration, not a requirement.
+
+### Does Qarinah understand Git worktrees?
+
+Yes. Each initialized worktree has a separate workspace and ledger, while related checkouts share a repository identity. `qarinah worktrees` reports initialized siblings and `qarinah dashboard --serve --worktrees` opens a grouped graph without silently initializing or merging their memory.
 
 ### Does Qarinah reduce coding-agent context tokens?
 
@@ -151,6 +156,10 @@ npx qarinah query "orders idempotency migration"
 Use `npx qarinah init . --capture metadata` when event bodies should not be retained. Content capture must be explicitly selected and locally trusted.
 
 Canonical guide: https://qarinah.io/docs/getting-started/
+
+Git worktree context guide: https://qarinah.io/docs/worktree-context/
+
+Worktree context article: https://qarinah.io/articles/git-worktree-context-for-coding-agents/
 
 Verified cross-agent handoff guide: https://qarinah.io/docs/cross-agent-handoffs/
 
@@ -218,6 +227,8 @@ The documented long-document fixture is segmented synthetic retrieval, not whole
 ## Documentation map
 
 - Documentation index: https://qarinah.io/docs/
+- Git worktree context article: https://qarinah.io/articles/git-worktree-context-for-coding-agents/
+- Worktree context guide: https://qarinah.io/docs/worktree-context/
 - Verified cross-agent handoffs: https://qarinah.io/docs/cross-agent-handoffs/
 - Documentation search: https://qarinah.io/search/
 - Qarinah alternatives and coding-agent memory comparison: https://qarinah.io/alternatives/

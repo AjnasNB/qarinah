@@ -71,7 +71,8 @@ Qarinah keeps one project-owned memory across Codex, Claude Code, Cursor, CLI, a
 - [Benchmark methodology and complete results](BENCHMARKS.md)
 - [Six-task result](../bench/results/software-task-context-0.1.0.json)
 - [Release benchmark receipt](../bench/results/benchmark-release-0.1.6.json)
-- [Multi-file result](../bench/results/multifile-context-0.1.6.json)
+- [Current multi-file result](../bench/results/multifile-context-0.2.0.json)
+- [Historical 0.1.6 multi-file result](../bench/results/multifile-context-0.1.6.json)
 
 ## Do not publish these claims
 

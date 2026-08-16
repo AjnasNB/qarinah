@@ -4,17 +4,28 @@
 
 <h1 align="center">Qarinah</h1>
 
-<p align="center"><strong>Send 98.71% less repeated project context. Keep the proof.</strong></p>
+<p align="center"><strong>One memory system for every Git worktree.</strong></p>
 
 <p align="center">
-  Qarinah compiles a compact, cited project memory for Codex, Claude Code, Cursor, and compatible tools. In six committed software-task fixtures, 442,113 estimated repeated-context tokens became 5,682 - with every required target directly covered in the top five.
+  Qarinah gives every checkout its own evidence-linked memory and groups sibling worktrees into one searchable context graph. Codex, Claude Code, Cursor, Kimi, Antigravity, CLI tools, and compatible MCP clients can continue from the right branch, commit, decisions, outcomes, and files instead of replaying the whole project history.
 </p>
+
+```sh
+# Initialize the exact checkout you are working in.
+npx qarinah setup . --capture content --allow-query
+
+# See every linked checkout and open all initialized worktree ledgers together.
+npx qarinah worktrees
+npx qarinah dashboard --serve --worktrees
+```
+
+Each worktree keeps a separate `.qarinah` ledger and consent record. Qarinah derives a shared repository identity, hashes branch and commit context into the project snapshot, and links each checkout to the files and memories it actually produced. It never replaces worktree ledgers with symlinks or a shared writable database. [Read the worktree context guide.](docs/WORKTREE-CONTEXT.md)
 
 <p align="center">
   <img src="assets/launch/qarinah-what-you-save.png" width="100%" alt="What you save with Qarinah: 98.71% less repeated context, a 77.81 to 1 baseline-to-pack ratio, 442,113 baseline tokens versus 5,682 Qarinah pack tokens, and exact illustrative savings at four flat uncached input-token rates.">
 </p>
 
-## Reproducible benchmark results
+## Reproducible context benchmark
 
 | **98.7148%** | **98.75%** | **89.05%** |
 | :---: | :---: | :---: |
@@ -40,7 +51,7 @@ At the normalized $1-per-million reference rate, the same calculation is **$0.44
 
 Scale regression: Qarinah also passed **380 / 380 file-specific exact and typo-tolerant queries** across deterministic 40-, 50-, and 100-file projects. The same run verified SQLite retrieval, graph relations, generated Markdown, conflicts, supersession, stale-projection repair, and 9 / 9 correct unsupported-query abstentions. [Inspect the multi-file method and result.](docs/BENCHMARKS.md#multi-file-project-context-and-projection-integrity-benchmark)
 
-<p align="center"><em>Switch agents. Keep the decisions, outcomes, and proof.</em></p>
+<p align="center"><em>Switch agents or branches. Keep the decisions, outcomes, and proof.</em></p>
 
 <p align="center">
   Qarinah keeps one compact, cited project memory beside your code, so Codex, Claude Code, Cursor, and compatible tools can continue from verified context instead of starting from zero.
@@ -115,6 +126,7 @@ If a native chat later disappears, Qarinah can still retrieve the permitted even
 | Setup | What Qarinah gives you |
 | --- | --- |
 | Personal project | One local cited memory shared by Codex, Claude Code, Cursor, Kimi, Antigravity, CLI tools, and compatible MCP clients |
+| Parallel Git worktrees | Isolated ledgers per checkout, one repository group, branch-and-commit-aware snapshots, and one local graph dashboard |
 | Portable review | Rebuildable SQLite, Markdown, JSON, graph, OKF, and responsive static or live-loopback dashboards for inspecting project memory |
 | Team workspace | Multi-repository relationships, freshness, encrypted bundles, signed checkpoints, membership, and separate authority boundaries |
 | Policy or approval add-on | Optional Maqam scopes and approval controls without making Maqam a Qarinah requirement |
@@ -472,15 +484,15 @@ The repository also runs `npm run mcp:smoke` against the exact bundled Codex and
 
 ### Install once, initialize each project
 
-Install the reviewed `v0.1.9` plugin once in each host after that release is published:
+Install the reviewed `v0.2.0` plugin once in each host after that release is published:
 
 ```sh
 # Codex: personal installation, available to opted-in projects.
-codex plugin marketplace add AjnasNB/qarinah --ref v0.1.9
+codex plugin marketplace add AjnasNB/qarinah --ref v0.2.0
 codex plugin add qarinah@qarinah
 
 # Claude Code: personal installation across projects.
-claude plugin marketplace add AjnasNB/qarinah@v0.1.9 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.2.0 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 

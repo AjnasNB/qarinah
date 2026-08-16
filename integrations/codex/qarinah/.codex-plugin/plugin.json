@@ -1,7 +1,7 @@
 {
   "name": "qarinah",
-  "version": "0.1.9",
-  "description": "Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.",
+  "version": "0.2.0",
+  "description": "Qarinah is worktree-aware project memory for coding agents - isolated per checkout and linked through a cited repository graph.",
   "author": {
     "name": "Ajnas NB",
     "email": "ajnasnb@gmail.com",
@@ -9,13 +9,13 @@
   },
   "repository": "https://github.com/AjnasNB/qarinah",
   "license": "Apache-2.0",
-  "keywords": ["context", "provenance", "governance", "codex"],
+  "keywords": ["context", "provenance", "git-worktree", "codex"],
   "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "Qarinah",
-    "shortDescription": "Opt-in, evidence-linked local context.",
-    "longDescription": "Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust. It captures explicitly permitted Codex lifecycle metadata into a local tamper-evident record. Read-only MCP tools report status and integrity; explicit local or Maqam-governed queries compile small cited context packs.",
+    "shortDescription": "Worktree-aware, cited local context.",
+    "longDescription": "Qarinah gives every initialized Git worktree its own evidence-linked project memory and can group sibling checkouts into one cited repository graph. It captures explicitly permitted Codex lifecycle metadata into a local tamper-evident record, while read-only MCP tools report status, integrity, and compact task context.",
     "developerName": "Ajnas NB",
     "category": "Productivity",
     "capabilities": ["Interactive", "Write"],

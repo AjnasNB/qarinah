@@ -100,7 +100,21 @@ export interface QarinahCapturePolicy {
   retentionClass: "session" | "project" | "durable";
   policyHash: `sha256:${string}`;
 }
-export interface QarinahWorkspace { root: string; qarinahDir: string; config: QarinahConfig; configPath: string; consent: QarinahConsent | null }
+export interface QarinahGitWorktree {
+  readonly schemaVersion: "qarinah.git-worktree.v1";
+  readonly repositoryId: `repo_${string}`;
+  readonly worktreeId: `wt_${string}`;
+  readonly root: string;
+  readonly branch: string | null;
+  readonly commit: string | null;
+  readonly detached: boolean;
+  readonly linked: boolean;
+}
+export interface QarinahDiscoveredGitWorktree extends QarinahGitWorktree {
+  readonly current: boolean;
+  readonly initialized: boolean;
+}
+export interface QarinahWorkspace { root: string; qarinahDir: string; config: QarinahConfig; configPath: string; consent: QarinahConsent | null; worktree: QarinahGitWorktree | null }
 export interface QarinahContextItem {
   eventId: string; kind: string; timestamp: string; title: string; excerpt: string;
   confidence: QarinahConfidence; authority?: QarinahAuthority; temporal?: QarinahTemporal;
@@ -222,13 +236,15 @@ export const INDEX_SCHEMA_VERSION: "qarinah.index.v2";
 export const GRAPH_SCHEMA_VERSION: "qarinah.graph.v2";
 export const LINKED_PROJECT_MEMORY_SCHEMA_VERSION: "qarinah.linked-project-memory.v1";
 export const LINKED_PROJECT_QUERY_SCHEMA_VERSION: "qarinah.linked-project-query.v1";
-export const PROJECT_STRUCTURE_SCHEMA_VERSION: "qarinah.project-structure.v1";
+export const PROJECT_STRUCTURE_SCHEMA_VERSION: "qarinah.project-structure.v2";
 export const SQLITE_READ_MODEL_SCHEMA_VERSION: 1;
 export const SQLITE_READ_MODEL_FILENAME: "qarinah.db";
 export const MEMORY_ATTACHMENT_SCHEMA_VERSION: "qarinah.memory-attachment.v1";
-export const QARINAH_VERSION: "0.1.9";
+export const QARINAH_VERSION: "0.2.0";
 export const EVENT_KINDS: readonly QarinahEventKind[];
 export const RELATION_TYPES: readonly QarinahRelationType[];
+export function inspectGitWorktree(start?: string): Promise<QarinahGitWorktree | null>;
+export function listGitWorktrees(start?: string): Promise<readonly QarinahDiscoveredGitWorktree[]>;
 export function initializeWorkspace(target?: string, options?: { capture?: "metadata" | "content" }): Promise<QarinahWorkspace>;
 export function findWorkspaceRoot(start?: string): Promise<string | null>;
 export function loadWorkspace(start?: string, options?: { allowDisabled?: boolean; skipConsent?: boolean }): Promise<QarinahWorkspace>;
@@ -297,6 +313,7 @@ export interface QarinahProjectStructureScanResult {
   readonly snapshotHash: string;
   readonly fileCount: number;
   readonly directoryCount: number;
+  readonly worktree?: Omit<QarinahGitWorktree, "root"> | null;
   readonly changes?: QarinahProjectStructureChanges;
 }
 export function scanProjectStructure(options?: {
@@ -506,7 +523,7 @@ export function rerankContextPack(
 ): Promise<QarinahContextPack & {
   semanticRerank?: { adapter: string; candidateCount: number; scoredCount: number; authority: "rerank-only" };
 }>;
-export type QarinahLinkedProjectNodeType = "memory" | "file" | "directory" | "concept" | "reference";
+export type QarinahLinkedProjectNodeType = "memory" | "file" | "directory" | "concept" | "reference" | "worktree";
 export interface QarinahLinkedProjectSourceProfile {
   readonly sourceNodeId: string;
   readonly sourceEventId: string | null;
@@ -812,6 +829,7 @@ export interface QarinahMemoryDashboard {
     name: string;
     root: string;
     workspaceId: string;
+    worktree: QarinahGitWorktree | null;
     repositoryIds: readonly string[];
     ledgerPath: ".qarinah/events/events.jsonl";
     ledgerHeadHash: `sha256:${string}` | null;
@@ -882,7 +900,7 @@ export function buildMemoryDashboard(options?: {
 export function renderMemoryDashboard(data: QarinahMemoryDashboard, options?: {
   live?: boolean;
   liveStatusPath?: string;
-  projects?: readonly Readonly<{ name: string; root: string; workspaceId: string; href: string }>[];
+  projects?: readonly QarinahDashboardProject[];
 }): string;
 export function writeMemoryDashboard(options?: {
   cwd?: string;
@@ -894,14 +912,26 @@ export function writeMemoryDashboard(options?: {
 export function serveMemoryDashboard(options?: {
   cwd?: string;
   workspaces?: readonly string[];
+  includeWorktrees?: boolean;
   port?: number;
 }): Promise<Readonly<{
   url: string;
   host: "127.0.0.1";
   port: number;
-  projects: readonly Readonly<{ name: string; root: string; workspaceId: string; href: string }>[];
+  projects: readonly QarinahDashboardProject[];
   close: () => Promise<void>;
 }>>;
+export interface QarinahDashboardProject {
+  readonly name: string;
+  readonly root: string;
+  readonly workspaceId: string;
+  readonly repositoryId: string | null;
+  readonly worktreeId: string | null;
+  readonly branch: string | null;
+  readonly commit: string | null;
+  readonly linked: boolean;
+  readonly href: string;
+}
 export interface QarinahContextEvaluationCase {
   id?: string;
   requiredDecisionIds?: string[];
