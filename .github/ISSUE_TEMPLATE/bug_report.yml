@@ -13,7 +13,7 @@ body:
     attributes:
       label: Qarinah version
       description: Output of `npm view qarinah version` and the installed version.
-      placeholder: "0.1.9"
+      placeholder: "0.2.0"
     validations:
       required: true
   - type: dropdown

@@ -158,12 +158,12 @@ Qarinah stores memory in the opted-in project, not in one editor's private conve
 Install the reviewed plugins once per host:
 
 ```sh
-codex plugin marketplace add AjnasNB/qarinah --ref v0.1.9
+codex plugin marketplace add AjnasNB/qarinah --ref v0.2.0
 codex plugin add qarinah@qarinah
 ```
 
 ```sh
-claude plugin marketplace add AjnasNB/qarinah@v0.1.9 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.2.0 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 

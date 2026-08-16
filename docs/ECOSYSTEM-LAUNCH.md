@@ -26,7 +26,7 @@ Re-check registries and repositories immediately before publishing. As of the da
 | Maqam | `0.3.2` is the stable GitHub and npm release | Ready for demos that use only documented guarantees |
 | ProductLoop | `0.2.3` is the stable GitHub and npm release | Present as orchestration, not a second flagship launch |
 | Cockroach Crawler | `0.3.0` is the stable GitHub and npm `latest` release | Ready for bounded-crawl, provider-routing, optional reach, browser-host, and restricted serverless demos within documented limits |
-| Qarinah | `0.1.9` release | Publish only the reviewed source, package, paper, and website from one exact commit |
+| Qarinah | `0.2.0` release | Publish only the reviewed source, package, paper, and website from one exact commit |
 
 Never describe a local candidate as published until the registry, tag, and public verification agree.
 

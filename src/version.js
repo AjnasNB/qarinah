@@ -1,1 +1,1 @@
-export const QARINAH_VERSION = "0.1.9";
+export const QARINAH_VERSION = "0.2.0";

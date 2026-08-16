@@ -1,17 +1,17 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
   "name": "io.github.AjnasNB/qarinah",
-  "description": "Evidence-linked project memory for coding agents with verified handoffs and a reproducible 98.71% estimated repeated-context reduction.",
+  "description": "Worktree-aware project memory and cited context graphs for coding agents.",
   "repository": {
     "url": "https://github.com/AjnasNB/qarinah",
     "source": "github"
   },
-  "version": "0.1.9",
+  "version": "0.2.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "qarinah",
-      "version": "0.1.9",
+      "version": "0.2.0",
       "transport": {
         "type": "stdio"
       }

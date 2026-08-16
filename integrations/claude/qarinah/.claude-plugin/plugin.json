@@ -1,7 +1,7 @@
 {
   "name": "qarinah",
-  "version": "0.1.9",
-  "description": "Qarinah is evidence-linked project memory for coding agents - compact enough to save context, inspectable enough to trust.",
+  "version": "0.2.0",
+  "description": "Qarinah is worktree-aware project memory for coding agents - isolated per checkout and linked through a cited repository graph.",
   "author": {
     "name": "Ajnas NB",
     "email": "ajnasnb@gmail.com",
@@ -9,7 +9,7 @@
   },
   "repository": "https://github.com/AjnasNB/qarinah",
   "license": "Apache-2.0",
-  "keywords": ["context", "provenance", "governance", "claude-code"],
+  "keywords": ["context", "provenance", "git-worktree", "claude-code"],
   "userConfig": {
     "node_path": {
       "type": "file",

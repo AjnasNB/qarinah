@@ -2,7 +2,7 @@
 
 ## Implemented platform foundation
 
-Qarinah 0.1.9 includes consent-gated MCP retrieval, one-command Codex/Claude/Cursor setup, a local memory dashboard, linked project memory, freshness checks, seven task packs, separate-authority multi-repository retrieval, optional reranking adapters, encrypted team bundles, role manifests, signed checkpoints, expanded quality evaluation, causal receipts across Cockroach, Qarinah, Maqam, execution, and observation, and a release-integrity gate that keeps package, runtime, type, MCP, website, paper, and benchmark metadata aligned.
+Qarinah 0.2.0 includes first-class Git worktree identities and isolated ledgers, consent-gated MCP retrieval, one-command Codex/Claude/Cursor setup, a grouped local memory dashboard, linked project memory, freshness checks, seven task packs, separate-authority multi-repository retrieval, optional reranking adapters, encrypted team bundles, role manifests, signed checkpoints, expanded quality evaluation, causal receipts across Cockroach, Qarinah, Maqam, execution, and observation, and a release-integrity gate that keeps package, runtime, type, MCP, website, paper, and benchmark metadata aligned.
 
 The encrypted sync surface is a public self-hostable protocol foundation. A managed cross-device service, identity-provider federation, durable hosted transport, and organization administration remain future service work.
 
@@ -18,7 +18,7 @@ The encrypted sync surface is a public self-hostable protocol foundation. A mana
 ## Integration 0.2
 
 - Claude Code plugin and generic JSONL adapters;
-- Maqam governed read/write tools;
+- optional Maqam approval tools;
 - validated Cockroach `SourceRecord` ingestion;
 - ProductLoop `ProvenanceSink` and `RunStore` implementation;
 - read-only local MCP server for Codex, Claude Code, and compatible hosts;
