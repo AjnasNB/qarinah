@@ -31,7 +31,7 @@ The setup initializes the local workspace, installs the reviewed project integra
 
 ## Record the handoff evidence
 
-Supported host adapters can record permitted lifecycle events and tool outcomes. A developer or governed workflow can explicitly record a durable decision:
+Supported host adapters can record captured lifecycle events and tool outcomes. A developer or connected workflow can explicitly record a durable decision:
 
 ```sh
 npx qarinah record \

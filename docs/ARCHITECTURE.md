@@ -2,7 +2,7 @@
 
 > One authoritative event chain. A fast rebuildable SQLite read model. Temporally correct, authority-scoped context at task time.
 
-Qarinah is a governance-native context compiler. It preserves permitted agent activity, explicit decisions, source evidence, and bounded project structure in a verified local record, then compiles only the context relevant to a later task.
+Qarinah is an evidence-linked project-memory and retrieval engine. It preserves captured agent activity, explicit decisions, source evidence, and project structure in a verified local record, then compiles only the context relevant to a later task.
 
 ## System map
 
@@ -24,7 +24,7 @@ Qarinah is a governance-native context compiler. It preserves permitted agent ac
 
 ## Write and rebuild lifecycle
 
-1. A user or governed workflow submits a permitted lifecycle event through a strict adapter.
+1. A user or connected workflow submits a captured lifecycle event through a strict adapter.
 2. The trusted capture policy validates the workspace, capture mode, and bounds.
 3. The ledger appends the canonical event under a renewable write lock and binds the previous hash.
 4. The caller receives the event ID and record hash.

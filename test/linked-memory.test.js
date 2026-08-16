@@ -246,6 +246,10 @@ test("the loopback dashboard exposes a bounded graph and an evidence-linked sear
   assert.match(html, /Linked project memory/u);
   assert.match(html, /data-linked-graph/u);
   assert.match(html, /data-graph-search/u);
+  assert.match(html, /data-graph-reset/u);
+  assert.match(html, /circular project map/u);
+  assert.match(html, /pointerdown/u);
+  assert.match(html, /qarinahPositionOverrides/u);
   assert.match(html, /data-search-path="\/api\/search\//u);
   assert.match(html, /Score basis/u);
   assert.match(html, /<ol class="graph-results"/u);

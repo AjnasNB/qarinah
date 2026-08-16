@@ -62,7 +62,7 @@ Scale regression: Qarinah also passed **380 / 380 file-specific exact and typo-t
   <code>EVIDENCE-LINKED</code>&nbsp;&nbsp;
   <code>GRAPH-AWARE</code>&nbsp;&nbsp;
   <code>OKF-PORTABLE</code>&nbsp;&nbsp;
-  <code>GOVERNANCE-READY</code>
+  <code>HYBRID-RETRIEVAL</code>
 </p>
 
 <p align="center">
@@ -82,7 +82,7 @@ npx qarinah setup . --capture content --allow-query
 </p>
 
 <p align="center">
-  Run the setup command once from a repository. It installs project-local integrations and consent-gated MCP retrieval for that exact workspace. Qarinah works as an independent local tool; Maqam is an optional governance integration for higher-authority workflows.
+  Run the setup command once from a repository. It installs project-local integrations and consent-gated MCP retrieval for that exact workspace. Qarinah works independently; connect Maqam only when a workflow also needs policy or human approval.
 </p>
 
 ---
@@ -117,7 +117,7 @@ If a native chat later disappears, Qarinah can still retrieve the permitted even
 | Personal project | One local cited memory shared by Codex, Claude Code, Cursor, Kimi, Antigravity, CLI tools, and compatible MCP clients |
 | Portable review | Rebuildable SQLite, Markdown, JSON, graph, OKF, and responsive static or live-loopback dashboards for inspecting project memory |
 | Team workspace | Multi-repository relationships, freshness, encrypted bundles, signed checkpoints, membership, and separate authority boundaries |
-| Governed workflow | Optional Maqam memory scopes and disclosure controls without making Maqam a requirement |
+| Policy or approval add-on | Optional Maqam scopes and approval controls without making Maqam a Qarinah requirement |
 
 Qarinah achieved 98.71% fewer estimated repeated-project-context tokens in its published software-task benchmark. That compared slice contained 436,431 fewer estimated input-context tokens, and the full-history baseline contained 77.81 times as many estimated tokens as the compiled Qarinah packs. A separate deterministic scale regression ranked the correct target first for 380 / 380 file-specific exact and typo-tolerant queries. We found no directly comparable public benchmark measuring the same project-history replay baseline. These results measure portable estimated input context and deterministic retrieval behavior, not provider billing, output tokens, latency, or universal task quality.
 
@@ -177,7 +177,7 @@ The JSONL chain remains authoritative. Graph, index, Markdown, dashboard, and OK
 
 <p align="center"><em>Nearly 99% less repeated context. Every selected memory points back to its source.</em></p>
 
-> Successfully verified across React editing, database migration, TypeScript refactoring, web research, production debugging, and governed release work. The evaluated tasks sent 436,431 fewer estimated input-context tokens. At a flat $3 per million uncached input tokens, that aggregate compared context slice moves from $1.326339 to $0.017046, saving $1.309293 each time the complete slice would otherwise be sent. The percentage is independent of the chosen flat unit price; the portable token estimate excludes provider-native tokenization, output, tools, caching, retrieval, hosting, and fixed provider charges. See the [machine-readable public metrics](https://qarinah.io/metrics.json) and [methodology](docs/BENCHMARKS.md).
+> Successfully verified across React editing, database migration, TypeScript refactoring, web research, production debugging, and release preparation. The evaluated tasks sent 436,431 fewer estimated input-context tokens. At a flat $3 per million uncached input tokens, that aggregate compared context slice moves from $1.326339 to $0.017046, saving $1.309293 each time the complete slice would otherwise be sent. The percentage is independent of the chosen flat unit price; the portable token estimate excludes provider-native tokenization, output, tools, caching, retrieval, hosting, and fixed provider charges. See the [machine-readable public metrics](https://qarinah.io/metrics.json) and [methodology](docs/BENCHMARKS.md).
 
 ## Install and compile the first cited pack
 
@@ -199,7 +199,7 @@ Start with the [feature map](docs/FEATURES.md) and [five-minute installation gui
 
 Your project already contains the decisions and evidence behind its changes. Qarinah lets the next agent query that record and receive a bounded, cited pack selected for the current task. The same local memory can support Codex, Claude Code, CLI workflows, and compatible MCP clients instead of locking project context to one editor.
 
-Qarinah is a local memory compiler for coding agents. It turns permitted agent activity, project structure, and explicitly committed decisions into durable project memory for Codex, Claude Code, CLIs, and governed workflows. It preserves evidence in a typed graph and deterministic Markdown and JSON views, then compiles a bounded cited pack selected for the current query instead of making an opaque summary or a full transcript the source of truth.
+Qarinah is a local memory and retrieval stack for coding agents. It turns captured agent activity, project structure, and explicitly committed decisions into durable project memory for Codex, Claude Code, CLIs, IDEs, and compatible MCP clients. It preserves evidence in a typed graph and deterministic Markdown and JSON views, then compiles a bounded cited pack selected for the current query instead of making an opaque summary or a full transcript the source of truth.
 
 ## Why Qarinah
 
@@ -212,21 +212,37 @@ Agent memory usually fails in one of two ways: the next model receives too much 
   </tr>
   <tr>
     <td width="50%"><strong>Rebuildable</strong><br>The JSONL chain is authoritative. Graph, index, Markdown, project structure, and OKF are deterministic derived views.</td>
-    <td width="50%"><strong>Governance-ready</strong><br>Explicit capture policy, fail-closed coverage, consent-gated MCP retrieval, and optional Maqam disclosure controls preserve boundaries.</td>
+    <td width="50%"><strong>Inspectable graph</strong><br>Search and move through memories, files, concepts, decisions, and source hashes in the local dashboard or query them from the CLI and API.</td>
   </tr>
 </table>
 
 Metadata-only capture is the default. Content capture requires explicit workspace consent. Hidden reasoning, private transcripts, credentials, and browser session state remain outside the product boundary.
 
+## One memory stack, five readable layers
+
+1. **Record:** each captured request, decision, result, source, or summary enters the project-owned JSONL ledger with its own identity and a hash linked to the previous record.
+2. **Index:** Qarinah rebuilds a local SQLite/FTS5 read model for fast text search. No hosted database is required.
+3. **Connect:** the typed graph links memories to files, directories, concepts, sources, conflicts, and superseded decisions. Project scans contribute paths and hashes, not a second source of truth.
+4. **Compress:** hybrid retrieval combines lexical relevance, one-hop graph evidence, and structural importance to produce a small cited pack for the task.
+5. **Expand:** every selected item keeps its event ID and content hash, so a developer can inspect the full retained record, its neighbors, and the readable Markdown view when more detail is needed.
+
+```sh
+# Search memory and code relationships from the terminal.
+npx qarinah map "release approval module" --type memory,file,concept
+
+# Open the local circular graph, drag crowded nodes, and inspect source hashes.
+npx qarinah dashboard --serve
+```
+
 ## Compile memory before the model request
 
 When a host or orchestrator queries Qarinah before constructing a model request, Qarinah compiles the retained project history into a bounded cited pack first. That same pack can be supplied to a small local model, a large-context model, or a high-reasoning Codex or Claude session. The compiler itself does not need an embedding API, a hosted memory service, or a Qarinah API key.
 
-Packs are requested explicitly. Hosts can call the CLI or JavaScript API, use a separately governed Maqam capability, or enable Qarinah's zero-write MCP `context.query` tool with a permit bound to the exact workspace and current consent-policy hash. Without that permit, the built-in MCP server exposes diagnostics only.
+Packs are requested explicitly. Hosts can call the CLI or JavaScript API, enable Qarinah's zero-write MCP `context.query` tool with a permit bound to the exact workspace and current consent-policy hash, or optionally route a query through Maqam when policy or approval is useful. Without that permit, the built-in MCP server exposes diagnostics only.
 
 ## What it records
 
-Qarinah records every permitted lifecycle event delivered by a supported host adapter and every decision that a user or governed workflow explicitly commits. It does not claim to infer every cognitive decision automatically.
+Qarinah records every captured lifecycle event delivered by a supported host adapter and every decision that a user or connected workflow explicitly commits. It does not claim to infer every cognitive decision automatically.
 
 Supported event classes include prompts, tool requests, tool completions, approvals, artifacts, sources, claims, decisions, summaries, compactions, subagents, completed turns, and failed turns. Relations connect sessions, turns, tool calls, sources, approvals, conflicts, supersession, derived evidence, and produced project structure.
 
@@ -488,14 +504,14 @@ npx -y qarinah@latest query "checkout dialog focus trap" \
 
 The returned pack selects complete cited records from the verified event chain. It is not a model-written rolling summary. Plugin installation is host-wide; capture permission and retained context remain project-specific. See [host integrations](docs/HOST-INTEGRATIONS.md) for current private-clone testing, Claude project/local scopes, upgrades, and interpreter trust.
 
-## Ecosystem boundary
+## Optional ecosystem connections
 
-- **Maqam governs** which registered reads and writes are allowed.
-- **Cockroach Crawler gathers** bounded public source records.
-- **Cockroach Browser emits** cited browser-outcome metadata under host-owned authority.
-- **Qarinah remembers** decisions, evidence, provenance, and outcomes.
-- **ProductLoop orchestrates** workflows across those explicit boundaries.
-- **ProductLoop Workbench presents** durable local runs, exact approval records, evidence, and cited Qarinah event references to one operator.
+- **Qarinah remembers** decisions, evidence, provenance, outcomes, and code relationships.
+- **Cockroach Crawler gathers** public web records for research and extraction workflows.
+- **Cockroach Browser emits** cited browser-outcome metadata from interactive sessions.
+- **Maqam optionally adds** policy and approval to selected registered reads or writes.
+- **ProductLoop can orchestrate** workflows across independently installed tools.
+- **ProductLoop Workbench can present** durable local runs, approval records, evidence, and cited Qarinah event references to one operator.
 
 These are composable packages, not one silently merged runtime. Qarinah also works without the other packages. Workbench stores Qarinah event IDs and hashes as references; it does not gain context-disclosure or append authority. Qarinah's Cockroach Browser adapter is a passive, metadata-only sink: it cannot launch a browser, inspect a session, approve an action, or grant origin access. See the [interoperability contract](docs/INTEROPERABILITY.md#cockroach-browser-cited-metadata-outcomes).
 

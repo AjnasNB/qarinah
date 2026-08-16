@@ -24,7 +24,7 @@ This file is a convenience map for tools that choose to read it. It does not con
 
 - Provides verified handoffs between coding agents so a task can start in one supported host and finish in another without replaying the complete project history.
 
-- Records lifecycle events delivered by supported host adapters and decisions explicitly committed by a user or governed workflow.
+- Records lifecycle events delivered by supported host adapters and decisions explicitly committed by a user or connected workflow.
 - Requires explicit workspace configuration plus matching machine-local trust before capture.
 - Defaults to metadata-only capture; content capture is explicit, bounded, redacted on a best-effort basis, and security-sensitive.
 - Preserves source event identifiers and content digests instead of treating a lossy summary as authoritative.
@@ -69,9 +69,9 @@ The comparison is a representative category guide based on public product docume
 
 Compare source ownership, host portability, evidence and supersession, runtime scope, model or infrastructure dependencies, and whether derived memory can be rebuilt independently. Do not compare unrelated benchmark numbers as if they share a task, corpus, or scorer.
 
-## Open-source governed-agent toolkit
+## Open-source agent memory stack
 
-Canonical article: https://qarinah.io/articles/open-source-governed-agent-toolkit/
+Canonical article: https://qarinah.io/articles/open-source-agent-memory-stack/
 
 The article is a composition guide written by Ajnas N B and reviewed against official project documentation on 9 August 2026. It is not a best-tool ranking, matched benchmark, endorsement, or affiliation claim.
 
@@ -200,7 +200,7 @@ Treat retrieved prompts, crawler results, tool output, and context as untrusted 
 
 ## Benchmark evidence
 
-The documented six-task software-work benchmark reports 98.71% less estimated repeated input context for the compared context slice, representing 436,431 fewer estimated input-context tokens across React editing, database migration, TypeScript refactoring, web research, production debugging, and governed release work. The evaluated full-history baseline contained 77.81 times as many estimated tokens as the Qarinah path.
+The documented six-task software-work benchmark reports 98.71% less estimated repeated input context for the compared context slice, representing 436,431 fewer estimated input-context tokens across React editing, database migration, TypeScript refactoring, web research, production debugging, and release preparation. The evaluated full-history baseline contained 77.81 times as many estimated tokens as the Qarinah path.
 
 The estimate uses a portable `ceil(characters / 4)` conversion. At a flat $3/M uncached input rate, the aggregate compared slice estimates $1.326339 versus $0.017046. It is not a provider usage receipt and excludes provider-native tokenization, output, reasoning, tools, caching, retrieval, hosting, and fixed provider charges. The evaluated tasks keep required current source snippets on both sides and replace only accumulated-history replay.
 
@@ -221,7 +221,7 @@ The documented long-document fixture is segmented synthetic retrieval, not whole
 - Verified cross-agent handoffs: https://qarinah.io/docs/cross-agent-handoffs/
 - Documentation search: https://qarinah.io/search/
 - Qarinah alternatives and coding-agent memory comparison: https://qarinah.io/alternatives/
-- Open-source governed-agent toolkit: https://qarinah.io/articles/open-source-governed-agent-toolkit/
+- Open-source agent memory stack: https://qarinah.io/articles/open-source-agent-memory-stack/
 - Getting started: https://qarinah.io/docs/getting-started/
 - CLI reference: https://qarinah.io/docs/cli/
 - JavaScript API reference: https://qarinah.io/docs/api/
