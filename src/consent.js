@@ -258,12 +258,18 @@ async function readBoundedMachineJsonOnce(candidate, maximumBytes, label) {
   try {
     const opened = await handle.stat({ bigint: true });
     const named = await lstat(candidate, { bigint: true });
-    if (!opened.isFile() || opened.nlink !== 1n
-      || named.isSymbolicLink() || !named.isFile() || named.nlink !== 1n) {
+    if (!opened.isFile() || named.isSymbolicLink() || !named.isFile()) {
       throw new QarinahError("TRUST_INVALID", `${label} must be a singly linked regular file.`);
     }
+    // A concurrent atomic checkpoint update can unlink the inode held by this
+    // handle before lstat observes the replacement. On POSIX that stale, still
+    // open inode reports nlink=0. Compare identity first so this safe
+    // replacement is retried instead of being misclassified as a hard link.
     if (opened.dev !== named.dev || opened.ino !== named.ino) {
       throw new MachineJsonReadRaceError();
+    }
+    if (opened.nlink !== 1n || named.nlink !== 1n) {
+      throw new QarinahError("TRUST_INVALID", `${label} must be a singly linked regular file.`);
     }
     if (opened.size > BigInt(maximumBytes)) {
       throw new QarinahError("TRUST_INVALID", `${label} exceeds its size limit.`);

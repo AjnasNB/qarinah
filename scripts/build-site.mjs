@@ -887,7 +887,7 @@ function footer() {
           <a class="startupbase-badge" href="https://startupbase.io/products/qarinah?utm_source=startupbase&amp;utm_medium=badge&amp;utm_campaign=launch-badge-dark" rel="noreferrer">
             <img src="https://statics.startupbase.io/site/badges/launched-on-sb-dark.svg" alt="Launched on StartupBase" height="55">
           </a>
-          <a href="https://fazier.com/launches/qarinah.io" target="_blank"><img src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=launched&amp;theme=light" width="120" alt="Fazier badge" /></a>
+          <a href="https://fazier.com/launches/qarinah" target="_blank"><img src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=launched&amp;theme=light" width="120" alt="Fazier badge" /></a>
           <a class="launchnest-badge" href="https://launchnest.io/p/qarinah" target="_blank">
             <img src="https://launchnest.io/badge/qarinah.svg?variant=listed" alt="Qarinah on LaunchNest" width="220" height="56">
           </a>
@@ -1324,11 +1324,14 @@ function homePage() {
             <p class="eyebrow">Project memory for parallel coding-agent work</p>
             <h1>One memory system for every Git worktree.</h1>
             <p class="hero-lede">Give each checkout its own evidence-linked ledger. Qarinah groups sibling worktrees into one branch-and-commit-aware context graph, then gives each coding agent the cited files, decisions, outcomes, and history relevant to its task.</p>
+            <a class="hero-context-proof" href="/docs/benchmarks/" aria-label="98.71% less estimated repeated context in the published six-fixture benchmark. Read the scoped method and artifacts.">
+              <strong>98.71%</strong>
+              <span><b>less estimated repeated context</b><small>442,113 baseline tokens &rarr; 5,682 cited-pack tokens in the published six-fixture evaluation</small></span>
+            </a>
             <div class="hero-actions">
               <a class="btn btn-primary btn-large" href="/docs/getting-started/">Set up this worktree</a>
               <a class="hero-text-link" href="/articles/git-worktree-context-for-coding-agents/">See how the graph works</a>
             </div>
-            <a class="hero-evidence-link" href="/docs/benchmarks/">Also verified: 98.71% less estimated repeated context in the published six-fixture benchmark</a>
           </div>
           <aside class="worktree-hero-map" aria-label="How Qarinah groups isolated Git worktree memory">
             <div class="worktree-map-header"><span>LOCAL CONTEXT GRAPH</span><strong>one repository · two isolated ledgers</strong></div>

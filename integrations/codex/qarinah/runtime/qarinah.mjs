@@ -1208,11 +1208,14 @@ async function readBoundedMachineJsonOnce(candidate, maximumBytes, label) {
   try {
     const opened = await handle.stat({ bigint: true });
     const named = await lstat2(candidate, { bigint: true });
-    if (!opened.isFile() || opened.nlink !== 1n || named.isSymbolicLink() || !named.isFile() || named.nlink !== 1n) {
+    if (!opened.isFile() || named.isSymbolicLink() || !named.isFile()) {
       throw new QarinahError("TRUST_INVALID", `${label} must be a singly linked regular file.`);
     }
     if (opened.dev !== named.dev || opened.ino !== named.ino) {
       throw new MachineJsonReadRaceError();
+    }
+    if (opened.nlink !== 1n || named.nlink !== 1n) {
+      throw new QarinahError("TRUST_INVALID", `${label} must be a singly linked regular file.`);
     }
     if (opened.size > BigInt(maximumBytes)) {
       throw new QarinahError("TRUST_INVALID", `${label} exceeds its size limit.`);
