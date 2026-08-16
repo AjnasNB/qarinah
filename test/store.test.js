@@ -80,6 +80,23 @@ test("workspace append, verification, disable, and re-enable are consistent", as
   assert.equal((await loadWorkspace(root)).config.enabled, true);
 });
 
+test("machine trust rejects a stable hard link while permitting atomic replacement retries", async (t) => {
+  const root = await temporaryDirectory(t);
+  const workspace = await initializeWorkspace(root);
+  const trustPath = machineTrustPath(workspace.root);
+  const linkedTrustPath = `${trustPath}.hardlink-test`;
+  t.after(() => rm(linkedTrustPath, { force: true }));
+  await link(trustPath, linkedTrustPath);
+
+  await assert.rejects(
+    () => loadWorkspace(root),
+    (error) => error.code === "TRUST_INVALID" && /singly linked regular file/u.test(error.message)
+  );
+
+  await rm(linkedTrustPath, { force: true });
+  assert.equal((await loadWorkspace(root)).root, workspace.root);
+});
+
 test("machine-local permit binds the complete capture policy and prevents portable reactivation", async (t) => {
   const root = await temporaryDirectory(t);
   const workspace = await initializeWorkspace(root);
