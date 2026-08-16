@@ -1,17 +1,17 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
   "name": "io.github.AjnasNB/qarinah",
-  "description": "Worktree-aware project memory and cited context graphs for coding agents.",
+  "description": "Worktree-aware coding context harness with automatic compact checkpoints and cited context graphs.",
   "repository": {
     "url": "https://github.com/AjnasNB/qarinah",
     "source": "github"
   },
-  "version": "0.2.0",
+  "version": "0.3.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "qarinah",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "transport": {
         "type": "stdio"
       }

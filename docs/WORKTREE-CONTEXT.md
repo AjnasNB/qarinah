@@ -19,7 +19,7 @@ Sibling checkouts share only a non-secret repository group ID derived from Git h
 Run setup in every checkout that should retain its own activity:
 
 ```sh
-npx qarinah setup . --capture content --allow-query
+npx qarinah setup . --capture content --allow-query --auto-compact
 npx qarinah scan
 npx qarinah build
 ```
@@ -29,9 +29,10 @@ From any checkout in the repository:
 ```sh
 npx qarinah worktrees
 npx qarinah dashboard --serve --worktrees
+npx qarinah harness "current task" --worktrees
 ```
 
-The first command lists up to 64 live Git worktrees with repository ID, worktree ID, branch, commit, linked/detached state, and exact-root Qarinah initialization status. The second opens every initialized sibling in one loopback-only dashboard.
+The first command lists up to 64 live Git worktrees with repository ID, worktree ID, branch, commit, linked/detached state, and exact-root Qarinah initialization status. The second opens every initialized sibling in one loopback-only dashboard. The harness command compiles and measures a separate cited pack per initialized checkout; it never flattens sibling contents into one authority surface.
 
 ## What the hashes mean
 

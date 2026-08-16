@@ -63,6 +63,8 @@ try {
     "  ingestCockroachSourceRecord,",
     "  importAgentArchive,",
     "  buildProjectOverview,",
+    "  runCodingContextHarness,",
+    "  renderCodingContextHarnessMarkdown,",
     "  buildLinkedProjectMemory,",
     "  loadLinkedProjectMemory,",
     "  queryLinkedProjectMemory,",
@@ -92,6 +94,8 @@ try {
     "  type QarinahOkfExportResult,",
     "  type QarinahAgentArchiveImportResult,",
     "  type QarinahProjectOverview,",
+    "  type QarinahCodingContextHarnessResult,",
+    "  type QarinahCodingContextSummarizer,",
     "  type QarinahLinkedProjectMemory,",
     "  type QarinahLinkedProjectQuery,",
     "  type QarinahGitWorktree",
@@ -112,6 +116,9 @@ try {
     "const projectOverview: Promise<QarinahProjectOverview> = buildProjectOverview();",
     "void projectOverview;",
     "void renderProjectOverviewMarkdown;",
+    "const contextSummarizer: QarinahCodingContextSummarizer = { id: 'consumer-summary', summarize: () => ({ text: 'bounded summary' }) };",
+    "const codingHarness: Promise<Readonly<QarinahCodingContextHarnessResult>> = runCodingContextHarness({ query: 'release readiness', summarizer: contextSummarizer, record: false });",
+    "void codingHarness.then(renderCodingContextHarnessMarkdown);",
     "void buildLinkedProjectMemory;",
     "void loadLinkedProjectMemory;",
     "void rankLinkedProjectMemory;",
@@ -244,6 +251,12 @@ try {
   );
   await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "linked-project-memory.schema.json"), "utf8");
   await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "linked-project-query.schema.json"), "utf8");
+  assert.equal(
+    installedPackage.exports["./schemas/coding-context-harness.json"],
+    "./schemas/coding-context-harness.schema.json"
+  );
+  await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "coding-context-harness.schema.json"), "utf8");
+  await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "docs", "CODING-CONTEXT-HARNESS.md"), "utf8");
   process.stdout.write("Exact cockroach-browser@0.1.0 TypeScript and registry-integrity contract passed.\n");
 } finally {
   await rm(temporaryDirectory, { recursive: true, force: true });

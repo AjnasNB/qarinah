@@ -66,6 +66,7 @@ All commands that omit a path use the current working directory. Workspace looku
 
 ```text
 qarinah init [path] [--capture metadata|content]
+qarinah setup [path] [--codex] [--claude] [--cursor] [--kimi] [--antigravity] [--auto-compact]
 qarinah policy [path]
 qarinah trust [path] --capture metadata|content --policy-hash sha256:<digest>
 qarinah untrust
@@ -79,6 +80,7 @@ qarinah build
 qarinah import <archive-file-or-directory> [options]
 qarinah overview [--format json|markdown]
 qarinah map [query] [--limit n] [--type memory,file,concept,directory,reference] [--repository id,...] [--scope id,...] [--as-of timestamp]
+qarinah harness [query] [--worktrees] [--record] [--no-rebuild] [--format json|markdown] [options]
 qarinah query [text] [options]
 qarinah query --stdin-json
 qarinah context [text] [options]
@@ -430,6 +432,31 @@ Admission is applied before the event window is bounded. A future, restricted, o
 
 Run `qarinah scan` before `map` when file and directory results are required. The linked view remains disposable derived state and `qarinah build` can regenerate it from the verified event record.
 
+## `harness`
+
+Compile one coding-agent context checkpoint from the verified ledger:
+
+```sh
+npx qarinah harness "release readiness" --format markdown
+npx qarinah harness "release readiness" --record
+npx qarinah harness "release readiness" --worktrees
+```
+
+| Option | Default | Meaning |
+| --- | --- | --- |
+| `--worktrees` | Current worktree only | Inspect every initialized sibling worktree and keep each pack separate. This mode is read-only and cannot be combined with `--record`. |
+| `--record` | Off | Append one idempotent, evidence-linked checkpoint for the current non-harness source head. |
+| `--no-rebuild` | Off | Append without immediately rebuilding disposable SQLite, graph, Markdown, and dashboard projections. Automatic Stop hooks use this lighter mode. |
+| `--format json\|markdown` | `json` | Select structured or readable output. |
+| `--max-chars n` | `12000` | Bound the compiled pack. |
+| `--max-tokens n` | Workspace character budget | Add a portable token ceiling. |
+| `--reserve-tokens n` | `0` | Reserve model-output space within the token plan. |
+| `--limit n` | `20` | Bound selected source events from 1 to 64. |
+| `--max-summary-chars n` | `2000` | Bound deterministic or host-model summary text. |
+| `--quiet` | Off | Suppress stdout for a host hook. |
+
+Every ready result includes exact selected event IDs and hashes, the context-pack manifest, actual portable token estimates for that retained ledger and pack, and the scoped published comparison. The embedded 98.71% figure is the published six-fixture repeated-input estimate (442,113 versus 5,682 tokens), not a guarantee for this invocation. See [Coding context harness](CODING-CONTEXT-HARNESS.md).
+
 ## `build` and `rebuild`
 
 Verify the authoritative event record and deterministically rebuild its graph, retrieval index, Markdown view, and event-ID projection.
@@ -692,10 +719,12 @@ The result includes store verification fields plus `enabled` and `maxLogBytes`. 
 Initialize one project, install selected project-local coding-agent integrations, configure MCP, initialize SQLite/graph/readable views/dashboard, and run an integrity check:
 
 ```sh
-npx qarinah setup . --codex --claude --cursor --kimi --antigravity --capture content --allow-query
+npx qarinah setup . --codex --claude --cursor --kimi --antigravity --capture content --allow-query --auto-compact
 ```
 
 Omit host flags to configure all five supported project integrations. Omit `--allow-query` for diagnostic-only MCP. With `--allow-query`, setup binds the zero-write `context.query` tool to the exact workspace's current consent-policy hash and response ceilings. Codex and Claude Code receive reviewed lifecycle hooks; Cursor, Kimi, and Antigravity receive their documented project-local MCP/configuration surfaces. See [Coding-agent host compatibility](HOST-COMPATIBILITY.md).
+
+`--auto-compact` is opt-in and applies to Codex and Claude Code Stop hooks. It runs after ordinary lifecycle capture and invokes `harness --record --no-rebuild --quiet`, producing one idempotent cited checkpoint without forcing a full projection rebuild after every turn.
 
 ## `mcp`
 

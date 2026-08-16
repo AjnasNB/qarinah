@@ -26,7 +26,7 @@ const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "
 const benchmarkRelease = JSON.parse(await readFile(path.join(root, "bench", "results", "benchmark-release-0.1.6.json"), "utf8"));
 const productVersion = packageJson.version;
 const productPositioning = "Worktree-aware project memory and cited context graphs for coding agents.";
-const productExplanation = "Qarinah gives every Git checkout an isolated evidence-linked ledger, groups sibling worktrees into one repository context graph, and gives Codex, Claude Code, Cursor, and compatible tools a compact cited handoff for the branch and task in front of them.";
+const productExplanation = "Qarinah gives every Git checkout an isolated evidence-linked ledger, groups sibling worktrees into one repository context graph, and automatically compiles compact cited checkpoints for Codex, Claude Code, Cursor, and compatible tools.";
 const repeatedContextMetric = benchmarkRelease.headlineContextResults.find((result) => result.id === "six-task-repeated-context");
 if (!repeatedContextMetric
   || repeatedContextMetric.baselineEstimatedTokens !== 442113
@@ -509,6 +509,14 @@ const docPages = [
     description: "Inspect real local Qarinah activity in responsive static snapshots or a live multi-project loopback dashboard with explicit workspace identity.",
     section: "Operate",
     aliases: ["memory dashboard", "project dashboard", "decision dashboard", "context savings", "agent activity", "affected files"]
+  },
+  {
+    route: "docs/coding-context-harness",
+    source: "docs/CODING-CONTEXT-HARNESS.md",
+    title: "Automatic coding context harness",
+    description: "Capture completed coding-agent turns, compile bounded cited checkpoints, measure each worktree's actual context reduction, and optionally use a host model on the bounded pack.",
+    section: "Use",
+    aliases: ["coding harness", "automatic compaction", "agent context checkpoint", "worktree token reduction", "same model summary"]
   },
   {
     route: "docs/worktree-context",
@@ -1313,7 +1321,7 @@ function commandBlock(command, label = "Terminal") {
 function homePage() {
   return layout({
     title: "Qarinah - One Memory System for Every Git Worktree",
-    description: "Qarinah keeps isolated project memory per Git checkout, groups sibling worktrees in one context graph, and compiles cited context for coding agents.",
+    description: "Qarinah keeps isolated project memory per Git checkout and automatically compiles bounded, cited context checkpoints for coding agents.",
     active: "home",
     canonical: "/",
     kind: "home",
@@ -1323,7 +1331,7 @@ function homePage() {
           <div class="hero-copy">
             <p class="eyebrow">Project memory for parallel coding-agent work</p>
             <h1>One memory system for every Git worktree.</h1>
-            <p class="hero-lede">Give each checkout its own evidence-linked ledger. Qarinah groups sibling worktrees into one branch-and-commit-aware context graph, then gives each coding agent the cited files, decisions, outcomes, and history relevant to its task.</p>
+            <p class="hero-lede">Give each checkout its own evidence-linked ledger. Qarinah groups sibling worktrees into one branch-and-commit-aware context graph, then automatically compiles the cited files, decisions, outcomes, and history relevant to the next coding task.</p>
             <a class="hero-context-proof" href="/docs/benchmarks/" aria-label="98.71% less estimated repeated context in the published six-fixture benchmark. Read the scoped method and artifacts.">
               <strong>98.71%</strong>
               <span><b>less estimated repeated context</b><small>442,113 baseline tokens &rarr; 5,682 cited-pack tokens in the published six-fixture evaluation</small></span>
@@ -1384,12 +1392,12 @@ function homePage() {
           <div class="handoff-stage-copy">
             <p class="eyebrow">One repository, precise checkout context</p>
             <h2 id="handoff-stage-title">Initialize the worktrees that should remember.</h2>
-            <p>Run setup inside each active checkout. Every supported host in that checkout queries its cited decisions and outcomes; the grouped dashboard shows initialized siblings without sharing their writable stores.</p>
-            ${commandBlock("npx qarinah setup . --codex --claude --cursor --capture content --allow-query\nnpx qarinah worktrees\nnpx qarinah dashboard --serve --worktrees", "Set up and inspect worktree memory")}
+            <p>Run setup inside each active checkout. Codex and Claude can record one idempotent compact checkpoint after a completed turn; every supported host can retrieve the cited pack, while the grouped dashboard keeps sibling writable stores separate.</p>
+            ${commandBlock("npx qarinah setup . --codex --claude --cursor --capture content --allow-query --auto-compact\nnpx qarinah harness \"current task\" --format markdown\nnpx qarinah dashboard --serve --worktrees", "Set up the automatic coding context harness")}
             <div class="host-shortcuts" aria-label="Qarinah host commands">
               <span><strong>Codex</strong><code>$qarinah</code></span>
               <span><strong>Claude Code</strong><code>/qarinah &lt;task&gt;</code></span>
-              <span><strong>Any terminal</strong><code>npx qarinah query "&lt;task&gt;"</code></span>
+              <span><strong>Any terminal</strong><code>npx qarinah harness "&lt;task&gt;"</code></span>
             </div>
           </div>
           <aside class="hero-proof" aria-label="Benchmark summary">
@@ -1417,7 +1425,7 @@ function homePage() {
           <figcaption>Generated from real local CLI setup, retained decisions, a project-structure v2 scan, and the hash-chained ledger. No fictional graph data or hosted account is involved.</figcaption>
         </figure>
         <div class="hero-actions dashboard-proof-actions">
-          <a class="btn btn-primary" href="/docs/worktree-context/">Open the worktree guide</a>
+          <a class="btn btn-primary" href="/docs/coding-context-harness/">Open the coding harness guide</a>
           <a class="hero-text-link" href="/docs/dashboard/">Run the local dashboard</a>
         </div>
       </section>

@@ -119,16 +119,38 @@ function qarinahHook(adapter) {
   };
 }
 
-function addHookEvents(settings, adapter) {
+function qarinahHarnessHook() {
+  return {
+    type: "command",
+    command: `node ${JSON.stringify(BIN_PATH)} harness --record --no-rebuild --quiet`,
+    timeout: 30,
+    statusMessage: "Compacting cited Qarinah coding context"
+  };
+}
+
+function addHookEvents(settings, adapter, options) {
   const next = { ...settings, hooks: { ...(settings.hooks ?? {}) } };
   const events = adapter === "codex"
     ? ["SessionStart", "UserPromptSubmit", "PreToolUse", "PermissionRequest", "PostToolUse", "PreCompact", "PostCompact", "Stop", "SubagentStart", "SubagentStop"]
     : ["SessionStart", "UserPromptSubmit", "PreToolUse", "PostToolUse", "PostToolUseFailure", "PermissionDenied", "PreCompact", "PostCompact", "Stop", "StopFailure", "SubagentStart", "SubagentStop", "SessionEnd"];
   for (const event of events) {
     const entries = Array.isArray(next.hooks[event]) ? [...next.hooks[event]] : [];
-    const serialized = JSON.stringify(entries);
-    if (!serialized.includes(`${BIN_PATH.replaceAll("\\", "\\\\")} hook ${adapter}`)) {
-      entries.push({ ...(event.includes("Tool") || event.startsWith("Subagent") ? { matcher: "*" } : {}), hooks: [qarinahHook(adapter)] });
+    const captureHook = qarinahHook(adapter);
+    let captureIndex = entries.findIndex((entry) => (
+      Array.isArray(entry?.hooks) && entry.hooks.some((hook) => hook?.command === captureHook.command)
+    ));
+    if (captureIndex === -1) {
+      entries.push({ ...(event.includes("Tool") || event.startsWith("Subagent") ? { matcher: "*" } : {}), hooks: [captureHook] });
+      captureIndex = entries.length - 1;
+    }
+    if (event === "Stop" && options.autoCompact === true) {
+      const entry = entries[captureIndex];
+      const hooks = Array.isArray(entry.hooks) ? [...entry.hooks] : [];
+      const harnessHook = qarinahHarnessHook();
+      if (!hooks.some((hook) => hook?.command === harnessHook.command)) {
+        hooks.push(harnessHook);
+        entries[captureIndex] = { ...entry, hooks };
+      }
     }
     next.hooks[event] = entries;
   }
@@ -198,7 +220,7 @@ async function configureCodex(workspace, options) {
     ? existing.replace(pattern, block)
     : `${existing.trimEnd()}${existing.trim() ? "\n\n" : ""}${block}\n`;
   await atomicWriteFile(configPath, next);
-  await writeJsonMerged(resolveWithin(root, "hooks.json"), workspace.root, ".codex/hooks.json", (value) => addHookEvents(value, "codex"));
+  await writeJsonMerged(resolveWithin(root, "hooks.json"), workspace.root, ".codex/hooks.json", (value) => addHookEvents(value, "codex", options));
   await installHostSkills(workspace, "codex");
   return [
     ".codex/config.toml",
@@ -223,7 +245,7 @@ async function configureClaude(workspace, options) {
       }
     }
   }));
-  await writeJsonMerged(resolveWithin(root, "settings.json"), workspace.root, ".claude/settings.json", (value) => addHookEvents(value, "claude"));
+  await writeJsonMerged(resolveWithin(root, "settings.json"), workspace.root, ".claude/settings.json", (value) => addHookEvents(value, "claude", options));
   await installHostSkills(workspace, "claude");
   return [
     ".mcp.json",
@@ -383,6 +405,7 @@ export async function setupWorkspace(options = {}) {
     workspaceId: workspace.config.workspaceId,
     capture: workspace.config.capture,
     queryEnabled: options.allowQuery === true,
+    autoCompact: options.autoCompact === true,
     targets,
     files,
     projectStructure,

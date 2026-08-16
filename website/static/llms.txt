@@ -1,8 +1,8 @@
 # Qarinah
 
-> One memory system for every Git worktree.
+> One automatic coding context harness for every Git worktree.
 
-Qarinah gives every Git worktree an isolated, cited project ledger while linking related checkouts into one repository context graph. Codex, Claude Code, Cursor, and compatible tools can continue from verified context without mixing parallel branches or replaying the complete project history.
+Qarinah gives every Git worktree an isolated, cited project ledger, automatically records compact completed-turn checkpoints, and links related checkouts into one repository context graph. Codex, Claude Code, Cursor, and compatible tools can continue from verified context without mixing parallel branches or replaying the complete project history.
 
 This file is a convenience map for tools that choose to read it. It is not a ranking signal or a substitute for the canonical documentation.
 
@@ -11,6 +11,7 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 - [Homepage](https://qarinah.io/): Product overview, benchmark summary, and primary navigation.
 - [Git worktree context](https://qarinah.io/articles/git-worktree-context-for-coding-agents/): Why parallel coding-agent branches need isolated ledgers and a shared repository graph.
 - [Worktree context guide](https://qarinah.io/docs/worktree-context/): Initialize each checkout, discover initialized siblings, inspect exact identities, and open the grouped graph dashboard.
+- [Coding context harness](https://qarinah.io/docs/coding-context-harness/): Automatically compact completed coding turns into measured, cited, per-worktree checkpoints.
 - [Machine-readable public metrics](https://qarinah.io/metrics.json): Exact release numbers, evidence source, estimator, and claim boundaries.
 - [Verified cross-agent handoffs](https://qarinah.io/docs/cross-agent-handoffs/): Switch coding agents and continue a real task with compact, cited project context.
 - [Direct answers](https://qarinah.io/docs/faq/): Concise answers about Qarinah, context reduction, cost boundaries, Codex, Claude Code, privacy, and open-source licensing.
@@ -38,6 +39,7 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 - Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler are separate projects by Ajnas N B. The ecosystem guide distinguishes them from third-party tools maintained by their own projects.
 - Cockroach Browser uses Playwright. Cockroach Crawler discloses Trafilatura as the optional quality dependency. The ecosystem guide does not claim that those established projects were created by Qarinah's author.
 - Qarinah's primary workflow is verified handoffs between coding agents.
+- Qarinah's optional automatic harness records a deterministic compact checkpoint after a supported completed turn; optional host-model compaction receives only the already bounded pack and is not enabled by the automatic hook.
 - Qarinah initializes a rebuildable SQLite WAL/FTS5 read model, graph, index, and Markdown view when a workspace is initialized.
 - Complete setup records a bounded project-structure graph, and `qarinah overview` explains memory counts, latest outcomes, languages, directories, and relationships.
 - `qarinah import` streams supported visible Codex, Claude, and portable JSONL archives. Compact mode stores one cited summary per session; full mode stores supported visible events in a content-authorized workspace.

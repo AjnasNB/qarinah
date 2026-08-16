@@ -1,7 +1,7 @@
 import { canonicalStringify, deepFreezeJson } from "./canonical.js";
 import { CONTEXT_PACK_SCHEMA_VERSION, createManifestHash, validateStoredEvent } from "./contracts.js";
 import { QarinahError } from "./errors.js";
-import { loadIndex } from "./indexer.js";
+import { buildDerivedState, loadIndex } from "./indexer.js";
 import { markdownDataBlock, markdownInline, markdownSafeText } from "./markdown.js";
 import { rankContextEvents } from "./retrieval.js";
 import { validateProjectStructureSnapshot } from "./project-structure.js";
@@ -262,12 +262,7 @@ function candidateFits(base, items, maxChars, tokenPlan) {
   };
 }
 
-export async function compileContext(query = "", options = {}) {
-  const { workspace, index } = await loadIndex(options.cwd || process.cwd(), {
-    rebuild: options.rebuild,
-    updateCheckpoint: options.updateCheckpoint,
-    inMemory: options.inMemory === true
-  });
+async function compileContextWithIndex(query, options, workspace, index) {
   const requestedMaxChars = options.maxChars ?? workspace.config.contextMaxChars;
   const limit = options.limit ?? 20;
   if (!Number.isSafeInteger(requestedMaxChars) || requestedMaxChars < 512 || requestedMaxChars > 1_000_000) {
@@ -444,6 +439,29 @@ export async function compileContext(query = "", options = {}) {
     throw new QarinahError("CONTEXT_BUDGET_EXCEEDED", "Context-pack size accounting exceeded its budget.");
   }
   return deepFreezeJson(pack);
+}
+
+export async function compileContext(query = "", options = {}) {
+  const { workspace, index } = await loadIndex(options.cwd || process.cwd(), {
+    rebuild: options.rebuild,
+    updateCheckpoint: options.updateCheckpoint,
+    inMemory: options.inMemory === true
+  });
+  return compileContextWithIndex(query, options, workspace, index);
+}
+
+// Package-internal entry point for callers that already hold a verified, policy-admitted event set.
+// It is intentionally not re-exported from src/index.js or the package export map.
+export async function compileContextFromVerifiedEvents(query = "", request = {}) {
+  if (!request || typeof request !== "object" || Array.isArray(request)) {
+    throw new TypeError("compileContextFromVerifiedEvents request must be a record.");
+  }
+  const { workspace, events, ...options } = request;
+  if (!workspace?.config?.workspaceId || !Array.isArray(events)) {
+    throw new TypeError("compileContextFromVerifiedEvents requires a loaded workspace and verified events array.");
+  }
+  const index = buildDerivedState(events, workspace.config.workspaceId).index;
+  return compileContextWithIndex(query, { ...options, inMemory: true }, workspace, index);
 }
 
 export function renderContextPackMarkdown(pack) {

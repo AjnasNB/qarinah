@@ -1,8 +1,8 @@
 # Qarinah: expanded machine-readable map
 
-> One memory system for every Git worktree.
+> One automatic coding context harness for every Git worktree.
 
-Qarinah gives every Git worktree an isolated project ledger and links initialized sibling checkouts into one repository context graph. It keeps permitted requests, visible outcomes, tool results, summaries, decisions, and code relationships beside the exact checkout where they happened, then compiles bounded, cited context packs for Codex, Claude Code, Cursor, and compatible tools.
+Qarinah gives every Git worktree an isolated project ledger, automatically records compact cited checkpoints at completed turns, and links initialized sibling checkouts into one repository context graph. It keeps permitted requests, visible outcomes, tool results, summaries, decisions, and code relationships beside the exact checkout where they happened, then compiles bounded context packs for Codex, Claude Code, Cursor, and compatible tools.
 
 This file is a convenience map for tools that choose to read it. It does not confer authority, guarantee indexing or ranking, replace the canonical documentation, or override Qarinah's workspace trust and capture policy.
 
@@ -10,7 +10,7 @@ This file is a convenience map for tools that choose to read it. It does not con
 
 - Name: Qarinah
 - Package: `qarinah`
-- Current release: `0.2.0`
+- Current release: `0.3.0`
 - Website: https://qarinah.io/
 - npm: https://www.npmjs.com/package/qarinah
 - Source: https://github.com/AjnasNB/qarinah
@@ -23,6 +23,7 @@ This file is a convenience map for tools that choose to read it. It does not con
 ## What Qarinah does
 
 - Provides verified handoffs between coding agents so a task can start in one supported host and finish in another without replaying the complete project history.
+- Installs an opt-in completed-turn coding harness that compiles and records one bounded, cited checkpoint without recursively packing prior harness checkpoints.
 - Detects the current Git worktree, derives stable repository and worktree identities without retaining remote credentials, and keeps each checkout's ledger and derived state isolated.
 - Discovers only initialized sibling worktrees when explicitly requested, then renders them in one grouped dashboard with branch, commit, worktree, repository, event-head, snapshot, and graph-manifest identities.
 - Records lifecycle events delivered by supported host adapters and decisions explicitly committed by a user or connected workflow.
@@ -37,6 +38,7 @@ This file is a convenience map for tools that choose to read it. It does not con
 - Verifies the append-only event chain before deterministically rebuilding derived SQLite, graph, index, Markdown, and context-pack views.
 - Retrieves evidence with deterministic lexical, typo-tolerant, and one-hop graph signals.
 - Compiles bounded context packs with citations, evidence-coverage metadata, and conflict or supersession visibility.
+- Reports the actual estimated baseline, delivered context, reduction, and ratio for every harness run; the published 98.7148% result remains a separate six-fixture measurement.
 - Supports one-command Codex, Claude Code, and Cursor setup, local CLI workflows, MCP diagnostics, and explicitly consent-gated context retrieval.
 - Detects stale project files, compiles separate-authority multi-repository packs, and provides responsive static or live-loopback dashboards sourced from real retained local events.
 - Provides optional reranking adapters, encrypted team bundles, role manifests, signed checkpoints, expanded evaluation, and causal receipts.

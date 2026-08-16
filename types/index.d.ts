@@ -240,7 +240,7 @@ export const PROJECT_STRUCTURE_SCHEMA_VERSION: "qarinah.project-structure.v2";
 export const SQLITE_READ_MODEL_SCHEMA_VERSION: 1;
 export const SQLITE_READ_MODEL_FILENAME: "qarinah.db";
 export const MEMORY_ATTACHMENT_SCHEMA_VERSION: "qarinah.memory-attachment.v1";
-export const QARINAH_VERSION: "0.2.0";
+export const QARINAH_VERSION: "0.3.0";
 export const EVENT_KINDS: readonly QarinahEventKind[];
 export const RELATION_TYPES: readonly QarinahRelationType[];
 export function inspectGitWorktree(start?: string): Promise<QarinahGitWorktree | null>;
@@ -415,6 +415,115 @@ export function measureMemoryFootprint(options?: {
   inMemory?: boolean;
   updateCheckpoint?: boolean;
 }): Promise<Readonly<QarinahMemoryFootprint>>;
+export const CODING_CONTEXT_HARNESS_SCHEMA_VERSION: "qarinah.coding-context-harness.v1";
+export interface QarinahCodingHarnessSummary {
+  readonly method: "deterministic-extractive-v1" | "model-assisted-v1";
+  readonly adapter: string;
+  readonly model: string | null;
+  readonly text: string;
+  readonly estimatedTokens: number;
+}
+export interface QarinahCodingHarnessComparison {
+  readonly baselineTokens: number;
+  readonly deliveredTokens: number;
+  readonly savedTokens: number;
+  readonly reductionPercent: number | null;
+  readonly baselineToPackRatio: number | null;
+  readonly publishedBenchmarkMatched: boolean;
+}
+export interface QarinahCodingHarnessReadyWorktree {
+  readonly status: "ready";
+  readonly current: boolean;
+  readonly root: string;
+  readonly workspaceId: string;
+  readonly capture: "metadata" | "content";
+  readonly worktree: QarinahGitWorktree | null;
+  readonly source: Readonly<{
+    eventCount: number;
+    sourceEventCount: number;
+    headHash: string | null;
+    sourceHeadHash: string | null;
+    ledgerCharacters: number;
+    ledgerEstimatedTokens: number;
+  }>;
+  readonly pack: QarinahContextPack;
+  readonly summary: QarinahCodingHarnessSummary;
+  readonly comparison: QarinahCodingHarnessComparison;
+  readonly recording: Readonly<{
+    status: "not-requested" | "created" | "reused";
+    eventId: string | null;
+    hash: string | null;
+  }>;
+}
+export interface QarinahCodingHarnessUninitializedWorktree {
+  readonly status: "uninitialized";
+  readonly current: boolean;
+  readonly root: string;
+  readonly worktree: QarinahDiscoveredGitWorktree;
+}
+export interface QarinahCodingContextHarnessResult {
+  readonly schemaVersion: "qarinah.coding-context-harness.v1";
+  readonly generatedAt: string;
+  readonly query: string;
+  readonly scope: "current" | "repository";
+  readonly contentRole: "untrusted-data";
+  readonly benchmark: Readonly<{
+    scope: "published six-fixture repeated-input estimate";
+    fixtureCount: 6;
+    baselineTokens: 442113;
+    deliveredTokens: 5682;
+    reductionPercent: 98.71;
+    exactReductionPercent: 98.7148;
+    baselineToPackRatio: 77.81;
+    estimator: string;
+    guarantee: false;
+  }>;
+  readonly worktrees: readonly (QarinahCodingHarnessReadyWorktree | QarinahCodingHarnessUninitializedWorktree)[];
+  readonly aggregate: Readonly<{
+    discoveredWorktrees: number;
+    readyWorktrees: number;
+    uninitializedWorktrees: number;
+    complete: boolean;
+    comparison: QarinahCodingHarnessComparison;
+  }>;
+  readonly boundaries: Readonly<Record<"sourceOfTruth" | "worktreeIsolation" | "capture" | "modelSummary" | "benchmark", string>>;
+  readonly manifestHash: string;
+}
+export interface QarinahCodingContextSummarizer {
+  id: string;
+  summarize(
+    input: Readonly<{
+      schemaVersion: "qarinah.coding-context-summary-input.v1";
+      contentRole: "untrusted-data";
+      workspaceId: string;
+      worktree: null | Readonly<{ repositoryId: string; worktreeId: string; branch: string | null; commit: string | null }>;
+      query: string;
+      maxSummaryChars: number;
+      sourceEvents: readonly Readonly<{ eventId: string; hash: string; kind: string }>[];
+      pack: QarinahContextPack;
+    }>,
+    context: { signal?: AbortSignal }
+  ): Promise<string | { text: string; model?: string }> | string | { text: string; model?: string };
+}
+export function runCodingContextHarness(options?: {
+  cwd?: string;
+  query?: string;
+  scope?: "current" | "repository";
+  maxChars?: number;
+  maxTokens?: number;
+  reserveTokens?: number;
+  limit?: number;
+  maxSummaryChars?: number;
+  authorityScopes?: string[];
+  repositoryIds?: string[];
+  summarizer?: QarinahCodingContextSummarizer | null;
+  record?: boolean;
+  rebuild?: boolean;
+  updateCheckpoint?: boolean;
+  signal?: AbortSignal;
+  clock?: () => Date;
+}): Promise<Readonly<QarinahCodingContextHarnessResult>>;
+export function renderCodingContextHarnessMarkdown(result: QarinahCodingContextHarnessResult): string;
 export interface QarinahProjectOverview {
   readonly schemaVersion: "qarinah.project-overview.v1";
   readonly workspaceId: string;
@@ -989,6 +1098,7 @@ export function setupWorkspace(options?: {
   kimi?: boolean;
   antigravity?: boolean;
   allowQuery?: boolean;
+  autoCompact?: boolean;
   maxChars?: number;
   maxItems?: number;
   backupSources?: string[];

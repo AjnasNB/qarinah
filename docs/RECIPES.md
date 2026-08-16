@@ -65,12 +65,12 @@ If direct coverage fails, inspect the error instead of silently relaxing the gat
 Install the reviewed host integrations:
 
 ```sh
-codex plugin marketplace add AjnasNB/qarinah --ref v0.2.0
+codex plugin marketplace add AjnasNB/qarinah --ref v0.3.0
 codex plugin add qarinah@qarinah
 ```
 
 ```sh
-claude plugin marketplace add AjnasNB/qarinah@v0.2.0 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.3.0 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 

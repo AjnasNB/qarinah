@@ -2,7 +2,7 @@
 
 ## Implemented platform foundation
 
-Qarinah 0.2.0 includes first-class Git worktree identities and isolated ledgers, consent-gated MCP retrieval, one-command Codex/Claude/Cursor setup, a grouped local memory dashboard, linked project memory, freshness checks, seven task packs, separate-authority multi-repository retrieval, optional reranking adapters, encrypted team bundles, role manifests, signed checkpoints, expanded quality evaluation, causal receipts across Cockroach, Qarinah, Maqam, execution, and observation, and a release-integrity gate that keeps package, runtime, type, MCP, website, paper, and benchmark metadata aligned.
+Qarinah 0.3.0 adds a coding context harness that automatically turns completed agent turns into compact cited checkpoints, keeps every initialized Git worktree isolated, and reports the actual estimated context ratio for each run. The deterministic path is the default; an optional versioned host summarizer may see only the already bounded pack. The release retains consent-gated MCP retrieval, the grouped local dashboard, linked project memory, freshness checks, seven task packs, separate-authority multi-repository retrieval, encrypted team bundles, signed checkpoints, expanded evaluation, and the release-integrity gate that aligns package, runtime, types, schemas, plugins, website, paper, and benchmark metadata.
 
 The encrypted sync surface is a public self-hostable protocol foundation. A managed cross-device service, identity-provider federation, durable hosted transport, and organization administration remain future service work.
 
