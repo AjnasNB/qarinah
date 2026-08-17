@@ -39,6 +39,11 @@ export { AGENT_ARCHIVE_IMPORT_SCHEMA_VERSION, importAgentArchive } from "./archi
 export { AGENT_ARCHIVE_BACKUP_SCHEMA_VERSION, backupAgentArchives } from "./archive-backup.js";
 export { MEMORY_FOOTPRINT_SCHEMA_VERSION, measureMemoryFootprint } from "./memory-footprint.js";
 export {
+  CODING_CONTEXT_HARNESS_SCHEMA_VERSION,
+  renderCodingContextHarnessMarkdown,
+  runCodingContextHarness
+} from "./coding-harness.js";
+export {
   PROJECT_OVERVIEW_SCHEMA_VERSION,
   buildProjectOverview,
   renderProjectOverviewMarkdown,

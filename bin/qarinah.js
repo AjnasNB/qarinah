@@ -26,9 +26,11 @@ import {
   rebuildDerivedState,
   renderProjectOverviewMarkdown,
   renderContextPackMarkdown,
+  renderCodingContextHarnessMarkdown,
   revokeWorkspaceTrust,
   runMcpServer,
   scanProjectStructure,
+  runCodingContextHarness,
   serveMemoryDashboard,
   setWorkspaceEnabled,
   setupWorkspace,
@@ -270,7 +272,7 @@ function help() {
 
 Usage:
   qarinah init [path] [--capture metadata|content]
-  qarinah setup [path] [--codex] [--claude] [--cursor] [--kimi] [--antigravity] [--capture metadata|content] [--allow-query] [--backup-source <export>] [--backup-destination <external-directory>]
+  qarinah setup [path] [--codex] [--claude] [--cursor] [--kimi] [--antigravity] [--capture metadata|content] [--allow-query] [--auto-compact] [--backup-source <export>] [--backup-destination <external-directory>]
   qarinah record --kind <kind> --title <title> [--body <text>] [--data-json <json>] [--relation type:target]
   qarinah record --stdin-json
   qarinah hook codex|claude
@@ -285,6 +287,7 @@ Usage:
   qarinah query [text] [--format json|markdown|handoff] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp] [--minimum-coverage any|partial|direct] [--minimum-evidence any|partial|direct]
   qarinah query --stdin-json
   qarinah task-pack debugging|code-review|feature-implementation|database-migration|incident-response|release-preparation|security-review [query]
+  qarinah harness [query] [--worktrees] [--record] [--no-rebuild] [--format json|markdown] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--limit n] [--max-summary-chars n]
   qarinah map [query] [--limit n] [--type memory,file,concept,directory,reference,worktree] [--repository id,...] [--scope id,...] [--as-of timestamp]
   qarinah worktrees
   qarinah freshness
@@ -316,7 +319,7 @@ async function run(argv) {
     return;
   }
   if (command === "setup") {
-    const flags = new Set(["--codex", "--claude", "--cursor", "--kimi", "--antigravity", "--allow-query"]);
+    const flags = new Set(["--codex", "--claude", "--cursor", "--kimi", "--antigravity", "--allow-query", "--auto-compact"]);
     const values = new Set(["--capture", "--max-chars", "--max-items", "--backup-source", "--backup-destination", "--backup-max-bytes", "--backup-max-files"]);
     const parsed = { positionals: [], flags: new Set(), values: new Map() };
     for (let index = 0; index < args.length; index += 1) {
@@ -352,6 +355,7 @@ async function run(argv) {
       kimi: parsed.flags.has("--kimi"),
       antigravity: parsed.flags.has("--antigravity"),
       allowQuery: parsed.flags.has("--allow-query"),
+      autoCompact: parsed.flags.has("--auto-compact"),
       maxChars: positive("--max-chars"),
       maxItems: positive("--max-items"),
       backupSources: parsed.values.has("--backup-source") ? [path.resolve(parsed.values.get("--backup-source"))] : undefined,
@@ -627,6 +631,56 @@ async function run(argv) {
     if (args.some((value) => value.startsWith("--"))) throw new TypeError("task-pack accepts a task name and optional query text only.");
     const pack = await compileTaskMemoryPack(task, values.slice(1).join(" "), { cwd: process.cwd() });
     process.stdout.write(`${JSON.stringify(pack, null, 2)}\n`);
+    return;
+  }
+  if (command === "harness") {
+    const flags = new Set(["--worktrees", "--record", "--no-rebuild", "--quiet"]);
+    const values = new Set(["--format", "--max-chars", "--max-tokens", "--reserve-tokens", "--limit", "--max-summary-chars"]);
+    const parsed = { positionals: [], flags: new Set(), values: new Map() };
+    for (let index = 0; index < args.length; index += 1) {
+      const value = args[index];
+      if (!value.startsWith("--")) {
+        parsed.positionals.push(value);
+        continue;
+      }
+      if (flags.has(value)) {
+        if (parsed.flags.has(value)) throw new TypeError(`harness received ${value} more than once.`);
+        parsed.flags.add(value);
+        continue;
+      }
+      if (!values.has(value)) throw new TypeError(`harness does not support ${value}.`);
+      if (parsed.values.has(value)) throw new TypeError(`harness received ${value} more than once.`);
+      if (index === args.length - 1 || args[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
+      parsed.values.set(value, args[index + 1]);
+      index += 1;
+    }
+    const boundedInteger = (name, minimum, maximum) => {
+      const value = parsed.values.get(name);
+      if (value === undefined) return undefined;
+      if (!/^[0-9]+$/u.test(value) || Number(value) < minimum || Number(value) > maximum) {
+        throw new TypeError(`${name} must be an integer from ${minimum} to ${maximum}.`);
+      }
+      return Number(value);
+    };
+    const format = parsed.values.get("--format") ?? "json";
+    if (!["json", "markdown"].includes(format)) throw new TypeError("--format must be json or markdown.");
+    const result = await runCodingContextHarness({
+      cwd: process.cwd(),
+      query: parsed.positionals.join(" "),
+      scope: parsed.flags.has("--worktrees") ? "repository" : "current",
+      record: parsed.flags.has("--record"),
+      rebuild: !parsed.flags.has("--no-rebuild"),
+      maxChars: boundedInteger("--max-chars", 512, 1_000_000),
+      maxTokens: boundedInteger("--max-tokens", 128, 1_000_000),
+      reserveTokens: boundedInteger("--reserve-tokens", 0, 999_936),
+      limit: boundedInteger("--limit", 1, 64),
+      maxSummaryChars: boundedInteger("--max-summary-chars", 256, 16_384)
+    });
+    if (!parsed.flags.has("--quiet")) {
+      process.stdout.write(format === "markdown"
+        ? renderCodingContextHarnessMarkdown(result)
+        : `${JSON.stringify(result, null, 2)}\n`);
+    }
     return;
   }
   if (command === "map") {

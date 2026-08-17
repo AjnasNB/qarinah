@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use Qarinah, please cite the software and its technical white paper."
 title: "Qarinah"
 type: software
-version: 0.2.0
+version: 0.3.0
 license: Apache-2.0
 authors:
   - family-names: "N B"
@@ -10,8 +10,9 @@ authors:
 repository-code: "https://github.com/AjnasNB/qarinah"
 url: "https://qarinah.io"
 abstract: >-
-  Worktree-aware local project memory for coding agents, with isolated ledgers,
-  deterministic retrieval, cited context graphs, and verifiable handoffs.
+  A worktree-aware coding context harness with isolated ledgers, automatic
+  compact checkpoints, deterministic retrieval, cited graphs, and verifiable
+  handoffs.
 keywords:
   - coding agents
   - project memory

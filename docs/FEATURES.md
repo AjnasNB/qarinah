@@ -10,6 +10,17 @@ Qarinah is evidence-linked project memory for coding agents. It keeps an inspect
 - `qarinah dashboard --serve --worktrees` groups initialized sibling checkouts in one responsive local view while keeping their writable stores isolated.
 - Worktree nodes participate in the same temporal, disclosure-aware graph and ranked search as files, decisions, concepts, and cited references.
 
+## Coding context harness
+
+- Opt-in Codex and Claude Stop hooks capture the completed turn, then append one idempotent compact checkpoint without paying for a full derived rebuild on every turn.
+- Current-worktree runs retrieve a task-specific bounded pack; repository-wide inspection keeps every sibling pack and writable ledger separate.
+- Each result reports the actual retained-source and delivered-pack token estimates, selected event IDs and hashes, pack manifest, and checkpoint identity.
+- The core summarizer is deterministic. A host may supply a side-effect-free model summarizer that receives only the bounded untrusted pack, never hidden reasoning or an undisclosed transcript.
+- Content mode can retain bounded redacted summary text. Metadata mode retains only the metric, citation, and manifest receipt.
+- The published 98.71% reduction and 77.81:1 ratio remain explicitly scoped to the committed six-fixture comparison; every live run reports its own measured estimate instead of inheriting that number.
+
+See [Coding context harness](CODING-CONTEXT-HARNESS.md).
+
 ## Project-owned memory
 
 - A canonical, append-only JSONL event record stored with the project.

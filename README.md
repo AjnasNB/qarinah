@@ -12,7 +12,7 @@
 
 ```sh
 # Initialize the exact checkout you are working in.
-npx qarinah setup . --capture content --allow-query
+npx qarinah setup . --capture content --allow-query --auto-compact
 
 # See every linked checkout and open all initialized worktree ledgers together.
 npx qarinah worktrees
@@ -20,6 +20,8 @@ npx qarinah dashboard --serve --worktrees
 ```
 
 Each worktree keeps a separate `.qarinah` ledger and consent record. Qarinah derives a shared repository identity, hashes branch and commit context into the project snapshot, and links each checkout to the files and memories it actually produced. It never replaces worktree ledgers with symlinks or a shared writable database. [Read the worktree context guide.](docs/WORKTREE-CONTEXT.md)
+
+With `--auto-compact`, the completed-turn hook compiles a bounded cited pack and records one idempotent checkpoint for the latest non-harness source event. The checkpoint can be expanded through exact event IDs, hashes, and the pack manifest. Run `npx qarinah harness "your task" --worktrees` to measure and inspect separate packs across every initialized sibling checkout. [Read the coding context harness guide.](docs/CODING-CONTEXT-HARNESS.md)
 
 <p align="center">
   <img src="assets/launch/qarinah-what-you-save.png" width="100%" alt="What you save with Qarinah: 98.71% less repeated context, a 77.81 to 1 baseline-to-pack ratio, 442,113 baseline tokens versus 5,682 Qarinah pack tokens, and exact illustrative savings at four flat uncached input-token rates.">
@@ -83,7 +85,7 @@ Scale regression: Qarinah also passed **380 / 380 file-specific exact and typo-t
 </p>
 
 ```sh
-npx qarinah setup . --capture content --allow-query
+npx qarinah setup . --capture content --allow-query --auto-compact
 ```
 
 <p align="center">
@@ -127,6 +129,7 @@ If a native chat later disappears, Qarinah can still retrieve the permitted even
 | --- | --- |
 | Personal project | One local cited memory shared by Codex, Claude Code, Cursor, Kimi, Antigravity, CLI tools, and compatible MCP clients |
 | Parallel Git worktrees | Isolated ledgers per checkout, one repository group, branch-and-commit-aware snapshots, and one local graph dashboard |
+| Coding harness | Automatic completed-turn checkpoints, bounded packs, actual per-worktree token estimates, and optional model-assisted summaries that retain source IDs and hashes |
 | Portable review | Rebuildable SQLite, Markdown, JSON, graph, OKF, and responsive static or live-loopback dashboards for inspecting project memory |
 | Team workspace | Multi-repository relationships, freshness, encrypted bundles, signed checkpoints, membership, and separate authority boundaries |
 | Policy or approval add-on | Optional Maqam scopes and approval controls without making Maqam a Qarinah requirement |
@@ -207,7 +210,7 @@ npx qarinah query "release provenance" \
   --format markdown
 ```
 
-Start with the [feature map](docs/FEATURES.md) and [five-minute installation guide](docs/GETTING-STARTED.md), then use [host compatibility](docs/HOST-COMPATIBILITY.md), the [project overview](docs/PROJECT-OVERVIEW.md), [agent archive import](docs/AGENT-ARCHIVE-IMPORT.md), [external archive backup](docs/AGENT-ARCHIVE-BACKUP.md), [private-project guide](docs/PRIVATE-PROJECTS.md), [cross-agent handoff guide](docs/CROSS-AGENT-HANDOFFS.md), [dashboard guide](docs/DASHBOARD.md), [team-memory guide](docs/TEAM-MEMORY.md), [CLI reference](docs/CLI-REFERENCE.md), [JavaScript API reference](docs/API-REFERENCE.md), [MCP guide](docs/MCP-GUIDE.md), [task recipes](docs/RECIPES.md), or [troubleshooting guide](docs/TROUBLESHOOTING.md).
+Start with the [feature map](docs/FEATURES.md) and [five-minute installation guide](docs/GETTING-STARTED.md), then use the [coding context harness](docs/CODING-CONTEXT-HARNESS.md), [worktree context](docs/WORKTREE-CONTEXT.md), [host compatibility](docs/HOST-COMPATIBILITY.md), the [project overview](docs/PROJECT-OVERVIEW.md), [agent archive import](docs/AGENT-ARCHIVE-IMPORT.md), [external archive backup](docs/AGENT-ARCHIVE-BACKUP.md), [private-project guide](docs/PRIVATE-PROJECTS.md), [cross-agent handoff guide](docs/CROSS-AGENT-HANDOFFS.md), [dashboard guide](docs/DASHBOARD.md), [team-memory guide](docs/TEAM-MEMORY.md), [CLI reference](docs/CLI-REFERENCE.md), [JavaScript API reference](docs/API-REFERENCE.md), [MCP guide](docs/MCP-GUIDE.md), [task recipes](docs/RECIPES.md), or [troubleshooting guide](docs/TROUBLESHOOTING.md).
 
 Your project already contains the decisions and evidence behind its changes. Qarinah lets the next agent query that record and receive a bounded, cited pack selected for the current task. The same local memory can support Codex, Claude Code, CLI workflows, and compatible MCP clients instead of locking project context to one editor.
 
@@ -484,15 +487,15 @@ The repository also runs `npm run mcp:smoke` against the exact bundled Codex and
 
 ### Install once, initialize each project
 
-Install the reviewed `v0.2.0` plugin once in each host after that release is published:
+Install the reviewed `v0.3.0` plugin once in each host after that release is published:
 
 ```sh
 # Codex: personal installation, available to opted-in projects.
-codex plugin marketplace add AjnasNB/qarinah --ref v0.2.0
+codex plugin marketplace add AjnasNB/qarinah --ref v0.3.0
 codex plugin add qarinah@qarinah
 
 # Claude Code: personal installation across projects.
-claude plugin marketplace add AjnasNB/qarinah@v0.2.0 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.3.0 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 

@@ -1,0 +1,175 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/AjnasNB/qarinah/schemas/coding-context-harness.schema.json",
+  "title": "Qarinah coding context harness v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "generatedAt", "query", "scope", "contentRole", "benchmark", "worktrees", "aggregate", "boundaries", "manifestHash"],
+  "properties": {
+    "schemaVersion": { "const": "qarinah.coding-context-harness.v1" },
+    "generatedAt": { "type": "string", "format": "date-time", "maxLength": 24 },
+    "query": { "type": "string", "maxLength": 4096 },
+    "scope": { "enum": ["current", "repository"] },
+    "contentRole": { "const": "untrusted-data" },
+    "benchmark": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope", "fixtureCount", "baselineTokens", "deliveredTokens", "reductionPercent", "exactReductionPercent", "baselineToPackRatio", "estimator", "guarantee"],
+      "properties": {
+        "scope": { "const": "published six-fixture repeated-input estimate" },
+        "fixtureCount": { "const": 6 },
+        "baselineTokens": { "const": 442113 },
+        "deliveredTokens": { "const": 5682 },
+        "reductionPercent": { "const": 98.71 },
+        "exactReductionPercent": { "const": 98.7148 },
+        "baselineToPackRatio": { "const": 77.81 },
+        "estimator": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "guarantee": { "const": false }
+      }
+    },
+    "worktrees": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/readyWorktree" },
+          { "$ref": "#/$defs/uninitializedWorktree" }
+        ]
+      }
+    },
+    "aggregate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["discoveredWorktrees", "readyWorktrees", "uninitializedWorktrees", "complete", "comparison"],
+      "properties": {
+        "discoveredWorktrees": { "type": "integer", "minimum": 1, "maximum": 64 },
+        "readyWorktrees": { "type": "integer", "minimum": 0, "maximum": 64 },
+        "uninitializedWorktrees": { "type": "integer", "minimum": 0, "maximum": 64 },
+        "complete": { "type": "boolean" },
+        "comparison": { "$ref": "#/$defs/comparison" }
+      }
+    },
+    "boundaries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceOfTruth", "worktreeIsolation", "capture", "modelSummary", "benchmark"],
+      "properties": {
+        "sourceOfTruth": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "worktreeIsolation": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "capture": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "modelSummary": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "benchmark": { "type": "string", "minLength": 1, "maxLength": 512 }
+      }
+    },
+    "manifestHash": { "$ref": "#/$defs/hash" }
+  },
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "worktree": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["schemaVersion", "repositoryId", "worktreeId", "root", "branch", "commit", "detached", "linked"],
+      "properties": {
+        "schemaVersion": { "const": "qarinah.git-worktree.v1" },
+        "repositoryId": { "type": "string", "pattern": "^repo_[0-9a-f]{32}$" },
+        "worktreeId": { "type": "string", "pattern": "^wt_[0-9a-f]{32}$" },
+        "root": { "type": "string", "minLength": 1, "maxLength": 4096 },
+        "branch": { "type": ["string", "null"], "maxLength": 512 },
+        "commit": { "type": ["string", "null"], "pattern": "^[0-9a-f]{40}$" },
+        "detached": { "type": "boolean" },
+        "linked": { "type": "boolean" },
+        "current": { "type": "boolean" },
+        "initialized": { "type": "boolean" }
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baselineTokens", "deliveredTokens", "savedTokens", "reductionPercent", "baselineToPackRatio", "publishedBenchmarkMatched"],
+      "properties": {
+        "baselineTokens": { "type": "integer", "minimum": 0 },
+        "deliveredTokens": { "type": "integer", "minimum": 0 },
+        "savedTokens": { "type": "integer", "minimum": 0 },
+        "reductionPercent": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+        "baselineToPackRatio": { "type": ["number", "null"], "minimum": 0 },
+        "publishedBenchmarkMatched": { "type": "boolean" }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "adapter", "model", "text", "estimatedTokens"],
+      "properties": {
+        "method": { "enum": ["deterministic-extractive-v1", "model-assisted-v1"] },
+        "adapter": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "model": { "type": ["string", "null"], "maxLength": 256 },
+        "text": { "type": "string", "maxLength": 16384 },
+        "estimatedTokens": { "type": "integer", "minimum": 0, "maximum": 100000000 }
+      }
+    },
+    "recording": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "eventId", "hash"],
+      "properties": {
+        "status": { "enum": ["not-requested", "created", "reused"] },
+        "eventId": { "type": ["string", "null"], "pattern": "^evt_[0-9a-f-]{36}$" },
+        "hash": { "oneOf": [{ "$ref": "#/$defs/hash" }, { "type": "null" }] }
+      }
+    },
+    "readyWorktree": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "current", "root", "workspaceId", "capture", "worktree", "source", "pack", "summary", "comparison", "recording"],
+      "properties": {
+        "status": { "const": "ready" },
+        "current": { "type": "boolean" },
+        "root": { "type": "string", "minLength": 1, "maxLength": 4096 },
+        "workspaceId": { "type": "string", "pattern": "^ws_[0-9a-f]{32}$" },
+        "capture": { "enum": ["metadata", "content"] },
+        "worktree": { "$ref": "#/$defs/worktree" },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["eventCount", "sourceEventCount", "headHash", "sourceHeadHash", "ledgerCharacters", "ledgerEstimatedTokens"],
+          "properties": {
+            "eventCount": { "type": "integer", "minimum": 0 },
+            "sourceEventCount": { "type": "integer", "minimum": 0 },
+            "headHash": { "oneOf": [{ "$ref": "#/$defs/hash" }, { "type": "null" }] },
+            "sourceHeadHash": { "oneOf": [{ "$ref": "#/$defs/hash" }, { "type": "null" }] },
+            "ledgerCharacters": { "type": "integer", "minimum": 0 },
+            "ledgerEstimatedTokens": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "pack": { "$ref": "context-pack.schema.json" },
+        "summary": { "$ref": "#/$defs/summary" },
+        "comparison": { "$ref": "#/$defs/comparison" },
+        "recording": { "$ref": "#/$defs/recording" }
+      }
+    },
+    "uninitializedWorktree": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "current", "root", "worktree"],
+      "properties": {
+        "status": { "const": "uninitialized" },
+        "current": { "type": "boolean" },
+        "root": { "type": "string", "minLength": 1, "maxLength": 4096 },
+        "worktree": {
+          "allOf": [
+            { "$ref": "#/$defs/worktree" },
+            {
+              "type": "object",
+              "properties": {
+                "current": { "type": "boolean" },
+                "initialized": { "const": false }
+              },
+              "required": ["current", "initialized"]
+            }
+          ]
+        }
+      }
+    }
+  }
+}

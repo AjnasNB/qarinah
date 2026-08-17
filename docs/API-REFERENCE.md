@@ -26,7 +26,7 @@ import { captureClaudeHook } from "qarinah/claude";
 import { createMcpServer, runMcpServer } from "qarinah/mcp";
 ```
 
-The declarations shipped in `types/index.d.ts`, `types/codex.d.ts`, `types/claude.d.ts`, and `types/mcp.d.ts` are the exact compile-time contract for version 0.2.0. JSON Schemas are available through package exports such as `qarinah/schemas/event.json`.
+The declarations shipped in `types/index.d.ts`, `types/codex.d.ts`, `types/claude.d.ts`, and `types/mcp.d.ts` are the exact compile-time contract for version 0.3.0. JSON Schemas are available through package exports such as `qarinah/schemas/event.json`.
 
 ## Runtime boundary
 
@@ -69,9 +69,9 @@ Invalid JavaScript argument shapes generally throw `TypeError`. Storage, trust, 
 
 ## Version and contract constants
 
-| Export | Value in 0.2.0 |
+| Export | Value in 0.3.0 |
 | --- | --- |
-| `QARINAH_VERSION` | `"0.2.0"` |
+| `QARINAH_VERSION` | `"0.3.0"` |
 | `EVENT_SCHEMA_VERSION` | `"qarinah.event.v1"` |
 | `CONTEXT_PACK_SCHEMA_VERSION` | `"qarinah.context-pack.v2"` |
 | `CONFIG_SCHEMA_VERSION` | `"qarinah.config.v1"` |
@@ -81,6 +81,7 @@ Invalid JavaScript argument shapes generally throw `TypeError`. Storage, trust, 
 | `AGENT_ARCHIVE_IMPORT_SCHEMA_VERSION` | `"qarinah.agent-archive-import.v1"` |
 | `AGENT_ARCHIVE_BACKUP_SCHEMA_VERSION` | `"qarinah.agent-archive-backup.v1"` |
 | `MEMORY_FOOTPRINT_SCHEMA_VERSION` | `"qarinah.memory-footprint.v1"` |
+| `CODING_CONTEXT_HARNESS_SCHEMA_VERSION` | `"qarinah.coding-context-harness.v1"` |
 | `PROJECT_OVERVIEW_SCHEMA_VERSION` | `"qarinah.project-overview.v1"` |
 | `OKF_EXPORT_SCHEMA_VERSION` | `"qarinah.okf-export.v1"` |
 | `OKF_VERSION` | `"0.1"` |
@@ -526,6 +527,37 @@ function rankContextEvents(
 Runs local hybrid ranking after repository, time, retention, disclosure, and supersession admission. The default `admission-first-v2` profile preserves BM25 order for admissible lexical candidates, then fills from typo-tolerant and graph evidence; authority may promote an otherwise matched record. `balanced-v1` preserves the original reciprocal-rank-fusion and diversity behavior for reproducibility. `includeFuzzy` and `includeGraph` support explicit ablations. `temporalBoundary: "strict-before"` excludes records whose timestamp equals the query checkpoint; the default inclusive mode preserves normal as-of semantics. Every v2 result includes deterministic `evidence-sufficiency-v2` diagnostics. Only `DIRECTLY_SUPPORTED` produces `decision: "ACCEPT_DIRECT"`; both partial and insufficient evidence produce `decision: "ABSTAIN"`. At the 0.65 operating point the production-bound development-v0.4 recomputation observed 10/10 static and 15/15 online direct accepts as structural-oracle positives, with zero observed direct false accepts among 49 and 31 oracle-negative cases. Exact 95% false-acceptance upper bounds remain 7.25% static and 11.22% online; this is not a universal semantic guarantee. Most callers should use `compileContext`, which also applies evidence gates and output budgets.
 
 ## Context compilation
+
+### `runCodingContextHarness(options?)`
+
+```ts
+function runCodingContextHarness(options?: {
+  cwd?: string;
+  query?: string;
+  scope?: "current" | "repository";
+  maxChars?: number;
+  maxTokens?: number;
+  reserveTokens?: number;
+  limit?: number;
+  maxSummaryChars?: number;
+  authorityScopes?: string[];
+  repositoryIds?: string[];
+  summarizer?: QarinahCodingContextSummarizer;
+  record?: boolean;
+  rebuild?: boolean;
+  updateCheckpoint?: boolean;
+  signal?: AbortSignal;
+  clock?: () => Date;
+}): Promise<QarinahCodingContextHarnessResult>;
+
+function renderCodingContextHarnessMarkdown(
+  result: QarinahCodingContextHarnessResult
+): string;
+```
+
+Compiles a bounded, cited pack for the current worktree or read-only sibling inspection, measures the verified non-harness source events against the delivered pack with the portable estimator, and optionally records one idempotent checkpoint. Repository scope never combines worktree stores and rejects `record: true`; record each worktree independently.
+
+The deterministic extractive summary requires no model. An optional host summarizer receives only the already bounded pack plus source descriptors, must be side-effect-free, and should honor the supplied abort signal. Its output is redacted, bounded, marked as lossy untrusted data, and cannot replace the cited ledger events. The result contains the scoped six-fixture 98.71% reference and the actual local estimate separately. Its strict JSON Schema is exported as `qarinah/schemas/coding-context-harness.json`. See [Coding context harness](CODING-CONTEXT-HARNESS.md).
 
 ### `compileContext(query?, options?)`
 
