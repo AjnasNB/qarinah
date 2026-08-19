@@ -322,11 +322,12 @@ for (const responsiveHeroRule of [
 if (home.includes('"@type":"SearchAction"') || home.includes("search_term_string")) {
   errors.push("Homepage must not emit the retired sitelinks-search SearchAction or its crawlable URL template.");
 }
-if (!home.includes("<strong>98.71%</strong>")
-  || !home.includes("<strong>436,431</strong>")
-  || !home.includes("<strong>77.81&times;</strong>")
-  || !home.includes("<strong>380 / 380</strong>")) {
-  errors.push("Homepage is missing the plain-language benchmark proof.");
+if (!home.includes("<strong>16 / 16</strong>")
+  || !home.includes("real-Git-worktree continuity scenarios passed")
+  || !home.includes("<strong>6 hosts</strong>")
+  || !home.includes("<strong>4 modes</strong>")
+  || !home.includes("<strong>0 bodies</strong>")) {
+  errors.push("Homepage is missing the plain-language visible-memory acceptance proof.");
 }
 for (const benchmarkProof of ["98.7148%", "98.75%", "89.05%", "Measured, reproducible, and explicitly scoped."]) {
   if (!home.includes(benchmarkProof)) errors.push(`Homepage benchmark ribbon is missing ${benchmarkProof}`);
@@ -338,31 +339,14 @@ for (const worktreeHeroProof of [
   "One memory system for every Git worktree.",
   "Project memory for parallel coding-agent work",
   'class="hero-context-proof"',
-  "98.71%",
-  "442,113 baseline tokens &rarr; 5,682 cited-pack tokens in the published six-fixture evaluation",
+  "16 / 16",
+  "real Git worktree continuity checks passed",
+  "incremental compaction",
   "one repository · two isolated ledgers",
   "branch + commit in snapshot hash",
   'href="/articles/git-worktree-context-for-coding-agents/"'
 ]) {
   if (!home.includes(worktreeHeroProof)) errors.push(`Homepage is missing the worktree-first product story: ${worktreeHeroProof}`);
-}
-for (const costProof of [
-  "98.71% less repeated context. A 77.81:1 baseline-to-pack ratio.",
-  "More than 70:1 compression in the published six-fixture estimate",
-  'src="/assets/qarinah-what-you-save.png"',
-  'alt="What you save with Qarinah: 98.71% less repeated context, a 77.81 to 1 baseline-to-pack ratio, 442,113 baseline tokens versus 5,682 Qarinah pack tokens, and exact illustrative savings at four flat uncached input-token rates."',
-  'class="cost-equivalent-table"',
-  "<th scope=\"col\">Rate</th>",
-  "<th scope=\"col\">Baseline</th>",
-  "<th scope=\"col\">Qarinah</th>",
-  "<th scope=\"col\">Estimated saving</th>",
-  "<th scope=\"row\">$1/M tokens</th><td>$0.442113</td><td>$0.005682</td><td>$0.436431</td>",
-  "<th scope=\"row\">$3/M tokens</th><td>$1.326339</td><td>$0.017046</td><td>$1.309293</td>",
-  "<th scope=\"row\">$5/M tokens</th><td>$2.210565</td><td>$0.028410</td><td>$2.182155</td>",
-  "<th scope=\"row\">$15/M tokens</th><td>$6.631695</td><td>$0.085230</td><td>$6.546465</td>",
-  "$13.092930 across ten repeats"
-]) {
-  if (!home.includes(costProof)) errors.push(`Homepage is missing the bounded cost equivalent: ${costProof}`);
 }
 if (home.indexOf('class="front-proof section shell"') > home.indexOf('class="handoff-stage"')) {
   errors.push("Homepage must place the verified claim and cost table directly after the hero, before the setup workflow.");
@@ -380,12 +364,17 @@ if (home.indexOf('<section class="hero">') > home.indexOf('<section class="bench
   errors.push("Homepage must lead with the centered product hero before benchmark detail.");
 }
 if (!home.includes("Worktree-aware project memory and cited context graphs for coding agents.")
-  || !home.includes("98.71% less estimated repeated context in the published six-fixture benchmark")) {
-  errors.push("Homepage is missing the worktree-aware category or the separate benchmark scope.");
+  || !home.includes("Measured, reproducible, and explicitly scoped.")) {
+  errors.push("Homepage is missing the worktree-aware category or the separate historical benchmark scope.");
 }
 if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
-  || publicMetrics.updatedAt !== "2026-08-10"
+  || publicMetrics.productVersion !== "0.4.0"
+  || publicMetrics.updatedAt !== "2026-08-19"
   || publicMetrics.providerBillingMeasurement !== false
+  || publicMetrics.metrics?.realGitWorktreeContinuity?.scenarios !== 16
+  || publicMetrics.metrics?.realGitWorktreeContinuity?.passed !== 16
+  || publicMetrics.metrics?.realGitWorktreeContinuity?.failed !== 0
+  || publicMetrics.metrics?.realGitWorktreeContinuity?.artifactHash !== "sha256:0a610a0c2f6503d4b3c53c2e8bfc187c2159c70906e1bc7e828693cc34b6be9d"
   || publicMetrics.metrics?.repeatedProjectContext?.baselineEstimatedTokens !== 442113
   || publicMetrics.metrics?.repeatedProjectContext?.qarinahEstimatedTokens !== 5682
   || publicMetrics.metrics?.repeatedProjectContext?.estimatedTokensAvoided !== 436431
@@ -435,7 +424,7 @@ for (const capability of [
 }
 if (!features.includes('"@type":"CollectionPage"')
   || !features.includes('"@type":"ItemList"')
-  || !features.includes('"numberOfItems":15')) {
+  || !features.includes('"numberOfItems":19')) {
   errors.push("Features page is missing its visible capability collection structured data.");
 }
 for (const requiredWorktreeArticleCopy of [
@@ -550,15 +539,15 @@ if (!faq.includes('"@type":"FAQPage"') || !faq.includes('"mainEntity"')) {
 if (!paper.includes('src="/assets/qarinah-flow.svg"')) {
   errors.push("Paper architecture image is not bound to the deployed asset.");
 }
-if (!paper.includes("/paper/Qarinah-Technical-White-Paper-v1.4.pdf")) {
+if (!paper.includes("/paper/Qarinah-Technical-White-Paper-v1.5.pdf")) {
   errors.push("Paper download does not point to the versioned website PDF.");
 }
 if (!paper.includes("https://doi.org/10.5281/zenodo.21850747")
   || !paper.includes("https://doi.org/10.5281/zenodo.21547684")
   || !paper.includes("https://doi.org/10.5281/zenodo.21843240")
   || !paper.includes('"creativeWorkStatus":"Published"')
-  || !paper.includes('"datePublished":"2026-08-08"')) {
-  errors.push("Paper page must bind published v1.4 to its version and series DOIs and preserve the published v1.3 DOI.");
+  || !paper.includes('"datePublished":"2026-08-19"')) {
+  errors.push("Paper page must bind current v1.5 to the paper series and preserve published v1.4/v1.3 DOIs.");
 }
 if (/release[- ]candidate|activates on publication|not registered or published|DOI reserved|assigned only when this manuscript is deposited|assigned by Zenodo when v1\.4 is deposited|A version DOI is assigned/iu.test(paper)) {
   errors.push("Paper page contains stale pre-publication lifecycle wording.");

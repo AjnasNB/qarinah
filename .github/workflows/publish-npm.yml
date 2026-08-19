@@ -6,7 +6,7 @@ on:
       version:
         description: Exact package version to publish
         required: true
-        default: 0.3.0
+        default: 0.4.0
         type: string
       expected_git_commit:
         description: Exact reviewed lowercase 40-character commit SHA
@@ -15,7 +15,7 @@ on:
       dist_tag:
         description: npm dist-tag
         required: true
-        default: next
+        default: latest
         type: choice
         options: [next, latest]
       expected_size_bytes:
@@ -73,6 +73,10 @@ jobs:
           [[ "${CONFIRMATION}" == "publish qarinah@${EXPECTED_VERSION}" ]] || { echo "Confirmation mismatch." >&2; exit 1; }
           if [[ "${EXPECTED_VERSION}" == *-* && "${DIST_TAG}" != "next" ]]; then
             echo "Prereleases must use the next dist-tag." >&2
+            exit 1
+          fi
+          if [[ "${EXPECTED_VERSION}" != *-* && "${DIST_TAG}" != "latest" ]]; then
+            echo "Stable releases must use the latest dist-tag." >&2
             exit 1
           fi
       - name: Check out approved commit

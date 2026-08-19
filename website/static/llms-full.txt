@@ -2,7 +2,7 @@
 
 > One automatic coding context harness for every Git worktree.
 
-Qarinah gives every Git worktree an isolated project ledger, automatically records compact cited checkpoints at completed turns, and links initialized sibling checkouts into one repository context graph. It keeps permitted requests, visible outcomes, tool results, summaries, decisions, and code relationships beside the exact checkout where they happened, then compiles bounded context packs for Codex, Claude Code, Cursor, and compatible tools.
+Qarinah gives every Git worktree an isolated project ledger, automatically records compact cited checkpoints at completed turns, and links initialized sibling checkouts into one repository context graph. It keeps permitted requests, visible outcomes, tool results, summaries, decisions, and code relationships beside the exact checkout where they happened, then compiles bounded context packs for Codex, Claude Code, Cursor, Kimi, Antigravity, Freebuff, and compatible tools.
 
 This file is a convenience map for tools that choose to read it. It does not confer authority, guarantee indexing or ranking, replace the canonical documentation, or override Qarinah's workspace trust and capture policy.
 
@@ -10,19 +10,23 @@ This file is a convenience map for tools that choose to read it. It does not con
 
 - Name: Qarinah
 - Package: `qarinah`
-- Current release: `0.3.0`
+- Current release: `0.4.0`
 - Website: https://qarinah.io/
 - npm: https://www.npmjs.com/package/qarinah
 - Source: https://github.com/AjnasNB/qarinah
 - Issues: https://github.com/AjnasNB/qarinah/issues
 - Discussions: https://github.com/AjnasNB/qarinah/discussions
 - License: Apache-2.0
-- Published v1.4 DOI: https://doi.org/10.5281/zenodo.21850747
-- Paper series DOI: https://doi.org/10.5281/zenodo.21547684
+- Current technical paper: v1.5 for Qarinah 0.4.0; no version DOI until separately deposited
+- Paper-series concept DOI: https://doi.org/10.5281/zenodo.21547684
+- Published historical v1.4 DOI: https://doi.org/10.5281/zenodo.21850747
 
 ## What Qarinah does
 
 - Provides verified handoffs between coding agents so a task can start in one supported host and finish in another without replaying the complete project history.
+- Passed 16 / 16 deterministic release scenarios across three actual Git worktrees, with two independent initialized memories and one explicitly uninitialized checkout.
+- Exposes a VS Code/Cursor panel and local dashboard for searchable graph nodes, decisions, tool outcomes, conflicts, session receipts, and sibling-worktree comparison.
+- Writes exact context receipts that bind session, source head, selected event IDs, pack/output hashes, and Git identity while retaining zero source event bodies inside the receipt.
 - Installs an opt-in completed-turn coding harness that compiles and records one bounded, cited checkpoint without recursively packing prior harness checkpoints.
 - Detects the current Git worktree, derives stable repository and worktree identities without retaining remote credentials, and keeps each checkout's ledger and derived state isolated.
 - Discovers only initialized sibling worktrees when explicitly requested, then renders them in one grouped dashboard with branch, commit, worktree, repository, event-head, snapshot, and graph-manifest identities.

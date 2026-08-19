@@ -8,25 +8,35 @@ const output = path.join(root, "site-dist");
 const github = "https://github.com/AjnasNB/qarinah";
 const siteOrigin = "https://qarinah.io";
 const npmPackage = "https://www.npmjs.com/package/qarinah";
-const doi = "https://doi.org/10.5281/zenodo.21850747";
 const conceptDoi = "https://doi.org/10.5281/zenodo.21547684";
+const doi = conceptDoi;
+const publishedV14Doi = "https://doi.org/10.5281/zenodo.21850747";
 const historicalVersionDoi = "https://doi.org/10.5281/zenodo.21843240";
-const paperVersion = "1.4";
+const paperVersion = "1.5";
 const paperPdf = `/paper/Qarinah-Technical-White-Paper-v${paperVersion}.pdf`;
 const historicalPaperPdfs = new Map([
   ["Qarinah-Technical-White-Paper-v1.2.pdf", "/paper/Qarinah-Technical-White-Paper-v1.2.pdf"],
-  ["Qarinah-Technical-White-Paper-v1.3.pdf", "/paper/Qarinah-Technical-White-Paper-v1.3.pdf"]
+  ["Qarinah-Technical-White-Paper-v1.3.pdf", "/paper/Qarinah-Technical-White-Paper-v1.3.pdf"],
+  ["Qarinah-Technical-White-Paper-v1.4.pdf", "/paper/Qarinah-Technical-White-Paper-v1.4.pdf"]
 ]);
-const releaseDate = "2026-08-16";
-const paperPublishedDate = "2026-08-08";
-const publicMetricsUpdatedDate = "2026-08-10";
+const releaseDate = "2026-08-19";
+const paperPublishedDate = "2026-08-19";
+const publicMetricsUpdatedDate = "2026-08-19";
 const toolkitArticleDate = "2026-08-16";
 const worktreeArticleDate = "2026-08-16";
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 const benchmarkRelease = JSON.parse(await readFile(path.join(root, "bench", "results", "benchmark-release-0.1.6.json"), "utf8"));
+const worktreeContinuity = JSON.parse(await readFile(path.join(root, "bench", "results", "worktree-continuity-v0.4.0.json"), "utf8"));
 const productVersion = packageJson.version;
 const productPositioning = "Worktree-aware project memory and cited context graphs for coding agents.";
 const productExplanation = "Qarinah gives every Git checkout an isolated evidence-linked ledger, groups sibling worktrees into one repository context graph, and automatically compiles compact cited checkpoints for Codex, Claude Code, Cursor, and compatible tools.";
+if (worktreeContinuity.schemaVersion !== "qarinah.worktree-continuity-evaluation.v1"
+  || worktreeContinuity.aggregate.scenarioCount !== 16
+  || worktreeContinuity.aggregate.passed !== 16
+  || worktreeContinuity.aggregate.failed !== 0
+  || worktreeContinuity.artifactHash !== "sha256:0a610a0c2f6503d4b3c53c2e8bfc187c2159c70906e1bc7e828693cc34b6be9d") {
+  throw new Error("The worktree-continuity website claim does not match the checked release artifact.");
+}
 const repeatedContextMetric = benchmarkRelease.headlineContextResults.find((result) => result.id === "six-task-repeated-context");
 if (!repeatedContextMetric
   || repeatedContextMetric.baselineEstimatedTokens !== 442113
@@ -55,6 +65,15 @@ const publicMetrics = {
   estimator: benchmarkRelease.portableTokenEstimator.method,
   providerBillingMeasurement: false,
   metrics: {
+    realGitWorktreeContinuity: {
+      protocol: worktreeContinuity.protocol.id,
+      scenarios: worktreeContinuity.aggregate.scenarioCount,
+      passed: worktreeContinuity.aggregate.passed,
+      failed: worktreeContinuity.aggregate.failed,
+      artifactHash: worktreeContinuity.artifactHash,
+      evidenceSource: `${github}/blob/main/bench/results/worktree-continuity-v0.4.0.json`,
+      boundary: worktreeContinuity.protocol.scope
+    },
     repeatedProjectContext: {
       fixture: "six committed software-task fixtures",
       baselineEstimatedTokens: repeatedContextMetric.baselineEstimatedTokens,
@@ -93,12 +112,16 @@ const publicMetrics = {
 };
 const qarinahFeatures = [
   "First-class Git worktree context with isolated ledgers",
+  "Searchable developer-memory graph and timeline",
+  "Exact per-session context receipts",
+  "Incremental automatic context checkpoints",
+  "VS Code and Cursor-compatible memory panel",
   "Verified handoffs between coding agents",
   "Local append-only project memory",
   "Evidence-linked cited context packs",
   "Typed project and provenance graph",
   "Budgeted hybrid retrieval",
-  "Codex and Claude Code integrations",
+  "Codex, Claude Code, Cursor, Kimi, Antigravity, and Freebuff integrations",
   "Consent-gated MCP context retrieval",
   "Multi-repository memory with separate authority",
   "Freshness checks and a visual memory dashboard",
@@ -487,6 +510,14 @@ const docPages = [
     aliases: ["kimi memory", "antigravity memory", "codex claude cursor integration", "agent cli compatibility"]
   },
   {
+    route: "docs/market-comparison",
+    source: "docs/MARKET-COMPARISON-2026.md",
+    title: "Coding-agent memory market comparison",
+    description: "Compare Qarinah with large and small coding-agent memory, temporal graph, native IDE memory, and repository-map products using current official sources.",
+    section: "Understand",
+    aliases: ["memory alternatives", "Mem0", "Graphiti", "Letta", "Pieces", "repository map", "coding agent memory comparison"]
+  },
+  {
     route: "docs/mcp",
     source: "docs/MCP-GUIDE.md",
     title: "MCP server guide",
@@ -525,6 +556,14 @@ const docPages = [
     description: "Keep isolated project memory per Git checkout and inspect sibling worktrees in one branch-and-commit-aware context graph.",
     section: "Operate",
     aliases: ["git worktree memory", "parallel agents", "branch context", "worktree graph", "isolated ledgers"]
+  },
+  {
+    route: "docs/linked-project-memory",
+    source: "docs/LINKED-PROJECT-MEMORY.md",
+    title: "Linked project-memory graph",
+    description: "Inspect Qarinah's deterministic searchable graph, temporal and disclosure projection, repository map, evidence edges, ranking basis, and boundedness.",
+    section: "Understand",
+    aliases: ["memory graph", "searchable nodes", "repository graph", "concept graph", "evidence edges", "graph ranking"]
   },
   {
     route: "docs/memory-footprint",
@@ -738,6 +777,7 @@ await cp(path.join(root, "assets", "launch", "qarinah-worktree-context-graph.png
 for (const filename of [
   "Qarinah-Technical-White-Paper-v1.2.pdf",
   "Qarinah-Technical-White-Paper-v1.3.pdf",
+  "Qarinah-Technical-White-Paper-v1.4.pdf",
   `Qarinah-Technical-White-Paper-v${paperVersion}.pdf`
 ]) {
   await cp(path.join(root, "output", "pdf", filename), path.join(output, "paper", filename));
@@ -808,18 +848,6 @@ function rewritePublicationLink(markdown, source) {
     .replace(
       `https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v${paperVersion}.pdf`,
       paperPdf
-    )
-    .replace(
-      "The v1.4 version DOI is assigned only when this manuscript is deposited; the persistent paper series uses concept DOI",
-      "The published v1.4 version DOI is [10.5281/zenodo.21850747](https://doi.org/10.5281/zenodo.21850747); the persistent paper series uses concept DOI"
-    )
-    .replace(
-      "- **Version DOI:** assigned by Zenodo when v1.4 is deposited",
-      "- **Version DOI:** [10.5281/zenodo.21850747](https://doi.org/10.5281/zenodo.21850747)"
-    )
-    .replace(
-      "https://doi.org/10.5281/zenodo.21547684. A version DOI is assigned\nwhen this manuscript is deposited.",
-      "https://doi.org/10.5281/zenodo.21547684. The published v1.4 version DOI is\nhttps://doi.org/10.5281/zenodo.21850747."
     );
 }
 
@@ -1332,9 +1360,9 @@ function homePage() {
             <p class="eyebrow">Project memory for parallel coding-agent work</p>
             <h1>One memory system for every Git worktree.</h1>
             <p class="hero-lede">Give each checkout its own evidence-linked ledger. Qarinah groups sibling worktrees into one branch-and-commit-aware context graph, then automatically compiles the cited files, decisions, outcomes, and history relevant to the next coding task.</p>
-            <a class="hero-context-proof" href="/docs/benchmarks/" aria-label="98.71% less estimated repeated context in the published six-fixture benchmark. Read the scoped method and artifacts.">
-              <strong>98.71%</strong>
-              <span><b>less estimated repeated context</b><small>442,113 baseline tokens &rarr; 5,682 cited-pack tokens in the published six-fixture evaluation</small></span>
+            <a class="hero-context-proof" href="/docs/worktree-context/" aria-label="16 of 16 real Git worktree continuity scenarios passed. Read the method and artifact.">
+              <strong>16 / 16</strong>
+              <span><b>real Git worktree continuity checks passed</b><small>isolation, retrieval, receipts, conflicts, and incremental compaction</small></span>
             </a>
             <div class="hero-actions">
               <a class="btn btn-primary btn-large" href="/docs/getting-started/">Set up this worktree</a>
@@ -1353,38 +1381,21 @@ function homePage() {
         </div>
       </section>
 
-      <section class="front-proof section shell" aria-labelledby="cost-equivalent-title">
+      <section class="front-proof section shell" aria-labelledby="visible-memory-title">
         <div class="section-heading split-heading">
           <div>
-            <p class="eyebrow">Published evidence and cost equivalent</p>
-            <h2 id="cost-equivalent-title">98.71% less repeated context. A 77.81:1 baseline-to-pack ratio.</h2>
+            <p class="eyebrow">Visible developer memory</p>
+            <h2 id="visible-memory-title">See what every session inherited, changed, and proved.</h2>
           </div>
-          <p>More than 70:1 compression in the published six-fixture estimate: 442,113 portable estimated input-context tokens for full-history replay versus 5,682 for Qarinah's cited packs. Every required target was directly covered in the top five.</p>
+          <p>Qarinah joins the branch, files, decisions, tool outcomes, conflicts, and selected context into one local read-only view. The ledger remains authoritative; the graph and receipts are rebuildable.</p>
         </div>
-        <figure class="what-you-save-figure">
-          <img src="/assets/qarinah-what-you-save.png" width="1664" height="936" loading="lazy" decoding="async" alt="What you save with Qarinah: 98.71% less repeated context, a 77.81 to 1 baseline-to-pack ratio, 442,113 baseline tokens versus 5,682 Qarinah pack tokens, and exact illustrative savings at four flat uncached input-token rates.">
-          <figcaption>Shareable proof card. The semantic table below remains the source for accessible text and exact values.</figcaption>
-        </figure>
-        <div class="cost-equivalent-table-wrap">
-          <table class="cost-equivalent-table" aria-describedby="cost-equivalent-note">
-            <caption>Illustrative flat uncached input-token cost equivalents for the published six-fixture estimate</caption>
-            <thead>
-              <tr>
-                <th scope="col">Rate</th>
-                <th scope="col">Baseline</th>
-                <th scope="col">Qarinah</th>
-                <th scope="col">Estimated saving</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><th scope="row">$1/M tokens</th><td>$0.442113</td><td>$0.005682</td><td>$0.436431</td></tr>
-              <tr><th scope="row">$3/M tokens</th><td>$1.326339</td><td>$0.017046</td><td>$1.309293</td></tr>
-              <tr><th scope="row">$5/M tokens</th><td>$2.210565</td><td>$0.028410</td><td>$2.182155</td></tr>
-              <tr><th scope="row">$15/M tokens</th><td>$6.631695</td><td>$0.085230</td><td>$6.546465</td></tr>
-            </tbody>
-          </table>
+        <div class="use-mode-grid visible-memory-grid">
+          <article class="use-mode-card"><span>Graph</span><h3>Search nodes and evidence</h3><p>Inspect memories, files, concepts, worktrees, typed relationships, ranking components, and hashes.</p><a href="/docs/linked-project-memory/">Open the graph model</a></article>
+          <article class="use-mode-card"><span>Timeline</span><h3>Decisions, tools, outcomes, conflicts</h3><p>Follow the visible execution history without flattening disagreement or superseded decisions.</p><a href="/docs/dashboard/">Open the dashboard guide</a></article>
+          <article class="use-mode-card"><span>Receipts</span><h3>Exact session context delivery</h3><p>Bind source event IDs, source and pack hashes, selected items, and measured context without copying event bodies.</p><a href="/docs/coding-context-harness/">Inspect session handoffs</a></article>
+          <article class="use-mode-card"><span>Editor</span><h3>VS Code and Cursor panel</h3><p>Search the same local developer-memory view from a sandboxed, read-only editor webview.</p><a href="/docs/host-compatibility/">Install the panel</a></article>
         </div>
-        <p class="benchmark-ribbon-note" id="cost-equivalent-note">Formula: <code>estimated tokens / 1,000,000 &times; flat uncached input rate &times; repeats</code>. At a flat $3/M input rate, the aggregate compared slice estimates $1.326339 for full-history replay and $0.017046 for Qarinah, saving $1.309293 per repeat and $13.092930 across ten repeats. This is arithmetic over the committed portable estimate, not a provider invoice. It excludes provider tokenization, caching, output, reasoning, tools, retrieval, hosting, fixed charges, and tiered pricing. <a href="/docs/public-metrics/">Method, calculator, and approved wording</a>.</p>
+        <p class="benchmark-ribbon-note"><strong>Reproducible acceptance result:</strong> a fresh local evaluator creates three actual Git worktrees and passes all 16 isolation, retrieval, receipt, conflict, and incremental-compaction scenarios. <a href="/docs/worktree-context/">Method and machine-readable artifact</a>.</p>
       </section>
 
       <section class="handoff-stage" aria-labelledby="handoff-stage-title">
@@ -1400,14 +1411,14 @@ function homePage() {
               <span><strong>Any terminal</strong><code>npx qarinah harness "&lt;task&gt;"</code></span>
             </div>
           </div>
-          <aside class="hero-proof" aria-label="Benchmark summary">
-            <p class="eyebrow">One measured result</p>
+          <aside class="hero-proof" aria-label="Session receipt summary">
+            <p class="eyebrow">Every resumed session gets a receipt</p>
             <div class="hero-proof-result">
-              <strong>77.81&times;</strong>
-              <span>baseline-to-pack ratio</span>
+              <strong>IDs + hashes</strong>
+              <span>source, selection, and delivered pack</span>
             </div>
-            <p>442,113 estimated input-context tokens became 5,682 - 98.71% less repeated context. Every required target was directly covered in the top five in the published fixture.</p>
-            <a href="/docs/benchmarks/">Read the method, artifacts, and limits</a>
+            <p>The body-free receipt identifies the exact host session, source head, selected events, pack manifest, evidence coverage, and portable context estimate.</p>
+            <a href="/docs/coding-context-harness/">Read the receipt and compaction contract</a>
           </aside>
         </div>
       </section>
@@ -1498,10 +1509,10 @@ function homePage() {
 
       <section class="proof-strip" aria-label="Qarinah proof points">
         <div class="shell proof-strip-grid">
-          <div><strong>98.71%</strong><span>less repeated context in the published six-task fixture</span></div>
-          <div><strong>436,431</strong><span>fewer portable estimated input-context tokens in the compared slice</span></div>
-          <div><strong>77.81&times;</strong><span>as many estimated tokens in the full-history baseline as the compiled context pack</span></div>
-          <div><strong>380 / 380</strong><span>file-specific exact and typo-tolerant queries ranked the target first</span></div>
+          <div><strong>16 / 16</strong><span>real-Git-worktree continuity scenarios passed</span></div>
+          <div><strong>6 hosts</strong><span>project-local setup for Codex, Claude, Cursor, Kimi, Antigravity, and Freebuff</span></div>
+          <div><strong>4 modes</strong><span>initial, unchanged, delta, and full-rebuild compaction receipts</span></div>
+          <div><strong>0 bodies</strong><span>retained inside per-session delivery receipts</span></div>
         </div>
       </section>
 
@@ -1624,8 +1635,8 @@ function homePage() {
             </article>
             <article class="feature-card">
               <span class="feature-index">02</span>
-              <h3>Does it reduce repeated context?</h3>
-              <p>The published evaluator measured 98.71% less estimated repeated input context for its compared task set.</p>
+              <h3>Can I verify worktree continuity?</h3>
+              <p>Yes. The release evaluator creates actual Git worktrees and replays all 16 acceptance scenarios from scratch.</p>
             </article>
             <article class="feature-card">
               <span class="feature-index">03</span>
@@ -2239,7 +2250,7 @@ async function markdownPage(page) {
             ? "install"
             : "docs";
   const publicationLink = page.route === "paper"
-    ? `<a href="${doi}">Published v1.4 DOI: 10.5281/zenodo.21850747</a> · <a href="${conceptDoi}">Paper series DOI</a> · <a href="${historicalVersionDoi}">Published v1.3</a>`
+    ? `<a href="${paperPdf}">Download v1.5 PDF</a> · <a href="${conceptDoi}">Paper series DOI</a> · <a href="${publishedV14Doi}">Published v1.4</a> · <a href="${historicalVersionDoi}">Published v1.3</a>`
     : "";
 
   return layout({

@@ -240,7 +240,7 @@ export const PROJECT_STRUCTURE_SCHEMA_VERSION: "qarinah.project-structure.v2";
 export const SQLITE_READ_MODEL_SCHEMA_VERSION: 1;
 export const SQLITE_READ_MODEL_FILENAME: "qarinah.db";
 export const MEMORY_ATTACHMENT_SCHEMA_VERSION: "qarinah.memory-attachment.v1";
-export const QARINAH_VERSION: "0.3.0";
+export const QARINAH_VERSION: "0.4.0";
 export const EVENT_KINDS: readonly QarinahEventKind[];
 export const RELATION_TYPES: readonly QarinahRelationType[];
 export function inspectGitWorktree(start?: string): Promise<QarinahGitWorktree | null>;
@@ -449,6 +449,14 @@ export interface QarinahCodingHarnessReadyWorktree {
   readonly pack: QarinahContextPack;
   readonly summary: QarinahCodingHarnessSummary;
   readonly comparison: QarinahCodingHarnessComparison;
+  readonly incremental: Readonly<{
+    mode: "initial" | "unchanged" | "delta" | "full-rebuild";
+    previousCheckpointEventId: string | null;
+    previousSourceHeadHash: string | null;
+    currentSourceHeadHash: string | null;
+    sourceEventCount: number;
+    changedEventCount: number;
+  }>;
   readonly recording: Readonly<{
     status: "not-requested" | "created" | "reused";
     eventId: string | null;
@@ -931,6 +939,92 @@ export function createCausalReceipt(input: Record<
   "evidence" | "memory" | "policy" | "execution" | "observation",
   { id: string; hash: `sha256:${string}`; system: string; timestamp: string }
 >): Readonly<Record<string, unknown>>;
+export const SESSION_CONTEXT_RECEIPT_SCHEMA_VERSION: "qarinah.session-context-receipt.v1";
+export const SESSION_CONTEXT_RECEIPT_INDEX_SCHEMA_VERSION: "qarinah.session-context-receipt-index.v1";
+export interface QarinahSessionContextReceipt {
+  readonly schemaVersion: "qarinah.session-context-receipt.v1";
+  readonly generatedAt: string;
+  readonly workspaceId: string;
+  readonly sessionId: string;
+  readonly sessionKey: string;
+  readonly hostAdapters: readonly string[];
+  readonly interval: Readonly<{ startedAt: string | null; completedAt: string | null }>;
+  readonly source: Readonly<{
+    eventCount: number;
+    headHash: `sha256:${string}` | null;
+    characters: number;
+    estimatedTokens: number;
+    estimator: string;
+    toolRequests: number;
+    toolOutcomes: number;
+  }>;
+  readonly delivered: Readonly<{
+    query: string;
+    itemCount: number;
+    citationCount: number;
+    eventIds: readonly string[];
+    sourceEventsSelected: number;
+    characters: number;
+    estimatedTokens: number;
+    manifestHash: `sha256:${string}`;
+    evidenceCoverage: string;
+  }>;
+  readonly comparison: Readonly<{
+    savedEstimatedTokens: number;
+    reductionPercent: number | null;
+    baselineToPackRatio: number | null;
+    selectionRatio: number | null;
+  }>;
+  readonly timing: Readonly<{ queryMilliseconds: number }>;
+  readonly unsupportedQueryCount: 0 | 1;
+  readonly boundaries: Readonly<Record<string, string>>;
+  readonly receiptHash: `sha256:${string}`;
+}
+export interface QarinahSessionContextReceiptIndex {
+  readonly schemaVersion: "qarinah.session-context-receipt-index.v1";
+  readonly generatedAt: string;
+  readonly workspaceId: string;
+  readonly query: string;
+  readonly receiptCount: number;
+  readonly manifestHash: `sha256:${string}`;
+  readonly receipts: readonly QarinahSessionContextReceipt[];
+}
+export function buildSessionContextReceipts(options?: {
+  cwd?: string;
+  query?: string;
+  sessionId?: string;
+  maxChars?: number;
+  maxTokens?: number;
+  limit?: number;
+  write?: boolean;
+  clock?: () => Date;
+}): Promise<Readonly<QarinahSessionContextReceiptIndex>>;
+export const DEVELOPER_MEMORY_VIEW_SCHEMA_VERSION: "qarinah.developer-memory-view.v1";
+export interface QarinahDeveloperMemoryView {
+  readonly schemaVersion: "qarinah.developer-memory-view.v1";
+  readonly generatedAt: string;
+  readonly query: string;
+  readonly workspace: Readonly<Record<string, unknown>>;
+  readonly health: Readonly<Record<string, unknown>>;
+  readonly search: Readonly<Record<string, unknown>>;
+  readonly graph: QarinahMemoryDashboard["linkedGraph"];
+  readonly timeline: readonly Readonly<Record<string, unknown>>[];
+  readonly decisions: Readonly<{ current: readonly Record<string, unknown>[]; superseded: readonly Record<string, unknown>[] }>;
+  readonly conflicts: readonly Record<string, unknown>[];
+  readonly tools: readonly Record<string, unknown>[];
+  readonly outcomes: readonly Record<string, unknown>[];
+  readonly sessions: QarinahSessionContextReceiptIndex;
+  readonly worktreeComparison: Readonly<Record<string, unknown>>;
+  readonly boundaries: Readonly<Record<string, string | boolean>>;
+  readonly manifestHash: `sha256:${string}`;
+}
+export function buildDeveloperMemoryView(options?: {
+  cwd?: string;
+  query?: string;
+  includeWorktrees?: boolean;
+  limit?: number;
+  clock?: () => Date;
+}): Promise<Readonly<QarinahDeveloperMemoryView>>;
 export interface QarinahMemoryDashboard {
   schemaVersion: "qarinah.memory-dashboard.v2";
   workspaceId: string;
@@ -958,6 +1052,7 @@ export interface QarinahMemoryDashboard {
     savingsPercent: number | null;
     baselineToPackRatio: number | null;
   };
+  sessionReceipts: QarinahSessionContextReceiptIndex;
   memoryFootprint: QarinahMemoryFootprint;
   currentDecisions: Record<string, unknown>[];
   supersededDecisions: Record<string, unknown>[];
@@ -1097,6 +1192,7 @@ export function setupWorkspace(options?: {
   cursor?: boolean;
   kimi?: boolean;
   antigravity?: boolean;
+  freebuff?: boolean;
   allowQuery?: boolean;
   autoCompact?: boolean;
   maxChars?: number;
@@ -1105,6 +1201,28 @@ export function setupWorkspace(options?: {
   backupDestination?: string;
   backupMaxBytes?: number;
   backupMaxFiles?: number;
+}): Promise<Readonly<Record<string, unknown>>>;
+export type QarinahHostIntegration = "codex" | "claude" | "cursor" | "kimi" | "antigravity" | "freebuff";
+export const HOST_INSTALL_MANIFEST_SCHEMA_VERSION: "qarinah.host-install-manifest.v1";
+export function previewHostInstall(options: {
+  cwd?: string;
+  host: QarinahHostIntegration;
+  scope?: "project";
+}): Promise<Readonly<Record<string, unknown>>>;
+export function installHostIntegration(options: {
+  cwd?: string;
+  host: QarinahHostIntegration;
+  scope?: "project";
+  capture?: "metadata" | "content";
+  allowQuery?: boolean;
+  autoCompact?: boolean;
+  maxChars?: number;
+  maxItems?: number;
+}): Promise<Readonly<Record<string, unknown>>>;
+export function uninstallHostIntegration(options: {
+  cwd?: string;
+  host: QarinahHostIntegration;
+  scope?: "project";
 }): Promise<Readonly<Record<string, unknown>>>;
 export function rankContextEvents(index: unknown, query: string | undefined, options: {
   limit?: number;

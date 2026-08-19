@@ -10,9 +10,22 @@ Qarinah keeps one project-owned memory record and exposes a bounded, read-only M
 | Kimi Code | Project-local `.kimi-code/mcp.json` | MCP retrieval; no claimed native transcript hook | Explicit `--format kimi` for official stream-json message output |
 | Classic Kimi CLI | Generated `.kimi/qarinah-mcp.json`, loaded with `--mcp-config-file` | MCP retrieval; no silent edits to the user-global config | Explicit `--format kimi` for official stream-json output |
 | Google Antigravity | Workspace plugin under `.agents/plugins/qarinah/` with MCP and a project-memory rule | MCP retrieval; no claimed native transcript hook | Portable JSONL/NDJSON import after an operator-controlled export |
+| Freebuff | Project-local agent definition under `.agents/qarinah-memory.js` | MCP retrieval; no claimed native transcript hook | Portable JSONL/NDJSON import after an operator-controlled export |
 | Other MCP clients | Use the Qarinah stdio command and exact workspace permit | Depends on the client | Portable JSONL/NDJSON import |
 
 Qarinah does not capture hidden reasoning, credentials, private browser state, or unsupported internal host files. A host without a reviewed event adapter still gets retrieval through MCP, but its chat/tool history enters Qarinah only through an explicit supported export.
+
+## Preview, install, and remove one host safely
+
+The 0.4.0 installer is deliberately narrower than `setup`: it handles one reviewed project-scoped host surface and records exact ownership. Always inspect the dry run first.
+
+```sh
+npx qarinah install . --host freebuff --scope project --dry-run --allow-query
+npx qarinah install . --host freebuff --scope project --allow-query
+npx qarinah uninstall . --host freebuff --scope project
+```
+
+Supported `--host` values are `codex`, `claude`, `cursor`, `kimi`, `antigravity`, and `freebuff`. The ownership manifest stores exact paths and installed digests. Uninstall refuses to delete a file that changed after installation and preserves unrelated shared configuration.
 
 ## Configure all supported project integrations
 
@@ -61,6 +74,10 @@ Antigravity documents workspace plugins under `.agents/plugins/` and MCP definit
 The plugin makes the same read-only diagnostic and explicitly authorized retrieval tools available in Antigravity. The rule tells the agent to retrieve a bounded cited pack before replaying broad project history. It does not grant write authority.
 
 Official contracts: [Antigravity plugins](https://www.antigravity.google/docs/plugins) and [Antigravity MCP](https://www.antigravity.google/docs/mcp).
+
+## Freebuff
+
+Qarinah generates a project-local Freebuff agent definition under `.agents/qarinah-memory.js`. It starts the same bounded stdio MCP surface and tells the host to retrieve a cited project pack before replaying broad history. The generated definition is inspectable, versioned, and reversible through the ownership manifest. It does not claim native Freebuff transcript capture or a universal host lifecycle.
 
 ## Verify the integration
 

@@ -5,6 +5,7 @@ coverage/
 benchmark-results/
 *.tgz
 site-dist/
+artifacts/
 tmp/
 __pycache__/
 *.pyc

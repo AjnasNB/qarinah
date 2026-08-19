@@ -211,6 +211,48 @@ function existingHarnessRecord(events, key) {
   )) ?? null;
 }
 
+function latestHarnessCheckpoint(events, options, worktree) {
+  return [...events].reverse().find((event) => (
+    event.provenance?.adapter === HARNESS_ADAPTER
+    && event.data?.codingHarness?.query === options.query
+    && (event.data?.codingHarness?.worktreeId ?? null) === (worktree?.worktreeId ?? null)
+    && (event.data?.codingHarness?.repositoryId ?? null) === (worktree?.repositoryId ?? null)
+  )) ?? null;
+}
+
+function incrementalState(sourceEvents, sourceHeadHash, previous) {
+  const previousSourceHeadHash = previous?.data?.codingHarness?.sourceHeadHash ?? null;
+  if (previous === null) {
+    return Object.freeze({
+      mode: "initial",
+      previousCheckpointEventId: null,
+      previousSourceHeadHash: null,
+      currentSourceHeadHash: sourceHeadHash,
+      sourceEventCount: sourceEvents.length,
+      changedEventCount: sourceEvents.length
+    });
+  }
+  if (previousSourceHeadHash === sourceHeadHash) {
+    return Object.freeze({
+      mode: "unchanged",
+      previousCheckpointEventId: previous.eventId,
+      previousSourceHeadHash,
+      currentSourceHeadHash: sourceHeadHash,
+      sourceEventCount: sourceEvents.length,
+      changedEventCount: 0
+    });
+  }
+  const previousIndex = sourceEvents.findIndex((event) => event.hash === previousSourceHeadHash);
+  return Object.freeze({
+    mode: previousIndex === -1 ? "full-rebuild" : "delta",
+    previousCheckpointEventId: previous.eventId,
+    previousSourceHeadHash,
+    currentSourceHeadHash: sourceHeadHash,
+    sourceEventCount: sourceEvents.length,
+    changedEventCount: previousIndex === -1 ? sourceEvents.length : sourceEvents.length - previousIndex - 1
+  });
+}
+
 async function modelSummary(options, workspace, worktree, pack, sources) {
   if (options.summarizer === null) {
     const value = deterministicSummary(pack, options.maxSummaryChars);
@@ -258,7 +300,7 @@ function repositoryDescriptor(worktree) {
   };
 }
 
-async function recordHarnessSummary(options, workspace, worktree, pack, events, summary, key, sourceHeadHash, metrics) {
+async function recordHarnessSummary(options, workspace, worktree, pack, events, summary, key, sourceHeadHash, metrics, incremental) {
   const sources = sourceDescriptors(pack);
   const data = {
     codingHarness: {
@@ -270,6 +312,11 @@ async function recordHarnessSummary(options, workspace, worktree, pack, events, 
       model: summary.model,
       sourceHeadHash,
       sourceEventCount: sources.length,
+      totalSourceEventCount: incremental.sourceEventCount,
+      previousCheckpointEventId: incremental.previousCheckpointEventId,
+      previousSourceHeadHash: incremental.previousSourceHeadHash,
+      changedEventCount: incremental.changedEventCount,
+      incrementalMode: incremental.mode,
       sourceManifestHash: sha256(sources),
       packManifestHash: pack.manifestHash,
       baselineTokens: metrics.baselineTokens,
@@ -318,6 +365,7 @@ async function compileWorktree(options, descriptor, isCurrent) {
   const worktree = workspace.worktree ?? (descriptor.schemaVersion === "qarinah.git-worktree.v1" ? descriptor : null);
   const key = runKey(options, worktree, sourceHeadHash);
   const previous = existingHarnessRecord(events, key);
+  const incremental = incrementalState(sourceEvents, sourceHeadHash, latestHarnessCheckpoint(events, options, worktree));
   const pack = await compileContextFromVerifiedEvents(options.query, {
     workspace,
     events: sourceEvents,
@@ -352,7 +400,7 @@ async function compileWorktree(options, descriptor, isCurrent) {
     summary = await modelSummary(options, workspace, worktree, pack, sources);
     if (options.record) {
       recording = await recordHarnessSummary(
-        options, workspace, worktree, pack, events, summary, key, sourceHeadHash, metrics
+        options, workspace, worktree, pack, events, summary, key, sourceHeadHash, metrics, incremental
       );
     }
   }
@@ -374,6 +422,7 @@ async function compileWorktree(options, descriptor, isCurrent) {
     pack,
     summary,
     comparison: metrics,
+    incremental,
     recording
   });
 }

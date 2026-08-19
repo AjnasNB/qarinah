@@ -2,7 +2,7 @@
 
 ## Implemented platform foundation
 
-Qarinah 0.3.0 adds a coding context harness that automatically turns completed agent turns into compact cited checkpoints, keeps every initialized Git worktree isolated, and reports the actual estimated context ratio for each run. The deterministic path is the default; an optional versioned host summarizer may see only the already bounded pack. The release retains consent-gated MCP retrieval, the grouped local dashboard, linked project memory, freshness checks, seven task packs, separate-authority multi-repository retrieval, encrypted team bundles, signed checkpoints, expanded evaluation, and the release-integrity gate that aligns package, runtime, types, schemas, plugins, website, paper, and benchmark metadata.
+Qarinah 0.4.0 makes developer memory visible. It adds exact session receipts, a searchable linked graph, a decisions/tools/outcomes/conflicts timeline, cross-worktree comparison, incremental compaction, a VS Code/Cursor panel, and reversible project-scoped setup for Codex, Claude Code, Cursor, Kimi, Antigravity, and Freebuff. A 16/16 real-Git-worktree acceptance fixture now protects the continuity contract. The release retains consent-gated MCP retrieval, freshness checks, seven task packs, separate-authority multi-repository retrieval, encrypted team bundles, signed checkpoints, expanded evaluation, and the release-integrity gate that aligns package, runtime, types, schemas, plugins, website, paper, and benchmark metadata.
 
 The encrypted sync surface is a public self-hostable protocol foundation. A managed cross-device service, identity-provider federation, durable hosted transport, and organization administration remain future service work.
 

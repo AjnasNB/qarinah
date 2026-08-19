@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use Qarinah, please cite the software and its technical white paper."
 title: "Qarinah"
 type: software
-version: 0.3.0
+version: 0.4.0
 license: Apache-2.0
 authors:
   - family-names: "N B"
@@ -24,10 +24,10 @@ preferred-citation:
   type: article
   title: "Qarinah: Less Context. More Proof."
   subtitle: "An evidence-linked project-memory compiler for coding agents"
-  version: "1.4"
+  version: "1.5"
   year: 2026
   authors:
     - family-names: "N B"
       given-names: "Ajnas"
-  doi: "10.5281/zenodo.21850747"
-  url: "https://doi.org/10.5281/zenodo.21850747"
+  doi: "10.5281/zenodo.21547684"
+  url: "https://doi.org/10.5281/zenodo.21547684"

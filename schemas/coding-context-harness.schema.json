@@ -118,10 +118,23 @@
         "hash": { "oneOf": [{ "$ref": "#/$defs/hash" }, { "type": "null" }] }
       }
     },
+    "incremental": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "previousCheckpointEventId", "previousSourceHeadHash", "currentSourceHeadHash", "sourceEventCount", "changedEventCount"],
+      "properties": {
+        "mode": { "enum": ["initial", "unchanged", "delta", "full-rebuild"] },
+        "previousCheckpointEventId": { "type": ["string", "null"], "pattern": "^evt_[0-9a-f-]{36}$" },
+        "previousSourceHeadHash": { "oneOf": [{ "$ref": "#/$defs/hash" }, { "type": "null" }] },
+        "currentSourceHeadHash": { "oneOf": [{ "$ref": "#/$defs/hash" }, { "type": "null" }] },
+        "sourceEventCount": { "type": "integer", "minimum": 0 },
+        "changedEventCount": { "type": "integer", "minimum": 0 }
+      }
+    },
     "readyWorktree": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "current", "root", "workspaceId", "capture", "worktree", "source", "pack", "summary", "comparison", "recording"],
+      "required": ["status", "current", "root", "workspaceId", "capture", "worktree", "source", "pack", "summary", "comparison", "incremental", "recording"],
       "properties": {
         "status": { "const": "ready" },
         "current": { "type": "boolean" },
@@ -145,6 +158,7 @@
         "pack": { "$ref": "context-pack.schema.json" },
         "summary": { "$ref": "#/$defs/summary" },
         "comparison": { "$ref": "#/$defs/comparison" },
+        "incremental": { "$ref": "#/$defs/incremental" },
         "recording": { "$ref": "#/$defs/recording" }
       }
     },

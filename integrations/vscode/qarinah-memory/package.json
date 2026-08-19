@@ -1,0 +1,48 @@
+{
+  "name": "qarinah-developer-memory",
+  "displayName": "Qarinah Developer Memory",
+  "description": "A local, searchable project-memory graph, timeline, session receipts, and Git worktree comparison for VS Code and Cursor.",
+  "version": "0.4.0",
+  "publisher": "ajnasnb",
+  "license": "Apache-2.0",
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "categories": ["Visualization", "Other"],
+  "keywords": ["ai", "agents", "memory", "context", "git", "worktree"],
+  "main": "./extension.cjs",
+  "activationEvents": ["onView:qarinah.developerMemory"],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "qarinah",
+          "title": "Qarinah",
+          "icon": "media/qarinah.svg"
+        }
+      ]
+    },
+    "views": {
+      "qarinah": [
+        {
+          "type": "webview",
+          "id": "qarinah.developerMemory",
+          "name": "Developer Memory"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "qarinah.refreshDeveloperMemory",
+        "title": "Qarinah: Refresh Developer Memory"
+      }
+    ]
+  },
+  "scripts": {
+    "package": "vsce package --no-dependencies"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AjnasNB/qarinah"
+  }
+}

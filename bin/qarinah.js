@@ -6,6 +6,8 @@ import {
   appendEvent,
   approveWorkspaceTrust,
   backupAgentArchives,
+  buildSessionContextReceipts,
+  buildDeveloperMemoryView,
   buildProjectOverview,
   captureClaudeHook,
   captureCodexHook,
@@ -16,6 +18,7 @@ import {
   initializeWorkspace,
   inspectMemoryFreshness,
   inspectWorkspacePolicy,
+  installHostIntegration,
   importAgentArchive,
   loadIndex,
   listGitWorktrees,
@@ -34,6 +37,8 @@ import {
   serveMemoryDashboard,
   setWorkspaceEnabled,
   setupWorkspace,
+  previewHostInstall,
+  uninstallHostIntegration,
   verifyStore,
   writeMemoryDashboard
 } from "../src/index.js";
@@ -272,7 +277,9 @@ function help() {
 
 Usage:
   qarinah init [path] [--capture metadata|content]
-  qarinah setup [path] [--codex] [--claude] [--cursor] [--kimi] [--antigravity] [--capture metadata|content] [--allow-query] [--auto-compact] [--backup-source <export>] [--backup-destination <external-directory>]
+  qarinah setup [path] [--codex] [--claude] [--cursor] [--kimi] [--antigravity] [--freebuff] [--capture metadata|content] [--allow-query] [--auto-compact] [--backup-source <export>] [--backup-destination <external-directory>]
+  qarinah install [path] --host codex|claude|cursor|kimi|antigravity|freebuff --scope project [--dry-run] [--capture metadata|content] [--allow-query] [--auto-compact]
+  qarinah uninstall [path] --host codex|claude|cursor|kimi|antigravity|freebuff --scope project
   qarinah record --kind <kind> --title <title> [--body <text>] [--data-json <json>] [--relation type:target]
   qarinah record --stdin-json
   qarinah hook codex|claude
@@ -283,6 +290,8 @@ Usage:
   qarinah backup <archive-file-or-directory>... --destination <external-directory> [--max-bytes n] [--max-files n]
   qarinah overview [--format json|markdown]
   qarinah footprint [query] [--baseline-tokens n] [--rate-per-million n] [--max-chars n] [--max-tokens n]
+  qarinah receipts [query] [--session <id>] [--write] [--max-chars n] [--max-tokens n] [--limit n]
+  qarinah panel [query] [--current-only] [--limit n]
   qarinah export okf [--output <path>]
   qarinah query [text] [--format json|markdown|handoff] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp] [--minimum-coverage any|partial|direct] [--minimum-evidence any|partial|direct]
   qarinah query --stdin-json
@@ -319,7 +328,7 @@ async function run(argv) {
     return;
   }
   if (command === "setup") {
-    const flags = new Set(["--codex", "--claude", "--cursor", "--kimi", "--antigravity", "--allow-query", "--auto-compact"]);
+    const flags = new Set(["--codex", "--claude", "--cursor", "--kimi", "--antigravity", "--freebuff", "--allow-query", "--auto-compact"]);
     const values = new Set(["--capture", "--max-chars", "--max-items", "--backup-source", "--backup-destination", "--backup-max-bytes", "--backup-max-files"]);
     const parsed = { positionals: [], flags: new Set(), values: new Map() };
     for (let index = 0; index < args.length; index += 1) {
@@ -354,6 +363,7 @@ async function run(argv) {
       cursor: parsed.flags.has("--cursor"),
       kimi: parsed.flags.has("--kimi"),
       antigravity: parsed.flags.has("--antigravity"),
+      freebuff: parsed.flags.has("--freebuff"),
       allowQuery: parsed.flags.has("--allow-query"),
       autoCompact: parsed.flags.has("--auto-compact"),
       maxChars: positive("--max-chars"),
@@ -362,6 +372,67 @@ async function run(argv) {
       backupDestination: parsed.values.has("--backup-destination") ? path.resolve(parsed.values.get("--backup-destination")) : undefined,
       backupMaxBytes: positive("--backup-max-bytes"),
       backupMaxFiles: positive("--backup-max-files")
+    });
+    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+    return;
+  }
+  if (command === "install") {
+    const flags = new Set(["--dry-run", "--allow-query", "--auto-compact"]);
+    const values = new Set(["--host", "--scope", "--capture", "--max-chars", "--max-items"]);
+    const parsed = { positionals: [], flags: new Set(), values: new Map() };
+    for (let index = 0; index < args.length; index += 1) {
+      const value = args[index];
+      if (!value.startsWith("--")) {
+        parsed.positionals.push(value);
+        continue;
+      }
+      if (flags.has(value)) {
+        if (parsed.flags.has(value)) throw new TypeError(`install received ${value} more than once.`);
+        parsed.flags.add(value);
+        continue;
+      }
+      if (!values.has(value)) throw new TypeError(`install does not support ${value}.`);
+      if (parsed.values.has(value)) throw new TypeError(`install received ${value} more than once.`);
+      if (index === args.length - 1 || args[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
+      parsed.values.set(value, args[index + 1]);
+      index += 1;
+    }
+    if (parsed.positionals.length > 1) throw new TypeError("install accepts at most one workspace path.");
+    if (!parsed.values.has("--host") || parsed.values.get("--scope") !== "project") {
+      throw new TypeError("install requires --host <supported-host> and explicit --scope project.");
+    }
+    const positive = (name) => {
+      const value = parsed.values.get(name);
+      if (value === undefined) return undefined;
+      if (!/^[0-9]+$/.test(value) || Number(value) < 1) throw new TypeError(`${name} must be a positive integer.`);
+      return Number(value);
+    };
+    const request = {
+      cwd: parsed.positionals[0] || process.cwd(),
+      host: parsed.values.get("--host"),
+      scope: "project",
+      capture: parsed.values.get("--capture"),
+      allowQuery: parsed.flags.has("--allow-query"),
+      autoCompact: parsed.flags.has("--auto-compact"),
+      maxChars: positive("--max-chars"),
+      maxItems: positive("--max-items")
+    };
+    const result = parsed.flags.has("--dry-run")
+      ? await previewHostInstall(request)
+      : await installHostIntegration(request);
+    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+    return;
+  }
+  if (command === "uninstall") {
+    const parsed = strictValueOptions(args, "uninstall", ["--host", "--scope"]);
+    if (parsed.positionals.length > 1) throw new TypeError("uninstall accepts at most one workspace path.");
+    if (!parsed.values.has("--host") || parsed.values.get("--scope") !== "project") {
+      throw new TypeError("uninstall requires --host <supported-host> and explicit --scope project.");
+    }
+    const result = await uninstallHostIntegration({
+      cwd: parsed.positionals[0] || process.cwd(),
+      host: parsed.values.get("--host"),
+      scope: "project"
     });
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
     return;
@@ -561,6 +632,79 @@ async function run(argv) {
       maxTokens: integer("--max-tokens")
     });
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+    return;
+  }
+  if (command === "receipts") {
+    const flags = new Set(["--write"]);
+    const values = new Set(["--session", "--max-chars", "--max-tokens", "--limit"]);
+    const parsed = { positionals: [], flags: new Set(), values: new Map() };
+    for (let index = 0; index < args.length; index += 1) {
+      const value = args[index];
+      if (!value.startsWith("--")) {
+        parsed.positionals.push(value);
+        continue;
+      }
+      if (flags.has(value)) {
+        if (parsed.flags.has(value)) throw new TypeError(`receipts received ${value} more than once.`);
+        parsed.flags.add(value);
+        continue;
+      }
+      if (!values.has(value)) throw new TypeError(`receipts does not support ${value}.`);
+      if (parsed.values.has(value)) throw new TypeError(`receipts received ${value} more than once.`);
+      if (index === args.length - 1 || args[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
+      parsed.values.set(value, args[index + 1]);
+      index += 1;
+    }
+    const bounded = (name, minimum, maximum) => {
+      const value = parsed.values.get(name);
+      if (value === undefined) return undefined;
+      if (!/^[0-9]+$/u.test(value) || Number(value) < minimum || Number(value) > maximum) {
+        throw new TypeError(`${name} must be an integer from ${minimum} to ${maximum}.`);
+      }
+      return Number(value);
+    };
+    const result = await buildSessionContextReceipts({
+      cwd: process.cwd(),
+      query: parsed.positionals.join(" ") || undefined,
+      sessionId: parsed.values.get("--session"),
+      maxChars: bounded("--max-chars", 512, 1_000_000),
+      maxTokens: bounded("--max-tokens", 128, 1_000_000),
+      limit: bounded("--limit", 1, 64),
+      write: parsed.flags.has("--write")
+    });
+    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+    return;
+  }
+  if (command === "panel") {
+    let currentOnly = false;
+    let limit;
+    const query = [];
+    for (let index = 0; index < args.length; index += 1) {
+      const value = args[index];
+      if (value === "--current-only") {
+        if (currentOnly) throw new TypeError("panel received --current-only more than once.");
+        currentOnly = true;
+        continue;
+      }
+      if (value === "--limit") {
+        if (limit !== undefined) throw new TypeError("panel received --limit more than once.");
+        const selected = args[index + 1];
+        if (!selected || !/^[0-9]+$/u.test(selected) || Number(selected) < 1 || Number(selected) > 100) {
+          throw new TypeError("--limit must be an integer from 1 to 100.");
+        }
+        limit = Number(selected);
+        index += 1;
+        continue;
+      }
+      if (value.startsWith("--")) throw new TypeError(`panel does not support ${value}.`);
+      query.push(value);
+    }
+    process.stdout.write(`${JSON.stringify(await buildDeveloperMemoryView({
+      cwd: process.cwd(),
+      query: query.join(" ") || undefined,
+      includeWorktrees: !currentOnly,
+      limit
+    }), null, 2)}\n`);
     return;
   }
   if (command === "export") {

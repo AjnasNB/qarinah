@@ -80,6 +80,12 @@ export { captureCodexHook } from "./hooks/codex.js";
 export { captureClaudeHook } from "./hooks/claude.js";
 export { createMcpServer, runMcpServer } from "./mcp/server.js";
 export { setupWorkspace } from "./setup.js";
+export {
+  HOST_INSTALL_MANIFEST_SCHEMA_VERSION,
+  installHostIntegration,
+  previewHostInstall,
+  uninstallHostIntegration
+} from "./host-installer.js";
 export { TASK_MEMORY_PACKS, compileTaskMemoryPack } from "./task-packs.js";
 export { rerankContextPack } from "./semantic.js";
 export {
@@ -100,8 +106,14 @@ export {
   verifySignedCheckpoint
 } from "./team-sync.js";
 export { createCausalReceipt } from "./receipts.js";
+export {
+  SESSION_CONTEXT_RECEIPT_INDEX_SCHEMA_VERSION,
+  SESSION_CONTEXT_RECEIPT_SCHEMA_VERSION,
+  buildSessionContextReceipts
+} from "./session-receipts.js";
 export { buildMemoryDashboard, renderMemoryDashboard, writeMemoryDashboard } from "./dashboard.js";
 export { serveMemoryDashboard } from "./dashboard-server.js";
+export { DEVELOPER_MEMORY_VIEW_SCHEMA_VERSION, buildDeveloperMemoryView } from "./developer-memory.js";
 export { evaluateContextQuality } from "./evaluation.js";
 export {
   MEMORY_ATTACHMENT_SCHEMA_VERSION,

@@ -1,5 +1,21 @@
 # Migrations
 
+## 0.3.0 to 0.4.0: visible developer memory
+
+Version 0.4.0 does not change the authoritative `qarinah.event.v1` ledger. It adds disposable session receipts, developer-memory views, host-install manifests, editor packaging, and a real-worktree acceptance artifact. Existing initialized workspaces remain readable.
+
+Run these commands in each initialized checkout after upgrading:
+
+```sh
+npx qarinah build
+npx qarinah receipts "current task" --write
+npx qarinah dashboard --serve --worktrees
+```
+
+Each Git worktree keeps its own `.qarinah` directory. Qarinah never migrates multiple worktree ledgers into one writable store. The repository comparison view reads initialized siblings independently. Host setup is now available through the explicit `install` command; preview it with `--dry-run` before writing. Existing setup files are not claimed by the new ownership manifest until installed through that command.
+
+The VS Code/Cursor extension is a read-only view over the local CLI contract. Install its generated VSIX only from the exact reviewed release. Antigravity and Freebuff support are project-local configuration surfaces; they do not add native hidden-transcript capture.
+
 ## Project structure v1 to v2 and Git worktrees
 
 Qarinah now emits `qarinah.project-structure.v2`. Version 2 adds a nullable `worktree` field containing a non-secret repository group ID, worktree ID, branch, commit, and primary/linked status. The snapshot hash covers this metadata, so a task pack can prove which checkout produced the file graph. Qarinah continues to validate and read historical v1 snapshots; the authoritative event schema and existing ledgers do not change.
