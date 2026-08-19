@@ -1192,6 +1192,7 @@ export function setupWorkspace(options?: {
   cursor?: boolean;
   kimi?: boolean;
   antigravity?: boolean;
+  freebuff?: boolean;
   allowQuery?: boolean;
   autoCompact?: boolean;
   maxChars?: number;
@@ -1200,6 +1201,28 @@ export function setupWorkspace(options?: {
   backupDestination?: string;
   backupMaxBytes?: number;
   backupMaxFiles?: number;
+}): Promise<Readonly<Record<string, unknown>>>;
+export type QarinahHostIntegration = "codex" | "claude" | "cursor" | "kimi" | "antigravity" | "freebuff";
+export const HOST_INSTALL_MANIFEST_SCHEMA_VERSION: "qarinah.host-install-manifest.v1";
+export function previewHostInstall(options: {
+  cwd?: string;
+  host: QarinahHostIntegration;
+  scope?: "project";
+}): Promise<Readonly<Record<string, unknown>>>;
+export function installHostIntegration(options: {
+  cwd?: string;
+  host: QarinahHostIntegration;
+  scope?: "project";
+  capture?: "metadata" | "content";
+  allowQuery?: boolean;
+  autoCompact?: boolean;
+  maxChars?: number;
+  maxItems?: number;
+}): Promise<Readonly<Record<string, unknown>>>;
+export function uninstallHostIntegration(options: {
+  cwd?: string;
+  host: QarinahHostIntegration;
+  scope?: "project";
 }): Promise<Readonly<Record<string, unknown>>>;
 export function rankContextEvents(index: unknown, query: string | undefined, options: {
   limit?: number;

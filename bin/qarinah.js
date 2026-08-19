@@ -18,6 +18,7 @@ import {
   initializeWorkspace,
   inspectMemoryFreshness,
   inspectWorkspacePolicy,
+  installHostIntegration,
   importAgentArchive,
   loadIndex,
   listGitWorktrees,
@@ -36,6 +37,8 @@ import {
   serveMemoryDashboard,
   setWorkspaceEnabled,
   setupWorkspace,
+  previewHostInstall,
+  uninstallHostIntegration,
   verifyStore,
   writeMemoryDashboard
 } from "../src/index.js";
@@ -275,6 +278,8 @@ function help() {
 Usage:
   qarinah init [path] [--capture metadata|content]
   qarinah setup [path] [--codex] [--claude] [--cursor] [--kimi] [--antigravity] [--freebuff] [--capture metadata|content] [--allow-query] [--auto-compact] [--backup-source <export>] [--backup-destination <external-directory>]
+  qarinah install [path] --host codex|claude|cursor|kimi|antigravity|freebuff --scope project [--dry-run] [--capture metadata|content] [--allow-query] [--auto-compact]
+  qarinah uninstall [path] --host codex|claude|cursor|kimi|antigravity|freebuff --scope project
   qarinah record --kind <kind> --title <title> [--body <text>] [--data-json <json>] [--relation type:target]
   qarinah record --stdin-json
   qarinah hook codex|claude
@@ -367,6 +372,67 @@ async function run(argv) {
       backupDestination: parsed.values.has("--backup-destination") ? path.resolve(parsed.values.get("--backup-destination")) : undefined,
       backupMaxBytes: positive("--backup-max-bytes"),
       backupMaxFiles: positive("--backup-max-files")
+    });
+    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+    return;
+  }
+  if (command === "install") {
+    const flags = new Set(["--dry-run", "--allow-query", "--auto-compact"]);
+    const values = new Set(["--host", "--scope", "--capture", "--max-chars", "--max-items"]);
+    const parsed = { positionals: [], flags: new Set(), values: new Map() };
+    for (let index = 0; index < args.length; index += 1) {
+      const value = args[index];
+      if (!value.startsWith("--")) {
+        parsed.positionals.push(value);
+        continue;
+      }
+      if (flags.has(value)) {
+        if (parsed.flags.has(value)) throw new TypeError(`install received ${value} more than once.`);
+        parsed.flags.add(value);
+        continue;
+      }
+      if (!values.has(value)) throw new TypeError(`install does not support ${value}.`);
+      if (parsed.values.has(value)) throw new TypeError(`install received ${value} more than once.`);
+      if (index === args.length - 1 || args[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
+      parsed.values.set(value, args[index + 1]);
+      index += 1;
+    }
+    if (parsed.positionals.length > 1) throw new TypeError("install accepts at most one workspace path.");
+    if (!parsed.values.has("--host") || parsed.values.get("--scope") !== "project") {
+      throw new TypeError("install requires --host <supported-host> and explicit --scope project.");
+    }
+    const positive = (name) => {
+      const value = parsed.values.get(name);
+      if (value === undefined) return undefined;
+      if (!/^[0-9]+$/.test(value) || Number(value) < 1) throw new TypeError(`${name} must be a positive integer.`);
+      return Number(value);
+    };
+    const request = {
+      cwd: parsed.positionals[0] || process.cwd(),
+      host: parsed.values.get("--host"),
+      scope: "project",
+      capture: parsed.values.get("--capture"),
+      allowQuery: parsed.flags.has("--allow-query"),
+      autoCompact: parsed.flags.has("--auto-compact"),
+      maxChars: positive("--max-chars"),
+      maxItems: positive("--max-items")
+    };
+    const result = parsed.flags.has("--dry-run")
+      ? await previewHostInstall(request)
+      : await installHostIntegration(request);
+    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+    return;
+  }
+  if (command === "uninstall") {
+    const parsed = strictValueOptions(args, "uninstall", ["--host", "--scope"]);
+    if (parsed.positionals.length > 1) throw new TypeError("uninstall accepts at most one workspace path.");
+    if (!parsed.values.has("--host") || parsed.values.get("--scope") !== "project") {
+      throw new TypeError("uninstall requires --host <supported-host> and explicit --scope project.");
+    }
+    const result = await uninstallHostIntegration({
+      cwd: parsed.positionals[0] || process.cwd(),
+      host: parsed.values.get("--host"),
+      scope: "project"
     });
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
     return;

@@ -45,7 +45,8 @@
     "./schemas/linked-project-memory.json": "./schemas/linked-project-memory.schema.json",
     "./schemas/linked-project-query.json": "./schemas/linked-project-query.schema.json",
     "./schemas/coding-context-harness.json": "./schemas/coding-context-harness.schema.json",
-    "./schemas/session-context-receipt.json": "./schemas/session-context-receipt.schema.json"
+    "./schemas/session-context-receipt.json": "./schemas/session-context-receipt.schema.json",
+    "./schemas/host-install-manifest.json": "./schemas/host-install-manifest.schema.json"
   },
   "files": [
     "bin/",

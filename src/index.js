@@ -80,6 +80,12 @@ export { captureCodexHook } from "./hooks/codex.js";
 export { captureClaudeHook } from "./hooks/claude.js";
 export { createMcpServer, runMcpServer } from "./mcp/server.js";
 export { setupWorkspace } from "./setup.js";
+export {
+  HOST_INSTALL_MANIFEST_SCHEMA_VERSION,
+  installHostIntegration,
+  previewHostInstall,
+  uninstallHostIntegration
+} from "./host-installer.js";
 export { TASK_MEMORY_PACKS, compileTaskMemoryPack } from "./task-packs.js";
 export { rerankContextPack } from "./semantic.js";
 export {

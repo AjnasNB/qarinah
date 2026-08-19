@@ -76,9 +76,12 @@ try {
     "  inspectGitWorktree,",
     "  listGitWorktrees,",
     "  inspectWorkspacePolicy,",
+    "  installHostIntegration,",
+    "  previewHostInstall,",
     "  approveWorkspaceTrust,",
     "  exportOkf,",
     "  registerMaqamContextAdapters,",
+    "  uninstallHostIntegration,",
     "  createMcpServer,",
     "  validateCockroachBrowserMemoryOutcome,",
     "  validateCockroachSourceRecordBoundary,",
@@ -98,7 +101,8 @@ try {
     "  type QarinahCodingContextSummarizer,",
     "  type QarinahLinkedProjectMemory,",
     "  type QarinahLinkedProjectQuery,",
-    "  type QarinahGitWorktree",
+    "  type QarinahGitWorktree,",
+    "  type QarinahHostIntegration",
     "} from \"qarinah\";",
     "import type { QarinahBrowserSink as PublicCockroachBrowserSink } from \"cockroach-browser/qarinah\";",
     "import { captureCodexHook } from \"qarinah/codex\";",
@@ -107,6 +111,10 @@ try {
     "// @ts-expect-error The Codex subpath exposes only the hook adapter.",
     "import { initializeWorkspace as invalidCodexExport } from \"qarinah/codex\";",
     "void initializeWorkspace;",
+    "const host: QarinahHostIntegration = 'antigravity';",
+    "void previewHostInstall({ host, scope: 'project' });",
+    "void installHostIntegration({ host: 'freebuff', scope: 'project', autoCompact: true });",
+    "void uninstallHostIntegration({ host: 'freebuff', scope: 'project' });",
     "const currentWorktree: Promise<QarinahGitWorktree | null> = inspectGitWorktree();",
     "void currentWorktree;",
     "const siblingWorktrees: Promise<readonly QarinahGitWorktree[]> = listGitWorktrees();",
@@ -236,6 +244,14 @@ try {
   assert.equal(
     installedPackage.exports["./schemas/cockroach-browser-memory.json"],
     "./schemas/cockroach-browser-memory.schema.json"
+  );
+  assert.equal(
+    installedPackage.exports["./schemas/host-install-manifest.json"],
+    "./schemas/host-install-manifest.schema.json"
+  );
+  await readFile(
+    path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "host-install-manifest.schema.json"),
+    "utf8"
   );
   await readFile(
     path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "cockroach-browser-memory.schema.json"),
