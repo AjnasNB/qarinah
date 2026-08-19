@@ -1,7 +1,8 @@
 # Coding-agent memory market comparison
 
-**Reviewed:** 19 August 2026  
-**Scope:** public product documentation and repositories available on that date  
+**Reviewed:** 19 August 2026
+
+**Scope:** public product documentation and repositories available on that date
 **Purpose:** help a developer choose the right memory or code-context layer. This is not a ranking and there is no matched cross-product benchmark.
 
 Qarinah is a local, project-owned memory layer for coding agents and Git worktrees. It records permitted decisions, visible outcomes, tool events, conflicts, source identities, and project structure in an append-only ledger. It then derives searchable graphs, session receipts, worktree comparisons, and bounded cited context packs. Qarinah does not replace a model, agent loop, IDE, vector database, or managed memory cloud.

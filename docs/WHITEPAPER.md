@@ -3,15 +3,15 @@
 ## An evidence-linked project-memory compiler for coding agents
 
 **Author:** Ajnas N B<br>
-**Paper version:** 1.4<br>
-**Implementation:** Qarinah `0.1.6`<br>
-**Date:** August 2026<br>
+**Paper version:** 1.5<br>
+**Implementation:** Qarinah `0.4.0`<br>
+**Date:** 19 August 2026<br>
 **License:** Apache License 2.0<br>
-**Status:** Implementation-backed technical white paper for Qarinah 0.1.6. This version is not peer-reviewed. All measured claims identify their benchmark, denominator, estimator, and limits. The v1.4 version DOI is assigned only when this manuscript is deposited; the persistent paper series uses concept DOI [10.5281/zenodo.21547684](https://doi.org/10.5281/zenodo.21547684).
+**Status:** Implementation-backed technical white paper for Qarinah 0.4.0. This version is not peer-reviewed. All measured claims identify their benchmark, denominator, estimator, and limits. Version 1.5 has no version DOI until a separate Zenodo deposit is completed; the persistent paper series uses concept DOI [10.5281/zenodo.21547684](https://doi.org/10.5281/zenodo.21547684).
 
-**Version note:** v1.4 adds the audited current-product v0.5 differential reproduction and the frozen context-efficiency comparison v2 result. The published v1.3 PDF, version DOI [10.5281/zenodo.21843240](https://doi.org/10.5281/zenodo.21843240), and integrity receipt remain immutable historical artifacts.
+**Version note:** v1.5 adds worktree-aware visible developer memory, per-session context receipts, a VS Code/Cursor panel, six project-local host integrations, incremental compaction, safe install/uninstall manifests, and a 16-scenario real-Git-worktree acceptance evaluation. Published v1.4, version DOI [10.5281/zenodo.21850747](https://doi.org/10.5281/zenodo.21850747), remains an immutable historical artifact.
 
-[Download the v1.4 PDF](https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.4.pdf)
+[Download the v1.5 PDF](https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.5.pdf)
 
 > Qarinah turns permitted agent activity, project structure, decisions, approvals, and source evidence into a local, verifiable record. When a later task needs context, Qarinah compiles a small cited pack instead of replaying the complete project history.
 
@@ -27,6 +27,8 @@ Qarinah treats project memory as a compilation problem rather than a transcript-
 
 The implementation is local-first, model-agnostic, and explicit about capture. A repository configuration does not grant consent by itself. Capture also requires machine-local trust for the repository's real path, and metadata-only capture is the default. Content capture is a separate reviewed choice. Derived files are disposable and can be rebuilt from the verified event chain.
 
+Qarinah 0.4.0 makes that memory visible during everyday development. Each initialized Git checkout retains a separate writable ledger and consent state. A shared repository identity lets the local dashboard compare initialized sibling worktrees without merging their stores. The developer view combines a searchable linked graph, decisions, tool outcomes, conflicts, session receipts, and branch/commit state. A sandboxed VS Code/Cursor panel reads the same local projection. Completed-turn hooks record idempotent incremental checkpoints in four explicit states: initial, unchanged, delta, and full rebuild.
+
 The committed software-task evaluation compares full-history replay with Qarinah packs while keeping the same current-task source material on both sides. Across 240 retained records and six software scenarios, the measured context falls from 442,113 to 5,682 estimated input-context tokens: a 98.7148% reduction and a 77.81:1 compression ratio. Every required target ranks in the top five with direct evidence coverage, and no model-written summaries are used. A separate 42-record, two-session continuation fixture measures two outputs against the same 9,489-token history: a 119-token model-facing capsule (98.7459% reduction) and a 1,039-token complete cited audit pack (89.0505% reduction). The capsule retains the selected summary identity and audit-pack manifest pointer; the larger pack retains all summary-source identities and hashes.
 
 A development-stage real-repository study uses the official public SWE-bench Lite task artifact and the software-issue framing introduced by Jimenez et al. [1]. It orders each repository chronologically, uses 60 early tasks to build memory, and evaluates 240 later queries. Admission-first Qarinah v2 matches admitted BM25 ranking, while its temporal and authority filters prevent the future and forbidden evidence admitted by ablations. Online mean reciprocal rank improves from 0.6007 for the earlier balanced profile to 0.6956 for v2; the repository-clustered 95% interval for the paired difference is [0.0572, 0.1115]. Graph expansion adds no ranking improvement in this corpus. The production-bound development-v0.4 recomputation observes zero direct false accepts under the structural oracle while accepting 4.17% of static and 6.25% of online queries, so it is not presented as a universal semantic guarantee.
@@ -41,7 +43,7 @@ These are reproducible context-volume, continuation, and retrieval results. They
 
 This paper describes the problem, system model, architecture, trust boundary, retrieval method, integrations, evaluation, limitations, and release criteria of the current implementation.
 
-**Keywords:** coding agents, project memory, context engineering, provenance, knowledge graph, retrieval, audit log, MCP, Codex, Claude Code, governance
+**Keywords:** coding agents, project memory, Git worktrees, context engineering, provenance, knowledge graph, retrieval, session receipts, MCP, Codex, Claude Code
 
 ## 1. Executive summary
 
@@ -55,7 +57,8 @@ A coding agent should not have to reread months of unrelated project history to 
 4. **Retrieval is evidence-aware.** Lexical relevance, typo tolerance, graph evidence, conflicts, supersession, time, retention, authority, and diversity influence selection.
 5. **Output is budgeted as a complete artifact.** Qarinah measures the full serialized pack, including citations and coverage metadata.
 6. **Selected memory remains inspectable.** Every returned item identifies the event and hash that support it.
-7. **Governance remains composable.** Maqam can govern registered context reads and approved writes; Cockroach Crawler can provide public source evidence; ProductLoop can provide workflow provenance.
+7. **Approval remains an optional composition.** Maqam can add policy or human approval to selected reads and writes; Qarinah remains useful without it.
+8. **Developer memory is visible.** The CLI, local dashboard, and VS Code/Cursor panel expose the same searchable graph, timeline, worktree comparison, and exact session receipts.
 
 The project does not claim to read hidden reasoning, monitor every host action, prove the truth of a stored claim, or turn a user-space package into an operating-system security boundary. It provides a narrower and more useful primitive: a verifiable local record and a deterministic way to compile the smallest evidence-backed context appropriate for a task.
 
@@ -468,6 +471,12 @@ Both tools are read-only, closed-world diagnostics. They can select an exact opt
 
 Context disclosure is not an ambient MCP side effect. A direct local query must be explicitly requested, or a separately governed Maqam capability can mediate it.
 
+### 11.6 Editor panel and project-scoped host lifecycle
+
+Qarinah 0.4.0 adds a VS Code extension that also runs in Cursor. The panel is a local projection of the initialized workspace rather than a second memory store. It shows the current worktree, session receipt, decisions, tool outcomes, conflicts, and a searchable linked graph. The webview receives a bounded message contract and cannot read arbitrary files or execute workspace commands.
+
+The CLI also supports dry-run, install, and uninstall plans for Codex, Claude Code, Cursor, Kimi, Antigravity, and Freebuff. Installation is project-scoped. Qarinah writes an ownership manifest containing exact paths and digests; uninstall removes only bytes still matching that manifest and preserves unrelated host configuration. Host support means a reviewed configuration or adapter is generated and verified. It does not mean every host exposes identical lifecycle events.
+
 ## 12. Composable ecosystem boundaries
 
 ### 12.1 Maqam
@@ -666,6 +675,12 @@ This smaller fixture is a regression suite, not the public context-volume headli
 
 The repository also benchmarks deterministic local append, replay, build, and query operations over a fixed retained workspace. These measurements identify implementation regressions. They are not presented as end-to-end model speed or "coding faster" results because model latency, tool execution, user review, and task difficulty are outside that measurement.
 
+### 14.9 Real Git-worktree continuity evaluation
+
+The 0.4.0 evaluator creates a temporary Git repository with three actual linked worktrees. Two worktrees are initialized independently and the third is deliberately left uninitialized. It records bounded decision, tool, outcome, conflict, and session events; advances the repository through initial, unchanged, delta, and rebuilt compaction states; and verifies isolation, discovery, retrieval, receipt hashes, and source-body exclusion.
+
+Sixteen assertions are defined before the result is accepted. The evaluator writes a deterministic JSON receipt and the release gate replays the experiment, compares the complete result, and verifies its SHA-256 digest. This is an implementation acceptance test over a real local Git topology. It is not a measure of generated-code correctness or a comparison against another product.
+
 ## 15. Results
 
 ### 15.1 Software-task context volume
@@ -772,6 +787,21 @@ At all three scales, SQLite event count and head match the verified ledger; grap
 | Character reduction | 94.96% |
 
 All four fixed targets remain retrievable. The selected pack is larger than the earlier context-pack format because v2 includes explicit evidence-coverage metadata.
+
+### 15.7 Visible-memory and worktree continuity result
+
+| Measurement | Result |
+| --- | ---: |
+| Actual Git worktrees | 3 |
+| Independently initialized worktrees | 2 |
+| Deliberately uninitialized worktrees | 1 |
+| Acceptance scenarios passed | 16 / 16 |
+| Incremental compaction states verified | 4 / 4 |
+| Receipt bodies retained | 0 |
+| Workspace identity collisions | 0 |
+| Result artifact SHA-256 | `0a610a0c2f6503d4b3c53c2e8bfc187c2159c70906e1bc7e828693cc34b6be9d` |
+
+The evaluation verifies that sibling worktrees remain distinct writable memories while the repository-level view can discover and compare initialized siblings. A session receipt binds the selected context, citations, workspace identity, repository state, source head, and output digest without embedding the original session body. Incremental capture distinguishes no-change checkpoints from deltas and full rebuilds, preventing an unchanged turn from being represented as new project evidence.
 
 ## 16. Interpretation
 
@@ -882,9 +912,9 @@ Recommended publication metadata:
 - **Title:** *Qarinah: Less Context. More Proof.*
 - **Subtitle:** *An evidence-linked project-memory compiler for coding agents*
 - **Author:** Ajnas N B
-- **Implementation version:** `0.1.6`
-- **Paper version:** 1.4
-- **Version DOI:** assigned by Zenodo when v1.4 is deposited
+- **Implementation version:** `0.4.0`
+- **Paper version:** 1.5
+- **Version DOI:** unassigned until v1.5 is separately deposited
 - **Concept DOI:** `10.5281/zenodo.21547684`
 - **License:** Apache-2.0
 - **Canonical source:** this repository at one reviewed commit
@@ -903,7 +933,7 @@ Security vulnerabilities should be reported privately according to the repositor
 
 ## 20. Roadmap and research agenda
 
-The post-0.1 research and hardening roadmap includes:
+The post-0.4 research and hardening roadmap includes:
 
 - at least 100 held-out positive and negative retrieval queries;
 - paraphrase, typo, conflict, supersession, time, authority, and unsupported-query coverage;
@@ -915,6 +945,9 @@ The post-0.1 research and hardening roadmap includes:
 - signed or independently anchored ledger checkpoints;
 - explicit deletion and retention workflows;
 - stronger multi-host coordination;
+- native JetBrains and additional editor surfaces;
+- independently reproduced cross-tool worktree-continuity results;
+- a managed opt-in team synchronization layer with an explicit separate threat model;
 - independent threat-model review; and
 - a separately designed privileged supervisor if the wider product evolves toward cross-platform operating-system mediation.
 
@@ -926,7 +959,7 @@ Coding agents need continuity, but continuity should not require replaying every
 
 Qarinah keeps durable evidence and task-time context as two different artifacts. The append-only ledger preserves the permitted project record. Deterministic projections make that record searchable and inspectable. The context compiler selects a small cited working set under an explicit budget. Conflicts, supersession, authority, retention, and evidence coverage remain visible rather than being compressed away.
 
-Qarinah 0.1.6 demonstrates that this design works end to end across local storage, SQLite retrieval, graph and Markdown projections, project structure, Codex and Claude Code adapters, MCP diagnostics, Maqam governance, crawler evidence, workflow provenance, and portable OKF export. Its committed evaluations show large context-volume reductions while preserving the required evidence in the evaluated scenarios. The 380-query multi-file regression extends that evidence through 100-file deterministic projects; v0.5 binds the current product to an exact reproduction of the inspected v0.4 development projection; and comparison v2 preserves an honest no-primary-result outcome when one required evidence item is missing.
+Qarinah 0.4.0 demonstrates this design end to end across local storage, SQLite retrieval, graph and Markdown projections, project structure, Codex and Claude Code adapters, MCP diagnostics, six project-scoped host setups, a VS Code/Cursor panel, worktree discovery, incremental compaction, session receipts, optional Maqam composition, crawler evidence, workflow provenance, and portable OKF export. Its 16/16 real-worktree acceptance result establishes the release's operational continuity contract. The historical 380-query multi-file regression extends the retrieval evidence through 100-file deterministic projects; v0.5 binds the current product to an exact reproduction of the inspected v0.4 development projection; and comparison v2 preserves an honest no-primary-result outcome when one required evidence item is missing.
 
 The central promise is intentionally simple:
 
@@ -967,6 +1000,9 @@ The author gratefully acknowledges Shahin Ahammed, Qarinah's non-technical cofou
 | No primary result in context-efficiency comparison v2 | Both primary methods eligible on 5/6 cases and token-identical on those five | Missing TypeScript support event cancels the six-case statistic and every winner claim |
 | Local-first and no Qarinah API key | Runtime architecture and package dependencies | AI hosts and external sources may still require their own access |
 | Deterministic rebuildable graph, index, Markdown, and OKF | Source implementation and test suite | Reproducibility depends on the same verified event head and build inputs |
+| 16 / 16 real-worktree acceptance scenarios | `bench/results/worktree-continuity-v0.4.0.json` and its deterministic evaluator | Local implementation acceptance; not generated-code quality or cross-product superiority |
+| Exact per-session context receipts | Receipt schema, source/output hashes, and real-worktree fixture | Binds selected context and citations; does not retain hidden reasoning or full transcript bodies |
+| Six project-scoped host setups | Installer plans and reversible manifest tests for Codex, Claude Code, Cursor, Kimi, Antigravity, and Freebuff | Configuration compatibility, not identical lifecycle coverage in every host |
 
 ## Appendix B. Artifact map
 
@@ -976,6 +1012,9 @@ The author gratefully acknowledges Shahin Ahammed, Qarinah's non-technical cofou
 | Benchmark methodology and results | [BENCHMARKS.md](BENCHMARKS.md) |
 | Security model | [SECURITY.md](SECURITY.md) |
 | Host integrations | [HOST-INTEGRATIONS.md](HOST-INTEGRATIONS.md) |
+| Real-worktree continuity result | [`worktree-continuity-v0.4.0.json`](../bench/results/worktree-continuity-v0.4.0.json) |
+| Linked project memory | [LINKED-PROJECT-MEMORY.md](LINKED-PROJECT-MEMORY.md) |
+| Current market comparison and gaps | [MARKET-COMPARISON-2026.md](MARKET-COMPARISON-2026.md) |
 | Maqam, crawler, ProductLoop, and OKF boundaries | [INTEROPERABILITY.md](INTEROPERABILITY.md) |
 | Migration notes | [MIGRATIONS.md](MIGRATIONS.md) |
 | Release gates | [LAUNCH.md](LAUNCH.md) |
@@ -986,7 +1025,7 @@ The author gratefully acknowledges Shahin Ahammed, Qarinah's non-technical cofou
 ```text
 Ajnas N B. "Qarinah: Less Context. More Proof. An evidence-linked
 project-memory compiler for coding agents." Technical white paper,
-version 1.4, August 2026. Qarinah 0.1.6. Paper series concept DOI:
-https://doi.org/10.5281/zenodo.21547684. A version DOI is assigned
-when this manuscript is deposited.
+version 1.5, August 2026. Qarinah 0.4.0. Paper series concept DOI:
+https://doi.org/10.5281/zenodo.21547684. Version 1.5 has no version DOI
+until this manuscript is separately deposited.
 ```
