@@ -52,6 +52,8 @@ test("coding harness compiles, measures, cites, records, and idempotently reuses
   assert.equal(first.benchmark.guarantee, false);
   assert.equal(first.worktrees.length, 1);
   assert.equal(first.worktrees[0].recording.status, "created");
+  assert.equal(first.worktrees[0].incremental.mode, "initial");
+  assert.equal(first.worktrees[0].incremental.changedEventCount, 2);
   assert.ok(first.worktrees[0].comparison.baselineTokens > first.worktrees[0].comparison.deliveredTokens);
   assert.equal(
     first.worktrees[0].comparison.savedTokens,
@@ -84,10 +86,25 @@ test("coding harness compiles, measures, cites, records, and idempotently reuses
     clock: CLOCK
   });
   assert.equal(second.worktrees[0].recording.status, "reused");
+  assert.equal(second.worktrees[0].incremental.mode, "unchanged");
+  assert.equal(second.worktrees[0].incremental.changedEventCount, 0);
   assert.equal(second.worktrees[0].recording.eventId, checkpoint.eventId);
   assert.equal(second.worktrees[0].pack.manifestHash, first.worktrees[0].pack.manifestHash);
   assert.deepEqual(second.worktrees[0].pack.items, first.worktrees[0].pack.items);
   assert.equal((await readEvents(root, { updateCheckpoint: false })).length, afterFirst.length);
+
+  await appendEvent(eventInput({ title: "Document the release handoff" }), { cwd: root });
+  const third = await runCodingContextHarness({
+    cwd: root,
+    query: "release artifact verification",
+    maxChars: 3_000,
+    maxSummaryChars: 1_200,
+    record: true,
+    clock: CLOCK
+  });
+  assert.equal(third.worktrees[0].incremental.mode, "delta");
+  assert.equal(third.worktrees[0].incremental.changedEventCount, 1);
+  assert.equal(third.worktrees[0].incremental.previousCheckpointEventId, checkpoint.eventId);
 });
 
 test("optional model compaction sees only a bounded untrusted pack and is redacted", async (t) => {
@@ -301,4 +318,5 @@ test("coding harness schema pins the public benchmark and strict nested contract
   assert.equal(schema.$defs.readyWorktree.properties.pack.$ref, "context-pack.schema.json");
   assert.equal(schema.$defs.uninitializedWorktree.additionalProperties, false);
   assert.equal(schema.$defs.recording.additionalProperties, false);
+  assert.equal(schema.$defs.incremental.additionalProperties, false);
 });

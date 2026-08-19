@@ -449,6 +449,14 @@ export interface QarinahCodingHarnessReadyWorktree {
   readonly pack: QarinahContextPack;
   readonly summary: QarinahCodingHarnessSummary;
   readonly comparison: QarinahCodingHarnessComparison;
+  readonly incremental: Readonly<{
+    mode: "initial" | "unchanged" | "delta" | "full-rebuild";
+    previousCheckpointEventId: string | null;
+    previousSourceHeadHash: string | null;
+    currentSourceHeadHash: string | null;
+    sourceEventCount: number;
+    changedEventCount: number;
+  }>;
   readonly recording: Readonly<{
     status: "not-requested" | "created" | "reused";
     eventId: string | null;
