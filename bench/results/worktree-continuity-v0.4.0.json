@@ -1,0 +1,101 @@
+{
+  "schemaVersion": "qarinah.worktree-continuity-evaluation.v1",
+  "protocol": {
+    "id": "real-git-worktree-continuity-v1",
+    "generatedAt": "2026-08-19T12:00:00.000Z",
+    "environment": "temporary local Git repository with three actual git worktree checkouts",
+    "scope": "Product acceptance evidence for Qarinah worktree isolation, handoff receipts, and incremental compaction. It is not an external comparative benchmark."
+  },
+  "aggregate": {
+    "scenarioCount": 16,
+    "passed": 16,
+    "failed": 0,
+    "passRate": 1,
+    "discoveredWorktrees": 3,
+    "initializedWorktrees": 2,
+    "sessionReceipts": 1
+  },
+  "scenarios": [
+    {
+      "id": "repository-discovers-three-real-worktrees",
+      "passed": true,
+      "observation": "3 discovered"
+    },
+    {
+      "id": "initialized-worktrees-are-explicit",
+      "passed": true,
+      "observation": "2 ready"
+    },
+    {
+      "id": "uninitialized-worktree-is-not-silently-skipped",
+      "passed": true,
+      "observation": "one explicit uninitialized worktree"
+    },
+    {
+      "id": "main-pack-retrieves-main-decision",
+      "passed": true,
+      "observation": "main decision cited"
+    },
+    {
+      "id": "feature-pack-retrieves-feature-decision",
+      "passed": true,
+      "observation": "feature decision cited"
+    },
+    {
+      "id": "main-pack-excludes-feature-memory",
+      "passed": true,
+      "observation": "feature evidence absent from main"
+    },
+    {
+      "id": "feature-pack-excludes-main-memory",
+      "passed": true,
+      "observation": "main evidence absent from feature"
+    },
+    {
+      "id": "workspace-identities-remain-distinct",
+      "passed": true,
+      "observation": "two workspace identities"
+    },
+    {
+      "id": "current-worktree-is-identified",
+      "passed": true,
+      "observation": "feature worktree current"
+    },
+    {
+      "id": "session-receipt-is-created",
+      "passed": true,
+      "observation": "one hash-bound receipt"
+    },
+    {
+      "id": "session-receipt-binds-source-hashes",
+      "passed": true,
+      "observation": "2 cited events"
+    },
+    {
+      "id": "session-receipt-excludes-event-bodies",
+      "passed": true,
+      "observation": "no retained event bodies"
+    },
+    {
+      "id": "initial-compaction-is-recorded",
+      "passed": true,
+      "observation": "initial checkpoint created"
+    },
+    {
+      "id": "unchanged-compaction-is-idempotent",
+      "passed": true,
+      "observation": "checkpoint reused"
+    },
+    {
+      "id": "delta-compaction-captures-one-change",
+      "passed": true,
+      "observation": "1 changed event"
+    },
+    {
+      "id": "developer-view-exposes-decision-tool-conflict",
+      "passed": true,
+      "observation": "decision, tool, and conflict visible"
+    }
+  ],
+  "artifactHash": "sha256:0a610a0c2f6503d4b3c53c2e8bfc187c2159c70906e1bc7e828693cc34b6be9d"
+}
