@@ -1,6 +1,6 @@
 {
   "name": "qarinah",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Qarinah is worktree-aware project memory for coding agents - isolated per checkout and linked through a cited repository graph.",
   "author": {
     "name": "Ajnas NB",

@@ -3,7 +3,7 @@
   "@type": "SoftwareSourceCode",
   "name": "Qarinah",
   "description": "A worktree-aware coding context harness with isolated ledgers, automatic compact checkpoints, deterministic retrieval, cited graphs, and verifiable handoffs.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "license": "https://spdx.org/licenses/Apache-2.0",
   "codeRepository": "https://github.com/AjnasNB/qarinah",
   "issueTracker": "https://github.com/AjnasNB/qarinah/issues",
@@ -20,7 +20,7 @@
       "familyName": "N B"
     }
   ],
-  "citation": "https://doi.org/10.5281/zenodo.21850747",
+  "citation": "https://doi.org/10.5281/zenodo.21547684",
   "keywords": [
     "coding agents",
     "project memory",
