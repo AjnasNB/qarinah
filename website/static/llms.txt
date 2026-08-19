@@ -2,7 +2,7 @@
 
 > One automatic coding context harness for every Git worktree.
 
-Qarinah gives every Git worktree an isolated, cited project ledger, automatically records compact completed-turn checkpoints, and links related checkouts into one repository context graph. Codex, Claude Code, Cursor, and compatible tools can continue from verified context without mixing parallel branches or replaying the complete project history.
+Qarinah gives every Git worktree an isolated, cited project ledger, automatically records compact completed-turn checkpoints, and links related checkouts into one repository context graph. Codex, Claude Code, Cursor, Kimi, Antigravity, Freebuff, and compatible tools can continue from verified context without mixing parallel branches or replaying the complete project history.
 
 This file is a convenience map for tools that choose to read it. It is not a ranking signal or a substitute for the canonical documentation.
 
@@ -39,6 +39,9 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 - Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler are separate projects by Ajnas N B. The ecosystem guide distinguishes them from third-party tools maintained by their own projects.
 - Cockroach Browser uses Playwright. Cockroach Crawler discloses Trafilatura as the optional quality dependency. The ecosystem guide does not claim that those established projects were created by Qarinah's author.
 - Qarinah's primary workflow is verified handoffs between coding agents.
+- Qarinah 0.4.0 passed 16 / 16 deterministic continuity scenarios across three actual Git worktrees, including separate workspace identities, retrieval, conflicts, session receipts, and four compaction states.
+- The VS Code/Cursor panel shows the same local searchable graph, decisions/tools/outcomes/conflicts timeline, exact session receipts, and sibling-worktree comparison as the CLI/dashboard projection.
+- Host installation is previewable and reversible for Codex, Claude Code, Cursor, Kimi, Antigravity, and Freebuff; support describes project configuration and does not claim identical native capture in every host.
 - Qarinah's optional automatic harness records a deterministic compact checkpoint after a supported completed turn; optional host-model compaction receives only the already bounded pack and is not enabled by the automatic hook.
 - Qarinah initializes a rebuildable SQLite WAL/FTS5 read model, graph, index, and Markdown view when a workspace is initialized.
 - Complete setup records a bounded project-structure graph, and `qarinah overview` explains memory counts, latest outcomes, languages, directories, and relationships.
@@ -76,7 +79,7 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 - [Troubleshooting](https://qarinah.io/docs/troubleshooting/): Diagnose trust, capture, rebuild, query, MCP, and host-integration failures.
 - [FAQ](https://qarinah.io/docs/faq/): Direct answers about storage, privacy, context reduction, hosts, and operating boundaries.
 - [Migration guide](https://qarinah.io/docs/migrations/): Upgrade persisted Qarinah workspaces safely.
-- [Technical white paper](https://qarinah.io/paper/): Published implementation-backed paper version 1.4 for Qarinah 0.1.6; version DOI 10.5281/zenodo.21850747 and persistent paper-series DOI 10.5281/zenodo.21547684.
+- [Technical white paper](https://qarinah.io/paper/): Implementation-backed paper version 1.5 for Qarinah 0.4.0. Version 1.5 has no version DOI until separately deposited; the persistent paper-series DOI is 10.5281/zenodo.21547684 and published v1.4 remains historical.
 
 ## Publication and support
 
