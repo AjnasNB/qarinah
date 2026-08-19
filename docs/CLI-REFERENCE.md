@@ -726,6 +726,27 @@ Omit host flags to configure all five supported project integrations. Omit `--al
 
 `--auto-compact` is opt-in and applies to Codex and Claude Code Stop hooks. It runs after ordinary lifecycle capture and invokes `harness --record --no-rebuild --quiet`, producing one idempotent cited checkpoint without forcing a full projection rebuild after every turn.
 
+## `install`
+
+Preview or write one reversible, project-scoped host integration:
+
+```sh
+npx qarinah install . --host cursor --scope project --dry-run --allow-query --auto-compact
+npx qarinah install . --host cursor --scope project --allow-query --auto-compact
+```
+
+`--host` is required and accepts `codex`, `claude`, `cursor`, `kimi`, `antigravity`, or `freebuff`. `--scope project` is also required. The result lists every planned file, whether it is created or structurally merged, and the exact ownership manifest path. Dry-run performs no writes.
+
+## `uninstall`
+
+Remove only files and shared-config entries still owned by a recorded Qarinah host installation:
+
+```sh
+npx qarinah uninstall . --host cursor --scope project
+```
+
+Qarinah verifies the manifest workspace identity, validates every relative path, compares current bytes with the installed digest, and refuses removal when an owned file has changed. Shared JSON is structurally edited so unrelated host configuration remains intact.
+
 ## `mcp`
 
 Start the native zero-write diagnostic MCP stdio server:

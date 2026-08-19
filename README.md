@@ -11,53 +11,60 @@
 </p>
 
 ```sh
-# Initialize the exact checkout you are working in.
-npx qarinah setup . --capture content --allow-query --auto-compact
+# Preview an exact project-local host installation without changing files.
+npx qarinah install . --host codex --scope project --dry-run
 
-# See every linked checkout and open all initialized worktree ledgers together.
-npx qarinah worktrees
-npx qarinah dashboard --serve --worktrees
+# Initialize this checkout, install all supported project integrations,
+# map the project, and enable incremental completed-turn checkpoints.
+npx qarinah setup . --capture content --allow-query --auto-compact
 ```
 
 Each worktree keeps a separate `.qarinah` ledger and consent record. Qarinah derives a shared repository identity, hashes branch and commit context into the project snapshot, and links each checkout to the files and memories it actually produced. It never replaces worktree ledgers with symlinks or a shared writable database. [Read the worktree context guide.](docs/WORKTREE-CONTEXT.md)
 
 With `--auto-compact`, the completed-turn hook compiles a bounded cited pack and records one idempotent checkpoint for the latest non-harness source event. The checkpoint can be expanded through exact event IDs, hashes, and the pack manifest. Run `npx qarinah harness "your task" --worktrees` to measure and inspect separate packs across every initialized sibling checkout. [Read the coding context harness guide.](docs/CODING-CONTEXT-HARNESS.md)
 
+## Resume the work, not the whole chat
+
+```sh
+# Search the visible graph and timeline from any terminal.
+npx qarinah panel "release readiness"
+
+# Write exact, body-free context receipts for each captured host session.
+npx qarinah receipts "release readiness" --write
+
+# Compare initialized sibling worktrees in one responsive local dashboard.
+npx qarinah dashboard --serve --worktrees
+```
+
+| Visible developer memory | What it proves |
+| --- | --- |
+| Searchable graph | Files, concepts, memories, typed relations, ranking components, and evidence hashes |
+| Decisions/tools/outcomes/conflicts timeline | What changed, why it changed, which tool ran, and what disagrees |
+| Exact session receipts | The host session, selected event IDs, source and pack hashes, measured selection, and no retained event bodies |
+| Cross-worktree comparison | Separate writable ledgers, branch and commit identities, divergent heads, event totals, and current decisions |
+| Incremental compaction | Initial, unchanged, delta, and full-rebuild states with the exact prior checkpoint and changed-event count |
+| VS Code/Cursor panel | A local sandboxed read-only webview backed by the Qarinah CLI |
+
+### Reproducible real-Git-worktree acceptance result
+
+The 0.4.0 evaluator creates **three actual Git worktree checkouts** and passes **16 / 16** isolation, retrieval, session-receipt, conflict, and incremental-compaction scenarios. Two initialized worktrees keep separate workspace identities and memories; the third is reported as explicitly uninitialized instead of being silently skipped.
+
+```sh
+npm run check:worktree-continuity
+```
+
+Inspect the [machine-readable result](bench/results/worktree-continuity-v0.4.0.json), [evaluator](scripts/evaluate-worktree-continuity.mjs), and [current market comparison](docs/MARKET-COMPARISON-2026.md). This is product-acceptance evidence, not an external comparative benchmark.
+
 <p align="center">
-  <img src="assets/launch/qarinah-what-you-save.png" width="100%" alt="What you save with Qarinah: 98.71% less repeated context, a 77.81 to 1 baseline-to-pack ratio, 442,113 baseline tokens versus 5,682 Qarinah pack tokens, and exact illustrative savings at four flat uncached input-token rates.">
+  <img src="assets/launch/qarinah-worktree-context-graph.png" width="100%" alt="Qarinah local developer-memory graph showing one worktree, its files, memories, concepts, relationships, ranked results, and selected evidence hash.">
 </p>
 
-## Reproducible context benchmark
+<details>
+<summary><strong>Separate scoped context-volume benchmark</strong></summary>
 
-| **98.7148%** | **98.75%** | **89.05%** |
-| :---: | :---: | :---: |
-| Six-task repeated-context reduction | Model-facing continuation capsule | Complete evidence-rich continuation pack |
-| 442,113 -> 5,682 estimated tokens | 9,489 -> 119 estimated tokens | 9,489 -> 1,039 estimated tokens |
+The historical six-fixture estimator reports 442,113 portable estimated full-history tokens versus 5,682 Qarinah-pack tokens, a 98.7148% reduction for that compared slice. It is not a provider bill, session-length claim, external comparison, or guarantee for another repository. The [benchmark page](docs/BENCHMARKS.md) preserves the complete method, artifacts, cost arithmetic, and limitations.
 
-The continuation percentages use the same 42-record, two-session history but measure two different outputs: the 119-token capsule is the smallest model-facing handoff, while the 1,039-token pack preserves the complete cited audit surface. All three measurements use the reproducible portable estimator `ceil(characters / 4)`; they are not provider billing receipts. [Inspect the fixtures, exact arithmetic, and claim boundaries.](docs/BENCHMARKS.md)
-
-### What the 77.81x ratio means
-
-The evaluated full-history baseline contained **77.81 times as many estimated input-context tokens** as the Qarinah path: `442,113 / 5,682 = 77.81`. This supports a **77.81:1 baseline-to-pack ratio** or **more than 70x baseline-to-pack compression** for the published six-fixture estimate. It does not mean agents run 77.81 times longer or every provider bill is 77.81 times lower.
-
-At a flat **$3 per million uncached input tokens**, the aggregate compared slice estimates **$1.326339 for full-history replay versus $0.017046 for Qarinah**, saving **$1.309293 per repeat** or **$13.092930 across ten repeats**. Use `estimated tokens / 1,000,000 x your input rate x repeats` for another rate. This arithmetic excludes provider-native tokenization, caching, output, reasoning, tools, retrieval, hosting, and fixed fees. [See the complete cost table and approved wording.](docs/PUBLIC-METRICS.md)
-
-| Flat uncached input rate | Full-history baseline | Qarinah pack | Estimated saving |
-| --- | ---: | ---: | ---: |
-| $1/M tokens | $0.442113 | $0.005682 | $0.436431 |
-| $3/M tokens | $1.326339 | $0.017046 | $1.309293 |
-| $5/M tokens | $2.210565 | $0.028410 | $2.182155 |
-| $15/M tokens | $6.631695 | $0.085230 | $6.546465 |
-
-At the normalized $1-per-million reference rate, the same calculation is **$0.4421 versus $0.0057**. In either flat-rate example, the fixture-bound statement remains: **98.71% lower input-context cost at the same token rate.**
-
-Scale regression: Qarinah also passed **380 / 380 file-specific exact and typo-tolerant queries** across deterministic 40-, 50-, and 100-file projects. The same run verified SQLite retrieval, graph relations, generated Markdown, conflicts, supersession, stale-projection repair, and 9 / 9 correct unsupported-query abstentions. [Inspect the multi-file method and result.](docs/BENCHMARKS.md#multi-file-project-context-and-projection-integrity-benchmark)
-
-<p align="center"><em>Switch agents or branches. Keep the decisions, outcomes, and proof.</em></p>
-
-<p align="center">
-  Qarinah keeps one compact, cited project memory beside your code, so Codex, Claude Code, Cursor, and compatible tools can continue from verified context instead of starting from zero.
-</p>
+</details>
 
 <p align="center">
   <a href="https://qarinah.io"><strong>Website</strong></a>&nbsp;&middot;&nbsp;
@@ -66,8 +73,9 @@ Scale regression: Qarinah also passed **380 / 380 file-specific exact and typo-t
   <a href="https://qarinah.io/docs/"><strong>Documentation</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://qarinah.io/docs/public-metrics/"><strong>Public metrics</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://qarinah.io/paper/"><strong>White paper</strong></a>&nbsp;&middot;&nbsp;
+  <a href="https://qarinah.io/docs/market-comparison/"><strong>Market comparison</strong></a>&nbsp;&middot;&nbsp;
   <a href="docs/RESEARCH-BENCHMARK.md"><strong>Research benchmark</strong></a>&nbsp;&middot;&nbsp;
-  <a href="https://doi.org/10.5281/zenodo.21850747"><strong>v1.4 DOI</strong></a>
+  <a href="https://doi.org/10.5281/zenodo.21547684"><strong>Paper series DOI</strong></a>
 </p>
 
 <p align="center">
@@ -79,9 +87,9 @@ Scale regression: Qarinah also passed **380 / 380 file-specific exact and typo-t
 </p>
 
 <p align="center">
-  <strong>98.71% less estimated repeated context in the published six-task benchmark.</strong><br>
-  442,113 &rarr; 5,682 estimated input-context tokens, with every required target directly covered in the top five.
-  <a href="docs/BENCHMARKS.md">Inspect the method and limits.</a>
+  <strong>16 / 16 real-Git-worktree continuity scenarios passed.</strong><br>
+  Resume with the exact branch, decision, tool outcome, conflict, source event, and pack receipt.
+  <a href="bench/results/worktree-continuity-v0.4.0.json">Inspect the result.</a>
 </p>
 
 ```sh
@@ -147,7 +155,7 @@ For the compared slice only: 98.71% lower estimated input-context cost at the sa
 5. Receive a compact cited pack with stale, conflicting, and superseded decisions marked.
 6. Finish the task without replaying the complete project history.
 
-Qarinah is a universal context engine for software projects, built on local-first temporal memory, an authoritative event ledger, SQLite and FTS retrieval, typed relationships, freshness checks, and compact cited context packs. Read the [verified cross-agent handoff guide](docs/CROSS-AGENT-HANDOFFS.md).
+Qarinah is a project-memory and context layer for software work, built on local-first temporal memory, an authoritative event ledger, SQLite and FTS retrieval, typed relationships, freshness checks, and compact cited context packs. Read the [verified cross-agent handoff guide](docs/CROSS-AGENT-HANDOFFS.md).
 
 ## What appears in your repository
 
@@ -174,9 +182,9 @@ The JSONL chain remains authoritative. Graph, index, Markdown, dashboard, and OK
 
 <p align="center">
   <a href="docs/WHITEPAPER.md">Technical paper</a>&nbsp;&middot;&nbsp;
-  <a href="output/pdf/Qarinah-Technical-White-Paper-v1.4.pdf">Verified v1.4 PDF</a>&nbsp;&middot;&nbsp;
-  <a href="https://doi.org/10.5281/zenodo.21850747">Published white paper v1.4</a>&nbsp;&middot;&nbsp;
+  <a href="output/pdf/Qarinah-Technical-White-Paper-v1.5.pdf">Technical white paper v1.5</a>&nbsp;&middot;&nbsp;
   <a href="https://doi.org/10.5281/zenodo.21547684">Paper series DOI</a>&nbsp;&middot;&nbsp;
+  <a href="https://doi.org/10.5281/zenodo.21850747">Published historical v1.4</a>&nbsp;&middot;&nbsp;
   <a href="docs/ARCHITECTURE.md">Architecture</a>&nbsp;&middot;&nbsp;
   <a href="docs/DASHBOARD.md">Dashboard</a>&nbsp;&middot;&nbsp;
   <a href="docs/BENCHMARKS.md">Benchmarks</a>&nbsp;&middot;&nbsp;
@@ -186,11 +194,11 @@ The JSONL chain remains authoritative. Graph, index, Markdown, dashboard, and OK
 </p>
 
 <p align="center">
-  <strong>What if your coding agents could send 98.71% less repeated project context?</strong><br>
-  442,113 estimated input-context tokens became 5,682 - 98.71% less repeated context and 77.81:1 context compression, with every required target directly covered in the top five.
+  <strong>What if every new coding session could show exactly what it inherited?</strong><br>
+  Qarinah binds the branch, decisions, tool outcomes, conflicts, source events, and delivered context pack into visible local receipts.
 </p>
 
-<p align="center"><em>Nearly 99% less repeated context. Every selected memory points back to its source.</em></p>
+<p align="center"><em>Resume the task. Inspect the memory. Follow every selected item back to its source.</em></p>
 
 > Successfully verified across React editing, database migration, TypeScript refactoring, web research, production debugging, and release preparation. The evaluated tasks sent 436,431 fewer estimated input-context tokens. At a flat $3 per million uncached input tokens, that aggregate compared context slice moves from $1.326339 to $0.017046, saving $1.309293 each time the complete slice would otherwise be sent. The percentage is independent of the chosen flat unit price; the portable token estimate excludes provider-native tokenization, output, tools, caching, retrieval, hosting, and fixed provider charges. See the [machine-readable public metrics](https://qarinah.io/metrics.json) and [methodology](docs/BENCHMARKS.md).
 
@@ -487,15 +495,15 @@ The repository also runs `npm run mcp:smoke` against the exact bundled Codex and
 
 ### Install once, initialize each project
 
-Install the reviewed `v0.3.0` plugin once in each host after that release is published:
+Install the reviewed `v0.4.0` plugin once in each host after that release is published:
 
 ```sh
 # Codex: personal installation, available to opted-in projects.
-codex plugin marketplace add AjnasNB/qarinah --ref v0.3.0
+codex plugin marketplace add AjnasNB/qarinah --ref v0.4.0
 codex plugin add qarinah@qarinah
 
 # Claude Code: personal installation across projects.
-claude plugin marketplace add AjnasNB/qarinah@v0.3.0 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.4.0 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 

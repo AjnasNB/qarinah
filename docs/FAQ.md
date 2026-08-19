@@ -148,7 +148,7 @@ Installing models or using external AI providers remains outside Qarinah's respo
 
 ## Which Node.js versions are supported?
 
-Qarinah 0.3.0 supports maintained Node.js 22, 24, and 26 releases:
+Qarinah 0.4.0 supports maintained Node.js 22, 24, and 26 releases:
 
 ```sh
 node --version
