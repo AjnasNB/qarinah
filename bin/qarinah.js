@@ -6,6 +6,8 @@ import {
   appendEvent,
   approveWorkspaceTrust,
   backupAgentArchives,
+  buildSessionContextReceipts,
+  buildDeveloperMemoryView,
   buildProjectOverview,
   captureClaudeHook,
   captureCodexHook,
@@ -283,6 +285,8 @@ Usage:
   qarinah backup <archive-file-or-directory>... --destination <external-directory> [--max-bytes n] [--max-files n]
   qarinah overview [--format json|markdown]
   qarinah footprint [query] [--baseline-tokens n] [--rate-per-million n] [--max-chars n] [--max-tokens n]
+  qarinah receipts [query] [--session <id>] [--write] [--max-chars n] [--max-tokens n] [--limit n]
+  qarinah panel [query] [--current-only] [--limit n]
   qarinah export okf [--output <path>]
   qarinah query [text] [--format json|markdown|handoff] [--limit n] [--max-chars n] [--max-tokens n] [--reserve-tokens n] [--as-of timestamp] [--minimum-coverage any|partial|direct] [--minimum-evidence any|partial|direct]
   qarinah query --stdin-json
@@ -561,6 +565,79 @@ async function run(argv) {
       maxTokens: integer("--max-tokens")
     });
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+    return;
+  }
+  if (command === "receipts") {
+    const flags = new Set(["--write"]);
+    const values = new Set(["--session", "--max-chars", "--max-tokens", "--limit"]);
+    const parsed = { positionals: [], flags: new Set(), values: new Map() };
+    for (let index = 0; index < args.length; index += 1) {
+      const value = args[index];
+      if (!value.startsWith("--")) {
+        parsed.positionals.push(value);
+        continue;
+      }
+      if (flags.has(value)) {
+        if (parsed.flags.has(value)) throw new TypeError(`receipts received ${value} more than once.`);
+        parsed.flags.add(value);
+        continue;
+      }
+      if (!values.has(value)) throw new TypeError(`receipts does not support ${value}.`);
+      if (parsed.values.has(value)) throw new TypeError(`receipts received ${value} more than once.`);
+      if (index === args.length - 1 || args[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
+      parsed.values.set(value, args[index + 1]);
+      index += 1;
+    }
+    const bounded = (name, minimum, maximum) => {
+      const value = parsed.values.get(name);
+      if (value === undefined) return undefined;
+      if (!/^[0-9]+$/u.test(value) || Number(value) < minimum || Number(value) > maximum) {
+        throw new TypeError(`${name} must be an integer from ${minimum} to ${maximum}.`);
+      }
+      return Number(value);
+    };
+    const result = await buildSessionContextReceipts({
+      cwd: process.cwd(),
+      query: parsed.positionals.join(" ") || undefined,
+      sessionId: parsed.values.get("--session"),
+      maxChars: bounded("--max-chars", 512, 1_000_000),
+      maxTokens: bounded("--max-tokens", 128, 1_000_000),
+      limit: bounded("--limit", 1, 64),
+      write: parsed.flags.has("--write")
+    });
+    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+    return;
+  }
+  if (command === "panel") {
+    let currentOnly = false;
+    let limit;
+    const query = [];
+    for (let index = 0; index < args.length; index += 1) {
+      const value = args[index];
+      if (value === "--current-only") {
+        if (currentOnly) throw new TypeError("panel received --current-only more than once.");
+        currentOnly = true;
+        continue;
+      }
+      if (value === "--limit") {
+        if (limit !== undefined) throw new TypeError("panel received --limit more than once.");
+        const selected = args[index + 1];
+        if (!selected || !/^[0-9]+$/u.test(selected) || Number(selected) < 1 || Number(selected) > 100) {
+          throw new TypeError("--limit must be an integer from 1 to 100.");
+        }
+        limit = Number(selected);
+        index += 1;
+        continue;
+      }
+      if (value.startsWith("--")) throw new TypeError(`panel does not support ${value}.`);
+      query.push(value);
+    }
+    process.stdout.write(`${JSON.stringify(await buildDeveloperMemoryView({
+      cwd: process.cwd(),
+      query: query.join(" ") || undefined,
+      includeWorktrees: !currentOnly,
+      limit
+    }), null, 2)}\n`);
     return;
   }
   if (command === "export") {

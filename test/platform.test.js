@@ -221,12 +221,15 @@ test("dashboard exposes decisions, conflicts, citations, activity, savings, and 
   assert.ok(dashboard.majorChanges.some((change) => change.title === "Use MCP"));
   assert.equal(dashboard.durableRecords.decisions, ".qarinah/records/DECISIONS.md");
   assert.equal(dashboard.memoryFootprint.schemaVersion, "qarinah.memory-footprint.v1");
+  assert.equal(dashboard.sessionReceipts.receiptCount, 1);
+  assert.equal(dashboard.sessionReceipts.receipts[0].sessionId, "session-dashboard");
   assert.match(dashboard.memoryFootprint.deliveredPack.manifestHash, /^sha256:/u);
   const written = await writeMemoryDashboard({ cwd: root, baselineTokens: 1000, deliveredTokens: 100 });
   assert.match(await readFile(written.output, "utf8"), /Shared memory your team can inspect/);
   assert.match(await readFile(written.output, "utf8"), /Execution flow/);
   assert.match(await readFile(written.output, "utf8"), /Agents need one interoperable/);
   assert.match(await readFile(written.output, "utf8"), /Memory footprint/);
+  assert.match(await readFile(written.output, "utf8"), /Exact per-session context receipts/);
   const rendered = renderMemoryDashboard({
     ...dashboard,
     affectedFiles: Array.from({ length: 11 }, (_, index) => ({

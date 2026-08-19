@@ -100,8 +100,14 @@ export {
   verifySignedCheckpoint
 } from "./team-sync.js";
 export { createCausalReceipt } from "./receipts.js";
+export {
+  SESSION_CONTEXT_RECEIPT_INDEX_SCHEMA_VERSION,
+  SESSION_CONTEXT_RECEIPT_SCHEMA_VERSION,
+  buildSessionContextReceipts
+} from "./session-receipts.js";
 export { buildMemoryDashboard, renderMemoryDashboard, writeMemoryDashboard } from "./dashboard.js";
 export { serveMemoryDashboard } from "./dashboard-server.js";
+export { DEVELOPER_MEMORY_VIEW_SCHEMA_VERSION, buildDeveloperMemoryView } from "./developer-memory.js";
 export { evaluateContextQuality } from "./evaluation.js";
 export {
   MEMORY_ATTACHMENT_SCHEMA_VERSION,

@@ -3,6 +3,7 @@ import { deepFreezeJson } from "./canonical.js";
 import { buildLinkedProjectMemory, rankLinkedProjectMemory } from "./linked-memory.js";
 import { measureMemoryFootprint } from "./memory-footprint.js";
 import { buildProjectRecordViews } from "./project-views.js";
+import { buildSessionContextReceipts } from "./session-receipts.js";
 import { readEvents } from "./store.js";
 import { atomicWriteFile, loadWorkspace, resolveWithin } from "./workspace.js";
 
@@ -112,6 +113,11 @@ export async function buildMemoryDashboard(options = {}) {
   const repositoryIds = [...new Set(events.map((event) => event.repository?.id).filter(Boolean))].sort();
   const latestEvent = events.at(-1) ?? null;
   const linkedMemory = buildLinkedProjectMemory(events, workspace.config.workspaceId, { asOf: generatedAt });
+  const sessionReceipts = await buildSessionContextReceipts({
+    cwd: workspace.root,
+    write: false,
+    clock: () => new Date(generatedAt)
+  });
   return deepFreezeJson({
     schemaVersion: "qarinah.memory-dashboard.v2",
     workspaceId: workspace.config.workspaceId,
@@ -153,6 +159,7 @@ export async function buildMemoryDashboard(options = {}) {
       savingsPercent,
       baselineToPackRatio
     },
+    sessionReceipts,
     memoryFootprint,
     currentDecisions: projectRecords.decisions.filter((decision) => decision.status === "current"),
     supersededDecisions: projectRecords.decisions.filter((decision) => decision.status === "superseded"),
@@ -248,6 +255,36 @@ export function renderMemoryDashboard(data, options = {}) {
   const projectNavigation = projects.length > 1
     ? `<nav class="project-nav" aria-label="Local Qarinah worktrees">${projects.map((project) => `<a href="${escapeHtml(project.href)}"${project.workspaceId === workspace.workspaceId ? ' aria-current="page"' : ""}>${escapeHtml(project.branch ?? project.name)}<small>${escapeHtml(project.commit?.slice(0, 10) ?? project.workspaceId)}</small></a>`).join("")}</nav>`
     : "";
+  const worktreeComparison = projects.length > 1
+    ? `<section class="wide"><h2>Cross-worktree comparison</h2><p>Each checkout keeps its own writable ledger. This view compares identities and live heads without merging branch memory.</p>${paginatedTable({
+        id: "worktree-comparison",
+        label: "Cross-worktree comparison",
+        headings: ["Worktree", "Commit", "Workspace", "Events", "Last activity"],
+        rows: projects.map((project) => [
+          `<a href="${escapeHtml(project.href)}">${escapeHtml(project.branch ?? project.name)}</a><br><small>${escapeHtml(project.root)}</small>`,
+          `<code>${escapeHtml(project.commit?.slice(0, 12) ?? "unborn")}</code>`,
+          `<code>${escapeHtml(project.workspaceId)}</code>`,
+          `<span data-worktree-events="${escapeHtml(project.workspaceId)}">${project.workspaceId === workspace.workspaceId ? workspace.eventCount.toLocaleString() : "Loading..."}</span>`,
+          `<span data-worktree-activity="${escapeHtml(project.workspaceId)}">${project.workspaceId === workspace.workspaceId ? escapeHtml(workspace.lastActivityAt ?? "No retained activity") : "Loading..."}</span>`
+        ]),
+        pageSize: 8
+      })}</section>`
+    : "";
+  const sessionReceipts = data.sessionReceipts.receipts.length === 0
+    ? '<p class="empty">No host-supplied session identifiers have been retained yet.</p>'
+    : paginatedTable({
+        id: "session-context-receipts",
+        label: "Exact per-session context receipts",
+        headings: ["Session", "Source", "Delivered", "Selection", "Receipt"],
+        rows: data.sessionReceipts.receipts.map((receipt) => [
+          `<code>${escapeHtml(receipt.sessionId)}</code><br><small>${escapeHtml(receipt.interval.startedAt ?? "Unknown start")} to ${escapeHtml(receipt.interval.completedAt ?? "open")}</small>`,
+          `${receipt.source.eventCount.toLocaleString()} events<br>${receipt.source.estimatedTokens.toLocaleString()} estimated tokens`,
+          `${receipt.delivered.itemCount.toLocaleString()} items / ${receipt.delivered.citationCount.toLocaleString()} citations<br>${receipt.delivered.estimatedTokens.toLocaleString()} estimated tokens`,
+          `${receipt.comparison.selectionRatio === null ? "n/a" : `${Math.round(receipt.comparison.selectionRatio * 10_000) / 100}%`} of events<br>${receipt.comparison.reductionPercent === null ? "n/a" : `${receipt.comparison.reductionPercent}% smaller estimated input`}`,
+          `<code>${escapeHtml(receipt.receiptHash)}</code>`
+        ]),
+        pageSize: 8
+      });
   const repositoryLabel = workspace.repositoryIds.length > 0
     ? workspace.repositoryIds.join(", ")
     : "No repository identity recorded yet";
@@ -261,6 +298,8 @@ export function renderMemoryDashboard(data, options = {}) {
     .replaceAll("<", "\\u003c")
     .replaceAll("\u2028", "\\u2028")
     .replaceAll("\u2029", "\\u2029");
+  const worktreeProjectsJson = JSON.stringify(projects.map((project) => ({ workspaceId: project.workspaceId })))
+    .replaceAll("<", "\\u003c");
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Qarinah memory dashboard</title>
@@ -313,6 +352,7 @@ li:first-child{border-top:0}li strong{min-width:0;overflow-wrap:anywhere}li span
 <div class="metric"><strong>${escapeHtml(savingsValue)}</strong><span>${escapeHtml(savingsLabel)}</span></div>
 </div></header>
 <main><div class="grid">
+${worktreeComparison}
 <section class="wide"><h2>Worktree context graph</h2><p>Explore the active Git worktree, current memories, concepts, files, and their evidence-backed relationships in a circular project map. Drag nodes to untangle a cluster, click any point for its source identity, or run ranked search to see the exact score basis.</p>
 <div class="graph-toolbar"><label>Ranked project-memory search<input type="search" data-graph-search data-search-path="${escapeHtml(options.searchPath ?? "")}" maxlength="256" placeholder="Try a branch, decision, or src/index.js"></label><label>Node type<select data-graph-type><option value="all">All node types</option><option value="worktree">Git worktrees</option><option value="memory">Memories</option><option value="file">Files</option><option value="concept">Concepts</option><option value="directory">Directories</option><option value="reference">References</option></select></label><button class="graph-reset" type="button" data-graph-reset>Reset map</button><output class="graph-summary" data-graph-summary aria-live="polite"></output></div>
 <div class="graph-shell"><svg class="graph-canvas" data-linked-graph viewBox="0 0 1040 560" role="img" aria-label="Interactive linked project-memory graph"><g data-graph-edges></g><g data-graph-nodes></g></svg><aside class="graph-details" aria-live="polite"><div><h3 data-graph-title>Choose a node</h3><p data-graph-description>Click a point or a result to inspect its type, rank, connections, and evidence identity.</p><dl><dt>Type</dt><dd data-graph-detail="type">-</dd><dt>Status</dt><dd data-graph-detail="status">-</dd><dt>Importance</dt><dd data-graph-detail="importance">-</dd><dt>Connections</dt><dd data-graph-detail="connections">-</dd><dt>Score basis</dt><dd data-graph-detail="basis">Browse rank</dd><dt>Evidence</dt><dd data-graph-detail="evidence">-</dd></dl></div><div><strong>Visible or ranked results</strong><ol class="graph-results" data-graph-results aria-label="Linked project-memory results"></ol></div></aside></div>
@@ -324,6 +364,7 @@ li:first-child{border-top:0}li strong{min-width:0;overflow-wrap:anywhere}li span
 <section class="wide"><h2>Execution flow</h2>${data.executionFlow.length === 0 ? '<p class="empty">No execution steps recorded.</p>' : paginatedTable({ id:"execution-flow",label:"Execution flow",headings:["#","Kind","Action","Tool","Evidence"],rows:data.executionFlow.map((step) => [escapeHtml(step.sequence),`<code>${escapeHtml(step.kind)}</code>`,escapeHtml(step.title),step.toolName ? `<code>${escapeHtml(step.toolName)}</code>` : "—",`<code>${escapeHtml(step.eventId)}</code>`]) })}</section>
 <section><h2>Tools called</h2>${list(data.tools.map((tool) => ({ ...tool, title: `${tool.toolName} · ${tool.kind}` })),"No tool activity recorded.",{ id:"tools",label:"Tool activity" })}</section>
 <section><h2>Major changes</h2>${list(data.majorChanges,"No major changes recorded.",{ id:"major-changes",label:"Major changes" })}</section>
+<section class="wide"><h2>Exact per-session context receipts</h2><p>Every row is derived from events carrying the same exact host-supplied session ID. It records cited selection, hashes, portable token estimates, and query timing without claiming provider billing.</p>${sessionReceipts}</section>
 <section><h2>Memory footprint</h2>${tableRegion("Memory footprint",`<table><tbody>
 <tr><th>Project memory on disk</th><td>${footprint.retained.storageBytes.total.toLocaleString()} bytes</td></tr>
 <tr><th>Authoritative ledger text</th><td>${footprint.retained.ledgerCharacters.toLocaleString()} characters · ${footprint.retained.ledgerEstimatedTokens?.toLocaleString() ?? "no retained baseline"} estimated tokens</td></tr>
@@ -335,8 +376,9 @@ ${data.contextSavings.status === "measured" ? `<tr><th>Estimated reduction</th><
 <section><h2>Source citations</h2>${list(data.citations,"No external source citations recorded.",{ id:"citations",label:"Source citations" })}</section>
 <section><h2>Agent activity timeline</h2>${list(data.activity,"No activity recorded.",{ id:"activity",label:"Agent activity" })}</section>
 <section class="wide"><h2>Files and systems affected</h2>${data.affectedFiles.length === 0 ? '<p class="empty">Run qarinah scan to populate the project map.</p>' : paginatedTable({ id:"affected-files",label:"Files and systems affected",headings:["Path","Language","Content hash"],rows:data.affectedFiles.map((file) => [escapeHtml(file.path),escapeHtml(file.language),`<code>${escapeHtml(file.contentHash)}</code>`]) })}</section>
-</div></main><script type="application/json" id="qarinah-linked-graph">${linkedGraphJson}</script><script>
+</div></main><script type="application/json" id="qarinah-linked-graph">${linkedGraphJson}</script><script type="application/json" id="qarinah-worktree-projects">${worktreeProjectsJson}</script><script>
 const qarinahGraph=JSON.parse(document.getElementById("qarinah-linked-graph").textContent);
+const qarinahWorktreeProjects=JSON.parse(document.getElementById("qarinah-worktree-projects").textContent);
 const qarinahGraphSvg=document.querySelector("[data-linked-graph]");
 const qarinahGraphEdges=document.querySelector("[data-graph-edges]");
 const qarinahGraphNodes=document.querySelector("[data-graph-nodes]");
@@ -456,6 +498,8 @@ for (const pageSet of document.querySelectorAll("[data-page-set]")) {
   next.addEventListener("click", () => { if (page + 1 < pageCount) { page += 1; showPage(); } });
   showPage();
 }
+const qarinahRefreshWorktrees=async()=>{for(const project of qarinahWorktreeProjects){try{const response=await fetch("/api/status/"+encodeURIComponent(project.workspaceId),{cache:"no-store"});if(!response.ok)continue;const status=await response.json();for(const node of document.querySelectorAll("[data-worktree-events]"))if(node.dataset.worktreeEvents===project.workspaceId)node.textContent=String(status.eventCount);for(const node of document.querySelectorAll("[data-worktree-activity]"))if(node.dataset.worktreeActivity===project.workspaceId)node.textContent=status.lastActivityAt??"No retained activity";}catch{}}};
+if(qarinahWorktreeProjects.length>1){void qarinahRefreshWorktrees();setInterval(qarinahRefreshWorktrees,2000)}
 ${liveScript}
 </script></body></html>`;
 }

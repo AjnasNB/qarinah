@@ -17,7 +17,7 @@ const CONFIG_KEYS = new Set([
   "schemaVersion", "workspaceId", "enabled", "capture", "maxEventBytes", "maxLogBytes",
   "contextMaxChars", "retentionClass", "createdAt"
 ]);
-const STORAGE_DIRECTORIES = Object.freeze(["events", "objects", "records", "graph", "index", "snapshots", "locks", "dashboard"]);
+const STORAGE_DIRECTORIES = Object.freeze(["events", "objects", "records", "graph", "index", "snapshots", "locks", "dashboard", "receipts"]);
 const MAX_CONFIG_BYTES = 64 * 1024;
 
 function isWithin(root, candidate) {
@@ -56,11 +56,53 @@ async function safeLstat(candidate, label, { allowMissing = false } = {}) {
 
 async function ensureSafeDirectory(candidate, root, label) {
   const existing = await safeLstat(candidate, label, { allowMissing: true });
-  if (!existing) await mkdir(candidate, { recursive: false, mode: 0o700 });
-  else if (!existing.isDirectory()) throw new QarinahError("WORKSPACE_INVALID", `${label} must be a directory.`);
+  if (!existing) {
+    try {
+      await mkdir(candidate, { recursive: false, mode: 0o700 });
+    } catch (error) {
+      if (error?.code !== "EEXIST") throw error;
+    }
+  }
+  const current = await safeLstat(candidate, label);
+  if (!current.isDirectory()) throw new QarinahError("WORKSPACE_INVALID", `${label} must be a directory.`);
   const actual = await realpath(candidate);
   if (!isWithin(root, actual)) throw new QarinahError("PATH_OUTSIDE_WORKSPACE", `${label} resolves outside the workspace root.`);
   return actual;
+}
+
+async function acquireInitializationLock(qarinahDir, signal) {
+  const locksDirectory = resolveWithin(qarinahDir, "locks");
+  await ensureSafeDirectory(locksDirectory, qarinahDir, ".qarinah/locks");
+  const lockPath = resolveWithin(locksDirectory, "initialize");
+  const startedAt = Date.now();
+  for (;;) {
+    if (signal?.aborted) throw signal.reason ?? new QarinahError("OPERATION_ABORTED", "Workspace initialization was aborted.");
+    try {
+      await mkdir(lockPath, { mode: 0o700 });
+      return async () => rm(lockPath, { recursive: true, force: true });
+    } catch (error) {
+      if (error?.code !== "EEXIST") throw error;
+      const metadata = await safeLstat(lockPath, ".qarinah/locks/initialize", { allowMissing: true });
+      if (metadata && !metadata.isDirectory()) {
+        throw new QarinahError("WORKSPACE_INVALID", ".qarinah/locks/initialize must be a directory.");
+      }
+      if (Date.now() - startedAt >= 15_000) {
+        throw new QarinahError("WORKSPACE_INITIALIZE_BUSY", "Another process is still initializing this Qarinah workspace.");
+      }
+      await new Promise((resolve, reject) => {
+        const finish = () => {
+          if (signal) signal.removeEventListener("abort", abort);
+          resolve();
+        };
+        const abort = () => {
+          clearTimeout(timer);
+          reject(signal.reason ?? new QarinahError("OPERATION_ABORTED", "Workspace initialization was aborted."));
+        };
+        const timer = setTimeout(finish, 10);
+        if (signal) signal.addEventListener("abort", abort, { once: true });
+      });
+    }
+  }
 }
 
 export async function atomicWriteFile(destination, contents, options = {}) {
@@ -206,43 +248,56 @@ export async function initializeWorkspace(target = process.cwd(), options = {}) 
   const root = await realpath(requestedRoot);
   const requestedQarinahDir = resolveWithin(root, ".qarinah");
   const qarinahDir = await ensureSafeDirectory(requestedQarinahDir, root, ".qarinah");
-  const configPath = resolveWithin(qarinahDir, "config.json");
-  const existingConfig = await safeLstat(configPath, ".qarinah/config.json", { allowMissing: true });
-  if (existingConfig) {
-    throw new QarinahError("WORKSPACE_EXISTS", `Context Ledger is already initialized at ${root}.`);
+  const release = await acquireInitializationLock(qarinahDir, options.signal);
+  try {
+    const configPath = resolveWithin(qarinahDir, "config.json");
+    const existingConfig = await safeLstat(configPath, ".qarinah/config.json", { allowMissing: true });
+    if (existingConfig) {
+      if (options.ifNeeded !== true) {
+        throw new QarinahError("WORKSPACE_EXISTS", `Context Ledger is already initialized at ${root}.`);
+      }
+      const workspace = await loadWorkspace(root);
+      if (options.capture !== undefined && workspace.config.capture !== options.capture) {
+        throw new QarinahError("CAPTURE_MODE_MISMATCH", `The existing workspace uses '${workspace.config.capture}' capture, not '${options.capture}'.`);
+      }
+      return workspace;
+    }
+    const capture = options.capture ?? "metadata";
+    if (!["metadata", "content"].includes(capture)) throw new QarinahError("CONFIG_INVALID", "capture must be metadata or content.");
+    for (const directory of STORAGE_DIRECTORIES) {
+      await ensureSafeDirectory(resolveWithin(qarinahDir, directory), qarinahDir, `.qarinah/${directory}`);
+    }
+    const eventPath = resolveWithin(qarinahDir, "events", "events.jsonl");
+    const existingEvent = await safeLstat(eventPath, ".qarinah/events/events.jsonl", { allowMissing: true });
+    if (existingEvent && (!existingEvent.isFile() || existingEvent.nlink !== 1 || existingEvent.size !== 0)) {
+      throw new QarinahError("WORKSPACE_PARTIAL", "Refusing to overwrite a non-empty or linked event log without a workspace config.");
+    }
+    await safeLstat(resolveWithin(qarinahDir, ".gitignore"), ".qarinah/.gitignore", { allowMissing: true });
+    const config = {
+      schemaVersion: CONFIG_SCHEMA_VERSION,
+      workspaceId: `ws_${randomBytes(16).toString("hex")}`,
+      enabled: true,
+      capture,
+      maxEventBytes: 1024 * 1024,
+      maxLogBytes: 32 * 1024 * 1024,
+      contextMaxChars: 12_000,
+      retentionClass: "project",
+      createdAt: new Date().toISOString()
+    };
+    await atomicWriteFile(resolveWithin(qarinahDir, ".gitignore"), [
+      "events/", "objects/", "records/", "graph/", "index/", "snapshots/", "locks/", "dashboard/", "receipts/", "",
+      "!.gitignore", "!config.json", ""
+    ].join("\n"));
+    if (!existingEvent) await atomicWriteFile(eventPath, "");
+    await grantWorkspaceConsent(root, config, { eventCount: 0, headHash: null, logBytes: 0 });
+    await atomicWriteFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
+    const workspace = await loadWorkspace(root);
+    const { rebuildDerivedState } = await import("./indexer.js");
+    await rebuildDerivedState(root);
+    return workspace;
+  } finally {
+    await release();
   }
-  const capture = options.capture ?? "metadata";
-  if (!["metadata", "content"].includes(capture)) throw new QarinahError("CONFIG_INVALID", "capture must be metadata or content.");
-  for (const directory of STORAGE_DIRECTORIES) {
-    await ensureSafeDirectory(resolveWithin(qarinahDir, directory), qarinahDir, `.qarinah/${directory}`);
-  }
-  const eventPath = resolveWithin(qarinahDir, "events", "events.jsonl");
-  if (await safeLstat(eventPath, ".qarinah/events/events.jsonl", { allowMissing: true })) {
-    throw new QarinahError("WORKSPACE_PARTIAL", "Refusing to overwrite an existing event log without a workspace config.");
-  }
-  await safeLstat(resolveWithin(qarinahDir, ".gitignore"), ".qarinah/.gitignore", { allowMissing: true });
-  const config = {
-    schemaVersion: CONFIG_SCHEMA_VERSION,
-    workspaceId: `ws_${randomBytes(16).toString("hex")}`,
-    enabled: true,
-    capture,
-    maxEventBytes: 1024 * 1024,
-    maxLogBytes: 32 * 1024 * 1024,
-    contextMaxChars: 12_000,
-    retentionClass: "project",
-    createdAt: new Date().toISOString()
-  };
-  await atomicWriteFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
-  await atomicWriteFile(resolveWithin(qarinahDir, ".gitignore"), [
-    "events/", "objects/", "records/", "graph/", "index/", "snapshots/", "locks/", "dashboard/", "",
-    "!.gitignore", "!config.json", ""
-  ].join("\n"));
-  await atomicWriteFile(eventPath, "");
-  await grantWorkspaceConsent(root, config, { eventCount: 0, headHash: null, logBytes: 0 });
-  const workspace = await loadWorkspace(root);
-  const { rebuildDerivedState } = await import("./indexer.js");
-  await rebuildDerivedState(root);
-  return workspace;
 }
 
 export async function findWorkspaceRoot(start = process.cwd()) {
@@ -297,12 +352,12 @@ export async function loadWorkspace(start = process.cwd(), options = {}) {
   }
   const provisional = { root: actualRoot, qarinahDir, config, configPath };
   for (const directory of STORAGE_DIRECTORIES) {
-    // Dashboard storage was introduced after the original workspace layout.
-    // It is derived, optional for reads, and created on the first snapshot
-    // write. If present, it must still pass the normal link/path checks.
+    // Dashboard and receipt storage were introduced after the original
+    // workspace layout. They are derived, optional for reads, and created on
+    // first use. If present, they still pass the normal link/path checks.
     await secureStoragePath(provisional, [directory], {
       type: "directory",
-      allowMissing: directory === "dashboard"
+      allowMissing: directory === "dashboard" || directory === "receipts"
     });
   }
   try {

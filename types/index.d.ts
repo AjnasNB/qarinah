@@ -931,6 +931,92 @@ export function createCausalReceipt(input: Record<
   "evidence" | "memory" | "policy" | "execution" | "observation",
   { id: string; hash: `sha256:${string}`; system: string; timestamp: string }
 >): Readonly<Record<string, unknown>>;
+export const SESSION_CONTEXT_RECEIPT_SCHEMA_VERSION: "qarinah.session-context-receipt.v1";
+export const SESSION_CONTEXT_RECEIPT_INDEX_SCHEMA_VERSION: "qarinah.session-context-receipt-index.v1";
+export interface QarinahSessionContextReceipt {
+  readonly schemaVersion: "qarinah.session-context-receipt.v1";
+  readonly generatedAt: string;
+  readonly workspaceId: string;
+  readonly sessionId: string;
+  readonly sessionKey: string;
+  readonly hostAdapters: readonly string[];
+  readonly interval: Readonly<{ startedAt: string | null; completedAt: string | null }>;
+  readonly source: Readonly<{
+    eventCount: number;
+    headHash: `sha256:${string}` | null;
+    characters: number;
+    estimatedTokens: number;
+    estimator: string;
+    toolRequests: number;
+    toolOutcomes: number;
+  }>;
+  readonly delivered: Readonly<{
+    query: string;
+    itemCount: number;
+    citationCount: number;
+    eventIds: readonly string[];
+    sourceEventsSelected: number;
+    characters: number;
+    estimatedTokens: number;
+    manifestHash: `sha256:${string}`;
+    evidenceCoverage: string;
+  }>;
+  readonly comparison: Readonly<{
+    savedEstimatedTokens: number;
+    reductionPercent: number | null;
+    baselineToPackRatio: number | null;
+    selectionRatio: number | null;
+  }>;
+  readonly timing: Readonly<{ queryMilliseconds: number }>;
+  readonly unsupportedQueryCount: 0 | 1;
+  readonly boundaries: Readonly<Record<string, string>>;
+  readonly receiptHash: `sha256:${string}`;
+}
+export interface QarinahSessionContextReceiptIndex {
+  readonly schemaVersion: "qarinah.session-context-receipt-index.v1";
+  readonly generatedAt: string;
+  readonly workspaceId: string;
+  readonly query: string;
+  readonly receiptCount: number;
+  readonly manifestHash: `sha256:${string}`;
+  readonly receipts: readonly QarinahSessionContextReceipt[];
+}
+export function buildSessionContextReceipts(options?: {
+  cwd?: string;
+  query?: string;
+  sessionId?: string;
+  maxChars?: number;
+  maxTokens?: number;
+  limit?: number;
+  write?: boolean;
+  clock?: () => Date;
+}): Promise<Readonly<QarinahSessionContextReceiptIndex>>;
+export const DEVELOPER_MEMORY_VIEW_SCHEMA_VERSION: "qarinah.developer-memory-view.v1";
+export interface QarinahDeveloperMemoryView {
+  readonly schemaVersion: "qarinah.developer-memory-view.v1";
+  readonly generatedAt: string;
+  readonly query: string;
+  readonly workspace: Readonly<Record<string, unknown>>;
+  readonly health: Readonly<Record<string, unknown>>;
+  readonly search: Readonly<Record<string, unknown>>;
+  readonly graph: QarinahMemoryDashboard["linkedGraph"];
+  readonly timeline: readonly Readonly<Record<string, unknown>>[];
+  readonly decisions: Readonly<{ current: readonly Record<string, unknown>[]; superseded: readonly Record<string, unknown>[] }>;
+  readonly conflicts: readonly Record<string, unknown>[];
+  readonly tools: readonly Record<string, unknown>[];
+  readonly outcomes: readonly Record<string, unknown>[];
+  readonly sessions: QarinahSessionContextReceiptIndex;
+  readonly worktreeComparison: Readonly<Record<string, unknown>>;
+  readonly boundaries: Readonly<Record<string, string | boolean>>;
+  readonly manifestHash: `sha256:${string}`;
+}
+export function buildDeveloperMemoryView(options?: {
+  cwd?: string;
+  query?: string;
+  includeWorktrees?: boolean;
+  limit?: number;
+  clock?: () => Date;
+}): Promise<Readonly<QarinahDeveloperMemoryView>>;
 export interface QarinahMemoryDashboard {
   schemaVersion: "qarinah.memory-dashboard.v2";
   workspaceId: string;
@@ -958,6 +1044,7 @@ export interface QarinahMemoryDashboard {
     savingsPercent: number | null;
     baselineToPackRatio: number | null;
   };
+  sessionReceipts: QarinahSessionContextReceiptIndex;
   memoryFootprint: QarinahMemoryFootprint;
   currentDecisions: Record<string, unknown>[];
   supersededDecisions: Record<string, unknown>[];

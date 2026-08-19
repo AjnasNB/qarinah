@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/AjnasNB/qarinah/schemas/session-context-receipt.schema.json",
+  "title": "Qarinah per-session context receipt v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "generatedAt", "workspaceId", "sessionId", "sessionKey", "hostAdapters", "interval", "source", "delivered", "comparison", "timing", "unsupportedQueryCount", "boundaries", "receiptHash"],
+  "properties": {
+    "schemaVersion": { "const": "qarinah.session-context-receipt.v1" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "workspaceId": { "type": "string", "pattern": "^ws_[0-9a-f]{32}$" },
+    "sessionId": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "sessionKey": { "type": "string", "pattern": "^session_[0-9a-f]{32}$" },
+    "hostAdapters": { "type": "array", "maxItems": 64, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 128 } },
+    "interval": {
+      "type": "object", "additionalProperties": false, "required": ["startedAt", "completedAt"],
+      "properties": { "startedAt": { "type": ["string", "null"], "format": "date-time" }, "completedAt": { "type": ["string", "null"], "format": "date-time" } }
+    },
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["eventCount", "headHash", "characters", "estimatedTokens", "estimator", "toolRequests", "toolOutcomes"],
+      "properties": {
+        "eventCount": { "type": "integer", "minimum": 0 },
+        "headHash": { "type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$" },
+        "characters": { "type": "integer", "minimum": 0 },
+        "estimatedTokens": { "type": "integer", "minimum": 0 },
+        "estimator": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "toolRequests": { "type": "integer", "minimum": 0 },
+        "toolOutcomes": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "delivered": {
+      "type": "object", "additionalProperties": false,
+      "required": ["query", "itemCount", "citationCount", "eventIds", "sourceEventsSelected", "characters", "estimatedTokens", "manifestHash", "evidenceCoverage"],
+      "properties": {
+        "query": { "type": "string", "maxLength": 4096 },
+        "itemCount": { "type": "integer", "minimum": 0 },
+        "citationCount": { "type": "integer", "minimum": 0 },
+        "eventIds": { "type": "array", "maxItems": 64, "uniqueItems": true, "items": { "type": "string", "pattern": "^evt_[0-9a-f-]{36}$" } },
+        "sourceEventsSelected": { "type": "integer", "minimum": 0 },
+        "characters": { "type": "integer", "minimum": 0 },
+        "estimatedTokens": { "type": "integer", "minimum": 0 },
+        "manifestHash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "evidenceCoverage": { "type": "string", "minLength": 1, "maxLength": 64 }
+      }
+    },
+    "comparison": {
+      "type": "object", "additionalProperties": false,
+      "required": ["savedEstimatedTokens", "reductionPercent", "baselineToPackRatio", "selectionRatio"],
+      "properties": {
+        "savedEstimatedTokens": { "type": "integer", "minimum": 0 },
+        "reductionPercent": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+        "baselineToPackRatio": { "type": ["number", "null"], "minimum": 0 },
+        "selectionRatio": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }
+      }
+    },
+    "timing": { "type": "object", "additionalProperties": false, "required": ["queryMilliseconds"], "properties": { "queryMilliseconds": { "type": "number", "minimum": 0 } } },
+    "unsupportedQueryCount": { "type": "integer", "minimum": 0, "maximum": 1 },
+    "boundaries": { "type": "object", "additionalProperties": { "type": "string", "minLength": 1, "maxLength": 512 } },
+    "receiptHash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  }
+}
