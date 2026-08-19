@@ -87,38 +87,44 @@ assert.equal(savedEstimatedTokens, 436_431);
 for (const [surface, content] of [
   ["README.md", readme],
   ["docs/WHITEPAPER.md", whitePaper],
-  ["package.json description", packageJson.description],
   ["docs/launch/PLATFORM-COPY.md", platformCopy]
 ]) {
   assert.ok(content.includes(publicPercent), `${surface} must carry the evidence-derived ${publicPercent} claim.`);
 }
+for (const term of ["Visible", "worktree-aware", "session receipts", "incremental compaction"]) {
+  assert.ok(packageJson.description.includes(term), `package.json description must carry the 0.4.0 visible-memory category: ${term}`);
+}
+assert.equal(
+  packageJson.description.includes(publicPercent),
+  false,
+  "package.json description must lead with the 0.4.0 product category, not the historical benchmark percentage."
+);
 assert.equal(
   `${readme}\n${whitePaper}\n${packageJson.description}\n${platformCopy}`.toLowerCase().includes("in our six-task benchmark"),
   false,
   "Public-facing copy must lead with the result instead of the removed six-task qualifier."
 );
-assert.ok(readme.includes(`${compressionRatio}:1 context compression`));
+assert.ok(readme.includes(`the full-history baseline contained ${compressionRatio} times as many estimated tokens`));
 assert.ok(whitePaper.includes(`${compressionRatio}:1 compression ratio`));
 assert.ok(whitePaper.includes(`**${totalBaselineEstimatedTokens.toLocaleString("en-US")}**`));
 assert.ok(whitePaper.includes(`**${totalQarinahEstimatedTokens.toLocaleString("en-US")}**`));
 assert.ok(whitePaper.includes(`${savedEstimatedTokens.toLocaleString("en-US")} fewer estimated input-context tokens`));
-assert.ok(readme.includes(`$${baselineAtOneDollarPerMillion.toFixed(4)}`));
-assert.ok(readme.includes(`$${qarinahAtOneDollarPerMillion.toFixed(4)}`));
-assert.ok(readme.includes(`${publicPercent} lower input-context cost at the same token rate.`));
-for (const surface of [readme, platformCopy, publicMetricsCopy]) {
+assert.ok(publicMetricsCopy.includes(`$${baselineAtOneDollarPerMillion.toFixed(6)}`));
+assert.ok(publicMetricsCopy.includes(`$${qarinahAtOneDollarPerMillion.toFixed(6)}`));
+assert.ok(whitePaper.includes(`${publicPercent} lower input-context cost at the same token rate`));
+for (const surface of [platformCopy, publicMetricsCopy]) {
   assert.ok(surface.includes(`${compressionRatio}:1 baseline-to-pack ratio`));
   assert.ok(surface.includes(`$${baselineAtIllustrativeRate.toFixed(6)}`));
   assert.ok(surface.includes(`$${qarinahAtIllustrativeRate.toFixed(6)}`));
   assert.ok(surface.includes(`$${savedAtIllustrativeRate.toFixed(6)}`));
 }
-assert.ok(readme.includes(`$${savedAcrossTenRepeatsAtIllustrativeRate.toFixed(6)}`));
 assert.ok(publicMetricsCopy.includes(`$${savedAcrossTenRepeatsAtIllustrativeRate.toFixed(6)}`));
 for (const flatRate of [1, 3, 5, 15]) {
   const baselineCost = baselineAtOneDollarPerMillion * flatRate;
   const qarinahCost = qarinahAtOneDollarPerMillion * flatRate;
   const savedCost = ((savedEstimatedTokens / 1_000_000) * flatRate);
-  const readmeCostRow = `| $${flatRate}/M tokens | $${baselineCost.toFixed(6)} | $${qarinahCost.toFixed(6)} | $${savedCost.toFixed(6)} |`;
-  assert.ok(readme.includes(readmeCostRow), `README.md must carry the evidence-derived cost row: ${readmeCostRow}`);
+  const publicMetricsCostRow = `| $${flatRate} / million | $${baselineCost.toFixed(6)} | $${qarinahCost.toFixed(6)} | $${savedCost.toFixed(6)} |`;
+  assert.ok(publicMetricsCopy.includes(publicMetricsCostRow), `PUBLIC-METRICS.md must carry the evidence-derived cost row: ${publicMetricsCostRow}`);
 }
 assert.ok(publicMetricsCopy.includes("Do not say agents run 70x longer"));
 assert.ok(whitePaper.includes(`**${publicPercent} lower input-context cost at the same token rate**`));
