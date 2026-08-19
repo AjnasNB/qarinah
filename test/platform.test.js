@@ -32,7 +32,7 @@ async function contentWorkspace(t) {
   return root;
 }
 
-test("one-command setup configures Codex, Claude, Cursor, Kimi, Antigravity, hooks, skills, and consent-gated MCP", async (t) => {
+test("one-command setup configures Codex, Claude, Cursor, Kimi, Antigravity, Freebuff, hooks, skills, and consent-gated MCP", async (t) => {
   const root = await temporaryDirectory(t);
   const result = await setupWorkspace({
     cwd: root,
@@ -40,7 +40,7 @@ test("one-command setup configures Codex, Claude, Cursor, Kimi, Antigravity, hoo
     allowQuery: true
   });
   assert.equal(result.ok, true);
-  assert.deepEqual(result.targets, ["codex", "claude", "cursor", "kimi", "antigravity"]);
+  assert.deepEqual(result.targets, ["codex", "claude", "cursor", "kimi", "antigravity", "freebuff"]);
   assert.equal(result.projectStructure.captured, true);
   const codexConfig = await readFile(path.join(root, ".codex", "config.toml"), "utf8");
   assert.match(codexConfig, /\[mcp_servers\.qarinah\]/);
@@ -67,6 +67,10 @@ test("one-command setup configures Codex, Claude, Cursor, Kimi, Antigravity, hoo
   const antigravityMcp = JSON.parse(await readFile(path.join(root, ".agents", "plugins", "qarinah", "mcp_config.json"), "utf8"));
   assert.ok(antigravityMcp.mcpServers.qarinah.args.includes("--policy-hash"));
   assert.match(await readFile(path.join(root, ".agents", "plugins", "qarinah", "rules", "qarinah.md"), "utf8"), /untrusted evidence/);
+  const freebuff = await readFile(path.join(root, ".agents", "qarinah-memory.ts"), "utf8");
+  assert.match(freebuff, /id: "qarinah-memory"/u);
+  assert.match(freebuff, /qarinah\/context\.query/u);
+  assert.match(freebuff, /compactContext: \{ cacheExpiryMs: null \}/u);
   assert.match(await readFile(path.join(root, ".qarinah", "records", "OVERVIEW.md"), "utf8"), /Qarinah project overview/);
   assert.match(await readFile(path.join(root, ".qarinah", "records", "DECISIONS.md"), "utf8"), /Project decisions/);
   assert.match(await readFile(path.join(root, ".qarinah", "records", "FLOW.md"), "utf8"), /Project execution flow/);

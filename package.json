@@ -168,6 +168,7 @@
     "examples/",
     "integrations/codex/qarinah/",
     "integrations/claude/qarinah/",
+    "integrations/vscode/qarinah-memory/",
     "server.json",
     "README.md"
   ],
@@ -179,6 +180,7 @@
     "check:site": "node scripts/check-site.mjs",
     "check:docs": "node scripts/check-docs.mjs",
     "check:codex-plugin": "npm run check:plugins",
+    "build:vscode-extension": "node scripts/package-vscode-extension.mjs",
     "mcp:smoke": "node scripts/mcp-transport-smoke.mjs",
     "prepack": "npm run check:plugins",
     "prepublishOnly": "npm run check",
@@ -304,6 +306,7 @@
   ],
   "devDependencies": {
     "@primer/css": "^22.3.0",
+    "@vscode/vsce": "3.9.2",
     "cockroach-browser": "0.1.0",
     "esbuild": "0.28.1",
     "marked": "^18.0.7",

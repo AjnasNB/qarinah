@@ -274,7 +274,7 @@ function help() {
 
 Usage:
   qarinah init [path] [--capture metadata|content]
-  qarinah setup [path] [--codex] [--claude] [--cursor] [--kimi] [--antigravity] [--capture metadata|content] [--allow-query] [--auto-compact] [--backup-source <export>] [--backup-destination <external-directory>]
+  qarinah setup [path] [--codex] [--claude] [--cursor] [--kimi] [--antigravity] [--freebuff] [--capture metadata|content] [--allow-query] [--auto-compact] [--backup-source <export>] [--backup-destination <external-directory>]
   qarinah record --kind <kind> --title <title> [--body <text>] [--data-json <json>] [--relation type:target]
   qarinah record --stdin-json
   qarinah hook codex|claude
@@ -323,7 +323,7 @@ async function run(argv) {
     return;
   }
   if (command === "setup") {
-    const flags = new Set(["--codex", "--claude", "--cursor", "--kimi", "--antigravity", "--allow-query", "--auto-compact"]);
+    const flags = new Set(["--codex", "--claude", "--cursor", "--kimi", "--antigravity", "--freebuff", "--allow-query", "--auto-compact"]);
     const values = new Set(["--capture", "--max-chars", "--max-items", "--backup-source", "--backup-destination", "--backup-max-bytes", "--backup-max-files"]);
     const parsed = { positionals: [], flags: new Set(), values: new Map() };
     for (let index = 0; index < args.length; index += 1) {
@@ -358,6 +358,7 @@ async function run(argv) {
       cursor: parsed.flags.has("--cursor"),
       kimi: parsed.flags.has("--kimi"),
       antigravity: parsed.flags.has("--antigravity"),
+      freebuff: parsed.flags.has("--freebuff"),
       allowQuery: parsed.flags.has("--allow-query"),
       autoCompact: parsed.flags.has("--auto-compact"),
       maxChars: positive("--max-chars"),
