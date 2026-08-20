@@ -1,6 +1,6 @@
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { buildSymbolGraph, parseTypeScriptSymbols, querySymbolGraph } from "./symbol-graph.js";
+import { buildSymbolGraph, parseTreeSitterSymbols, parseTypeScriptSymbols, querySymbolGraph } from "./symbol-graph.js";
 
 export const QARINAH_LSP_PROTOCOL_VERSION = "qarinah-lsp.v1";
 const MAX_MESSAGE_BYTES = 4 * 1024 * 1024;
@@ -8,6 +8,13 @@ const LSP_KIND = Object.freeze({
   file: 1, namespace: 3, class: 5, method: 6, property: 7, enum: 10, interface: 11,
   function: 12, variable: 13, parameter: 13, getter: 7, setter: 7, type: 26, import: 13
 });
+const TREE_SITTER_DOCUMENT_LANGUAGES = Object.freeze(new Map([
+  [".c", "c"], [".h", "c"],
+  [".cc", "cpp"], [".cpp", "cpp"], [".cxx", "cpp"], [".hh", "cpp"], [".hpp", "cpp"], [".hxx", "cpp"],
+  [".cs", "csharp"], [".go", "go"], [".java", "java"],
+  [".kt", "kotlin"], [".kts", "kotlin"], [".py", "python"], [".pyi", "python"], [".rs", "rust"]
+]));
+const TYPESCRIPT_DOCUMENT_EXTENSIONS = new Set([".js", ".jsx", ".mjs", ".cjs", ".ts", ".tsx", ".mts", ".cts"]);
 
 function lspRange(span) {
   return {
@@ -34,6 +41,13 @@ function documentSymbol(symbol) {
     range,
     selectionRange: range
   };
+}
+
+async function parseDocumentSymbols(filePath, text) {
+  const extension = path.extname(filePath).toLowerCase();
+  if (TYPESCRIPT_DOCUMENT_EXTENSIONS.has(extension)) return parseTypeScriptSymbols(filePath, text);
+  const language = TREE_SITTER_DOCUMENT_LANGUAGES.get(extension);
+  return language ? parseTreeSitterSymbols(filePath, language, text) : { symbols: [], references: [], diagnostics: [] };
 }
 
 function offsetAt(text, position) {
@@ -121,7 +135,7 @@ export function createLanguageServer(options = {}) {
       case "textDocument/documentSymbol": {
         const text = await documentText(params.textDocument.uri);
         const relative = path.relative(root, fileURLToPath(params.textDocument.uri)).split(path.sep).join("/");
-        return parseTypeScriptSymbols(relative, text).symbols.map(documentSymbol);
+        return (await parseDocumentSymbols(relative, text)).symbols.map(documentSymbol);
       }
       case "textDocument/definition": {
         const text = await documentText(params.textDocument.uri);

@@ -189,6 +189,7 @@
     "integrations/codex/qarinah/",
     "integrations/claude/qarinah/",
     "integrations/vscode/qarinah-memory/",
+    "integrations/jetbrains/qarinah-lsp/",
     "server.json",
     "README.md"
   ],

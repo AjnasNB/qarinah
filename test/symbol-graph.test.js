@@ -169,7 +169,7 @@ function responseReader(output) {
   });
 }
 
-test("language server exposes initialize, workspace symbols, and document symbols over bounded JSON-RPC", async (t) => {
+test("language server exposes bounded multi-language symbols over JSON-RPC", async (t) => {
   const root = await fixture(t);
   const input = new PassThrough();
   const output = new PassThrough();
@@ -192,6 +192,18 @@ test("language server exposes initialize, workspace symbols, and document symbol
   input.write(frame({ jsonrpc: "2.0", id: 3, method: "textDocument/documentSymbol", params: { textDocument: { uri: pathToFileURL(path.join(root, "math.ts")).href } } }));
   const documentSymbols = await responsePromise;
   assert.equal(documentSymbols.result.some((symbol) => symbol.name === "Calculator"), true);
+
+  responsePromise = waitFor(4);
+  input.write(frame({ jsonrpc: "2.0", id: 4, method: "textDocument/documentSymbol", params: { textDocument: { uri: pathToFileURL(path.join(root, "notes.py")).href } } }));
+  const pythonSymbols = await responsePromise;
+  assert.equal(pythonSymbols.result.some((symbol) => symbol.name === "ContextPack"), true);
+  assert.equal(pythonSymbols.result.some((symbol) => symbol.name === "compact_evidence"), true);
+
+  await writeFile(path.join(root, "unsupported.rb"), "class Ignored\nend\n");
+  responsePromise = waitFor(5);
+  input.write(frame({ jsonrpc: "2.0", id: 5, method: "textDocument/documentSymbol", params: { textDocument: { uri: pathToFileURL(path.join(root, "unsupported.rb")).href } } }));
+  const unsupportedSymbols = await responsePromise;
+  assert.deepEqual(unsupportedSymbols.result, []);
 });
 
 test("symbol graph schema is strict at the public boundary", async () => {

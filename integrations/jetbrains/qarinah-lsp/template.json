@@ -1,0 +1,58 @@
+{
+  "id": "qarinah-lsp",
+  "name": "Qarinah project memory",
+  "programArgs": {
+    "default": "sh -c \"\\\"$PROJECT_DIR$/node_modules/.bin/qarinah-lsp\\\"\"",
+    "windows": "cmd /d /s /c \"\"$PROJECT_DIR$\\node_modules\\.bin\\qarinah-lsp.cmd\"\""
+  },
+  "fileTypeMappings": [
+    {
+      "fileType": { "name": "JavaScript", "patterns": ["*.js", "*.mjs", "*.cjs"] },
+      "languageId": "javascript"
+    },
+    {
+      "fileType": { "name": "JavaScript-React", "patterns": ["*.jsx"] },
+      "languageId": "javascriptreact"
+    },
+    {
+      "fileType": { "name": "TypeScript", "patterns": ["*.ts", "*.mts", "*.cts"] },
+      "languageId": "typescript"
+    },
+    {
+      "fileType": { "name": "TypeScript-React", "patterns": ["*.tsx"] },
+      "languageId": "typescriptreact"
+    },
+    {
+      "fileType": { "name": "Python", "patterns": ["*.py", "*.pyi"] },
+      "languageId": "python"
+    },
+    {
+      "fileType": { "name": "Go", "patterns": ["*.go"] },
+      "languageId": "go"
+    },
+    {
+      "fileType": { "name": "Rust", "patterns": ["*.rs"] },
+      "languageId": "rust"
+    },
+    {
+      "fileType": { "name": "Java", "patterns": ["*.java"] },
+      "languageId": "java"
+    },
+    {
+      "fileType": { "name": "Kotlin", "patterns": ["*.kt", "*.kts"] },
+      "languageId": "kotlin"
+    },
+    {
+      "fileType": { "name": "C", "patterns": ["*.c", "*.h"] },
+      "languageId": "c"
+    },
+    {
+      "fileType": { "name": "C++", "patterns": ["*.cc", "*.cpp", "*.cxx", "*.hh", "*.hpp", "*.hxx"] },
+      "languageId": "cpp"
+    },
+    {
+      "fileType": { "name": "C#", "patterns": ["*.cs"] },
+      "languageId": "csharp"
+    }
+  ]
+}

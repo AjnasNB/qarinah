@@ -42,7 +42,7 @@ The bounded JSON-RPC server implements:
 
 Open buffers are parsed in memory for document symbols. Workspace definition/reference results come from the last verified scan and therefore remain evidence-bound. Run `qarinah scan` and `qarinah symbols build` after material file changes.
 
-VS Code and Cursor use the shipped Qarinah memory panel. Other editors can attach any standards-compatible generic LSP client to `qarinah-lsp`; Qarinah does not yet ship separate native JetBrains, Neovim, Emacs, or Visual Studio packages.
+VS Code and Cursor use the shipped Qarinah memory panel. JetBrains IDEs can import the packaged [`integrations/jetbrains/qarinah-lsp`](../integrations/jetbrains/qarinah-lsp/) LSP4IJ template, which starts the exact project-local Qarinah dependency. Other editors can attach any standards-compatible generic LSP client to `qarinah-lsp`. This is an LSP integration, not a native JetBrains plugin.
 
 ## Coverage and limits
 

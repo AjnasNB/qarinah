@@ -517,7 +517,7 @@ qarinah symbols query [text] [--limit n] [--kind function,class,...]
 qarinah-lsp
 ```
 
-Run `qarinah scan` before the first symbol build. The v1 built-in parser covers JavaScript, JSX, TypeScript, and TSX and verifies each file against the latest snapshot hash. Query returns the lexical, local-subword-vector, and structural score components. `qarinah-lsp` starts the bounded stdio language server. See [Symbol graph and language server](SYMBOL-GRAPH.md).
+Run `qarinah scan` before the first symbol build. The v2 graph uses the pinned TypeScript parser for JavaScript, JSX, TypeScript, and TSX, plus pinned Tree-sitter WASM grammars for Python, Go, Rust, Java, Kotlin, C, C++, and C#. Every file is verified against the latest snapshot hash. Query returns the lexical, local-subword-vector, and structural score components. `qarinah-lsp` starts the bounded stdio language server; the package also includes an importable JetBrains LSP4IJ template. See [Symbol graph and language server](SYMBOL-GRAPH.md).
 
 `compact` is the default. It writes one cited summary per session and is appropriate for large exports. `full` writes each supported visible item separately and requires content-authorized capture. Hidden reasoning and encrypted reasoning blocks are ignored in either mode. The result reports source bytes, files, records, visible items, sessions, newly imported events, formats, and rebuilt-state identity.
 

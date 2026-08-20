@@ -103,7 +103,7 @@ npx qarinah-lsp
 npx qarinah watch --interval-ms 2000
 ```
 
-The v1 parser covers JavaScript, JSX, TypeScript, and TSX. Other languages are reported as unsupported instead of being guessed. Read [Symbol graph and language server](docs/SYMBOL-GRAPH.md) for the exact coverage boundary.
+The v2 symbol graph covers JavaScript, JSX, TypeScript, TSX, Python, Go, Rust, Java, Kotlin, C, C++, and C# through pinned parsers. Unsupported languages are reported instead of guessed. VS Code and Cursor use the packaged memory panel; JetBrains IDEs can import the packaged LSP4IJ template. Read [Symbol graph and language server](docs/SYMBOL-GRAPH.md) for the exact coverage boundary.
 
 ### Facts that can be checked, not a free-floating AI summary
 
