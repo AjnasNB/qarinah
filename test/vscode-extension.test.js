@@ -14,6 +14,9 @@ test("VS Code and Cursor panel package is local, read-only, searchable, and exac
   assert.match(source, /data-search/u);
   assert.match(source, /data-graph/u);
   assert.match(source, /data-sessions/u);
+  assert.match(source, /data-session-detail/u);
+  assert.match(source, /renderSessionDetail/u);
+  assert.match(source, /eventManifestHash/u);
   assert.match(source, /data-worktrees/u);
   assert.match(source, /default-src 'none'/u);
   assert.deepEqual([...new Set(source.match(/https?:\/\/[^"']+/gu))], ["http://www.w3.org/2000/svg"]);
