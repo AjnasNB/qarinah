@@ -49,7 +49,8 @@
     "./schemas/session-context-receipt.json": "./schemas/session-context-receipt.schema.json",
     "./schemas/host-install-manifest.json": "./schemas/host-install-manifest.schema.json",
     "./schemas/content-archive.json": "./schemas/content-archive.schema.json",
-    "./schemas/symbol-graph.json": "./schemas/symbol-graph.schema.json"
+    "./schemas/symbol-graph.json": "./schemas/symbol-graph.schema.json",
+    "./schemas/project-memory-cycle.json": "./schemas/project-memory-cycle.schema.json"
   },
   "files": [
     "bin/",
@@ -112,6 +113,7 @@
     "docs/SYMBOL-GRAPH.md",
     "docs/WORKTREE-CONTEXT.md",
     "docs/CODING-CONTEXT-HARNESS.md",
+    "docs/AUTOMATIC-PROJECT-MEMORY.md",
     "bench/fixtures/software-task-scenarios.mjs",
     "bench/research/",
     "bench/results/",

@@ -19,6 +19,13 @@ Qarinah is evidence-linked project memory for coding agents. It keeps an inspect
 - Content mode can retain bounded redacted summary text. Metadata mode retains only the metric, citation, and manifest receipt.
 - The published 98.71% reduction and 77.81:1 ratio remain explicitly scoped to the committed six-fixture comparison; every live run reports its own measured estimate instead of inheriting that number.
 
+## Explicit automatic project memory
+
+- `qarinah watch` runs in the foreground and serially refreshes project structure, symbols, one cited incremental checkpoint, and all derived read models after a real source change.
+- Unchanged snapshots do not append duplicate events or rebuild projections.
+- The watcher remains inside one initialized workspace and applies the same ignore, secret-name, link, capture-policy, and byte/count ceilings as the ordinary project scanner.
+- Stop signals and API cancellation interrupt polling. Qarinah does not install a silent desktop-wide collector.
+
 ## Lossless source retention beside compact context
 
 - Explicit content-capture workspaces can archive selected project files without placing those bytes in every context pack.
@@ -36,7 +43,7 @@ Qarinah is evidence-linked project memory for coding agents. It keeps an inspect
 - `qarinah-lsp` exposes document symbols, workspace symbols, definitions, and references through bounded stdio JSON-RPC.
 - The strict symbol-graph schema is public and additive. Other language grammars are future adapters, not silently approximated by the v1 parser.
 
-See [Coding context harness](CODING-CONTEXT-HARNESS.md).
+See [Coding context harness](CODING-CONTEXT-HARNESS.md) and [Automatic project memory](AUTOMATIC-PROJECT-MEMORY.md).
 
 ## Project-owned memory
 

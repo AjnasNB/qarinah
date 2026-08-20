@@ -23,6 +23,8 @@ Each worktree keeps a separate `.qarinah` ledger and consent record. Qarinah der
 
 With `--auto-compact`, the completed-turn hook compiles a bounded cited pack and records one idempotent checkpoint for the latest non-harness source event. The checkpoint can be expanded through exact event IDs, hashes, and the pack manifest. Run `npx qarinah harness "your task" --worktrees` to measure and inspect separate packs across every initialized sibling checkout. [Read the coding context harness guide.](docs/CODING-CONTEXT-HARNESS.md)
 
+For an explicit foreground loop that also notices source changes, refreshes the symbol graph, and regenerates every local read model, run `npx qarinah watch`. Unchanged cycles create no duplicate checkpoints. Qarinah does not install a hidden background service or passively inspect unrelated applications. [Read the automatic project-memory guide.](docs/AUTOMATIC-PROJECT-MEMORY.md)
+
 ## Resume the work, not the whole chat
 
 ```sh
@@ -88,6 +90,7 @@ npx qarinah scan
 npx qarinah symbols build
 npx qarinah symbols query "context compiler"
 npx qarinah-lsp
+npx qarinah watch --interval-ms 2000
 ```
 
 The v1 parser covers JavaScript, JSX, TypeScript, and TSX. Other languages are reported as unsupported instead of being guessed. Read [Symbol graph and language server](docs/SYMBOL-GRAPH.md) for the exact coverage boundary.

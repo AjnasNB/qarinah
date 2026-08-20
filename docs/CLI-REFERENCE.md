@@ -759,6 +759,17 @@ Omit host flags to configure all five supported project integrations. Omit `--al
 
 `--auto-compact` is opt-in and applies to Codex and Claude Code Stop hooks. It runs after ordinary lifecycle capture and invokes `harness --record --no-rebuild --quiet`, producing one idempotent cited checkpoint without forcing a full projection rebuild after every turn.
 
+## `watch`
+
+Run one explicit automatic-memory cycle or keep a foreground watcher active:
+
+```sh
+npx qarinah watch --once
+npx qarinah watch --interval-ms 2000 --query "current implementation decisions"
+```
+
+Options are `--once`, `--interval-ms 250..3600000`, `--query`, `--no-compact`, `--no-symbols`, and `--no-rebuild`. The watcher never installs itself as an operating-system service. A changed scan refreshes the selected stages serially; an unchanged scan returns `changed:false` without duplicate writes. Each JSON cycle contains the exact snapshot, optional symbol/checkpoint/derived receipts, explicit boundaries, and a `cycleHash`.
+
 ## `install`
 
 Preview or write one reversible, project-scoped host integration:

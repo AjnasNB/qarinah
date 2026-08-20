@@ -16,6 +16,7 @@ import {
   compileTaskMemoryPack,
   createContentArchive,
   createContextHandoffCapsule,
+  createProjectMemoryWatcher,
   cryptographicallyEraseContentArchiveVault,
   deleteContentArchive,
   exportOkf,
@@ -42,6 +43,7 @@ import {
   runMcpServer,
   scanProjectStructure,
   runCodingContextHarness,
+  runProjectMemoryCycle,
   serveMemoryDashboard,
   setWorkspaceEnabled,
   setupWorkspace,
@@ -306,6 +308,7 @@ Usage:
   qarinah archive erase-key --confirm-workspace <workspace-id>
   qarinah symbols build
   qarinah symbols query [text] [--limit n] [--kind function,class,...]
+  qarinah watch [--once] [--interval-ms n] [--no-compact] [--no-symbols] [--no-rebuild] [--query text]
   qarinah overview [--format json|markdown]
   qarinah footprint [query] [--baseline-tokens n] [--rate-per-million n] [--max-chars n] [--max-tokens n]
   qarinah receipts [query] [--session <id>] [--write] [--max-chars n] [--max-tokens n] [--limit n]
@@ -705,6 +708,63 @@ async function run(argv) {
       return;
     }
     throw new TypeError("symbols requires build or query.");
+  }
+  if (command === "watch") {
+    const flags = new Set(["--once", "--no-compact", "--no-symbols", "--no-rebuild"]);
+    const values = new Set(["--interval-ms", "--query"]);
+    const parsed = { flags: new Set(), values: new Map() };
+    for (let index = 0; index < args.length; index += 1) {
+      const value = args[index];
+      if (flags.has(value)) {
+        if (parsed.flags.has(value)) throw new TypeError(`watch received ${value} more than once.`);
+        parsed.flags.add(value);
+        continue;
+      }
+      if (!values.has(value)) throw new TypeError(`watch does not support ${value}.`);
+      if (parsed.values.has(value)) throw new TypeError(`watch received ${value} more than once.`);
+      if (index === args.length - 1 || args[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
+      parsed.values.set(value, args[index + 1]);
+      index += 1;
+    }
+    const interval = parsed.values.get("--interval-ms");
+    if (interval !== undefined && (!/^[0-9]+$/u.test(interval) || Number(interval) < 250 || Number(interval) > 3_600_000)) {
+      throw new TypeError("--interval-ms must be from 250 to 3600000.");
+    }
+    const options = {
+      cwd: process.cwd(),
+      query: parsed.values.get("--query"),
+      compact: !parsed.flags.has("--no-compact"),
+      symbols: !parsed.flags.has("--no-symbols"),
+      rebuild: !parsed.flags.has("--no-rebuild")
+    };
+    if (parsed.flags.has("--once")) {
+      process.stdout.write(`${JSON.stringify(await runProjectMemoryCycle(options), null, 2)}\n`);
+      return;
+    }
+    const controller = new AbortController();
+    const stop = () => controller.abort();
+    process.once("SIGINT", stop);
+    process.once("SIGTERM", stop);
+    const watcher = createProjectMemoryWatcher({
+      ...options,
+      intervalMs: interval === undefined ? undefined : Number(interval),
+      signal: controller.signal,
+      onCycle(cycle) {
+        process.stdout.write(`${JSON.stringify(cycle)}\n`);
+      },
+      onError(error) {
+        process.stderr.write(`${JSON.stringify({ error: error?.code ?? error?.name ?? "WATCH_CYCLE_FAILED", message: error?.message ?? "Project memory cycle failed." })}\n`);
+      }
+    });
+    try {
+      await watcher.run();
+    } catch (error) {
+      if (!controller.signal.aborted) throw error;
+    } finally {
+      process.removeListener("SIGINT", stop);
+      process.removeListener("SIGTERM", stop);
+    }
+    return;
   }
   if (command === "overview") {
     const parsed = strictValueOptions(args, "overview", ["--format"]);

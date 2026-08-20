@@ -44,6 +44,11 @@ export {
   searchSymbols
 } from "./symbol-graph.js";
 export { QARINAH_LSP_PROTOCOL_VERSION, createLanguageServer, runLanguageServer } from "./lsp-server.js";
+export {
+  PROJECT_MEMORY_CYCLE_SCHEMA_VERSION,
+  createProjectMemoryWatcher,
+  runProjectMemoryCycle
+} from "./project-watcher.js";
 export { AGENT_ARCHIVE_IMPORT_SCHEMA_VERSION, importAgentArchive } from "./archive-import.js";
 export { AGENT_ARCHIVE_BACKUP_SCHEMA_VERSION, backupAgentArchives } from "./archive-backup.js";
 export {

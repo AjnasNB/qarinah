@@ -73,6 +73,8 @@ try {
     "  querySymbolGraph,",
     "  searchSymbols,",
     "  createLanguageServer,",
+    "  createProjectMemoryWatcher,",
+    "  runProjectMemoryCycle,",
     "  ingestCockroachSourceRecord,",
     "  importAgentArchive,",
     "  buildProjectOverview,",
@@ -116,6 +118,7 @@ try {
     "  type QarinahProjectOverview,",
     "  type QarinahCodingContextHarnessResult,",
     "  type QarinahCodingContextSummarizer,",
+    "  type QarinahProjectMemoryCycle,",
     "  type QarinahLinkedProjectMemory,",
     "  type QarinahLinkedProjectQuery,",
     "  type QarinahGitWorktree,",
@@ -156,6 +159,10 @@ try {
     "if (symbolGraph) { const symbolQuery: QarinahSymbolQuery = querySymbolGraph(symbolGraph, 'consumer'); void symbolQuery; }",
     "void searchSymbols;",
     "void createLanguageServer;",
+    "const memoryCycle: Promise<QarinahProjectMemoryCycle> = runProjectMemoryCycle({ compact: false, symbols: false, rebuild: false });",
+    "void memoryCycle;",
+    "const memoryWatcher = createProjectMemoryWatcher({ intervalMs: 2000, compact: false });",
+    "void memoryWatcher.status();",
     "const projectOverview: Promise<QarinahProjectOverview> = buildProjectOverview();",
     "void projectOverview;",
     "void renderProjectOverviewMarkdown;",
@@ -321,6 +328,11 @@ try {
   assert.equal(installedPackage.bin["qarinah-lsp"], "bin/qarinah-lsp.js");
   assert.equal(installedPackage.dependencies["typescript-classic"], "npm:typescript@5.9.3");
   await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "symbol-graph.schema.json"), "utf8");
+  assert.equal(
+    installedPackage.exports["./schemas/project-memory-cycle.json"],
+    "./schemas/project-memory-cycle.schema.json"
+  );
+  await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "project-memory-cycle.schema.json"), "utf8");
   await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "docs", "SYMBOL-GRAPH.md"), "utf8");
   process.stdout.write("Exact cockroach-browser@0.1.0 TypeScript and registry-integrity contract passed.\n");
 } finally {

@@ -595,6 +595,60 @@ export function measureMemoryFootprint(options?: {
   inMemory?: boolean;
   updateCheckpoint?: boolean;
 }): Promise<Readonly<QarinahMemoryFootprint>>;
+export const PROJECT_MEMORY_CYCLE_SCHEMA_VERSION: "qarinah.project-memory-cycle.v1";
+export interface QarinahProjectMemoryCycle {
+  readonly schemaVersion: "qarinah.project-memory-cycle.v1";
+  readonly generatedAt: string;
+  readonly workspaceId: string;
+  readonly worktreeId: string | null;
+  readonly changed: boolean;
+  readonly scan: Readonly<Record<string, unknown>>;
+  readonly symbols: null | Readonly<{ schemaVersion: string; manifestHash: string; files: number; symbols: number; references: number; complete: boolean }>;
+  readonly harness: null | Readonly<{
+    manifestHash: string;
+    sourceHeadHash: string | null;
+    packManifestHash: string | null;
+    recording: Readonly<{ status: "not-requested" | "created" | "reused"; eventId: string | null; hash: string | null }> | null;
+    comparison: QarinahCodingHarnessComparison | null;
+  }>;
+  readonly derived: null | Readonly<{ headHash: string | null; eventCount: number; linkedNodes: number; sqliteSchemaVersion: number }>;
+  readonly boundaries: Readonly<Record<"activation" | "scope" | "content" | "compaction", string>>;
+  readonly cycleHash: `sha256:${string}`;
+}
+export interface QarinahProjectMemoryCycleOptions {
+  cwd?: string;
+  query?: string;
+  compact?: boolean;
+  symbols?: boolean;
+  rebuild?: boolean;
+  maxChars?: number;
+  maxTokens?: number;
+  limit?: number;
+  maxSummaryChars?: number;
+  scan?: Readonly<Record<string, number>>;
+  signal?: AbortSignal;
+  clock?: () => Date;
+}
+export function runProjectMemoryCycle(options?: QarinahProjectMemoryCycleOptions): Promise<Readonly<QarinahProjectMemoryCycle>>;
+export function createProjectMemoryWatcher(options?: QarinahProjectMemoryCycleOptions & {
+  intervalMs?: number;
+  onCycle?: (cycle: Readonly<QarinahProjectMemoryCycle>) => void | Promise<void>;
+  onError?: (error: unknown, status: Readonly<QarinahProjectMemoryWatcherStatus>) => void | Promise<void>;
+}): Readonly<{
+  run(): Promise<Readonly<QarinahProjectMemoryWatcherStatus>>;
+  stop(): void;
+  status(): Readonly<QarinahProjectMemoryWatcherStatus>;
+}>;
+export interface QarinahProjectMemoryWatcherStatus {
+  readonly schemaVersion: "qarinah.project-memory-watcher-status.v1";
+  readonly running: boolean;
+  readonly stopping: boolean;
+  readonly intervalMs: number;
+  readonly cycles: number;
+  readonly changedCycles: number;
+  readonly lastCycle: QarinahProjectMemoryCycle | null;
+  readonly lastError: null | Readonly<{ name: string; code: string | null; message: string }>;
+}
 export const CODING_CONTEXT_HARNESS_SCHEMA_VERSION: "qarinah.coding-context-harness.v1";
 export interface QarinahCodingHarnessSummary {
   readonly method: "deterministic-extractive-v1" | "model-assisted-v1";

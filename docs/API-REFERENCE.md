@@ -1139,6 +1139,18 @@ Validates and appends the paired revision and acquisition events under the activ
 
 The accepted structural record schema is exported as `qarinah/schemas/cockroach-source-record.json`.
 
+## Automatic project memory
+
+### `runProjectMemoryCycle(options?)`
+
+Runs one bounded source scan. When the snapshot changed, it optionally rebuilds the local symbol graph, records one idempotent cited harness checkpoint, and regenerates derived views. It returns a `qarinah.project-memory-cycle.v1` receipt whose `cycleHash` binds the complete cycle result.
+
+### `createProjectMemoryWatcher(options?)`
+
+Creates a serial foreground polling loop with `run()`, `stop()`, and `status()`. `intervalMs` is bounded from 250 through 3,600,000 milliseconds. Optional `onCycle` and `onError` callbacks observe results without changing Qarinah's capture authority. The watcher accepts an `AbortSignal` and does not install a background service.
+
+The strict receipt schema is exported as `qarinah/schemas/project-memory-cycle.json`. See [Automatic project memory](AUTOMATIC-PROJECT-MEMORY.md).
+
 ## ProductLoop interoperability
 
 Exports:
@@ -1188,6 +1200,7 @@ qarinah/schemas/maqam-context-adapter.json
 qarinah/schemas/cockroach-browser-memory.json
 qarinah/schemas/cockroach-source-record.json
 qarinah/schemas/productloop-runtime-event.json
+qarinah/schemas/project-memory-cycle.json
 ```
 
 Anything outside this export map is internal and may change without becoming a public API.

@@ -7872,6 +7872,751 @@ async function searchSymbols(query = "", options = {}) {
   return querySymbolGraph(graph, query, { limit: options.limit, kinds: options.kinds });
 }
 
+// src/project-watcher.js
+init_abort();
+init_canonical();
+
+// src/coding-harness.js
+init_canonical();
+init_capture_policy();
+init_git_worktrees();
+init_markdown();
+init_redact();
+init_indexer();
+init_store();
+init_workspace();
+init_abort();
+var CODING_CONTEXT_HARNESS_SCHEMA_VERSION = "qarinah.coding-context-harness.v1";
+var HARNESS_ADAPTER = "qarinah.coding-harness";
+var DEFAULT_QUERY = "project decisions changes tool outcomes tests failures next steps";
+var PUBLISHED_BENCHMARK = Object.freeze({
+  scope: "published six-fixture repeated-input estimate",
+  fixtureCount: 6,
+  baselineTokens: 442113,
+  deliveredTokens: 5682,
+  reductionPercent: 98.71,
+  exactReductionPercent: 98.7148,
+  baselineToPackRatio: 77.81,
+  estimator: "fixture token counts from the published comparison artifact",
+  guarantee: false
+});
+function integer2(value, label, minimum, maximum, fallback) {
+  const selected3 = value ?? fallback;
+  if (!Number.isSafeInteger(selected3) || selected3 < minimum || selected3 > maximum) {
+    throw new TypeError(`${label} must be an integer from ${minimum} to ${maximum}.`);
+  }
+  return selected3;
+}
+function boolean(value, label, fallback) {
+  const selected3 = value ?? fallback;
+  if (typeof selected3 !== "boolean") throw new TypeError(`${label} must be a boolean.`);
+  return selected3;
+}
+function text(value, label, maximum, fallback) {
+  const selected3 = value ?? fallback;
+  if (typeof selected3 !== "string" || selected3.length > maximum) {
+    throw new TypeError(`${label} must be a string up to ${maximum} characters.`);
+  }
+  return selected3;
+}
+function stringList(value, label) {
+  if (value === void 0) return void 0;
+  if (!Array.isArray(value) || value.length > 64 || value.some((item) => typeof item !== "string" || item.trim() === "" || item.length > 256)) {
+    throw new TypeError(`${label} must contain at most 64 non-empty strings up to 256 characters.`);
+  }
+  if (new Set(value).size !== value.length) throw new TypeError(`${label} cannot contain duplicates.`);
+  return Object.freeze([...value].sort());
+}
+function normalizeSummarizer(value) {
+  if (value === void 0 || value === null) return null;
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new TypeError("summarizer must be a record.");
+  }
+  const unknown = Object.keys(value).filter((key) => !["id", "summarize"].includes(key));
+  if (unknown.length > 0) throw new TypeError(`summarizer contains unknown field(s): ${unknown.join(", ")}.`);
+  if (typeof value.id !== "string" || !/^[a-z0-9][a-z0-9._-]{0,63}$/u.test(value.id)) {
+    throw new TypeError("summarizer.id must be a lowercase identifier up to 64 characters.");
+  }
+  if (typeof value.summarize !== "function") throw new TypeError("summarizer.summarize must be a function.");
+  return value;
+}
+function normalizeOptions(options) {
+  if (!options || typeof options !== "object" || Array.isArray(options)) {
+    throw new TypeError("Coding harness options must be a record.");
+  }
+  const allowed = /* @__PURE__ */ new Set([
+    "cwd",
+    "query",
+    "scope",
+    "maxChars",
+    "maxTokens",
+    "reserveTokens",
+    "limit",
+    "maxSummaryChars",
+    "authorityScopes",
+    "repositoryIds",
+    "summarizer",
+    "record",
+    "rebuild",
+    "updateCheckpoint",
+    "signal",
+    "clock"
+  ]);
+  const unknown = Object.keys(options).filter((key) => !allowed.has(key));
+  if (unknown.length > 0) throw new TypeError(`Coding harness options contain unknown field(s): ${unknown.join(", ")}.`);
+  if (options.cwd !== void 0 && (typeof options.cwd !== "string" || options.cwd.trim() === "")) {
+    throw new TypeError("cwd must be a non-empty path string.");
+  }
+  const scope = options.scope ?? "current";
+  if (!["current", "repository"].includes(scope)) throw new TypeError("scope must be current or repository.");
+  const signal = validateAbortSignal(options.signal);
+  if (options.clock !== void 0 && typeof options.clock !== "function") throw new TypeError("clock must be a function.");
+  const now = options.clock === void 0 ? /* @__PURE__ */ new Date() : options.clock();
+  if (!(now instanceof Date) || !Number.isFinite(now.getTime())) throw new TypeError("clock must return a valid Date.");
+  const generatedAt = now.toISOString();
+  if (generatedAt.length !== 24) throw new TypeError("clock must return a four-digit UTC calendar year.");
+  const record2 = boolean(options.record, "record", false);
+  if (scope === "repository" && record2) {
+    throw new TypeError("record cannot be combined with repository scope; record each worktree independently.");
+  }
+  return Object.freeze({
+    cwd: options.cwd ?? process.cwd(),
+    query: text(options.query, "query", 4096, DEFAULT_QUERY),
+    scope,
+    maxChars: integer2(options.maxChars, "maxChars", 512, 1e6, 12e3),
+    maxTokens: options.maxTokens === void 0 ? void 0 : integer2(options.maxTokens, "maxTokens", 128, 1e6),
+    reserveTokens: options.reserveTokens === void 0 ? void 0 : integer2(options.reserveTokens, "reserveTokens", 0, 999936),
+    limit: integer2(options.limit, "limit", 1, 64, 20),
+    maxSummaryChars: integer2(options.maxSummaryChars, "maxSummaryChars", 256, 16384, 2e3),
+    authorityScopes: stringList(options.authorityScopes, "authorityScopes"),
+    repositoryIds: stringList(options.repositoryIds, "repositoryIds"),
+    summarizer: normalizeSummarizer(options.summarizer),
+    record: record2,
+    rebuild: boolean(options.rebuild, "rebuild", true),
+    updateCheckpoint: boolean(options.updateCheckpoint, "updateCheckpoint", false),
+    signal,
+    generatedAt
+  });
+}
+function eventIdFromDigest(value) {
+  const digits = sha256(value).slice("sha256:".length, "sha256:".length + 32).split("");
+  digits[12] = "4";
+  digits[16] = "8";
+  const hex = digits.join("");
+  return `evt_${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+function comparison(baselineTokens, deliveredTokens) {
+  const savedTokens = Math.max(0, baselineTokens - deliveredTokens);
+  const reductionPercent = baselineTokens > 0 ? Math.round(savedTokens / baselineTokens * 1e4) / 100 : null;
+  const ratio = deliveredTokens > 0 ? Math.round(baselineTokens / deliveredTokens * 100) / 100 : null;
+  return Object.freeze({
+    baselineTokens,
+    deliveredTokens,
+    savedTokens,
+    reductionPercent,
+    baselineToPackRatio: ratio,
+    publishedBenchmarkMatched: reductionPercent !== null && reductionPercent >= PUBLISHED_BENCHMARK.reductionPercent
+  });
+}
+function sourceDescriptors(pack) {
+  return Object.freeze(pack.items.map((item) => Object.freeze({
+    eventId: item.eventId,
+    hash: item.hash,
+    kind: item.kind
+  })));
+}
+function deterministicSummary(pack, maximum) {
+  const lines = [
+    "Evidence-linked coding context checkpoint.",
+    `Query: ${pack.query || "latest project context"}`,
+    `Pack: ${pack.manifestHash}`
+  ];
+  for (const item of pack.items) {
+    const excerpt2 = item.excerpt.replace(/\s+/gu, " ").trim();
+    lines.push(`- [${item.kind}] ${item.title} (${item.eventId} ${item.hash})${excerpt2 ? `: ${excerpt2}` : ""}`);
+  }
+  const joined = markdownSafeText(redactText(lines.join("\n")));
+  if (joined.length <= maximum) return joined;
+  const marker = `
+[QARINAH_COMPACTED:${joined.length - maximum}]`;
+  return `${joined.slice(0, Math.max(0, maximum - marker.length))}${marker}`;
+}
+function normalizeSummaryResult(value, maximum) {
+  const candidate = typeof value === "string" ? { text: value } : value;
+  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) {
+    throw new TypeError("summarizer.summarize must return a string or a record.");
+  }
+  const unknown = Object.keys(candidate).filter((key) => !["text", "model"].includes(key));
+  if (unknown.length > 0) throw new TypeError(`summarizer result contains unknown field(s): ${unknown.join(", ")}.`);
+  if (typeof candidate.text !== "string" || candidate.text.trim() === "" || candidate.text.length > maximum) {
+    throw new TypeError(`summarizer result text must be non-empty and no longer than ${maximum} characters.`);
+  }
+  if (candidate.model !== void 0 && (typeof candidate.model !== "string" || candidate.model.trim() === "" || candidate.model.length > 256)) {
+    throw new TypeError("summarizer result model must be a non-empty string up to 256 characters.");
+  }
+  return Object.freeze({ text: markdownSafeText(redactText(candidate.text)), model: candidate.model ?? null });
+}
+function runKey(options, worktree, sourceHeadHash) {
+  return sha256({
+    query: options.query,
+    maxChars: options.maxChars,
+    maxTokens: options.maxTokens ?? null,
+    reserveTokens: options.reserveTokens ?? null,
+    limit: options.limit,
+    maxSummaryChars: options.maxSummaryChars,
+    summarizer: options.summarizer?.id ?? "deterministic-extractive-v1",
+    repositoryId: worktree?.repositoryId ?? null,
+    worktreeId: worktree?.worktreeId ?? null,
+    sourceHeadHash
+  });
+}
+function existingHarnessRecord(events, key) {
+  return [...events].reverse().find((event) => event.provenance?.adapter === HARNESS_ADAPTER && event.data?.codingHarness?.runKey === key) ?? null;
+}
+function latestHarnessCheckpoint(events, options, worktree) {
+  return [...events].reverse().find((event) => event.provenance?.adapter === HARNESS_ADAPTER && event.data?.codingHarness?.query === options.query && (event.data?.codingHarness?.worktreeId ?? null) === (worktree?.worktreeId ?? null) && (event.data?.codingHarness?.repositoryId ?? null) === (worktree?.repositoryId ?? null)) ?? null;
+}
+function incrementalState(sourceEvents, sourceHeadHash, previous) {
+  const previousSourceHeadHash = previous?.data?.codingHarness?.sourceHeadHash ?? null;
+  if (previous === null) {
+    return Object.freeze({
+      mode: "initial",
+      previousCheckpointEventId: null,
+      previousSourceHeadHash: null,
+      currentSourceHeadHash: sourceHeadHash,
+      sourceEventCount: sourceEvents.length,
+      changedEventCount: sourceEvents.length
+    });
+  }
+  if (previousSourceHeadHash === sourceHeadHash) {
+    return Object.freeze({
+      mode: "unchanged",
+      previousCheckpointEventId: previous.eventId,
+      previousSourceHeadHash,
+      currentSourceHeadHash: sourceHeadHash,
+      sourceEventCount: sourceEvents.length,
+      changedEventCount: 0
+    });
+  }
+  const previousIndex = sourceEvents.findIndex((event) => event.hash === previousSourceHeadHash);
+  return Object.freeze({
+    mode: previousIndex === -1 ? "full-rebuild" : "delta",
+    previousCheckpointEventId: previous.eventId,
+    previousSourceHeadHash,
+    currentSourceHeadHash: sourceHeadHash,
+    sourceEventCount: sourceEvents.length,
+    changedEventCount: previousIndex === -1 ? sourceEvents.length : sourceEvents.length - previousIndex - 1
+  });
+}
+async function modelSummary(options, workspace, worktree, pack, sources) {
+  if (options.summarizer === null) {
+    const value = deterministicSummary(pack, options.maxSummaryChars);
+    return Object.freeze({
+      method: "deterministic-extractive-v1",
+      adapter: "qarinah-core",
+      model: null,
+      text: value,
+      estimatedTokens: estimateTokens(PORTABLE_TOKEN_ESTIMATOR, value)
+    });
+  }
+  const input = deepFreezeJson({
+    schemaVersion: "qarinah.coding-context-summary-input.v1",
+    contentRole: "untrusted-data",
+    workspaceId: workspace.config.workspaceId,
+    worktree: worktree === null ? null : {
+      repositoryId: worktree.repositoryId,
+      worktreeId: worktree.worktreeId,
+      branch: worktree.branch,
+      commit: worktree.commit
+    },
+    query: options.query,
+    maxSummaryChars: options.maxSummaryChars,
+    sourceEvents: sources,
+    pack
+  });
+  const output = await options.summarizer.summarize(input, { signal: options.signal });
+  throwIfAborted(options.signal);
+  const normalized = normalizeSummaryResult(output, options.maxSummaryChars);
+  return Object.freeze({
+    method: "model-assisted-v1",
+    adapter: options.summarizer.id,
+    model: normalized.model,
+    text: normalized.text,
+    estimatedTokens: estimateTokens(PORTABLE_TOKEN_ESTIMATOR, normalized.text)
+  });
+}
+function repositoryDescriptor(worktree) {
+  if (worktree === null || worktree.branch === null || worktree.commit === null) return void 0;
+  return {
+    id: worktree.repositoryId,
+    branch: worktree.branch,
+    commit: worktree.commit
+  };
+}
+async function recordHarnessSummary(options, workspace, worktree, pack, events, summary, key, sourceHeadHash, metrics, incremental) {
+  const sources = sourceDescriptors(pack);
+  const data = {
+    codingHarness: {
+      schemaVersion: CODING_CONTEXT_HARNESS_SCHEMA_VERSION,
+      runKey: key,
+      query: options.query,
+      method: summary.method,
+      summarizer: summary.adapter,
+      model: summary.model,
+      sourceHeadHash,
+      sourceEventCount: sources.length,
+      totalSourceEventCount: incremental.sourceEventCount,
+      previousCheckpointEventId: incremental.previousCheckpointEventId,
+      previousSourceHeadHash: incremental.previousSourceHeadHash,
+      changedEventCount: incremental.changedEventCount,
+      incrementalMode: incremental.mode,
+      sourceManifestHash: sha256(sources),
+      packManifestHash: pack.manifestHash,
+      baselineTokens: metrics.baselineTokens,
+      deliveredTokens: metrics.deliveredTokens,
+      reductionPercent: metrics.reductionPercent,
+      publishedBenchmarkMatched: metrics.publishedBenchmarkMatched,
+      benchmarkScope: PUBLISHED_BENCHMARK.scope,
+      worktreeId: worktree?.worktreeId ?? null,
+      repositoryId: worktree?.repositoryId ?? null
+    },
+    sourceEvents: sources
+  };
+  const payload = {
+    eventId: eventIdFromDigest({ workspaceId: workspace.config.workspaceId, runKey: key }),
+    kind: "summary",
+    actor: { type: "system", id: "qarinah-coding-harness" },
+    title: "Coding context checkpoint",
+    body: workspace.config.capture === "content" ? summary.text : "",
+    data,
+    confidence: summary.method === "model-assisted-v1" ? "inferred" : "extracted",
+    relations: sources.slice(0, 64).map((source) => ({ type: "derived_from", target: source.eventId })),
+    ...repositoryDescriptor(worktree) === void 0 ? {} : { repository: repositoryDescriptor(worktree) },
+    provenance: { adapter: HARNESS_ADAPTER, sourceId: `pack:${pack.manifestHash}` },
+    retention: { class: workspace.config.retentionClass, expiresAt: null }
+  };
+  const input = workspace.config.capture === "metadata" ? reviewMetadataEventInput(payload) : payload;
+  const event = await appendEvent(input, {
+    workspace,
+    capture: workspace.config.capture,
+    idempotent: true,
+    signal: options.signal
+  });
+  if (options.rebuild) await rebuildDerivedState(workspace.root, { signal: options.signal });
+  return Object.freeze({ status: existingHarnessRecord(events, key) ? "reused" : "created", eventId: event.eventId, hash: event.hash });
+}
+async function compileWorktree(options, descriptor, isCurrent) {
+  throwIfAborted(options.signal);
+  const workspace = await loadWorkspace(descriptor.root);
+  const events = await readEvents(workspace, {
+    updateCheckpoint: options.updateCheckpoint,
+    signal: options.signal
+  });
+  const sourceEvents = events.filter((event) => event.provenance?.adapter !== HARNESS_ADAPTER);
+  const sourceHeadHash = sourceEvents.at(-1)?.hash ?? null;
+  const worktree = workspace.worktree ?? (descriptor.schemaVersion === "qarinah.git-worktree.v1" ? descriptor : null);
+  const key = runKey(options, worktree, sourceHeadHash);
+  const previous = existingHarnessRecord(events, key);
+  const incremental = incrementalState(sourceEvents, sourceHeadHash, latestHarnessCheckpoint(events, options, worktree));
+  const pack = await compileContextFromVerifiedEvents(options.query, {
+    workspace,
+    events: sourceEvents,
+    maxChars: Math.min(options.maxChars, workspace.config.contextMaxChars),
+    ...options.maxTokens === void 0 ? {} : { maxTokens: options.maxTokens },
+    ...options.reserveTokens === void 0 ? {} : { reserveTokens: options.reserveTokens },
+    limit: options.limit,
+    minimumCoverage: "any",
+    rankingProfile: "admission-first-v2",
+    authorityScopes: options.authorityScopes,
+    repositoryIds: options.repositoryIds,
+    updateCheckpoint: options.updateCheckpoint,
+    clock: () => new Date(options.generatedAt)
+  });
+  const ledgerCharacters = sourceEvents.reduce((total, event) => total + canonicalStringify(event).length + 1, 0);
+  const baselineTokens = sourceEvents.length === 0 ? 0 : Math.ceil(ledgerCharacters / 4);
+  const metrics = comparison(baselineTokens, pack.budget.estimatedTokens);
+  const sources = sourceDescriptors(pack);
+  let summary;
+  let recording = Object.freeze({ status: "not-requested", eventId: null, hash: null });
+  if (options.record && previous !== null) {
+    const value = previous.body || "[Summary content was not retained by the metadata-only capture policy.]";
+    summary = Object.freeze({
+      method: previous.data?.codingHarness?.method ?? "deterministic-extractive-v1",
+      adapter: previous.data?.codingHarness?.summarizer ?? "qarinah-core",
+      model: previous.data?.codingHarness?.model ?? null,
+      text: value,
+      estimatedTokens: estimateTokens(PORTABLE_TOKEN_ESTIMATOR, value)
+    });
+    recording = Object.freeze({ status: "reused", eventId: previous.eventId, hash: previous.hash });
+  } else {
+    summary = await modelSummary(options, workspace, worktree, pack, sources);
+    if (options.record) {
+      recording = await recordHarnessSummary(
+        options,
+        workspace,
+        worktree,
+        pack,
+        events,
+        summary,
+        key,
+        sourceHeadHash,
+        metrics,
+        incremental
+      );
+    }
+  }
+  return deepFreezeJson({
+    status: "ready",
+    current: isCurrent,
+    root: workspace.root,
+    workspaceId: workspace.config.workspaceId,
+    capture: workspace.config.capture,
+    worktree,
+    source: {
+      eventCount: events.length,
+      sourceEventCount: sourceEvents.length,
+      headHash: events.at(-1)?.hash ?? null,
+      sourceHeadHash,
+      ledgerCharacters,
+      ledgerEstimatedTokens: baselineTokens
+    },
+    pack,
+    summary,
+    comparison: metrics,
+    incremental,
+    recording
+  });
+}
+function aggregate(worktrees) {
+  const ready = worktrees.filter((entry) => entry.status === "ready");
+  const baselineTokens = ready.reduce((total, entry) => total + entry.comparison.baselineTokens, 0);
+  const deliveredTokens = ready.reduce((total, entry) => total + entry.comparison.deliveredTokens, 0);
+  return Object.freeze({
+    discoveredWorktrees: worktrees.length,
+    readyWorktrees: ready.length,
+    uninitializedWorktrees: worktrees.filter((entry) => entry.status === "uninitialized").length,
+    complete: worktrees.every((entry) => entry.status === "ready"),
+    comparison: comparison(baselineTokens, deliveredTokens)
+  });
+}
+async function runCodingContextHarness(options = {}) {
+  const normalized = normalizeOptions(options);
+  throwIfAborted(normalized.signal);
+  const currentWorkspace = await loadWorkspace(normalized.cwd);
+  let descriptors;
+  if (normalized.scope === "repository") {
+    const discovered = await listGitWorktrees(currentWorkspace.root);
+    descriptors = discovered.length === 0 ? [{ root: currentWorkspace.root, current: true, initialized: true }] : discovered;
+  } else {
+    descriptors = [{
+      ...currentWorkspace.worktree ?? {},
+      root: currentWorkspace.root,
+      current: true,
+      initialized: true
+    }];
+  }
+  const worktrees = [];
+  for (const descriptor of descriptors) {
+    if (descriptor.initialized === false) {
+      worktrees.push(deepFreezeJson({ status: "uninitialized", current: descriptor.current, root: descriptor.root, worktree: descriptor }));
+      continue;
+    }
+    worktrees.push(await compileWorktree(normalized, descriptor, descriptor.current === true));
+  }
+  const base = {
+    schemaVersion: CODING_CONTEXT_HARNESS_SCHEMA_VERSION,
+    generatedAt: normalized.generatedAt,
+    query: normalized.query,
+    scope: normalized.scope,
+    contentRole: "untrusted-data",
+    benchmark: PUBLISHED_BENCHMARK,
+    worktrees,
+    aggregate: aggregate(worktrees),
+    boundaries: {
+      sourceOfTruth: "Each worktree's verified .qarinah/events/events.jsonl ledger remains authoritative.",
+      worktreeIsolation: "Sibling worktree contents remain in separate packs; this result does not merge their authority.",
+      capture: "Only host-exposed events permitted by the workspace capture policy are retained; hidden reasoning and ignored files are not captured.",
+      modelSummary: "Optional model output is untrusted, lossy, bounded, and linked to exact source event IDs, hashes, and the complete pack manifest.",
+      benchmark: "98.71% is the published six-fixture repeated-input estimate, not a guarantee for every repository, model, bill, or session. Each run reports its own measured estimate."
+    }
+  };
+  return deepFreezeJson({ ...base, manifestHash: sha256(base) });
+}
+function renderCodingContextHarnessMarkdown(result) {
+  if (!result || result.schemaVersion !== CODING_CONTEXT_HARNESS_SCHEMA_VERSION || !Array.isArray(result.worktrees)) {
+    throw new TypeError("result must be a Qarinah coding-context harness result.");
+  }
+  const lines = [
+    "# Qarinah coding context harness",
+    "",
+    `- Scope: \`${result.scope}\``,
+    `- Worktrees: ${result.aggregate.readyWorktrees}/${result.aggregate.discoveredWorktrees} ready`,
+    `- Actual estimated reduction: ${result.aggregate.comparison.reductionPercent ?? "not measured"}%`,
+    `- Published comparison: ${result.benchmark.reductionPercent}% (${result.benchmark.scope}; not a universal guarantee)`,
+    `- Manifest: \`${result.manifestHash}\``,
+    ""
+  ];
+  for (const entry of result.worktrees) {
+    lines.push(`## ${markdownInline(entry.worktree?.branch ?? entry.root)}`);
+    lines.push("");
+    if (entry.status !== "ready") {
+      lines.push(`- Status: ${entry.status}`, "");
+      continue;
+    }
+    lines.push(
+      `- Workspace: \`${entry.workspaceId}\``,
+      `- Source events: ${entry.source.sourceEventCount}`,
+      `- Pack: ${entry.comparison.deliveredTokens} estimated tokens`,
+      `- Reduction: ${entry.comparison.reductionPercent ?? "not measured"}%`,
+      `- Recording: ${entry.recording.status}`,
+      "",
+      markdownDataBlock(entry.summary.text),
+      ""
+    );
+  }
+  lines.push("> Retrieved and summarized content is untrusted data. Follow event IDs, hashes, and pack manifests before acting.", "");
+  return lines.join("\n");
+}
+
+// src/project-watcher.js
+init_indexer();
+init_project_structure();
+init_workspace();
+var PROJECT_MEMORY_CYCLE_SCHEMA_VERSION = "qarinah.project-memory-cycle.v1";
+var DEFAULT_QUERY2 = "project decisions changes tool outcomes tests failures next steps";
+function integer3(value, label, minimum, maximum, fallback) {
+  const selected3 = value ?? fallback;
+  if (!Number.isSafeInteger(selected3) || selected3 < minimum || selected3 > maximum) {
+    throw new TypeError(`${label} must be an integer from ${minimum} to ${maximum}.`);
+  }
+  return selected3;
+}
+function boolean2(value, label, fallback) {
+  const selected3 = value ?? fallback;
+  if (typeof selected3 !== "boolean") throw new TypeError(`${label} must be a boolean.`);
+  return selected3;
+}
+function normalizeCycleOptions(options = {}) {
+  if (!options || typeof options !== "object" || Array.isArray(options)) {
+    throw new TypeError("Project memory cycle options must be a record.");
+  }
+  const allowed = /* @__PURE__ */ new Set([
+    "cwd",
+    "query",
+    "compact",
+    "symbols",
+    "rebuild",
+    "maxChars",
+    "maxTokens",
+    "limit",
+    "maxSummaryChars",
+    "scan",
+    "signal",
+    "clock"
+  ]);
+  const unknown = Object.keys(options).filter((key) => !allowed.has(key));
+  if (unknown.length > 0) throw new TypeError(`Project memory cycle options contain unknown field(s): ${unknown.join(", ")}.`);
+  if (options.cwd !== void 0 && (typeof options.cwd !== "string" || options.cwd.trim() === "")) {
+    throw new TypeError("cwd must be a non-empty path string.");
+  }
+  if (options.query !== void 0 && (typeof options.query !== "string" || options.query.length > 4096)) {
+    throw new TypeError("query must be a string up to 4096 characters.");
+  }
+  if (options.scan !== void 0 && (!options.scan || typeof options.scan !== "object" || Array.isArray(options.scan))) {
+    throw new TypeError("scan must be a project structure scan options record.");
+  }
+  if (options.clock !== void 0 && typeof options.clock !== "function") throw new TypeError("clock must be a function.");
+  const now = options.clock === void 0 ? /* @__PURE__ */ new Date() : options.clock();
+  if (!(now instanceof Date) || !Number.isFinite(now.getTime())) throw new TypeError("clock must return a valid Date.");
+  return Object.freeze({
+    cwd: options.cwd ?? process.cwd(),
+    query: options.query ?? DEFAULT_QUERY2,
+    compact: boolean2(options.compact, "compact", true),
+    symbols: boolean2(options.symbols, "symbols", true),
+    rebuild: boolean2(options.rebuild, "rebuild", true),
+    maxChars: integer3(options.maxChars, "maxChars", 512, 1e6, 12e3),
+    maxTokens: options.maxTokens === void 0 ? void 0 : integer3(options.maxTokens, "maxTokens", 128, 1e6),
+    limit: integer3(options.limit, "limit", 1, 64, 20),
+    maxSummaryChars: integer3(options.maxSummaryChars, "maxSummaryChars", 256, 16384, 2e3),
+    scan: Object.freeze({ ...options.scan ?? {} }),
+    signal: validateAbortSignal(options.signal),
+    generatedAt: now.toISOString()
+  });
+}
+function normalizeWatcherOptions(options = {}) {
+  if (!options || typeof options !== "object" || Array.isArray(options)) {
+    throw new TypeError("Project memory watcher options must be a record.");
+  }
+  const allowed = /* @__PURE__ */ new Set([
+    "cwd",
+    "query",
+    "compact",
+    "symbols",
+    "rebuild",
+    "maxChars",
+    "maxTokens",
+    "limit",
+    "maxSummaryChars",
+    "scan",
+    "signal",
+    "clock",
+    "intervalMs",
+    "onCycle",
+    "onError"
+  ]);
+  const unknown = Object.keys(options).filter((key) => !allowed.has(key));
+  if (unknown.length > 0) throw new TypeError(`Project memory watcher options contain unknown field(s): ${unknown.join(", ")}.`);
+  if (options.onCycle !== void 0 && typeof options.onCycle !== "function") throw new TypeError("onCycle must be a function.");
+  if (options.onError !== void 0 && typeof options.onError !== "function") throw new TypeError("onError must be a function.");
+  const { intervalMs: _intervalMs, onCycle: _onCycle, onError: _onError, ...cycle } = options;
+  return Object.freeze({
+    cycle,
+    intervalMs: integer3(options.intervalMs, "intervalMs", 250, 36e5, 2e3),
+    onCycle: options.onCycle ?? null,
+    onError: options.onError ?? null,
+    signal: validateAbortSignal(options.signal)
+  });
+}
+async function runProjectMemoryCycle(options = {}) {
+  const normalized = normalizeCycleOptions(options);
+  throwIfAborted(normalized.signal);
+  const workspace = await loadWorkspace(normalized.cwd);
+  const scan = await scanProjectStructure({
+    cwd: workspace.root,
+    ...normalized.scan
+  });
+  throwIfAborted(normalized.signal);
+  let symbols = null;
+  let harness = null;
+  let derived = null;
+  if (scan.captured) {
+    if (normalized.symbols) {
+      const graph = await buildSymbolGraph({ cwd: workspace.root, persist: true });
+      symbols = Object.freeze({
+        schemaVersion: graph.schemaVersion,
+        manifestHash: graph.manifestHash,
+        files: graph.coverage.indexedFiles,
+        symbols: graph.coverage.declarations,
+        references: graph.coverage.resolvedReferences,
+        complete: graph.coverage.complete
+      });
+    }
+    if (normalized.compact) {
+      const result = await runCodingContextHarness({
+        cwd: workspace.root,
+        query: normalized.query,
+        maxChars: normalized.maxChars,
+        ...normalized.maxTokens === void 0 ? {} : { maxTokens: normalized.maxTokens },
+        limit: normalized.limit,
+        maxSummaryChars: normalized.maxSummaryChars,
+        record: true,
+        rebuild: false,
+        updateCheckpoint: false,
+        signal: normalized.signal,
+        clock: () => new Date(normalized.generatedAt)
+      });
+      const current = result.worktrees.find((entry) => entry.status === "ready" && entry.current) ?? result.worktrees[0];
+      harness = Object.freeze({
+        manifestHash: result.manifestHash,
+        sourceHeadHash: current?.source?.sourceHeadHash ?? null,
+        packManifestHash: current?.pack?.manifestHash ?? null,
+        recording: current?.recording ?? null,
+        comparison: current?.comparison ?? null
+      });
+    }
+    if (normalized.rebuild) {
+      const state = await rebuildDerivedState(workspace.root, { signal: normalized.signal });
+      derived = Object.freeze({
+        headHash: state.headHash,
+        eventCount: state.eventCount,
+        linkedNodes: state.linkedMemory.nodes,
+        sqliteSchemaVersion: state.readModel.schemaVersion
+      });
+    }
+  }
+  const core = {
+    schemaVersion: PROJECT_MEMORY_CYCLE_SCHEMA_VERSION,
+    generatedAt: normalized.generatedAt,
+    workspaceId: workspace.config.workspaceId,
+    worktreeId: workspace.worktree?.worktreeId ?? null,
+    changed: scan.captured,
+    scan,
+    symbols,
+    harness,
+    derived,
+    boundaries: {
+      activation: "Explicit long-running command or API call only; Qarinah does not install a hidden background service.",
+      scope: "Only the initialized project and its configured capture policy are observed.",
+      content: "Ignored, linked, secret-named, dependency, generated, and out-of-root paths remain excluded by the project scanner.",
+      compaction: "Compact checkpoints are cited projections; the verified ledger and optional encrypted archive remain the recoverable sources."
+    }
+  };
+  return deepFreezeJson({ ...core, cycleHash: sha256(core) });
+}
+function createProjectMemoryWatcher(options = {}) {
+  const normalized = normalizeWatcherOptions(options);
+  const stopController = new AbortController();
+  const signal = normalized.signal === void 0 ? stopController.signal : AbortSignal.any([normalized.signal, stopController.signal]);
+  let running = false;
+  let stopping = false;
+  let cycles = 0;
+  let changedCycles = 0;
+  let lastCycle = null;
+  let lastError = null;
+  const status = () => deepFreezeJson({
+    schemaVersion: "qarinah.project-memory-watcher-status.v1",
+    running,
+    stopping,
+    intervalMs: normalized.intervalMs,
+    cycles,
+    changedCycles,
+    lastCycle,
+    lastError
+  });
+  async function run2() {
+    if (running) throw new TypeError("Project memory watcher is already running.");
+    running = true;
+    stopping = false;
+    try {
+      while (!stopping) {
+        throwIfAborted(signal);
+        try {
+          const cycle = await runProjectMemoryCycle({ ...normalized.cycle, signal });
+          cycles += 1;
+          if (cycle.changed) changedCycles += 1;
+          lastCycle = cycle;
+          lastError = null;
+          if (normalized.onCycle !== null) await normalized.onCycle(cycle);
+        } catch (error) {
+          if (signal.aborted || stopping) throw error;
+          lastError = Object.freeze({
+            name: typeof error?.name === "string" ? error.name : "Error",
+            code: typeof error?.code === "string" ? error.code : null,
+            message: typeof error?.message === "string" ? error.message.slice(0, 1e3) : "Project memory cycle failed."
+          });
+          if (normalized.onError === null) throw error;
+          await normalized.onError(error, status());
+        }
+        if (!stopping) await abortableDelay(normalized.intervalMs, signal);
+      }
+    } catch (error) {
+      if (!stopping && !normalized.signal?.aborted) throw error;
+    } finally {
+      running = false;
+      stopping = false;
+    }
+    return status();
+  }
+  return Object.freeze({
+    run: run2,
+    stop() {
+      stopping = true;
+      stopController.abort();
+    },
+    status
+  });
+}
+
 // src/archive-import.js
 init_canonical();
 init_errors();
@@ -9653,508 +10398,6 @@ async function measureMemoryFootprint(options = {}) {
       cost: "Flat uncached input-token arithmetic only; excludes output, reasoning, tools, caching, retrieval, hosting, and fixed fees."
     }
   });
-}
-
-// src/coding-harness.js
-init_canonical();
-init_capture_policy();
-init_git_worktrees();
-init_markdown();
-init_redact();
-init_indexer();
-init_store();
-init_workspace();
-init_abort();
-var CODING_CONTEXT_HARNESS_SCHEMA_VERSION = "qarinah.coding-context-harness.v1";
-var HARNESS_ADAPTER = "qarinah.coding-harness";
-var DEFAULT_QUERY = "project decisions changes tool outcomes tests failures next steps";
-var PUBLISHED_BENCHMARK = Object.freeze({
-  scope: "published six-fixture repeated-input estimate",
-  fixtureCount: 6,
-  baselineTokens: 442113,
-  deliveredTokens: 5682,
-  reductionPercent: 98.71,
-  exactReductionPercent: 98.7148,
-  baselineToPackRatio: 77.81,
-  estimator: "fixture token counts from the published comparison artifact",
-  guarantee: false
-});
-function integer2(value, label, minimum, maximum, fallback) {
-  const selected3 = value ?? fallback;
-  if (!Number.isSafeInteger(selected3) || selected3 < minimum || selected3 > maximum) {
-    throw new TypeError(`${label} must be an integer from ${minimum} to ${maximum}.`);
-  }
-  return selected3;
-}
-function boolean(value, label, fallback) {
-  const selected3 = value ?? fallback;
-  if (typeof selected3 !== "boolean") throw new TypeError(`${label} must be a boolean.`);
-  return selected3;
-}
-function text(value, label, maximum, fallback) {
-  const selected3 = value ?? fallback;
-  if (typeof selected3 !== "string" || selected3.length > maximum) {
-    throw new TypeError(`${label} must be a string up to ${maximum} characters.`);
-  }
-  return selected3;
-}
-function stringList(value, label) {
-  if (value === void 0) return void 0;
-  if (!Array.isArray(value) || value.length > 64 || value.some((item) => typeof item !== "string" || item.trim() === "" || item.length > 256)) {
-    throw new TypeError(`${label} must contain at most 64 non-empty strings up to 256 characters.`);
-  }
-  if (new Set(value).size !== value.length) throw new TypeError(`${label} cannot contain duplicates.`);
-  return Object.freeze([...value].sort());
-}
-function normalizeSummarizer(value) {
-  if (value === void 0 || value === null) return null;
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
-    throw new TypeError("summarizer must be a record.");
-  }
-  const unknown = Object.keys(value).filter((key) => !["id", "summarize"].includes(key));
-  if (unknown.length > 0) throw new TypeError(`summarizer contains unknown field(s): ${unknown.join(", ")}.`);
-  if (typeof value.id !== "string" || !/^[a-z0-9][a-z0-9._-]{0,63}$/u.test(value.id)) {
-    throw new TypeError("summarizer.id must be a lowercase identifier up to 64 characters.");
-  }
-  if (typeof value.summarize !== "function") throw new TypeError("summarizer.summarize must be a function.");
-  return value;
-}
-function normalizeOptions(options) {
-  if (!options || typeof options !== "object" || Array.isArray(options)) {
-    throw new TypeError("Coding harness options must be a record.");
-  }
-  const allowed = /* @__PURE__ */ new Set([
-    "cwd",
-    "query",
-    "scope",
-    "maxChars",
-    "maxTokens",
-    "reserveTokens",
-    "limit",
-    "maxSummaryChars",
-    "authorityScopes",
-    "repositoryIds",
-    "summarizer",
-    "record",
-    "rebuild",
-    "updateCheckpoint",
-    "signal",
-    "clock"
-  ]);
-  const unknown = Object.keys(options).filter((key) => !allowed.has(key));
-  if (unknown.length > 0) throw new TypeError(`Coding harness options contain unknown field(s): ${unknown.join(", ")}.`);
-  if (options.cwd !== void 0 && (typeof options.cwd !== "string" || options.cwd.trim() === "")) {
-    throw new TypeError("cwd must be a non-empty path string.");
-  }
-  const scope = options.scope ?? "current";
-  if (!["current", "repository"].includes(scope)) throw new TypeError("scope must be current or repository.");
-  const signal = validateAbortSignal(options.signal);
-  if (options.clock !== void 0 && typeof options.clock !== "function") throw new TypeError("clock must be a function.");
-  const now = options.clock === void 0 ? /* @__PURE__ */ new Date() : options.clock();
-  if (!(now instanceof Date) || !Number.isFinite(now.getTime())) throw new TypeError("clock must return a valid Date.");
-  const generatedAt = now.toISOString();
-  if (generatedAt.length !== 24) throw new TypeError("clock must return a four-digit UTC calendar year.");
-  const record2 = boolean(options.record, "record", false);
-  if (scope === "repository" && record2) {
-    throw new TypeError("record cannot be combined with repository scope; record each worktree independently.");
-  }
-  return Object.freeze({
-    cwd: options.cwd ?? process.cwd(),
-    query: text(options.query, "query", 4096, DEFAULT_QUERY),
-    scope,
-    maxChars: integer2(options.maxChars, "maxChars", 512, 1e6, 12e3),
-    maxTokens: options.maxTokens === void 0 ? void 0 : integer2(options.maxTokens, "maxTokens", 128, 1e6),
-    reserveTokens: options.reserveTokens === void 0 ? void 0 : integer2(options.reserveTokens, "reserveTokens", 0, 999936),
-    limit: integer2(options.limit, "limit", 1, 64, 20),
-    maxSummaryChars: integer2(options.maxSummaryChars, "maxSummaryChars", 256, 16384, 2e3),
-    authorityScopes: stringList(options.authorityScopes, "authorityScopes"),
-    repositoryIds: stringList(options.repositoryIds, "repositoryIds"),
-    summarizer: normalizeSummarizer(options.summarizer),
-    record: record2,
-    rebuild: boolean(options.rebuild, "rebuild", true),
-    updateCheckpoint: boolean(options.updateCheckpoint, "updateCheckpoint", false),
-    signal,
-    generatedAt
-  });
-}
-function eventIdFromDigest(value) {
-  const digits = sha256(value).slice("sha256:".length, "sha256:".length + 32).split("");
-  digits[12] = "4";
-  digits[16] = "8";
-  const hex = digits.join("");
-  return `evt_${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
-}
-function comparison(baselineTokens, deliveredTokens) {
-  const savedTokens = Math.max(0, baselineTokens - deliveredTokens);
-  const reductionPercent = baselineTokens > 0 ? Math.round(savedTokens / baselineTokens * 1e4) / 100 : null;
-  const ratio = deliveredTokens > 0 ? Math.round(baselineTokens / deliveredTokens * 100) / 100 : null;
-  return Object.freeze({
-    baselineTokens,
-    deliveredTokens,
-    savedTokens,
-    reductionPercent,
-    baselineToPackRatio: ratio,
-    publishedBenchmarkMatched: reductionPercent !== null && reductionPercent >= PUBLISHED_BENCHMARK.reductionPercent
-  });
-}
-function sourceDescriptors(pack) {
-  return Object.freeze(pack.items.map((item) => Object.freeze({
-    eventId: item.eventId,
-    hash: item.hash,
-    kind: item.kind
-  })));
-}
-function deterministicSummary(pack, maximum) {
-  const lines = [
-    "Evidence-linked coding context checkpoint.",
-    `Query: ${pack.query || "latest project context"}`,
-    `Pack: ${pack.manifestHash}`
-  ];
-  for (const item of pack.items) {
-    const excerpt2 = item.excerpt.replace(/\s+/gu, " ").trim();
-    lines.push(`- [${item.kind}] ${item.title} (${item.eventId} ${item.hash})${excerpt2 ? `: ${excerpt2}` : ""}`);
-  }
-  const joined = markdownSafeText(redactText(lines.join("\n")));
-  if (joined.length <= maximum) return joined;
-  const marker = `
-[QARINAH_COMPACTED:${joined.length - maximum}]`;
-  return `${joined.slice(0, Math.max(0, maximum - marker.length))}${marker}`;
-}
-function normalizeSummaryResult(value, maximum) {
-  const candidate = typeof value === "string" ? { text: value } : value;
-  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) {
-    throw new TypeError("summarizer.summarize must return a string or a record.");
-  }
-  const unknown = Object.keys(candidate).filter((key) => !["text", "model"].includes(key));
-  if (unknown.length > 0) throw new TypeError(`summarizer result contains unknown field(s): ${unknown.join(", ")}.`);
-  if (typeof candidate.text !== "string" || candidate.text.trim() === "" || candidate.text.length > maximum) {
-    throw new TypeError(`summarizer result text must be non-empty and no longer than ${maximum} characters.`);
-  }
-  if (candidate.model !== void 0 && (typeof candidate.model !== "string" || candidate.model.trim() === "" || candidate.model.length > 256)) {
-    throw new TypeError("summarizer result model must be a non-empty string up to 256 characters.");
-  }
-  return Object.freeze({ text: markdownSafeText(redactText(candidate.text)), model: candidate.model ?? null });
-}
-function runKey(options, worktree, sourceHeadHash) {
-  return sha256({
-    query: options.query,
-    maxChars: options.maxChars,
-    maxTokens: options.maxTokens ?? null,
-    reserveTokens: options.reserveTokens ?? null,
-    limit: options.limit,
-    maxSummaryChars: options.maxSummaryChars,
-    summarizer: options.summarizer?.id ?? "deterministic-extractive-v1",
-    repositoryId: worktree?.repositoryId ?? null,
-    worktreeId: worktree?.worktreeId ?? null,
-    sourceHeadHash
-  });
-}
-function existingHarnessRecord(events, key) {
-  return [...events].reverse().find((event) => event.provenance?.adapter === HARNESS_ADAPTER && event.data?.codingHarness?.runKey === key) ?? null;
-}
-function latestHarnessCheckpoint(events, options, worktree) {
-  return [...events].reverse().find((event) => event.provenance?.adapter === HARNESS_ADAPTER && event.data?.codingHarness?.query === options.query && (event.data?.codingHarness?.worktreeId ?? null) === (worktree?.worktreeId ?? null) && (event.data?.codingHarness?.repositoryId ?? null) === (worktree?.repositoryId ?? null)) ?? null;
-}
-function incrementalState(sourceEvents, sourceHeadHash, previous) {
-  const previousSourceHeadHash = previous?.data?.codingHarness?.sourceHeadHash ?? null;
-  if (previous === null) {
-    return Object.freeze({
-      mode: "initial",
-      previousCheckpointEventId: null,
-      previousSourceHeadHash: null,
-      currentSourceHeadHash: sourceHeadHash,
-      sourceEventCount: sourceEvents.length,
-      changedEventCount: sourceEvents.length
-    });
-  }
-  if (previousSourceHeadHash === sourceHeadHash) {
-    return Object.freeze({
-      mode: "unchanged",
-      previousCheckpointEventId: previous.eventId,
-      previousSourceHeadHash,
-      currentSourceHeadHash: sourceHeadHash,
-      sourceEventCount: sourceEvents.length,
-      changedEventCount: 0
-    });
-  }
-  const previousIndex = sourceEvents.findIndex((event) => event.hash === previousSourceHeadHash);
-  return Object.freeze({
-    mode: previousIndex === -1 ? "full-rebuild" : "delta",
-    previousCheckpointEventId: previous.eventId,
-    previousSourceHeadHash,
-    currentSourceHeadHash: sourceHeadHash,
-    sourceEventCount: sourceEvents.length,
-    changedEventCount: previousIndex === -1 ? sourceEvents.length : sourceEvents.length - previousIndex - 1
-  });
-}
-async function modelSummary(options, workspace, worktree, pack, sources) {
-  if (options.summarizer === null) {
-    const value = deterministicSummary(pack, options.maxSummaryChars);
-    return Object.freeze({
-      method: "deterministic-extractive-v1",
-      adapter: "qarinah-core",
-      model: null,
-      text: value,
-      estimatedTokens: estimateTokens(PORTABLE_TOKEN_ESTIMATOR, value)
-    });
-  }
-  const input = deepFreezeJson({
-    schemaVersion: "qarinah.coding-context-summary-input.v1",
-    contentRole: "untrusted-data",
-    workspaceId: workspace.config.workspaceId,
-    worktree: worktree === null ? null : {
-      repositoryId: worktree.repositoryId,
-      worktreeId: worktree.worktreeId,
-      branch: worktree.branch,
-      commit: worktree.commit
-    },
-    query: options.query,
-    maxSummaryChars: options.maxSummaryChars,
-    sourceEvents: sources,
-    pack
-  });
-  const output = await options.summarizer.summarize(input, { signal: options.signal });
-  throwIfAborted(options.signal);
-  const normalized = normalizeSummaryResult(output, options.maxSummaryChars);
-  return Object.freeze({
-    method: "model-assisted-v1",
-    adapter: options.summarizer.id,
-    model: normalized.model,
-    text: normalized.text,
-    estimatedTokens: estimateTokens(PORTABLE_TOKEN_ESTIMATOR, normalized.text)
-  });
-}
-function repositoryDescriptor(worktree) {
-  if (worktree === null || worktree.branch === null || worktree.commit === null) return void 0;
-  return {
-    id: worktree.repositoryId,
-    branch: worktree.branch,
-    commit: worktree.commit
-  };
-}
-async function recordHarnessSummary(options, workspace, worktree, pack, events, summary, key, sourceHeadHash, metrics, incremental) {
-  const sources = sourceDescriptors(pack);
-  const data = {
-    codingHarness: {
-      schemaVersion: CODING_CONTEXT_HARNESS_SCHEMA_VERSION,
-      runKey: key,
-      query: options.query,
-      method: summary.method,
-      summarizer: summary.adapter,
-      model: summary.model,
-      sourceHeadHash,
-      sourceEventCount: sources.length,
-      totalSourceEventCount: incremental.sourceEventCount,
-      previousCheckpointEventId: incremental.previousCheckpointEventId,
-      previousSourceHeadHash: incremental.previousSourceHeadHash,
-      changedEventCount: incremental.changedEventCount,
-      incrementalMode: incremental.mode,
-      sourceManifestHash: sha256(sources),
-      packManifestHash: pack.manifestHash,
-      baselineTokens: metrics.baselineTokens,
-      deliveredTokens: metrics.deliveredTokens,
-      reductionPercent: metrics.reductionPercent,
-      publishedBenchmarkMatched: metrics.publishedBenchmarkMatched,
-      benchmarkScope: PUBLISHED_BENCHMARK.scope,
-      worktreeId: worktree?.worktreeId ?? null,
-      repositoryId: worktree?.repositoryId ?? null
-    },
-    sourceEvents: sources
-  };
-  const payload = {
-    eventId: eventIdFromDigest({ workspaceId: workspace.config.workspaceId, runKey: key }),
-    kind: "summary",
-    actor: { type: "system", id: "qarinah-coding-harness" },
-    title: "Coding context checkpoint",
-    body: workspace.config.capture === "content" ? summary.text : "",
-    data,
-    confidence: summary.method === "model-assisted-v1" ? "inferred" : "extracted",
-    relations: sources.slice(0, 64).map((source) => ({ type: "derived_from", target: source.eventId })),
-    ...repositoryDescriptor(worktree) === void 0 ? {} : { repository: repositoryDescriptor(worktree) },
-    provenance: { adapter: HARNESS_ADAPTER, sourceId: `pack:${pack.manifestHash}` },
-    retention: { class: workspace.config.retentionClass, expiresAt: null }
-  };
-  const input = workspace.config.capture === "metadata" ? reviewMetadataEventInput(payload) : payload;
-  const event = await appendEvent(input, {
-    workspace,
-    capture: workspace.config.capture,
-    idempotent: true,
-    signal: options.signal
-  });
-  if (options.rebuild) await rebuildDerivedState(workspace.root, { signal: options.signal });
-  return Object.freeze({ status: existingHarnessRecord(events, key) ? "reused" : "created", eventId: event.eventId, hash: event.hash });
-}
-async function compileWorktree(options, descriptor, isCurrent) {
-  throwIfAborted(options.signal);
-  const workspace = await loadWorkspace(descriptor.root);
-  const events = await readEvents(workspace, {
-    updateCheckpoint: options.updateCheckpoint,
-    signal: options.signal
-  });
-  const sourceEvents = events.filter((event) => event.provenance?.adapter !== HARNESS_ADAPTER);
-  const sourceHeadHash = sourceEvents.at(-1)?.hash ?? null;
-  const worktree = workspace.worktree ?? (descriptor.schemaVersion === "qarinah.git-worktree.v1" ? descriptor : null);
-  const key = runKey(options, worktree, sourceHeadHash);
-  const previous = existingHarnessRecord(events, key);
-  const incremental = incrementalState(sourceEvents, sourceHeadHash, latestHarnessCheckpoint(events, options, worktree));
-  const pack = await compileContextFromVerifiedEvents(options.query, {
-    workspace,
-    events: sourceEvents,
-    maxChars: Math.min(options.maxChars, workspace.config.contextMaxChars),
-    ...options.maxTokens === void 0 ? {} : { maxTokens: options.maxTokens },
-    ...options.reserveTokens === void 0 ? {} : { reserveTokens: options.reserveTokens },
-    limit: options.limit,
-    minimumCoverage: "any",
-    rankingProfile: "admission-first-v2",
-    authorityScopes: options.authorityScopes,
-    repositoryIds: options.repositoryIds,
-    updateCheckpoint: options.updateCheckpoint,
-    clock: () => new Date(options.generatedAt)
-  });
-  const ledgerCharacters = sourceEvents.reduce((total, event) => total + canonicalStringify(event).length + 1, 0);
-  const baselineTokens = sourceEvents.length === 0 ? 0 : Math.ceil(ledgerCharacters / 4);
-  const metrics = comparison(baselineTokens, pack.budget.estimatedTokens);
-  const sources = sourceDescriptors(pack);
-  let summary;
-  let recording = Object.freeze({ status: "not-requested", eventId: null, hash: null });
-  if (options.record && previous !== null) {
-    const value = previous.body || "[Summary content was not retained by the metadata-only capture policy.]";
-    summary = Object.freeze({
-      method: previous.data?.codingHarness?.method ?? "deterministic-extractive-v1",
-      adapter: previous.data?.codingHarness?.summarizer ?? "qarinah-core",
-      model: previous.data?.codingHarness?.model ?? null,
-      text: value,
-      estimatedTokens: estimateTokens(PORTABLE_TOKEN_ESTIMATOR, value)
-    });
-    recording = Object.freeze({ status: "reused", eventId: previous.eventId, hash: previous.hash });
-  } else {
-    summary = await modelSummary(options, workspace, worktree, pack, sources);
-    if (options.record) {
-      recording = await recordHarnessSummary(
-        options,
-        workspace,
-        worktree,
-        pack,
-        events,
-        summary,
-        key,
-        sourceHeadHash,
-        metrics,
-        incremental
-      );
-    }
-  }
-  return deepFreezeJson({
-    status: "ready",
-    current: isCurrent,
-    root: workspace.root,
-    workspaceId: workspace.config.workspaceId,
-    capture: workspace.config.capture,
-    worktree,
-    source: {
-      eventCount: events.length,
-      sourceEventCount: sourceEvents.length,
-      headHash: events.at(-1)?.hash ?? null,
-      sourceHeadHash,
-      ledgerCharacters,
-      ledgerEstimatedTokens: baselineTokens
-    },
-    pack,
-    summary,
-    comparison: metrics,
-    incremental,
-    recording
-  });
-}
-function aggregate(worktrees) {
-  const ready = worktrees.filter((entry) => entry.status === "ready");
-  const baselineTokens = ready.reduce((total, entry) => total + entry.comparison.baselineTokens, 0);
-  const deliveredTokens = ready.reduce((total, entry) => total + entry.comparison.deliveredTokens, 0);
-  return Object.freeze({
-    discoveredWorktrees: worktrees.length,
-    readyWorktrees: ready.length,
-    uninitializedWorktrees: worktrees.filter((entry) => entry.status === "uninitialized").length,
-    complete: worktrees.every((entry) => entry.status === "ready"),
-    comparison: comparison(baselineTokens, deliveredTokens)
-  });
-}
-async function runCodingContextHarness(options = {}) {
-  const normalized = normalizeOptions(options);
-  throwIfAborted(normalized.signal);
-  const currentWorkspace = await loadWorkspace(normalized.cwd);
-  let descriptors;
-  if (normalized.scope === "repository") {
-    const discovered = await listGitWorktrees(currentWorkspace.root);
-    descriptors = discovered.length === 0 ? [{ root: currentWorkspace.root, current: true, initialized: true }] : discovered;
-  } else {
-    descriptors = [{
-      ...currentWorkspace.worktree ?? {},
-      root: currentWorkspace.root,
-      current: true,
-      initialized: true
-    }];
-  }
-  const worktrees = [];
-  for (const descriptor of descriptors) {
-    if (descriptor.initialized === false) {
-      worktrees.push(deepFreezeJson({ status: "uninitialized", current: descriptor.current, root: descriptor.root, worktree: descriptor }));
-      continue;
-    }
-    worktrees.push(await compileWorktree(normalized, descriptor, descriptor.current === true));
-  }
-  const base = {
-    schemaVersion: CODING_CONTEXT_HARNESS_SCHEMA_VERSION,
-    generatedAt: normalized.generatedAt,
-    query: normalized.query,
-    scope: normalized.scope,
-    contentRole: "untrusted-data",
-    benchmark: PUBLISHED_BENCHMARK,
-    worktrees,
-    aggregate: aggregate(worktrees),
-    boundaries: {
-      sourceOfTruth: "Each worktree's verified .qarinah/events/events.jsonl ledger remains authoritative.",
-      worktreeIsolation: "Sibling worktree contents remain in separate packs; this result does not merge their authority.",
-      capture: "Only host-exposed events permitted by the workspace capture policy are retained; hidden reasoning and ignored files are not captured.",
-      modelSummary: "Optional model output is untrusted, lossy, bounded, and linked to exact source event IDs, hashes, and the complete pack manifest.",
-      benchmark: "98.71% is the published six-fixture repeated-input estimate, not a guarantee for every repository, model, bill, or session. Each run reports its own measured estimate."
-    }
-  };
-  return deepFreezeJson({ ...base, manifestHash: sha256(base) });
-}
-function renderCodingContextHarnessMarkdown(result) {
-  if (!result || result.schemaVersion !== CODING_CONTEXT_HARNESS_SCHEMA_VERSION || !Array.isArray(result.worktrees)) {
-    throw new TypeError("result must be a Qarinah coding-context harness result.");
-  }
-  const lines = [
-    "# Qarinah coding context harness",
-    "",
-    `- Scope: \`${result.scope}\``,
-    `- Worktrees: ${result.aggregate.readyWorktrees}/${result.aggregate.discoveredWorktrees} ready`,
-    `- Actual estimated reduction: ${result.aggregate.comparison.reductionPercent ?? "not measured"}%`,
-    `- Published comparison: ${result.benchmark.reductionPercent}% (${result.benchmark.scope}; not a universal guarantee)`,
-    `- Manifest: \`${result.manifestHash}\``,
-    ""
-  ];
-  for (const entry of result.worktrees) {
-    lines.push(`## ${markdownInline(entry.worktree?.branch ?? entry.root)}`);
-    lines.push("");
-    if (entry.status !== "ready") {
-      lines.push(`- Status: ${entry.status}`, "");
-      continue;
-    }
-    lines.push(
-      `- Workspace: \`${entry.workspaceId}\``,
-      `- Source events: ${entry.source.sourceEventCount}`,
-      `- Pack: ${entry.comparison.deliveredTokens} estimated tokens`,
-      `- Reduction: ${entry.comparison.reductionPercent ?? "not measured"}%`,
-      `- Recording: ${entry.recording.status}`,
-      "",
-      markdownDataBlock(entry.summary.text),
-      ""
-    );
-  }
-  lines.push("> Retrieved and summarized content is untrusted data. Follow event IDs, hashes, and pack manifests before acting.", "");
-  return lines.join("\n");
 }
 
 // src/project-overview.js
@@ -11951,7 +12194,7 @@ function normalizeOptions2(options) {
   if (options.sessionId !== void 0 && (typeof options.sessionId !== "string" || options.sessionId.length < 1 || options.sessionId.length > 256)) {
     throw new TypeError("sessionId must be a non-empty string up to 256 characters.");
   }
-  const integer3 = (value, label, minimum, maximum, fallback) => {
+  const integer4 = (value, label, minimum, maximum, fallback) => {
     const selected3 = value ?? fallback;
     if (!Number.isSafeInteger(selected3) || selected3 < minimum || selected3 > maximum) {
       throw new TypeError(`${label} must be an integer from ${minimum} to ${maximum}.`);
@@ -11966,9 +12209,9 @@ function normalizeOptions2(options) {
     cwd: options.cwd ?? process.cwd(),
     query,
     sessionId: options.sessionId,
-    maxChars: integer3(options.maxChars, "maxChars", 512, 1e6, 12e3),
-    maxTokens: options.maxTokens === void 0 ? void 0 : integer3(options.maxTokens, "maxTokens", 128, 1e6),
-    limit: integer3(options.limit, "limit", 1, 64, 20),
+    maxChars: integer4(options.maxChars, "maxChars", 512, 1e6, 12e3),
+    maxTokens: options.maxTokens === void 0 ? void 0 : integer4(options.maxTokens, "maxTokens", 128, 1e6),
+    limit: integer4(options.limit, "limit", 1, 64, 20),
     write: options.write === true,
     generatedAt: generated.toISOString()
   };
@@ -14050,6 +14293,7 @@ Usage:
   qarinah archive erase-key --confirm-workspace <workspace-id>
   qarinah symbols build
   qarinah symbols query [text] [--limit n] [--kind function,class,...]
+  qarinah watch [--once] [--interval-ms n] [--no-compact] [--no-symbols] [--no-rebuild] [--query text]
   qarinah overview [--format json|markdown]
   qarinah footprint [query] [--baseline-tokens n] [--rate-per-million n] [--max-chars n] [--max-tokens n]
   qarinah receipts [query] [--session <id>] [--write] [--max-chars n] [--max-tokens n] [--limit n]
@@ -14305,7 +14549,7 @@ async function run(argv) {
   if (command === "scan") {
     const parsed = strictValueOptions(args, "scan", ["--max-files", "--max-file-bytes", "--max-total-bytes", "--max-depth"]);
     if (parsed.positionals.length !== 0) throw new TypeError("scan accepts options only and always uses the trusted workspace root.");
-    const integer3 = (name) => {
+    const integer4 = (name) => {
       const value = parsed.values.get(name);
       if (value === void 0) return void 0;
       if (!/^[0-9]+$/.test(value)) throw new TypeError(`${name} must be a positive integer.`);
@@ -14313,10 +14557,10 @@ async function run(argv) {
     };
     const result = await scanProjectStructure({
       cwd: process2.cwd(),
-      maxFiles: integer3("--max-files"),
-      maxFileBytes: integer3("--max-file-bytes"),
-      maxTotalBytes: integer3("--max-total-bytes"),
-      maxDepth: integer3("--max-depth")
+      maxFiles: integer4("--max-files"),
+      maxFileBytes: integer4("--max-file-bytes"),
+      maxTotalBytes: integer4("--max-total-bytes"),
+      maxDepth: integer4("--max-depth")
     });
     if (result.captured) await rebuildDerivedState(process2.cwd());
     process2.stdout.write(`${JSON.stringify(result, null, 2)}
@@ -14326,7 +14570,7 @@ async function run(argv) {
   if (command === "import") {
     const parsed = strictValueOptions(args, "import", ["--format", "--mode", "--max-bytes", "--max-files", "--max-records", "--max-line-bytes"]);
     if (parsed.positionals.length !== 1) throw new TypeError("import requires exactly one archive file or directory.");
-    const integer3 = (name) => {
+    const integer4 = (name) => {
       const value = parsed.values.get(name);
       if (value === void 0) return void 0;
       if (!/^[0-9]+$/.test(value) || Number(value) < 1) throw new TypeError(`${name} must be a positive integer.`);
@@ -14336,10 +14580,10 @@ async function run(argv) {
       cwd: process2.cwd(),
       format: parsed.values.get("--format") ?? "auto",
       mode: parsed.values.get("--mode") ?? "compact",
-      maxBytes: integer3("--max-bytes"),
-      maxFiles: integer3("--max-files"),
-      maxRecords: integer3("--max-records"),
-      maxLineBytes: integer3("--max-line-bytes")
+      maxBytes: integer4("--max-bytes"),
+      maxFiles: integer4("--max-files"),
+      maxRecords: integer4("--max-records"),
+      maxLineBytes: integer4("--max-line-bytes")
     });
     process2.stdout.write(`${JSON.stringify(result, null, 2)}
 `);
@@ -14350,7 +14594,7 @@ async function run(argv) {
     if (parsed.positionals.length === 0) throw new TypeError("backup requires at least one archive file or directory.");
     const destination = parsed.values.get("--destination");
     if (!destination) throw new TypeError("backup requires --destination <external-directory>.");
-    const integer3 = (name) => {
+    const integer4 = (name) => {
       const value = parsed.values.get(name);
       if (value === void 0) return void 0;
       if (!/^[0-9]+$/.test(value) || Number(value) < 1) throw new TypeError(`${name} must be a positive integer.`);
@@ -14361,8 +14605,8 @@ async function run(argv) {
       path22.resolve(destination),
       {
         cwd: process2.cwd(),
-        maxBytes: integer3("--max-bytes"),
-        maxFiles: integer3("--max-files")
+        maxBytes: integer4("--max-bytes"),
+        maxFiles: integer4("--max-files")
       }
     );
     process2.stdout.write(`${JSON.stringify(result, null, 2)}
@@ -14374,7 +14618,7 @@ async function run(argv) {
     if (action === "create") {
       const parsed = strictValueOptions(archiveArgs, "archive create", ["--label", "--max-files", "--max-file-bytes", "--max-total-bytes"]);
       if (parsed.positionals.length !== 1) throw new TypeError("archive create requires exactly one workspace path.");
-      const integer3 = (name) => {
+      const integer4 = (name) => {
         const value = parsed.values.get(name);
         if (value === void 0) return void 0;
         if (!/^[0-9]+$/u.test(value) || Number(value) < 1) throw new TypeError(`${name} must be a positive integer.`);
@@ -14383,9 +14627,9 @@ async function run(argv) {
       process2.stdout.write(`${JSON.stringify(await createContentArchive(parsed.positionals[0], {
         cwd: process2.cwd(),
         label: parsed.values.get("--label"),
-        maxFiles: integer3("--max-files"),
-        maxFileBytes: integer3("--max-file-bytes"),
-        maxTotalBytes: integer3("--max-total-bytes")
+        maxFiles: integer4("--max-files"),
+        maxFileBytes: integer4("--max-file-bytes"),
+        maxTotalBytes: integer4("--max-total-bytes")
       }), null, 2)}
 `);
       return;
@@ -14468,6 +14712,66 @@ async function run(argv) {
     }
     throw new TypeError("symbols requires build or query.");
   }
+  if (command === "watch") {
+    const flags = /* @__PURE__ */ new Set(["--once", "--no-compact", "--no-symbols", "--no-rebuild"]);
+    const values = /* @__PURE__ */ new Set(["--interval-ms", "--query"]);
+    const parsed = { flags: /* @__PURE__ */ new Set(), values: /* @__PURE__ */ new Map() };
+    for (let index = 0; index < args.length; index += 1) {
+      const value = args[index];
+      if (flags.has(value)) {
+        if (parsed.flags.has(value)) throw new TypeError(`watch received ${value} more than once.`);
+        parsed.flags.add(value);
+        continue;
+      }
+      if (!values.has(value)) throw new TypeError(`watch does not support ${value}.`);
+      if (parsed.values.has(value)) throw new TypeError(`watch received ${value} more than once.`);
+      if (index === args.length - 1 || args[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
+      parsed.values.set(value, args[index + 1]);
+      index += 1;
+    }
+    const interval = parsed.values.get("--interval-ms");
+    if (interval !== void 0 && (!/^[0-9]+$/u.test(interval) || Number(interval) < 250 || Number(interval) > 36e5)) {
+      throw new TypeError("--interval-ms must be from 250 to 3600000.");
+    }
+    const options = {
+      cwd: process2.cwd(),
+      query: parsed.values.get("--query"),
+      compact: !parsed.flags.has("--no-compact"),
+      symbols: !parsed.flags.has("--no-symbols"),
+      rebuild: !parsed.flags.has("--no-rebuild")
+    };
+    if (parsed.flags.has("--once")) {
+      process2.stdout.write(`${JSON.stringify(await runProjectMemoryCycle(options), null, 2)}
+`);
+      return;
+    }
+    const controller = new AbortController();
+    const stop = () => controller.abort();
+    process2.once("SIGINT", stop);
+    process2.once("SIGTERM", stop);
+    const watcher = createProjectMemoryWatcher({
+      ...options,
+      intervalMs: interval === void 0 ? void 0 : Number(interval),
+      signal: controller.signal,
+      onCycle(cycle) {
+        process2.stdout.write(`${JSON.stringify(cycle)}
+`);
+      },
+      onError(error) {
+        process2.stderr.write(`${JSON.stringify({ error: error?.code ?? error?.name ?? "WATCH_CYCLE_FAILED", message: error?.message ?? "Project memory cycle failed." })}
+`);
+      }
+    });
+    try {
+      await watcher.run();
+    } catch (error) {
+      if (!controller.signal.aborted) throw error;
+    } finally {
+      process2.removeListener("SIGINT", stop);
+      process2.removeListener("SIGTERM", stop);
+    }
+    return;
+  }
   if (command === "overview") {
     const parsed = strictValueOptions(args, "overview", ["--format"]);
     if (parsed.positionals.length !== 0) throw new TypeError("overview accepts options only.");
@@ -14480,7 +14784,7 @@ async function run(argv) {
   }
   if (command === "footprint") {
     const parsed = strictValueOptions(args, "footprint", ["--baseline-tokens", "--rate-per-million", "--max-chars", "--max-tokens"]);
-    const integer3 = (name) => {
+    const integer4 = (name) => {
       const value = parsed.values.get(name);
       if (value === void 0) return void 0;
       if (!/^[0-9]+$/u.test(value)) throw new TypeError(`${name} must be a non-negative integer.`);
@@ -14494,10 +14798,10 @@ async function run(argv) {
     const result = await measureMemoryFootprint({
       cwd: process2.cwd(),
       query: parsed.positionals.join(" ") || void 0,
-      baselineTokens: integer3("--baseline-tokens"),
+      baselineTokens: integer4("--baseline-tokens"),
       ratePerMillion,
-      maxChars: integer3("--max-chars"),
-      maxTokens: integer3("--max-tokens")
+      maxChars: integer4("--max-chars"),
+      maxTokens: integer4("--max-tokens")
     });
     process2.stdout.write(`${JSON.stringify(result, null, 2)}
 `);
