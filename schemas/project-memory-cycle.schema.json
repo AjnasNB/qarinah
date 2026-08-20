@@ -4,13 +4,16 @@
   "title": "Qarinah project memory cycle",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "generatedAt", "workspaceId", "worktreeId", "changed", "scan", "symbols", "harness", "derived", "boundaries", "cycleHash"],
+  "required": ["schemaVersion", "generatedAt", "workspaceId", "worktreeId", "changed", "incremental", "recovery", "state", "scan", "symbols", "harness", "derived", "boundaries", "cycleHash"],
   "properties": {
-    "schemaVersion": { "const": "qarinah.project-memory-cycle.v1" },
+    "schemaVersion": { "const": "qarinah.project-memory-cycle.v2" },
     "generatedAt": { "type": "string", "format": "date-time" },
     "workspaceId": { "type": "string", "pattern": "^ws_[0-9a-f]{32}$" },
     "worktreeId": { "type": ["string", "null"], "pattern": "^wt_[0-9a-f]{32}$" },
     "changed": { "type": "boolean" },
+    "incremental": { "$ref": "#/$defs/incremental" },
+    "recovery": { "$ref": "#/$defs/recovery" },
+    "state": { "$ref": "#/$defs/cycleState" },
     "scan": { "$ref": "#/$defs/scan" },
     "symbols": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/symbols" }] },
     "harness": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/harness" }] },
@@ -30,6 +33,41 @@
   },
   "$defs": {
     "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "incremental": {
+      "type": "object", "additionalProperties": false, "required": ["mode", "changeCount", "snapshotHash"],
+      "properties": {
+        "mode": { "enum": ["initial", "delta", "unchanged"] },
+        "changeCount": { "type": "integer", "minimum": 0 },
+        "snapshotHash": { "$ref": "#/$defs/hash" }
+      }
+    },
+    "recovery": {
+      "type": "object", "additionalProperties": false,
+      "required": ["detected", "priorStatus", "priorCycleId", "priorPhase", "priorStateHash", "action"],
+      "properties": {
+        "detected": { "type": "boolean" },
+        "priorStatus": { "enum": ["none", "valid", "invalid"] },
+        "priorCycleId": { "type": ["string", "null"], "pattern": "^cycle_[0-9a-f]{32}$" },
+        "priorPhase": { "type": ["string", "null"], "enum": [null, "invalid", "started", "scan-complete", "symbols-complete", "compaction-complete", "derived-complete", "completed", "failed"] },
+        "priorStateHash": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/hash" }] },
+        "action": { "enum": ["none", "replayed-idempotent-cycle"] }
+      }
+    },
+    "cycleState": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schemaVersion", "workspaceId", "cycleId", "generatedAt", "phase", "phaseOrdinal", "sourceSnapshotHash", "failureCode", "stateHash"],
+      "properties": {
+        "schemaVersion": { "const": "qarinah.project-memory-cycle-state.v1" },
+        "workspaceId": { "type": "string", "pattern": "^ws_[0-9a-f]{32}$" },
+        "cycleId": { "type": "string", "pattern": "^cycle_[0-9a-f]{32}$" },
+        "generatedAt": { "type": "string", "format": "date-time" },
+        "phase": { "enum": ["started", "scan-complete", "symbols-complete", "compaction-complete", "derived-complete", "completed", "failed"] },
+        "phaseOrdinal": { "type": "integer", "minimum": 0, "maximum": 6 },
+        "sourceSnapshotHash": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/hash" }] },
+        "failureCode": { "type": ["string", "null"], "maxLength": 128 },
+        "stateHash": { "$ref": "#/$defs/hash" }
+      }
+    },
     "worktree": {
       "type": ["object", "null"],
       "additionalProperties": false,

@@ -607,7 +607,7 @@ export function measureMemoryFootprint(options?: {
   inMemory?: boolean;
   updateCheckpoint?: boolean;
 }): Promise<Readonly<QarinahMemoryFootprint>>;
-export const PROJECT_MEMORY_CYCLE_SCHEMA_VERSION: "qarinah.project-memory-cycle.v1";
+export const PROJECT_MEMORY_CYCLE_SCHEMA_VERSION: "qarinah.project-memory-cycle.v2";
 export const FACT_CONSOLIDATION_SCHEMA_VERSION: "qarinah.fact-consolidation.v1";
 export type QarinahConsolidatedFactCategory = "decision" | "constraint" | "tool" | "outcome" | "evidence" | "conflict" | "summary";
 export interface QarinahConsolidatedFact {
@@ -664,11 +664,31 @@ export function consolidateProjectFacts(options?: {
   clock?: () => Date;
 }): Promise<Readonly<QarinahFactConsolidation>>;
 export interface QarinahProjectMemoryCycle {
-  readonly schemaVersion: "qarinah.project-memory-cycle.v1";
+  readonly schemaVersion: "qarinah.project-memory-cycle.v2";
   readonly generatedAt: string;
   readonly workspaceId: string;
   readonly worktreeId: string | null;
   readonly changed: boolean;
+  readonly incremental: Readonly<{ mode: "initial" | "delta" | "unchanged"; changeCount: number; snapshotHash: `sha256:${string}` }>;
+  readonly recovery: Readonly<{
+    detected: boolean;
+    priorStatus: "none" | "valid" | "invalid";
+    priorCycleId: string | null;
+    priorPhase: "invalid" | "started" | "scan-complete" | "symbols-complete" | "compaction-complete" | "derived-complete" | "completed" | "failed" | null;
+    priorStateHash: `sha256:${string}` | null;
+    action: "none" | "replayed-idempotent-cycle";
+  }>;
+  readonly state: Readonly<{
+    schemaVersion: "qarinah.project-memory-cycle-state.v1";
+    workspaceId: string;
+    cycleId: string;
+    generatedAt: string;
+    phase: "completed";
+    phaseOrdinal: 5;
+    sourceSnapshotHash: `sha256:${string}`;
+    failureCode: null;
+    stateHash: `sha256:${string}`;
+  }>;
   readonly scan: Readonly<Record<string, unknown>>;
   readonly symbols: null | Readonly<{ schemaVersion: string; manifestHash: string; files: number; symbols: number; references: number; complete: boolean }>;
   readonly harness: null | Readonly<{

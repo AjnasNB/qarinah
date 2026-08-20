@@ -768,7 +768,7 @@ npx qarinah watch --once
 npx qarinah watch --interval-ms 2000 --query "current implementation decisions"
 ```
 
-Options are `--once`, `--interval-ms 250..3600000`, `--query`, `--no-compact`, `--no-symbols`, and `--no-rebuild`. The watcher never installs itself as an operating-system service. A changed scan refreshes the selected stages serially; an unchanged scan returns `changed:false` without duplicate writes. Each JSON cycle contains the exact snapshot, optional symbol/checkpoint/derived receipts, explicit boundaries, and a `cycleHash`.
+Options are `--once`, `--interval-ms 250..3600000`, `--query`, `--no-compact`, `--no-symbols`, and `--no-rebuild`. The watcher never installs itself as an operating-system service. A changed scan refreshes the selected stages serially; an unchanged scan returns `changed:false` without duplicate writes. Each v2 JSON cycle contains the exact snapshot, initial/delta/unchanged mode, atomic phase state, interrupted-cycle recovery status, optional symbol/checkpoint/derived receipts, explicit boundaries, and a `cycleHash`.
 
 ## `facts`
 

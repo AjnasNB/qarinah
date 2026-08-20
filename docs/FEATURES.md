@@ -24,6 +24,7 @@ Qarinah is evidence-linked project memory for coding agents. It keeps an inspect
 - `qarinah watch` runs in the foreground and serially refreshes project structure, symbols, one cited incremental checkpoint, and all derived read models after a real source change.
 - Unchanged snapshots do not append duplicate events or rebuild projections.
 - The watcher remains inside one initialized workspace and applies the same ignore, secret-name, link, capture-policy, and byte/count ceilings as the ordinary project scanner.
+- A hash-bound atomic phase journal exposes initial, delta, unchanged, interrupted, and recovered cycles instead of silently losing the last refresh state after a process crash.
 - Stop signals and API cancellation interrupt polling. Qarinah does not install a silent desktop-wide collector.
 
 ## Cited fact consolidation

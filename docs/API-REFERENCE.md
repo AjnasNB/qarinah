@@ -1143,7 +1143,7 @@ The accepted structural record schema is exported as `qarinah/schemas/cockroach-
 
 ### `runProjectMemoryCycle(options?)`
 
-Runs one bounded source scan. When the snapshot changed, it optionally rebuilds the local symbol graph, records one idempotent cited harness checkpoint, and regenerates derived views. It returns a `qarinah.project-memory-cycle.v1` receipt whose `cycleHash` binds the complete cycle result.
+Runs one bounded source scan. When the snapshot changed, it optionally rebuilds the local symbol graph, records one idempotent cited harness checkpoint, and regenerates derived views. It returns a `qarinah.project-memory-cycle.v2` receipt whose `cycleHash` binds the complete cycle result. The v2 receipt exposes initial/delta/unchanged mode, exact change count, a hash-chained atomic phase state, and detected interrupted-cycle recovery.
 
 ### `createProjectMemoryWatcher(options?)`
 
