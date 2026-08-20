@@ -26,6 +26,13 @@ Qarinah is evidence-linked project memory for coding agents. It keeps an inspect
 - The watcher remains inside one initialized workspace and applies the same ignore, secret-name, link, capture-policy, and byte/count ceilings as the ordinary project scanner.
 - Stop signals and API cancellation interrupt polling. Qarinah does not install a silent desktop-wide collector.
 
+## Cited fact consolidation
+
+- `qarinah facts` produces bounded decisions, constraints, tools, outcomes, evidence, conflicts, and summaries from the admitted verified pack.
+- Every structured fact cites one to eight source event IDs present in that pack.
+- The default extractor is deterministic. Optional model adapters receive bounded untrusted inputs and cannot introduce uncited event IDs or extra fields.
+- Recording is idempotent. Metadata capture stores a content-free receipt; content capture may retain the bounded cited statements.
+
 ## Lossless source retention beside compact context
 
 - Explicit content-capture workspaces can archive selected project files without placing those bytes in every context pack.
@@ -43,7 +50,7 @@ Qarinah is evidence-linked project memory for coding agents. It keeps an inspect
 - `qarinah-lsp` exposes document symbols, workspace symbols, definitions, and references through bounded stdio JSON-RPC.
 - The strict symbol-graph schema is public and additive. Other language grammars are future adapters, not silently approximated by the v1 parser.
 
-See [Coding context harness](CODING-CONTEXT-HARNESS.md) and [Automatic project memory](AUTOMATIC-PROJECT-MEMORY.md).
+See [Coding context harness](CODING-CONTEXT-HARNESS.md), [Automatic project memory](AUTOMATIC-PROJECT-MEMORY.md), and [Cited fact consolidation](CITED-FACT-CONSOLIDATION.md).
 
 ## Project-owned memory
 

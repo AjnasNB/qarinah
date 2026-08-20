@@ -50,7 +50,8 @@
     "./schemas/host-install-manifest.json": "./schemas/host-install-manifest.schema.json",
     "./schemas/content-archive.json": "./schemas/content-archive.schema.json",
     "./schemas/symbol-graph.json": "./schemas/symbol-graph.schema.json",
-    "./schemas/project-memory-cycle.json": "./schemas/project-memory-cycle.schema.json"
+    "./schemas/project-memory-cycle.json": "./schemas/project-memory-cycle.schema.json",
+    "./schemas/fact-consolidation.json": "./schemas/fact-consolidation.schema.json"
   },
   "files": [
     "bin/",
@@ -114,6 +115,7 @@
     "docs/WORKTREE-CONTEXT.md",
     "docs/CODING-CONTEXT-HARNESS.md",
     "docs/AUTOMATIC-PROJECT-MEMORY.md",
+    "docs/CITED-FACT-CONSOLIDATION.md",
     "bench/fixtures/software-task-scenarios.mjs",
     "bench/research/",
     "bench/results/",

@@ -95,6 +95,17 @@ npx qarinah watch --interval-ms 2000
 
 The v1 parser covers JavaScript, JSX, TypeScript, and TSX. Other languages are reported as unsupported instead of being guessed. Read [Symbol graph and language server](docs/SYMBOL-GRAPH.md) for the exact coverage boundary.
 
+### Facts that can be checked, not a free-floating AI summary
+
+`qarinah facts` consolidates admitted memory into decisions, constraints, tool activity, outcomes, evidence, conflicts, and summaries. Every fact must cite an exact retained event ID. The default extractor is deterministic and local; an optional host model receives only the bounded untrusted pack and its output is rejected if it cites an event outside that pack.
+
+```sh
+npx qarinah facts "current release decisions"
+npx qarinah facts "current release decisions" --record
+```
+
+Metadata-only projects retain a content-free consolidation receipt. Content projects may retain the bounded cited statements. Read [Cited fact consolidation](docs/CITED-FACT-CONSOLIDATION.md).
+
 <p align="center">
   <a href="https://qarinah.io"><strong>Website</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://qarinah.io/docs/features/"><strong>Features</strong></a>&nbsp;&middot;&nbsp;

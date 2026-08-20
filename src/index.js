@@ -44,6 +44,7 @@ export {
   searchSymbols
 } from "./symbol-graph.js";
 export { QARINAH_LSP_PROTOCOL_VERSION, createLanguageServer, runLanguageServer } from "./lsp-server.js";
+export { FACT_CONSOLIDATION_SCHEMA_VERSION, consolidateProjectFacts } from "./fact-consolidation.js";
 export {
   PROJECT_MEMORY_CYCLE_SCHEMA_VERSION,
   createProjectMemoryWatcher,

@@ -596,6 +596,61 @@ export function measureMemoryFootprint(options?: {
   updateCheckpoint?: boolean;
 }): Promise<Readonly<QarinahMemoryFootprint>>;
 export const PROJECT_MEMORY_CYCLE_SCHEMA_VERSION: "qarinah.project-memory-cycle.v1";
+export const FACT_CONSOLIDATION_SCHEMA_VERSION: "qarinah.fact-consolidation.v1";
+export type QarinahConsolidatedFactCategory = "decision" | "constraint" | "tool" | "outcome" | "evidence" | "conflict" | "summary";
+export interface QarinahConsolidatedFact {
+  readonly id: `fact_${string}`;
+  readonly category: QarinahConsolidatedFactCategory;
+  readonly statement: string;
+  readonly confidence: "extracted" | "inferred";
+  readonly sourceEventIds: readonly string[];
+}
+export interface QarinahFactConsolidation {
+  readonly schemaVersion: "qarinah.fact-consolidation.v1";
+  readonly generatedAt: string;
+  readonly workspaceId: string;
+  readonly query: string;
+  readonly contentRole: "untrusted-data";
+  readonly method: "deterministic-cited-v1" | "model-assisted-cited-v1";
+  readonly adapter: string;
+  readonly model: string | null;
+  readonly sourcePackManifestHash: `sha256:${string}`;
+  readonly sources: readonly Readonly<{ eventId: string; hash: `sha256:${string}`; kind: string }>[];
+  readonly facts: readonly QarinahConsolidatedFact[];
+  readonly coverage: Readonly<{ sourceItems: number; factCount: number; truncated: boolean; retrieval: "none" | "partial" | "direct" }>;
+  readonly boundaries: Readonly<Record<"citations" | "model" | "retention" | "accuracy", string>>;
+  readonly manifestHash: `sha256:${string}`;
+  readonly recording: Readonly<{ status: "not-requested" | "recorded" | "reused"; eventId: string | null; hash: `sha256:${string}` | null }>;
+}
+export interface QarinahFactExtractor {
+  id: string;
+  extract(
+    input: Readonly<{
+      schemaVersion: "qarinah.fact-extraction-input.v1";
+      contentRole: "untrusted-data";
+      instruction: string;
+      query: string;
+      maximumFacts: number;
+      sources: readonly Readonly<{ eventId: string; hash: `sha256:${string}`; kind: string; confidence: string; title: string; excerpt: string }>[];
+    }>,
+    context: { signal?: AbortSignal }
+  ): Promise<Readonly<{ facts: readonly Omit<QarinahConsolidatedFact, "id">[]; model?: string }>> | Readonly<{ facts: readonly Omit<QarinahConsolidatedFact, "id">[]; model?: string }>;
+}
+export function consolidateProjectFacts(options?: {
+  cwd?: string;
+  query?: string;
+  maxChars?: number;
+  maxTokens?: number;
+  limit?: number;
+  maxFacts?: number;
+  authorityScopes?: readonly string[];
+  repositoryIds?: readonly string[];
+  extractor?: QarinahFactExtractor | null;
+  record?: boolean;
+  rebuild?: boolean;
+  signal?: AbortSignal;
+  clock?: () => Date;
+}): Promise<Readonly<QarinahFactConsolidation>>;
 export interface QarinahProjectMemoryCycle {
   readonly schemaVersion: "qarinah.project-memory-cycle.v1";
   readonly generatedAt: string;

@@ -770,6 +770,17 @@ npx qarinah watch --interval-ms 2000 --query "current implementation decisions"
 
 Options are `--once`, `--interval-ms 250..3600000`, `--query`, `--no-compact`, `--no-symbols`, and `--no-rebuild`. The watcher never installs itself as an operating-system service. A changed scan refreshes the selected stages serially; an unchanged scan returns `changed:false` without duplicate writes. Each JSON cycle contains the exact snapshot, optional symbol/checkpoint/derived receipts, explicit boundaries, and a `cycleHash`.
 
+## `facts`
+
+Create a structured cited fact set from the admitted verified context pack:
+
+```sh
+npx qarinah facts "current implementation decisions"
+npx qarinah facts "current implementation decisions" --record --max-facts 24
+```
+
+Options are `--record`, `--max-facts 1..64`, `--max-chars 512..1000000`, `--max-tokens 128..1000000`, and `--limit 1..64`. The CLI uses the deterministic local extractor. Library callers may provide an optional model extractor through the public API. All facts remain labeled untrusted data and cite admitted source event IDs.
+
 ## `install`
 
 Preview or write one reversible, project-scoped host integration:

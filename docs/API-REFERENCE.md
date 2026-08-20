@@ -1151,6 +1151,12 @@ Creates a serial foreground polling loop with `run()`, `stop()`, and `status()`.
 
 The strict receipt schema is exported as `qarinah/schemas/project-memory-cycle.json`. See [Automatic project memory](AUTOMATIC-PROJECT-MEMORY.md).
 
+## `consolidateProjectFacts(options?)`
+
+Compiles an admitted context pack and returns a strict `qarinah.fact-consolidation.v1` result. The built-in path deterministically creates cited facts. An optional `extractor` has an `id` and `extract(input, { signal })` function; output is rejected unless every fact uses the closed category/confidence set and cites one to eight source event IDs from the supplied bounded pack.
+
+`record:true` appends an idempotent summary linked to its source events. Metadata capture stores a content-free receipt. Content capture may store the bounded statements. The strict result schema is exported as `qarinah/schemas/fact-consolidation.json`. See [Cited fact consolidation](CITED-FACT-CONSOLIDATION.md).
+
 ## ProductLoop interoperability
 
 Exports:
@@ -1201,6 +1207,7 @@ qarinah/schemas/cockroach-browser-memory.json
 qarinah/schemas/cockroach-source-record.json
 qarinah/schemas/productloop-runtime-event.json
 qarinah/schemas/project-memory-cycle.json
+qarinah/schemas/fact-consolidation.json
 ```
 
 Anything outside this export map is internal and may change without becoming a public API.

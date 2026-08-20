@@ -75,6 +75,7 @@ try {
     "  createLanguageServer,",
     "  createProjectMemoryWatcher,",
     "  runProjectMemoryCycle,",
+    "  consolidateProjectFacts,",
     "  ingestCockroachSourceRecord,",
     "  importAgentArchive,",
     "  buildProjectOverview,",
@@ -119,6 +120,8 @@ try {
     "  type QarinahCodingContextHarnessResult,",
     "  type QarinahCodingContextSummarizer,",
     "  type QarinahProjectMemoryCycle,",
+    "  type QarinahFactConsolidation,",
+    "  type QarinahFactExtractor,",
     "  type QarinahLinkedProjectMemory,",
     "  type QarinahLinkedProjectQuery,",
     "  type QarinahGitWorktree,",
@@ -169,6 +172,9 @@ try {
     "const contextSummarizer: QarinahCodingContextSummarizer = { id: 'consumer-summary', summarize: () => ({ text: 'bounded summary' }) };",
     "const codingHarness: Promise<Readonly<QarinahCodingContextHarnessResult>> = runCodingContextHarness({ query: 'release readiness', summarizer: contextSummarizer, record: false });",
     "void codingHarness.then(renderCodingContextHarnessMarkdown);",
+    "const factExtractor: QarinahFactExtractor = { id: 'consumer-facts', extract: (input) => ({ facts: [{ category: 'summary', statement: 'Cited fact', confidence: 'extracted', sourceEventIds: [input.sources[0]?.eventId ?? 'evt_fixture'] }] }) };",
+    "const facts: Promise<QarinahFactConsolidation> = consolidateProjectFacts({ extractor: factExtractor });",
+    "void facts;",
     "void buildLinkedProjectMemory;",
     "void loadLinkedProjectMemory;",
     "void rankLinkedProjectMemory;",
@@ -333,6 +339,11 @@ try {
     "./schemas/project-memory-cycle.schema.json"
   );
   await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "project-memory-cycle.schema.json"), "utf8");
+  assert.equal(
+    installedPackage.exports["./schemas/fact-consolidation.json"],
+    "./schemas/fact-consolidation.schema.json"
+  );
+  await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "fact-consolidation.schema.json"), "utf8");
   await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "docs", "SYMBOL-GRAPH.md"), "utf8");
   process.stdout.write("Exact cockroach-browser@0.1.0 TypeScript and registry-integrity contract passed.\n");
 } finally {

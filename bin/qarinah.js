@@ -14,6 +14,7 @@ import {
   captureCodexHook,
   compileContext,
   compileTaskMemoryPack,
+  consolidateProjectFacts,
   createContentArchive,
   createContextHandoffCapsule,
   createProjectMemoryWatcher,
@@ -308,6 +309,7 @@ Usage:
   qarinah archive erase-key --confirm-workspace <workspace-id>
   qarinah symbols build
   qarinah symbols query [text] [--limit n] [--kind function,class,...]
+  qarinah facts [query] [--record] [--max-facts n] [--max-chars n] [--max-tokens n] [--limit n]
   qarinah watch [--once] [--interval-ms n] [--no-compact] [--no-symbols] [--no-rebuild] [--query text]
   qarinah overview [--format json|markdown]
   qarinah footprint [query] [--baseline-tokens n] [--rate-per-million n] [--max-chars n] [--max-tokens n]
@@ -708,6 +710,47 @@ async function run(argv) {
       return;
     }
     throw new TypeError("symbols requires build or query.");
+  }
+  if (command === "facts") {
+    const flags = new Set(["--record"]);
+    const values = new Set(["--max-facts", "--max-chars", "--max-tokens", "--limit"]);
+    const parsed = { positionals: [], flags: new Set(), values: new Map() };
+    for (let index = 0; index < args.length; index += 1) {
+      const value = args[index];
+      if (!value.startsWith("--")) {
+        parsed.positionals.push(value);
+        continue;
+      }
+      if (flags.has(value)) {
+        if (parsed.flags.has(value)) throw new TypeError(`facts received ${value} more than once.`);
+        parsed.flags.add(value);
+        continue;
+      }
+      if (!values.has(value)) throw new TypeError(`facts does not support ${value}.`);
+      if (parsed.values.has(value)) throw new TypeError(`facts received ${value} more than once.`);
+      if (index === args.length - 1 || args[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
+      parsed.values.set(value, args[index + 1]);
+      index += 1;
+    }
+    if (parsed.positionals.length > 1) throw new TypeError("facts accepts at most one query string.");
+    const numeric = (name, minimum, maximum) => {
+      const value = parsed.values.get(name);
+      if (value === undefined) return undefined;
+      if (!/^[0-9]+$/u.test(value) || Number(value) < minimum || Number(value) > maximum) {
+        throw new TypeError(`${name} must be from ${minimum} to ${maximum}.`);
+      }
+      return Number(value);
+    };
+    process.stdout.write(`${JSON.stringify(await consolidateProjectFacts({
+      cwd: process.cwd(),
+      query: parsed.positionals[0],
+      record: parsed.flags.has("--record"),
+      maxFacts: numeric("--max-facts", 1, 64),
+      maxChars: numeric("--max-chars", 512, 1_000_000),
+      maxTokens: numeric("--max-tokens", 128, 1_000_000),
+      limit: numeric("--limit", 1, 64)
+    }), null, 2)}\n`);
+    return;
   }
   if (command === "watch") {
     const flags = new Set(["--once", "--no-compact", "--no-symbols", "--no-rebuild"]);

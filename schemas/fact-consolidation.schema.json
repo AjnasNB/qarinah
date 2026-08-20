@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qarinah.io/schemas/fact-consolidation.schema.json",
+  "title": "Qarinah cited fact consolidation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "generatedAt", "workspaceId", "query", "contentRole", "method", "adapter", "model", "sourcePackManifestHash", "sources", "facts", "coverage", "boundaries", "manifestHash", "recording"],
+  "properties": {
+    "schemaVersion": { "const": "qarinah.fact-consolidation.v1" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "workspaceId": { "type": "string", "pattern": "^ws_[0-9a-f]{32}$" },
+    "query": { "type": "string", "maxLength": 4096 },
+    "contentRole": { "const": "untrusted-data" },
+    "method": { "enum": ["deterministic-cited-v1", "model-assisted-cited-v1"] },
+    "adapter": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "model": { "type": ["string", "null"], "maxLength": 256 },
+    "sourcePackManifestHash": { "$ref": "#/$defs/hash" },
+    "sources": { "type": "array", "maxItems": 64, "items": { "$ref": "#/$defs/source" } },
+    "facts": { "type": "array", "maxItems": 64, "items": { "$ref": "#/$defs/fact" } },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceItems", "factCount", "truncated", "retrieval"],
+      "properties": {
+        "sourceItems": { "type": "integer", "minimum": 0, "maximum": 64 },
+        "factCount": { "type": "integer", "minimum": 0, "maximum": 64 },
+        "truncated": { "type": "boolean" },
+        "retrieval": { "enum": ["none", "partial", "direct"] }
+      }
+    },
+    "boundaries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["citations", "model", "retention", "accuracy"],
+      "properties": {
+        "citations": { "type": "string", "minLength": 1 },
+        "model": { "type": "string", "minLength": 1 },
+        "retention": { "type": "string", "minLength": 1 },
+        "accuracy": { "type": "string", "minLength": 1 }
+      }
+    },
+    "manifestHash": { "$ref": "#/$defs/hash" },
+    "recording": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "eventId", "hash"],
+      "properties": {
+        "status": { "enum": ["not-requested", "recorded", "reused"] },
+        "eventId": { "type": ["string", "null"] },
+        "hash": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/hash" }] }
+      }
+    }
+  },
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eventId", "hash", "kind"],
+      "properties": {
+        "eventId": { "type": "string" },
+        "hash": { "$ref": "#/$defs/hash" },
+        "kind": { "type": "string" }
+      }
+    },
+    "fact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "category", "statement", "confidence", "sourceEventIds"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^fact_[0-9a-f]{32}$" },
+        "category": { "enum": ["decision", "constraint", "tool", "outcome", "evidence", "conflict", "summary"] },
+        "statement": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "confidence": { "enum": ["extracted", "inferred"] },
+        "sourceEventIds": { "type": "array", "minItems": 1, "maxItems": 8, "uniqueItems": true, "items": { "type": "string" } }
+      }
+    }
+  }
+}
