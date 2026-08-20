@@ -384,6 +384,16 @@ The public package now includes:
 
 See [Shared and verifiable team memory](docs/TEAM-MEMORY.md) and the [self-hosted opaque sync guide](docs/TEAM-SYNC-SERVICE.md) for commands, APIs, and security boundaries.
 
+## Public-source continuity proof
+
+Qarinah's current self-evaluation runs the complete memory pipeline on an isolated copy of this public repository: **10/10 structural scenarios pass**. It scans 379 tracked project files, indexes all 179 symbol-eligible files, resolves four exact public definitions, records an observed session lifecycle, produces a minimized v2 receipt, retrieves the next session's cited decision, and verifies the complete ledger chain. The artifact binds its evaluator and source manifests and makes no provider, cost, latency, or independent-validation claim.
+
+```sh
+npm run check:public-project-memory
+```
+
+Read the [method and boundaries](docs/PUBLIC-PROJECT-MEMORY-EVALUATION.md) or inspect the [machine-readable result](bench/results/public-project-memory-0.5.json).
+
 ## Inspect project memory in the local dashboard
 
 <p align="center">
