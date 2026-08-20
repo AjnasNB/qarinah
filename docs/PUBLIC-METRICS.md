@@ -82,7 +82,7 @@ Qarinah keeps one verifiable project memory across Codex, Claude Code, Cursor, C
 - [Deep-memory product-acceptance result](../bench/results/deep-memory-platform-v0.4.0.json)
 - [Six-task result](../bench/results/software-task-context-0.1.0.json)
 - [Release benchmark receipt](../bench/results/benchmark-release-0.1.6.json)
-- [Current multi-file result](../bench/results/multifile-context-0.2.0.json)
+- [Current multi-file result](../bench/results/multifile-context-0.5.0-rc.1.json)
 - [Historical 0.1.6 multi-file result](../bench/results/multifile-context-0.1.6.json)
 
 ## Do not publish these claims

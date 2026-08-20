@@ -261,4 +261,22 @@ for (const relativePath of publicMarkdown) {
   }
 }
 
+const currentReleaseDocRequirements = new Map([
+  ["docs/API-REFERENCE.md", ["version 0.5.0-rc.1", "| `QARINAH_VERSION` | `\"0.5.0-rc.1\"` |"]],
+  ["docs/FAQ.md", ["Qarinah 0.5.0-rc.1 supports", "multifile-context-0.5.0-rc.1.json"]],
+  ["docs/HOST-COMPATIBILITY.md", ["The 0.5.0-rc.1 installer"]],
+  ["docs/HOST-INTEGRATIONS.md", ["--ref v0.5.0-rc.1", "qarinah@v0.5.0-rc.1"]],
+  ["docs/MCP-GUIDE.md", ["Qarinah 0.5.0-rc.1 includes", "qarinah@0.5.0-rc.1"]],
+  ["docs/TOKEN-EFFICIENT-CONTEXT.md", ["--ref v0.5.0-rc.1", "qarinah@v0.5.0-rc.1"]],
+  ["docs/RECIPES.md", ["--ref v0.5.0-rc.1", "qarinah@v0.5.0-rc.1"]],
+  ["docs/BENCHMARKS.md", ["current 0.5.0-rc.1 machine-readable result", "multifile-context-0.5.0-rc.1.json"]],
+  ["docs/PUBLIC-METRICS.md", ["multifile-context-0.5.0-rc.1.json"]]
+]);
+for (const [relativePath, requiredSnippets] of currentReleaseDocRequirements) {
+  const markdown = await read(relativePath);
+  for (const snippet of requiredSnippets) {
+    if (!markdown.includes(snippet)) throw new Error(`${relativePath} is missing current release documentation: ${snippet}`);
+  }
+}
+
 console.log("Documentation diagrams, encoding, and local links are valid.");

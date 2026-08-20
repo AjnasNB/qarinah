@@ -145,7 +145,7 @@ All three scales additionally verify:
 
 “Fail closed” therefore does not mean that long-document or multi-file retrieval failed. It means Qarinah refused to label unsupported evidence as direct. In this benchmark, **9 / 9 unsupported controls were successful fail-closed behavior**.
 
-The fixture is synthetic so relevance and answers are completely auditable. It measures local retrieval, bounded evidence preservation, and projection integrity; it does not measure provider-reported tokens or coding-task completion. The context-volume values use portable `ceil(characters / 4)` estimates. See the [evaluator](../scripts/evaluate-multifile-context.mjs), [current 0.2.0 machine-readable result](../bench/results/multifile-context-0.2.0.json), [historical 0.1.6 result](../bench/results/multifile-context-0.1.6.json), and [artifact verifier](../scripts/verify-multifile-context.mjs).
+The fixture is synthetic so relevance and answers are completely auditable. It measures local retrieval, bounded evidence preservation, and projection integrity; it does not measure provider-reported tokens or coding-task completion. The context-volume values use portable `ceil(characters / 4)` estimates. See the [evaluator](../scripts/evaluate-multifile-context.mjs), [current 0.5.0-rc.1 machine-readable result](../bench/results/multifile-context-0.5.0-rc.1.json), [historical 0.1.6 result](../bench/results/multifile-context-0.1.6.json), and [artifact verifier](../scripts/verify-multifile-context.mjs).
 
 ## Retrieval-regression fixture
 
