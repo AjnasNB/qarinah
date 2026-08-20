@@ -50,6 +50,7 @@ Qarinah is evidence-linked project memory for coding agents. It keeps an inspect
 - Every parsed file must still match the content hash in the latest explicit project scan; stale or linked files abstain.
 - Default symbol search combines lexical matching, a deterministic local subword vector, and resolved-reference structure with a visible score basis.
 - `qarinah-lsp` exposes document symbols, workspace symbols, definitions, and references through bounded stdio JSON-RPC.
+- The VS Code/Cursor extension adds detailed per-session replay; JetBrains IDEs can import the packaged LSP4IJ template, while other editors may attach a generic LSP client.
 - The strict `qarinah.symbol-graph.v2` schema publishes parser versions, supported languages, indexed languages, file-level parser identity, and explicit coverage gaps.
 
 See [Coding context harness](CODING-CONTEXT-HARNESS.md), [Automatic project memory](AUTOMATIC-PROJECT-MEMORY.md), and [Cited fact consolidation](CITED-FACT-CONSOLIDATION.md).
@@ -96,7 +97,8 @@ See [Coding context harness](CODING-CONTEXT-HARNESS.md), [Automatic project memo
 - Reviewed Codex and Claude Code lifecycle integrations that use the same explicitly trusted project record.
 - Project-local MCP setup for Cursor, Kimi Code, classic Kimi CLI, and Google Antigravity, with host-appropriate project rules/configuration.
 - Reversible project-scoped installation manifests for Codex, Claude Code, Cursor, Kimi, Antigravity, and Freebuff.
-- A sandboxed VS Code/Cursor developer-memory panel with graph search, timeline, receipts, and worktree comparison.
+- A sandboxed VS Code/Cursor developer-memory panel with graph search, timeline, receipts, detailed session replay, and worktree comparison.
+- A packaged JetBrains LSP4IJ template that invokes the exact project-local `qarinah-lsp` dependency; it is not a native JetBrains plugin.
 - Explicit Kimi stream-json import for visible user, assistant, tool-call, and tool-result messages.
 - A native MCP stdio server with diagnostic-only defaults and explicitly authorized, zero-write context retrieval.
 - Cross-agent handoff capsules for continuing a task without replaying the complete retained history.
@@ -105,6 +107,7 @@ See [Coding context harness](CODING-CONTEXT-HARNESS.md), [Automatic project memo
 
 - Multi-repository context packs that preserve separate repository and authority boundaries.
 - Freshness diagnostics, encrypted sync bundles, signed checkpoints, and explicit membership records.
+- An optional self-hosted loopback service for tenant-bound immutable encrypted bundles, owner/maintainer/reader roles, rate limits, and token-free audit evidence.
 - Deterministic Markdown, JSON, typed graph, and Google Open Knowledge Format exports.
 - Schemas and adapters for Cockroach Crawler evidence, Cockroach Browser memory records, ProductLoop runtime events, and optional Maqam authority scopes.
 

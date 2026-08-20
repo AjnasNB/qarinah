@@ -322,16 +322,13 @@ for (const responsiveHeroRule of [
 if (home.includes('"@type":"SearchAction"') || home.includes("search_term_string")) {
   errors.push("Homepage must not emit the retired sitelinks-search SearchAction or its crawlable URL template.");
 }
-if (!home.includes("<strong>12 / 12</strong>")
-  || !home.includes("deep-memory product checks passed")
-  || !home.includes("restored 390,226 source bytes exactly")
-  || !home.includes("reused two of three chunks")
-  || !home.includes("Symbols and references")
+if (!home.includes("<strong>10 / 10</strong>")
+  || !home.includes("public-project memory checks passed")
+  || !home.includes("eligible source files indexed")
+  || !home.includes("Multi-language symbols and references")
   || !home.includes("Strict cited facts")
-  || !home.includes("<strong>16 / 16</strong>")
-  || !home.includes("real-Git-worktree continuity scenarios passed")
-  || !home.includes("<strong>6 hosts</strong>")
-  || !home.includes("<strong>4 modes</strong>")
+  || !home.includes("public-project memory scenarios passed")
+  || !home.includes("10 languages")
   || !home.includes("<strong>0 bodies</strong>")) {
   errors.push("Homepage is missing the plain-language visible-memory acceptance proof.");
 }
@@ -345,9 +342,9 @@ for (const worktreeHeroProof of [
   "Your project remembers. Every agent gets the proof.",
   "Verifiable memory for coding agents",
   'class="hero-context-proof"',
-  "12 / 12",
-  "deep-memory product checks passed",
-  "exact recovery, chunk reuse, symbols, references, cited facts, and incremental refresh",
+  "10 / 10",
+  "public-project memory checks passed",
+  "eligible source files indexed, exact definitions found, session receipt and cited continuation verified",
   "one repository · two isolated ledgers",
   "branch + commit in snapshot hash",
   'href="/docs/content-archive/"'
@@ -389,6 +386,11 @@ if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.indexedSymbols !== 4
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.resolvedReferences !== 3
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.artifactHash !== "sha256:bb801a59d5c1822b87bda5596237a126a064e62ac6f588e3351ebe949551ff46"
+  || publicMetrics.metrics?.publicProjectMemory?.scenarios !== 10
+  || publicMetrics.metrics?.publicProjectMemory?.passed !== 10
+  || publicMetrics.metrics?.publicProjectMemory?.indexedSymbolFiles !== publicMetrics.metrics?.publicProjectMemory?.eligibleSymbolFiles
+  || publicMetrics.metrics?.publicProjectMemory?.providerCalls !== 0
+  || publicMetrics.metrics?.publicProjectMemory?.privateDataUsed !== false
   || publicMetrics.metrics?.repeatedProjectContext?.baselineEstimatedTokens !== 442113
   || publicMetrics.metrics?.repeatedProjectContext?.qarinahEstimatedTokens !== 5682
   || publicMetrics.metrics?.repeatedProjectContext?.estimatedTokensAvoided !== 436431
@@ -441,7 +443,7 @@ for (const capability of [
 }
 if (!features.includes('"@type":"CollectionPage"')
   || !features.includes('"@type":"ItemList"')
-  || !features.includes('"numberOfItems":25')) {
+  || !features.includes('"numberOfItems":28')) {
   errors.push("Features page is missing its visible capability collection structured data.");
 }
 for (const requiredWorktreeArticleCopy of [

@@ -45,7 +45,18 @@ npx qarinah dashboard --serve --worktrees
 | Exact session receipts | The host session, observed lifecycle, turn and outcome identities, source and pack hashes, measured selection, and no retained event bodies |
 | Cross-worktree comparison | Separate writable ledgers, branch and commit identities, divergent heads, event totals, and current decisions |
 | Incremental compaction | Initial, unchanged, delta, and full-rebuild states with the exact prior checkpoint and changed-event count |
-| VS Code/Cursor panel | A local sandboxed read-only webview backed by the Qarinah CLI |
+| VS Code/Cursor panel | A local sandboxed read-only webview with searchable graph, timeline, worktree comparison, and detailed session replay |
+| Standard LSP + JetBrains template | Multi-language symbols, definitions, and references through project-local `qarinah-lsp` |
+
+### Reproducible public-checkout memory result
+
+The 0.5 evaluator copies Qarinah's public source into an isolated temporary Git repository and runs the current product end to end. It passes **10 / 10** structural scenarios, indexes **all 179 eligible source files**, resolves four exact implementation definitions, records one completed session lifecycle, writes a minimized v2 receipt, compiles cited continuation context, and verifies the complete ledger chain. It uses no private data or provider calls.
+
+```sh
+npm run check:public-project-memory
+```
+
+Read the [method and boundaries](docs/PUBLIC-PROJECT-MEMORY-EVALUATION.md) or inspect the [machine-readable result](bench/results/public-project-memory-0.5.json). The exact file counts are refreshed before the release commit.
 
 ### Reproducible deep-memory product result
 
@@ -93,7 +104,7 @@ The 98.7148% result above is a context-volume estimate, not an archive-compressi
 
 ### Code-aware memory, not only chat summaries
 
-After `qarinah scan`, the built-in JavaScript/TypeScript parser can create a hash-linked symbol graph with declarations, exact spans, exported status, and unambiguous references. The local search path combines lexical matching, deterministic subword vectors, and reference structure without downloading a model or calling a hosted vector database. Qarinah also ships `qarinah-lsp` for workspace symbols, document symbols, definitions, and references over the Language Server Protocol.
+After `qarinah scan`, the pinned TypeScript and Tree-sitter parser lanes create a hash-linked symbol graph with declarations, exact spans, exported status, and unambiguous references across ten registered languages. The local search path combines lexical matching, deterministic subword vectors, and reference structure without downloading a model or calling a hosted vector database. Qarinah also ships `qarinah-lsp` for workspace symbols, multi-language document symbols, definitions, and references over the Language Server Protocol.
 
 ```powershell
 npx qarinah scan
@@ -383,16 +394,6 @@ The public package now includes:
 - causal receipts connecting Cockroach evidence, Qarinah memory, Maqam policy, execution, and observed results.
 
 See [Shared and verifiable team memory](docs/TEAM-MEMORY.md) and the [self-hosted opaque sync guide](docs/TEAM-SYNC-SERVICE.md) for commands, APIs, and security boundaries.
-
-## Public-source continuity proof
-
-Qarinah's current self-evaluation runs the complete memory pipeline on an isolated copy of this public repository: **10/10 structural scenarios pass**. It scans 379 tracked project files, indexes all 179 symbol-eligible files, resolves four exact public definitions, records an observed session lifecycle, produces a minimized v2 receipt, retrieves the next session's cited decision, and verifies the complete ledger chain. The artifact binds its evaluator and source manifests and makes no provider, cost, latency, or independent-validation claim.
-
-```sh
-npm run check:public-project-memory
-```
-
-Read the [method and boundaries](docs/PUBLIC-PROJECT-MEMORY-EVALUATION.md) or inspect the [machine-readable result](bench/results/public-project-memory-0.5.json).
 
 ## Inspect project memory in the local dashboard
 
