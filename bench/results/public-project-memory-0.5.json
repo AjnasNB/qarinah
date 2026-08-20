@@ -22,7 +22,7 @@
     "sessionReceipt": "qarinah.session-context-receipt.v2"
   },
   "observed": {
-    "projectFiles": 385,
+    "projectFiles": 387,
     "projectDirectories": 56,
     "supportedSymbolLanguages": [
       "c",
@@ -43,8 +43,8 @@
     ],
     "eligibleSymbolFiles": 181,
     "indexedSymbolFiles": 181,
-    "declarations": 46972,
-    "references": 99280,
+    "declarations": 46984,
+    "references": 99307,
     "definitions": [
       {
         "query": "appendEvent",
@@ -130,5 +130,5 @@
     "No provider model, learned embedding service, wall-clock performance, billing, or private agent history is measured.",
     "A passing result proves these exact structural scenarios, not universal task success or semantic correctness."
   ],
-  "manifestHash": "sha256:ee1e0cb915a76af95656501eac44503e6febcd0946518974d9b7d5b1a31e58c0"
+  "manifestHash": "sha256:24ceb62224edbe711b4c3c06e1ea82992a66fbbd596587b0ad530403ebbaa35b"
 }
