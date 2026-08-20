@@ -9,7 +9,13 @@ import { build } from "esbuild";
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const packageJson = JSON.parse(await readFile(path.join(repositoryRoot, "package.json"), "utf8"));
 const versionSource = await readFile(path.join(repositoryRoot, "src", "version.js"), "utf8");
-const builtinSpecifiers = new Set(builtinModules.flatMap((specifier) => [specifier, `node:${specifier}`]));
+const builtinSpecifiers = new Set([
+  ...builtinModules.flatMap((specifier) => [specifier, `node:${specifier}`]),
+  // Node 22.13+ provides the built-in SQLite module, but some maintained Node 22
+  // releases omit it from `builtinModules`. The bundle must still preserve the
+  // runtime import instead of misclassifying it as a third-party dependency.
+  "node:sqlite"
+]);
 const treeSitterWasmFiles = ["c", "cpp", "c_sharp", "go", "java", "kotlin", "python", "rust"]
   .map((grammar) => `tree-sitter-${grammar}.wasm`);
 const treeSitterWasmRoot = path.join(repositoryRoot, "node_modules", "tree-sitter-wasms", "out");
