@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qarinah.io/schemas/project-memory-cycle.schema.json",
+  "title": "Qarinah project memory cycle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "generatedAt", "workspaceId", "worktreeId", "changed", "scan", "symbols", "harness", "derived", "boundaries", "cycleHash"],
+  "properties": {
+    "schemaVersion": { "const": "qarinah.project-memory-cycle.v1" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "workspaceId": { "type": "string", "pattern": "^ws_[0-9a-f]{32}$" },
+    "worktreeId": { "type": ["string", "null"], "pattern": "^wt_[0-9a-f]{32}$" },
+    "changed": { "type": "boolean" },
+    "scan": { "$ref": "#/$defs/scan" },
+    "symbols": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/symbols" }] },
+    "harness": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/harness" }] },
+    "derived": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/derived" }] },
+    "boundaries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["activation", "scope", "content", "compaction"],
+      "properties": {
+        "activation": { "type": "string", "minLength": 1 },
+        "scope": { "type": "string", "minLength": 1 },
+        "content": { "type": "string", "minLength": 1 },
+        "compaction": { "type": "string", "minLength": 1 }
+      }
+    },
+    "cycleHash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  },
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "worktree": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["schemaVersion", "repositoryId", "worktreeId", "branch", "commit", "detached", "linked"],
+      "properties": {
+        "schemaVersion": { "const": "qarinah.git-worktree.v1" },
+        "repositoryId": { "type": "string", "pattern": "^repo_[0-9a-f]{32}$" },
+        "worktreeId": { "type": "string", "pattern": "^wt_[0-9a-f]{32}$" },
+        "branch": { "type": ["string", "null"] },
+        "commit": { "type": ["string", "null"], "pattern": "^[0-9a-f]{40}$" },
+        "detached": { "type": "boolean" },
+        "linked": { "type": "boolean" }
+      }
+    },
+    "changes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["added", "changed", "deleted", "renamed"],
+      "properties": {
+        "added": { "type": "array", "items": { "type": "string" } },
+        "changed": { "type": "array", "items": { "type": "string" } },
+        "deleted": { "type": "array", "items": { "type": "string" } },
+        "renamed": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["from", "to", "contentHash"],
+            "properties": {
+              "from": { "type": "string" },
+              "to": { "type": "string" },
+              "contentHash": { "$ref": "#/$defs/hash" }
+            }
+          }
+        }
+      }
+    },
+    "scan": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["captured", "unchanged", "eventId", "snapshotHash", "fileCount", "directoryCount", "worktree"],
+          "properties": {
+            "captured": { "const": false },
+            "unchanged": { "const": true },
+            "eventId": { "type": "string" },
+            "snapshotHash": { "$ref": "#/$defs/hash" },
+            "fileCount": { "type": "integer", "minimum": 0 },
+            "directoryCount": { "type": "integer", "minimum": 1 },
+            "worktree": { "$ref": "#/$defs/worktree" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["captured", "unchanged", "eventId", "hash", "snapshotHash", "fileCount", "directoryCount", "worktree", "changes"],
+          "properties": {
+            "captured": { "const": true },
+            "unchanged": { "const": false },
+            "eventId": { "type": "string" },
+            "hash": { "$ref": "#/$defs/hash" },
+            "snapshotHash": { "$ref": "#/$defs/hash" },
+            "fileCount": { "type": "integer", "minimum": 0 },
+            "directoryCount": { "type": "integer", "minimum": 1 },
+            "worktree": { "$ref": "#/$defs/worktree" },
+            "changes": { "$ref": "#/$defs/changes" }
+          }
+        }
+      ]
+    },
+    "symbols": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "manifestHash", "files", "symbols", "references", "complete"],
+      "properties": {
+        "schemaVersion": { "const": "qarinah.symbol-graph.v1" },
+        "manifestHash": { "$ref": "#/$defs/hash" },
+        "files": { "type": "integer", "minimum": 0 },
+        "symbols": { "type": "integer", "minimum": 0 },
+        "references": { "type": "integer", "minimum": 0 },
+        "complete": { "type": "boolean" }
+      }
+    },
+    "recording": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "eventId", "hash"],
+      "properties": {
+        "status": { "enum": ["not-requested", "created", "reused"] },
+        "eventId": { "type": ["string", "null"] },
+        "hash": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/hash" }] }
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baselineTokens", "deliveredTokens", "savedTokens", "reductionPercent", "baselineToPackRatio", "publishedBenchmarkMatched"],
+      "properties": {
+        "baselineTokens": { "type": "integer", "minimum": 0 },
+        "deliveredTokens": { "type": "integer", "minimum": 0 },
+        "savedTokens": { "type": "integer", "minimum": 0 },
+        "reductionPercent": { "type": ["number", "null"] },
+        "baselineToPackRatio": { "type": ["number", "null"] },
+        "publishedBenchmarkMatched": { "type": "boolean" }
+      }
+    },
+    "harness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifestHash", "sourceHeadHash", "packManifestHash", "recording", "comparison"],
+      "properties": {
+        "manifestHash": { "$ref": "#/$defs/hash" },
+        "sourceHeadHash": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/hash" }] },
+        "packManifestHash": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/hash" }] },
+        "recording": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/recording" }] },
+        "comparison": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/comparison" }] }
+      }
+    },
+    "derived": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["headHash", "eventCount", "linkedNodes", "sqliteSchemaVersion"],
+      "properties": {
+        "headHash": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/hash" }] },
+        "eventCount": { "type": "integer", "minimum": 0 },
+        "linkedNodes": { "type": "integer", "minimum": 0 },
+        "sqliteSchemaVersion": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}

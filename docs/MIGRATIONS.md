@@ -24,6 +24,8 @@ Every Git worktree keeps its own `.qarinah` directory, event chain, consent reco
 
 Linked-memory consumers must accept the additive `worktree` node type. Run `qarinah scan` and `qarinah build` in an initialized worktree to write a v2 snapshot and regenerate both graph projections.
 
+The additive `.qarinah/archive/` directory is ignored by Git and is created only when an explicitly content-authorized caller creates a lossless archive. Existing workspaces require no migration. Removing the directory removes local archive material but does not alter the authoritative event ledger; use the archive deletion and key-erasure commands when a durable receipt is required.
+
 ## Cockroach Browser metadata-outcome boundary
 
 The `cockroach.browser-memory.v1` receiving API is additive and does not change `qarinah.event.v1` or existing workspaces. No ledger migration or rebuild is required. New consumers may pass a passive `createCockroachBrowserMemorySink()` to the public Cockroach Browser Qarinah recorder.
@@ -56,7 +58,7 @@ Qarinah graph schema `qarinah.graph.v2` keeps every v1 event node and relation e
 
 The event chain is unchanged. Run `qarinah build` to regenerate `graph/graph.json`, `index/index.json`, and `records/CONTEXT.md` from the verified log. A project structure does not appear until a trusted user explicitly runs `qarinah scan`.
 
-`qarinah scan` does not claim compiler or language-server equivalence. Version 1 records a bounded filesystem snapshot and conservative ECMAScript/TypeScript module and Markdown-link observations with exact source spans. Deeper AST symbol extraction remains separately versioned work.
+`qarinah scan` remains the bounded filesystem and conservative module/link observation layer. Qarinah 0.4.0 adds a separate additive `qarinah.symbol-graph.v1` projection for JavaScript, JSX, TypeScript, and TSX, built only after the latest scan hash is verified. Run `qarinah symbols build` or the explicit `qarinah watch` loop to create it. The `qarinah-lsp` process reads that projection for workspace definitions and references. Unsupported languages remain explicit coverage gaps; no ledger migration is required.
 
 ## Linked project memory v1
 

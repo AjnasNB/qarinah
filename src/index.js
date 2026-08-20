@@ -35,8 +35,34 @@ export {
   renderContextPackMarkdown
 } from "./compiler.js";
 export { PROJECT_STRUCTURE_SCHEMA_VERSION, scanProjectStructure } from "./project-structure.js";
+export {
+  SYMBOL_GRAPH_SCHEMA_VERSION,
+  buildSymbolGraph,
+  loadSymbolGraph,
+  parseTypeScriptSymbols,
+  querySymbolGraph,
+  searchSymbols
+} from "./symbol-graph.js";
+export { QARINAH_LSP_PROTOCOL_VERSION, createLanguageServer, runLanguageServer } from "./lsp-server.js";
+export { FACT_CONSOLIDATION_SCHEMA_VERSION, consolidateProjectFacts } from "./fact-consolidation.js";
+export {
+  PROJECT_MEMORY_CYCLE_SCHEMA_VERSION,
+  createProjectMemoryWatcher,
+  runProjectMemoryCycle
+} from "./project-watcher.js";
 export { AGENT_ARCHIVE_IMPORT_SCHEMA_VERSION, importAgentArchive } from "./archive-import.js";
 export { AGENT_ARCHIVE_BACKUP_SCHEMA_VERSION, backupAgentArchives } from "./archive-backup.js";
+export {
+  CONTENT_ARCHIVE_KEY_SCHEMA_VERSION,
+  CONTENT_ARCHIVE_SCHEMA_VERSION,
+  createContentArchive,
+  cryptographicallyEraseContentArchiveVault,
+  deleteContentArchive,
+  garbageCollectContentArchive,
+  listContentArchives,
+  restoreContentArchive,
+  verifyContentArchive
+} from "./content-archive.js";
 export { MEMORY_FOOTPRINT_SCHEMA_VERSION, measureMemoryFootprint } from "./memory-footprint.js";
 export {
   CODING_CONTEXT_HARNESS_SCHEMA_VERSION,

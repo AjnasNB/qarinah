@@ -6,7 +6,6 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const output = path.join(root, "site-dist");
 const required = [
   "index.html",
-  "alternatives/index.html",
   "articles/git-worktree-context-for-coding-agents/index.html",
   "articles/open-source-agent-memory-stack/index.html",
   "docs/index.html",
@@ -18,6 +17,10 @@ const required = [
   "docs/integrations/index.html",
   "docs/mcp/index.html",
   "docs/team-memory/index.html",
+  "docs/content-archive/index.html",
+  "docs/automatic-project-memory/index.html",
+  "docs/cited-facts/index.html",
+  "docs/symbol-graph/index.html",
   "docs/worktree-context/index.html",
   "docs/token-efficient-context/index.html",
   "docs/recipes/index.html",
@@ -33,7 +36,9 @@ const required = [
   "search-index.json",
   "metrics.json",
   "paper/index.html",
+  "paper/Qarinah-Technical-White-Paper-v1.6.pdf",
   "paper/Qarinah-Technical-White-Paper-v1.4.pdf",
+  "paper/Qarinah-Technical-White-Paper-v1.5.pdf",
   "paper/Qarinah-Technical-White-Paper-v1.3.pdf",
   "paper/Qarinah-Technical-White-Paper-v1.2.pdf",
   "assets/qarinah-mark.svg",
@@ -255,9 +260,6 @@ for (const route of availableRoutes) {
     errors.push(`search-index.json is missing ${route}`);
   }
 }
-if (!indexedRoutes.has("/alternatives/")) {
-  errors.push("search-index.json is missing /alternatives/");
-}
 if (!indexedRoutes.has("/articles/open-source-agent-memory-stack/")) {
   errors.push("search-index.json is missing /articles/open-source-agent-memory-stack/");
 }
@@ -283,7 +285,6 @@ for (const canonicalResource of [
   "https://qarinah.io/docs/faq/",
   "https://qarinah.io/docs/public-metrics/",
   "https://qarinah.io/metrics.json",
-  "https://qarinah.io/alternatives/",
   "https://qarinah.io/articles/git-worktree-context-for-coding-agents/",
   "https://qarinah.io/articles/open-source-agent-memory-stack/",
   "https://www.npmjs.com/package/qarinah",
@@ -294,7 +295,6 @@ for (const canonicalResource of [
 }
 
 const home = await readFile(path.join(output, "index.html"), "utf8");
-const alternatives = await readFile(path.join(output, "alternatives", "index.html"), "utf8");
 const worktreeArticle = await readFile(path.join(output, "articles", "git-worktree-context-for-coding-agents", "index.html"), "utf8");
 const toolkit = await readFile(path.join(output, "articles", "open-source-agent-memory-stack", "index.html"), "utf8");
 const paper = await readFile(path.join(output, "paper", "index.html"), "utf8");
@@ -322,7 +322,13 @@ for (const responsiveHeroRule of [
 if (home.includes('"@type":"SearchAction"') || home.includes("search_term_string")) {
   errors.push("Homepage must not emit the retired sitelinks-search SearchAction or its crawlable URL template.");
 }
-if (!home.includes("<strong>16 / 16</strong>")
+if (!home.includes("<strong>12 / 12</strong>")
+  || !home.includes("deep-memory product checks passed")
+  || !home.includes("restored 390,226 source bytes exactly")
+  || !home.includes("reused two of three chunks")
+  || !home.includes("Symbols and references")
+  || !home.includes("Strict cited facts")
+  || !home.includes("<strong>16 / 16</strong>")
   || !home.includes("real-Git-worktree continuity scenarios passed")
   || !home.includes("<strong>6 hosts</strong>")
   || !home.includes("<strong>4 modes</strong>")
@@ -336,17 +342,17 @@ if (!home.includes("What coding agents and developers need to know.") || !home.i
   errors.push("Homepage is missing the direct answer-engine surface.");
 }
 for (const worktreeHeroProof of [
-  "One memory system for every Git worktree.",
-  "Project memory for parallel coding-agent work",
+  "Your project remembers. Every agent gets the proof.",
+  "Verifiable memory for coding agents",
   'class="hero-context-proof"',
-  "16 / 16",
-  "real Git worktree continuity checks passed",
-  "incremental compaction",
+  "12 / 12",
+  "deep-memory product checks passed",
+  "exact recovery, chunk reuse, symbols, references, cited facts, and incremental refresh",
   "one repository · two isolated ledgers",
   "branch + commit in snapshot hash",
-  'href="/articles/git-worktree-context-for-coding-agents/"'
+  'href="/docs/content-archive/"'
 ]) {
-  if (!home.includes(worktreeHeroProof)) errors.push(`Homepage is missing the worktree-first product story: ${worktreeHeroProof}`);
+  if (!home.includes(worktreeHeroProof)) errors.push(`Homepage is missing the deep-memory product story: ${worktreeHeroProof}`);
 }
 if (home.indexOf('class="front-proof section shell"') > home.indexOf('class="handoff-stage"')) {
   errors.push("Homepage must place the verified claim and cost table directly after the hero, before the setup workflow.");
@@ -363,18 +369,26 @@ for (const dashboardProof of [
 if (home.indexOf('<section class="hero">') > home.indexOf('<section class="benchmark-ribbon"')) {
   errors.push("Homepage must lead with the centered product hero before benchmark detail.");
 }
-if (!home.includes("Worktree-aware project memory and cited context graphs for coding agents.")
+if (!home.includes("Verifiable project memory, exact source recovery, and cited context for coding agents.")
   || !home.includes("Measured, reproducible, and explicitly scoped.")) {
   errors.push("Homepage is missing the worktree-aware category or the separate historical benchmark scope.");
 }
 if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
   || publicMetrics.productVersion !== "0.4.0"
-  || publicMetrics.updatedAt !== "2026-08-19"
+  || publicMetrics.updatedAt !== "2026-08-20"
   || publicMetrics.providerBillingMeasurement !== false
   || publicMetrics.metrics?.realGitWorktreeContinuity?.scenarios !== 16
   || publicMetrics.metrics?.realGitWorktreeContinuity?.passed !== 16
   || publicMetrics.metrics?.realGitWorktreeContinuity?.failed !== 0
   || publicMetrics.metrics?.realGitWorktreeContinuity?.artifactHash !== "sha256:0a610a0c2f6503d4b3c53c2e8bfc187c2159c70906e1bc7e828693cc34b6be9d"
+  || publicMetrics.metrics?.deepMemoryProductAcceptance?.scenarios !== 12
+  || publicMetrics.metrics?.deepMemoryProductAcceptance?.passed !== 12
+  || publicMetrics.metrics?.deepMemoryProductAcceptance?.failed !== 0
+  || publicMetrics.metrics?.deepMemoryProductAcceptance?.restoredSourceBytes !== 390226
+  || publicMetrics.metrics?.deepMemoryProductAcceptance?.reusedChunks !== 2
+  || publicMetrics.metrics?.deepMemoryProductAcceptance?.indexedSymbols !== 4
+  || publicMetrics.metrics?.deepMemoryProductAcceptance?.resolvedReferences !== 3
+  || publicMetrics.metrics?.deepMemoryProductAcceptance?.artifactHash !== "sha256:bb801a59d5c1822b87bda5596237a126a064e62ac6f588e3351ebe949551ff46"
   || publicMetrics.metrics?.repeatedProjectContext?.baselineEstimatedTokens !== 442113
   || publicMetrics.metrics?.repeatedProjectContext?.qarinahEstimatedTokens !== 5682
   || publicMetrics.metrics?.repeatedProjectContext?.estimatedTokensAvoided !== 436431
@@ -392,6 +406,9 @@ if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
   errors.push("metrics.json is incomplete or has drifted from the verified public benchmark receipt.");
 }
 for (const requiredPublicMetricCopy of [
+  "12 / 12 deep-memory product checks passed",
+  "390,226 source bytes exactly",
+  "2 of 3",
   "98.7148% less estimated repeated project context",
   "436,431 fewer estimated input-context tokens",
   "full-history baseline contained 77.81 times as many estimated tokens",
@@ -424,7 +441,7 @@ for (const capability of [
 }
 if (!features.includes('"@type":"CollectionPage"')
   || !features.includes('"@type":"ItemList"')
-  || !features.includes('"numberOfItems":19')) {
+  || !features.includes('"numberOfItems":25')) {
   errors.push("Features page is missing its visible capability collection structured data.");
 }
 for (const requiredWorktreeArticleCopy of [
@@ -465,31 +482,6 @@ for (const imageOrigin of ["https://api.producthunt.com", "https://launchnest.io
   if (!headerPolicy.includes(imageOrigin)) {
     errors.push(`Site image policy is missing launch-directory origin ${imageOrigin}`);
   }
-}
-for (const requiredAlternative of [
-  "Qarinah alternatives and coding-agent memory comparison",
-  "Application personalization memory",
-  "Letta",
-  "LangMem and LangGraph memory",
-  "General temporal knowledge graph",
-  "GitHub Copilot Memory",
-  "Claude Code memory",
-  "Cursor Memories",
-  "One category choice, not a universal winner",
-  "It is not a performance ranking"
-]) {
-  if (!alternatives.includes(requiredAlternative)) {
-    errors.push(`Alternatives page is missing ${requiredAlternative}`);
-  }
-}
-if (!alternatives.includes('"@type":"ItemList"')
-  || !alternatives.includes('"itemListOrder":"https://schema.org/ItemListUnordered"')
-  || !alternatives.includes('"@type":"FAQPage"')) {
-  errors.push("Alternatives page is missing unordered comparison or answer-oriented structured data.");
-}
-const alternativesClaimCopy = alternatives.replaceAll("Is Qarinah better than every adjacent memory category?", "");
-if (/Qarinah is (?:the )?(?:best|only)|Qarinah (?:is )?better than|Qarinah outperforms?/iu.test(alternativesClaimCopy)) {
-  errors.push("Alternatives page contains an unsupported superiority term.");
 }
 for (const requiredToolkitCopy of [
   "Give agents memory, web reach, and a browser.",
@@ -539,15 +531,15 @@ if (!faq.includes('"@type":"FAQPage"') || !faq.includes('"mainEntity"')) {
 if (!paper.includes('src="/assets/qarinah-flow.svg"')) {
   errors.push("Paper architecture image is not bound to the deployed asset.");
 }
-if (!paper.includes("/paper/Qarinah-Technical-White-Paper-v1.5.pdf")) {
+if (!paper.includes("/paper/Qarinah-Technical-White-Paper-v1.6.pdf")) {
   errors.push("Paper download does not point to the versioned website PDF.");
 }
 if (!paper.includes("https://doi.org/10.5281/zenodo.21850747")
   || !paper.includes("https://doi.org/10.5281/zenodo.21547684")
   || !paper.includes("https://doi.org/10.5281/zenodo.21843240")
   || !paper.includes('"creativeWorkStatus":"Published"')
-  || !paper.includes('"datePublished":"2026-08-19"')) {
-  errors.push("Paper page must bind current v1.5 to the paper series and preserve published v1.4/v1.3 DOIs.");
+  || !paper.includes('"datePublished":"2026-08-20"')) {
+  errors.push("Paper page must bind current v1.6 to the paper series and preserve published v1.4/v1.3 DOIs.");
 }
 if (/release[- ]candidate|activates on publication|not registered or published|DOI reserved|assigned only when this manuscript is deposited|assigned by Zenodo when v1\.4 is deposited|A version DOI is assigned/iu.test(paper)) {
   errors.push("Paper page contains stale pre-publication lifecycle wording.");

@@ -17,7 +17,7 @@ const CONFIG_KEYS = new Set([
   "schemaVersion", "workspaceId", "enabled", "capture", "maxEventBytes", "maxLogBytes",
   "contextMaxChars", "retentionClass", "createdAt"
 ]);
-const STORAGE_DIRECTORIES = Object.freeze(["events", "objects", "records", "graph", "index", "snapshots", "locks", "dashboard", "receipts"]);
+const STORAGE_DIRECTORIES = Object.freeze(["events", "objects", "records", "graph", "index", "snapshots", "locks", "dashboard", "receipts", "archive"]);
 const MAX_CONFIG_BYTES = 64 * 1024;
 
 function isWithin(root, candidate) {
@@ -285,7 +285,7 @@ export async function initializeWorkspace(target = process.cwd(), options = {}) 
       createdAt: new Date().toISOString()
     };
     await atomicWriteFile(resolveWithin(qarinahDir, ".gitignore"), [
-      "events/", "objects/", "records/", "graph/", "index/", "snapshots/", "locks/", "dashboard/", "receipts/", "",
+      "events/", "objects/", "records/", "graph/", "index/", "snapshots/", "locks/", "dashboard/", "receipts/", "archive/", "",
       "!.gitignore", "!config.json", ""
     ].join("\n"));
     if (!existingEvent) await atomicWriteFile(eventPath, "");
@@ -357,7 +357,7 @@ export async function loadWorkspace(start = process.cwd(), options = {}) {
     // first use. If present, they still pass the normal link/path checks.
     await secureStoragePath(provisional, [directory], {
       type: "directory",
-      allowMissing: directory === "dashboard" || directory === "receipts"
+      allowMissing: directory === "dashboard" || directory === "receipts" || directory === "archive"
     });
   }
   try {

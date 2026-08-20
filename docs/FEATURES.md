@@ -19,7 +19,38 @@ Qarinah is evidence-linked project memory for coding agents. It keeps an inspect
 - Content mode can retain bounded redacted summary text. Metadata mode retains only the metric, citation, and manifest receipt.
 - The published 98.71% reduction and 77.81:1 ratio remain explicitly scoped to the committed six-fixture comparison; every live run reports its own measured estimate instead of inheriting that number.
 
-See [Coding context harness](CODING-CONTEXT-HARNESS.md).
+## Explicit automatic project memory
+
+- `qarinah watch` runs in the foreground and serially refreshes project structure, symbols, one cited incremental checkpoint, and all derived read models after a real source change.
+- Unchanged snapshots do not append duplicate events or rebuild projections.
+- The watcher remains inside one initialized workspace and applies the same ignore, secret-name, link, capture-policy, and byte/count ceilings as the ordinary project scanner.
+- Stop signals and API cancellation interrupt polling. Qarinah does not install a silent desktop-wide collector.
+
+## Cited fact consolidation
+
+- `qarinah facts` produces bounded decisions, constraints, tools, outcomes, evidence, conflicts, and summaries from the admitted verified pack.
+- Every structured fact cites one to eight source event IDs present in that pack.
+- The default extractor is deterministic. Optional model adapters receive bounded untrusted inputs and cannot introduce uncited event IDs or extra fields.
+- Recording is idempotent. Metadata capture stores a content-free receipt; content capture may retain the bounded cited statements.
+
+## Lossless source retention beside compact context
+
+- Explicit content-capture workspaces can archive selected project files without placing those bytes in every context pack.
+- Content-defined chunks deduplicate unchanged regions across snapshots; Brotli is used only when it reduces stored bytes.
+- AES-256-GCM authentication, per-file SHA-256 verification, key-scoped object paths, and deterministic manifests detect changed or misplaced archive content.
+- Restore, manifest deletion, orphan-object garbage collection, and local-key destruction require explicit identifiers and return bounded receipts.
+- Ignore rules, secret-filename rejection, link rejection, and hard resource ceilings keep the archive opt-in and project-scoped.
+- This is a local project archive, not a managed backup cloud, device-wide passive capture service, or physical-media erasure guarantee.
+
+## Code-aware symbol memory
+
+- A real TypeScript compiler parser indexes JavaScript, JSX, TypeScript, and TSX declarations, containers, exports, exact spans, signature hashes, and unambiguous references.
+- Every parsed file must still match the content hash in the latest explicit project scan; stale or linked files abstain.
+- Default symbol search combines lexical matching, a deterministic local subword vector, and resolved-reference structure with a visible score basis.
+- `qarinah-lsp` exposes document symbols, workspace symbols, definitions, and references through bounded stdio JSON-RPC.
+- The strict symbol-graph schema is public and additive. Other language grammars are future adapters, not silently approximated by the v1 parser.
+
+See [Coding context harness](CODING-CONTEXT-HARNESS.md), [Automatic project memory](AUTOMATIC-PROJECT-MEMORY.md), and [Cited fact consolidation](CITED-FACT-CONSOLIDATION.md).
 
 ## Project-owned memory
 
@@ -81,4 +112,4 @@ Qarinah is not an autonomous agent runtime, a hosted personalization service, or
 
 Qarinah can support private and NDA-conscious projects with local storage, explicit consent, metadata-only defaults, redaction, encrypted bundles, and signed checkpoints. It does not create or replace a legal NDA. See [private projects](PRIVATE-PROJECTS.md).
 
-Continue with [installation and setup](GETTING-STARTED.md), [project overview](PROJECT-OVERVIEW.md), [agent archive import](AGENT-ARCHIVE-IMPORT.md), [memory-footprint measurement](MEMORY-FOOTPRINT.md), [host compatibility](HOST-COMPATIBILITY.md), the [CLI reference](CLI-REFERENCE.md), or the [JavaScript and TypeScript API](API-REFERENCE.md).
+Continue with [installation and setup](GETTING-STARTED.md), [project overview](PROJECT-OVERVIEW.md), [agent archive import](AGENT-ARCHIVE-IMPORT.md), [lossless content archives](CONTENT-ARCHIVE.md), [memory-footprint measurement](MEMORY-FOOTPRINT.md), [host compatibility](HOST-COMPATIBILITY.md), the [CLI reference](CLI-REFERENCE.md), or the [JavaScript and TypeScript API](API-REFERENCE.md).

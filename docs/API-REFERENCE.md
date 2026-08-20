@@ -80,6 +80,10 @@ Invalid JavaScript argument shapes generally throw `TypeError`. Storage, trust, 
 | `PROJECT_STRUCTURE_SCHEMA_VERSION` | `"qarinah.project-structure.v2"` |
 | `AGENT_ARCHIVE_IMPORT_SCHEMA_VERSION` | `"qarinah.agent-archive-import.v1"` |
 | `AGENT_ARCHIVE_BACKUP_SCHEMA_VERSION` | `"qarinah.agent-archive-backup.v1"` |
+| `CONTENT_ARCHIVE_SCHEMA_VERSION` | `"qarinah.content-archive.v1"` |
+| `CONTENT_ARCHIVE_KEY_SCHEMA_VERSION` | `"qarinah.content-archive-key.v1"` |
+| `SYMBOL_GRAPH_SCHEMA_VERSION` | `"qarinah.symbol-graph.v1"` |
+| `QARINAH_LSP_PROTOCOL_VERSION` | `"qarinah-lsp.v1"` |
 | `MEMORY_FOOTPRINT_SCHEMA_VERSION` | `"qarinah.memory-footprint.v1"` |
 | `CODING_CONTEXT_HARNESS_SCHEMA_VERSION` | `"qarinah.coding-context-harness.v1"` |
 | `PROJECT_OVERVIEW_SCHEMA_VERSION` | `"qarinah.project-overview.v1"` |
@@ -448,6 +452,34 @@ function backupAgentArchives(
 ```
 
 Streams from 1 to 32 explicit absolute JSONL/NDJSON files or directories into a new directory beneath an existing absolute destination. It rejects linked paths and source/destination overlap, meters files and bytes before and during copying, verifies per-file SHA-256 digests, writes `manifest.json`, and optionally records a compact receipt when `cwd` identifies a trusted workspace. See [External agent-archive backup](AGENT-ARCHIVE-BACKUP.md).
+
+## Lossless content archive
+
+```ts
+function createContentArchive(source?: string, options?: QarinahContentArchiveOptions): Promise<QarinahContentArchiveManifest>;
+function listContentArchives(options?: { cwd?: string }): Promise<readonly QarinahContentArchiveManifest[]>;
+function verifyContentArchive(archiveId: string, options?: { cwd?: string; signal?: AbortSignal }): Promise<QarinahContentArchiveVerification>;
+function restoreContentArchive(archiveId: string, destination: string, options?: { cwd?: string; overwrite?: boolean; signal?: AbortSignal }): Promise<QarinahContentArchiveRestoreResult>;
+function deleteContentArchive(archiveId: string, options: { cwd?: string; confirmArchiveId: string }): Promise<QarinahContentArchiveDeletionResult>;
+function garbageCollectContentArchive(options: { cwd?: string; confirmWorkspaceId: string }): Promise<QarinahContentArchiveGarbageCollectionResult>;
+function cryptographicallyEraseContentArchiveVault(options: { cwd?: string; confirmWorkspaceId: string }): Promise<QarinahContentArchiveErasureResult>;
+```
+
+The archive is an opt-in, bounded, local content store for workspaces whose capture mode is `content`. It uses content-defined chunks, cross-manifest deduplication, conditional Brotli compression, AES-256-GCM authentication, SHA-256 identities, exact restore verification, and explicit destructive confirmations. The adjacent local key is not an OS keystore or KMS. The strict manifest contract is exported as `qarinah/schemas/content-archive.json`. See [Lossless content archive](CONTENT-ARCHIVE.md).
+
+## Symbol graph and language server
+
+```ts
+function parseTypeScriptSymbols(filePath: string, text: string, options?: { maxCharacters?: number }): QarinahParsedSymbols;
+function buildSymbolGraph(options?: { cwd?: string; persist?: boolean; signal?: AbortSignal }): Promise<QarinahSymbolGraph>;
+function loadSymbolGraph(options?: { cwd?: string }): Promise<QarinahSymbolGraph>;
+function querySymbolGraph(graph: QarinahSymbolGraph, query?: string, options?: { limit?: number; kinds?: readonly QarinahSymbolKind[] }): QarinahSymbolQuery;
+function searchSymbols(query?: string, options?: QarinahSymbolSearchOptions): Promise<QarinahSymbolQuery>;
+function createLanguageServer(options?: QarinahLanguageServerOptions): QarinahLanguageServer;
+function runLanguageServer(options?: QarinahLanguageServerOptions): QarinahLanguageServer;
+```
+
+`buildSymbolGraph` reads only JavaScript/TypeScript-family files whose exact hashes remain current in the latest validated project snapshot. The query API returns an explicit lexical/local-vector/structural score basis. The language server implements bounded LSP stdio requests for symbols, definitions, and references. The strict graph contract is exported as `qarinah/schemas/symbol-graph.json`. See [Symbol graph and language server](SYMBOL-GRAPH.md).
 
 ### `buildProjectOverview(options?)`
 
@@ -1107,6 +1139,24 @@ Validates and appends the paired revision and acquisition events under the activ
 
 The accepted structural record schema is exported as `qarinah/schemas/cockroach-source-record.json`.
 
+## Automatic project memory
+
+### `runProjectMemoryCycle(options?)`
+
+Runs one bounded source scan. When the snapshot changed, it optionally rebuilds the local symbol graph, records one idempotent cited harness checkpoint, and regenerates derived views. It returns a `qarinah.project-memory-cycle.v1` receipt whose `cycleHash` binds the complete cycle result.
+
+### `createProjectMemoryWatcher(options?)`
+
+Creates a serial foreground polling loop with `run()`, `stop()`, and `status()`. `intervalMs` is bounded from 250 through 3,600,000 milliseconds. Optional `onCycle` and `onError` callbacks observe results without changing Qarinah's capture authority. The watcher accepts an `AbortSignal` and does not install a background service.
+
+The strict receipt schema is exported as `qarinah/schemas/project-memory-cycle.json`. See [Automatic project memory](AUTOMATIC-PROJECT-MEMORY.md).
+
+## `consolidateProjectFacts(options?)`
+
+Compiles an admitted context pack and returns a strict `qarinah.fact-consolidation.v1` result. The built-in path deterministically creates cited facts. An optional `extractor` has an `id` and `extract(input, { signal })` function; output is rejected unless every fact uses the closed category/confidence set and cites one to eight source event IDs from the supplied bounded pack.
+
+`record:true` appends an idempotent summary linked to its source events. Metadata capture stores a content-free receipt. Content capture may store the bounded statements. The strict result schema is exported as `qarinah/schemas/fact-consolidation.json`. See [Cited fact consolidation](CITED-FACT-CONSOLIDATION.md).
+
 ## ProductLoop interoperability
 
 Exports:
@@ -1156,6 +1206,8 @@ qarinah/schemas/maqam-context-adapter.json
 qarinah/schemas/cockroach-browser-memory.json
 qarinah/schemas/cockroach-source-record.json
 qarinah/schemas/productloop-runtime-event.json
+qarinah/schemas/project-memory-cycle.json
+qarinah/schemas/fact-consolidation.json
 ```
 
 Anything outside this export map is internal and may change without becoming a public API.

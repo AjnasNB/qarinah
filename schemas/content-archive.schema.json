@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/AjnasNB/qarinah/schemas/content-archive.schema.json",
+  "title": "Qarinah lossless content archive manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "workspaceId", "createdAt", "label", "source", "chunking", "encryption", "limits", "files", "skipped", "totals", "archiveId", "manifestHash"],
+  "properties": {
+    "schemaVersion": { "const": "qarinah.content-archive.v1" },
+    "workspaceId": { "type": "string", "pattern": "^ws_[0-9a-f]{32}$" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "label": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path"],
+      "properties": { "path": { "$ref": "#/$defs/path" } }
+    },
+    "chunking": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "minBytes", "averageBytes", "maxBytes"],
+      "properties": {
+        "algorithm": { "const": "qarinah-gear-content-defined-v1" },
+        "minBytes": { "type": "integer", "minimum": 4096, "maximum": 1048576 },
+        "averageBytes": { "type": "integer", "minimum": 8192, "maximum": 4194304 },
+        "maxBytes": { "type": "integer", "minimum": 16384, "maximum": 16777216 }
+      }
+    },
+    "encryption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "keyId", "keyStorage"],
+      "properties": {
+        "algorithm": { "const": "AES-256-GCM" },
+        "keyId": { "type": "string", "pattern": "^key_[0-9a-f]{32}$" },
+        "keyStorage": { "const": "workspace-local" }
+      }
+    },
+    "limits": { "$ref": "#/$defs/limits" },
+    "files": {
+      "type": "array",
+      "maxItems": 100000,
+      "items": { "$ref": "#/$defs/file" }
+    },
+    "skipped": {
+      "type": "array",
+      "maxItems": 100000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "reason"],
+        "properties": {
+          "path": { "$ref": "#/$defs/path" },
+          "reason": { "enum": ["ignored", "secret-filename", "linked-or-non-regular"] }
+        }
+      }
+    },
+    "totals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fileCount", "sourceBytes", "chunkCount", "uniqueObjectCount", "uniqueObjectBytes", "reusedObjectCount"],
+      "properties": {
+        "fileCount": { "type": "integer", "minimum": 1, "maximum": 100000 },
+        "sourceBytes": { "type": "integer", "minimum": 0 },
+        "chunkCount": { "type": "integer", "minimum": 1 },
+        "uniqueObjectCount": { "type": "integer", "minimum": 1 },
+        "uniqueObjectBytes": { "type": "integer", "minimum": 0 },
+        "reusedObjectCount": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "archiveId": { "type": "string", "pattern": "^archive_[0-9a-f]{64}$" },
+    "manifestHash": { "$ref": "#/$defs/hash" }
+  },
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "path": { "type": "string", "minLength": 1, "maxLength": 1024, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$" },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxFiles", "maxFileBytes", "maxTotalBytes", "minChunkBytes", "averageChunkBytes", "maxChunkBytes"],
+      "properties": {
+        "maxFiles": { "type": "integer", "minimum": 1, "maximum": 100000 },
+        "maxFileBytes": { "type": "integer", "minimum": 1024, "maximum": 1073741824 },
+        "maxTotalBytes": { "type": "integer", "minimum": 1024, "maximum": 8589934592 },
+        "minChunkBytes": { "type": "integer", "minimum": 4096, "maximum": 1048576 },
+        "averageChunkBytes": { "type": "integer", "minimum": 8192, "maximum": 4194304 },
+        "maxChunkBytes": { "type": "integer", "minimum": 16384, "maximum": 16777216 }
+      }
+    },
+    "chunk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["objectId", "plaintextHash", "offset", "length", "storedBytes", "codec"],
+      "properties": {
+        "objectId": { "type": "string", "pattern": "^obj_[0-9a-f]{64}$" },
+        "plaintextHash": { "$ref": "#/$defs/hash" },
+        "offset": { "type": "integer", "minimum": 0 },
+        "length": { "type": "integer", "minimum": 0, "maximum": 16777216 },
+        "storedBytes": { "type": "integer", "minimum": 33 },
+        "codec": { "enum": ["identity-v1", "brotli-v1"] }
+      }
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "size", "contentHash", "chunks"],
+      "properties": {
+        "path": { "$ref": "#/$defs/path" },
+        "size": { "type": "integer", "minimum": 0, "maximum": 1073741824 },
+        "contentHash": { "$ref": "#/$defs/hash" },
+        "chunks": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/chunk" } }
+      }
+    }
+  }
+}

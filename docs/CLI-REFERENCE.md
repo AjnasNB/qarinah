@@ -80,6 +80,15 @@ qarinah build
 qarinah import <archive-file-or-directory> [options]
 qarinah overview [--format json|markdown]
 qarinah map [query] [--limit n] [--type memory,file,concept,directory,reference] [--repository id,...] [--scope id,...] [--as-of timestamp]
+qarinah archive create <workspace-relative-source> [--label text]
+qarinah archive list
+qarinah archive verify <archive-id>
+qarinah archive restore <archive-id> --destination <directory>
+qarinah archive delete <archive-id> --confirm <archive-id>
+qarinah archive gc --confirm-workspace <workspace-id>
+qarinah archive erase-key --confirm-workspace <workspace-id>
+qarinah symbols build
+qarinah symbols query [text] [--limit n] [--kind function,class,...]
 qarinah harness [query] [--worktrees] [--record] [--no-rebuild] [--format json|markdown] [options]
 qarinah query [text] [options]
 qarinah query --stdin-json
@@ -486,6 +495,30 @@ qarinah import <archive-file-or-directory> \
 
 The source must be an explicit regular `.jsonl` or `.ndjson` file, or a directory containing those files. Linked files and directories are not followed. `auto` detects supported Codex and Claude records and otherwise applies the portable format. Use explicit `kimi` for Kimi's documented stream-json user, assistant, tool-call, and tool-result messages.
 
+## Lossless project-content archive
+
+```text
+qarinah archive create <workspace-relative-source> [--label text]
+qarinah archive list
+qarinah archive verify <archive-id>
+qarinah archive restore <archive-id> --destination <directory>
+qarinah archive delete <archive-id> --confirm <archive-id>
+qarinah archive gc --confirm-workspace <workspace-id>
+qarinah archive erase-key --confirm-workspace <workspace-id>
+```
+
+Creation requires a workspace initialized with `--capture content`. Sources remain inside the workspace and outside `.qarinah`; links, generated/dependency trees, ignored paths, and common secret filenames are not archived. Verify reconstructs and hashes every file. Restore refuses existing output files. Delete removes only the manifest, while garbage collection removes objects no remaining manifest references. Key destruction is a local cryptographic-erasure operation with explicit backup and physical-media caveats. See [Lossless content archive](CONTENT-ARCHIVE.md).
+
+## Symbols and language server
+
+```text
+qarinah symbols build
+qarinah symbols query [text] [--limit n] [--kind function,class,...]
+qarinah-lsp
+```
+
+Run `qarinah scan` before the first symbol build. The v1 built-in parser covers JavaScript, JSX, TypeScript, and TSX and verifies each file against the latest snapshot hash. Query returns the lexical, local-subword-vector, and structural score components. `qarinah-lsp` starts the bounded stdio language server. See [Symbol graph and language server](SYMBOL-GRAPH.md).
+
 `compact` is the default. It writes one cited summary per session and is appropriate for large exports. `full` writes each supported visible item separately and requires content-authorized capture. Hidden reasoning and encrypted reasoning blocks are ignored in either mode. The result reports source bytes, files, records, visible items, sessions, newly imported events, formats, and rebuilt-state identity.
 
 ## `backup`
@@ -725,6 +758,28 @@ npx qarinah setup . --codex --claude --cursor --kimi --antigravity --capture con
 Omit host flags to configure all five supported project integrations. Omit `--allow-query` for diagnostic-only MCP. With `--allow-query`, setup binds the zero-write `context.query` tool to the exact workspace's current consent-policy hash and response ceilings. Codex and Claude Code receive reviewed lifecycle hooks; Cursor, Kimi, and Antigravity receive their documented project-local MCP/configuration surfaces. See [Coding-agent host compatibility](HOST-COMPATIBILITY.md).
 
 `--auto-compact` is opt-in and applies to Codex and Claude Code Stop hooks. It runs after ordinary lifecycle capture and invokes `harness --record --no-rebuild --quiet`, producing one idempotent cited checkpoint without forcing a full projection rebuild after every turn.
+
+## `watch`
+
+Run one explicit automatic-memory cycle or keep a foreground watcher active:
+
+```sh
+npx qarinah watch --once
+npx qarinah watch --interval-ms 2000 --query "current implementation decisions"
+```
+
+Options are `--once`, `--interval-ms 250..3600000`, `--query`, `--no-compact`, `--no-symbols`, and `--no-rebuild`. The watcher never installs itself as an operating-system service. A changed scan refreshes the selected stages serially; an unchanged scan returns `changed:false` without duplicate writes. Each JSON cycle contains the exact snapshot, optional symbol/checkpoint/derived receipts, explicit boundaries, and a `cycleHash`.
+
+## `facts`
+
+Create a structured cited fact set from the admitted verified context pack:
+
+```sh
+npx qarinah facts "current implementation decisions"
+npx qarinah facts "current implementation decisions" --record --max-facts 24
+```
+
+Options are `--record`, `--max-facts 1..64`, `--max-chars 512..1000000`, `--max-tokens 128..1000000`, and `--limit 1..64`. The CLI uses the deterministic local extractor. Library callers may provide an optional model extractor through the public API. All facts remain labeled untrusted data and cite admitted source event IDs.
 
 ## `install`
 

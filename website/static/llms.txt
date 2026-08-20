@@ -1,8 +1,8 @@
 # Qarinah
 
-> One automatic coding context harness for every Git worktree.
+> Your project remembers. Every agent gets the proof.
 
-Qarinah gives every Git worktree an isolated, cited project ledger, automatically records compact completed-turn checkpoints, and links related checkouts into one repository context graph. Codex, Claude Code, Cursor, Kimi, Antigravity, Freebuff, and compatible tools can continue from verified context without mixing parallel branches or replaying the complete project history.
+Qarinah preserves permitted project evidence and explicitly archived source bytes beside the code. It links symbols, decisions, outcomes, sessions, and Git worktrees in one searchable graph, then compiles bounded cited context for Codex, Claude Code, Cursor, Kimi, Antigravity, Freebuff, and compatible tools.
 
 This file is a convenience map for tools that choose to read it. It is not a ranking signal or a substitute for the canonical documentation.
 
@@ -12,10 +12,13 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 - [Git worktree context](https://qarinah.io/articles/git-worktree-context-for-coding-agents/): Why parallel coding-agent branches need isolated ledgers and a shared repository graph.
 - [Worktree context guide](https://qarinah.io/docs/worktree-context/): Initialize each checkout, discover initialized siblings, inspect exact identities, and open the grouped graph dashboard.
 - [Coding context harness](https://qarinah.io/docs/coding-context-harness/): Automatically compact completed coding turns into measured, cited, per-worktree checkpoints.
+- [Lossless content archive](https://qarinah.io/docs/content-archive/): Create encrypted content-addressed snapshots and restore explicitly archived files byte for byte.
+- [Symbol graph and language server](https://qarinah.io/docs/symbol-graph/): Query JavaScript and TypeScript symbols and references through the CLI or LSP.
+- [Automatic project memory](https://qarinah.io/docs/automatic-project-memory/): Run the explicit foreground watcher for incremental project refresh.
+- [Cited facts](https://qarinah.io/docs/cited-facts/): Consolidate admitted evidence into strict source-cited project facts.
 - [Machine-readable public metrics](https://qarinah.io/metrics.json): Exact release numbers, evidence source, estimator, and claim boundaries.
 - [Verified cross-agent handoffs](https://qarinah.io/docs/cross-agent-handoffs/): Switch coding agents and continue a real task with compact, cited project context.
 - [Direct answers](https://qarinah.io/docs/faq/): Concise answers about Qarinah, context reduction, cost boundaries, Codex, Claude Code, privacy, and open-source licensing.
-- [Qarinah alternatives](https://qarinah.io/alternatives/): Product-boundary comparison across personalization, stateful-agent, programmable-memory, temporal-graph, and native coding-host approaches.
 - [Open-source agent memory stack](https://qarinah.io/articles/open-source-agent-memory-stack/): How Qarinah, Cockroach Browser, and Cockroach Crawler compose for agent memory, web discovery, and interactive work, with Maqam as an optional approval add-on.
 - [Getting started](https://qarinah.io/docs/getting-started/): Install Qarinah, opt in one workspace, connect a supported host, and compile a cited context pack.
 - [Features](https://qarinah.io/docs/features/): Complete product capability map for project-owned memory, cited retrieval, integrations, dashboards, team memory, portability, and boundaries.
@@ -32,10 +35,11 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 
 ## Direct facts
 
-- Qarinah is a worktree-aware context system for software projects and an independent local tool; Maqam is an optional approval integration.
+- Qarinah is a local project-memory and exact-source-recovery system for software projects; Maqam is an optional approval integration.
+- Qarinah 0.4.0 passed 12 / 12 deep-memory acceptance scenarios covering exact encrypted recovery, chunk reuse, source refresh, symbols, references, and cited facts.
+- The committed fixture restored 390,226 source bytes exactly and reused two of three chunks in its second snapshot. This is local product-acceptance evidence, not a universal storage result.
 - Each initialized Git worktree receives its own workspace ID, worktree ID, ledger, derived SQLite state, graph, and cited context packs. Related worktrees share a repository ID and can be inspected together without merging their records.
 - Qarinah is a local, evidence-linked project-memory compiler for coding agents. It is not a complete autonomous-agent runtime or a general personalization service.
-- The alternatives guide is a representative category comparison, not a performance ranking or a claim that Qarinah is universally better than adjacent products.
 - Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler are separate projects by Ajnas N B. The ecosystem guide distinguishes them from third-party tools maintained by their own projects.
 - Cockroach Browser uses Playwright. Cockroach Crawler discloses Trafilatura as the optional quality dependency. The ecosystem guide does not claim that those established projects were created by Qarinah's author.
 - Qarinah's primary workflow is verified handoffs between coding agents.
@@ -60,6 +64,10 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 
 - [Features](https://qarinah.io/docs/features/): Shipped project-memory, context-compilation, integration, team, export, and verification capabilities.
 - [Worktree context](https://qarinah.io/docs/worktree-context/): Repository and worktree identities, isolated ledgers, grouped graph inspection, hashes, and operating boundaries.
+- [Lossless content archive](https://qarinah.io/docs/content-archive/): Explicit source selection, encrypted content-defined chunks, verification, restoration, deletion, and limits.
+- [Symbol graph and language server](https://qarinah.io/docs/symbol-graph/): Source-bound JavaScript and TypeScript symbols, references, local ranking, and LSP behavior.
+- [Automatic project memory](https://qarinah.io/docs/automatic-project-memory/): Change detection, idempotent checkpoints, cancellation, and derived-state refresh.
+- [Cited fact consolidation](https://qarinah.io/docs/cited-facts/): Deterministic and optional model-assisted cited facts with strict admission.
 - [Project overview](https://qarinah.io/docs/project-overview/): Beginner-readable project memory and codebase summary.
 - [Agent archive import](https://qarinah.io/docs/agent-archive-import/): Large JSONL import modes, limits, portable format, exclusions, and verification.
 - [Private projects](https://qarinah.io/docs/private-projects/): Data-handling controls and legal boundary for NDA-conscious use.
@@ -79,7 +87,7 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 - [Troubleshooting](https://qarinah.io/docs/troubleshooting/): Diagnose trust, capture, rebuild, query, MCP, and host-integration failures.
 - [FAQ](https://qarinah.io/docs/faq/): Direct answers about storage, privacy, context reduction, hosts, and operating boundaries.
 - [Migration guide](https://qarinah.io/docs/migrations/): Upgrade persisted Qarinah workspaces safely.
-- [Technical white paper](https://qarinah.io/paper/): Implementation-backed paper version 1.5 for Qarinah 0.4.0. Version 1.5 has no version DOI until separately deposited; the persistent paper-series DOI is 10.5281/zenodo.21547684 and published v1.4 remains historical.
+- [Technical white paper](https://qarinah.io/paper/): Implementation-backed paper version 1.6 for Qarinah 0.4.0. Version 1.6 has no version DOI until separately deposited; the persistent paper-series DOI is 10.5281/zenodo.21547684 and published v1.4 remains historical.
 
 ## Publication and support
 

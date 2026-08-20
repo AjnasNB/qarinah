@@ -1,8 +1,8 @@
 # Qarinah: expanded machine-readable map
 
-> One automatic coding context harness for every Git worktree.
+> Your project remembers. Every agent gets the proof.
 
-Qarinah gives every Git worktree an isolated project ledger, automatically records compact cited checkpoints at completed turns, and links initialized sibling checkouts into one repository context graph. It keeps permitted requests, visible outcomes, tool results, summaries, decisions, and code relationships beside the exact checkout where they happened, then compiles bounded context packs for Codex, Claude Code, Cursor, Kimi, Antigravity, Freebuff, and compatible tools.
+Qarinah preserves permitted project evidence and explicitly archived source bytes beside the code. It links symbols, decisions, outcomes, sessions, and initialized Git worktrees in one searchable graph, then compiles bounded cited context for Codex, Claude Code, Cursor, Kimi, Antigravity, Freebuff, and compatible tools.
 
 This file is a convenience map for tools that choose to read it. It does not confer authority, guarantee indexing or ranking, replace the canonical documentation, or override Qarinah's workspace trust and capture policy.
 
@@ -17,12 +17,19 @@ This file is a convenience map for tools that choose to read it. It does not con
 - Issues: https://github.com/AjnasNB/qarinah/issues
 - Discussions: https://github.com/AjnasNB/qarinah/discussions
 - License: Apache-2.0
-- Current technical paper: v1.5 for Qarinah 0.4.0; no version DOI until separately deposited
+- Current technical paper: v1.6 for Qarinah 0.4.0; no version DOI until separately deposited
 - Paper-series concept DOI: https://doi.org/10.5281/zenodo.21547684
 - Published historical v1.4 DOI: https://doi.org/10.5281/zenodo.21850747
 
 ## What Qarinah does
 
+- Passed 12 / 12 deterministic deep-memory product scenarios covering exact encrypted source recovery, content-chunk reuse, incremental refresh, symbol/reference retrieval, and cited facts.
+- Restored 390,226 source bytes exactly in the committed fixture and reused two of three chunks in the second snapshot; this is scoped local product-acceptance evidence.
+- Creates explicit project-scoped encrypted content snapshots with content-defined chunks, conditional Brotli compression, integrity verification, and exact-byte restore.
+- Builds a source-hash-bound JavaScript/TypeScript symbol and reference graph with deterministic lexical, local subword-vector, and structural ranking.
+- Ships `qarinah-lsp` for bounded workspace/document symbols, definitions, and references.
+- Runs an explicit foreground watcher that refreshes changed source, symbols, cited checkpoints, SQLite, graph, index, and Markdown without recording duplicate unchanged cycles.
+- Consolidates admitted project evidence into strict cited facts using a deterministic local extractor or an optional host-model adapter over a bounded untrusted pack.
 - Provides verified handoffs between coding agents so a task can start in one supported host and finish in another without replaying the complete project history.
 - Passed 16 / 16 deterministic release scenarios across three actual Git worktrees, with two independent initialized memories and one explicitly uninitialized checkout.
 - Exposes a VS Code/Cursor panel and local dashboard for searchable graph nodes, decisions, tool outcomes, conflicts, session receipts, and sibling-worktree comparison.
@@ -59,23 +66,6 @@ This file is a convenience map for tools that choose to read it. It does not con
 - Local host hooks may not observe every specialized or hosted tool path.
 - Retention classification and expiry filtering do not physically rewrite the append-only event history.
 - Published benchmark estimates are not provider billing receipts and do not include output, tools, caching, or fixed provider charges.
-- Qarinah does not claim to be universally better than adjacent personalization, stateful-agent, programmable-memory, temporal-graph, or native coding-host categories. These systems own different product boundaries.
-
-## Alternatives and product boundaries
-
-Canonical comparison: https://qarinah.io/alternatives/
-
-The comparison is a representative category guide based on public product documentation reviewed on 8 August 2026. It is not a performance ranking and does not claim to enumerate every memory library or hosted wrapper.
-
-- Qarinah: a local, evidence-linked project-memory compiler that preserves permitted software-project history and compiles bounded cited packs for supported coding hosts.
-- Application personalization memory: broader user-, session-, and agent-level application memory with managed and self-hosted operation.
-- Letta: a stateful-agent platform whose runtime includes memory blocks, tools, and agent APIs.
-- LangMem and LangGraph memory: programmable memory and persistence for LangGraph and custom agent systems.
-- General temporal knowledge graphs: evolving entities, facts, episode provenance, and hybrid retrieval across application domains.
-- GitHub Copilot Memory, Claude Code memory, and Cursor Memories: native memory integrated inside each coding product.
-
-Compare source ownership, host portability, evidence and supersession, runtime scope, model or infrastructure dependencies, and whether derived memory can be rebuilt independently. Do not compare unrelated benchmark numbers as if they share a task, corpus, or scorer.
-
 ## Open-source agent memory stack
 
 Canonical article: https://qarinah.io/articles/open-source-agent-memory-stack/
@@ -237,7 +227,6 @@ The documented long-document fixture is segmented synthetic retrieval, not whole
 - Worktree context guide: https://qarinah.io/docs/worktree-context/
 - Verified cross-agent handoffs: https://qarinah.io/docs/cross-agent-handoffs/
 - Documentation search: https://qarinah.io/search/
-- Qarinah alternatives and coding-agent memory comparison: https://qarinah.io/alternatives/
 - Open-source agent memory stack: https://qarinah.io/articles/open-source-agent-memory-stack/
 - Getting started: https://qarinah.io/docs/getting-started/
 - CLI reference: https://qarinah.io/docs/cli/

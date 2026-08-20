@@ -60,6 +60,22 @@ try {
     "  createCockroachBrowserMemorySink,",
     "  cockroachSourceRecordToAcquisitionEventInput,",
     "  createProductLoopProvenanceSink,",
+    "  createContentArchive,",
+    "  verifyContentArchive,",
+    "  restoreContentArchive,",
+    "  listContentArchives,",
+    "  deleteContentArchive,",
+    "  garbageCollectContentArchive,",
+    "  cryptographicallyEraseContentArchiveVault,",
+    "  buildSymbolGraph,",
+    "  loadSymbolGraph,",
+    "  parseTypeScriptSymbols,",
+    "  querySymbolGraph,",
+    "  searchSymbols,",
+    "  createLanguageServer,",
+    "  createProjectMemoryWatcher,",
+    "  runProjectMemoryCycle,",
+    "  consolidateProjectFacts,",
     "  ingestCockroachSourceRecord,",
     "  importAgentArchive,",
     "  buildProjectOverview,",
@@ -94,11 +110,18 @@ try {
     "  type ProductLoopRuntimeEventBoundary,",
     "  type QarinahContextPack,",
     "  type QarinahCapturePolicy,",
+    "  type QarinahContentArchiveManifest,",
+    "  type QarinahContentArchiveOptions,",
+    "  type QarinahSymbolGraph,",
+    "  type QarinahSymbolQuery,",
     "  type QarinahOkfExportResult,",
     "  type QarinahAgentArchiveImportResult,",
     "  type QarinahProjectOverview,",
     "  type QarinahCodingContextHarnessResult,",
     "  type QarinahCodingContextSummarizer,",
+    "  type QarinahProjectMemoryCycle,",
+    "  type QarinahFactConsolidation,",
+    "  type QarinahFactExtractor,",
     "  type QarinahLinkedProjectMemory,",
     "  type QarinahLinkedProjectQuery,",
     "  type QarinahGitWorktree,",
@@ -121,12 +144,37 @@ try {
     "void siblingWorktrees;",
     "const archiveImport: Promise<QarinahAgentArchiveImportResult> = importAgentArchive('./history.jsonl', { mode: 'compact' });",
     "void archiveImport;",
+    "const archiveOptions: QarinahContentArchiveOptions = { cwd: '.', label: 'consumer source', maxFiles: 10 };",
+    "const contentArchive: Promise<QarinahContentArchiveManifest> = createContentArchive('src', archiveOptions);",
+    "void contentArchive;",
+    "void verifyContentArchive;",
+    "void restoreContentArchive;",
+    "void listContentArchives;",
+    "void deleteContentArchive;",
+    "void garbageCollectContentArchive;",
+    "void cryptographicallyEraseContentArchiveVault;",
+    "const parsedSymbols = parseTypeScriptSymbols('consumer.ts', 'export function consumer() {}');",
+    "void parsedSymbols;",
+    "const symbolGraphPromise: Promise<QarinahSymbolGraph> = buildSymbolGraph({ persist: false });",
+    "void symbolGraphPromise;",
+    "void loadSymbolGraph;",
+    "const symbolGraph: QarinahSymbolGraph | null = null;",
+    "if (symbolGraph) { const symbolQuery: QarinahSymbolQuery = querySymbolGraph(symbolGraph, 'consumer'); void symbolQuery; }",
+    "void searchSymbols;",
+    "void createLanguageServer;",
+    "const memoryCycle: Promise<QarinahProjectMemoryCycle> = runProjectMemoryCycle({ compact: false, symbols: false, rebuild: false });",
+    "void memoryCycle;",
+    "const memoryWatcher = createProjectMemoryWatcher({ intervalMs: 2000, compact: false });",
+    "void memoryWatcher.status();",
     "const projectOverview: Promise<QarinahProjectOverview> = buildProjectOverview();",
     "void projectOverview;",
     "void renderProjectOverviewMarkdown;",
     "const contextSummarizer: QarinahCodingContextSummarizer = { id: 'consumer-summary', summarize: () => ({ text: 'bounded summary' }) };",
     "const codingHarness: Promise<Readonly<QarinahCodingContextHarnessResult>> = runCodingContextHarness({ query: 'release readiness', summarizer: contextSummarizer, record: false });",
     "void codingHarness.then(renderCodingContextHarnessMarkdown);",
+    "const factExtractor: QarinahFactExtractor = { id: 'consumer-facts', extract: (input) => ({ facts: [{ category: 'summary', statement: 'Cited fact', confidence: 'extracted', sourceEventIds: [input.sources[0]?.eventId ?? 'evt_fixture'] }] }) };",
+    "const facts: Promise<QarinahFactConsolidation> = consolidateProjectFacts({ extractor: factExtractor });",
+    "void facts;",
     "void buildLinkedProjectMemory;",
     "void loadLinkedProjectMemory;",
     "void rankLinkedProjectMemory;",
@@ -273,6 +321,30 @@ try {
   );
   await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "coding-context-harness.schema.json"), "utf8");
   await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "docs", "CODING-CONTEXT-HARNESS.md"), "utf8");
+  assert.equal(
+    installedPackage.exports["./schemas/content-archive.json"],
+    "./schemas/content-archive.schema.json"
+  );
+  await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "content-archive.schema.json"), "utf8");
+  await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "docs", "CONTENT-ARCHIVE.md"), "utf8");
+  assert.equal(
+    installedPackage.exports["./schemas/symbol-graph.json"],
+    "./schemas/symbol-graph.schema.json"
+  );
+  assert.equal(installedPackage.bin["qarinah-lsp"], "bin/qarinah-lsp.js");
+  assert.equal(installedPackage.dependencies["typescript-classic"], "npm:typescript@5.9.3");
+  await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "symbol-graph.schema.json"), "utf8");
+  assert.equal(
+    installedPackage.exports["./schemas/project-memory-cycle.json"],
+    "./schemas/project-memory-cycle.schema.json"
+  );
+  await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "project-memory-cycle.schema.json"), "utf8");
+  assert.equal(
+    installedPackage.exports["./schemas/fact-consolidation.json"],
+    "./schemas/fact-consolidation.schema.json"
+  );
+  await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "fact-consolidation.schema.json"), "utf8");
+  await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "docs", "SYMBOL-GRAPH.md"), "utf8");
   process.stdout.write("Exact cockroach-browser@0.1.0 TypeScript and registry-integrity contract passed.\n");
 } finally {
   await rm(temporaryDirectory, { recursive: true, force: true });

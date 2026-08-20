@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/AjnasNB/qarinah/schemas/symbol-graph.schema.json",
+  "title": "Qarinah JavaScript and TypeScript symbol graph",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "workspaceId", "generatedAt", "source", "extractor", "coverage", "files", "skipped", "symbols", "edges", "manifestHash"],
+  "properties": {
+    "schemaVersion": { "const": "qarinah.symbol-graph.v1" },
+    "workspaceId": { "type": "string", "pattern": "^ws_[0-9a-f]{32}$" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["eventId", "eventHash", "snapshotHash"],
+      "properties": { "eventId": { "type": "string" }, "eventHash": { "$ref": "#/$defs/hash" }, "snapshotHash": { "$ref": "#/$defs/hash" } }
+    },
+    "extractor": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "version", "parser"],
+      "properties": { "id": { "const": "qarinah.typescript-symbols" }, "version": { "const": "1" }, "parser": { "type": "string" } }
+    },
+    "coverage": { "$ref": "#/$defs/coverage" },
+    "files": { "type": "array", "maxItems": 5000, "items": { "$ref": "#/$defs/file" } },
+    "skipped": { "type": "array", "maxItems": 5000, "items": { "$ref": "#/$defs/skipped" } },
+    "symbols": { "type": "array", "maxItems": 100000, "items": { "$ref": "#/$defs/symbol" } },
+    "edges": { "type": "array", "maxItems": 600000, "items": { "$ref": "#/$defs/edge" } },
+    "manifestHash": { "$ref": "#/$defs/hash" }
+  },
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "span": {
+      "type": "object", "additionalProperties": false,
+      "required": ["start", "end", "line", "column", "endLine", "endColumn"],
+      "properties": {
+        "start": { "type": "integer", "minimum": 0 }, "end": { "type": "integer", "minimum": 0 },
+        "line": { "type": "integer", "minimum": 1 }, "column": { "type": "integer", "minimum": 1 },
+        "endLine": { "type": "integer", "minimum": 1 }, "endColumn": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "reference": {
+      "type": "object", "additionalProperties": false, "required": ["path", "span"],
+      "properties": { "path": { "type": "string" }, "span": { "$ref": "#/$defs/span" } }
+    },
+    "symbol": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "name", "kind", "path", "container", "exported", "span", "signatureHash", "references"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^symbol_[0-9a-f]{64}$" }, "name": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "kind": { "enum": ["function", "class", "interface", "type", "enum", "namespace", "method", "property", "getter", "setter", "parameter", "variable", "import"] },
+        "path": { "type": "string" }, "container": { "type": ["string", "null"] }, "exported": { "type": "boolean" },
+        "span": { "$ref": "#/$defs/span" }, "signatureHash": { "$ref": "#/$defs/hash" },
+        "references": { "type": "array", "maxItems": 500000, "items": { "$ref": "#/$defs/reference" } }
+      }
+    },
+    "file": {
+      "type": "object", "additionalProperties": false, "required": ["path", "language", "contentHash", "diagnosticCount", "symbolIds"],
+      "properties": {
+        "path": { "type": "string" }, "language": { "enum": ["javascript", "typescript"] }, "contentHash": { "$ref": "#/$defs/hash" },
+        "diagnosticCount": { "type": "integer", "minimum": 0, "maximum": 128 },
+        "symbolIds": { "type": "array", "maxItems": 100000, "items": { "type": "string", "pattern": "^symbol_[0-9a-f]{64}$" }, "uniqueItems": true }
+      }
+    },
+    "skipped": {
+      "type": "object", "additionalProperties": false, "required": ["path", "reason"],
+      "properties": { "path": { "type": "string" }, "reason": { "enum": ["unsupported-language", "binary", "oversized", "unhashed", "stale-or-linked"] } }
+    },
+    "edge": {
+      "type": "object", "additionalProperties": false, "required": ["source", "type", "target"],
+      "properties": {
+        "source": { "type": "string" }, "type": { "enum": ["defines", "references"] }, "target": { "type": "string" },
+        "span": { "$ref": "#/$defs/span" }
+      }
+    },
+    "coverage": {
+      "type": "object", "additionalProperties": false,
+      "required": ["sourceFiles", "eligibleFiles", "indexedFiles", "skippedFiles", "declarations", "references", "resolvedReferences", "unresolvedReferences", "ambiguousReferences", "complete"],
+      "properties": {
+        "sourceFiles": { "type": "integer", "minimum": 0 }, "eligibleFiles": { "type": "integer", "minimum": 0 },
+        "indexedFiles": { "type": "integer", "minimum": 0 }, "skippedFiles": { "type": "integer", "minimum": 0 },
+        "declarations": { "type": "integer", "minimum": 0, "maximum": 100000 }, "references": { "type": "integer", "minimum": 0, "maximum": 500000 },
+        "resolvedReferences": { "type": "integer", "minimum": 0, "maximum": 500000 }, "unresolvedReferences": { "type": "integer", "minimum": 0, "maximum": 500000 },
+        "ambiguousReferences": { "type": "integer", "minimum": 0, "maximum": 500000 }, "complete": { "type": "boolean" }
+      }
+    }
+  }
+}

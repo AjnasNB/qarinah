@@ -8,7 +8,8 @@
   "type": "module",
   "sideEffects": false,
   "bin": {
-    "qarinah": "bin/qarinah.js"
+    "qarinah": "bin/qarinah.js",
+    "qarinah-lsp": "bin/qarinah-lsp.js"
   },
   "main": "src/index.js",
   "types": "types/index.d.ts",
@@ -46,7 +47,11 @@
     "./schemas/linked-project-query.json": "./schemas/linked-project-query.schema.json",
     "./schemas/coding-context-harness.json": "./schemas/coding-context-harness.schema.json",
     "./schemas/session-context-receipt.json": "./schemas/session-context-receipt.schema.json",
-    "./schemas/host-install-manifest.json": "./schemas/host-install-manifest.schema.json"
+    "./schemas/host-install-manifest.json": "./schemas/host-install-manifest.schema.json",
+    "./schemas/content-archive.json": "./schemas/content-archive.schema.json",
+    "./schemas/symbol-graph.json": "./schemas/symbol-graph.schema.json",
+    "./schemas/project-memory-cycle.json": "./schemas/project-memory-cycle.schema.json",
+    "./schemas/fact-consolidation.json": "./schemas/fact-consolidation.schema.json"
   },
   "files": [
     "bin/",
@@ -98,7 +103,7 @@
     "docs/AGENT-ARCHIVE-BACKUP.md",
     "docs/HOST-COMPATIBILITY.md",
     "docs/MEMORY-FOOTPRINT.md",
-    "docs/MARKET-COMPARISON-2026.md",
+    "docs/CONTENT-ARCHIVE.md",
     "docs/AZURE-EVALUATION.md",
     "docs/RELEASE-READINESS-0.5.md",
     "docs/PRIVATE-PROJECTS.md",
@@ -106,8 +111,11 @@
     "docs/SQLITE-READ-MODEL.md",
     "docs/TEMPORAL-AUTHORITY.md",
     "docs/LINKED-PROJECT-MEMORY.md",
+    "docs/SYMBOL-GRAPH.md",
     "docs/WORKTREE-CONTEXT.md",
     "docs/CODING-CONTEXT-HARNESS.md",
+    "docs/AUTOMATIC-PROJECT-MEMORY.md",
+    "docs/CITED-FACT-CONSOLIDATION.md",
     "bench/fixtures/software-task-scenarios.mjs",
     "bench/research/",
     "bench/results/",
@@ -115,6 +123,7 @@
     "bench/final/",
     "scripts/evaluate-software-tasks.mjs",
     "scripts/evaluate-worktree-continuity.mjs",
+    "scripts/evaluate-deep-memory-platform.mjs",
     "scripts/evaluate-long-document.mjs",
     "scripts/evaluate-multifile-context.mjs",
     "scripts/evaluate-context-efficiency-comparison-v1.mjs",
@@ -155,10 +164,10 @@
     "scripts/prepare-protocol-amendment-001.mjs",
     "scripts/verify-protocol-amendment-001.mjs",
     "scripts/verify-execution-readiness-v1.mjs",
-    "output/pdf/Qarinah-Technical-White-Paper-v1.5.pdf",
-    "output/pdf/Qarinah-Technical-White-Paper-v1.5.source.sha256",
-    "output/pdf/Qarinah-Technical-White-Paper-v1.5.pdf.sha256",
-    "output/pdf/Qarinah-Technical-White-Paper-v1.5.build.json",
+    "output/pdf/Qarinah-Technical-White-Paper-v1.6.pdf",
+    "output/pdf/Qarinah-Technical-White-Paper-v1.6.source.sha256",
+    "output/pdf/Qarinah-Technical-White-Paper-v1.6.pdf.sha256",
+    "output/pdf/Qarinah-Technical-White-Paper-v1.6.build.json",
     "LICENSE",
     "NOTICE",
     "THIRD_PARTY_NOTICES.md",
@@ -193,7 +202,7 @@
     "prepublishOnly": "npm run check",
     "test": "node scripts/run-tests.mjs",
     "typecheck": "node scripts/typecheck-consumer.mjs",
-    "check": "npm run check:plugins && npm run check:docs && npm run build:site && npm run check:site && npm run build:vscode-extension && npm run mcp:smoke && npm test && npm run typecheck && npm run check:benchmark-evidence && npm run check:multifile-context && npm run check:context-efficiency-comparison && npm run check:context-efficiency-comparison:v2 && npm run check:benchmark-release && npm run check:continuation-evidence && npm run check:worktree-continuity && npm run check:research-evidence && npm run check:research-development-evidence && npm run check:research-sufficiency && npm run check:research-production-evidence && npm run check:research-protocol && npm run check:research-final-manifest && npm run check:research-abstention-controls && npm run check:research-contamination && npm run check:research-power && npm run check:research-pilot && npm run check:research-readiness && npm run benchmark && npm run evaluate:context && npm run evaluate:continuation && npm run evaluate:software-tasks && npm run evaluate:long-document && npm run evaluate:multifile-context && npm pack --dry-run --ignore-scripts",
+    "check": "npm run check:plugins && npm run check:docs && npm run build:site && npm run check:site && npm run build:vscode-extension && npm run mcp:smoke && npm test && npm run typecheck && npm run check:benchmark-evidence && npm run check:multifile-context && npm run check:context-efficiency-comparison && npm run check:context-efficiency-comparison:v2 && npm run check:benchmark-release && npm run check:continuation-evidence && npm run check:worktree-continuity && npm run check:deep-memory && npm run check:research-evidence && npm run check:research-development-evidence && npm run check:research-sufficiency && npm run check:research-production-evidence && npm run check:research-protocol && npm run check:research-final-manifest && npm run check:research-abstention-controls && npm run check:research-contamination && npm run check:research-power && npm run check:research-pilot && npm run check:research-readiness && npm run benchmark && npm run evaluate:context && npm run evaluate:continuation && npm run evaluate:software-tasks && npm run evaluate:long-document && npm run evaluate:multifile-context && npm pack --dry-run --ignore-scripts",
     "check:benchmark-evidence": "node scripts/verify-benchmark-evidence.mjs",
     "check:multifile-context": "node scripts/verify-multifile-context.mjs",
     "check:context-efficiency-comparison": "node scripts/verify-context-efficiency-comparison-v1-result.mjs",
@@ -219,6 +228,9 @@
     "evaluate:worktree-continuity": "node scripts/evaluate-worktree-continuity.mjs",
     "evaluate:worktree-continuity:write": "node scripts/evaluate-worktree-continuity.mjs --write",
     "check:worktree-continuity": "node scripts/evaluate-worktree-continuity.mjs",
+    "evaluate:deep-memory": "node scripts/evaluate-deep-memory-platform.mjs",
+    "evaluate:deep-memory:write": "node scripts/evaluate-deep-memory-platform.mjs --write",
+    "check:deep-memory": "node scripts/evaluate-deep-memory-platform.mjs",
     "smoke:codex-continuation": "node scripts/run-codex-continuation-smoke.mjs",
     "smoke:codex-continuation:record": "node scripts/run-codex-continuation-smoke.mjs --write",
     "evaluate:software-tasks": "node scripts/evaluate-software-tasks.mjs",
@@ -323,6 +335,7 @@
     "typescript": "7.0.2"
   },
   "dependencies": {
-    "ignore": "7.0.6"
+    "ignore": "7.0.6",
+    "typescript-classic": "npm:typescript@5.9.3"
   }
 }

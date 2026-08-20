@@ -1,7 +1,7 @@
 {
-  "combinedSourceSha256": "sha256:108cbe323482c94e9c31a8829c6d81a4986f72a7f5815e4f902ff2fa66b92f2f",
+  "combinedSourceSha256": "sha256:8456db9c4aa695a415a5f7304bf049505b3030f7c9943d2b7c103fa785021e50",
   "generator": {
-    "command": "python scripts/build-whitepaper-pdf-v1.5.py",
+    "command": "python scripts/build-whitepaper-pdf-v1.6.py",
     "fonts": [
       {
         "fileName": "arial.ttf",
@@ -33,13 +33,13 @@
     "pythonVersion": "3.12.13",
     "reportlabVersion": "4.4.9"
   },
-  "paperVersion": "1.5",
+  "paperVersion": "1.6",
   "schemaVersion": "qarinah.white-paper-build.v1",
   "sourceDigestAlgorithm": "sha256(file-bytes + NUL separators; listed order)",
   "sources": [
     {
       "path": "docs/WHITEPAPER.md",
-      "sha256": "sha256:fef1fab0e2dbd7db18182abfb47f97c6fab227f3aab2123ea6438a06e973ba9d"
+      "sha256": "sha256:e47a4bb0f355fac5086f77826c5154a78c1e3e2026a7c0d437a1bc42f494ad7d"
     },
     {
       "path": "scripts/build-whitepaper-pdf.py",
@@ -52,6 +52,10 @@
     {
       "path": "scripts/build-whitepaper-pdf-v1.5.py",
       "sha256": "sha256:2cfe126c690e6202a92b1c0b7a9350d3ef0b3e012758763416c3e0d507165913"
+    },
+    {
+      "path": "scripts/build-whitepaper-pdf-v1.6.py",
+      "sha256": "sha256:5169ff0fa44284a18a6fe3a8bcc44eadf6ad22a4a40b2573c7f296dc3213d53a"
     }
   ]
 }

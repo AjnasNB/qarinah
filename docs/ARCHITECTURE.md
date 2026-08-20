@@ -1,8 +1,8 @@
 # Architecture
 
-> One authoritative event chain. A fast rebuildable SQLite read model. Temporally correct, authority-scoped context at task time.
+> One authoritative event chain. Explicit exact-source snapshots. Rebuildable code and memory graphs. Cited context at task time.
 
-Qarinah is an evidence-linked project-memory and retrieval engine. It preserves captured agent activity, explicit decisions, source evidence, and project structure in a verified local record, then compiles only the context relevant to a later task.
+Qarinah is an evidence-linked project-memory, exact-source-recovery, and retrieval engine. It preserves permitted agent activity, explicit decisions, source evidence, and project structure in a verified local record; optionally archives selected source bytes exactly; then compiles bounded cited context for a later task.
 
 ## System map
 
@@ -18,7 +18,8 @@ Qarinah is an evidence-linked project-memory and retrieval engine. It preserves 
 | --- | --- | --- |
 | Capture | An initialized workspace and machine-local permit control whether metadata or reviewed content may be retained. | No silent global capture and no hidden-reasoning or transcript scraping. |
 | Authority | Canonical JSONL events bind the previous hash, content hash, record hash, provenance, confidence, retention, and typed relations. | A valid chain proves continuity relative to the checkpoint, not the factual truth of every claim. |
-| Derivation | SQLite, graph, index, Markdown, project structure, dashboard, and OKF are disposable projections. | Derived state never replaces the event chain and can be deleted and rebuilt. |
+| Exact archive | Explicitly selected regular files are chunked, encrypted, manifested, verified, and restored byte for byte. | The archive is opt-in and separate from model context; it does not capture excluded, ignored, linked, or unauthorized data. |
+| Derivation | SQLite, evidence graph, symbol graph, index, Markdown, project structure, dashboard, and OKF are disposable projections. | Derived state never replaces the event chain or archive manifest and can be deleted and rebuilt. |
 | Retrieval | FTS5/BM25, typo tolerance, graph traversal, time, freshness, authority, conflict, supersession, diversity, coverage, and output budgets are composed deterministically. | Optional caller-owned semantic adapters may rerank admitted evidence but cannot introduce authority. |
 | Disclosure | Every selected item cites an event ID and hash. Maqam may temporarily attach exact scopes and repositories to one run. | Agent input cannot grant itself a scope or cross a repository boundary. |
 
@@ -29,7 +30,7 @@ Qarinah is an evidence-linked project-memory and retrieval engine. It preserves 
 3. The ledger appends the canonical event under a renewable write lock and binds the previous hash.
 4. The caller receives the event ID and record hash.
 5. A build or explicit query verifies the complete authoritative chain.
-6. Deterministic graph, JSON index, and SQLite FTS5 projections feed the context compiler.
+6. Deterministic evidence graph, symbol graph, JSON index, and SQLite FTS5 projections feed the context compiler.
 7. Temporal validity, freshness, supersession, conflicts, repository identity, and host-assigned disclosure scopes filter the candidate set.
 8. The caller receives a cited pack that fits the complete-output budget.
 
@@ -47,19 +48,26 @@ A machine-local permit binds the trusted real path, workspace ID, enabled state,
 | --- | --- | --- |
 | `events/events.jsonl` | Canonical append-only event envelopes | Authoritative |
 | `graph/graph.json` | Event nodes, typed relations, and the latest project-structure projection | Rebuildable |
+| `graph/symbol-graph.json` | Source-hash-bound JavaScript/TypeScript declarations and unambiguous references | Rebuildable |
 | `index/index.json` | Lexical postings, trigram terms, and graph adjacency | Rebuildable |
 | `index/qarinah.db` | SQLite WAL read model with FTS5, typed tables, temporal state, citations, disclosures, and pack metadata | Disposable and rebuildable from the ledger |
 | `records/CONTEXT.md` | Bounded human-readable current record | Rebuildable |
 | `records/okf/` | Deterministic Google OKF 0.1 Draft Markdown interchange | Rebuildable |
 | `index/event-ids/` | Checkpoint-authenticated idempotency buckets | Disposable and verified before use |
-| `objects/` | Reserved content-addressed source snapshots | Reserved |
-| `snapshots/` | Reserved signed context-pack manifests | Reserved |
+| `archive/manifests/` | Exact selected-source snapshot manifests | Recovery authority for the named archive |
+| `archive/objects/key_*/` | Authenticated content-defined chunks scoped to one local vault key | Required for exact restore; never injected wholesale into model context |
 
 The same verified event head and build inputs produce the same projections. `qarinah rebuild` recreates the database and every other derived view from the verified ledger. The SQLite schema has an explicit version and migration record; a future migration may rebuild rather than mutating authoritative history. An OKF export is portable interchange, not a second source of truth or retrieval engine.
 
 ## Retrieval lifecycle
 
-The compiler normalizes bounded query terms, uses SQLite FTS5 and the portable BM25 index, adds typo-tolerant character n-grams and typed graph neighbors, combines candidates through reciprocal-rank fusion, and applies time, retention, freshness, repository, authority, conflict, supersession, and diversity rules. Optional local embeddings, customer-owned models, query expansion, or rerankers can reorder only evidence already admitted by those rules. Evidence coverage then either emits a complete cited JSON or Markdown pack within budget, or fails closed when the caller's minimum is not met.
+The event-memory compiler normalizes bounded query terms, uses SQLite FTS5 and the portable BM25 index, adds typo-tolerant character n-grams and typed graph neighbors, combines candidates through reciprocal-rank fusion, and applies time, retention, freshness, repository, authority, conflict, supersession, and diversity rules. Optional customer-owned embeddings, models, query expansion, or rerankers can reorder only evidence already admitted by those rules. The symbol graph has a separate built-in deterministic local subword vector plus lexical and reference-structure components; it does not download an embedding model. Evidence coverage then either emits a complete cited JSON or Markdown pack within budget, or fails closed when the caller's minimum is not met.
+
+## Automatic refresh and fact consolidation
+
+The explicit foreground watcher serializes project cycles. A changed project snapshot refreshes the symbol graph, records one cited context checkpoint, and rebuilds derived views. An unchanged snapshot performs no duplicate append or rebuild. This is project-scoped automation initiated by the operator, not passive desktop-wide monitoring.
+
+Fact consolidation operates only on an admitted verified pack. The deterministic extractor or optional host-model adapter must return bounded typed facts citing retained source event IDs. Model output is schema-validated untrusted data; it cannot add uncited sources or replace the ledger.
 
 The compiler resolves one UTC `asOf` value when the caller omits it. Exact replay supplies that value explicitly. Budgets cover the complete pretty-JSON and Markdown encodings, and every selected item records why it was chosen.
 

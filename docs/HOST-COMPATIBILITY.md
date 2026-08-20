@@ -13,6 +13,12 @@ Qarinah keeps one project-owned memory record and exposes a bounded, read-only M
 | Freebuff | Project-local agent definition under `.agents/qarinah-memory.js` | MCP retrieval; no claimed native transcript hook | Portable JSONL/NDJSON import after an operator-controlled export |
 | Other MCP clients | Use the Qarinah stdio command and exact workspace permit | Depends on the client | Portable JSONL/NDJSON import |
 
+## Editor symbol integration
+
+The shipped VS Code extension provides the interactive Qarinah memory panel and runs in Cursor-compatible extension hosts. Qarinah also ships a separate standards-compatible `qarinah-lsp` stdio server for JavaScript/TypeScript document symbols, workspace symbols, definitions, and references. Editors with a generic Language Server Protocol client can start that executable at the initialized project root.
+
+Qarinah does not silently install editor-wide extensions. It does not yet ship a dedicated native JetBrains, Neovim, Emacs, or Visual Studio package; those hosts use their generic LSP client and the project-local MCP setup where available. See [Symbol graph and language server](SYMBOL-GRAPH.md).
+
 Qarinah does not capture hidden reasoning, credentials, private browser state, or unsupported internal host files. A host without a reviewed event adapter still gets retrieval through MCP, but its chat/tool history enters Qarinah only through an explicit supported export.
 
 ## Preview, install, and remove one host safely

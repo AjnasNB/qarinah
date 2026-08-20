@@ -4,10 +4,10 @@
 
 <h1 align="center">Qarinah</h1>
 
-<p align="center"><strong>One memory system for every Git worktree.</strong></p>
+<p align="center"><strong>Your project remembers. Every agent gets the proof.</strong></p>
 
 <p align="center">
-  Qarinah gives every checkout its own evidence-linked memory and groups sibling worktrees into one searchable context graph. Codex, Claude Code, Cursor, Kimi, Antigravity, CLI tools, and compatible MCP clients can continue from the right branch, commit, decisions, outcomes, and files instead of replaying the whole project history.
+  Qarinah preserves permitted project evidence and explicitly archived source bytes beside the code. It connects symbols, decisions, outcomes, sessions, and Git worktrees in one searchable graph, then compiles bounded cited context for Codex, Claude Code, Cursor, Kimi, Antigravity, CLI tools, and compatible MCP clients.
 </p>
 
 ```sh
@@ -22,6 +22,8 @@ npx qarinah setup . --capture content --allow-query --auto-compact
 Each worktree keeps a separate `.qarinah` ledger and consent record. Qarinah derives a shared repository identity, hashes branch and commit context into the project snapshot, and links each checkout to the files and memories it actually produced. It never replaces worktree ledgers with symlinks or a shared writable database. [Read the worktree context guide.](docs/WORKTREE-CONTEXT.md)
 
 With `--auto-compact`, the completed-turn hook compiles a bounded cited pack and records one idempotent checkpoint for the latest non-harness source event. The checkpoint can be expanded through exact event IDs, hashes, and the pack manifest. Run `npx qarinah harness "your task" --worktrees` to measure and inspect separate packs across every initialized sibling checkout. [Read the coding context harness guide.](docs/CODING-CONTEXT-HARNESS.md)
+
+For an explicit foreground loop that also notices source changes, refreshes the symbol graph, and regenerates every local read model, run `npx qarinah watch`. Unchanged cycles create no duplicate checkpoints. Qarinah does not install a hidden background service or passively inspect unrelated applications. [Read the automatic project-memory guide.](docs/AUTOMATIC-PROJECT-MEMORY.md)
 
 ## Resume the work, not the whole chat
 
@@ -45,6 +47,16 @@ npx qarinah dashboard --serve --worktrees
 | Incremental compaction | Initial, unchanged, delta, and full-rebuild states with the exact prior checkpoint and changed-event count |
 | VS Code/Cursor panel | A local sandboxed read-only webview backed by the Qarinah CLI |
 
+### Reproducible deep-memory product result
+
+The 0.4.0 product evaluator runs the full local path in a temporary initialized project: incremental source refresh, symbol and cross-file-reference indexing, cited fact consolidation, two encrypted content snapshots, integrity verification, and exact byte restoration. It passes **12 / 12** scenarios, restores **390,226 source bytes exactly**, reuses **2 of 3** chunks in the second snapshot, indexes **4 symbols** and **3 resolved references**, and retains **3 cited facts**.
+
+```sh
+npm run check:deep-memory
+```
+
+Inspect the [machine-readable result](bench/results/deep-memory-platform-v0.4.0.json) and [evaluator](scripts/evaluate-deep-memory-platform.mjs). This is local product-acceptance evidence, not a cross-product comparison or a promise about arbitrary repositories.
+
 ### Reproducible real-Git-worktree acceptance result
 
 The 0.4.0 evaluator creates **three actual Git worktree checkouts** and passes **16 / 16** isolation, retrieval, session-receipt, conflict, and incremental-compaction scenarios. Two initialized worktrees keep separate workspace identities and memories; the third is reported as explicitly uninitialized instead of being silently skipped.
@@ -53,7 +65,7 @@ The 0.4.0 evaluator creates **three actual Git worktree checkouts** and passes *
 npm run check:worktree-continuity
 ```
 
-Inspect the [machine-readable result](bench/results/worktree-continuity-v0.4.0.json), [evaluator](scripts/evaluate-worktree-continuity.mjs), and [current market comparison](docs/MARKET-COMPARISON-2026.md). This is product-acceptance evidence, not an external comparative benchmark.
+Inspect the [machine-readable result](bench/results/worktree-continuity-v0.4.0.json) and [evaluator](scripts/evaluate-worktree-continuity.mjs). This is product-acceptance evidence, not an external comparative benchmark.
 
 <p align="center">
   <img src="assets/launch/qarinah-worktree-context-graph.png" width="100%" alt="Qarinah local developer-memory graph showing one worktree, its files, memories, concepts, relationships, ranked results, and selected evidence hash.">
@@ -66,6 +78,44 @@ The historical six-fixture estimator reports 442,113 portable estimated full-his
 
 </details>
 
+### Compact context without throwing away selected source
+
+Qarinah now separates model context from retention. The ledger and graph compile small, cited task packs; an optional lossless content archive preserves the exact bytes of explicitly selected project files using content-defined chunks, deduplication, conditional Brotli compression, AES-256-GCM authentication, and SHA-256 reconstruction checks.
+
+```powershell
+npx qarinah init --capture content
+npx qarinah archive create . --label "project source"
+npx qarinah archive list
+npx qarinah archive verify archive_<sha256>
+```
+
+The 98.7148% result above is a context-volume estimate, not an archive-compression claim. The archive is local and opt-in, excludes common secret filenames and ignored/generated paths, rejects links, and has hard resource ceilings. Read [Lossless content archive](docs/CONTENT-ARCHIVE.md) before enabling content capture.
+
+### Code-aware memory, not only chat summaries
+
+After `qarinah scan`, the built-in JavaScript/TypeScript parser can create a hash-linked symbol graph with declarations, exact spans, exported status, and unambiguous references. The local search path combines lexical matching, deterministic subword vectors, and reference structure without downloading a model or calling a hosted vector database. Qarinah also ships `qarinah-lsp` for workspace symbols, document symbols, definitions, and references over the Language Server Protocol.
+
+```powershell
+npx qarinah scan
+npx qarinah symbols build
+npx qarinah symbols query "context compiler"
+npx qarinah-lsp
+npx qarinah watch --interval-ms 2000
+```
+
+The v1 parser covers JavaScript, JSX, TypeScript, and TSX. Other languages are reported as unsupported instead of being guessed. Read [Symbol graph and language server](docs/SYMBOL-GRAPH.md) for the exact coverage boundary.
+
+### Facts that can be checked, not a free-floating AI summary
+
+`qarinah facts` consolidates admitted memory into decisions, constraints, tool activity, outcomes, evidence, conflicts, and summaries. Every fact must cite an exact retained event ID. The default extractor is deterministic and local; an optional host model receives only the bounded untrusted pack and its output is rejected if it cites an event outside that pack.
+
+```sh
+npx qarinah facts "current release decisions"
+npx qarinah facts "current release decisions" --record
+```
+
+Metadata-only projects retain a content-free consolidation receipt. Content projects may retain the bounded cited statements. Read [Cited fact consolidation](docs/CITED-FACT-CONSOLIDATION.md).
+
 <p align="center">
   <a href="https://qarinah.io"><strong>Website</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://qarinah.io/docs/features/"><strong>Features</strong></a>&nbsp;&middot;&nbsp;
@@ -73,7 +123,6 @@ The historical six-fixture estimator reports 442,113 portable estimated full-his
   <a href="https://qarinah.io/docs/"><strong>Documentation</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://qarinah.io/docs/public-metrics/"><strong>Public metrics</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://qarinah.io/paper/"><strong>White paper</strong></a>&nbsp;&middot;&nbsp;
-  <a href="https://qarinah.io/docs/market-comparison/"><strong>Market comparison</strong></a>&nbsp;&middot;&nbsp;
   <a href="docs/RESEARCH-BENCHMARK.md"><strong>Research benchmark</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://doi.org/10.5281/zenodo.21547684"><strong>Paper series DOI</strong></a>
 </p>
@@ -182,7 +231,7 @@ The JSONL chain remains authoritative. Graph, index, Markdown, dashboard, and OK
 
 <p align="center">
   <a href="docs/WHITEPAPER.md">Technical paper</a>&nbsp;&middot;&nbsp;
-  <a href="output/pdf/Qarinah-Technical-White-Paper-v1.5.pdf">Technical white paper v1.5</a>&nbsp;&middot;&nbsp;
+  <a href="output/pdf/Qarinah-Technical-White-Paper-v1.6.pdf">Technical white paper v1.6</a>&nbsp;&middot;&nbsp;
   <a href="https://doi.org/10.5281/zenodo.21547684">Paper series DOI</a>&nbsp;&middot;&nbsp;
   <a href="https://doi.org/10.5281/zenodo.21850747">Published historical v1.4</a>&nbsp;&middot;&nbsp;
   <a href="docs/ARCHITECTURE.md">Architecture</a>&nbsp;&middot;&nbsp;
@@ -218,7 +267,7 @@ npx qarinah query "release provenance" \
   --format markdown
 ```
 
-Start with the [feature map](docs/FEATURES.md) and [five-minute installation guide](docs/GETTING-STARTED.md), then use the [coding context harness](docs/CODING-CONTEXT-HARNESS.md), [worktree context](docs/WORKTREE-CONTEXT.md), [host compatibility](docs/HOST-COMPATIBILITY.md), the [project overview](docs/PROJECT-OVERVIEW.md), [agent archive import](docs/AGENT-ARCHIVE-IMPORT.md), [external archive backup](docs/AGENT-ARCHIVE-BACKUP.md), [private-project guide](docs/PRIVATE-PROJECTS.md), [cross-agent handoff guide](docs/CROSS-AGENT-HANDOFFS.md), [dashboard guide](docs/DASHBOARD.md), [team-memory guide](docs/TEAM-MEMORY.md), [CLI reference](docs/CLI-REFERENCE.md), [JavaScript API reference](docs/API-REFERENCE.md), [MCP guide](docs/MCP-GUIDE.md), [task recipes](docs/RECIPES.md), or [troubleshooting guide](docs/TROUBLESHOOTING.md).
+Start with the [feature map](docs/FEATURES.md) and [five-minute installation guide](docs/GETTING-STARTED.md), then use the [coding context harness](docs/CODING-CONTEXT-HARNESS.md), [worktree context](docs/WORKTREE-CONTEXT.md), [symbol graph and language server](docs/SYMBOL-GRAPH.md), [host compatibility](docs/HOST-COMPATIBILITY.md), the [project overview](docs/PROJECT-OVERVIEW.md), [agent archive import](docs/AGENT-ARCHIVE-IMPORT.md), [lossless content archive](docs/CONTENT-ARCHIVE.md), [external archive backup](docs/AGENT-ARCHIVE-BACKUP.md), [private-project guide](docs/PRIVATE-PROJECTS.md), [cross-agent handoff guide](docs/CROSS-AGENT-HANDOFFS.md), [dashboard guide](docs/DASHBOARD.md), [team-memory guide](docs/TEAM-MEMORY.md), [CLI reference](docs/CLI-REFERENCE.md), [JavaScript API reference](docs/API-REFERENCE.md), [MCP guide](docs/MCP-GUIDE.md), [task recipes](docs/RECIPES.md), or [troubleshooting guide](docs/TROUBLESHOOTING.md).
 
 Your project already contains the decisions and evidence behind its changes. Qarinah lets the next agent query that record and receive a bounded, cited pack selected for the current task. The same local memory can support Codex, Claude Code, CLI workflows, and compatible MCP clients instead of locking project context to one editor.
 
@@ -272,10 +321,10 @@ Supported event classes include prompts, tool requests, tool completions, approv
 ## Architecture
 
 <p align="center">
-  <img src="assets/architecture/qarinah-flow.svg" width="920" alt="Detailed Qarinah architecture showing capture controls, authoritative JSONL, temporal memory, rebuildable SQLite and graph projections, Maqam scopes, deterministic retrieval, cited packs, and evaluation.">
+  <img src="assets/architecture/qarinah-flow.svg" width="920" alt="Qarinah core evidence architecture showing capture controls, authoritative JSONL, temporal memory, rebuildable SQLite and graph projections, optional Maqam scopes, deterministic retrieval, cited packs, and evaluation.">
 </p>
 
-The project graph covers directories, files, content hashes, JavaScript and TypeScript module references, Markdown links, exact source spans, additions, changes, renames, and deletions. See the [architecture guide](docs/ARCHITECTURE.md) or the [editable diagram source](docs/architecture.mmd).
+The project graph covers directories, files, content hashes, JavaScript and TypeScript module references, Markdown links, exact source spans, additions, changes, renames, and deletions. The separate symbol graph adds declarations and resolved references for JavaScript, JSX, TypeScript, and TSX, while the encrypted archive preserves explicitly selected source bytes outside model context. See the [architecture guide](docs/ARCHITECTURE.md) or the [editable core-evidence diagram source](docs/architecture.mmd).
 
 ## Technology
 
@@ -563,6 +612,9 @@ Content-mode redaction cannot prove that arbitrary tool output contains no secre
 | `qarinah scan` | Record a bounded project structure snapshot |
 | `qarinah build` | Verify and rebuild graph, index, and Markdown |
 | `qarinah map` | Search admitted memory and the repository map with temporal, repository, scope, and node-type filters |
+| `qarinah archive` | Create, list, verify, restore, delete, garbage-collect, or cryptographically erase an explicit local content archive |
+| `qarinah symbols` | Build or search the hash-linked JavaScript/TypeScript symbol and reference graph |
+| `qarinah-lsp` | Serve document/workspace symbols, definitions, and references to an LSP client over stdio |
 | `qarinah query` | Compile a coverage-aware, cited, budgeted context pack |
 | `qarinah export okf` | Build a deterministic Markdown interoperability bundle |
 | `qarinah doctor` / `qarinah status` | Verify integrity or inspect current state |
