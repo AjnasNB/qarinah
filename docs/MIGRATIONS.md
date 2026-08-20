@@ -4,6 +4,8 @@
 
 Version 0.4.0 does not change the authoritative `qarinah.event.v1` ledger. It adds disposable session receipts, developer-memory views, host-install manifests, editor packaging, and a real-worktree acceptance artifact. Existing initialized workspaces remain readable.
 
+Qarinah 0.5.0 upgrades disposable session receipts to `qarinah.session-context-receipt.v2` and their index to `qarinah.session-context-receipt-index.v2`. Version 2 adds an ordered event-manifest hash, observed lifecycle counts, exact turn identities, typed event counts, and an outcome manifest. It still retains no event bodies. Run `qarinah receipts --write` to replace v1 receipt projections; the authoritative ledger is unchanged.
+
 Run these commands in each initialized checkout after upgrading:
 
 ```sh

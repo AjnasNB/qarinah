@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/AjnasNB/qarinah/schemas/session-context-receipt.schema.json",
-  "title": "Qarinah per-session context receipt v1",
+  "title": "Qarinah exact per-session lifecycle and context receipt v2",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "generatedAt", "workspaceId", "sessionId", "sessionKey", "hostAdapters", "interval", "source", "delivered", "comparison", "timing", "unsupportedQueryCount", "boundaries", "receiptHash"],
+  "required": ["schemaVersion", "generatedAt", "workspaceId", "sessionId", "sessionKey", "hostAdapters", "interval", "source", "lifecycle", "outcomes", "delivered", "comparison", "timing", "unsupportedQueryCount", "boundaries", "receiptHash"],
   "properties": {
-    "schemaVersion": { "const": "qarinah.session-context-receipt.v1" },
+    "schemaVersion": { "const": "qarinah.session-context-receipt.v2" },
     "generatedAt": { "type": "string", "format": "date-time" },
     "workspaceId": { "type": "string", "pattern": "^ws_[0-9a-f]{32}$" },
     "sessionId": { "type": "string", "minLength": 1, "maxLength": 256 },
@@ -18,15 +18,46 @@
     },
     "source": {
       "type": "object", "additionalProperties": false,
-      "required": ["eventCount", "headHash", "characters", "estimatedTokens", "estimator", "toolRequests", "toolOutcomes"],
+      "required": ["eventCount", "headHash", "eventManifestHash", "characters", "estimatedTokens", "estimator", "toolRequests", "toolOutcomes"],
       "properties": {
         "eventCount": { "type": "integer", "minimum": 0 },
         "headHash": { "type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$" },
+        "eventManifestHash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
         "characters": { "type": "integer", "minimum": 0 },
         "estimatedTokens": { "type": "integer", "minimum": 0 },
         "estimator": { "type": "string", "minLength": 1, "maxLength": 128 },
         "toolRequests": { "type": "integer", "minimum": 0 },
         "toolOutcomes": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "lifecycle": {
+      "type": "object", "additionalProperties": false,
+      "required": ["observedState", "firstEventId", "lastEventId", "sessionStartEvents", "promptEvents", "completedTurns", "compactionEvents", "turnIds", "kindCounts", "manifestHash"],
+      "properties": {
+        "observedState": { "enum": ["started", "active", "turn-completed"] },
+        "firstEventId": { "type": ["string", "null"], "pattern": "^evt_[0-9a-f-]{36}$" },
+        "lastEventId": { "type": ["string", "null"], "pattern": "^evt_[0-9a-f-]{36}$" },
+        "sessionStartEvents": { "type": "integer", "minimum": 0 },
+        "promptEvents": { "type": "integer", "minimum": 0 },
+        "completedTurns": { "type": "integer", "minimum": 0 },
+        "compactionEvents": { "type": "integer", "minimum": 0 },
+        "turnIds": { "type": "array", "maxItems": 100000, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 256 } },
+        "kindCounts": {
+          "type": "array", "maxItems": 32,
+          "items": {
+            "type": "object", "additionalProperties": false, "required": ["kind", "count"],
+            "properties": { "kind": { "type": "string", "minLength": 1, "maxLength": 64 }, "count": { "type": "integer", "minimum": 1 } }
+          }
+        },
+        "manifestHash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    },
+    "outcomes": {
+      "type": "object", "additionalProperties": false, "required": ["eventCount", "eventIds", "manifestHash"],
+      "properties": {
+        "eventCount": { "type": "integer", "minimum": 0 },
+        "eventIds": { "type": "array", "maxItems": 100000, "uniqueItems": true, "items": { "type": "string", "pattern": "^evt_[0-9a-f-]{36}$" } },
+        "manifestHash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
       }
     },
     "delivered": {

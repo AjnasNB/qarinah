@@ -1240,10 +1240,10 @@ export function createCausalReceipt(input: Record<
   "evidence" | "memory" | "policy" | "execution" | "observation",
   { id: string; hash: `sha256:${string}`; system: string; timestamp: string }
 >): Readonly<Record<string, unknown>>;
-export const SESSION_CONTEXT_RECEIPT_SCHEMA_VERSION: "qarinah.session-context-receipt.v1";
-export const SESSION_CONTEXT_RECEIPT_INDEX_SCHEMA_VERSION: "qarinah.session-context-receipt-index.v1";
+export const SESSION_CONTEXT_RECEIPT_SCHEMA_VERSION: "qarinah.session-context-receipt.v2";
+export const SESSION_CONTEXT_RECEIPT_INDEX_SCHEMA_VERSION: "qarinah.session-context-receipt-index.v2";
 export interface QarinahSessionContextReceipt {
-  readonly schemaVersion: "qarinah.session-context-receipt.v1";
+  readonly schemaVersion: "qarinah.session-context-receipt.v2";
   readonly generatedAt: string;
   readonly workspaceId: string;
   readonly sessionId: string;
@@ -1253,11 +1253,29 @@ export interface QarinahSessionContextReceipt {
   readonly source: Readonly<{
     eventCount: number;
     headHash: `sha256:${string}` | null;
+    eventManifestHash: `sha256:${string}`;
     characters: number;
     estimatedTokens: number;
     estimator: string;
     toolRequests: number;
     toolOutcomes: number;
+  }>;
+  readonly lifecycle: Readonly<{
+    observedState: "started" | "active" | "turn-completed";
+    firstEventId: string | null;
+    lastEventId: string | null;
+    sessionStartEvents: number;
+    promptEvents: number;
+    completedTurns: number;
+    compactionEvents: number;
+    turnIds: readonly string[];
+    kindCounts: readonly Readonly<{ kind: string; count: number }>[];
+    manifestHash: `sha256:${string}`;
+  }>;
+  readonly outcomes: Readonly<{
+    eventCount: number;
+    eventIds: readonly string[];
+    manifestHash: `sha256:${string}`;
   }>;
   readonly delivered: Readonly<{
     query: string;
@@ -1282,7 +1300,7 @@ export interface QarinahSessionContextReceipt {
   readonly receiptHash: `sha256:${string}`;
 }
 export interface QarinahSessionContextReceiptIndex {
-  readonly schemaVersion: "qarinah.session-context-receipt-index.v1";
+  readonly schemaVersion: "qarinah.session-context-receipt-index.v2";
   readonly generatedAt: string;
   readonly workspaceId: string;
   readonly query: string;

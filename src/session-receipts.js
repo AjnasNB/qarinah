@@ -6,8 +6,8 @@ import { readEvents } from "./store.js";
 import { PORTABLE_TOKEN_ESTIMATOR } from "./token-budget.js";
 import { atomicWriteFile, loadWorkspace, resolveWithin } from "./workspace.js";
 
-export const SESSION_CONTEXT_RECEIPT_SCHEMA_VERSION = "qarinah.session-context-receipt.v1";
-export const SESSION_CONTEXT_RECEIPT_INDEX_SCHEMA_VERSION = "qarinah.session-context-receipt-index.v1";
+export const SESSION_CONTEXT_RECEIPT_SCHEMA_VERSION = "qarinah.session-context-receipt.v2";
+export const SESSION_CONTEXT_RECEIPT_INDEX_SCHEMA_VERSION = "qarinah.session-context-receipt-index.v2";
 
 function normalizeOptions(options) {
   if (!options || typeof options !== "object" || Array.isArray(options)) throw new TypeError("Session receipt options must be a record.");
@@ -73,6 +73,35 @@ async function buildReceipt(workspace, sessionId, events, options) {
   const selected = new Set(selectedEventIds);
   const toolRequests = events.filter((event) => event.kind === "tool.requested").length;
   const toolOutcomes = events.filter((event) => event.kind === "tool.completed").length;
+  const turnIds = [...new Set(events.map((event) => event.turnId).filter((value) => typeof value === "string"))].sort();
+  const kindCounts = [...events.reduce((counts, event) => counts.set(event.kind, (counts.get(event.kind) ?? 0) + 1), new Map())]
+    .map(([kind, count]) => ({ kind, count }))
+    .sort((left, right) => left.kind.localeCompare(right.kind));
+  const completedTurns = events.filter((event) => event.kind === "turn.completed");
+  const outcomeEvents = events.filter((event) => ["approval", "decision", "summary", "tool.completed", "turn.completed"].includes(event.kind));
+  const eventManifestHash = sha256(events.map((event) => ({
+    eventId: event.eventId,
+    hash: event.hash,
+    kind: event.kind,
+    timestamp: event.timestamp,
+    turnId: event.turnId
+  })));
+  const lifecycleCore = {
+    observedState: completedTurns.length > 0 ? "turn-completed" : events.some((event) => event.kind === "session.started") ? "started" : "active",
+    firstEventId: events[0]?.eventId ?? null,
+    lastEventId: events.at(-1)?.eventId ?? null,
+    sessionStartEvents: events.filter((event) => event.kind === "session.started").length,
+    promptEvents: events.filter((event) => event.kind === "prompt.submitted").length,
+    completedTurns: completedTurns.length,
+    compactionEvents: events.filter((event) => event.kind === "compaction.started" || event.kind === "compaction.completed").length,
+    turnIds,
+    kindCounts
+  };
+  const outcomeCore = {
+    eventCount: outcomeEvents.length,
+    eventIds: outcomeEvents.map((event) => event.eventId),
+    manifestHash: sha256(outcomeEvents.map((event) => ({ eventId: event.eventId, hash: event.hash, kind: event.kind })))
+  };
   const base = {
     schemaVersion: SESSION_CONTEXT_RECEIPT_SCHEMA_VERSION,
     generatedAt: options.generatedAt,
@@ -87,12 +116,15 @@ async function buildReceipt(workspace, sessionId, events, options) {
     source: {
       eventCount: events.length,
       headHash: events.at(-1)?.hash ?? null,
+      eventManifestHash,
       characters: sourceCharacters,
       estimatedTokens: sourceEstimatedTokens,
       estimator: `${PORTABLE_TOKEN_ESTIMATOR.id}@${PORTABLE_TOKEN_ESTIMATOR.version}`,
       toolRequests,
       toolOutcomes
     },
+    lifecycle: { ...lifecycleCore, manifestHash: sha256(lifecycleCore) },
+    outcomes: outcomeCore,
     delivered: {
       query: receiptQuery,
       itemCount: pack.items.length,
@@ -121,7 +153,8 @@ async function buildReceipt(workspace, sessionId, events, options) {
     boundaries: {
       providerUsage: "No provider-billed usage is inferred. Token values use the named portable estimator.",
       content: "The receipt contains identities, counts, timings, and hashes, not retained event bodies.",
-      session: "Only events carrying this exact host-supplied sessionId are measured."
+      session: "Only events carrying this exact host-supplied sessionId are measured.",
+      lifecycle: "turn-completed means at least one completed turn was observed; it does not invent a host session-end event."
     }
   };
   return deepFreezeJson({ ...base, receiptHash: sha256(base) });
@@ -154,6 +187,8 @@ export async function buildSessionContextReceipts(options = {}) {
       sessionKey: receipt.sessionKey,
       receiptHash: receipt.receiptHash,
       sourceEventCount: receipt.source.eventCount,
+      observedState: receipt.lifecycle.observedState,
+      outcomeEventCount: receipt.outcomes.eventCount,
       deliveredTokens: receipt.delivered.estimatedTokens,
       reductionPercent: receipt.comparison.reductionPercent
     }))

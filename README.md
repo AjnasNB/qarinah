@@ -42,7 +42,7 @@ npx qarinah dashboard --serve --worktrees
 | --- | --- |
 | Searchable graph | Files, concepts, memories, typed relations, ranking components, and evidence hashes |
 | Decisions/tools/outcomes/conflicts timeline | What changed, why it changed, which tool ran, and what disagrees |
-| Exact session receipts | The host session, selected event IDs, source and pack hashes, measured selection, and no retained event bodies |
+| Exact session receipts | The host session, observed lifecycle, turn and outcome identities, source and pack hashes, measured selection, and no retained event bodies |
 | Cross-worktree comparison | Separate writable ledgers, branch and commit identities, divergent heads, event totals, and current decisions |
 | Incremental compaction | Initial, unchanged, delta, and full-rebuild states with the exact prior checkpoint and changed-event count |
 | VS Code/Cursor panel | A local sandboxed read-only webview backed by the Qarinah CLI |
