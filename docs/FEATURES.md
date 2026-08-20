@@ -19,6 +19,15 @@ Qarinah is evidence-linked project memory for coding agents. It keeps an inspect
 - Content mode can retain bounded redacted summary text. Metadata mode retains only the metric, citation, and manifest receipt.
 - The published 98.71% reduction and 77.81:1 ratio remain explicitly scoped to the committed six-fixture comparison; every live run reports its own measured estimate instead of inheriting that number.
 
+## Lossless source retention beside compact context
+
+- Explicit content-capture workspaces can archive selected project files without placing those bytes in every context pack.
+- Content-defined chunks deduplicate unchanged regions across snapshots; Brotli is used only when it reduces stored bytes.
+- AES-256-GCM authentication, per-file SHA-256 verification, key-scoped object paths, and deterministic manifests detect changed or misplaced archive content.
+- Restore, manifest deletion, orphan-object garbage collection, and local-key destruction require explicit identifiers and return bounded receipts.
+- Ignore rules, secret-filename rejection, link rejection, and hard resource ceilings keep the archive opt-in and project-scoped.
+- This is a local project archive, not a managed backup cloud, device-wide passive capture service, or physical-media erasure guarantee.
+
 See [Coding context harness](CODING-CONTEXT-HARNESS.md).
 
 ## Project-owned memory
@@ -81,4 +90,4 @@ Qarinah is not an autonomous agent runtime, a hosted personalization service, or
 
 Qarinah can support private and NDA-conscious projects with local storage, explicit consent, metadata-only defaults, redaction, encrypted bundles, and signed checkpoints. It does not create or replace a legal NDA. See [private projects](PRIVATE-PROJECTS.md).
 
-Continue with [installation and setup](GETTING-STARTED.md), [project overview](PROJECT-OVERVIEW.md), [agent archive import](AGENT-ARCHIVE-IMPORT.md), [memory-footprint measurement](MEMORY-FOOTPRINT.md), [host compatibility](HOST-COMPATIBILITY.md), the [CLI reference](CLI-REFERENCE.md), or the [JavaScript and TypeScript API](API-REFERENCE.md).
+Continue with [installation and setup](GETTING-STARTED.md), [project overview](PROJECT-OVERVIEW.md), [agent archive import](AGENT-ARCHIVE-IMPORT.md), [lossless content archives](CONTENT-ARCHIVE.md), [memory-footprint measurement](MEMORY-FOOTPRINT.md), [host compatibility](HOST-COMPATIBILITY.md), the [CLI reference](CLI-REFERENCE.md), or the [JavaScript and TypeScript API](API-REFERENCE.md).

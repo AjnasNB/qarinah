@@ -80,6 +80,8 @@ Invalid JavaScript argument shapes generally throw `TypeError`. Storage, trust, 
 | `PROJECT_STRUCTURE_SCHEMA_VERSION` | `"qarinah.project-structure.v2"` |
 | `AGENT_ARCHIVE_IMPORT_SCHEMA_VERSION` | `"qarinah.agent-archive-import.v1"` |
 | `AGENT_ARCHIVE_BACKUP_SCHEMA_VERSION` | `"qarinah.agent-archive-backup.v1"` |
+| `CONTENT_ARCHIVE_SCHEMA_VERSION` | `"qarinah.content-archive.v1"` |
+| `CONTENT_ARCHIVE_KEY_SCHEMA_VERSION` | `"qarinah.content-archive-key.v1"` |
 | `MEMORY_FOOTPRINT_SCHEMA_VERSION` | `"qarinah.memory-footprint.v1"` |
 | `CODING_CONTEXT_HARNESS_SCHEMA_VERSION` | `"qarinah.coding-context-harness.v1"` |
 | `PROJECT_OVERVIEW_SCHEMA_VERSION` | `"qarinah.project-overview.v1"` |
@@ -448,6 +450,20 @@ function backupAgentArchives(
 ```
 
 Streams from 1 to 32 explicit absolute JSONL/NDJSON files or directories into a new directory beneath an existing absolute destination. It rejects linked paths and source/destination overlap, meters files and bytes before and during copying, verifies per-file SHA-256 digests, writes `manifest.json`, and optionally records a compact receipt when `cwd` identifies a trusted workspace. See [External agent-archive backup](AGENT-ARCHIVE-BACKUP.md).
+
+## Lossless content archive
+
+```ts
+function createContentArchive(source?: string, options?: QarinahContentArchiveOptions): Promise<QarinahContentArchiveManifest>;
+function listContentArchives(options?: { cwd?: string }): Promise<readonly QarinahContentArchiveManifest[]>;
+function verifyContentArchive(archiveId: string, options?: { cwd?: string; signal?: AbortSignal }): Promise<QarinahContentArchiveVerification>;
+function restoreContentArchive(archiveId: string, destination: string, options?: { cwd?: string; overwrite?: boolean; signal?: AbortSignal }): Promise<QarinahContentArchiveRestoreResult>;
+function deleteContentArchive(archiveId: string, options: { cwd?: string; confirmArchiveId: string }): Promise<QarinahContentArchiveDeletionResult>;
+function garbageCollectContentArchive(options: { cwd?: string; confirmWorkspaceId: string }): Promise<QarinahContentArchiveGarbageCollectionResult>;
+function cryptographicallyEraseContentArchiveVault(options: { cwd?: string; confirmWorkspaceId: string }): Promise<QarinahContentArchiveErasureResult>;
+```
+
+The archive is an opt-in, bounded, local content store for workspaces whose capture mode is `content`. It uses content-defined chunks, cross-manifest deduplication, conditional Brotli compression, AES-256-GCM authentication, SHA-256 identities, exact restore verification, and explicit destructive confirmations. The adjacent local key is not an OS keystore or KMS. The strict manifest contract is exported as `qarinah/schemas/content-archive.json`. See [Lossless content archive](CONTENT-ARCHIVE.md).
 
 ### `buildProjectOverview(options?)`
 

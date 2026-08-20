@@ -60,6 +60,13 @@ try {
     "  createCockroachBrowserMemorySink,",
     "  cockroachSourceRecordToAcquisitionEventInput,",
     "  createProductLoopProvenanceSink,",
+    "  createContentArchive,",
+    "  verifyContentArchive,",
+    "  restoreContentArchive,",
+    "  listContentArchives,",
+    "  deleteContentArchive,",
+    "  garbageCollectContentArchive,",
+    "  cryptographicallyEraseContentArchiveVault,",
     "  ingestCockroachSourceRecord,",
     "  importAgentArchive,",
     "  buildProjectOverview,",
@@ -94,6 +101,8 @@ try {
     "  type ProductLoopRuntimeEventBoundary,",
     "  type QarinahContextPack,",
     "  type QarinahCapturePolicy,",
+    "  type QarinahContentArchiveManifest,",
+    "  type QarinahContentArchiveOptions,",
     "  type QarinahOkfExportResult,",
     "  type QarinahAgentArchiveImportResult,",
     "  type QarinahProjectOverview,",
@@ -121,6 +130,15 @@ try {
     "void siblingWorktrees;",
     "const archiveImport: Promise<QarinahAgentArchiveImportResult> = importAgentArchive('./history.jsonl', { mode: 'compact' });",
     "void archiveImport;",
+    "const archiveOptions: QarinahContentArchiveOptions = { cwd: '.', label: 'consumer source', maxFiles: 10 };",
+    "const contentArchive: Promise<QarinahContentArchiveManifest> = createContentArchive('src', archiveOptions);",
+    "void contentArchive;",
+    "void verifyContentArchive;",
+    "void restoreContentArchive;",
+    "void listContentArchives;",
+    "void deleteContentArchive;",
+    "void garbageCollectContentArchive;",
+    "void cryptographicallyEraseContentArchiveVault;",
     "const projectOverview: Promise<QarinahProjectOverview> = buildProjectOverview();",
     "void projectOverview;",
     "void renderProjectOverviewMarkdown;",
@@ -273,6 +291,12 @@ try {
   );
   await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "coding-context-harness.schema.json"), "utf8");
   await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "docs", "CODING-CONTEXT-HARNESS.md"), "utf8");
+  assert.equal(
+    installedPackage.exports["./schemas/content-archive.json"],
+    "./schemas/content-archive.schema.json"
+  );
+  await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "content-archive.schema.json"), "utf8");
+  await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "docs", "CONTENT-ARCHIVE.md"), "utf8");
   process.stdout.write("Exact cockroach-browser@0.1.0 TypeScript and registry-integrity contract passed.\n");
 } finally {
   await rm(temporaryDirectory, { recursive: true, force: true });

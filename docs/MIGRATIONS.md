@@ -24,6 +24,8 @@ Every Git worktree keeps its own `.qarinah` directory, event chain, consent reco
 
 Linked-memory consumers must accept the additive `worktree` node type. Run `qarinah scan` and `qarinah build` in an initialized worktree to write a v2 snapshot and regenerate both graph projections.
 
+The additive `.qarinah/archive/` directory is ignored by Git and is created only when an explicitly content-authorized caller creates a lossless archive. Existing workspaces require no migration. Removing the directory removes local archive material but does not alter the authoritative event ledger; use the archive deletion and key-erasure commands when a durable receipt is required.
+
 ## Cockroach Browser metadata-outcome boundary
 
 The `cockroach.browser-memory.v1` receiving API is additive and does not change `qarinah.event.v1` or existing workspaces. No ledger migration or rebuild is required. New consumers may pass a passive `createCockroachBrowserMemorySink()` to the public Cockroach Browser Qarinah recorder.

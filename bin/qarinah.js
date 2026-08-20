@@ -13,8 +13,12 @@ import {
   captureCodexHook,
   compileContext,
   compileTaskMemoryPack,
+  createContentArchive,
   createContextHandoffCapsule,
+  cryptographicallyEraseContentArchiveVault,
+  deleteContentArchive,
   exportOkf,
+  garbageCollectContentArchive,
   initializeWorkspace,
   inspectMemoryFreshness,
   inspectWorkspacePolicy,
@@ -22,6 +26,7 @@ import {
   importAgentArchive,
   loadIndex,
   listGitWorktrees,
+  listContentArchives,
   loadWorkspace,
   measureMemoryFootprint,
   queryLinkedProjectMemory,
@@ -30,6 +35,7 @@ import {
   renderProjectOverviewMarkdown,
   renderContextPackMarkdown,
   renderCodingContextHarnessMarkdown,
+  restoreContentArchive,
   revokeWorkspaceTrust,
   runMcpServer,
   scanProjectStructure,
@@ -40,6 +46,7 @@ import {
   previewHostInstall,
   uninstallHostIntegration,
   verifyStore,
+  verifyContentArchive,
   writeMemoryDashboard
 } from "../src/index.js";
 
@@ -288,6 +295,13 @@ Usage:
   qarinah scan [--max-files n] [--max-file-bytes n] [--max-total-bytes n] [--max-depth n]
   qarinah import <archive-file-or-directory> [--format auto|codex|claude|kimi|portable] [--mode compact|full] [--max-bytes n] [--max-files n] [--max-records n] [--max-line-bytes n]
   qarinah backup <archive-file-or-directory>... --destination <external-directory> [--max-bytes n] [--max-files n]
+  qarinah archive create <workspace-path> [--label <name>] [--max-files n] [--max-file-bytes n] [--max-total-bytes n]
+  qarinah archive list
+  qarinah archive verify <archive-id>
+  qarinah archive restore <archive-id> --destination <directory>
+  qarinah archive delete <archive-id> --confirm <archive-id>
+  qarinah archive gc --confirm-workspace <workspace-id>
+  qarinah archive erase-key --confirm-workspace <workspace-id>
   qarinah overview [--format json|markdown]
   qarinah footprint [query] [--baseline-tokens n] [--rate-per-million n] [--max-chars n] [--max-tokens n]
   qarinah receipts [query] [--session <id>] [--write] [--max-chars n] [--max-tokens n] [--limit n]
@@ -600,6 +614,69 @@ async function run(argv) {
     );
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
     return;
+  }
+  if (command === "archive") {
+    const [action, ...archiveArgs] = args;
+    if (action === "create") {
+      const parsed = strictValueOptions(archiveArgs, "archive create", ["--label", "--max-files", "--max-file-bytes", "--max-total-bytes"]);
+      if (parsed.positionals.length !== 1) throw new TypeError("archive create requires exactly one workspace path.");
+      const integer = (name) => {
+        const value = parsed.values.get(name);
+        if (value === undefined) return undefined;
+        if (!/^[0-9]+$/u.test(value) || Number(value) < 1) throw new TypeError(`${name} must be a positive integer.`);
+        return Number(value);
+      };
+      process.stdout.write(`${JSON.stringify(await createContentArchive(parsed.positionals[0], {
+        cwd: process.cwd(),
+        label: parsed.values.get("--label"),
+        maxFiles: integer("--max-files"),
+        maxFileBytes: integer("--max-file-bytes"),
+        maxTotalBytes: integer("--max-total-bytes")
+      }), null, 2)}\n`);
+      return;
+    }
+    if (action === "list") {
+      if (archiveArgs.length !== 0) throw new TypeError("archive list accepts no arguments.");
+      process.stdout.write(`${JSON.stringify(await listContentArchives({ cwd: process.cwd() }), null, 2)}\n`);
+      return;
+    }
+    if (action === "verify") {
+      if (archiveArgs.length !== 1 || archiveArgs[0].startsWith("--")) throw new TypeError("archive verify requires exactly one archive id.");
+      process.stdout.write(`${JSON.stringify(await verifyContentArchive(archiveArgs[0], { cwd: process.cwd() }), null, 2)}\n`);
+      return;
+    }
+    if (action === "restore") {
+      const parsed = strictValueOptions(archiveArgs, "archive restore", ["--destination"]);
+      if (parsed.positionals.length !== 1 || !parsed.values.has("--destination")) {
+        throw new TypeError("archive restore requires one archive id and --destination <directory>.");
+      }
+      process.stdout.write(`${JSON.stringify(await restoreContentArchive(
+        parsed.positionals[0], parsed.values.get("--destination"), { cwd: process.cwd() }
+      ), null, 2)}\n`);
+      return;
+    }
+    if (action === "delete") {
+      const parsed = strictValueOptions(archiveArgs, "archive delete", ["--confirm"]);
+      if (parsed.positionals.length !== 1 || !parsed.values.has("--confirm")) {
+        throw new TypeError("archive delete requires one archive id and --confirm <same-archive-id>.");
+      }
+      process.stdout.write(`${JSON.stringify(await deleteContentArchive(parsed.positionals[0], {
+        cwd: process.cwd(), confirmArchiveId: parsed.values.get("--confirm")
+      }), null, 2)}\n`);
+      return;
+    }
+    if (action === "gc" || action === "erase-key") {
+      const parsed = strictValueOptions(archiveArgs, `archive ${action}`, ["--confirm-workspace"]);
+      if (parsed.positionals.length !== 0 || !parsed.values.has("--confirm-workspace")) {
+        throw new TypeError(`archive ${action} requires --confirm-workspace <workspace-id>.`);
+      }
+      const operation = action === "gc" ? garbageCollectContentArchive : cryptographicallyEraseContentArchiveVault;
+      process.stdout.write(`${JSON.stringify(await operation({
+        cwd: process.cwd(), confirmWorkspaceId: parsed.values.get("--confirm-workspace")
+      }), null, 2)}\n`);
+      return;
+    }
+    throw new TypeError("archive requires create, list, verify, restore, delete, gc, or erase-key.");
   }
   if (command === "overview") {
     const parsed = strictValueOptions(args, "overview", ["--format"]);

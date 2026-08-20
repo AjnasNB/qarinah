@@ -80,6 +80,13 @@ qarinah build
 qarinah import <archive-file-or-directory> [options]
 qarinah overview [--format json|markdown]
 qarinah map [query] [--limit n] [--type memory,file,concept,directory,reference] [--repository id,...] [--scope id,...] [--as-of timestamp]
+qarinah archive create <workspace-relative-source> [--label text]
+qarinah archive list
+qarinah archive verify <archive-id>
+qarinah archive restore <archive-id> --destination <directory>
+qarinah archive delete <archive-id> --confirm <archive-id>
+qarinah archive gc --confirm-workspace <workspace-id>
+qarinah archive erase-key --confirm-workspace <workspace-id>
 qarinah harness [query] [--worktrees] [--record] [--no-rebuild] [--format json|markdown] [options]
 qarinah query [text] [options]
 qarinah query --stdin-json
@@ -485,6 +492,20 @@ qarinah import <archive-file-or-directory> \
 ```
 
 The source must be an explicit regular `.jsonl` or `.ndjson` file, or a directory containing those files. Linked files and directories are not followed. `auto` detects supported Codex and Claude records and otherwise applies the portable format. Use explicit `kimi` for Kimi's documented stream-json user, assistant, tool-call, and tool-result messages.
+
+## Lossless project-content archive
+
+```text
+qarinah archive create <workspace-relative-source> [--label text]
+qarinah archive list
+qarinah archive verify <archive-id>
+qarinah archive restore <archive-id> --destination <directory>
+qarinah archive delete <archive-id> --confirm <archive-id>
+qarinah archive gc --confirm-workspace <workspace-id>
+qarinah archive erase-key --confirm-workspace <workspace-id>
+```
+
+Creation requires a workspace initialized with `--capture content`. Sources remain inside the workspace and outside `.qarinah`; links, generated/dependency trees, ignored paths, and common secret filenames are not archived. Verify reconstructs and hashes every file. Restore refuses existing output files. Delete removes only the manifest, while garbage collection removes objects no remaining manifest references. Key destruction is a local cryptographic-erasure operation with explicit backup and physical-media caveats. See [Lossless content archive](CONTENT-ARCHIVE.md).
 
 `compact` is the default. It writes one cited summary per session and is appropriate for large exports. `full` writes each supported visible item separately and requires content-authorized capture. Hidden reasoning and encrypted reasoning blocks are ignored in either mode. The result reports source bytes, files, records, visible items, sessions, newly imported events, formats, and rebuilt-state identity.
 

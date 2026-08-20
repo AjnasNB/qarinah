@@ -368,6 +368,117 @@ export function backupAgentArchives(
     clock?: () => Date;
   }
 ): Promise<Readonly<QarinahAgentArchiveBackupResult>>;
+export const CONTENT_ARCHIVE_SCHEMA_VERSION: "qarinah.content-archive.v1";
+export const CONTENT_ARCHIVE_KEY_SCHEMA_VERSION: "qarinah.content-archive-key.v1";
+export interface QarinahContentArchiveChunk {
+  readonly objectId: `obj_${string}`;
+  readonly plaintextHash: `sha256:${string}`;
+  readonly offset: number;
+  readonly length: number;
+  readonly storedBytes: number;
+  readonly codec: "identity-v1" | "brotli-v1";
+}
+export interface QarinahContentArchiveManifest {
+  readonly schemaVersion: "qarinah.content-archive.v1";
+  readonly workspaceId: string;
+  readonly createdAt: string;
+  readonly label: string;
+  readonly source: Readonly<{ path: string }>;
+  readonly chunking: Readonly<{
+    algorithm: "qarinah-gear-content-defined-v1";
+    minBytes: number;
+    averageBytes: number;
+    maxBytes: number;
+  }>;
+  readonly encryption: Readonly<{
+    algorithm: "AES-256-GCM";
+    keyId: `key_${string}`;
+    keyStorage: "workspace-local";
+  }>;
+  readonly limits: Readonly<{
+    maxFiles: number;
+    maxFileBytes: number;
+    maxTotalBytes: number;
+    minChunkBytes: number;
+    averageChunkBytes: number;
+    maxChunkBytes: number;
+  }>;
+  readonly files: readonly Readonly<{
+    path: string;
+    size: number;
+    contentHash: `sha256:${string}`;
+    chunks: readonly QarinahContentArchiveChunk[];
+  }>[];
+  readonly skipped: readonly Readonly<{
+    path: string;
+    reason: "ignored" | "secret-filename" | "linked-or-non-regular";
+  }>[];
+  readonly totals: Readonly<{
+    fileCount: number;
+    sourceBytes: number;
+    chunkCount: number;
+    uniqueObjectCount: number;
+    uniqueObjectBytes: number;
+    reusedObjectCount: number;
+  }>;
+  readonly archiveId: `archive_${string}`;
+  readonly manifestHash: `sha256:${string}`;
+}
+export interface QarinahContentArchiveOptions {
+  cwd?: string;
+  label?: string;
+  maxFiles?: number;
+  maxFileBytes?: number;
+  maxTotalBytes?: number;
+  minChunkBytes?: number;
+  averageChunkBytes?: number;
+  maxChunkBytes?: number;
+  signal?: AbortSignal;
+  clock?: () => Date;
+}
+export function createContentArchive(source?: string, options?: QarinahContentArchiveOptions): Promise<QarinahContentArchiveManifest>;
+export interface QarinahContentArchiveVerification {
+  ok: true;
+  schemaVersion: "qarinah.content-archive.v1";
+  archiveId: string;
+  manifestHash: string;
+  fileCount: number;
+  sourceBytes: number;
+  chunkCount: number;
+  verifiedObjectCount: number;
+  keyId: string;
+}
+export function verifyContentArchive(archiveId: string, options?: { cwd?: string; signal?: AbortSignal }): Promise<Readonly<QarinahContentArchiveVerification>>;
+export interface QarinahContentArchiveRestoreResult {
+  ok: true;
+  archiveId: string;
+  destination: string;
+  restored: readonly string[];
+}
+export function restoreContentArchive(archiveId: string, destination: string, options?: { cwd?: string; overwrite?: boolean; signal?: AbortSignal }): Promise<Readonly<QarinahContentArchiveRestoreResult>>;
+export function listContentArchives(options?: { cwd?: string }): Promise<readonly QarinahContentArchiveManifest[]>;
+export interface QarinahContentArchiveDeletionResult {
+  ok: true;
+  archiveId: string;
+  manifestDeleted: true;
+  objectsRetainedUntilGarbageCollection: true;
+}
+export function deleteContentArchive(archiveId: string, options: { cwd?: string; confirmArchiveId: string }): Promise<Readonly<QarinahContentArchiveDeletionResult>>;
+export interface QarinahContentArchiveGarbageCollectionResult {
+  ok: true;
+  removed: readonly string[];
+  retained: number;
+}
+export function garbageCollectContentArchive(options: { cwd?: string; confirmWorkspaceId: string }): Promise<Readonly<QarinahContentArchiveGarbageCollectionResult>>;
+export interface QarinahContentArchiveErasureResult {
+  ok: true;
+  workspaceId: string;
+  destroyedKeyId: string;
+  scope: string;
+  physicalMediaErasureClaimed: false;
+  backupErasureClaimed: false;
+}
+export function cryptographicallyEraseContentArchiveVault(options: { cwd?: string; confirmWorkspaceId: string }): Promise<Readonly<QarinahContentArchiveErasureResult>>;
 export const MEMORY_FOOTPRINT_SCHEMA_VERSION: "qarinah.memory-footprint.v1";
 export interface QarinahMemoryFootprint {
   readonly schemaVersion: "qarinah.memory-footprint.v1";

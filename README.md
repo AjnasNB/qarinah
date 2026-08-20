@@ -66,6 +66,19 @@ The historical six-fixture estimator reports 442,113 portable estimated full-his
 
 </details>
 
+### Compact context without throwing away selected source
+
+Qarinah now separates model context from retention. The ledger and graph compile small, cited task packs; an optional lossless content archive preserves the exact bytes of explicitly selected project files using content-defined chunks, deduplication, conditional Brotli compression, AES-256-GCM authentication, and SHA-256 reconstruction checks.
+
+```powershell
+npx qarinah init --capture content
+npx qarinah archive create . --label "project source"
+npx qarinah archive list
+npx qarinah archive verify archive_<sha256>
+```
+
+The 98.7148% result above is a context-volume estimate, not an archive-compression claim. The archive is local and opt-in, excludes common secret filenames and ignored/generated paths, rejects links, and has hard resource ceilings. Read [Lossless content archive](docs/CONTENT-ARCHIVE.md) before enabling content capture.
+
 <p align="center">
   <a href="https://qarinah.io"><strong>Website</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://qarinah.io/docs/features/"><strong>Features</strong></a>&nbsp;&middot;&nbsp;
@@ -217,7 +230,7 @@ npx qarinah query "release provenance" \
   --format markdown
 ```
 
-Start with the [feature map](docs/FEATURES.md) and [five-minute installation guide](docs/GETTING-STARTED.md), then use the [coding context harness](docs/CODING-CONTEXT-HARNESS.md), [worktree context](docs/WORKTREE-CONTEXT.md), [host compatibility](docs/HOST-COMPATIBILITY.md), the [project overview](docs/PROJECT-OVERVIEW.md), [agent archive import](docs/AGENT-ARCHIVE-IMPORT.md), [external archive backup](docs/AGENT-ARCHIVE-BACKUP.md), [private-project guide](docs/PRIVATE-PROJECTS.md), [cross-agent handoff guide](docs/CROSS-AGENT-HANDOFFS.md), [dashboard guide](docs/DASHBOARD.md), [team-memory guide](docs/TEAM-MEMORY.md), [CLI reference](docs/CLI-REFERENCE.md), [JavaScript API reference](docs/API-REFERENCE.md), [MCP guide](docs/MCP-GUIDE.md), [task recipes](docs/RECIPES.md), or [troubleshooting guide](docs/TROUBLESHOOTING.md).
+Start with the [feature map](docs/FEATURES.md) and [five-minute installation guide](docs/GETTING-STARTED.md), then use the [coding context harness](docs/CODING-CONTEXT-HARNESS.md), [worktree context](docs/WORKTREE-CONTEXT.md), [host compatibility](docs/HOST-COMPATIBILITY.md), the [project overview](docs/PROJECT-OVERVIEW.md), [agent archive import](docs/AGENT-ARCHIVE-IMPORT.md), [lossless content archive](docs/CONTENT-ARCHIVE.md), [external archive backup](docs/AGENT-ARCHIVE-BACKUP.md), [private-project guide](docs/PRIVATE-PROJECTS.md), [cross-agent handoff guide](docs/CROSS-AGENT-HANDOFFS.md), [dashboard guide](docs/DASHBOARD.md), [team-memory guide](docs/TEAM-MEMORY.md), [CLI reference](docs/CLI-REFERENCE.md), [JavaScript API reference](docs/API-REFERENCE.md), [MCP guide](docs/MCP-GUIDE.md), [task recipes](docs/RECIPES.md), or [troubleshooting guide](docs/TROUBLESHOOTING.md).
 
 Your project already contains the decisions and evidence behind its changes. Qarinah lets the next agent query that record and receive a bounded, cited pack selected for the current task. The same local memory can support Codex, Claude Code, CLI workflows, and compatible MCP clients instead of locking project context to one editor.
 
@@ -562,6 +575,7 @@ Content-mode redaction cannot prove that arbitrary tool output contains no secre
 | `qarinah scan` | Record a bounded project structure snapshot |
 | `qarinah build` | Verify and rebuild graph, index, and Markdown |
 | `qarinah map` | Search admitted memory and the repository map with temporal, repository, scope, and node-type filters |
+| `qarinah archive` | Create, list, verify, restore, delete, garbage-collect, or cryptographically erase an explicit local content archive |
 | `qarinah query` | Compile a coverage-aware, cited, budgeted context pack |
 | `qarinah export okf` | Build a deterministic Markdown interoperability bundle |
 | `qarinah doctor` / `qarinah status` | Verify integrity or inspect current state |
