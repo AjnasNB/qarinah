@@ -164,6 +164,8 @@ test("copied plugin avoids compatibility-CLI fallback and workspace Node shadowi
   };
   const initialized = await run(process.execPath, [runtime, "init", workspace], { cwd: sandbox, env });
   assertSucceeded(initialized);
+  await writeFile(path.join(workspace, "memory.py"), "def retained_context():\n    return True\n", "utf8");
+  await writeFile(path.join(workspace, "memory.ts"), "export function typedContext(): boolean { return true; }\n", "utf8");
   if (process.platform === "win32") {
     await writeFile(path.join(workspace, "node.cmd"), `@echo compromised>"${nodeMarker}"\r\n`, "utf8");
   }
@@ -195,6 +197,14 @@ test("copied plugin avoids compatibility-CLI fallback and workspace Node shadowi
   assert.equal(throughShell.stdout, "");
   await assert.rejects(() => access(nodeMarker));
 
+  assertSucceeded(await run(process.execPath, [runtime, "scan"], { cwd: workspace, env }));
+  assertSucceeded(await run(process.execPath, [runtime, "symbols", "build"], { cwd: workspace, env }));
+  const symbolQuery = await run(process.execPath, [runtime, "symbols", "query", "retained_context"], { cwd: workspace, env });
+  assertSucceeded(symbolQuery);
+  assert.equal(JSON.parse(symbolQuery.stdout).results[0].symbol.name, "retained_context");
+  const typedQuery = await run(process.execPath, [runtime, "symbols", "query", "typedContext"], { cwd: workspace, env });
+  assertSucceeded(typedQuery);
+  assert.equal(JSON.parse(typedQuery.stdout).results[0].symbol.name, "typedContext");
   assertSucceeded(await run(process.execPath, [runtime, "build"], { cwd: workspace, env }));
   const doctor = await run(process.execPath, [runtime, "doctor"], { cwd: workspace, env });
   assertSucceeded(doctor);

@@ -2,13 +2,13 @@ import { createHash } from "node:crypto";
 import { createRequire } from "node:module";
 import { lstat, readFile, stat } from "node:fs/promises";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { throwIfAborted, validateAbortSignal } from "./abort.js";
 import { canonicalStringify, deepFreezeJson, sha256 } from "./canonical.js";
 import { QarinahError } from "./errors.js";
 import { validateProjectStructureSnapshot } from "./project-structure.js";
 import { readEvents } from "./store.js";
 import { atomicWriteFile, loadWorkspace, resolveWithin, secureStoragePath } from "./workspace.js";
-import Parser from "web-tree-sitter";
 
 export const SYMBOL_GRAPH_SCHEMA_VERSION = "qarinah.symbol-graph.v2";
 const MAX_GRAPH_BYTES = 128 * 1024 * 1024;
@@ -29,26 +29,49 @@ const TREE_SITTER_GRAMMARS = Object.freeze({
 const SYMBOL_LANGUAGES = new Set([...SCRIPT_LANGUAGES, ...Object.keys(TREE_SITTER_GRAMMARS)]);
 const TREE_SITTER_LANGUAGE_NAMES = Object.freeze([...new Set(Object.keys(TREE_SITTER_GRAMMARS))].sort());
 const TYPESCRIPT_RUNTIME_SPECIFIER = "typescript-classic";
+const TREE_SITTER_RUNTIME_SPECIFIER = "web-tree-sitter";
 const runtimeRequire = createRequire(import.meta.url);
-const TREE_SITTER_RUNTIME_VERSION = runtimeRequire("web-tree-sitter/package.json").version;
-const TREE_SITTER_GRAMMAR_VERSION = runtimeRequire("tree-sitter-wasms/package.json").version;
+const TREE_SITTER_RUNTIME_VERSION = "0.20.8";
+const TREE_SITTER_GRAMMAR_VERSION = "0.1.13";
 let ts;
+let Parser;
 let treeSitterReady;
 const treeSitterLanguages = new Map();
 
+function optionalRuntime(specifier, vendoredPath) {
+  try {
+    return runtimeRequire(specifier);
+  } catch (error) {
+    if (error?.code !== "MODULE_NOT_FOUND") throw error;
+    return runtimeRequire(fileURLToPath(new URL(vendoredPath, import.meta.url)));
+  }
+}
+
 function typeScriptRuntime() {
-  ts ??= runtimeRequire(TYPESCRIPT_RUNTIME_SPECIFIER);
+  ts ??= optionalRuntime(TYPESCRIPT_RUNTIME_SPECIFIER, "./vendor/typescript-classic/lib/typescript.js");
   return ts;
+}
+
+function treeSitterRuntime() {
+  Parser ??= optionalRuntime(TREE_SITTER_RUNTIME_SPECIFIER, "./vendor/web-tree-sitter/tree-sitter.js");
+  return Parser;
 }
 
 async function treeSitterLanguage(language) {
   const grammar = TREE_SITTER_GRAMMARS[language];
   if (!grammar) throw new QarinahError("SYMBOL_LANGUAGE_UNSUPPORTED", `${language} is not a registered symbol language.`);
-  treeSitterReady ??= Parser.init();
+  const runtime = treeSitterRuntime();
+  treeSitterReady ??= runtime.init();
   await treeSitterReady;
   if (!treeSitterLanguages.has(grammar)) {
-    const wasmPath = runtimeRequire.resolve(`tree-sitter-wasms/out/tree-sitter-${grammar}.wasm`);
-    treeSitterLanguages.set(grammar, Parser.Language.load(wasmPath));
+    let wasmPath;
+    try {
+      wasmPath = runtimeRequire.resolve(`tree-sitter-wasms/out/tree-sitter-${grammar}.wasm`);
+    } catch (error) {
+      if (error?.code !== "MODULE_NOT_FOUND") throw error;
+      wasmPath = fileURLToPath(new URL(`./tree-sitter-wasms/tree-sitter-${grammar}.wasm`, import.meta.url));
+    }
+    treeSitterLanguages.set(grammar, runtime.Language.load(wasmPath));
   }
   return treeSitterLanguages.get(grammar);
 }
@@ -305,7 +328,8 @@ export async function parseTreeSitterSymbols(filePath, language, text, options =
   if (typeof text !== "string") throw new TypeError("text must be a string.");
   if (text.length > (options.maxCharacters ?? 4 * 1024 * 1024)) throw new QarinahError("SYMBOL_FILE_LIMIT", `${filePath} exceeds the symbol parser character limit.`);
   const loadedLanguage = await treeSitterLanguage(language);
-  const parser = new Parser();
+  const ParserRuntime = treeSitterRuntime();
+  const parser = new ParserRuntime();
   parser.setLanguage(loadedLanguage);
   const tree = parser.parse(text);
   const symbols = [];

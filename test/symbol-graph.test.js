@@ -72,7 +72,7 @@ test("symbol graph parses declarations, resolves references, and ranks with a tr
   assert.equal(graph.coverage.eligibleFiles, 10);
   assert.deepEqual(graph.coverage.indexedLanguages, ["c", "cpp", "csharp", "go", "java", "kotlin", "python", "rust", "typescript"]);
   assert.equal(graph.coverage.supportedLanguages.includes("csharp"), true);
-  assert.equal(graph.extractor.parsers.some((parser) => parser.id === "tree-sitter-wasm" && parser.grammarVersion === "0.1.13"), true);
+  assert.equal(graph.extractor.parsers.some((parser) => parser.id === "tree-sitter-wasm" && parser.version === "0.20.8" && parser.grammarVersion === "0.1.13"), true);
   const add = graph.symbols.find((symbol) => symbol.name === "add" && symbol.kind === "function");
   assert.ok(add);
   assert.equal(add.exported, true);

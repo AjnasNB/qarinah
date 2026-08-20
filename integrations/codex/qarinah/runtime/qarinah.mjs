@@ -6,21 +6,15 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
-  get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
-}) : x)(function(x) {
-  if (typeof require !== "undefined") return require.apply(this, arguments);
-  throw Error('Dynamic require of "' + x + '" is not supported');
-});
-var __esm = (fn, res, err2) => function __init() {
-  if (err2) throw err2[0];
+var __esm = (fn, res, err) => function __init() {
+  if (err) throw err[0];
   try {
     return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
   } catch (e) {
-    throw err2 = [e], e;
+    throw err = [e], e;
   }
 };
-var __commonJS = (cb, mod) => function __require2() {
+var __commonJS = (cb, mod) => function __require() {
   try {
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   } catch (e) {
@@ -262,19 +256,19 @@ var init_boundary = __esm({
 });
 
 // src/redact.js
-function privateKeyLabel(value, start2, end) {
-  if (end - start2 < PRIVATE_KEY_LABEL_SUFFIX.length) return false;
+function privateKeyLabel(value, start, end) {
+  if (end - start < PRIVATE_KEY_LABEL_SUFFIX.length) return false;
   const suffixStart = end - PRIVATE_KEY_LABEL_SUFFIX.length;
   if (!value.startsWith(PRIVATE_KEY_LABEL_SUFFIX, suffixStart)) return false;
-  for (let index = start2; index < suffixStart; index += 1) {
+  for (let index = start; index < suffixStart; index += 1) {
     const code = value.charCodeAt(index);
     if (code !== 32 && (code < 65 || code > 90)) return false;
   }
   return true;
 }
-function privateKeyMarkerEnd(value, start2, prefix) {
-  if (!value.startsWith(prefix, start2)) return -1;
-  const labelStart = start2 + prefix.length;
+function privateKeyMarkerEnd(value, start, prefix) {
+  if (!value.startsWith(prefix, start)) return -1;
+  const labelStart = start + prefix.length;
   const suffixStart = value.indexOf(PEM_MARKER_SUFFIX, labelStart);
   if (suffixStart === -1 || !privateKeyLabel(value, labelStart, suffixStart)) return -1;
   return suffixStart + PEM_MARKER_SUFFIX.length;
@@ -510,7 +504,7 @@ function createEventEnvelope(input, options) {
   const now = candidate.timestamp ?? (options?.clock ? options.clock() : /* @__PURE__ */ new Date()).toISOString();
   const eventTimestamp = canonicalIsoTimestamp(typeof now === "string" ? now : now.toISOString(), "timestamp");
   const title = boundedString(candidate.title, "title", 512);
-  const body2 = boundedString(candidate.body ?? "", "body", 65536, { empty: true });
+  const body = boundedString(candidate.body ?? "", "body", 65536, { empty: true });
   const rawData = candidate.data ?? {};
   if (!rawData || typeof rawData !== "object" || Array.isArray(rawData)) {
     throw new TypeError("data must be a record.");
@@ -524,7 +518,7 @@ function createEventEnvelope(input, options) {
   const disclosure = normalizeDisclosure(candidate.disclosure);
   const content = {
     title,
-    body: body2,
+    body,
     data,
     ...authority === null ? {} : { authority },
     ...temporal === null ? {} : { temporal },
@@ -547,7 +541,7 @@ function createEventEnvelope(input, options) {
     kind: candidate.kind,
     actor: normalizeActor(candidate.actor ?? { type: "human", id: "local-user" }),
     title,
-    body: body2,
+    body,
     data,
     confidence,
     ...authority === null ? {} : { authority },
@@ -736,8 +730,8 @@ async function optionalMetadata(target) {
 }
 async function readGitText(target, optional = false) {
   try {
-    const metadata2 = await lstat(target);
-    if (metadata2.isSymbolicLink() || !metadata2.isFile() || metadata2.size > MAX_GIT_METADATA_BYTES) {
+    const metadata = await lstat(target);
+    if (metadata.isSymbolicLink() || !metadata.isFile() || metadata.size > MAX_GIT_METADATA_BYTES) {
       if (optional) return null;
       throw new TypeError(`Git metadata is not a bounded regular file: ${path.basename(target)}`);
     }
@@ -747,10 +741,10 @@ async function readGitText(target, optional = false) {
     throw error;
   }
 }
-async function findWorktreeRoot(start2) {
+async function findWorktreeRoot(start) {
   let current;
   try {
-    current = await realpath(path.resolve(start2));
+    current = await realpath(path.resolve(start));
   } catch {
     return null;
   }
@@ -766,12 +760,12 @@ async function findWorktreeRoot(start2) {
 }
 async function resolveGitDirectories(root) {
   const marker = path.join(root, ".git");
-  const metadata2 = await optionalMetadata(marker);
-  if (metadata2?.isDirectory()) {
+  const metadata = await optionalMetadata(marker);
+  if (metadata?.isDirectory()) {
     const gitDir2 = await realpath(marker);
     return { gitDir: gitDir2, commonDir: gitDir2, linked: false };
   }
-  if (!metadata2?.isFile() || metadata2.isSymbolicLink()) return null;
+  if (!metadata?.isFile() || metadata.isSymbolicLink()) return null;
   const pointer = await readGitText(marker);
   const match = /^gitdir: (.+)$/u.exec(pointer);
   if (!match) return null;
@@ -823,8 +817,8 @@ async function inspectResolvedWorktree(root) {
 async function exactWorkspaceInitialized(root) {
   const config = path.join(root, ".qarinah", "config.json");
   try {
-    const metadata2 = await lstat(config);
-    if (metadata2.isSymbolicLink() || !metadata2.isFile()) return false;
+    const metadata = await lstat(config);
+    if (metadata.isSymbolicLink() || !metadata.isFile()) return false;
     await access(config);
     return true;
   } catch {
@@ -844,8 +838,8 @@ function publicWorktree(worktree, extra = {}) {
     ...extra
   });
 }
-async function inspectGitWorktree(start2 = process.cwd()) {
-  const root = await findWorktreeRoot(start2);
+async function inspectGitWorktree(start = process.cwd()) {
+  const root = await findWorktreeRoot(start);
   if (!root) return null;
   const inspected = await inspectResolvedWorktree(root);
   return inspected ? publicWorktree(inspected) : null;
@@ -885,8 +879,8 @@ async function linkedWorktreeRoots(commonDir) {
   }
   return roots;
 }
-async function listGitWorktrees(start2 = process.cwd()) {
-  const currentRoot = await findWorktreeRoot(start2);
+async function listGitWorktrees(start = process.cwd()) {
+  const currentRoot = await findWorktreeRoot(start);
   if (!currentRoot) return Object.freeze([]);
   const current = await inspectResolvedWorktree(currentRoot);
   if (!current) return Object.freeze([]);
@@ -1030,12 +1024,12 @@ async function atomicWrite(destination, contents) {
     throw new QarinahError("TRUST_INVALID", "The machine-local trust directory must be a real directory.");
   }
   const temporary = path2.join(directory, `.${path2.basename(destination)}.${process.pid}.${randomBytes(6).toString("hex")}.tmp`);
-  const handle2 = await open(temporary, "wx", 384);
+  const handle = await open(temporary, "wx", 384);
   try {
-    await handle2.writeFile(contents, "utf8");
-    await handle2.sync();
+    await handle.writeFile(contents, "utf8");
+    await handle.sync();
   } finally {
-    await handle2.close();
+    await handle.close();
   }
   try {
     for (let attempt = 0; ; attempt += 1) {
@@ -1209,10 +1203,10 @@ async function canonicalRealRoot(root) {
   return realpath2(path2.resolve(root));
 }
 async function readBoundedMachineJsonOnce(candidate, maximumBytes, label) {
-  const flags2 = constants.O_RDONLY | (Number.isInteger(constants.O_NOFOLLOW) ? constants.O_NOFOLLOW : 0);
-  const handle2 = await open(candidate, flags2);
+  const flags = constants.O_RDONLY | (Number.isInteger(constants.O_NOFOLLOW) ? constants.O_NOFOLLOW : 0);
+  const handle = await open(candidate, flags);
   try {
-    const opened = await handle2.stat({ bigint: true });
+    const opened = await handle.stat({ bigint: true });
     const named = await lstat2(candidate, { bigint: true });
     if (!opened.isFile() || named.isSymbolicLink() || !named.isFile()) {
       throw new QarinahError("TRUST_INVALID", `${label} must be a singly linked regular file.`);
@@ -1231,13 +1225,13 @@ async function readBoundedMachineJsonOnce(candidate, maximumBytes, label) {
     if (!isWithin(actualDirectory, actual)) {
       throw new QarinahError("TRUST_INVALID", `${label} resolves outside its machine-local state directory.`);
     }
-    const contents = await handle2.readFile();
+    const contents = await handle.readFile();
     if (contents.length !== Number(opened.size)) {
       throw new QarinahError("TRUST_INVALID", `${label} changed while it was being read.`);
     }
     return JSON.parse(contents.toString("utf8"));
   } finally {
-    await handle2.close();
+    await handle.close();
   }
 }
 async function readBoundedMachineJson(candidate, maximumBytes, label) {
@@ -1471,7 +1465,7 @@ var init_markdown = __esm({
 
 // node_modules/ignore/index.js
 var require_ignore = __commonJS({
-  "node_modules/ignore/index.js"(exports2, module2) {
+  "node_modules/ignore/index.js"(exports, module) {
     function makeArray(subject) {
       return Array.isArray(subject) ? subject : [subject];
     }
@@ -1677,11 +1671,11 @@ var require_ignore = __commonJS({
     var checkPattern = (pattern) => pattern && isString(pattern) && !REGEX_TEST_BLANK_LINE.test(pattern) && !REGEX_INVALID_TRAILING_BACKSLASH.test(pattern) && pattern.indexOf("#") !== 0;
     var splitPattern = (pattern) => pattern.split(REGEX_SPLITALL_CRLF).filter(Boolean);
     var IgnoreRule = class {
-      constructor(pattern, mark, body2, ignoreCase, negative, prefix) {
+      constructor(pattern, mark, body, ignoreCase, negative, prefix) {
         this.pattern = pattern;
         this.mark = mark;
         this.negative = negative;
-        define(this, "body", body2);
+        define(this, "body", body);
         define(this, "ignoreCase", ignoreCase);
         define(this, "regexPrefix", prefix);
       }
@@ -1714,17 +1708,17 @@ var require_ignore = __commonJS({
       mark
     }, ignoreCase) => {
       let negative = false;
-      let body2 = pattern;
-      if (body2.indexOf("!") === 0) {
+      let body = pattern;
+      if (body.indexOf("!") === 0) {
         negative = true;
-        body2 = body2.substr(1);
+        body = body.substr(1);
       }
-      body2 = body2.replace(REGEX_REPLACE_LEADING_EXCAPED_EXCLAMATION, "!").replace(REGEX_REPLACE_LEADING_EXCAPED_HASH, "#");
-      const regexPrefix = makeRegexPrefix(body2);
+      body = body.replace(REGEX_REPLACE_LEADING_EXCAPED_EXCLAMATION, "!").replace(REGEX_REPLACE_LEADING_EXCAPED_HASH, "#");
+      const regexPrefix = makeRegexPrefix(body);
       return new IgnoreRule(
         pattern,
         mark,
-        body2,
+        body,
         ignoreCase,
         negative,
         regexPrefix
@@ -1920,10 +1914,10 @@ var require_ignore = __commonJS({
     ) {
       setupWindows();
     }
-    module2.exports = factory;
+    module.exports = factory;
     factory.default = factory;
-    module2.exports.isPathValid = isPathValid;
-    define(module2.exports, /* @__PURE__ */ Symbol.for("setupWindows"), setupWindows);
+    module.exports.isPathValid = isPathValid;
+    define(module.exports, /* @__PURE__ */ Symbol.for("setupWindows"), setupWindows);
   }
 });
 
@@ -2099,21 +2093,21 @@ function validateProjectStructureSnapshot(structure) {
 function hashBytes(bytes) {
   return `sha256:${createHash4("sha256").update(bytes).digest("hex")}`;
 }
-function spanAt(text2, start2, length) {
-  const before = text2.slice(0, start2);
+function spanAt(text2, start, length) {
+  const before = text2.slice(0, start);
   const lines = before.split("\n");
   return Object.freeze({
-    start: start2,
-    end: start2 + length,
+    start,
+    end: start + length,
     line: lines.length,
     column: lines.at(-1).length + 1
   });
 }
-function extractedReference(type, specifier, start2, text2, extractor) {
+function extractedReference(type, specifier, start, text2, extractor) {
   return Object.freeze({
     type,
     specifier,
-    span: spanAt(text2, start2, specifier.length),
+    span: spanAt(text2, start, specifier.length),
     confidence: "extracted",
     extractor
   });
@@ -2163,19 +2157,19 @@ function resolveReference(fromPath, specifier, filesByPath) {
   return candidates.find((candidate) => filesByPath.has(candidate)) ?? null;
 }
 async function assertReadableWorkspaceEntry(workspace, absolute) {
-  const metadata2 = await lstat3(absolute);
-  if (metadata2.isSymbolicLink()) return null;
+  const metadata = await lstat3(absolute);
+  if (metadata.isSymbolicLink()) return null;
   const resolved = await realpath3(absolute);
   portablePath(workspace.root, resolved);
-  return metadata2;
+  return metadata;
 }
 async function loadIgnoreMatcher(workspace) {
   const matcher = (0, import_ignore.default)();
   for (const name of [".gitignore", ".qarinahignore"]) {
     const absolute = path3.join(workspace.root, name);
     try {
-      const metadata2 = await assertReadableWorkspaceEntry(workspace, absolute);
-      if (!metadata2?.isFile() || metadata2.size > MAX_IGNORE_BYTES) continue;
+      const metadata = await assertReadableWorkspaceEntry(workspace, absolute);
+      if (!metadata?.isFile() || metadata.size > MAX_IGNORE_BYTES) continue;
       matcher.add(await readFile2(absolute, "utf8"));
     } catch (error) {
       if (error?.code !== "ENOENT") throw error;
@@ -2198,34 +2192,34 @@ async function collectStructure(workspace, options) {
     for (const entry of entries) {
       if (entry.name.includes("\0")) continue;
       const absolute = path3.join(absoluteDirectory, entry.name);
-      const metadata2 = await assertReadableWorkspaceEntry(workspace, absolute);
-      if (!metadata2) continue;
+      const metadata = await assertReadableWorkspaceEntry(workspace, absolute);
+      if (!metadata) continue;
       const entryPath = portablePath(workspace.root, absolute);
-      if (metadata2.isDirectory()) {
+      if (metadata.isDirectory()) {
         if (EXCLUDED_DIRECTORIES.has(entry.name)) continue;
         if (entry.name.startsWith(".") && !HIDDEN_DIRECTORY_ALLOWLIST.has(entry.name)) continue;
         if (ignoreMatcher.ignores(`${entryPath}/`)) continue;
         await walk(absolute, depth + 1);
         continue;
       }
-      if (!metadata2.isFile() || entry.name.startsWith(".") || ignoreMatcher.ignores(entryPath) || !isCandidateFile(entry.name)) continue;
+      if (!metadata.isFile() || entry.name.startsWith(".") || ignoreMatcher.ignores(entryPath) || !isCandidateFile(entry.name)) continue;
       if (files.length >= options.maxFiles) {
         throw new QarinahError("PROJECT_SCAN_LIMIT", `Project structure exceeds maxFiles ${options.maxFiles}.`);
       }
       const filePath = entryPath;
-      if (metadata2.size > options.maxFileBytes) {
+      if (metadata.size > options.maxFileBytes) {
         files.push(Object.freeze({
           id: nodeId("file", filePath),
           path: filePath,
           language: languageFor(filePath),
-          size: metadata2.size,
+          size: metadata.size,
           contentHash: null,
           skipped: "oversized",
           references: []
         }));
         continue;
       }
-      if (totalBytes + metadata2.size > options.maxTotalBytes) {
+      if (totalBytes + metadata.size > options.maxTotalBytes) {
         throw new QarinahError("PROJECT_SCAN_LIMIT", `Project structure exceeds maxTotalBytes ${options.maxTotalBytes}.`);
       }
       const bytes = await readFile2(absolute);
@@ -3396,7 +3390,7 @@ function buildAdmittedConcepts(sourceNodes, sourceSignatures) {
   }
   return { concepts, edges };
 }
-function projectQueryNode(node, metadata2) {
+function projectQueryNode(node, metadata) {
   const projected = {
     id: node.id,
     type: node.type,
@@ -3411,7 +3405,7 @@ function projectQueryNode(node, metadata2) {
     confidence: node.confidence,
     status: "current",
     supersededBy: [],
-    conflicted: metadata2.conflicted,
+    conflicted: metadata.conflicted,
     repositoryId: node.repositoryId,
     disclosureScopes: [...node.disclosureScopes],
     classification: node.classification,
@@ -3419,12 +3413,12 @@ function projectQueryNode(node, metadata2) {
     sourceEventId: node.sourceEventId,
     evidenceHash: node.evidenceHash,
     contentHash: node.contentHash,
-    terms: metadata2.terms,
-    signature: metadata2.signature,
-    importance: metadata2.importance,
-    repositoryRank: metadata2.repositoryRank,
-    incoming: metadata2.incoming,
-    outgoing: metadata2.outgoing
+    terms: metadata.terms,
+    signature: metadata.signature,
+    importance: metadata.importance,
+    repositoryRank: metadata.repositoryRank,
+    incoming: metadata.incoming,
+    outgoing: metadata.outgoing
   };
   if (node.sourceProfiles.length > 0) {
     projected.sourceProfileCount = node.sourceProfileCount;
@@ -3480,7 +3474,7 @@ function rankLinkedProjectMemory(memory, query = "", options = {}) {
   const timeSpan = Math.max(1, maximumTime - minimumTime);
   const signatures = new Map(sourceSignatures);
   for (const concept of localConcepts.concepts) signatures.set(concept.id, concept.signature);
-  const metadata2 = new Map(localNodes.map((node) => {
+  const metadata = new Map(localNodes.map((node) => {
     const degree = degrees.get(node.id) ?? { incoming: 0, outgoing: 0, normalized: 0 };
     const repositoryRank = localRepositoryRanks.get(node.id) ?? 0;
     const recency = node.timestamp === null ? 0 : (Date.parse(node.timestamp) - minimumTime) / timeSpan;
@@ -3498,12 +3492,12 @@ function rankLinkedProjectMemory(memory, query = "", options = {}) {
   const scored = [];
   for (const node of localNodes) {
     if (allowedTypes && !allowedTypes.has(node.type)) continue;
-    const nodeMetadata = metadata2.get(node.id);
+    const nodeMetadata = metadata.get(node.id);
     const local = vectorScore(nodeMetadata.signature, queryTerms);
     let graph = 0;
     if (queryTerms.size > 0) {
       for (const neighborId of adjacency.get(node.id) ?? []) {
-        graph = Math.max(graph, vectorScore(metadata2.get(neighborId)?.signature ?? [], queryTerms));
+        graph = Math.max(graph, vectorScore(metadata.get(neighborId)?.signature ?? [], queryTerms));
       }
     }
     const importance = nodeMetadata.importance;
@@ -3514,7 +3508,7 @@ function rankLinkedProjectMemory(memory, query = "", options = {}) {
   scored.sort((left, right) => right.score - left.score || right.local - left.local || right.importance - left.importance || left.node.id.localeCompare(right.node.id));
   const items = scored.slice(0, limit).map((entry, index) => {
     const statusAtAsOf = "current";
-    const node = projectQueryNode(entry.node, metadata2.get(entry.node.id));
+    const node = projectQueryNode(entry.node, metadata.get(entry.node.id));
     return {
       rank: index + 1,
       score: entry.score,
@@ -4733,8 +4727,8 @@ function markdownFor(events, workspaceId, headHash) {
     lines.push(`- Hash: \`${event.hash}\``);
     if (event.body) {
       lines.push("");
-      const body2 = event.body.length > 1e3 ? `${event.body.slice(0, 997)}...` : event.body;
-      lines.push(markdownDataBlock(body2));
+      const body = event.body.length > 1e3 ? `${event.body.slice(0, 997)}...` : event.body;
+      lines.push(markdownDataBlock(body));
     }
     lines.push("");
   }
@@ -4761,10 +4755,10 @@ function markdownFor(events, workspaceId, headHash) {
   return `${lines.join("\n")}
 `;
 }
-async function rebuildDerivedState(start2 = process.cwd(), options = {}) {
+async function rebuildDerivedState(start = process.cwd(), options = {}) {
   const signal = validateAbortSignal(options.signal);
   throwIfAborted(signal);
-  const workspace = await loadWorkspace(start2);
+  const workspace = await loadWorkspace(start);
   const events = await readEvents(workspace, { signal });
   throwIfAborted(signal);
   const derived = buildDerivedState(events, workspace.config.workspaceId);
@@ -4830,8 +4824,8 @@ async function readBoundedIndex(workspace, segments, maximumBytes) {
     throw new QarinahError("INDEX_INVALID", "Derived index is not valid JSON.", { cause: error.message });
   }
 }
-async function loadIndex(start2 = process.cwd(), options = {}) {
-  const workspace = await loadWorkspace(start2);
+async function loadIndex(start = process.cwd(), options = {}) {
+  const workspace = await loadWorkspace(start);
   if (options.inMemory === true) {
     const events2 = await readEvents(workspace, { updateCheckpoint: options.updateCheckpoint !== false });
     const expected2 = buildDerivedState(events2, workspace.config.workspaceId);
@@ -4985,15 +4979,15 @@ async function exists(candidate) {
   }
 }
 async function safeLstat(candidate, label, { allowMissing = false } = {}) {
-  let metadata2;
+  let metadata;
   try {
-    metadata2 = await lstat4(candidate);
+    metadata = await lstat4(candidate);
   } catch (error) {
     if (allowMissing && error?.code === "ENOENT") return null;
     throw error;
   }
-  if (metadata2.isSymbolicLink()) throw new QarinahError("STORAGE_LINK_REJECTED", `${label} cannot be a symbolic link or junction.`);
-  return metadata2;
+  if (metadata.isSymbolicLink()) throw new QarinahError("STORAGE_LINK_REJECTED", `${label} cannot be a symbolic link or junction.`);
+  return metadata;
 }
 async function ensureSafeDirectory(candidate, root, label) {
   const existing = await safeLstat(candidate, label, { allowMissing: true });
@@ -5022,8 +5016,8 @@ async function acquireInitializationLock(qarinahDir, signal) {
       return async () => rm3(lockPath, { recursive: true, force: true });
     } catch (error) {
       if (error?.code !== "EEXIST") throw error;
-      const metadata2 = await safeLstat(lockPath, ".qarinah/locks/initialize", { allowMissing: true });
-      if (metadata2 && !metadata2.isDirectory()) {
+      const metadata = await safeLstat(lockPath, ".qarinah/locks/initialize", { allowMissing: true });
+      if (metadata && !metadata.isDirectory()) {
         throw new QarinahError("WORKSPACE_INVALID", ".qarinah/locks/initialize must be a directory.");
       }
       if (Date.now() - startedAt >= 15e3) {
@@ -5031,15 +5025,15 @@ async function acquireInitializationLock(qarinahDir, signal) {
       }
       await new Promise((resolve, reject) => {
         const finish = () => {
-          if (signal) signal.removeEventListener("abort", abort2);
+          if (signal) signal.removeEventListener("abort", abort);
           resolve();
         };
-        const abort2 = () => {
+        const abort = () => {
           clearTimeout(timer);
           reject(signal.reason ?? new QarinahError("OPERATION_ABORTED", "Workspace initialization was aborted."));
         };
         const timer = setTimeout(finish, 10);
-        if (signal) signal.addEventListener("abort", abort2, { once: true });
+        if (signal) signal.addEventListener("abort", abort, { once: true });
       });
     }
   }
@@ -5049,12 +5043,12 @@ async function atomicWriteFile(destination, contents, options = {}) {
   await mkdir2(directory, { recursive: true });
   const temporary = path7.join(directory, `.${path7.basename(destination)}.${process.pid}.${randomBytes3(6).toString("hex")}.tmp`);
   try {
-    const handle2 = await open2(temporary, "wx", 384);
+    const handle = await open2(temporary, "wx", 384);
     try {
-      await handle2.writeFile(contents, "utf8");
-      if (options.sync !== false) await handle2.sync();
+      await handle.writeFile(contents, "utf8");
+      if (options.sync !== false) await handle.sync();
     } finally {
-      await handle2.close();
+      await handle.close();
     }
     if (typeof options.afterWrite === "function") await options.afterWrite();
     for (let attempt = 0; ; attempt += 1) {
@@ -5080,20 +5074,20 @@ async function secureStoragePath(workspace, segments, options = {}) {
   for (let index = 0; index < segments.length; index += 1) {
     current = path7.join(current, segments[index]);
     const final = index === segments.length - 1;
-    const metadata2 = await safeLstat(current, `.qarinah/${segments.slice(0, index + 1).join("/")}`, {
+    const metadata = await safeLstat(current, `.qarinah/${segments.slice(0, index + 1).join("/")}`, {
       allowMissing: final && options.allowMissing === true
     });
-    if (!metadata2) return candidate;
-    if (!final && !metadata2.isDirectory()) {
+    if (!metadata) return candidate;
+    if (!final && !metadata.isDirectory()) {
       throw new QarinahError("WORKSPACE_INVALID", `.qarinah/${segments.slice(0, index + 1).join("/")} must be a directory.`);
     }
-    if (final && options.type === "directory" && !metadata2.isDirectory()) {
+    if (final && options.type === "directory" && !metadata.isDirectory()) {
       throw new QarinahError("WORKSPACE_INVALID", `.qarinah/${segments.join("/")} must be a directory.`);
     }
-    if (final && options.type === "file" && !metadata2.isFile()) {
+    if (final && options.type === "file" && !metadata.isFile()) {
       throw new QarinahError("WORKSPACE_INVALID", `.qarinah/${segments.join("/")} must be a regular file.`);
     }
-    if (final && options.type === "file" && metadata2.nlink !== 1) {
+    if (final && options.type === "file" && metadata.nlink !== 1) {
       throw new QarinahError("STORAGE_LINK_REJECTED", `.qarinah/${segments.join("/")} cannot have multiple filesystem links.`);
     }
     const actual = await realpath4(current);
@@ -5103,9 +5097,9 @@ async function secureStoragePath(workspace, segments, options = {}) {
   }
   return candidate;
 }
-async function verifyOpenedStorageFile(workspace, segments, candidate, handle2) {
+async function verifyOpenedStorageFile(workspace, segments, candidate, handle) {
   const label = `.qarinah/${segments.join("/")}`;
-  const opened = await handle2.stat({ bigint: true });
+  const opened = await handle.stat({ bigint: true });
   if (!opened.isFile() || opened.nlink !== 1n) {
     throw new QarinahError("STORAGE_LINK_REJECTED", `${label} is not a singly linked regular file.`);
   }
@@ -5127,25 +5121,25 @@ async function verifyOpenedStorageFile(workspace, segments, candidate, handle2) 
 }
 async function openSecureReadFile(workspace, segments) {
   const candidate = await secureStoragePath(workspace, segments, { type: "file" });
-  const flags2 = constants2.O_RDONLY | (Number.isInteger(constants2.O_NOFOLLOW) ? constants2.O_NOFOLLOW : 0);
-  const handle2 = await open2(candidate, flags2);
+  const flags = constants2.O_RDONLY | (Number.isInteger(constants2.O_NOFOLLOW) ? constants2.O_NOFOLLOW : 0);
+  const handle = await open2(candidate, flags);
   try {
-    const metadata2 = await verifyOpenedStorageFile(workspace, segments, candidate, handle2);
-    return Object.freeze({ handle: handle2, metadata: metadata2 });
+    const metadata = await verifyOpenedStorageFile(workspace, segments, candidate, handle);
+    return Object.freeze({ handle, metadata });
   } catch (error) {
-    await handle2.close();
+    await handle.close();
     throw error;
   }
 }
 async function openSecureAppendFile(workspace, segments) {
   const candidate = await secureStoragePath(workspace, segments, { type: "file" });
-  const flags2 = constants2.O_RDWR | constants2.O_APPEND | (Number.isInteger(constants2.O_NOFOLLOW) ? constants2.O_NOFOLLOW : 0);
-  const handle2 = await open2(candidate, flags2, 384);
+  const flags = constants2.O_RDWR | constants2.O_APPEND | (Number.isInteger(constants2.O_NOFOLLOW) ? constants2.O_NOFOLLOW : 0);
+  const handle = await open2(candidate, flags, 384);
   try {
-    const metadata2 = await verifyOpenedStorageFile(workspace, segments, candidate, handle2);
-    return Object.freeze({ handle: handle2, metadata: metadata2 });
+    const metadata = await verifyOpenedStorageFile(workspace, segments, candidate, handle);
+    return Object.freeze({ handle, metadata });
   } catch (error) {
-    await handle2.close();
+    await handle.close();
     throw error;
   }
 }
@@ -5244,10 +5238,10 @@ async function initializeWorkspace(target = process.cwd(), options = {}) {
     await release();
   }
 }
-async function findWorkspaceRoot(start2 = process.cwd()) {
+async function findWorkspaceRoot(start = process.cwd()) {
   let current;
   try {
-    current = await realpath4(path7.resolve(start2));
+    current = await realpath4(path7.resolve(start));
   } catch {
     return null;
   }
@@ -5260,8 +5254,8 @@ async function findWorkspaceRoot(start2 = process.cwd()) {
   }
   return null;
 }
-async function loadWorkspace(start2 = process.cwd(), options = {}) {
-  const root = await findWorkspaceRoot(start2);
+async function loadWorkspace(start = process.cwd(), options = {}) {
+  const root = await findWorkspaceRoot(start);
   if (!root) throw new QarinahError("WORKSPACE_NOT_INITIALIZED", "No enabled Context Ledger workspace was found. Run `qarinah init` first.");
   const actualRoot = await realpath4(root);
   const requestedQarinahDir = resolveWithin(actualRoot, ".qarinah");
@@ -5313,9 +5307,9 @@ async function loadWorkspace(start2 = process.cwd(), options = {}) {
   const worktree = await inspectGitWorktree(actualRoot);
   return Object.freeze({ ...provisional, consent, worktree });
 }
-async function setWorkspaceEnabled(start2, enabled) {
+async function setWorkspaceEnabled(start, enabled) {
   if (typeof enabled !== "boolean") throw new TypeError("enabled must be a boolean.");
-  let workspace = await loadWorkspace(start2, { allowDisabled: true, skipConsent: true });
+  let workspace = await loadWorkspace(start, { allowDisabled: true, skipConsent: true });
   const { acquireWorkspaceWriteLock: acquireWorkspaceWriteLock2 } = await Promise.resolve().then(() => (init_store(), store_exports));
   const release = await acquireWorkspaceWriteLock2(workspace);
   try {
@@ -5336,9 +5330,9 @@ async function setWorkspaceEnabled(start2, enabled) {
     await release();
   }
 }
-async function revokeWorkspaceTrust(start2 = process.cwd()) {
-  const located = await findWorkspaceRoot(start2);
-  const root = await realpath4(path7.resolve(located ?? start2));
+async function revokeWorkspaceTrust(start = process.cwd()) {
+  const located = await findWorkspaceRoot(start);
+  const root = await realpath4(path7.resolve(located ?? start));
   const revocation = await revokeWorkspaceConsent(root);
   return Object.freeze({
     root,
@@ -5409,32 +5403,32 @@ async function inspectLockOwner(lockPath) {
   const names = (await readdir3(lockPath)).filter((name) => OWNER_NAME_PATTERN.test(name));
   if (names.length !== 1) return null;
   const ownerPath = resolveWithin(lockPath, names[0]);
-  const flags2 = constants3.O_RDONLY | (Number.isInteger(constants3.O_NOFOLLOW) ? constants3.O_NOFOLLOW : 0);
-  const handle2 = await open3(ownerPath, flags2);
-  let metadata2;
+  const flags = constants3.O_RDONLY | (Number.isInteger(constants3.O_NOFOLLOW) ? constants3.O_NOFOLLOW : 0);
+  const handle = await open3(ownerPath, flags);
+  let metadata;
   let value;
   try {
-    const opened = await handle2.stat({ bigint: true });
+    const opened = await handle.stat({ bigint: true });
     const named = await lstat5(ownerPath, { bigint: true });
     if (named.isSymbolicLink() || !named.isFile() || named.nlink !== 1n || !opened.isFile() || opened.nlink !== 1n || opened.dev !== named.dev || opened.ino !== named.ino) {
       throw new QarinahError("STORAGE_LINK_REJECTED", ".qarinah/locks/append.lock owner must be one singly linked regular file.");
     }
     if (opened.size > BigInt(LOCK_OWNER_MAX_BYTES)) return null;
-    const contents = await handle2.readFile();
+    const contents = await handle.readFile();
     if (contents.length !== Number(opened.size)) return null;
-    metadata2 = Object.freeze({ mtimeMs: Number(opened.mtimeMs) });
+    metadata = Object.freeze({ mtimeMs: Number(opened.mtimeMs) });
     value = JSON.parse(contents.toString("utf8"));
   } catch (error) {
     if (error instanceof QarinahError) throw error;
-    return Object.freeze({ ownerPath, metadata: metadata2, value: null });
+    return Object.freeze({ ownerPath, metadata, value: null });
   } finally {
-    await handle2.close();
+    await handle.close();
   }
   const match = OWNER_NAME_PATTERN.exec(names[0]);
   if (!value || typeof value !== "object" || Array.isArray(value) || Object.keys(value).some((key) => !["ownerToken", "pid", "hostname", "acquiredAt"].includes(key)) || value.ownerToken !== match[1] || !Number.isSafeInteger(value.pid) || value.pid <= 0 || typeof value.hostname !== "string" || value.hostname.length === 0 || value.hostname.length > 255 || typeof value.acquiredAt !== "string" || !Number.isFinite(Date.parse(value.acquiredAt))) {
-    return Object.freeze({ ownerPath, metadata: metadata2, value: null });
+    return Object.freeze({ ownerPath, metadata, value: null });
   }
-  return Object.freeze({ ownerPath, metadata: metadata2, value: Object.freeze(value) });
+  return Object.freeze({ ownerPath, metadata, value: Object.freeze(value) });
 }
 function eventIdBucket(eventId) {
   if (!EVENT_ID_PATTERN2.test(eventId)) throw new QarinahError("EVENT_ID_INDEX_INVALID", "Event-ID projection contains an invalid event id.");
@@ -5467,11 +5461,11 @@ async function readCanonicalIndexJson(workspace, segments, maximumBytes) {
   let parsed;
   let contents;
   try {
-    const buffer2 = await opened.handle.readFile();
-    if (buffer2.length !== opened.metadata.size) {
+    const buffer = await opened.handle.readFile();
+    if (buffer.length !== opened.metadata.size) {
       throw new QarinahError("STORAGE_RACE_DETECTED", "Event-ID projection changed while it was being read.");
     }
-    contents = buffer2.toString("utf8");
+    contents = buffer.toString("utf8");
     parsed = JSON.parse(contents);
   } catch (error) {
     if (error instanceof QarinahError) throw error;
@@ -5649,24 +5643,24 @@ async function readIndexedEvent(workspace, eventId, entry) {
     await opened.handle.close();
     throw new QarinahError("EVENT_ID_INDEX_INVALID", `Event-ID projection entry '${eventId}' exceeds the authoritative log.`);
   }
-  const buffer2 = Buffer.allocUnsafe(entry.length);
+  const buffer = Buffer.allocUnsafe(entry.length);
   try {
     let consumed = 0;
-    while (consumed < buffer2.length) {
-      const { bytesRead } = await opened.handle.read(buffer2, consumed, buffer2.length - consumed, entry.offset + consumed);
+    while (consumed < buffer.length) {
+      const { bytesRead } = await opened.handle.read(buffer, consumed, buffer.length - consumed, entry.offset + consumed);
       if (bytesRead === 0) break;
       consumed += bytesRead;
     }
-    if (consumed !== buffer2.length) {
+    if (consumed !== buffer.length) {
       throw new QarinahError("EVENT_ID_INDEX_INVALID", `Event-ID projection entry '${eventId}' could not be read completely.`);
     }
   } finally {
     await opened.handle.close();
   }
-  if (buffer2.at(-1) !== 10) {
+  if (buffer.at(-1) !== 10) {
     throw new QarinahError("EVENT_ID_INDEX_INVALID", `Event-ID projection entry '${eventId}' does not end at a record boundary.`);
   }
-  const recordBytes = buffer2.subarray(0, -1);
+  const recordBytes = buffer.subarray(0, -1);
   let parsed;
   try {
     parsed = JSON.parse(recordBytes.toString("utf8"));
@@ -5729,13 +5723,13 @@ async function acquireWorkspaceWriteLock(workspace, options = {}) {
     try {
       await mkdir3(lockPath);
       try {
-        const handle2 = await open3(ownerPath, "wx", 384);
+        const handle = await open3(ownerPath, "wx", 384);
         try {
-          await handle2.writeFile(`${JSON.stringify({ ownerToken, pid: process.pid, hostname: HOSTNAME, acquiredAt: (/* @__PURE__ */ new Date()).toISOString() })}
+          await handle.writeFile(`${JSON.stringify({ ownerToken, pid: process.pid, hostname: HOSTNAME, acquiredAt: (/* @__PURE__ */ new Date()).toISOString() })}
 `, "utf8");
-          await handle2.sync();
+          await handle.sync();
         } finally {
-          await handle2.close();
+          await handle.close();
         }
       } catch (error) {
         try {
@@ -5806,11 +5800,11 @@ async function acquireWorkspaceWriteLock(workspace, options = {}) {
     } catch (error) {
       if (error?.code !== "EEXIST") throw error;
       try {
-        const metadata2 = await lstat5(lockPath);
-        if (metadata2.isSymbolicLink()) throw new QarinahError("STORAGE_LINK_REJECTED", ".qarinah/locks/append.lock cannot be a symbolic link or junction.");
-        if (!metadata2.isDirectory()) throw new QarinahError("WORKSPACE_INVALID", ".qarinah/locks/append.lock must be a directory.");
+        const metadata = await lstat5(lockPath);
+        if (metadata.isSymbolicLink()) throw new QarinahError("STORAGE_LINK_REJECTED", ".qarinah/locks/append.lock cannot be a symbolic link or junction.");
+        if (!metadata.isDirectory()) throw new QarinahError("WORKSPACE_INVALID", ".qarinah/locks/append.lock must be a directory.");
         const owner = await inspectLockOwner(lockPath);
-        const heartbeatMtime = owner?.metadata?.mtimeMs ?? metadata2.mtimeMs;
+        const heartbeatMtime = owner?.metadata?.mtimeMs ?? metadata.mtimeMs;
         const locallyAlive = owner?.value?.hostname === HOSTNAME && processIsAlive(owner.value.pid);
         if (Date.now() - heartbeatMtime > LOCK_STALE_MS && !locallyAlive) {
           const latest = owner ? await lstat5(owner.ownerPath) : await lstat5(lockPath);
@@ -5829,26 +5823,26 @@ async function acquireWorkspaceWriteLock(workspace, options = {}) {
   }
   throw new QarinahError("STORE_BUSY", "Timed out waiting for the Context Ledger append lock.");
 }
-async function readHeadFromHandle(workspace, handle2, metadata2) {
-  if (metadata2.size === 0) {
-    return Object.freeze({ event: null, size: 0, dev: metadata2.dev, ino: metadata2.ino });
+async function readHeadFromHandle(workspace, handle, metadata) {
+  if (metadata.size === 0) {
+    return Object.freeze({ event: null, size: 0, dev: metadata.dev, ino: metadata.ino });
   }
-  if (metadata2.size > workspace.config.maxLogBytes) {
+  if (metadata.size > workspace.config.maxLogBytes) {
     throw new QarinahError("LOG_LIMIT_EXCEEDED", "Event log exceeds the configured maximum size.");
   }
   const maximumTailBytes = workspace.config.maxEventBytes + 2;
-  const length = Math.min(metadata2.size, maximumTailBytes);
-  const buffer2 = Buffer.allocUnsafe(length);
-  const { bytesRead } = await handle2.read(buffer2, 0, length, metadata2.size - length);
+  const length = Math.min(metadata.size, maximumTailBytes);
+  const buffer = Buffer.allocUnsafe(length);
+  const { bytesRead } = await handle.read(buffer, 0, length, metadata.size - length);
   if (bytesRead !== length) throw new QarinahError("EVENT_LOG_READ_INCOMPLETE", "Could not read the event log tail.");
-  if (buffer2[length - 1] !== 10) {
+  if (buffer[length - 1] !== 10) {
     throw new QarinahError("EVENT_LOG_NON_CANONICAL", "Event log must end with a newline.");
   }
-  const precedingNewline = buffer2.lastIndexOf(10, length - 2);
-  if (precedingNewline === -1 && metadata2.size > length) {
+  const precedingNewline = buffer.lastIndexOf(10, length - 2);
+  if (precedingNewline === -1 && metadata.size > length) {
     throw new QarinahError("EVENT_INVALID", "The final event exceeds the configured event-size limit.");
   }
-  const line = buffer2.subarray(precedingNewline + 1, length - 1).toString("utf8");
+  const line = buffer.subarray(precedingNewline + 1, length - 1).toString("utf8");
   if (line === "") throw new QarinahError("EVENT_LOG_NON_CANONICAL", "Event log ends with an unexpected blank line.");
   let parsed;
   try {
@@ -5864,7 +5858,7 @@ async function readHeadFromHandle(workspace, handle2, metadata2) {
       workspaceId: workspace.config.workspaceId,
       maximumEventBytes: workspace.config.maxEventBytes
     });
-    return Object.freeze({ event, size: metadata2.size, dev: metadata2.dev, ino: metadata2.ino });
+    return Object.freeze({ event, size: metadata.size, dev: metadata.dev, ino: metadata.ino });
   } catch (error) {
     throw new QarinahError("EVENT_INVALID", `The final event failed validation: ${error.message}`);
   }
@@ -5953,11 +5947,11 @@ async function readEventsFromWorkspace(workspace, options = {}) {
   }
   let contents;
   try {
-    const buffer2 = await opened.handle.readFile();
-    if (buffer2.length !== opened.metadata.size) {
+    const buffer = await opened.handle.readFile();
+    if (buffer.length !== opened.metadata.size) {
       throw new QarinahError("STORAGE_RACE_DETECTED", "The authoritative event log changed while it was being read.");
     }
-    contents = buffer2.toString("utf8");
+    contents = buffer.toString("utf8");
   } finally {
     await opened.handle.close();
   }
@@ -6014,8 +6008,8 @@ async function readEventsFromWorkspace(workspace, options = {}) {
 async function readEvents(workspaceOrStart = process.cwd(), options = {}) {
   const signal = validateAbortSignal(options.signal);
   throwIfAborted(signal);
-  const start2 = typeof workspaceOrStart === "string" ? workspaceOrStart : workspaceRootLocator(workspaceOrStart, "workspace");
-  let workspace = await loadWorkspace(start2);
+  const start = typeof workspaceOrStart === "string" ? workspaceOrStart : workspaceRootLocator(workspaceOrStart, "workspace");
+  let workspace = await loadWorkspace(start);
   if (options.updateCheckpoint === false || options.skipCheckpoint === true) {
     return readEventsFromWorkspace(workspace, { ...options, signal });
   }
@@ -6118,8 +6112,8 @@ function createCapturedEvent(input, workspace, previousHash, options, capture, r
 async function appendEvent(input, options = {}) {
   const signal = validateAbortSignal(options.signal);
   throwIfAborted(signal);
-  const start2 = options.workspace ? workspaceRootLocator(options.workspace, "options.workspace") : options.cwd || process.cwd();
-  let workspace = await loadWorkspace(start2);
+  const start = options.workspace ? workspaceRootLocator(options.workspace, "options.workspace") : options.cwd || process.cwd();
+  let workspace = await loadWorkspace(start);
   await injectStoreFault(options, "after-initial-workspace-load", { workspaceId: workspace.config.workspaceId });
   throwIfAborted(signal);
   const release = await acquireWorkspaceWriteLock(workspace, { signal });
@@ -6239,8 +6233,8 @@ async function appendEvent(input, options = {}) {
     await release();
   }
 }
-async function verifyStore(start2 = process.cwd(), options = {}) {
-  const workspace = await loadWorkspace(start2);
+async function verifyStore(start = process.cwd(), options = {}) {
+  const workspace = await loadWorkspace(start);
   const events = await readEvents(workspace, { updateCheckpoint: options.updateCheckpoint !== false });
   const result = {
     ok: true,
@@ -6252,18 +6246,18 @@ async function verifyStore(start2 = process.cwd(), options = {}) {
   if (options.includeRoot !== false) result.root = workspace.root;
   return Object.freeze(result);
 }
-async function inspectWorkspacePolicy(start2 = process.cwd()) {
-  const workspace = await loadWorkspace(start2, { allowDisabled: true, skipConsent: true });
+async function inspectWorkspacePolicy(start = process.cwd()) {
+  const workspace = await loadWorkspace(start, { allowDisabled: true, skipConsent: true });
   return describeCapturePolicy(workspace.root, workspace.config);
 }
-async function approveWorkspaceTrust(start2 = process.cwd(), expectedCapture, expectedPolicyHash) {
+async function approveWorkspaceTrust(start = process.cwd(), expectedCapture, expectedPolicyHash) {
   if (!["metadata", "content"].includes(expectedCapture)) {
     throw new TypeError("expectedCapture must be explicitly set to metadata or content.");
   }
   if (typeof expectedPolicyHash !== "string" || !HASH_PATTERN3.test(expectedPolicyHash)) {
     throw new TypeError("expectedPolicyHash must be the exact sha256 digest shown by inspectWorkspacePolicy or `qarinah policy`.");
   }
-  let workspace = await loadWorkspace(start2, { allowDisabled: true, skipConsent: true });
+  let workspace = await loadWorkspace(start, { allowDisabled: true, skipConsent: true });
   const release = await acquireWorkspaceWriteLock(workspace);
   try {
     workspace = await loadWorkspace(workspace.root, { allowDisabled: true, skipConsent: true });
@@ -6330,1623 +6324,6 @@ var init_store = __esm({
     HASH_PATTERN3 = /^sha256:[0-9a-f]{64}$/;
     EVENT_ID_MANIFEST_MAX_BYTES = 64 * 1024;
     EVENT_ID_BUCKET_MAX_BYTES = 32 * 1024 * 1024;
-  }
-});
-
-// node_modules/web-tree-sitter/tree-sitter.js
-var require_tree_sitter = __commonJS({
-  "node_modules/web-tree-sitter/tree-sitter.js"(exports, module) {
-    var Module = void 0 !== Module ? Module : {};
-    var TreeSitter = (function() {
-      var initPromise, document = "object" == typeof window ? { currentScript: window.document.currentScript } : null;
-      class Parser {
-        constructor() {
-          this.initialize();
-        }
-        initialize() {
-          throw new Error("cannot construct a Parser before calling `init()`");
-        }
-        static init(moduleOptions) {
-          return initPromise || (Module = Object.assign({}, Module, moduleOptions), initPromise = new Promise(((resolveInitPromise) => {
-            var moduleOverrides = Object.assign({}, Module), arguments_ = [], thisProgram = "./this.program", quit_ = (e, t) => {
-              throw t;
-            }, ENVIRONMENT_IS_WEB = "object" == typeof window, ENVIRONMENT_IS_WORKER = "function" == typeof importScripts, ENVIRONMENT_IS_NODE = "object" == typeof process && "object" == typeof process.versions && "string" == typeof process.versions.node, scriptDirectory = "", read_, readAsync, readBinary, setWindowTitle;
-            function locateFile(e) {
-              return Module.locateFile ? Module.locateFile(e, scriptDirectory) : scriptDirectory + e;
-            }
-            function logExceptionOnExit(e) {
-              if (e instanceof ExitStatus) return;
-              err("exiting due to exception: " + e);
-            }
-            if (ENVIRONMENT_IS_NODE) {
-              var fs = __require("fs"), nodePath = __require("path");
-              scriptDirectory = ENVIRONMENT_IS_WORKER ? nodePath.dirname(scriptDirectory) + "/" : __dirname + "/", read_ = (e, t) => (e = isFileURI(e) ? new URL(e) : nodePath.normalize(e), fs.readFileSync(e, t ? void 0 : "utf8")), readBinary = (e) => {
-                var t = read_(e, true);
-                return t.buffer || (t = new Uint8Array(t)), t;
-              }, readAsync = (e, t, r) => {
-                e = isFileURI(e) ? new URL(e) : nodePath.normalize(e), fs.readFile(e, (function(e2, _) {
-                  e2 ? r(e2) : t(_.buffer);
-                }));
-              }, process.argv.length > 1 && (thisProgram = process.argv[1].replace(/\\/g, "/")), arguments_ = process.argv.slice(2), "undefined" != typeof module && (module.exports = Module), quit_ = (e, t) => {
-                if (keepRuntimeAlive()) throw process.exitCode = e, t;
-                logExceptionOnExit(t), process.exit(e);
-              }, Module.inspect = function() {
-                return "[Emscripten Module object]";
-              };
-            } else (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER) && (ENVIRONMENT_IS_WORKER ? scriptDirectory = self.location.href : void 0 !== document && document.currentScript && (scriptDirectory = document.currentScript.src), scriptDirectory = 0 !== scriptDirectory.indexOf("blob:") ? scriptDirectory.substr(0, scriptDirectory.replace(/[?#].*/, "").lastIndexOf("/") + 1) : "", read_ = (e) => {
-              var t = new XMLHttpRequest();
-              return t.open("GET", e, false), t.send(null), t.responseText;
-            }, ENVIRONMENT_IS_WORKER && (readBinary = (e) => {
-              var t = new XMLHttpRequest();
-              return t.open("GET", e, false), t.responseType = "arraybuffer", t.send(null), new Uint8Array(t.response);
-            }), readAsync = (e, t, r) => {
-              var _ = new XMLHttpRequest();
-              _.open("GET", e, true), _.responseType = "arraybuffer", _.onload = () => {
-                200 == _.status || 0 == _.status && _.response ? t(_.response) : r();
-              }, _.onerror = r, _.send(null);
-            }, setWindowTitle = (e) => document.title = e);
-            var out = Module.print || console.log.bind(console), err = Module.printErr || console.warn.bind(console);
-            Object.assign(Module, moduleOverrides), moduleOverrides = null, Module.arguments && (arguments_ = Module.arguments), Module.thisProgram && (thisProgram = Module.thisProgram), Module.quit && (quit_ = Module.quit);
-            var STACK_ALIGN = 16, dynamicLibraries = Module.dynamicLibraries || [], wasmBinary;
-            Module.wasmBinary && (wasmBinary = Module.wasmBinary);
-            var noExitRuntime = Module.noExitRuntime || true, wasmMemory;
-            "object" != typeof WebAssembly && abort("no native wasm support detected");
-            var ABORT = false, EXITSTATUS, UTF8Decoder = "undefined" != typeof TextDecoder ? new TextDecoder("utf8") : void 0, buffer, HEAP8, HEAPU8, HEAP16, HEAPU16, HEAP32, HEAPU32, HEAPF32, HEAPF64;
-            function UTF8ArrayToString(e, t, r) {
-              for (var _ = t + r, n = t; e[n] && !(n >= _); ) ++n;
-              if (n - t > 16 && e.buffer && UTF8Decoder) return UTF8Decoder.decode(e.subarray(t, n));
-              for (var s = ""; t < n; ) {
-                var a = e[t++];
-                if (128 & a) {
-                  var o = 63 & e[t++];
-                  if (192 != (224 & a)) {
-                    var i = 63 & e[t++];
-                    if ((a = 224 == (240 & a) ? (15 & a) << 12 | o << 6 | i : (7 & a) << 18 | o << 12 | i << 6 | 63 & e[t++]) < 65536) s += String.fromCharCode(a);
-                    else {
-                      var l = a - 65536;
-                      s += String.fromCharCode(55296 | l >> 10, 56320 | 1023 & l);
-                    }
-                  } else s += String.fromCharCode((31 & a) << 6 | o);
-                } else s += String.fromCharCode(a);
-              }
-              return s;
-            }
-            function UTF8ToString(e, t) {
-              return e ? UTF8ArrayToString(HEAPU8, e, t) : "";
-            }
-            function stringToUTF8Array(e, t, r, _) {
-              if (!(_ > 0)) return 0;
-              for (var n = r, s = r + _ - 1, a = 0; a < e.length; ++a) {
-                var o = e.charCodeAt(a);
-                if (o >= 55296 && o <= 57343) o = 65536 + ((1023 & o) << 10) | 1023 & e.charCodeAt(++a);
-                if (o <= 127) {
-                  if (r >= s) break;
-                  t[r++] = o;
-                } else if (o <= 2047) {
-                  if (r + 1 >= s) break;
-                  t[r++] = 192 | o >> 6, t[r++] = 128 | 63 & o;
-                } else if (o <= 65535) {
-                  if (r + 2 >= s) break;
-                  t[r++] = 224 | o >> 12, t[r++] = 128 | o >> 6 & 63, t[r++] = 128 | 63 & o;
-                } else {
-                  if (r + 3 >= s) break;
-                  t[r++] = 240 | o >> 18, t[r++] = 128 | o >> 12 & 63, t[r++] = 128 | o >> 6 & 63, t[r++] = 128 | 63 & o;
-                }
-              }
-              return t[r] = 0, r - n;
-            }
-            function stringToUTF8(e, t, r) {
-              return stringToUTF8Array(e, HEAPU8, t, r);
-            }
-            function lengthBytesUTF8(e) {
-              for (var t = 0, r = 0; r < e.length; ++r) {
-                var _ = e.charCodeAt(r);
-                _ <= 127 ? t++ : _ <= 2047 ? t += 2 : _ >= 55296 && _ <= 57343 ? (t += 4, ++r) : t += 3;
-              }
-              return t;
-            }
-            function updateGlobalBufferAndViews(e) {
-              buffer = e, Module.HEAP8 = HEAP8 = new Int8Array(e), Module.HEAP16 = HEAP16 = new Int16Array(e), Module.HEAP32 = HEAP32 = new Int32Array(e), Module.HEAPU8 = HEAPU8 = new Uint8Array(e), Module.HEAPU16 = HEAPU16 = new Uint16Array(e), Module.HEAPU32 = HEAPU32 = new Uint32Array(e), Module.HEAPF32 = HEAPF32 = new Float32Array(e), Module.HEAPF64 = HEAPF64 = new Float64Array(e);
-            }
-            var INITIAL_MEMORY = Module.INITIAL_MEMORY || 33554432;
-            wasmMemory = Module.wasmMemory ? Module.wasmMemory : new WebAssembly.Memory({ initial: INITIAL_MEMORY / 65536, maximum: 32768 }), wasmMemory && (buffer = wasmMemory.buffer), INITIAL_MEMORY = buffer.byteLength, updateGlobalBufferAndViews(buffer);
-            var wasmTable = new WebAssembly.Table({ initial: 20, element: "anyfunc" }), __ATPRERUN__ = [], __ATINIT__ = [], __ATMAIN__ = [], __ATPOSTRUN__ = [], __RELOC_FUNCS__ = [], runtimeInitialized = false;
-            function keepRuntimeAlive() {
-              return noExitRuntime;
-            }
-            function preRun() {
-              if (Module.preRun) for ("function" == typeof Module.preRun && (Module.preRun = [Module.preRun]); Module.preRun.length; ) addOnPreRun(Module.preRun.shift());
-              callRuntimeCallbacks(__ATPRERUN__);
-            }
-            function initRuntime() {
-              runtimeInitialized = true, callRuntimeCallbacks(__RELOC_FUNCS__), callRuntimeCallbacks(__ATINIT__);
-            }
-            function preMain() {
-              callRuntimeCallbacks(__ATMAIN__);
-            }
-            function postRun() {
-              if (Module.postRun) for ("function" == typeof Module.postRun && (Module.postRun = [Module.postRun]); Module.postRun.length; ) addOnPostRun(Module.postRun.shift());
-              callRuntimeCallbacks(__ATPOSTRUN__);
-            }
-            function addOnPreRun(e) {
-              __ATPRERUN__.unshift(e);
-            }
-            function addOnInit(e) {
-              __ATINIT__.unshift(e);
-            }
-            function addOnPostRun(e) {
-              __ATPOSTRUN__.unshift(e);
-            }
-            var runDependencies = 0, runDependencyWatcher = null, dependenciesFulfilled = null;
-            function addRunDependency(e) {
-              runDependencies++, Module.monitorRunDependencies && Module.monitorRunDependencies(runDependencies);
-            }
-            function removeRunDependency(e) {
-              if (runDependencies--, Module.monitorRunDependencies && Module.monitorRunDependencies(runDependencies), 0 == runDependencies && (null !== runDependencyWatcher && (clearInterval(runDependencyWatcher), runDependencyWatcher = null), dependenciesFulfilled)) {
-                var t = dependenciesFulfilled;
-                dependenciesFulfilled = null, t();
-              }
-            }
-            function abort(e) {
-              throw Module.onAbort && Module.onAbort(e), err(e = "Aborted(" + e + ")"), ABORT = true, EXITSTATUS = 1, e += ". Build with -sASSERTIONS for more info.", new WebAssembly.RuntimeError(e);
-            }
-            var dataURIPrefix = "data:application/octet-stream;base64,", wasmBinaryFile, tempDouble, tempI64;
-            function isDataURI(e) {
-              return e.startsWith(dataURIPrefix);
-            }
-            function isFileURI(e) {
-              return e.startsWith("file://");
-            }
-            function getBinary(e) {
-              try {
-                if (e == wasmBinaryFile && wasmBinary) return new Uint8Array(wasmBinary);
-                if (readBinary) return readBinary(e);
-                throw "both async and sync fetching of the wasm failed";
-              } catch (e2) {
-                abort(e2);
-              }
-            }
-            function getBinaryPromise() {
-              if (!wasmBinary && (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER)) {
-                if ("function" == typeof fetch && !isFileURI(wasmBinaryFile)) return fetch(wasmBinaryFile, { credentials: "same-origin" }).then((function(e) {
-                  if (!e.ok) throw "failed to load wasm binary file at '" + wasmBinaryFile + "'";
-                  return e.arrayBuffer();
-                })).catch((function() {
-                  return getBinary(wasmBinaryFile);
-                }));
-                if (readAsync) return new Promise((function(e, t) {
-                  readAsync(wasmBinaryFile, (function(t2) {
-                    e(new Uint8Array(t2));
-                  }), t);
-                }));
-              }
-              return Promise.resolve().then((function() {
-                return getBinary(wasmBinaryFile);
-              }));
-            }
-            function createWasm() {
-              var e = { env: asmLibraryArg, wasi_snapshot_preview1: asmLibraryArg, "GOT.mem": new Proxy(asmLibraryArg, GOTHandler), "GOT.func": new Proxy(asmLibraryArg, GOTHandler) };
-              function t(e2, t2) {
-                var r2 = e2.exports;
-                r2 = relocateExports(r2, 1024);
-                var _2 = getDylinkMetadata(t2);
-                _2.neededDynlibs && (dynamicLibraries = _2.neededDynlibs.concat(dynamicLibraries)), mergeLibSymbols(r2, "main"), Module.asm = r2, addOnInit(Module.asm.__wasm_call_ctors), __RELOC_FUNCS__.push(Module.asm.__wasm_apply_data_relocs), removeRunDependency("wasm-instantiate");
-              }
-              function r(e2) {
-                t(e2.instance, e2.module);
-              }
-              function _(t2) {
-                return getBinaryPromise().then((function(t3) {
-                  return WebAssembly.instantiate(t3, e);
-                })).then((function(e2) {
-                  return e2;
-                })).then(t2, (function(e2) {
-                  err("failed to asynchronously prepare wasm: " + e2), abort(e2);
-                }));
-              }
-              if (addRunDependency("wasm-instantiate"), Module.instantiateWasm) try {
-                return Module.instantiateWasm(e, t);
-              } catch (e2) {
-                return err("Module.instantiateWasm callback failed with error: " + e2), false;
-              }
-              return wasmBinary || "function" != typeof WebAssembly.instantiateStreaming || isDataURI(wasmBinaryFile) || isFileURI(wasmBinaryFile) || ENVIRONMENT_IS_NODE || "function" != typeof fetch ? _(r) : fetch(wasmBinaryFile, { credentials: "same-origin" }).then((function(t2) {
-                return WebAssembly.instantiateStreaming(t2, e).then(r, (function(e2) {
-                  return err("wasm streaming compile failed: " + e2), err("falling back to ArrayBuffer instantiation"), _(r);
-                }));
-              })), {};
-            }
-            wasmBinaryFile = "tree-sitter.wasm", isDataURI(wasmBinaryFile) || (wasmBinaryFile = locateFile(wasmBinaryFile));
-            var ASM_CONSTS = {};
-            function ExitStatus(e) {
-              this.name = "ExitStatus", this.message = "Program terminated with exit(" + e + ")", this.status = e;
-            }
-            var GOT = {}, CurrentModuleWeakSymbols = /* @__PURE__ */ new Set([]), GOTHandler = { get: function(e, t) {
-              var r = GOT[t];
-              return r || (r = GOT[t] = new WebAssembly.Global({ value: "i32", mutable: true })), CurrentModuleWeakSymbols.has(t) || (r.required = true), r;
-            } };
-            function callRuntimeCallbacks(e) {
-              for (; e.length > 0; ) e.shift()(Module);
-            }
-            function getDylinkMetadata(e) {
-              var t = 0, r = 0;
-              function _() {
-                for (var r2 = 0, _2 = 1; ; ) {
-                  var n2 = e[t++];
-                  if (r2 += (127 & n2) * _2, _2 *= 128, !(128 & n2)) break;
-                }
-                return r2;
-              }
-              function n() {
-                var r2 = _();
-                return UTF8ArrayToString(e, (t += r2) - r2, r2);
-              }
-              function s(e2, t2) {
-                if (e2) throw new Error(t2);
-              }
-              var a = "dylink.0";
-              if (e instanceof WebAssembly.Module) {
-                var o = WebAssembly.Module.customSections(e, a);
-                0 === o.length && (a = "dylink", o = WebAssembly.Module.customSections(e, a)), s(0 === o.length, "need dylink section"), r = (e = new Uint8Array(o[0])).length;
-              } else {
-                s(!(1836278016 == new Uint32Array(new Uint8Array(e.subarray(0, 24)).buffer)[0]), "need to see wasm magic number"), s(0 !== e[8], "need the dylink section to be first"), t = 9;
-                var i = _();
-                r = t + i, a = n();
-              }
-              var l = { neededDynlibs: [], tlsExports: /* @__PURE__ */ new Set(), weakImports: /* @__PURE__ */ new Set() };
-              if ("dylink" == a) {
-                l.memorySize = _(), l.memoryAlign = _(), l.tableSize = _(), l.tableAlign = _();
-                for (var u = _(), d = 0; d < u; ++d) {
-                  var c = n();
-                  l.neededDynlibs.push(c);
-                }
-              } else {
-                s("dylink.0" !== a);
-                for (; t < r; ) {
-                  var m = e[t++], p = _();
-                  if (1 === m) l.memorySize = _(), l.memoryAlign = _(), l.tableSize = _(), l.tableAlign = _();
-                  else if (2 === m) for (u = _(), d = 0; d < u; ++d) c = n(), l.neededDynlibs.push(c);
-                  else if (3 === m) for (var f = _(); f--; ) {
-                    var h = n();
-                    256 & _() && l.tlsExports.add(h);
-                  }
-                  else if (4 === m) for (f = _(); f--; ) {
-                    n(), h = n();
-                    1 == (3 & _()) && l.weakImports.add(h);
-                  }
-                  else t += p;
-                }
-              }
-              return l;
-            }
-            function getValue(e, t = "i8") {
-              switch (t.endsWith("*") && (t = "*"), t) {
-                case "i1":
-                case "i8":
-                  return HEAP8[e >> 0];
-                case "i16":
-                  return HEAP16[e >> 1];
-                case "i32":
-                case "i64":
-                  return HEAP32[e >> 2];
-                case "float":
-                  return HEAPF32[e >> 2];
-                case "double":
-                  return HEAPF64[e >> 3];
-                case "*":
-                  return HEAPU32[e >> 2];
-                default:
-                  abort("invalid type for getValue: " + t);
-              }
-              return null;
-            }
-            function asmjsMangle(e) {
-              return 0 == e.indexOf("dynCall_") || ["stackAlloc", "stackSave", "stackRestore", "getTempRet0", "setTempRet0"].includes(e) ? e : "_" + e;
-            }
-            function mergeLibSymbols(e, t) {
-              for (var r in e) if (e.hasOwnProperty(r)) {
-                asmLibraryArg.hasOwnProperty(r) || (asmLibraryArg[r] = e[r]);
-                var _ = asmjsMangle(r);
-                Module.hasOwnProperty(_) || (Module[_] = e[r]), "__main_argc_argv" == r && (Module._main = e[r]);
-              }
-            }
-            var LDSO = { loadedLibsByName: {}, loadedLibsByHandle: {} };
-            function dynCallLegacy(e, t, r) {
-              var _ = Module["dynCall_" + e];
-              return r && r.length ? _.apply(null, [t].concat(r)) : _.call(null, t);
-            }
-            var wasmTableMirror = [];
-            function getWasmTableEntry(e) {
-              var t = wasmTableMirror[e];
-              return t || (e >= wasmTableMirror.length && (wasmTableMirror.length = e + 1), wasmTableMirror[e] = t = wasmTable.get(e)), t;
-            }
-            function dynCall(e, t, r) {
-              return e.includes("j") ? dynCallLegacy(e, t, r) : getWasmTableEntry(t).apply(null, r);
-            }
-            function createInvokeFunction(e) {
-              return function() {
-                var t = stackSave();
-                try {
-                  return dynCall(e, arguments[0], Array.prototype.slice.call(arguments, 1));
-                } catch (e2) {
-                  if (stackRestore(t), e2 !== e2 + 0) throw e2;
-                  _setThrew(1, 0);
-                }
-              };
-            }
-            var ___heap_base = 78144;
-            function zeroMemory(e, t) {
-              return HEAPU8.fill(0, e, e + t), e;
-            }
-            function getMemory(e) {
-              if (runtimeInitialized) return zeroMemory(_malloc(e), e);
-              var t = ___heap_base, r = t + e + 15 & -16;
-              return ___heap_base = r, GOT.__heap_base.value = r, t;
-            }
-            function isInternalSym(e) {
-              return ["__cpp_exception", "__c_longjmp", "__wasm_apply_data_relocs", "__dso_handle", "__tls_size", "__tls_align", "__set_stack_limits", "_emscripten_tls_init", "__wasm_init_tls", "__wasm_call_ctors", "__start_em_asm", "__stop_em_asm"].includes(e);
-            }
-            function uleb128Encode(e, t) {
-              e < 128 ? t.push(e) : t.push(e % 128 | 128, e >> 7);
-            }
-            function sigToWasmTypes(e) {
-              for (var t = { i: "i32", j: "i32", f: "f32", d: "f64", p: "i32" }, r = { parameters: [], results: "v" == e[0] ? [] : [t[e[0]]] }, _ = 1; _ < e.length; ++_) r.parameters.push(t[e[_]]), "j" === e[_] && r.parameters.push("i32");
-              return r;
-            }
-            function generateFuncType(e, t) {
-              var r = e.slice(0, 1), _ = e.slice(1), n = { i: 127, p: 127, j: 126, f: 125, d: 124 };
-              t.push(96), uleb128Encode(_.length, t);
-              for (var s = 0; s < _.length; ++s) t.push(n[_[s]]);
-              "v" == r ? t.push(0) : t.push(1, n[r]);
-            }
-            function convertJsFunctionToWasm(e, t) {
-              if ("function" == typeof WebAssembly.Function) return new WebAssembly.Function(sigToWasmTypes(t), e);
-              var r = [1];
-              generateFuncType(t, r);
-              var _ = [0, 97, 115, 109, 1, 0, 0, 0, 1];
-              uleb128Encode(r.length, _), _.push.apply(_, r), _.push(2, 7, 1, 1, 101, 1, 102, 0, 0, 7, 5, 1, 1, 102, 0, 0);
-              var n = new WebAssembly.Module(new Uint8Array(_));
-              return new WebAssembly.Instance(n, { e: { f: e } }).exports.f;
-            }
-            function updateTableMap(e, t) {
-              if (functionsInTableMap) for (var r = e; r < e + t; r++) {
-                var _ = getWasmTableEntry(r);
-                _ && functionsInTableMap.set(_, r);
-              }
-            }
-            var functionsInTableMap = void 0, freeTableIndexes = [];
-            function getEmptyTableSlot() {
-              if (freeTableIndexes.length) return freeTableIndexes.pop();
-              try {
-                wasmTable.grow(1);
-              } catch (e) {
-                if (!(e instanceof RangeError)) throw e;
-                throw "Unable to grow wasm table. Set ALLOW_TABLE_GROWTH.";
-              }
-              return wasmTable.length - 1;
-            }
-            function setWasmTableEntry(e, t) {
-              wasmTable.set(e, t), wasmTableMirror[e] = wasmTable.get(e);
-            }
-            function addFunction(e, t) {
-              if (functionsInTableMap || (functionsInTableMap = /* @__PURE__ */ new WeakMap(), updateTableMap(0, wasmTable.length)), functionsInTableMap.has(e)) return functionsInTableMap.get(e);
-              var r = getEmptyTableSlot();
-              try {
-                setWasmTableEntry(r, e);
-              } catch (_) {
-                if (!(_ instanceof TypeError)) throw _;
-                setWasmTableEntry(r, convertJsFunctionToWasm(e, t));
-              }
-              return functionsInTableMap.set(e, r), r;
-            }
-            function updateGOT(e, t) {
-              for (var r in e) if (!isInternalSym(r)) {
-                var _ = e[r];
-                r.startsWith("orig$") && (r = r.split("$")[1], t = true), GOT[r] || (GOT[r] = new WebAssembly.Global({ value: "i32", mutable: true })), (t || 0 == GOT[r].value) && ("function" == typeof _ ? GOT[r].value = addFunction(_) : "number" == typeof _ ? GOT[r].value = _ : err("unhandled export type for `" + r + "`: " + typeof _));
-              }
-            }
-            function relocateExports(e, t, r) {
-              var _ = {};
-              for (var n in e) {
-                var s = e[n];
-                "object" == typeof s && (s = s.value), "number" == typeof s && (s += t), _[n] = s;
-              }
-              return updateGOT(_, r), _;
-            }
-            function resolveGlobalSymbol(e, t) {
-              var r;
-              return t && (r = asmLibraryArg["orig$" + e]), r || (r = asmLibraryArg[e]) && r.stub && (r = void 0), r || (r = Module[asmjsMangle(e)]), !r && e.startsWith("invoke_") && (r = createInvokeFunction(e.split("_")[1])), r;
-            }
-            function alignMemory(e, t) {
-              return Math.ceil(e / t) * t;
-            }
-            function loadWebAssemblyModule(binary, flags, handle) {
-              var metadata = getDylinkMetadata(binary);
-              function loadModule() {
-                var firstLoad = !handle || !HEAP8[handle + 12 >> 0];
-                if (firstLoad) {
-                  var memAlign = Math.pow(2, metadata.memoryAlign);
-                  memAlign = Math.max(memAlign, STACK_ALIGN);
-                  var memoryBase = metadata.memorySize ? alignMemory(getMemory(metadata.memorySize + memAlign), memAlign) : 0, tableBase = metadata.tableSize ? wasmTable.length : 0;
-                  handle && (HEAP8[handle + 12 >> 0] = 1, HEAPU32[handle + 16 >> 2] = memoryBase, HEAP32[handle + 20 >> 2] = metadata.memorySize, HEAPU32[handle + 24 >> 2] = tableBase, HEAP32[handle + 28 >> 2] = metadata.tableSize);
-                } else memoryBase = HEAPU32[handle + 16 >> 2], tableBase = HEAPU32[handle + 24 >> 2];
-                var tableGrowthNeeded = tableBase + metadata.tableSize - wasmTable.length, moduleExports;
-                function resolveSymbol(e) {
-                  var t = resolveGlobalSymbol(e, false);
-                  return t || (t = moduleExports[e]), t;
-                }
-                tableGrowthNeeded > 0 && wasmTable.grow(tableGrowthNeeded);
-                var proxyHandler = { get: function(e, t) {
-                  switch (t) {
-                    case "__memory_base":
-                      return memoryBase;
-                    case "__table_base":
-                      return tableBase;
-                  }
-                  if (t in asmLibraryArg) return asmLibraryArg[t];
-                  var r;
-                  t in e || (e[t] = function() {
-                    return r || (r = resolveSymbol(t)), r.apply(null, arguments);
-                  });
-                  return e[t];
-                } }, proxy = new Proxy({}, proxyHandler), info = { "GOT.mem": new Proxy({}, GOTHandler), "GOT.func": new Proxy({}, GOTHandler), env: proxy, wasi_snapshot_preview1: proxy };
-                function postInstantiation(instance) {
-                  function addEmAsm(addr, body) {
-                    for (var args = [], arity = 0; arity < 16 && -1 != body.indexOf("$" + arity); arity++) args.push("$" + arity);
-                    args = args.join(",");
-                    var func = "(" + args + " ) => { " + body + "};";
-                    ASM_CONSTS[start] = eval(func);
-                  }
-                  if (updateTableMap(tableBase, metadata.tableSize), moduleExports = relocateExports(instance.exports, memoryBase), flags.allowUndefined || reportUndefinedSymbols(), "__start_em_asm" in moduleExports) for (var start = moduleExports.__start_em_asm, stop = moduleExports.__stop_em_asm; start < stop; ) {
-                    var jsString = UTF8ToString(start);
-                    addEmAsm(start, jsString), start = HEAPU8.indexOf(0, start) + 1;
-                  }
-                  var applyRelocs = moduleExports.__wasm_apply_data_relocs;
-                  applyRelocs && (runtimeInitialized ? applyRelocs() : __RELOC_FUNCS__.push(applyRelocs));
-                  var init = moduleExports.__wasm_call_ctors;
-                  return init && (runtimeInitialized ? init() : __ATINIT__.push(init)), moduleExports;
-                }
-                if (flags.loadAsync) {
-                  if (binary instanceof WebAssembly.Module) {
-                    var instance = new WebAssembly.Instance(binary, info);
-                    return Promise.resolve(postInstantiation(instance));
-                  }
-                  return WebAssembly.instantiate(binary, info).then((function(e) {
-                    return postInstantiation(e.instance);
-                  }));
-                }
-                var module = binary instanceof WebAssembly.Module ? binary : new WebAssembly.Module(binary), instance = new WebAssembly.Instance(module, info);
-                return postInstantiation(instance);
-              }
-              return CurrentModuleWeakSymbols = metadata.weakImports, flags.loadAsync ? metadata.neededDynlibs.reduce((function(e, t) {
-                return e.then((function() {
-                  return loadDynamicLibrary(t, flags);
-                }));
-              }), Promise.resolve()).then((function() {
-                return loadModule();
-              })) : (metadata.neededDynlibs.forEach((function(e) {
-                loadDynamicLibrary(e, flags);
-              })), loadModule());
-            }
-            function loadDynamicLibrary(e, t, r) {
-              t = t || { global: true, nodelete: true };
-              var _ = LDSO.loadedLibsByName[e];
-              if (_) return t.global && !_.global && (_.global = true, "loading" !== _.module && mergeLibSymbols(_.module, e)), t.nodelete && _.refcount !== 1 / 0 && (_.refcount = 1 / 0), _.refcount++, r && (LDSO.loadedLibsByHandle[r] = _), !t.loadAsync || Promise.resolve(true);
-              function n(e2) {
-                if (t.fs && t.fs.findObject(e2)) {
-                  var r2 = t.fs.readFile(e2, { encoding: "binary" });
-                  return r2 instanceof Uint8Array || (r2 = new Uint8Array(r2)), t.loadAsync ? Promise.resolve(r2) : r2;
-                }
-                if (e2 = locateFile(e2), t.loadAsync) return new Promise((function(t2, r3) {
-                  readAsync(e2, ((e3) => t2(new Uint8Array(e3))), r3);
-                }));
-                if (!readBinary) throw new Error(e2 + ": file not found, and synchronous loading of external files is not available");
-                return readBinary(e2);
-              }
-              function s() {
-                if ("undefined" != typeof preloadedWasm && preloadedWasm[e]) {
-                  var _2 = preloadedWasm[e];
-                  return t.loadAsync ? Promise.resolve(_2) : _2;
-                }
-                return t.loadAsync ? n(e).then((function(e2) {
-                  return loadWebAssemblyModule(e2, t, r);
-                })) : loadWebAssemblyModule(n(e), t, r);
-              }
-              function a(t2) {
-                _.global && mergeLibSymbols(t2, e), _.module = t2;
-              }
-              return _ = { refcount: t.nodelete ? 1 / 0 : 1, name: e, module: "loading", global: t.global }, LDSO.loadedLibsByName[e] = _, r && (LDSO.loadedLibsByHandle[r] = _), t.loadAsync ? s().then((function(e2) {
-                return a(e2), true;
-              })) : (a(s()), true);
-            }
-            function reportUndefinedSymbols() {
-              for (var e in GOT) if (0 == GOT[e].value) {
-                var t = resolveGlobalSymbol(e, true);
-                if (!t && !GOT[e].required) continue;
-                if ("function" == typeof t) GOT[e].value = addFunction(t, t.sig);
-                else {
-                  if ("number" != typeof t) throw new Error("bad export type for `" + e + "`: " + typeof t);
-                  GOT[e].value = t;
-                }
-              }
-            }
-            function preloadDylibs() {
-              dynamicLibraries.length ? (addRunDependency("preloadDylibs"), dynamicLibraries.reduce((function(e, t) {
-                return e.then((function() {
-                  return loadDynamicLibrary(t, { loadAsync: true, global: true, nodelete: true, allowUndefined: true });
-                }));
-              }), Promise.resolve()).then((function() {
-                reportUndefinedSymbols(), removeRunDependency("preloadDylibs");
-              }))) : reportUndefinedSymbols();
-            }
-            function setValue(e, t, r = "i8") {
-              switch (r.endsWith("*") && (r = "*"), r) {
-                case "i1":
-                case "i8":
-                  HEAP8[e >> 0] = t;
-                  break;
-                case "i16":
-                  HEAP16[e >> 1] = t;
-                  break;
-                case "i32":
-                  HEAP32[e >> 2] = t;
-                  break;
-                case "i64":
-                  tempI64 = [t >>> 0, (tempDouble = t, +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (0 | Math.min(+Math.floor(tempDouble / 4294967296), 4294967295)) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0)], HEAP32[e >> 2] = tempI64[0], HEAP32[e + 4 >> 2] = tempI64[1];
-                  break;
-                case "float":
-                  HEAPF32[e >> 2] = t;
-                  break;
-                case "double":
-                  HEAPF64[e >> 3] = t;
-                  break;
-                case "*":
-                  HEAPU32[e >> 2] = t;
-                  break;
-                default:
-                  abort("invalid type for setValue: " + r);
-              }
-            }
-            var ___memory_base = new WebAssembly.Global({ value: "i32", mutable: false }, 1024), ___stack_pointer = new WebAssembly.Global({ value: "i32", mutable: true }, 78144), ___table_base = new WebAssembly.Global({ value: "i32", mutable: false }, 1), nowIsMonotonic = true, _emscripten_get_now;
-            function __emscripten_get_now_is_monotonic() {
-              return nowIsMonotonic;
-            }
-            function _abort() {
-              abort("");
-            }
-            function _emscripten_date_now() {
-              return Date.now();
-            }
-            function _emscripten_memcpy_big(e, t, r) {
-              HEAPU8.copyWithin(e, t, t + r);
-            }
-            function getHeapMax() {
-              return 2147483648;
-            }
-            function emscripten_realloc_buffer(e) {
-              try {
-                return wasmMemory.grow(e - buffer.byteLength + 65535 >>> 16), updateGlobalBufferAndViews(wasmMemory.buffer), 1;
-              } catch (e2) {
-              }
-            }
-            function _emscripten_resize_heap(e) {
-              var t = HEAPU8.length;
-              e >>>= 0;
-              var r = getHeapMax();
-              if (e > r) return false;
-              for (var _ = 1; _ <= 4; _ *= 2) {
-                var n = t * (1 + 0.2 / _);
-                if (n = Math.min(n, e + 100663296), emscripten_realloc_buffer(Math.min(r, (s = Math.max(e, n)) + ((a = 65536) - s % a) % a))) return true;
-              }
-              var s, a;
-              return false;
-            }
-            __emscripten_get_now_is_monotonic.sig = "i", Module._abort = _abort, _abort.sig = "v", _emscripten_date_now.sig = "d", _emscripten_get_now = ENVIRONMENT_IS_NODE ? () => {
-              var e = process.hrtime();
-              return 1e3 * e[0] + e[1] / 1e6;
-            } : () => performance.now(), _emscripten_get_now.sig = "d", _emscripten_memcpy_big.sig = "vppp", _emscripten_resize_heap.sig = "ip";
-            var SYSCALLS = { DEFAULT_POLLMASK: 5, calculateAt: function(e, t, r) {
-              if (PATH.isAbs(t)) return t;
-              var _;
-              -100 === e ? _ = FS.cwd() : _ = SYSCALLS.getStreamFromFD(e).path;
-              if (0 == t.length) {
-                if (!r) throw new FS.ErrnoError(44);
-                return _;
-              }
-              return PATH.join2(_, t);
-            }, doStat: function(e, t, r) {
-              try {
-                var _ = e(t);
-              } catch (e2) {
-                if (e2 && e2.node && PATH.normalize(t) !== PATH.normalize(FS.getPath(e2.node))) return -54;
-                throw e2;
-              }
-              HEAP32[r >> 2] = _.dev, HEAP32[r + 8 >> 2] = _.ino, HEAP32[r + 12 >> 2] = _.mode, HEAPU32[r + 16 >> 2] = _.nlink, HEAP32[r + 20 >> 2] = _.uid, HEAP32[r + 24 >> 2] = _.gid, HEAP32[r + 28 >> 2] = _.rdev, tempI64 = [_.size >>> 0, (tempDouble = _.size, +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (0 | Math.min(+Math.floor(tempDouble / 4294967296), 4294967295)) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0)], HEAP32[r + 40 >> 2] = tempI64[0], HEAP32[r + 44 >> 2] = tempI64[1], HEAP32[r + 48 >> 2] = 4096, HEAP32[r + 52 >> 2] = _.blocks;
-              var n = _.atime.getTime(), s = _.mtime.getTime(), a = _.ctime.getTime();
-              return tempI64 = [Math.floor(n / 1e3) >>> 0, (tempDouble = Math.floor(n / 1e3), +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (0 | Math.min(+Math.floor(tempDouble / 4294967296), 4294967295)) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0)], HEAP32[r + 56 >> 2] = tempI64[0], HEAP32[r + 60 >> 2] = tempI64[1], HEAPU32[r + 64 >> 2] = n % 1e3 * 1e3, tempI64 = [Math.floor(s / 1e3) >>> 0, (tempDouble = Math.floor(s / 1e3), +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (0 | Math.min(+Math.floor(tempDouble / 4294967296), 4294967295)) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0)], HEAP32[r + 72 >> 2] = tempI64[0], HEAP32[r + 76 >> 2] = tempI64[1], HEAPU32[r + 80 >> 2] = s % 1e3 * 1e3, tempI64 = [Math.floor(a / 1e3) >>> 0, (tempDouble = Math.floor(a / 1e3), +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (0 | Math.min(+Math.floor(tempDouble / 4294967296), 4294967295)) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0)], HEAP32[r + 88 >> 2] = tempI64[0], HEAP32[r + 92 >> 2] = tempI64[1], HEAPU32[r + 96 >> 2] = a % 1e3 * 1e3, tempI64 = [_.ino >>> 0, (tempDouble = _.ino, +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (0 | Math.min(+Math.floor(tempDouble / 4294967296), 4294967295)) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0)], HEAP32[r + 104 >> 2] = tempI64[0], HEAP32[r + 108 >> 2] = tempI64[1], 0;
-            }, doMsync: function(e, t, r, _, n) {
-              if (!FS.isFile(t.node.mode)) throw new FS.ErrnoError(43);
-              if (2 & _) return 0;
-              var s = HEAPU8.slice(e, e + r);
-              FS.msync(t, s, n, r, _);
-            }, varargs: void 0, get: function() {
-              return SYSCALLS.varargs += 4, HEAP32[SYSCALLS.varargs - 4 >> 2];
-            }, getStr: function(e) {
-              return UTF8ToString(e);
-            }, getStreamFromFD: function(e) {
-              var t = FS.getStream(e);
-              if (!t) throw new FS.ErrnoError(8);
-              return t;
-            } };
-            function _proc_exit(e) {
-              EXITSTATUS = e, keepRuntimeAlive() || (Module.onExit && Module.onExit(e), ABORT = true), quit_(e, new ExitStatus(e));
-            }
-            function exitJS(e, t) {
-              EXITSTATUS = e, _proc_exit(e);
-            }
-            _proc_exit.sig = "vi";
-            var _exit = exitJS;
-            function _fd_close(e) {
-              try {
-                var t = SYSCALLS.getStreamFromFD(e);
-                return FS.close(t), 0;
-              } catch (e2) {
-                if ("undefined" == typeof FS || !(e2 instanceof FS.ErrnoError)) throw e2;
-                return e2.errno;
-              }
-            }
-            function convertI32PairToI53Checked(e, t) {
-              return t + 2097152 >>> 0 < 4194305 - !!e ? (e >>> 0) + 4294967296 * t : NaN;
-            }
-            function _fd_seek(e, t, r, _, n) {
-              try {
-                var s = convertI32PairToI53Checked(t, r);
-                if (isNaN(s)) return 61;
-                var a = SYSCALLS.getStreamFromFD(e);
-                return FS.llseek(a, s, _), tempI64 = [a.position >>> 0, (tempDouble = a.position, +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (0 | Math.min(+Math.floor(tempDouble / 4294967296), 4294967295)) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0)], HEAP32[n >> 2] = tempI64[0], HEAP32[n + 4 >> 2] = tempI64[1], a.getdents && 0 === s && 0 === _ && (a.getdents = null), 0;
-              } catch (e2) {
-                if ("undefined" == typeof FS || !(e2 instanceof FS.ErrnoError)) throw e2;
-                return e2.errno;
-              }
-            }
-            function doWritev(e, t, r, _) {
-              for (var n = 0, s = 0; s < r; s++) {
-                var a = HEAPU32[t >> 2], o = HEAPU32[t + 4 >> 2];
-                t += 8;
-                var i = FS.write(e, HEAP8, a, o, _);
-                if (i < 0) return -1;
-                n += i, void 0 !== _ && (_ += i);
-              }
-              return n;
-            }
-            function _fd_write(e, t, r, _) {
-              try {
-                var n = doWritev(SYSCALLS.getStreamFromFD(e), t, r);
-                return HEAPU32[_ >> 2] = n, 0;
-              } catch (e2) {
-                if ("undefined" == typeof FS || !(e2 instanceof FS.ErrnoError)) throw e2;
-                return e2.errno;
-              }
-            }
-            function _tree_sitter_log_callback(e, t) {
-              if (currentLogCallback) {
-                const r = UTF8ToString(t);
-                currentLogCallback(r, 0 !== e);
-              }
-            }
-            function _tree_sitter_parse_callback(e, t, r, _, n) {
-              var s = currentParseCallback(t, { row: r, column: _ });
-              "string" == typeof s ? (setValue(n, s.length, "i32"), stringToUTF16(s, e, 10240)) : setValue(n, 0, "i32");
-            }
-            function handleException(e) {
-              if (e instanceof ExitStatus || "unwind" == e) return EXITSTATUS;
-              quit_(1, e);
-            }
-            function allocateUTF8OnStack(e) {
-              var t = lengthBytesUTF8(e) + 1, r = stackAlloc(t);
-              return stringToUTF8Array(e, HEAP8, r, t), r;
-            }
-            function stringToUTF16(e, t, r) {
-              if (void 0 === r && (r = 2147483647), r < 2) return 0;
-              for (var _ = t, n = (r -= 2) < 2 * e.length ? r / 2 : e.length, s = 0; s < n; ++s) {
-                var a = e.charCodeAt(s);
-                HEAP16[t >> 1] = a, t += 2;
-              }
-              return HEAP16[t >> 1] = 0, t - _;
-            }
-            function AsciiToString(e) {
-              for (var t = ""; ; ) {
-                var r = HEAPU8[e++ >> 0];
-                if (!r) return t;
-                t += String.fromCharCode(r);
-              }
-            }
-            _exit.sig = "vi", _fd_close.sig = "ii", _fd_seek.sig = "iijip", _fd_write.sig = "iippp";
-            var asmLibraryArg = { __heap_base: ___heap_base, __indirect_function_table: wasmTable, __memory_base: ___memory_base, __stack_pointer: ___stack_pointer, __table_base: ___table_base, _emscripten_get_now_is_monotonic: __emscripten_get_now_is_monotonic, abort: _abort, emscripten_get_now: _emscripten_get_now, emscripten_memcpy_big: _emscripten_memcpy_big, emscripten_resize_heap: _emscripten_resize_heap, exit: _exit, fd_close: _fd_close, fd_seek: _fd_seek, fd_write: _fd_write, memory: wasmMemory, tree_sitter_log_callback: _tree_sitter_log_callback, tree_sitter_parse_callback: _tree_sitter_parse_callback }, asm = createWasm(), ___wasm_call_ctors = Module.___wasm_call_ctors = function() {
-              return (___wasm_call_ctors = Module.___wasm_call_ctors = Module.asm.__wasm_call_ctors).apply(null, arguments);
-            }, ___wasm_apply_data_relocs = Module.___wasm_apply_data_relocs = function() {
-              return (___wasm_apply_data_relocs = Module.___wasm_apply_data_relocs = Module.asm.__wasm_apply_data_relocs).apply(null, arguments);
-            }, _malloc = Module._malloc = function() {
-              return (_malloc = Module._malloc = Module.asm.malloc).apply(null, arguments);
-            }, _calloc = Module._calloc = function() {
-              return (_calloc = Module._calloc = Module.asm.calloc).apply(null, arguments);
-            }, _realloc = Module._realloc = function() {
-              return (_realloc = Module._realloc = Module.asm.realloc).apply(null, arguments);
-            }, _free = Module._free = function() {
-              return (_free = Module._free = Module.asm.free).apply(null, arguments);
-            }, _ts_language_symbol_count = Module._ts_language_symbol_count = function() {
-              return (_ts_language_symbol_count = Module._ts_language_symbol_count = Module.asm.ts_language_symbol_count).apply(null, arguments);
-            }, _ts_language_version = Module._ts_language_version = function() {
-              return (_ts_language_version = Module._ts_language_version = Module.asm.ts_language_version).apply(null, arguments);
-            }, _ts_language_field_count = Module._ts_language_field_count = function() {
-              return (_ts_language_field_count = Module._ts_language_field_count = Module.asm.ts_language_field_count).apply(null, arguments);
-            }, _ts_language_symbol_name = Module._ts_language_symbol_name = function() {
-              return (_ts_language_symbol_name = Module._ts_language_symbol_name = Module.asm.ts_language_symbol_name).apply(null, arguments);
-            }, _ts_language_symbol_for_name = Module._ts_language_symbol_for_name = function() {
-              return (_ts_language_symbol_for_name = Module._ts_language_symbol_for_name = Module.asm.ts_language_symbol_for_name).apply(null, arguments);
-            }, _ts_language_symbol_type = Module._ts_language_symbol_type = function() {
-              return (_ts_language_symbol_type = Module._ts_language_symbol_type = Module.asm.ts_language_symbol_type).apply(null, arguments);
-            }, _ts_language_field_name_for_id = Module._ts_language_field_name_for_id = function() {
-              return (_ts_language_field_name_for_id = Module._ts_language_field_name_for_id = Module.asm.ts_language_field_name_for_id).apply(null, arguments);
-            }, _memset = Module._memset = function() {
-              return (_memset = Module._memset = Module.asm.memset).apply(null, arguments);
-            }, _memcpy = Module._memcpy = function() {
-              return (_memcpy = Module._memcpy = Module.asm.memcpy).apply(null, arguments);
-            }, _ts_parser_delete = Module._ts_parser_delete = function() {
-              return (_ts_parser_delete = Module._ts_parser_delete = Module.asm.ts_parser_delete).apply(null, arguments);
-            }, _ts_parser_reset = Module._ts_parser_reset = function() {
-              return (_ts_parser_reset = Module._ts_parser_reset = Module.asm.ts_parser_reset).apply(null, arguments);
-            }, _ts_parser_set_language = Module._ts_parser_set_language = function() {
-              return (_ts_parser_set_language = Module._ts_parser_set_language = Module.asm.ts_parser_set_language).apply(null, arguments);
-            }, _ts_parser_timeout_micros = Module._ts_parser_timeout_micros = function() {
-              return (_ts_parser_timeout_micros = Module._ts_parser_timeout_micros = Module.asm.ts_parser_timeout_micros).apply(null, arguments);
-            }, _ts_parser_set_timeout_micros = Module._ts_parser_set_timeout_micros = function() {
-              return (_ts_parser_set_timeout_micros = Module._ts_parser_set_timeout_micros = Module.asm.ts_parser_set_timeout_micros).apply(null, arguments);
-            }, _memmove = Module._memmove = function() {
-              return (_memmove = Module._memmove = Module.asm.memmove).apply(null, arguments);
-            }, _memcmp = Module._memcmp = function() {
-              return (_memcmp = Module._memcmp = Module.asm.memcmp).apply(null, arguments);
-            }, _ts_query_new = Module._ts_query_new = function() {
-              return (_ts_query_new = Module._ts_query_new = Module.asm.ts_query_new).apply(null, arguments);
-            }, _ts_query_delete = Module._ts_query_delete = function() {
-              return (_ts_query_delete = Module._ts_query_delete = Module.asm.ts_query_delete).apply(null, arguments);
-            }, _iswspace = Module._iswspace = function() {
-              return (_iswspace = Module._iswspace = Module.asm.iswspace).apply(null, arguments);
-            }, _iswalnum = Module._iswalnum = function() {
-              return (_iswalnum = Module._iswalnum = Module.asm.iswalnum).apply(null, arguments);
-            }, _ts_query_pattern_count = Module._ts_query_pattern_count = function() {
-              return (_ts_query_pattern_count = Module._ts_query_pattern_count = Module.asm.ts_query_pattern_count).apply(null, arguments);
-            }, _ts_query_capture_count = Module._ts_query_capture_count = function() {
-              return (_ts_query_capture_count = Module._ts_query_capture_count = Module.asm.ts_query_capture_count).apply(null, arguments);
-            }, _ts_query_string_count = Module._ts_query_string_count = function() {
-              return (_ts_query_string_count = Module._ts_query_string_count = Module.asm.ts_query_string_count).apply(null, arguments);
-            }, _ts_query_capture_name_for_id = Module._ts_query_capture_name_for_id = function() {
-              return (_ts_query_capture_name_for_id = Module._ts_query_capture_name_for_id = Module.asm.ts_query_capture_name_for_id).apply(null, arguments);
-            }, _ts_query_string_value_for_id = Module._ts_query_string_value_for_id = function() {
-              return (_ts_query_string_value_for_id = Module._ts_query_string_value_for_id = Module.asm.ts_query_string_value_for_id).apply(null, arguments);
-            }, _ts_query_predicates_for_pattern = Module._ts_query_predicates_for_pattern = function() {
-              return (_ts_query_predicates_for_pattern = Module._ts_query_predicates_for_pattern = Module.asm.ts_query_predicates_for_pattern).apply(null, arguments);
-            }, _ts_tree_copy = Module._ts_tree_copy = function() {
-              return (_ts_tree_copy = Module._ts_tree_copy = Module.asm.ts_tree_copy).apply(null, arguments);
-            }, _ts_tree_delete = Module._ts_tree_delete = function() {
-              return (_ts_tree_delete = Module._ts_tree_delete = Module.asm.ts_tree_delete).apply(null, arguments);
-            }, _ts_init = Module._ts_init = function() {
-              return (_ts_init = Module._ts_init = Module.asm.ts_init).apply(null, arguments);
-            }, _ts_parser_new_wasm = Module._ts_parser_new_wasm = function() {
-              return (_ts_parser_new_wasm = Module._ts_parser_new_wasm = Module.asm.ts_parser_new_wasm).apply(null, arguments);
-            }, _ts_parser_enable_logger_wasm = Module._ts_parser_enable_logger_wasm = function() {
-              return (_ts_parser_enable_logger_wasm = Module._ts_parser_enable_logger_wasm = Module.asm.ts_parser_enable_logger_wasm).apply(null, arguments);
-            }, _ts_parser_parse_wasm = Module._ts_parser_parse_wasm = function() {
-              return (_ts_parser_parse_wasm = Module._ts_parser_parse_wasm = Module.asm.ts_parser_parse_wasm).apply(null, arguments);
-            }, _ts_language_type_is_named_wasm = Module._ts_language_type_is_named_wasm = function() {
-              return (_ts_language_type_is_named_wasm = Module._ts_language_type_is_named_wasm = Module.asm.ts_language_type_is_named_wasm).apply(null, arguments);
-            }, _ts_language_type_is_visible_wasm = Module._ts_language_type_is_visible_wasm = function() {
-              return (_ts_language_type_is_visible_wasm = Module._ts_language_type_is_visible_wasm = Module.asm.ts_language_type_is_visible_wasm).apply(null, arguments);
-            }, _ts_tree_root_node_wasm = Module._ts_tree_root_node_wasm = function() {
-              return (_ts_tree_root_node_wasm = Module._ts_tree_root_node_wasm = Module.asm.ts_tree_root_node_wasm).apply(null, arguments);
-            }, _ts_tree_edit_wasm = Module._ts_tree_edit_wasm = function() {
-              return (_ts_tree_edit_wasm = Module._ts_tree_edit_wasm = Module.asm.ts_tree_edit_wasm).apply(null, arguments);
-            }, _ts_tree_get_changed_ranges_wasm = Module._ts_tree_get_changed_ranges_wasm = function() {
-              return (_ts_tree_get_changed_ranges_wasm = Module._ts_tree_get_changed_ranges_wasm = Module.asm.ts_tree_get_changed_ranges_wasm).apply(null, arguments);
-            }, _ts_tree_cursor_new_wasm = Module._ts_tree_cursor_new_wasm = function() {
-              return (_ts_tree_cursor_new_wasm = Module._ts_tree_cursor_new_wasm = Module.asm.ts_tree_cursor_new_wasm).apply(null, arguments);
-            }, _ts_tree_cursor_delete_wasm = Module._ts_tree_cursor_delete_wasm = function() {
-              return (_ts_tree_cursor_delete_wasm = Module._ts_tree_cursor_delete_wasm = Module.asm.ts_tree_cursor_delete_wasm).apply(null, arguments);
-            }, _ts_tree_cursor_reset_wasm = Module._ts_tree_cursor_reset_wasm = function() {
-              return (_ts_tree_cursor_reset_wasm = Module._ts_tree_cursor_reset_wasm = Module.asm.ts_tree_cursor_reset_wasm).apply(null, arguments);
-            }, _ts_tree_cursor_goto_first_child_wasm = Module._ts_tree_cursor_goto_first_child_wasm = function() {
-              return (_ts_tree_cursor_goto_first_child_wasm = Module._ts_tree_cursor_goto_first_child_wasm = Module.asm.ts_tree_cursor_goto_first_child_wasm).apply(null, arguments);
-            }, _ts_tree_cursor_goto_next_sibling_wasm = Module._ts_tree_cursor_goto_next_sibling_wasm = function() {
-              return (_ts_tree_cursor_goto_next_sibling_wasm = Module._ts_tree_cursor_goto_next_sibling_wasm = Module.asm.ts_tree_cursor_goto_next_sibling_wasm).apply(null, arguments);
-            }, _ts_tree_cursor_goto_parent_wasm = Module._ts_tree_cursor_goto_parent_wasm = function() {
-              return (_ts_tree_cursor_goto_parent_wasm = Module._ts_tree_cursor_goto_parent_wasm = Module.asm.ts_tree_cursor_goto_parent_wasm).apply(null, arguments);
-            }, _ts_tree_cursor_current_node_type_id_wasm = Module._ts_tree_cursor_current_node_type_id_wasm = function() {
-              return (_ts_tree_cursor_current_node_type_id_wasm = Module._ts_tree_cursor_current_node_type_id_wasm = Module.asm.ts_tree_cursor_current_node_type_id_wasm).apply(null, arguments);
-            }, _ts_tree_cursor_current_node_is_named_wasm = Module._ts_tree_cursor_current_node_is_named_wasm = function() {
-              return (_ts_tree_cursor_current_node_is_named_wasm = Module._ts_tree_cursor_current_node_is_named_wasm = Module.asm.ts_tree_cursor_current_node_is_named_wasm).apply(null, arguments);
-            }, _ts_tree_cursor_current_node_is_missing_wasm = Module._ts_tree_cursor_current_node_is_missing_wasm = function() {
-              return (_ts_tree_cursor_current_node_is_missing_wasm = Module._ts_tree_cursor_current_node_is_missing_wasm = Module.asm.ts_tree_cursor_current_node_is_missing_wasm).apply(null, arguments);
-            }, _ts_tree_cursor_current_node_id_wasm = Module._ts_tree_cursor_current_node_id_wasm = function() {
-              return (_ts_tree_cursor_current_node_id_wasm = Module._ts_tree_cursor_current_node_id_wasm = Module.asm.ts_tree_cursor_current_node_id_wasm).apply(null, arguments);
-            }, _ts_tree_cursor_start_position_wasm = Module._ts_tree_cursor_start_position_wasm = function() {
-              return (_ts_tree_cursor_start_position_wasm = Module._ts_tree_cursor_start_position_wasm = Module.asm.ts_tree_cursor_start_position_wasm).apply(null, arguments);
-            }, _ts_tree_cursor_end_position_wasm = Module._ts_tree_cursor_end_position_wasm = function() {
-              return (_ts_tree_cursor_end_position_wasm = Module._ts_tree_cursor_end_position_wasm = Module.asm.ts_tree_cursor_end_position_wasm).apply(null, arguments);
-            }, _ts_tree_cursor_start_index_wasm = Module._ts_tree_cursor_start_index_wasm = function() {
-              return (_ts_tree_cursor_start_index_wasm = Module._ts_tree_cursor_start_index_wasm = Module.asm.ts_tree_cursor_start_index_wasm).apply(null, arguments);
-            }, _ts_tree_cursor_end_index_wasm = Module._ts_tree_cursor_end_index_wasm = function() {
-              return (_ts_tree_cursor_end_index_wasm = Module._ts_tree_cursor_end_index_wasm = Module.asm.ts_tree_cursor_end_index_wasm).apply(null, arguments);
-            }, _ts_tree_cursor_current_field_id_wasm = Module._ts_tree_cursor_current_field_id_wasm = function() {
-              return (_ts_tree_cursor_current_field_id_wasm = Module._ts_tree_cursor_current_field_id_wasm = Module.asm.ts_tree_cursor_current_field_id_wasm).apply(null, arguments);
-            }, _ts_tree_cursor_current_node_wasm = Module._ts_tree_cursor_current_node_wasm = function() {
-              return (_ts_tree_cursor_current_node_wasm = Module._ts_tree_cursor_current_node_wasm = Module.asm.ts_tree_cursor_current_node_wasm).apply(null, arguments);
-            }, _ts_node_symbol_wasm = Module._ts_node_symbol_wasm = function() {
-              return (_ts_node_symbol_wasm = Module._ts_node_symbol_wasm = Module.asm.ts_node_symbol_wasm).apply(null, arguments);
-            }, _ts_node_child_count_wasm = Module._ts_node_child_count_wasm = function() {
-              return (_ts_node_child_count_wasm = Module._ts_node_child_count_wasm = Module.asm.ts_node_child_count_wasm).apply(null, arguments);
-            }, _ts_node_named_child_count_wasm = Module._ts_node_named_child_count_wasm = function() {
-              return (_ts_node_named_child_count_wasm = Module._ts_node_named_child_count_wasm = Module.asm.ts_node_named_child_count_wasm).apply(null, arguments);
-            }, _ts_node_child_wasm = Module._ts_node_child_wasm = function() {
-              return (_ts_node_child_wasm = Module._ts_node_child_wasm = Module.asm.ts_node_child_wasm).apply(null, arguments);
-            }, _ts_node_named_child_wasm = Module._ts_node_named_child_wasm = function() {
-              return (_ts_node_named_child_wasm = Module._ts_node_named_child_wasm = Module.asm.ts_node_named_child_wasm).apply(null, arguments);
-            }, _ts_node_child_by_field_id_wasm = Module._ts_node_child_by_field_id_wasm = function() {
-              return (_ts_node_child_by_field_id_wasm = Module._ts_node_child_by_field_id_wasm = Module.asm.ts_node_child_by_field_id_wasm).apply(null, arguments);
-            }, _ts_node_next_sibling_wasm = Module._ts_node_next_sibling_wasm = function() {
-              return (_ts_node_next_sibling_wasm = Module._ts_node_next_sibling_wasm = Module.asm.ts_node_next_sibling_wasm).apply(null, arguments);
-            }, _ts_node_prev_sibling_wasm = Module._ts_node_prev_sibling_wasm = function() {
-              return (_ts_node_prev_sibling_wasm = Module._ts_node_prev_sibling_wasm = Module.asm.ts_node_prev_sibling_wasm).apply(null, arguments);
-            }, _ts_node_next_named_sibling_wasm = Module._ts_node_next_named_sibling_wasm = function() {
-              return (_ts_node_next_named_sibling_wasm = Module._ts_node_next_named_sibling_wasm = Module.asm.ts_node_next_named_sibling_wasm).apply(null, arguments);
-            }, _ts_node_prev_named_sibling_wasm = Module._ts_node_prev_named_sibling_wasm = function() {
-              return (_ts_node_prev_named_sibling_wasm = Module._ts_node_prev_named_sibling_wasm = Module.asm.ts_node_prev_named_sibling_wasm).apply(null, arguments);
-            }, _ts_node_parent_wasm = Module._ts_node_parent_wasm = function() {
-              return (_ts_node_parent_wasm = Module._ts_node_parent_wasm = Module.asm.ts_node_parent_wasm).apply(null, arguments);
-            }, _ts_node_descendant_for_index_wasm = Module._ts_node_descendant_for_index_wasm = function() {
-              return (_ts_node_descendant_for_index_wasm = Module._ts_node_descendant_for_index_wasm = Module.asm.ts_node_descendant_for_index_wasm).apply(null, arguments);
-            }, _ts_node_named_descendant_for_index_wasm = Module._ts_node_named_descendant_for_index_wasm = function() {
-              return (_ts_node_named_descendant_for_index_wasm = Module._ts_node_named_descendant_for_index_wasm = Module.asm.ts_node_named_descendant_for_index_wasm).apply(null, arguments);
-            }, _ts_node_descendant_for_position_wasm = Module._ts_node_descendant_for_position_wasm = function() {
-              return (_ts_node_descendant_for_position_wasm = Module._ts_node_descendant_for_position_wasm = Module.asm.ts_node_descendant_for_position_wasm).apply(null, arguments);
-            }, _ts_node_named_descendant_for_position_wasm = Module._ts_node_named_descendant_for_position_wasm = function() {
-              return (_ts_node_named_descendant_for_position_wasm = Module._ts_node_named_descendant_for_position_wasm = Module.asm.ts_node_named_descendant_for_position_wasm).apply(null, arguments);
-            }, _ts_node_start_point_wasm = Module._ts_node_start_point_wasm = function() {
-              return (_ts_node_start_point_wasm = Module._ts_node_start_point_wasm = Module.asm.ts_node_start_point_wasm).apply(null, arguments);
-            }, _ts_node_end_point_wasm = Module._ts_node_end_point_wasm = function() {
-              return (_ts_node_end_point_wasm = Module._ts_node_end_point_wasm = Module.asm.ts_node_end_point_wasm).apply(null, arguments);
-            }, _ts_node_start_index_wasm = Module._ts_node_start_index_wasm = function() {
-              return (_ts_node_start_index_wasm = Module._ts_node_start_index_wasm = Module.asm.ts_node_start_index_wasm).apply(null, arguments);
-            }, _ts_node_end_index_wasm = Module._ts_node_end_index_wasm = function() {
-              return (_ts_node_end_index_wasm = Module._ts_node_end_index_wasm = Module.asm.ts_node_end_index_wasm).apply(null, arguments);
-            }, _ts_node_to_string_wasm = Module._ts_node_to_string_wasm = function() {
-              return (_ts_node_to_string_wasm = Module._ts_node_to_string_wasm = Module.asm.ts_node_to_string_wasm).apply(null, arguments);
-            }, _ts_node_children_wasm = Module._ts_node_children_wasm = function() {
-              return (_ts_node_children_wasm = Module._ts_node_children_wasm = Module.asm.ts_node_children_wasm).apply(null, arguments);
-            }, _ts_node_named_children_wasm = Module._ts_node_named_children_wasm = function() {
-              return (_ts_node_named_children_wasm = Module._ts_node_named_children_wasm = Module.asm.ts_node_named_children_wasm).apply(null, arguments);
-            }, _ts_node_descendants_of_type_wasm = Module._ts_node_descendants_of_type_wasm = function() {
-              return (_ts_node_descendants_of_type_wasm = Module._ts_node_descendants_of_type_wasm = Module.asm.ts_node_descendants_of_type_wasm).apply(null, arguments);
-            }, _ts_node_is_named_wasm = Module._ts_node_is_named_wasm = function() {
-              return (_ts_node_is_named_wasm = Module._ts_node_is_named_wasm = Module.asm.ts_node_is_named_wasm).apply(null, arguments);
-            }, _ts_node_has_changes_wasm = Module._ts_node_has_changes_wasm = function() {
-              return (_ts_node_has_changes_wasm = Module._ts_node_has_changes_wasm = Module.asm.ts_node_has_changes_wasm).apply(null, arguments);
-            }, _ts_node_has_error_wasm = Module._ts_node_has_error_wasm = function() {
-              return (_ts_node_has_error_wasm = Module._ts_node_has_error_wasm = Module.asm.ts_node_has_error_wasm).apply(null, arguments);
-            }, _ts_node_is_missing_wasm = Module._ts_node_is_missing_wasm = function() {
-              return (_ts_node_is_missing_wasm = Module._ts_node_is_missing_wasm = Module.asm.ts_node_is_missing_wasm).apply(null, arguments);
-            }, _ts_query_matches_wasm = Module._ts_query_matches_wasm = function() {
-              return (_ts_query_matches_wasm = Module._ts_query_matches_wasm = Module.asm.ts_query_matches_wasm).apply(null, arguments);
-            }, _ts_query_captures_wasm = Module._ts_query_captures_wasm = function() {
-              return (_ts_query_captures_wasm = Module._ts_query_captures_wasm = Module.asm.ts_query_captures_wasm).apply(null, arguments);
-            }, ___cxa_atexit = Module.___cxa_atexit = function() {
-              return (___cxa_atexit = Module.___cxa_atexit = Module.asm.__cxa_atexit).apply(null, arguments);
-            }, _iswdigit = Module._iswdigit = function() {
-              return (_iswdigit = Module._iswdigit = Module.asm.iswdigit).apply(null, arguments);
-            }, _iswalpha = Module._iswalpha = function() {
-              return (_iswalpha = Module._iswalpha = Module.asm.iswalpha).apply(null, arguments);
-            }, _iswlower = Module._iswlower = function() {
-              return (_iswlower = Module._iswlower = Module.asm.iswlower).apply(null, arguments);
-            }, _memchr = Module._memchr = function() {
-              return (_memchr = Module._memchr = Module.asm.memchr).apply(null, arguments);
-            }, _strlen = Module._strlen = function() {
-              return (_strlen = Module._strlen = Module.asm.strlen).apply(null, arguments);
-            }, _towupper = Module._towupper = function() {
-              return (_towupper = Module._towupper = Module.asm.towupper).apply(null, arguments);
-            }, _setThrew = Module._setThrew = function() {
-              return (_setThrew = Module._setThrew = Module.asm.setThrew).apply(null, arguments);
-            }, stackSave = Module.stackSave = function() {
-              return (stackSave = Module.stackSave = Module.asm.stackSave).apply(null, arguments);
-            }, stackRestore = Module.stackRestore = function() {
-              return (stackRestore = Module.stackRestore = Module.asm.stackRestore).apply(null, arguments);
-            }, stackAlloc = Module.stackAlloc = function() {
-              return (stackAlloc = Module.stackAlloc = Module.asm.stackAlloc).apply(null, arguments);
-            }, __Znwm = Module.__Znwm = function() {
-              return (__Znwm = Module.__Znwm = Module.asm._Znwm).apply(null, arguments);
-            }, __ZdlPv = Module.__ZdlPv = function() {
-              return (__ZdlPv = Module.__ZdlPv = Module.asm._ZdlPv).apply(null, arguments);
-            }, __ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEED2Ev = Module.__ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEED2Ev = function() {
-              return (__ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEED2Ev = Module.__ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEED2Ev = Module.asm._ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEED2Ev).apply(null, arguments);
-            }, __ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE9__grow_byEmmmmmm = Module.__ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE9__grow_byEmmmmmm = function() {
-              return (__ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE9__grow_byEmmmmmm = Module.__ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE9__grow_byEmmmmmm = Module.asm._ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE9__grow_byEmmmmmm).apply(null, arguments);
-            }, __ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE6__initEPKcm = Module.__ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE6__initEPKcm = function() {
-              return (__ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE6__initEPKcm = Module.__ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE6__initEPKcm = Module.asm._ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE6__initEPKcm).apply(null, arguments);
-            }, __ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE7reserveEm = Module.__ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE7reserveEm = function() {
-              return (__ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE7reserveEm = Module.__ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE7reserveEm = Module.asm._ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE7reserveEm).apply(null, arguments);
-            }, __ZNKSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE4copyEPcmm = Module.__ZNKSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE4copyEPcmm = function() {
-              return (__ZNKSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE4copyEPcmm = Module.__ZNKSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE4copyEPcmm = Module.asm._ZNKSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE4copyEPcmm).apply(null, arguments);
-            }, __ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE9push_backEc = Module.__ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE9push_backEc = function() {
-              return (__ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE9push_backEc = Module.__ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE9push_backEc = Module.asm._ZNSt3__212basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE9push_backEc).apply(null, arguments);
-            }, __ZNSt3__212basic_stringIwNS_11char_traitsIwEENS_9allocatorIwEEED2Ev = Module.__ZNSt3__212basic_stringIwNS_11char_traitsIwEENS_9allocatorIwEEED2Ev = function() {
-              return (__ZNSt3__212basic_stringIwNS_11char_traitsIwEENS_9allocatorIwEEED2Ev = Module.__ZNSt3__212basic_stringIwNS_11char_traitsIwEENS_9allocatorIwEEED2Ev = Module.asm._ZNSt3__212basic_stringIwNS_11char_traitsIwEENS_9allocatorIwEEED2Ev).apply(null, arguments);
-            }, __ZNSt3__212basic_stringIwNS_11char_traitsIwEENS_9allocatorIwEEE9push_backEw = Module.__ZNSt3__212basic_stringIwNS_11char_traitsIwEENS_9allocatorIwEEE9push_backEw = function() {
-              return (__ZNSt3__212basic_stringIwNS_11char_traitsIwEENS_9allocatorIwEEE9push_backEw = Module.__ZNSt3__212basic_stringIwNS_11char_traitsIwEENS_9allocatorIwEEE9push_backEw = Module.asm._ZNSt3__212basic_stringIwNS_11char_traitsIwEENS_9allocatorIwEEE9push_backEw).apply(null, arguments);
-            }, __ZNSt3__212basic_stringIwNS_11char_traitsIwEENS_9allocatorIwEEE6resizeEmw = Module.__ZNSt3__212basic_stringIwNS_11char_traitsIwEENS_9allocatorIwEEE6resizeEmw = function() {
-              return (__ZNSt3__212basic_stringIwNS_11char_traitsIwEENS_9allocatorIwEEE6resizeEmw = Module.__ZNSt3__212basic_stringIwNS_11char_traitsIwEENS_9allocatorIwEEE6resizeEmw = Module.asm._ZNSt3__212basic_stringIwNS_11char_traitsIwEENS_9allocatorIwEEE6resizeEmw).apply(null, arguments);
-            }, dynCall_jiji = Module.dynCall_jiji = function() {
-              return (dynCall_jiji = Module.dynCall_jiji = Module.asm.dynCall_jiji).apply(null, arguments);
-            }, _orig$ts_parser_timeout_micros = Module._orig$ts_parser_timeout_micros = function() {
-              return (_orig$ts_parser_timeout_micros = Module._orig$ts_parser_timeout_micros = Module.asm.orig$ts_parser_timeout_micros).apply(null, arguments);
-            }, _orig$ts_parser_set_timeout_micros = Module._orig$ts_parser_set_timeout_micros = function() {
-              return (_orig$ts_parser_set_timeout_micros = Module._orig$ts_parser_set_timeout_micros = Module.asm.orig$ts_parser_set_timeout_micros).apply(null, arguments);
-            }, calledRun;
-            function callMain(e) {
-              var t = Module._main;
-              if (t) {
-                (e = e || []).unshift(thisProgram);
-                var r = e.length, _ = stackAlloc(4 * (r + 1)), n = _ >> 2;
-                e.forEach(((e2) => {
-                  HEAP32[n++] = allocateUTF8OnStack(e2);
-                })), HEAP32[n] = 0;
-                try {
-                  var s = t(r, _);
-                  return exitJS(s, true), s;
-                } catch (e2) {
-                  return handleException(e2);
-                }
-              }
-            }
-            Module.AsciiToString = AsciiToString, Module.stringToUTF16 = stringToUTF16, dependenciesFulfilled = function e() {
-              calledRun || run(), calledRun || (dependenciesFulfilled = e);
-            };
-            var dylibsLoaded = false;
-            function run(e) {
-              function t() {
-                calledRun || (calledRun = true, Module.calledRun = true, ABORT || (initRuntime(), preMain(), Module.onRuntimeInitialized && Module.onRuntimeInitialized(), shouldRunNow && callMain(e), postRun()));
-              }
-              e = e || arguments_, runDependencies > 0 || !dylibsLoaded && (preloadDylibs(), dylibsLoaded = true, runDependencies > 0) || (preRun(), runDependencies > 0 || (Module.setStatus ? (Module.setStatus("Running..."), setTimeout((function() {
-                setTimeout((function() {
-                  Module.setStatus("");
-                }), 1), t();
-              }), 1)) : t()));
-            }
-            if (Module.preInit) for ("function" == typeof Module.preInit && (Module.preInit = [Module.preInit]); Module.preInit.length > 0; ) Module.preInit.pop()();
-            var shouldRunNow = true;
-            Module.noInitialRun && (shouldRunNow = false), run();
-            const C = Module, INTERNAL = {}, SIZE_OF_INT = 4, SIZE_OF_NODE = 5 * SIZE_OF_INT, SIZE_OF_POINT = 2 * SIZE_OF_INT, SIZE_OF_RANGE = 2 * SIZE_OF_INT + 2 * SIZE_OF_POINT, ZERO_POINT = { row: 0, column: 0 }, QUERY_WORD_REGEX = /[\w-.]*/g, PREDICATE_STEP_TYPE_CAPTURE = 1, PREDICATE_STEP_TYPE_STRING = 2, LANGUAGE_FUNCTION_REGEX = /^_?tree_sitter_\w+/;
-            var VERSION, MIN_COMPATIBLE_VERSION, TRANSFER_BUFFER, currentParseCallback, currentLogCallback;
-            class ParserImpl {
-              static init() {
-                TRANSFER_BUFFER = C._ts_init(), VERSION = getValue(TRANSFER_BUFFER, "i32"), MIN_COMPATIBLE_VERSION = getValue(TRANSFER_BUFFER + SIZE_OF_INT, "i32");
-              }
-              initialize() {
-                C._ts_parser_new_wasm(), this[0] = getValue(TRANSFER_BUFFER, "i32"), this[1] = getValue(TRANSFER_BUFFER + SIZE_OF_INT, "i32");
-              }
-              delete() {
-                C._ts_parser_delete(this[0]), C._free(this[1]), this[0] = 0, this[1] = 0;
-              }
-              setLanguage(e) {
-                let t;
-                if (e) {
-                  if (e.constructor !== Language) throw new Error("Argument must be a Language");
-                  {
-                    t = e[0];
-                    const r = C._ts_language_version(t);
-                    if (r < MIN_COMPATIBLE_VERSION || VERSION < r) throw new Error(`Incompatible language version ${r}. Compatibility range ${MIN_COMPATIBLE_VERSION} through ${VERSION}.`);
-                  }
-                } else t = 0, e = null;
-                return this.language = e, C._ts_parser_set_language(this[0], t), this;
-              }
-              getLanguage() {
-                return this.language;
-              }
-              parse(e, t, r) {
-                if ("string" == typeof e) currentParseCallback = (t2, r2, _2) => e.slice(t2, _2);
-                else {
-                  if ("function" != typeof e) throw new Error("Argument must be a string or a function");
-                  currentParseCallback = e;
-                }
-                this.logCallback ? (currentLogCallback = this.logCallback, C._ts_parser_enable_logger_wasm(this[0], 1)) : (currentLogCallback = null, C._ts_parser_enable_logger_wasm(this[0], 0));
-                let _ = 0, n = 0;
-                if (r && r.includedRanges) {
-                  _ = r.includedRanges.length, n = C._calloc(_, SIZE_OF_RANGE);
-                  let e2 = n;
-                  for (let t2 = 0; t2 < _; t2++) marshalRange(e2, r.includedRanges[t2]), e2 += SIZE_OF_RANGE;
-                }
-                const s = C._ts_parser_parse_wasm(this[0], this[1], t ? t[0] : 0, n, _);
-                if (!s) throw currentParseCallback = null, currentLogCallback = null, new Error("Parsing failed");
-                const a = new Tree(INTERNAL, s, this.language, currentParseCallback);
-                return currentParseCallback = null, currentLogCallback = null, a;
-              }
-              reset() {
-                C._ts_parser_reset(this[0]);
-              }
-              setTimeoutMicros(e) {
-                C._ts_parser_set_timeout_micros(this[0], e);
-              }
-              getTimeoutMicros() {
-                return C._ts_parser_timeout_micros(this[0]);
-              }
-              setLogger(e) {
-                if (e) {
-                  if ("function" != typeof e) throw new Error("Logger callback must be a function");
-                } else e = null;
-                return this.logCallback = e, this;
-              }
-              getLogger() {
-                return this.logCallback;
-              }
-            }
-            class Tree {
-              constructor(e, t, r, _) {
-                assertInternal(e), this[0] = t, this.language = r, this.textCallback = _;
-              }
-              copy() {
-                const e = C._ts_tree_copy(this[0]);
-                return new Tree(INTERNAL, e, this.language, this.textCallback);
-              }
-              delete() {
-                C._ts_tree_delete(this[0]), this[0] = 0;
-              }
-              edit(e) {
-                marshalEdit(e), C._ts_tree_edit_wasm(this[0]);
-              }
-              get rootNode() {
-                return C._ts_tree_root_node_wasm(this[0]), unmarshalNode(this);
-              }
-              getLanguage() {
-                return this.language;
-              }
-              walk() {
-                return this.rootNode.walk();
-              }
-              getChangedRanges(e) {
-                if (e.constructor !== Tree) throw new TypeError("Argument must be a Tree");
-                C._ts_tree_get_changed_ranges_wasm(this[0], e[0]);
-                const t = getValue(TRANSFER_BUFFER, "i32"), r = getValue(TRANSFER_BUFFER + SIZE_OF_INT, "i32"), _ = new Array(t);
-                if (t > 0) {
-                  let e2 = r;
-                  for (let r2 = 0; r2 < t; r2++) _[r2] = unmarshalRange(e2), e2 += SIZE_OF_RANGE;
-                  C._free(r);
-                }
-                return _;
-              }
-            }
-            class Node {
-              constructor(e, t) {
-                assertInternal(e), this.tree = t;
-              }
-              get typeId() {
-                return marshalNode(this), C._ts_node_symbol_wasm(this.tree[0]);
-              }
-              get type() {
-                return this.tree.language.types[this.typeId] || "ERROR";
-              }
-              get endPosition() {
-                return marshalNode(this), C._ts_node_end_point_wasm(this.tree[0]), unmarshalPoint(TRANSFER_BUFFER);
-              }
-              get endIndex() {
-                return marshalNode(this), C._ts_node_end_index_wasm(this.tree[0]);
-              }
-              get text() {
-                return getText(this.tree, this.startIndex, this.endIndex);
-              }
-              isNamed() {
-                return marshalNode(this), 1 === C._ts_node_is_named_wasm(this.tree[0]);
-              }
-              hasError() {
-                return marshalNode(this), 1 === C._ts_node_has_error_wasm(this.tree[0]);
-              }
-              hasChanges() {
-                return marshalNode(this), 1 === C._ts_node_has_changes_wasm(this.tree[0]);
-              }
-              isMissing() {
-                return marshalNode(this), 1 === C._ts_node_is_missing_wasm(this.tree[0]);
-              }
-              equals(e) {
-                return this.id === e.id;
-              }
-              child(e) {
-                return marshalNode(this), C._ts_node_child_wasm(this.tree[0], e), unmarshalNode(this.tree);
-              }
-              namedChild(e) {
-                return marshalNode(this), C._ts_node_named_child_wasm(this.tree[0], e), unmarshalNode(this.tree);
-              }
-              childForFieldId(e) {
-                return marshalNode(this), C._ts_node_child_by_field_id_wasm(this.tree[0], e), unmarshalNode(this.tree);
-              }
-              childForFieldName(e) {
-                const t = this.tree.language.fields.indexOf(e);
-                if (-1 !== t) return this.childForFieldId(t);
-              }
-              get childCount() {
-                return marshalNode(this), C._ts_node_child_count_wasm(this.tree[0]);
-              }
-              get namedChildCount() {
-                return marshalNode(this), C._ts_node_named_child_count_wasm(this.tree[0]);
-              }
-              get firstChild() {
-                return this.child(0);
-              }
-              get firstNamedChild() {
-                return this.namedChild(0);
-              }
-              get lastChild() {
-                return this.child(this.childCount - 1);
-              }
-              get lastNamedChild() {
-                return this.namedChild(this.namedChildCount - 1);
-              }
-              get children() {
-                if (!this._children) {
-                  marshalNode(this), C._ts_node_children_wasm(this.tree[0]);
-                  const e = getValue(TRANSFER_BUFFER, "i32"), t = getValue(TRANSFER_BUFFER + SIZE_OF_INT, "i32");
-                  if (this._children = new Array(e), e > 0) {
-                    let r = t;
-                    for (let t2 = 0; t2 < e; t2++) this._children[t2] = unmarshalNode(this.tree, r), r += SIZE_OF_NODE;
-                    C._free(t);
-                  }
-                }
-                return this._children;
-              }
-              get namedChildren() {
-                if (!this._namedChildren) {
-                  marshalNode(this), C._ts_node_named_children_wasm(this.tree[0]);
-                  const e = getValue(TRANSFER_BUFFER, "i32"), t = getValue(TRANSFER_BUFFER + SIZE_OF_INT, "i32");
-                  if (this._namedChildren = new Array(e), e > 0) {
-                    let r = t;
-                    for (let t2 = 0; t2 < e; t2++) this._namedChildren[t2] = unmarshalNode(this.tree, r), r += SIZE_OF_NODE;
-                    C._free(t);
-                  }
-                }
-                return this._namedChildren;
-              }
-              descendantsOfType(e, t, r) {
-                Array.isArray(e) || (e = [e]), t || (t = ZERO_POINT), r || (r = ZERO_POINT);
-                const _ = [], n = this.tree.language.types;
-                for (let t2 = 0, r2 = n.length; t2 < r2; t2++) e.includes(n[t2]) && _.push(t2);
-                const s = C._malloc(SIZE_OF_INT * _.length);
-                for (let e2 = 0, t2 = _.length; e2 < t2; e2++) setValue(s + e2 * SIZE_OF_INT, _[e2], "i32");
-                marshalNode(this), C._ts_node_descendants_of_type_wasm(this.tree[0], s, _.length, t.row, t.column, r.row, r.column);
-                const a = getValue(TRANSFER_BUFFER, "i32"), o = getValue(TRANSFER_BUFFER + SIZE_OF_INT, "i32"), i = new Array(a);
-                if (a > 0) {
-                  let e2 = o;
-                  for (let t2 = 0; t2 < a; t2++) i[t2] = unmarshalNode(this.tree, e2), e2 += SIZE_OF_NODE;
-                }
-                return C._free(o), C._free(s), i;
-              }
-              get nextSibling() {
-                return marshalNode(this), C._ts_node_next_sibling_wasm(this.tree[0]), unmarshalNode(this.tree);
-              }
-              get previousSibling() {
-                return marshalNode(this), C._ts_node_prev_sibling_wasm(this.tree[0]), unmarshalNode(this.tree);
-              }
-              get nextNamedSibling() {
-                return marshalNode(this), C._ts_node_next_named_sibling_wasm(this.tree[0]), unmarshalNode(this.tree);
-              }
-              get previousNamedSibling() {
-                return marshalNode(this), C._ts_node_prev_named_sibling_wasm(this.tree[0]), unmarshalNode(this.tree);
-              }
-              get parent() {
-                return marshalNode(this), C._ts_node_parent_wasm(this.tree[0]), unmarshalNode(this.tree);
-              }
-              descendantForIndex(e, t = e) {
-                if ("number" != typeof e || "number" != typeof t) throw new Error("Arguments must be numbers");
-                marshalNode(this);
-                let r = TRANSFER_BUFFER + SIZE_OF_NODE;
-                return setValue(r, e, "i32"), setValue(r + SIZE_OF_INT, t, "i32"), C._ts_node_descendant_for_index_wasm(this.tree[0]), unmarshalNode(this.tree);
-              }
-              namedDescendantForIndex(e, t = e) {
-                if ("number" != typeof e || "number" != typeof t) throw new Error("Arguments must be numbers");
-                marshalNode(this);
-                let r = TRANSFER_BUFFER + SIZE_OF_NODE;
-                return setValue(r, e, "i32"), setValue(r + SIZE_OF_INT, t, "i32"), C._ts_node_named_descendant_for_index_wasm(this.tree[0]), unmarshalNode(this.tree);
-              }
-              descendantForPosition(e, t = e) {
-                if (!isPoint(e) || !isPoint(t)) throw new Error("Arguments must be {row, column} objects");
-                marshalNode(this);
-                let r = TRANSFER_BUFFER + SIZE_OF_NODE;
-                return marshalPoint(r, e), marshalPoint(r + SIZE_OF_POINT, t), C._ts_node_descendant_for_position_wasm(this.tree[0]), unmarshalNode(this.tree);
-              }
-              namedDescendantForPosition(e, t = e) {
-                if (!isPoint(e) || !isPoint(t)) throw new Error("Arguments must be {row, column} objects");
-                marshalNode(this);
-                let r = TRANSFER_BUFFER + SIZE_OF_NODE;
-                return marshalPoint(r, e), marshalPoint(r + SIZE_OF_POINT, t), C._ts_node_named_descendant_for_position_wasm(this.tree[0]), unmarshalNode(this.tree);
-              }
-              walk() {
-                return marshalNode(this), C._ts_tree_cursor_new_wasm(this.tree[0]), new TreeCursor(INTERNAL, this.tree);
-              }
-              toString() {
-                marshalNode(this);
-                const e = C._ts_node_to_string_wasm(this.tree[0]), t = AsciiToString(e);
-                return C._free(e), t;
-              }
-            }
-            class TreeCursor {
-              constructor(e, t) {
-                assertInternal(e), this.tree = t, unmarshalTreeCursor(this);
-              }
-              delete() {
-                marshalTreeCursor(this), C._ts_tree_cursor_delete_wasm(this.tree[0]), this[0] = this[1] = this[2] = 0;
-              }
-              reset(e) {
-                marshalNode(e), marshalTreeCursor(this, TRANSFER_BUFFER + SIZE_OF_NODE), C._ts_tree_cursor_reset_wasm(this.tree[0]), unmarshalTreeCursor(this);
-              }
-              get nodeType() {
-                return this.tree.language.types[this.nodeTypeId] || "ERROR";
-              }
-              get nodeTypeId() {
-                return marshalTreeCursor(this), C._ts_tree_cursor_current_node_type_id_wasm(this.tree[0]);
-              }
-              get nodeId() {
-                return marshalTreeCursor(this), C._ts_tree_cursor_current_node_id_wasm(this.tree[0]);
-              }
-              get nodeIsNamed() {
-                return marshalTreeCursor(this), 1 === C._ts_tree_cursor_current_node_is_named_wasm(this.tree[0]);
-              }
-              get nodeIsMissing() {
-                return marshalTreeCursor(this), 1 === C._ts_tree_cursor_current_node_is_missing_wasm(this.tree[0]);
-              }
-              get nodeText() {
-                marshalTreeCursor(this);
-                const e = C._ts_tree_cursor_start_index_wasm(this.tree[0]), t = C._ts_tree_cursor_end_index_wasm(this.tree[0]);
-                return getText(this.tree, e, t);
-              }
-              get startPosition() {
-                return marshalTreeCursor(this), C._ts_tree_cursor_start_position_wasm(this.tree[0]), unmarshalPoint(TRANSFER_BUFFER);
-              }
-              get endPosition() {
-                return marshalTreeCursor(this), C._ts_tree_cursor_end_position_wasm(this.tree[0]), unmarshalPoint(TRANSFER_BUFFER);
-              }
-              get startIndex() {
-                return marshalTreeCursor(this), C._ts_tree_cursor_start_index_wasm(this.tree[0]);
-              }
-              get endIndex() {
-                return marshalTreeCursor(this), C._ts_tree_cursor_end_index_wasm(this.tree[0]);
-              }
-              currentNode() {
-                return marshalTreeCursor(this), C._ts_tree_cursor_current_node_wasm(this.tree[0]), unmarshalNode(this.tree);
-              }
-              currentFieldId() {
-                return marshalTreeCursor(this), C._ts_tree_cursor_current_field_id_wasm(this.tree[0]);
-              }
-              currentFieldName() {
-                return this.tree.language.fields[this.currentFieldId()];
-              }
-              gotoFirstChild() {
-                marshalTreeCursor(this);
-                const e = C._ts_tree_cursor_goto_first_child_wasm(this.tree[0]);
-                return unmarshalTreeCursor(this), 1 === e;
-              }
-              gotoNextSibling() {
-                marshalTreeCursor(this);
-                const e = C._ts_tree_cursor_goto_next_sibling_wasm(this.tree[0]);
-                return unmarshalTreeCursor(this), 1 === e;
-              }
-              gotoParent() {
-                marshalTreeCursor(this);
-                const e = C._ts_tree_cursor_goto_parent_wasm(this.tree[0]);
-                return unmarshalTreeCursor(this), 1 === e;
-              }
-            }
-            class Language {
-              constructor(e, t) {
-                assertInternal(e), this[0] = t, this.types = new Array(C._ts_language_symbol_count(this[0]));
-                for (let e2 = 0, t2 = this.types.length; e2 < t2; e2++) C._ts_language_symbol_type(this[0], e2) < 2 && (this.types[e2] = UTF8ToString(C._ts_language_symbol_name(this[0], e2)));
-                this.fields = new Array(C._ts_language_field_count(this[0]) + 1);
-                for (let e2 = 0, t2 = this.fields.length; e2 < t2; e2++) {
-                  const t3 = C._ts_language_field_name_for_id(this[0], e2);
-                  this.fields[e2] = 0 !== t3 ? UTF8ToString(t3) : null;
-                }
-              }
-              get version() {
-                return C._ts_language_version(this[0]);
-              }
-              get fieldCount() {
-                return this.fields.length - 1;
-              }
-              fieldIdForName(e) {
-                const t = this.fields.indexOf(e);
-                return -1 !== t ? t : null;
-              }
-              fieldNameForId(e) {
-                return this.fields[e] || null;
-              }
-              idForNodeType(e, t) {
-                const r = lengthBytesUTF8(e), _ = C._malloc(r + 1);
-                stringToUTF8(e, _, r + 1);
-                const n = C._ts_language_symbol_for_name(this[0], _, r, t);
-                return C._free(_), n || null;
-              }
-              get nodeTypeCount() {
-                return C._ts_language_symbol_count(this[0]);
-              }
-              nodeTypeForId(e) {
-                const t = C._ts_language_symbol_name(this[0], e);
-                return t ? UTF8ToString(t) : null;
-              }
-              nodeTypeIsNamed(e) {
-                return !!C._ts_language_type_is_named_wasm(this[0], e);
-              }
-              nodeTypeIsVisible(e) {
-                return !!C._ts_language_type_is_visible_wasm(this[0], e);
-              }
-              query(e) {
-                const t = lengthBytesUTF8(e), r = C._malloc(t + 1);
-                stringToUTF8(e, r, t + 1);
-                const _ = C._ts_query_new(this[0], r, t, TRANSFER_BUFFER, TRANSFER_BUFFER + SIZE_OF_INT);
-                if (!_) {
-                  const t2 = getValue(TRANSFER_BUFFER + SIZE_OF_INT, "i32"), _2 = UTF8ToString(r, getValue(TRANSFER_BUFFER, "i32")).length, n2 = e.substr(_2, 100).split("\n")[0];
-                  let s2, a2 = n2.match(QUERY_WORD_REGEX)[0];
-                  switch (t2) {
-                    case 2:
-                      s2 = new RangeError(`Bad node name '${a2}'`);
-                      break;
-                    case 3:
-                      s2 = new RangeError(`Bad field name '${a2}'`);
-                      break;
-                    case 4:
-                      s2 = new RangeError(`Bad capture name @${a2}`);
-                      break;
-                    case 5:
-                      s2 = new TypeError(`Bad pattern structure at offset ${_2}: '${n2}'...`), a2 = "";
-                      break;
-                    default:
-                      s2 = new SyntaxError(`Bad syntax at offset ${_2}: '${n2}'...`), a2 = "";
-                  }
-                  throw s2.index = _2, s2.length = a2.length, C._free(r), s2;
-                }
-                const n = C._ts_query_string_count(_), s = C._ts_query_capture_count(_), a = C._ts_query_pattern_count(_), o = new Array(s), i = new Array(n);
-                for (let e2 = 0; e2 < s; e2++) {
-                  const t2 = C._ts_query_capture_name_for_id(_, e2, TRANSFER_BUFFER), r2 = getValue(TRANSFER_BUFFER, "i32");
-                  o[e2] = UTF8ToString(t2, r2);
-                }
-                for (let e2 = 0; e2 < n; e2++) {
-                  const t2 = C._ts_query_string_value_for_id(_, e2, TRANSFER_BUFFER), r2 = getValue(TRANSFER_BUFFER, "i32");
-                  i[e2] = UTF8ToString(t2, r2);
-                }
-                const l = new Array(a), u = new Array(a), d = new Array(a), c = new Array(a), m = new Array(a);
-                for (let e2 = 0; e2 < a; e2++) {
-                  const t2 = C._ts_query_predicates_for_pattern(_, e2, TRANSFER_BUFFER), r2 = getValue(TRANSFER_BUFFER, "i32");
-                  c[e2] = [], m[e2] = [];
-                  const n2 = [];
-                  let s2 = t2;
-                  for (let t3 = 0; t3 < r2; t3++) {
-                    const t4 = getValue(s2, "i32");
-                    s2 += SIZE_OF_INT;
-                    const r3 = getValue(s2, "i32");
-                    if (s2 += SIZE_OF_INT, t4 === PREDICATE_STEP_TYPE_CAPTURE) n2.push({ type: "capture", name: o[r3] });
-                    else if (t4 === PREDICATE_STEP_TYPE_STRING) n2.push({ type: "string", value: i[r3] });
-                    else if (n2.length > 0) {
-                      if ("string" !== n2[0].type) throw new Error("Predicates must begin with a literal value");
-                      const t5 = n2[0].value;
-                      let r4 = true;
-                      switch (t5) {
-                        case "not-eq?":
-                          r4 = false;
-                        case "eq?":
-                          if (3 !== n2.length) throw new Error("Wrong number of arguments to `#eq?` predicate. Expected 2, got " + (n2.length - 1));
-                          if ("capture" !== n2[1].type) throw new Error(`First argument of \`#eq?\` predicate must be a capture. Got "${n2[1].value}"`);
-                          if ("capture" === n2[2].type) {
-                            const t6 = n2[1].name, _3 = n2[2].name;
-                            m[e2].push((function(e3) {
-                              let n3, s4;
-                              for (const r5 of e3) r5.name === t6 && (n3 = r5.node), r5.name === _3 && (s4 = r5.node);
-                              return void 0 === n3 || void 0 === s4 || n3.text === s4.text === r4;
-                            }));
-                          } else {
-                            const t6 = n2[1].name, _3 = n2[2].value;
-                            m[e2].push((function(e3) {
-                              for (const n3 of e3) if (n3.name === t6) return n3.node.text === _3 === r4;
-                              return true;
-                            }));
-                          }
-                          break;
-                        case "not-match?":
-                          r4 = false;
-                        case "match?":
-                          if (3 !== n2.length) throw new Error(`Wrong number of arguments to \`#match?\` predicate. Expected 2, got ${n2.length - 1}.`);
-                          if ("capture" !== n2[1].type) throw new Error(`First argument of \`#match?\` predicate must be a capture. Got "${n2[1].value}".`);
-                          if ("string" !== n2[2].type) throw new Error(`Second argument of \`#match?\` predicate must be a string. Got @${n2[2].value}.`);
-                          const _2 = n2[1].name, s3 = new RegExp(n2[2].value);
-                          m[e2].push((function(e3) {
-                            for (const t6 of e3) if (t6.name === _2) return s3.test(t6.node.text) === r4;
-                            return true;
-                          }));
-                          break;
-                        case "set!":
-                          if (n2.length < 2 || n2.length > 3) throw new Error(`Wrong number of arguments to \`#set!\` predicate. Expected 1 or 2. Got ${n2.length - 1}.`);
-                          if (n2.some(((e3) => "string" !== e3.type))) throw new Error('Arguments to `#set!` predicate must be a strings.".');
-                          l[e2] || (l[e2] = {}), l[e2][n2[1].value] = n2[2] ? n2[2].value : null;
-                          break;
-                        case "is?":
-                        case "is-not?":
-                          if (n2.length < 2 || n2.length > 3) throw new Error(`Wrong number of arguments to \`#${t5}\` predicate. Expected 1 or 2. Got ${n2.length - 1}.`);
-                          if (n2.some(((e3) => "string" !== e3.type))) throw new Error(`Arguments to \`#${t5}\` predicate must be a strings.".`);
-                          const a2 = "is?" === t5 ? u : d;
-                          a2[e2] || (a2[e2] = {}), a2[e2][n2[1].value] = n2[2] ? n2[2].value : null;
-                          break;
-                        default:
-                          c[e2].push({ operator: t5, operands: n2.slice(1) });
-                      }
-                      n2.length = 0;
-                    }
-                  }
-                  Object.freeze(l[e2]), Object.freeze(u[e2]), Object.freeze(d[e2]);
-                }
-                return C._free(r), new Query(INTERNAL, _, o, m, c, Object.freeze(l), Object.freeze(u), Object.freeze(d));
-              }
-              static load(e) {
-                let t;
-                if (e instanceof Uint8Array) t = Promise.resolve(e);
-                else {
-                  const r2 = e;
-                  if ("undefined" != typeof process && process.versions && process.versions.node) {
-                    const e2 = __require("fs");
-                    t = Promise.resolve(e2.readFileSync(r2));
-                  } else t = fetch(r2).then(((e2) => e2.arrayBuffer().then(((t2) => {
-                    if (e2.ok) return new Uint8Array(t2);
-                    {
-                      const r3 = new TextDecoder("utf-8").decode(t2);
-                      throw new Error(`Language.load failed with status ${e2.status}.
-
-${r3}`);
-                    }
-                  }))));
-                }
-                const r = "function" == typeof loadSideModule ? loadSideModule : loadWebAssemblyModule;
-                return t.then(((e2) => r(e2, { loadAsync: true }))).then(((e2) => {
-                  const t2 = Object.keys(e2), r2 = t2.find(((e3) => LANGUAGE_FUNCTION_REGEX.test(e3) && !e3.includes("external_scanner_")));
-                  r2 || console.log(`Couldn't find language function in WASM file. Symbols:
-${JSON.stringify(t2, null, 2)}`);
-                  const _ = e2[r2]();
-                  return new Language(INTERNAL, _);
-                }));
-              }
-            }
-            class Query {
-              constructor(e, t, r, _, n, s, a, o) {
-                assertInternal(e), this[0] = t, this.captureNames = r, this.textPredicates = _, this.predicates = n, this.setProperties = s, this.assertedProperties = a, this.refutedProperties = o, this.exceededMatchLimit = false;
-              }
-              delete() {
-                C._ts_query_delete(this[0]), this[0] = 0;
-              }
-              matches(e, t, r, _) {
-                t || (t = ZERO_POINT), r || (r = ZERO_POINT), _ || (_ = {});
-                let n = _.matchLimit;
-                if (void 0 === n) n = 0;
-                else if ("number" != typeof n) throw new Error("Arguments must be numbers");
-                marshalNode(e), C._ts_query_matches_wasm(this[0], e.tree[0], t.row, t.column, r.row, r.column, n);
-                const s = getValue(TRANSFER_BUFFER, "i32"), a = getValue(TRANSFER_BUFFER + SIZE_OF_INT, "i32"), o = getValue(TRANSFER_BUFFER + 2 * SIZE_OF_INT, "i32"), i = new Array(s);
-                this.exceededMatchLimit = !!o;
-                let l = 0, u = a;
-                for (let t2 = 0; t2 < s; t2++) {
-                  const r2 = getValue(u, "i32");
-                  u += SIZE_OF_INT;
-                  const _2 = getValue(u, "i32");
-                  u += SIZE_OF_INT;
-                  const n2 = new Array(_2);
-                  if (u = unmarshalCaptures(this, e.tree, u, n2), this.textPredicates[r2].every(((e2) => e2(n2)))) {
-                    i[l++] = { pattern: r2, captures: n2 };
-                    const e2 = this.setProperties[r2];
-                    e2 && (i[t2].setProperties = e2);
-                    const _3 = this.assertedProperties[r2];
-                    _3 && (i[t2].assertedProperties = _3);
-                    const s2 = this.refutedProperties[r2];
-                    s2 && (i[t2].refutedProperties = s2);
-                  }
-                }
-                return i.length = l, C._free(a), i;
-              }
-              captures(e, t, r, _) {
-                t || (t = ZERO_POINT), r || (r = ZERO_POINT), _ || (_ = {});
-                let n = _.matchLimit;
-                if (void 0 === n) n = 0;
-                else if ("number" != typeof n) throw new Error("Arguments must be numbers");
-                marshalNode(e), C._ts_query_captures_wasm(this[0], e.tree[0], t.row, t.column, r.row, r.column, n);
-                const s = getValue(TRANSFER_BUFFER, "i32"), a = getValue(TRANSFER_BUFFER + SIZE_OF_INT, "i32"), o = getValue(TRANSFER_BUFFER + 2 * SIZE_OF_INT, "i32"), i = [];
-                this.exceededMatchLimit = !!o;
-                const l = [];
-                let u = a;
-                for (let t2 = 0; t2 < s; t2++) {
-                  const t3 = getValue(u, "i32");
-                  u += SIZE_OF_INT;
-                  const r2 = getValue(u, "i32");
-                  u += SIZE_OF_INT;
-                  const _2 = getValue(u, "i32");
-                  if (u += SIZE_OF_INT, l.length = r2, u = unmarshalCaptures(this, e.tree, u, l), this.textPredicates[t3].every(((e2) => e2(l)))) {
-                    const e2 = l[_2], r3 = this.setProperties[t3];
-                    r3 && (e2.setProperties = r3);
-                    const n2 = this.assertedProperties[t3];
-                    n2 && (e2.assertedProperties = n2);
-                    const s2 = this.refutedProperties[t3];
-                    s2 && (e2.refutedProperties = s2), i.push(e2);
-                  }
-                }
-                return C._free(a), i;
-              }
-              predicatesForPattern(e) {
-                return this.predicates[e];
-              }
-              didExceedMatchLimit() {
-                return this.exceededMatchLimit;
-              }
-            }
-            function getText(e, t, r) {
-              const _ = r - t;
-              let n = e.textCallback(t, null, r);
-              for (t += n.length; t < r; ) {
-                const _2 = e.textCallback(t, null, r);
-                if (!(_2 && _2.length > 0)) break;
-                t += _2.length, n += _2;
-              }
-              return t > r && (n = n.slice(0, _)), n;
-            }
-            function unmarshalCaptures(e, t, r, _) {
-              for (let n = 0, s = _.length; n < s; n++) {
-                const s2 = getValue(r, "i32"), a = unmarshalNode(t, r += SIZE_OF_INT);
-                r += SIZE_OF_NODE, _[n] = { name: e.captureNames[s2], node: a };
-              }
-              return r;
-            }
-            function assertInternal(e) {
-              if (e !== INTERNAL) throw new Error("Illegal constructor");
-            }
-            function isPoint(e) {
-              return e && "number" == typeof e.row && "number" == typeof e.column;
-            }
-            function marshalNode(e) {
-              let t = TRANSFER_BUFFER;
-              setValue(t, e.id, "i32"), t += SIZE_OF_INT, setValue(t, e.startIndex, "i32"), t += SIZE_OF_INT, setValue(t, e.startPosition.row, "i32"), t += SIZE_OF_INT, setValue(t, e.startPosition.column, "i32"), t += SIZE_OF_INT, setValue(t, e[0], "i32");
-            }
-            function unmarshalNode(e, t = TRANSFER_BUFFER) {
-              const r = getValue(t, "i32");
-              if (0 === r) return null;
-              const _ = getValue(t += SIZE_OF_INT, "i32"), n = getValue(t += SIZE_OF_INT, "i32"), s = getValue(t += SIZE_OF_INT, "i32"), a = getValue(t += SIZE_OF_INT, "i32"), o = new Node(INTERNAL, e);
-              return o.id = r, o.startIndex = _, o.startPosition = { row: n, column: s }, o[0] = a, o;
-            }
-            function marshalTreeCursor(e, t = TRANSFER_BUFFER) {
-              setValue(t + 0 * SIZE_OF_INT, e[0], "i32"), setValue(t + 1 * SIZE_OF_INT, e[1], "i32"), setValue(t + 2 * SIZE_OF_INT, e[2], "i32");
-            }
-            function unmarshalTreeCursor(e) {
-              e[0] = getValue(TRANSFER_BUFFER + 0 * SIZE_OF_INT, "i32"), e[1] = getValue(TRANSFER_BUFFER + 1 * SIZE_OF_INT, "i32"), e[2] = getValue(TRANSFER_BUFFER + 2 * SIZE_OF_INT, "i32");
-            }
-            function marshalPoint(e, t) {
-              setValue(e, t.row, "i32"), setValue(e + SIZE_OF_INT, t.column, "i32");
-            }
-            function unmarshalPoint(e) {
-              return { row: getValue(e, "i32"), column: getValue(e + SIZE_OF_INT, "i32") };
-            }
-            function marshalRange(e, t) {
-              marshalPoint(e, t.startPosition), marshalPoint(e += SIZE_OF_POINT, t.endPosition), setValue(e += SIZE_OF_POINT, t.startIndex, "i32"), setValue(e += SIZE_OF_INT, t.endIndex, "i32"), e += SIZE_OF_INT;
-            }
-            function unmarshalRange(e) {
-              const t = {};
-              return t.startPosition = unmarshalPoint(e), e += SIZE_OF_POINT, t.endPosition = unmarshalPoint(e), e += SIZE_OF_POINT, t.startIndex = getValue(e, "i32"), e += SIZE_OF_INT, t.endIndex = getValue(e, "i32"), t;
-            }
-            function marshalEdit(e) {
-              let t = TRANSFER_BUFFER;
-              marshalPoint(t, e.startPosition), t += SIZE_OF_POINT, marshalPoint(t, e.oldEndPosition), t += SIZE_OF_POINT, marshalPoint(t, e.newEndPosition), t += SIZE_OF_POINT, setValue(t, e.startIndex, "i32"), t += SIZE_OF_INT, setValue(t, e.oldEndIndex, "i32"), t += SIZE_OF_INT, setValue(t, e.newEndIndex, "i32"), t += SIZE_OF_INT;
-            }
-            for (const e of Object.getOwnPropertyNames(ParserImpl.prototype)) Object.defineProperty(Parser.prototype, e, { value: ParserImpl.prototype[e], enumerable: false, writable: false });
-            Parser.Language = Language, Module.onRuntimeInitialized = () => {
-              ParserImpl.init(), resolveInitPromise();
-            };
-          })));
-        }
-      }
-      return Parser;
-    })();
-    "object" == typeof exports && (module.exports = TreeSitter);
   }
 });
 
@@ -8874,8 +7251,8 @@ function createContextHandoffCapsule(pack, events, options = {}) {
   const fullTitle = capsuleInline(event.title);
   const fullBody = capsuleInline(event.body);
   const title = truncateCapsuleText(fullTitle, Math.min(128, available));
-  const body2 = truncateCapsuleText(fullBody, Math.max(0, available - title.length));
-  const text2 = `${[header, title, body2, ...footer].join("\n")}
+  const body = truncateCapsuleText(fullBody, Math.max(0, available - title.length));
+  const text2 = `${[header, title, body, ...footer].join("\n")}
 `;
   if (text2.length > maxChars) throw new QarinahError("CONTEXT_CAPSULE_BUDGET_EXCEEDED", "Handoff capsule exceeded its character budget.");
   return deepFreezeJson({
@@ -8886,7 +7263,7 @@ function createContextHandoffCapsule(pack, events, options = {}) {
     packManifestHash: pack.manifestHash,
     confidence: event.confidence,
     sourceEventCount: sources.length,
-    truncated: title !== fullTitle || body2 !== fullBody,
+    truncated: title !== fullTitle || body !== fullBody,
     budget: {
       maxChars,
       usedChars: text2.length,
@@ -9181,11 +7558,11 @@ init_errors();
 init_project_structure();
 init_store();
 init_workspace();
-var import_web_tree_sitter = __toESM(require_tree_sitter(), 1);
 import { createHash as createHash5 } from "node:crypto";
 import { createRequire } from "node:module";
 import { lstat as lstat6, readFile as readFile3, stat } from "node:fs/promises";
 import path8 from "node:path";
+import { fileURLToPath } from "node:url";
 var SYMBOL_GRAPH_SCHEMA_VERSION = "qarinah.symbol-graph.v2";
 var MAX_GRAPH_BYTES = 128 * 1024 * 1024;
 var MAX_SYMBOLS = 1e5;
@@ -9205,24 +7582,45 @@ var TREE_SITTER_GRAMMARS = Object.freeze({
 var SYMBOL_LANGUAGES = /* @__PURE__ */ new Set([...SCRIPT_LANGUAGES, ...Object.keys(TREE_SITTER_GRAMMARS)]);
 var TREE_SITTER_LANGUAGE_NAMES = Object.freeze([...new Set(Object.keys(TREE_SITTER_GRAMMARS))].sort());
 var TYPESCRIPT_RUNTIME_SPECIFIER = "typescript-classic";
+var TREE_SITTER_RUNTIME_SPECIFIER = "web-tree-sitter";
 var runtimeRequire = createRequire(import.meta.url);
-var TREE_SITTER_RUNTIME_VERSION = runtimeRequire("web-tree-sitter/package.json").version;
-var TREE_SITTER_GRAMMAR_VERSION = runtimeRequire("tree-sitter-wasms/package.json").version;
+var TREE_SITTER_RUNTIME_VERSION = "0.20.8";
+var TREE_SITTER_GRAMMAR_VERSION = "0.1.13";
 var ts;
+var Parser;
 var treeSitterReady;
 var treeSitterLanguages = /* @__PURE__ */ new Map();
+function optionalRuntime(specifier, vendoredPath) {
+  try {
+    return runtimeRequire(specifier);
+  } catch (error) {
+    if (error?.code !== "MODULE_NOT_FOUND") throw error;
+    return runtimeRequire(fileURLToPath(new URL(vendoredPath, import.meta.url)));
+  }
+}
 function typeScriptRuntime() {
-  ts ??= runtimeRequire(TYPESCRIPT_RUNTIME_SPECIFIER);
+  ts ??= optionalRuntime(TYPESCRIPT_RUNTIME_SPECIFIER, "./vendor/typescript-classic/lib/typescript.js");
   return ts;
+}
+function treeSitterRuntime() {
+  Parser ??= optionalRuntime(TREE_SITTER_RUNTIME_SPECIFIER, "./vendor/web-tree-sitter/tree-sitter.js");
+  return Parser;
 }
 async function treeSitterLanguage(language) {
   const grammar = TREE_SITTER_GRAMMARS[language];
   if (!grammar) throw new QarinahError("SYMBOL_LANGUAGE_UNSUPPORTED", `${language} is not a registered symbol language.`);
-  treeSitterReady ??= import_web_tree_sitter.default.init();
+  const runtime = treeSitterRuntime();
+  treeSitterReady ??= runtime.init();
   await treeSitterReady;
   if (!treeSitterLanguages.has(grammar)) {
-    const wasmPath = runtimeRequire.resolve(`tree-sitter-wasms/out/tree-sitter-${grammar}.wasm`);
-    treeSitterLanguages.set(grammar, import_web_tree_sitter.default.Language.load(wasmPath));
+    let wasmPath;
+    try {
+      wasmPath = runtimeRequire.resolve(`tree-sitter-wasms/out/tree-sitter-${grammar}.wasm`);
+    } catch (error) {
+      if (error?.code !== "MODULE_NOT_FOUND") throw error;
+      wasmPath = fileURLToPath(new URL(`./tree-sitter-wasms/tree-sitter-${grammar}.wasm`, import.meta.url));
+    }
+    treeSitterLanguages.set(grammar, runtime.Language.load(wasmPath));
   }
   return treeSitterLanguages.get(grammar);
 }
@@ -9247,12 +7645,12 @@ function scriptKind(filePath) {
   return ts.ScriptKind.JS;
 }
 function span(source, node) {
-  const start2 = node.getStart(source, false);
+  const start = node.getStart(source, false);
   const end = node.getEnd();
-  const startPoint = source.getLineAndCharacterOfPosition(start2);
+  const startPoint = source.getLineAndCharacterOfPosition(start);
   const endPoint = source.getLineAndCharacterOfPosition(end);
   return Object.freeze({
-    start: start2,
+    start,
     end,
     line: startPoint.line + 1,
     column: startPoint.character + 1,
@@ -9310,8 +7708,8 @@ function nonReferenceIdentifier(identifier) {
 }
 function signatureHash(node, source) {
   let text2 = node.getText(source);
-  const body2 = text2.indexOf("{");
-  if (body2 >= 0) text2 = text2.slice(0, body2);
+  const body = text2.indexOf("{");
+  if (body >= 0) text2 = text2.slice(0, body);
   return sha256(text2.trim().slice(0, 8192));
 }
 function parseTypeScriptSymbols(filePath, text2, options = {}) {
@@ -9449,9 +7847,9 @@ function treeExported(language, name, sourceSlice) {
 }
 function treeSignatureHash(node, text2) {
   let value = text2.slice(node.startIndex, Math.min(node.endIndex, node.startIndex + 8192));
-  const body2 = value.search(/[{:]/u);
+  const body = value.search(/[{:]/u);
   const newline = value.search(/[\r\n]/u);
-  const boundary = [body2, newline].filter((index) => index >= 0).sort((left, right) => left - right)[0];
+  const boundary = [body, newline].filter((index) => index >= 0).sort((left, right) => left - right)[0];
   if (boundary !== void 0) value = value.slice(0, boundary + 1);
   return sha256(value.normalize("NFKC").trim());
 }
@@ -9461,7 +7859,8 @@ async function parseTreeSitterSymbols(filePath, language, text2, options = {}) {
   if (typeof text2 !== "string") throw new TypeError("text must be a string.");
   if (text2.length > (options.maxCharacters ?? 4 * 1024 * 1024)) throw new QarinahError("SYMBOL_FILE_LIMIT", `${filePath} exceeds the symbol parser character limit.`);
   const loadedLanguage = await treeSitterLanguage(language);
-  const parser = new import_web_tree_sitter.default();
+  const ParserRuntime = treeSitterRuntime();
+  const parser = new ParserRuntime();
   parser.setLanguage(loadedLanguage);
   const tree = parser.parse(text2);
   const symbols = [];
@@ -9624,15 +8023,15 @@ async function buildSymbolGraph(options = {}) {
       continue;
     }
     const candidate = resolveWithin(workspace.root, ...file.path.split("/"));
-    let metadata2;
+    let metadata;
     try {
-      metadata2 = await lstat6(candidate);
+      metadata = await lstat6(candidate);
     } catch (error) {
       if (error?.code !== "ENOENT") throw error;
       skipped.push({ path: file.path, reason: "stale-or-linked" });
       continue;
     }
-    if (metadata2.isSymbolicLink() || !metadata2.isFile() || metadata2.nlink !== 1 || metadata2.size !== file.size) {
+    if (metadata.isSymbolicLink() || !metadata.isFile() || metadata.nlink !== 1 || metadata.size !== file.size) {
       skipped.push({ path: file.path, reason: "stale-or-linked" });
       continue;
     }
@@ -9711,8 +8110,8 @@ async function buildSymbolGraph(options = {}) {
 async function loadSymbolGraph(options = {}) {
   const workspace = await loadWorkspace(options.cwd ?? process.cwd());
   const candidate = await secureStoragePath(workspace, ["graph", "symbol-graph.json"], { type: "file" });
-  const metadata2 = await stat(candidate);
-  if (!metadata2.isFile() || metadata2.nlink !== 1 || metadata2.size > MAX_GRAPH_BYTES) throw new QarinahError("SYMBOL_GRAPH_INVALID", "Symbol graph is not a bounded regular file.");
+  const metadata = await stat(candidate);
+  if (!metadata.isFile() || metadata.nlink !== 1 || metadata.size > MAX_GRAPH_BYTES) throw new QarinahError("SYMBOL_GRAPH_INVALID", "Symbol graph is not a bounded regular file.");
   return validateGraph(JSON.parse(await readFile3(candidate, "utf8")), workspace.config.workspaceId);
 }
 function querySymbolGraph(graph, query = "", options = {}) {
@@ -10652,14 +9051,14 @@ function validCycleState(value, workspaceId) {
 }
 async function readCycleState(workspace) {
   const candidate = await secureStoragePath(workspace, ["graph", "project-memory-cycle-state.json"], { type: "file", allowMissing: true });
-  let metadata2;
+  let metadata;
   try {
-    metadata2 = await stat2(candidate);
+    metadata = await stat2(candidate);
   } catch (error) {
     if (error?.code === "ENOENT") return Object.freeze({ status: "none", state: null });
     throw error;
   }
-  if (!metadata2.isFile() || metadata2.nlink !== 1 || metadata2.size > MAX_CYCLE_STATE_BYTES) return Object.freeze({ status: "invalid", state: null });
+  if (!metadata.isFile() || metadata.nlink !== 1 || metadata.size > MAX_CYCLE_STATE_BYTES) return Object.freeze({ status: "invalid", state: null });
   try {
     const parsed = JSON.parse(await readFile4(candidate, "utf8"));
     return validCycleState(parsed, workspace.config.workspaceId) ? Object.freeze({ status: "valid", state: deepFreezeJson(parsed) }) : Object.freeze({ status: "invalid", state: null });
@@ -10809,7 +9208,7 @@ function createProjectMemoryWatcher(options = {}) {
     lastCycle,
     lastError
   });
-  async function run3() {
+  async function run2() {
     if (running) throw new TypeError("Project memory watcher is already running.");
     running = true;
     stopping = false;
@@ -10844,7 +9243,7 @@ function createProjectMemoryWatcher(options = {}) {
     return status();
   }
   return Object.freeze({
-    run: run3,
+    run: run2,
     stop() {
       stopping = true;
       stopController.abort();
@@ -11303,22 +9702,22 @@ async function archiveFiles(source, limits) {
   let totalBytes = 0;
   let directoriesSeen = 0;
   async function addFile(candidate) {
-    const metadata2 = await lstat7(candidate);
-    if (metadata2.isSymbolicLink() || !metadata2.isFile()) return;
-    if (metadata2.nlink !== 1) throw new QarinahError("ARCHIVE_LINK_REJECTED", "Archive files must be singly linked regular files.");
+    const metadata = await lstat7(candidate);
+    if (metadata.isSymbolicLink() || !metadata.isFile()) return;
+    if (metadata.nlink !== 1) throw new QarinahError("ARCHIVE_LINK_REJECTED", "Archive files must be singly linked regular files.");
     if (!ARCHIVE_EXTENSIONS.has(path9.extname(candidate).toLowerCase())) return;
-    totalBytes += metadata2.size;
+    totalBytes += metadata.size;
     if (files.length + 1 > limits.maxFiles) throw new QarinahError("ARCHIVE_LIMIT_EXCEEDED", "Archive contains more files than allowed.");
     if (totalBytes > limits.maxBytes) throw new QarinahError("ARCHIVE_LIMIT_EXCEEDED", "Archive exceeds the configured byte limit.");
-    files.push({ path: candidate, size: metadata2.size });
+    files.push({ path: candidate, size: metadata.size });
   }
   async function walk(directory, depth = 0) {
     if (depth > MAX_ARCHIVE_DEPTH) throw new QarinahError("ARCHIVE_LIMIT_EXCEEDED", `Archive directory depth exceeds ${MAX_ARCHIVE_DEPTH}.`);
     directoriesSeen += 1;
     if (directoriesSeen > limits.maxFiles) throw new QarinahError("ARCHIVE_LIMIT_EXCEEDED", "Archive contains more directories than allowed.");
     const entries = [];
-    const handle2 = await opendir(directory);
-    for await (const entry of handle2) entries.push(entry);
+    const handle = await opendir(directory);
+    for await (const entry of handle) entries.push(entry);
     entries.sort((left, right) => left.name.localeCompare(right.name));
     for (const entry of entries) {
       const candidate = path9.join(directory, entry.name);
@@ -11449,7 +9848,7 @@ async function importAgentArchive(source, options = {}) {
       const fileDigest = `sha256:${normalizedDigest.digest("hex")}`;
       for (const aggregate2 of aggregates.values()) {
         const contentDigest = `sha256:${aggregate2.digest.digest("hex")}`;
-        const body2 = workspace.config.capture === "content" ? summaryBody(aggregate2) : "";
+        const body = workspace.config.capture === "content" ? summaryBody(aggregate2) : "";
         const data = {
           archiveImport: {
             schemaVersion: AGENT_ARCHIVE_IMPORT_SCHEMA_VERSION,
@@ -11469,7 +9868,7 @@ async function importAgentArchive(source, options = {}) {
             contentDigest,
             normalizedFileDigest: fileDigest,
             sourceBytes: file.size,
-            body: summarizeHookContent(body2)
+            body: summarizeHookContent(body)
           }
         };
         const identity = { schemaVersion: AGENT_ARCHIVE_IMPORT_SCHEMA_VERSION, fileDigest, sessionId: aggregate2.sessionId, contentDigest, data };
@@ -11480,7 +9879,7 @@ async function importAgentArchive(source, options = {}) {
           kind: "summary",
           actor: { type: "tool", id: "qarinah-archive-import" },
           title: "Imported agent session summary",
-          body: body2,
+          body,
           data,
           confidence: "extracted",
           relations: [{ type: "references", target: `session:${aggregate2.sessionId}` }],
@@ -11558,22 +9957,22 @@ async function inspectSource(source, limits, sourceIndex) {
   let totalBytes = 0;
   let directories = 0;
   async function addFile(candidate, relativePath) {
-    const metadata2 = await lstat8(candidate);
-    if (metadata2.isSymbolicLink()) throw new QarinahError("BACKUP_LINK_REJECTED", "Backup source trees cannot contain symbolic links or junctions.");
-    if (!metadata2.isFile() || metadata2.nlink !== 1) throw new QarinahError("BACKUP_SOURCE_INVALID", "Backup sources must contain singly linked regular files.");
+    const metadata = await lstat8(candidate);
+    if (metadata.isSymbolicLink()) throw new QarinahError("BACKUP_LINK_REJECTED", "Backup source trees cannot contain symbolic links or junctions.");
+    if (!metadata.isFile() || metadata.nlink !== 1) throw new QarinahError("BACKUP_SOURCE_INVALID", "Backup sources must contain singly linked regular files.");
     if (!EXTENSIONS.has(path10.extname(candidate).toLowerCase())) return;
-    totalBytes += metadata2.size;
+    totalBytes += metadata.size;
     if (files.length + 1 > limits.maxFiles) throw new QarinahError("BACKUP_LIMIT_EXCEEDED", "Backup contains more files than allowed.");
     if (totalBytes > limits.maxBytes) throw new QarinahError("BACKUP_LIMIT_EXCEEDED", "Backup exceeds the configured byte limit.");
-    files.push({ sourceIndex, source: candidate, relativePath, expectedBytes: metadata2.size });
+    files.push({ sourceIndex, source: candidate, relativePath, expectedBytes: metadata.size });
   }
   async function walk(directory, relativeDirectory = "", depth = 0) {
     if (depth > MAX_DEPTH) throw new QarinahError("BACKUP_LIMIT_EXCEEDED", `Backup directory depth exceeds ${MAX_DEPTH}.`);
     directories += 1;
     if (directories > limits.maxFiles) throw new QarinahError("BACKUP_LIMIT_EXCEEDED", "Backup contains more directories than allowed.");
     const entries = [];
-    const handle2 = await opendir2(directory);
-    for await (const entry of handle2) entries.push(entry);
+    const handle = await opendir2(directory);
+    for await (const entry of handle) entries.push(entry);
     entries.sort((left, right) => left.name.localeCompare(right.name));
     for (const entry of entries) {
       const candidate = path10.join(directory, entry.name);
@@ -11610,8 +10009,8 @@ async function prepareDestination(destination, sources) {
     throw new QarinahError("BACKUP_DESTINATION_INVALID", "Backup destination parent must be a real directory.");
   }
   await mkdir4(requested, { recursive: false, mode: 448 });
-  const metadata2 = await lstat8(requested);
-  if (metadata2.isSymbolicLink() || !metadata2.isDirectory()) {
+  const metadata = await lstat8(requested);
+  if (metadata.isSymbolicLink() || !metadata.isDirectory()) {
     throw new QarinahError("BACKUP_DESTINATION_INVALID", "Backup destination must be a real directory.");
   }
   return realpath6(requested);
@@ -11859,15 +10258,15 @@ async function ensureArchiveDirectory(workspace, segments) {
   let current = workspace.qarinahDir;
   for (const segment of segments) {
     current = resolveWithin(current, segment);
-    let metadata2;
+    let metadata;
     try {
-      metadata2 = await lstat9(current);
+      metadata = await lstat9(current);
     } catch (error) {
       if (error?.code !== "ENOENT") throw error;
       await mkdir5(current, { mode: 448 });
-      metadata2 = await lstat9(current);
+      metadata = await lstat9(current);
     }
-    if (metadata2.isSymbolicLink() || !metadata2.isDirectory()) {
+    if (metadata.isSymbolicLink() || !metadata.isDirectory()) {
       throw new QarinahError("STORAGE_LINK_REJECTED", `.qarinah/${segments.join("/")} must contain only real directories.`);
     }
     const actual = await realpath7(current);
@@ -11882,8 +10281,8 @@ async function loadIgnoreMatcher2(workspace) {
   for (const filename of [".gitignore", ".qarinahignore"]) {
     const candidate = path11.join(workspace.root, filename);
     try {
-      const metadata2 = await lstat9(candidate);
-      if (!metadata2.isSymbolicLink() && metadata2.isFile() && metadata2.size <= 1024 * 1024) {
+      const metadata = await lstat9(candidate);
+      if (!metadata.isSymbolicLink() && metadata.isFile() && metadata.size <= 1024 * 1024) {
         matcher.add(await readFile5(candidate, "utf8"));
       }
     } catch (error) {
@@ -11907,8 +10306,8 @@ async function collectSourceFiles(workspace, source, limits, signal) {
   let totalBytes = 0;
   async function addFile(candidate) {
     throwIfAborted(signal);
-    const metadata2 = await lstat9(candidate);
-    if (metadata2.isSymbolicLink() || !metadata2.isFile() || metadata2.nlink !== 1) {
+    const metadata = await lstat9(candidate);
+    if (metadata.isSymbolicLink() || !metadata.isFile() || metadata.nlink !== 1) {
       skipped.push(Object.freeze({ path: portablePath2(sourceRoot, candidate), reason: "linked-or-non-regular" }));
       return;
     }
@@ -11918,11 +10317,11 @@ async function collectSourceFiles(workspace, source, limits, signal) {
       skipped.push(Object.freeze({ path: relative, reason: secretFilename(relative) ? "secret-filename" : "ignored" }));
       return;
     }
-    if (metadata2.size > limits.maxFileBytes) throw new QarinahError("ARCHIVE_LIMIT", `${relative} exceeds maxFileBytes.`);
+    if (metadata.size > limits.maxFileBytes) throw new QarinahError("ARCHIVE_LIMIT", `${relative} exceeds maxFileBytes.`);
     if (files.length >= limits.maxFiles) throw new QarinahError("ARCHIVE_LIMIT", `Archive exceeds maxFiles ${limits.maxFiles}.`);
-    if (totalBytes + metadata2.size > limits.maxTotalBytes) throw new QarinahError("ARCHIVE_LIMIT", `Archive exceeds maxTotalBytes ${limits.maxTotalBytes}.`);
-    totalBytes += metadata2.size;
-    files.push(Object.freeze({ absolute: candidate, path: relative, size: metadata2.size }));
+    if (totalBytes + metadata.size > limits.maxTotalBytes) throw new QarinahError("ARCHIVE_LIMIT", `Archive exceeds maxTotalBytes ${limits.maxTotalBytes}.`);
+    totalBytes += metadata.size;
+    files.push(Object.freeze({ absolute: candidate, path: relative, size: metadata.size }));
   }
   async function walk(directory) {
     throwIfAborted(signal);
@@ -11953,18 +10352,18 @@ function contentDefinedChunks(bytes, limits) {
   if (bytes.length === 0) return [Buffer.alloc(0)];
   const chunks = [];
   const mask = limits.averageChunkBytes - 1;
-  let start2 = 0;
+  let start = 0;
   let fingerprint = 0;
   for (let index = 0; index < bytes.length; index += 1) {
     fingerprint = (fingerprint << 1) + GEAR[bytes[index]] >>> 0;
-    const length = index + 1 - start2;
+    const length = index + 1 - start;
     if (length >= limits.minChunkBytes && ((fingerprint & mask) === 0 || length >= limits.maxChunkBytes)) {
-      chunks.push(bytes.subarray(start2, index + 1));
-      start2 = index + 1;
+      chunks.push(bytes.subarray(start, index + 1));
+      start = index + 1;
       fingerprint = 0;
     }
   }
-  if (start2 < bytes.length) chunks.push(bytes.subarray(start2));
+  if (start < bytes.length) chunks.push(bytes.subarray(start));
   return chunks;
 }
 async function compressChunk(bytes) {
@@ -12021,8 +10420,8 @@ async function loadOrCreateVaultKey(workspace) {
   await ensureArchiveDirectory(workspace, ["archive"]);
   const candidate = await secureStoragePath(workspace, ["archive", "key.json"], { type: "file", allowMissing: true });
   if (await exists2(candidate)) {
-    const metadata2 = await stat3(candidate);
-    if (!metadata2.isFile() || metadata2.nlink !== 1 || metadata2.size > MAX_KEY_BYTES) {
+    const metadata = await stat3(candidate);
+    if (!metadata.isFile() || metadata.nlink !== 1 || metadata.size > MAX_KEY_BYTES) {
       throw new QarinahError("ARCHIVE_KEY_INVALID", "Archive key record is not a bounded regular file.");
     }
     return parseVaultKeyRecord(JSON.parse(await readFile5(candidate, "utf8")));
@@ -12079,18 +10478,18 @@ async function writeObject(workspace, object, payload, archiveKeyId) {
   const objectsDirectory = await ensureArchiveDirectory(workspace, ["archive", "objects", archiveKeyId]);
   const candidate = resolveWithin(objectsDirectory, `${object.objectId}.qar`);
   try {
-    const handle2 = await open4(candidate, "wx", 384);
+    const handle = await open4(candidate, "wx", 384);
     try {
-      await handle2.writeFile(payload);
-      await handle2.sync();
+      await handle.writeFile(payload);
+      await handle.sync();
     } finally {
-      await handle2.close();
+      await handle.close();
     }
     return true;
   } catch (error) {
     if (error?.code !== "EEXIST") throw error;
-    const metadata2 = await lstat9(candidate);
-    if (metadata2.isSymbolicLink() || !metadata2.isFile() || metadata2.nlink !== 1) {
+    const metadata = await lstat9(candidate);
+    if (metadata.isSymbolicLink() || !metadata.isFile() || metadata.nlink !== 1) {
       throw new QarinahError("STORAGE_LINK_REJECTED", "Existing archive object is not a singly linked regular file.");
     }
     return false;
@@ -12098,8 +10497,8 @@ async function writeObject(workspace, object, payload, archiveKeyId) {
 }
 async function readVaultKey(workspace) {
   const candidate = await secureStoragePath(workspace, ["archive", "key.json"], { type: "file" });
-  const metadata2 = await stat3(candidate);
-  if (!metadata2.isFile() || metadata2.nlink !== 1 || metadata2.size > MAX_KEY_BYTES) {
+  const metadata = await stat3(candidate);
+  if (!metadata.isFile() || metadata.nlink !== 1 || metadata.size > MAX_KEY_BYTES) {
     throw new QarinahError("ARCHIVE_KEY_INVALID", "Archive key record is not a bounded regular file.");
   }
   const parsed = JSON.parse(await readFile5(candidate, "utf8"));
@@ -12158,16 +10557,16 @@ function validateManifest(manifest, workspaceId) {
 async function readManifest(workspace, archiveId) {
   if (!/^archive_[0-9a-f]{64}$/u.test(archiveId)) throw new TypeError("archiveId is invalid.");
   const candidate = await secureStoragePath(workspace, ["archive", "manifests", `${archiveId}.json`], { type: "file" });
-  const metadata2 = await stat3(candidate);
-  if (!metadata2.isFile() || metadata2.nlink !== 1 || metadata2.size > MAX_MANIFEST_BYTES) {
+  const metadata = await stat3(candidate);
+  if (!metadata.isFile() || metadata.nlink !== 1 || metadata.size > MAX_MANIFEST_BYTES) {
     throw new QarinahError("ARCHIVE_MANIFEST_INVALID", "Content archive manifest is not a bounded regular file.");
   }
   return validateManifest(JSON.parse(await readFile5(candidate, "utf8")), workspace.config.workspaceId);
 }
 async function readArchiveObject(workspace, chunk, key, archiveKeyId) {
   const candidate = await secureStoragePath(workspace, ["archive", "objects", archiveKeyId, `${chunk.objectId}.qar`], { type: "file" });
-  const metadata2 = await stat3(candidate);
-  if (!metadata2.isFile() || metadata2.isSymbolicLink?.() || metadata2.nlink !== 1 || metadata2.size !== chunk.storedBytes) {
+  const metadata = await stat3(candidate);
+  if (!metadata.isFile() || metadata.isSymbolicLink?.() || metadata.nlink !== 1 || metadata.size !== chunk.storedBytes) {
     throw new QarinahError("ARCHIVE_OBJECT_INVALID", `Archive object ${chunk.objectId} has changed.`);
   }
   const plaintext = await decryptObject(await readFile5(candidate), chunk.plaintextHash, key);
@@ -12349,8 +10748,8 @@ async function ensureRestoreParent(root, relative) {
   for (const segment of segments) {
     current = path11.join(current, segment);
     try {
-      const metadata2 = await lstat9(current);
-      if (metadata2.isSymbolicLink() || !metadata2.isDirectory()) throw new QarinahError("ARCHIVE_RESTORE_PATH", "Restore parent is not a real directory.");
+      const metadata = await lstat9(current);
+      if (metadata.isSymbolicLink() || !metadata.isDirectory()) throw new QarinahError("ARCHIVE_RESTORE_PATH", "Restore parent is not a real directory.");
     } catch (error) {
       if (error?.code !== "ENOENT") throw error;
       await mkdir5(current, { mode: 448 });
@@ -12375,26 +10774,26 @@ async function restoreContentArchive(archiveId, destination, options = {}) {
     await ensureRestoreParent(root, file.path);
     const output = path11.resolve(root, ...file.path.split("/"));
     if (!isWithin4(root, output)) throw new QarinahError("ARCHIVE_RESTORE_PATH", "Restore file escaped the destination.");
-    const handle2 = await open4(output, options.overwrite === true ? "w" : "wx", 384);
+    const handle = await open4(output, options.overwrite === true ? "w" : "wx", 384);
     try {
       const hash = createHash8("sha256");
       let size = 0;
       for (const chunk of file.chunks) {
         const plaintext = await readArchiveObject(workspace, chunk, vault.key, manifest.encryption.keyId);
-        await handle2.write(plaintext);
+        await handle.write(plaintext);
         hash.update(plaintext);
         size += plaintext.length;
       }
-      await handle2.sync();
+      await handle.sync();
       if (size !== file.size || `sha256:${hash.digest("hex")}` !== file.contentHash) {
         throw new QarinahError("ARCHIVE_FILE_INVALID", `${file.path} failed restore verification.`);
       }
     } catch (error) {
-      await handle2.close();
+      await handle.close();
       await rm6(output, { force: true });
       throw error;
     }
-    await handle2.close();
+    await handle.close();
     restored.push(file.path);
   }
   return deepFreezeJson({ ok: true, archiveId, destination: root, restored });
@@ -12450,8 +10849,8 @@ async function garbageCollectContentArchive(options = {}) {
       const scopedId = `${keyEntry.name}/${id}`;
       if (retained.has(scopedId)) continue;
       const candidate = resolveWithin(keyDirectory, entry.name);
-      const metadata2 = await lstat9(candidate);
-      if (metadata2.isSymbolicLink() || !metadata2.isFile() || metadata2.nlink !== 1) throw new QarinahError("STORAGE_LINK_REJECTED", "Archive garbage collection encountered a linked object.");
+      const metadata = await lstat9(candidate);
+      if (metadata.isSymbolicLink() || !metadata.isFile() || metadata.nlink !== 1) throw new QarinahError("STORAGE_LINK_REJECTED", "Archive garbage collection encountered a linked object.");
       await rm6(candidate);
       removed.push(scopedId);
     }
@@ -12535,11 +10934,11 @@ function money(value) {
 async function fileBytes(workspace, segments) {
   const candidate = path12.join(workspace.qarinahDir, ...segments);
   try {
-    const metadata2 = await lstat10(candidate);
-    if (metadata2.isSymbolicLink() || !metadata2.isFile() || metadata2.nlink !== 1) {
+    const metadata = await lstat10(candidate);
+    if (metadata.isSymbolicLink() || !metadata.isFile() || metadata.nlink !== 1) {
       throw new QarinahError("STORAGE_LINK_REJECTED", `.qarinah/${segments.join("/")} must be a singly linked regular file.`);
     }
-    return metadata2.size;
+    return metadata.size;
   } catch (error) {
     if (error?.code === "ENOENT") return 0;
     throw error;
@@ -12659,14 +11058,14 @@ function topDirectory(filePath) {
   return separator === -1 ? "(root)" : filePath.slice(0, separator);
 }
 function outcome(event) {
-  const body2 = event.body.replaceAll(/\s+/gu, " ").trim();
+  const body = event.body.replaceAll(/\s+/gu, " ").trim();
   return {
     eventId: event.eventId,
     hash: event.hash,
     kind: event.kind,
     timestamp: event.timestamp,
     title: event.title,
-    excerpt: body2.length > 280 ? `${body2.slice(0, 277)}...` : body2
+    excerpt: body.length > 280 ? `${body.slice(0, 277)}...` : body
   };
 }
 async function buildProjectOverview(options = {}) {
@@ -12869,19 +11268,19 @@ async function ensureSafeDirectoryChain(root, directory) {
   let current = root;
   for (const segment of relative.split(path13.sep).filter(Boolean)) {
     current = path13.join(current, segment);
-    let metadata2 = await optionalLstat(current);
-    if (!metadata2) {
+    let metadata = await optionalLstat(current);
+    if (!metadata) {
       try {
         await mkdir6(current, { mode: 448 });
       } catch (error) {
         if (error?.code !== "EEXIST") throw error;
       }
-      metadata2 = await lstat11(current);
+      metadata = await lstat11(current);
     }
-    if (metadata2.isSymbolicLink()) {
+    if (metadata.isSymbolicLink()) {
       throw new QarinahError("STORAGE_LINK_REJECTED", "OKF output paths cannot traverse a symbolic link or junction.");
     }
-    if (!metadata2.isDirectory()) {
+    if (!metadata.isDirectory()) {
       throw new QarinahError("OKF_OUTPUT_INVALID", "Every existing OKF output parent must be a directory.");
     }
     const actual = await realpath8(current);
@@ -12960,7 +11359,7 @@ function renderEventConcept(event, eventById) {
   const citations = citationsFor(event);
   const relations = sortedRelations(event);
   const description = safeOneLine(event.body, `Recorded ${event.kind} event.`, 240);
-  const metadata2 = [
+  const metadata = [
     ["type", "Qarinah Event"],
     ["title", safeOneLine(event.title, event.eventId, 512)],
     ["description", description],
@@ -12990,7 +11389,7 @@ function renderEventConcept(event, eventById) {
     ["qarinah_retention", event.retention]
   ];
   const lines = [
-    frontmatter(metadata2),
+    frontmatter(metadata),
     `# ${markdownInline(event.title)}`,
     "",
     "> Derived Google Open Knowledge Format 0.1 Draft interchange. The Qarinah JSONL event ledger is authoritative; this document is not a retrieval index or storage layer.",
@@ -13145,23 +11544,23 @@ function validateMarker(value, workspaceId, eventFileCount) {
   }
 }
 async function assertRegularFile(candidate, label, maximumBytes = 256 * 1024 * 1024) {
-  const metadata2 = await lstat11(candidate);
-  if (metadata2.isSymbolicLink()) {
+  const metadata = await lstat11(candidate);
+  if (metadata.isSymbolicLink()) {
     throw new QarinahError("STORAGE_LINK_REJECTED", `${label} cannot be a symbolic link or junction.`);
   }
-  if (!metadata2.isFile()) throw new QarinahError("OKF_OUTPUT_NOT_OWNED", `${label} must be a regular file.`);
-  if (metadata2.size > maximumBytes) {
+  if (!metadata.isFile()) throw new QarinahError("OKF_OUTPUT_NOT_OWNED", `${label} must be a regular file.`);
+  if (metadata.size > maximumBytes) {
     throw new QarinahError("OKF_OUTPUT_NOT_OWNED", `${label} exceeds its bounded size.`);
   }
-  return metadata2;
+  return metadata;
 }
 async function assertOwnedOutput(outputDirectory, workspace) {
-  const metadata2 = await optionalLstat(outputDirectory);
-  if (!metadata2) return false;
-  if (metadata2.isSymbolicLink()) {
+  const metadata = await optionalLstat(outputDirectory);
+  if (!metadata) return false;
+  if (metadata.isSymbolicLink()) {
     throw new QarinahError("STORAGE_LINK_REJECTED", "OKF output cannot be a symbolic link or junction.");
   }
-  if (!metadata2.isDirectory()) {
+  if (!metadata.isDirectory()) {
     throw new QarinahError("OKF_OUTPUT_INVALID", "Existing OKF output must be a directory.");
   }
   const actual = await realpath8(outputDirectory);
@@ -13435,7 +11834,7 @@ function hookPayload(input, workspace) {
   const requestedCwd = path14.resolve(input.cwd);
   const relativeCwd = path14.relative(workspace.root, requestedCwd);
   const workspaceRelativeCwd = relativeCwd === "" || !relativeCwd.startsWith("..") && !path14.isAbsolute(relativeCwd) ? relativeCwd || "." : "[outside-workspace]";
-  const metadata2 = {
+  const metadata = {
     hookEvent: eventName,
     model: input.model,
     permissionMode: input.permission_mode ?? null,
@@ -13469,7 +11868,7 @@ function hookPayload(input, workspace) {
   const content = Object.fromEntries(
     Object.entries(contentValues).map(([key, value]) => [key, retainHookContent(value)])
   );
-  const data = workspace.config.capture === "content" ? { ...metadata2, content, bodyRetention: hookRetentionMetadata(bodyRetention) } : metadata2;
+  const data = workspace.config.capture === "content" ? { ...metadata, content, bodyRetention: hookRetentionMetadata(bodyRetention) } : metadata;
   const relations = hookRelations(input);
   const actor = eventName.startsWith("Subagent") ? { type: "agent", id: input.agent_id } : input.agent_id && mapping.actor.type === "agent" ? { type: "agent", id: input.agent_id } : mapping.actor;
   const eventId = deterministicHookEventId(input);
@@ -13771,7 +12170,7 @@ function hookPayload2(input, ignoredFieldCount, workspace) {
   const requestedCwd = path15.resolve(input.cwd);
   const relativeCwd = path15.relative(workspace.root, requestedCwd);
   const workspaceRelativeCwd = relativeCwd === "" || !relativeCwd.startsWith("..") && !path15.isAbsolute(relativeCwd) ? relativeCwd || "." : "[outside-workspace]";
-  const metadata2 = {
+  const metadata = {
     host: "claude-code",
     hookEvent: eventName,
     model: input.model ?? null,
@@ -13823,7 +12222,7 @@ function hookPayload2(input, ignoredFieldCount, workspace) {
   const content = Object.fromEntries(
     Object.entries(contentValues).map(([key, value]) => [key, retainHookContent(value)])
   );
-  const data = workspace.config.capture === "content" ? { ...metadata2, content, bodyRetention: hookRetentionMetadata(bodyRetention) } : metadata2;
+  const data = workspace.config.capture === "content" ? { ...metadata, content, bodyRetention: hookRetentionMetadata(bodyRetention) } : metadata;
   const relations = input.tool_use_id ? [{
     type: ["PostToolUse", "PostToolUseFailure"].includes(eventName) ? "derived_from" : "references",
     target: `toolcall:${input.tool_use_id}`
@@ -13875,7 +12274,7 @@ async function captureClaudeHook(value, options = {}) {
 // src/mcp/server.js
 import { realpath as realpath9 } from "node:fs/promises";
 import path16 from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath as fileURLToPath2 } from "node:url";
 init_errors();
 init_indexer();
 init_store();
@@ -14028,7 +12427,7 @@ function pathFromRoot(root) {
   if (!root || typeof root !== "object" || Array.isArray(root) || typeof root.uri !== "string") return null;
   try {
     const url = new URL(root.uri);
-    return url.protocol === "file:" ? fileURLToPath(url) : null;
+    return url.protocol === "file:" ? fileURLToPath2(url) : null;
   } catch {
     return null;
   }
@@ -14040,7 +12439,7 @@ function pathFromSelector(value) {
   const selector = value.trim();
   if (selector.startsWith("file:")) {
     try {
-      return fileURLToPath(new URL(selector));
+      return fileURLToPath2(new URL(selector));
     } catch {
       throw new QarinahError("MCP_WORKSPACE_INVALID", "The MCP workspace selector is not a valid local file URI.");
     }
@@ -14289,7 +12688,7 @@ function createMcpServer(options = {}) {
     }
     return jsonRpcError(message.id, -32601, `Method '${message.method}' is not supported.`);
   }
-  async function handle2(message) {
+  async function handle(message) {
     if (!message || typeof message !== "object" || Array.isArray(message) || message.jsonrpc !== "2.0") {
       send2(jsonRpcError(null, -32600, "Invalid JSON-RPC request."));
       return;
@@ -14325,7 +12724,7 @@ function createMcpServer(options = {}) {
     }
     pending.clear();
   }
-  return Object.freeze({ handle: handle2, close, tools });
+  return Object.freeze({ handle, close, tools });
 }
 async function runMcpServer(options = {}) {
   const input = options.input ?? process.stdin;
@@ -14404,7 +12803,7 @@ async function runMcpServer(options = {}) {
 init_errors();
 import { lstat as lstat12, mkdir as mkdir8, readFile as readFile7 } from "node:fs/promises";
 import path18 from "node:path";
-import { fileURLToPath as fileURLToPath2 } from "node:url";
+import { fileURLToPath as fileURLToPath3 } from "node:url";
 
 // src/dashboard.js
 init_canonical();
@@ -14415,7 +12814,7 @@ init_project_views();
 // src/session-receipts.js
 init_canonical();
 import { mkdir as mkdir7 } from "node:fs/promises";
-import { performance as performance2 } from "node:perf_hooks";
+import { performance } from "node:perf_hooks";
 init_store();
 init_workspace();
 var SESSION_CONTEXT_RECEIPT_SCHEMA_VERSION = "qarinah.session-context-receipt.v2";
@@ -14460,7 +12859,7 @@ function receiptPathId(sessionId2) {
   return sha256(sessionId2).slice("sha256:".length, "sha256:".length + 32);
 }
 async function buildReceipt(workspace, sessionId2, events, options) {
-  const startedAt = performance2.now();
+  const startedAt = performance.now();
   const receiptQuery = options.query ?? events.map((event) => event.title).join(" ").slice(0, 4096);
   const pack = await compileContextFromVerifiedEvents(receiptQuery, {
     workspace,
@@ -14473,7 +12872,7 @@ async function buildReceipt(workspace, sessionId2, events, options) {
     updateCheckpoint: false,
     clock: () => new Date(options.generatedAt)
   });
-  const completedAt = performance2.now();
+  const completedAt = performance.now();
   const sourceCharacters = events.reduce((total, event) => total + canonicalStringify(event).length + 1, 0);
   const sourceEstimatedTokens = Math.ceil(sourceCharacters / 4);
   const packCharacters = pack.budget.usedChars;
@@ -15078,7 +13477,7 @@ init_workspace();
 var MAX_MANAGED_FILE_BYTES = 512 * 1024;
 var MANAGED_TOML_START = "# qarinah:managed:start";
 var MANAGED_TOML_END = "# qarinah:managed:end";
-var PACKAGE_ROOT = path18.resolve(path18.dirname(fileURLToPath2(import.meta.url)), "..");
+var PACKAGE_ROOT = path18.resolve(path18.dirname(fileURLToPath3(import.meta.url)), "..");
 var BIN_PATH = path18.join(PACKAGE_ROOT, "bin", "qarinah.js");
 function tomlString(value) {
   return JSON.stringify(String(value));
@@ -15089,33 +13488,33 @@ function normalizeTargets(options) {
   return targets.length === 0 ? supported : targets;
 }
 async function safeRead(candidate, label) {
-  let metadata2;
+  let metadata;
   try {
-    metadata2 = await lstat12(candidate);
+    metadata = await lstat12(candidate);
   } catch (error) {
     if (error?.code === "ENOENT") return null;
     throw error;
   }
-  if (metadata2.isSymbolicLink() || !metadata2.isFile() || metadata2.nlink !== 1) {
+  if (metadata.isSymbolicLink() || !metadata.isFile() || metadata.nlink !== 1) {
     throw new QarinahError("SETUP_LINK_REJECTED", `${label} must be a singly linked regular file.`);
   }
-  if (metadata2.size > MAX_MANAGED_FILE_BYTES) {
+  if (metadata.size > MAX_MANAGED_FILE_BYTES) {
     throw new QarinahError("SETUP_FILE_TOO_LARGE", `${label} exceeds ${MAX_MANAGED_FILE_BYTES} bytes.`);
   }
   return readFile7(candidate, "utf8");
 }
 async function ensureDirectory(candidate, root, label) {
-  let metadata2;
+  let metadata;
   try {
-    metadata2 = await lstat12(candidate);
+    metadata = await lstat12(candidate);
   } catch (error) {
     if (error?.code !== "ENOENT") throw error;
   }
-  if (!metadata2) {
+  if (!metadata) {
     await mkdir8(candidate, { recursive: true, mode: 448 });
-    metadata2 = await lstat12(candidate);
+    metadata = await lstat12(candidate);
   }
-  if (metadata2.isSymbolicLink() || !metadata2.isDirectory()) {
+  if (metadata.isSymbolicLink() || !metadata.isDirectory()) {
     throw new QarinahError("SETUP_LINK_REJECTED", `${label} must be a real directory.`);
   }
   resolveWithin(root, path18.relative(root, candidate));
@@ -15147,9 +13546,9 @@ async function writeExactManaged(candidate, root, label, contents) {
   if (existing === null) await atomicWriteFile(candidate, contents);
 }
 function mcpArguments(workspace, options) {
-  const args2 = [BIN_PATH, "mcp"];
+  const args = [BIN_PATH, "mcp"];
   if (options.allowQuery) {
-    args2.push(
+    args.push(
       "--allow-query",
       "--workspace-id",
       workspace.config.workspaceId,
@@ -15161,7 +13560,7 @@ function mcpArguments(workspace, options) {
       String(options.maxItems ?? 20)
     );
   }
-  return args2;
+  return args;
 }
 function qarinahHook(adapter) {
   return {
@@ -15242,13 +13641,13 @@ async function configureCodex(workspace, options) {
   await ensureDirectory(root, workspace.root, ".codex");
   const configPath = resolveWithin(root, "config.toml");
   const existing = await safeRead(configPath, ".codex/config.toml") ?? "";
-  const args2 = mcpArguments(workspace, options);
+  const args = mcpArguments(workspace, options);
   const enabledTools = options.allowQuery ? ["context_status", "context_doctor", "context.query"] : ["context_status", "context_doctor"];
   const block = [
     MANAGED_TOML_START,
     "[mcp_servers.qarinah]",
     `command = ${tomlString(process.execPath)}`,
-    `args = [${args2.map(tomlString).join(", ")}]`,
+    `args = [${args.map(tomlString).join(", ")}]`,
     `cwd = ${tomlString(workspace.root)}`,
     `enabled_tools = [${enabledTools.map(tomlString).join(", ")}]`,
     // Qarinah currently exposes only accurately annotated read-only MCP tools.
@@ -15498,10 +13897,10 @@ init_errors();
 import { createHash as createHash9 } from "node:crypto";
 import { lstat as lstat13, mkdir as mkdir9, readFile as readFile8, realpath as realpath10, unlink } from "node:fs/promises";
 import path19 from "node:path";
-import { fileURLToPath as fileURLToPath3 } from "node:url";
+import { fileURLToPath as fileURLToPath4 } from "node:url";
 init_workspace();
 var HOST_INSTALL_MANIFEST_SCHEMA_VERSION = "qarinah.host-install-manifest.v1";
-var PACKAGE_ROOT2 = path19.resolve(path19.dirname(fileURLToPath3(import.meta.url)), "..");
+var PACKAGE_ROOT2 = path19.resolve(path19.dirname(fileURLToPath4(import.meta.url)), "..");
 var BIN_PATH2 = path19.join(PACKAGE_ROOT2, "bin", "qarinah.js");
 var MAX_CONFIG_BYTES2 = 512 * 1024;
 var MANAGED_TOML_START2 = "# qarinah:managed:start";
@@ -15553,17 +13952,17 @@ function digest(contents) {
 }
 async function inspectFile(root, relativePath) {
   const candidate = resolveWithin(root, relativePath);
-  let metadata2;
+  let metadata;
   try {
-    metadata2 = await lstat13(candidate);
+    metadata = await lstat13(candidate);
   } catch (error) {
     if (error?.code === "ENOENT") return Object.freeze({ exists: false, digest: null, bytes: 0 });
     throw error;
   }
-  if (metadata2.isSymbolicLink() || !metadata2.isFile() || metadata2.nlink !== 1) {
+  if (metadata.isSymbolicLink() || !metadata.isFile() || metadata.nlink !== 1) {
     throw new QarinahError("INSTALL_LINK_REJECTED", `${relativePath} must be a singly linked regular file.`);
   }
-  if (metadata2.size > MAX_CONFIG_BYTES2) {
+  if (metadata.size > MAX_CONFIG_BYTES2) {
     throw new QarinahError("INSTALL_FILE_TOO_LARGE", `${relativePath} exceeds ${MAX_CONFIG_BYTES2} bytes.`);
   }
   const contents = await readFile8(candidate);
@@ -15579,7 +13978,7 @@ async function previewHostInstall(options = {}) {
   const host = assertHost(options.host);
   const scope = assertScope(options.scope ?? "project");
   const root = await canonicalTarget(options.cwd);
-  const binary2 = await readFile8(BIN_PATH2);
+  const binary = await readFile8(BIN_PATH2);
   const files = [];
   for (const [relativePath, ownership] of INVENTORY[host]) {
     const current = await inspectFile(root, relativePath);
@@ -15598,7 +13997,7 @@ async function previewHostInstall(options = {}) {
     scope,
     packageVersion: QARINAH_VERSION,
     interpreter: Object.freeze({ path: process.execPath, version: process.versions.node }),
-    binary: Object.freeze({ path: BIN_PATH2, digest: digest(binary2), bytes: binary2.byteLength }),
+    binary: Object.freeze({ path: BIN_PATH2, digest: digest(binary), bytes: binary.byteLength }),
     manifestPath: manifestRelativePath(host),
     files: Object.freeze(files)
   });
@@ -15836,14 +14235,14 @@ function hashBytes3(bytes) {
 }
 async function inspectFile2(workspace, file) {
   const absolute = resolveWithin(workspace.root, ...file.path.split("/"));
-  let metadata2;
+  let metadata;
   try {
-    metadata2 = await lstat14(absolute);
+    metadata = await lstat14(absolute);
   } catch (error) {
     if (error?.code === "ENOENT") return { path: file.path, status: "missing", expectedHash: file.contentHash ?? file.hash };
     throw error;
   }
-  if (metadata2.isSymbolicLink() || !metadata2.isFile()) {
+  if (metadata.isSymbolicLink() || !metadata.isFile()) {
     return { path: file.path, status: "unsafe", expectedHash: file.contentHash ?? file.hash };
   }
   const resolved = await realpath11(absolute);
@@ -15851,7 +14250,7 @@ async function inspectFile2(workspace, file) {
   if (relative.startsWith("..") || path20.isAbsolute(relative)) {
     throw new QarinahError("PATH_OUTSIDE_WORKSPACE", "A freshness target resolves outside the trusted workspace.");
   }
-  if (file.bytes !== void 0 && metadata2.size > file.bytes || metadata2.size > 4 * 1024 * 1024) {
+  if (file.bytes !== void 0 && metadata.size > file.bytes || metadata.size > 4 * 1024 * 1024) {
     return {
       path: file.path,
       status: "changed",
@@ -16020,7 +14419,7 @@ ${projects.map((project) => `<a class="project" href="${escapeHtml2(project.href
 const refresh=async()=>{for(const card of document.querySelectorAll("[data-project]")){try{const id=card.dataset.project;const response=await fetch("/api/status/"+encodeURIComponent(id),{cache:"no-store"});if(!response.ok)continue;const status=await response.json();card.querySelector("[data-events]").textContent=String(status.eventCount);card.querySelector("[data-activity]").textContent=status.lastActivityAt??"No retained activity";}catch{}}};refresh();setInterval(refresh,2000);
 </script></body></html>`;
 }
-function send(response, statusCode, contentType, body2, method = "GET") {
+function send(response, statusCode, contentType, body, method = "GET") {
   response.writeHead(statusCode, {
     "Cache-Control": "no-store",
     "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
@@ -16030,7 +14429,7 @@ function send(response, statusCode, contentType, body2, method = "GET") {
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY"
   });
-  if (method !== "HEAD") response.end(body2);
+  if (method !== "HEAD") response.end(body);
   else response.end();
 }
 async function serveMemoryDashboard(options = {}) {
@@ -16301,34 +14700,34 @@ async function buildDeveloperMemoryView(options = {}) {
 }
 
 // bin/qarinah.js
-function option(args2, name, fallback = void 0) {
-  const index = args2.indexOf(name);
+function option(args, name, fallback = void 0) {
+  const index = args.indexOf(name);
   if (index === -1) return fallback;
-  if (index === args2.length - 1 || args2[index + 1].startsWith("--")) throw new TypeError(`${name} requires a value.`);
-  return args2[index + 1];
+  if (index === args.length - 1 || args[index + 1].startsWith("--")) throw new TypeError(`${name} requires a value.`);
+  return args[index + 1];
 }
-function positionals(args2) {
+function positionals(args) {
   const values = [];
-  for (let index = 0; index < args2.length; index += 1) {
-    if (args2[index].startsWith("--")) {
+  for (let index = 0; index < args.length; index += 1) {
+    if (args[index].startsWith("--")) {
       index += 1;
       continue;
     }
-    values.push(args2[index]);
+    values.push(args[index]);
   }
   return values;
 }
-function integerOption(args2, name, fallback) {
-  const value = option(args2, name);
+function integerOption(args, name, fallback) {
+  const value = option(args, name);
   if (value === void 0) return fallback;
   if (!/^[0-9]+$/.test(value)) throw new TypeError(`${name} must be a positive integer.`);
   return Number(value);
 }
-function parseRelations(args2) {
+function parseRelations(args) {
   const relations = [];
-  for (let index = 0; index < args2.length; index += 1) {
-    if (args2[index] !== "--relation") continue;
-    const value = args2[index + 1];
+  for (let index = 0; index < args.length; index += 1) {
+    if (args[index] !== "--relation") continue;
+    const value = args[index + 1];
     const separator = value?.indexOf(":") ?? -1;
     if (separator < 1 || separator === value.length - 1) throw new TypeError("--relation must use type:target.");
     relations.push({ type: value.slice(0, separator), target: value.slice(separator + 1) });
@@ -16336,33 +14735,33 @@ function parseRelations(args2) {
   }
   return relations;
 }
-function strictValueOptions(args2, command, allowedOptions) {
+function strictValueOptions(args, command, allowedOptions) {
   const allowed = new Set(allowedOptions);
   const seen = /* @__PURE__ */ new Set();
   const values = /* @__PURE__ */ new Map();
   const positionalValues = [];
-  for (let index = 0; index < args2.length; index += 1) {
-    const value = args2[index];
+  for (let index = 0; index < args.length; index += 1) {
+    const value = args[index];
     if (!value.startsWith("--")) {
       positionalValues.push(value);
       continue;
     }
     if (!allowed.has(value)) throw new TypeError(`${command} does not support ${value}.`);
     if (seen.has(value)) throw new TypeError(`${command} received ${value} more than once.`);
-    if (index === args2.length - 1 || args2[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
+    if (index === args.length - 1 || args[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
     seen.add(value);
-    values.set(value, args2[index + 1]);
+    values.set(value, args[index + 1]);
     index += 1;
   }
   return { values, positionals: positionalValues };
 }
-function dashboardOptions(args2) {
+function dashboardOptions(args) {
   const values = /* @__PURE__ */ new Map();
   const projects = [];
   let serve = false;
   let worktrees = false;
-  for (let index = 0; index < args2.length; index += 1) {
-    const name = args2[index];
+  for (let index = 0; index < args.length; index += 1) {
+    const name = args[index];
     if (name === "--serve") {
       if (serve) throw new TypeError("dashboard received --serve more than once.");
       serve = true;
@@ -16377,8 +14776,8 @@ function dashboardOptions(args2) {
       if (name.startsWith("--")) throw new TypeError(`dashboard does not support ${name}.`);
       throw new TypeError("dashboard accepts options only.");
     }
-    if (index === args2.length - 1 || args2[index + 1].startsWith("--")) throw new TypeError(`${name} requires a value.`);
-    const value = args2[index + 1];
+    if (index === args.length - 1 || args[index + 1].startsWith("--")) throw new TypeError(`${name} requires a value.`);
+    const value = args[index + 1];
     index += 1;
     if (name === "--project") {
       if (projects.length >= 31) throw new TypeError("dashboard supports at most 31 additional --project paths.");
@@ -16435,9 +14834,9 @@ async function readStdin(maximumBytes = 1048576) {
   }
   return Buffer.concat(chunks).toString("utf8");
 }
-async function readStdinJsonRequest(args2, command, maximumBytes, allowedFields) {
-  if (!args2.includes("--stdin-json")) return null;
-  if (args2.length !== 1 || args2[0] !== "--stdin-json") {
+async function readStdinJsonRequest(args, command, maximumBytes, allowedFields) {
+  if (!args.includes("--stdin-json")) return null;
+  if (args.length !== 1 || args[0] !== "--stdin-json") {
     throw new TypeError(`${command} --stdin-json cannot be combined with positional arguments or other options.`);
   }
   const text2 = await readStdin(maximumBytes);
@@ -16586,42 +14985,42 @@ Usage:
   qarinah status
 `;
 }
-async function run2(argv) {
+async function run(argv) {
   const [nodeMajor, nodeMinor] = process2.versions.node.split(".").map(Number);
   if (![22, 24, 26].includes(nodeMajor) || nodeMajor === 22 && nodeMinor < 13) {
     throw new TypeError(`Qarinah requires Node.js 22, 24, or 26; received ${process2.versions.node}.`);
   }
-  const [command = "help", ...args2] = argv;
+  const [command = "help", ...args] = argv;
   if (["help", "--help", "-h"].includes(command)) {
     process2.stdout.write(help());
     return;
   }
   if (command === "init") {
-    const target = positionals(args2)[0] || process2.cwd();
-    const workspace = await initializeWorkspace(target, { capture: option(args2, "--capture", "metadata") });
+    const target = positionals(args)[0] || process2.cwd();
+    const workspace = await initializeWorkspace(target, { capture: option(args, "--capture", "metadata") });
     process2.stdout.write(`${JSON.stringify({ ok: true, root: workspace.root, workspaceId: workspace.config.workspaceId, capture: workspace.config.capture }, null, 2)}
 `);
     return;
   }
   if (command === "setup") {
-    const flags2 = /* @__PURE__ */ new Set(["--codex", "--claude", "--cursor", "--kimi", "--antigravity", "--freebuff", "--allow-query", "--auto-compact"]);
+    const flags = /* @__PURE__ */ new Set(["--codex", "--claude", "--cursor", "--kimi", "--antigravity", "--freebuff", "--allow-query", "--auto-compact"]);
     const values = /* @__PURE__ */ new Set(["--capture", "--max-chars", "--max-items", "--backup-source", "--backup-destination", "--backup-max-bytes", "--backup-max-files"]);
     const parsed = { positionals: [], flags: /* @__PURE__ */ new Set(), values: /* @__PURE__ */ new Map() };
-    for (let index = 0; index < args2.length; index += 1) {
-      const value = args2[index];
+    for (let index = 0; index < args.length; index += 1) {
+      const value = args[index];
       if (!value.startsWith("--")) {
         parsed.positionals.push(value);
         continue;
       }
-      if (flags2.has(value)) {
+      if (flags.has(value)) {
         if (parsed.flags.has(value)) throw new TypeError(`setup received ${value} more than once.`);
         parsed.flags.add(value);
         continue;
       }
       if (!values.has(value)) throw new TypeError(`setup does not support ${value}.`);
       if (parsed.values.has(value)) throw new TypeError(`setup received ${value} more than once.`);
-      if (index === args2.length - 1 || args2[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
-      parsed.values.set(value, args2[index + 1]);
+      if (index === args.length - 1 || args[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
+      parsed.values.set(value, args[index + 1]);
       index += 1;
     }
     if (parsed.positionals.length > 1) throw new TypeError("setup accepts at most one workspace path.");
@@ -16654,24 +15053,24 @@ async function run2(argv) {
     return;
   }
   if (command === "install") {
-    const flags2 = /* @__PURE__ */ new Set(["--dry-run", "--allow-query", "--auto-compact"]);
+    const flags = /* @__PURE__ */ new Set(["--dry-run", "--allow-query", "--auto-compact"]);
     const values = /* @__PURE__ */ new Set(["--host", "--scope", "--capture", "--max-chars", "--max-items"]);
     const parsed = { positionals: [], flags: /* @__PURE__ */ new Set(), values: /* @__PURE__ */ new Map() };
-    for (let index = 0; index < args2.length; index += 1) {
-      const value = args2[index];
+    for (let index = 0; index < args.length; index += 1) {
+      const value = args[index];
       if (!value.startsWith("--")) {
         parsed.positionals.push(value);
         continue;
       }
-      if (flags2.has(value)) {
+      if (flags.has(value)) {
         if (parsed.flags.has(value)) throw new TypeError(`install received ${value} more than once.`);
         parsed.flags.add(value);
         continue;
       }
       if (!values.has(value)) throw new TypeError(`install does not support ${value}.`);
       if (parsed.values.has(value)) throw new TypeError(`install received ${value} more than once.`);
-      if (index === args2.length - 1 || args2[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
-      parsed.values.set(value, args2[index + 1]);
+      if (index === args.length - 1 || args[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
+      parsed.values.set(value, args[index + 1]);
       index += 1;
     }
     if (parsed.positionals.length > 1) throw new TypeError("install accepts at most one workspace path.");
@@ -16700,7 +15099,7 @@ async function run2(argv) {
     return;
   }
   if (command === "uninstall") {
-    const parsed = strictValueOptions(args2, "uninstall", ["--host", "--scope"]);
+    const parsed = strictValueOptions(args, "uninstall", ["--host", "--scope"]);
     if (parsed.positionals.length > 1) throw new TypeError("uninstall accepts at most one workspace path.");
     if (!parsed.values.has("--host") || parsed.values.get("--scope") !== "project") {
       throw new TypeError("uninstall requires --host <supported-host> and explicit --scope project.");
@@ -16715,7 +15114,7 @@ async function run2(argv) {
     return;
   }
   if (command === "trust") {
-    const parsed = strictValueOptions(args2, "trust", ["--capture", "--policy-hash"]);
+    const parsed = strictValueOptions(args, "trust", ["--capture", "--policy-hash"]);
     if (parsed.positionals.length > 1) throw new TypeError("trust accepts at most one workspace path.");
     const target = parsed.positionals[0] || process2.cwd();
     const capture = parsed.values.get("--capture");
@@ -16728,10 +15127,10 @@ async function run2(argv) {
     return;
   }
   if (command === "policy") {
-    if (args2.length > 1 || args2.some((value) => value.startsWith("--"))) {
+    if (args.length > 1 || args.some((value) => value.startsWith("--"))) {
       throw new TypeError("policy accepts at most one workspace path and no options.");
     }
-    process2.stdout.write(`${JSON.stringify(await inspectWorkspacePolicy(args2[0] || process2.cwd()), null, 2)}
+    process2.stdout.write(`${JSON.stringify(await inspectWorkspacePolicy(args[0] || process2.cwd()), null, 2)}
 `);
     return;
   }
@@ -16742,23 +15141,23 @@ async function run2(argv) {
   }
   if (command === "record") {
     const request = await readStdinJsonRequest(
-      args2,
+      args,
       "record",
       RECORD_STDIN_JSON_MAX_BYTES,
       RECORD_STDIN_JSON_FIELDS
     );
     const input = request === null ? {
-      kind: option(args2, "--kind"),
-      title: option(args2, "--title"),
-      body: option(args2, "--body", ""),
-      actor: { type: option(args2, "--actor-type", "human"), id: option(args2, "--actor-id", "local-user") },
-      sessionId: option(args2, "--session", null),
-      turnId: option(args2, "--turn", null),
-      data: JSON.parse(option(args2, "--data-json", "{}")),
-      confidence: option(args2, "--confidence", "claimed"),
-      relations: parseRelations(args2),
-      provenance: { adapter: "qarinah-cli", sourceId: option(args2, "--source-id", null) },
-      retention: { class: option(args2, "--retention", "project"), expiresAt: null }
+      kind: option(args, "--kind"),
+      title: option(args, "--title"),
+      body: option(args, "--body", ""),
+      actor: { type: option(args, "--actor-type", "human"), id: option(args, "--actor-id", "local-user") },
+      sessionId: option(args, "--session", null),
+      turnId: option(args, "--turn", null),
+      data: JSON.parse(option(args, "--data-json", "{}")),
+      confidence: option(args, "--confidence", "claimed"),
+      relations: parseRelations(args),
+      provenance: { adapter: "qarinah-cli", sourceId: option(args, "--source-id", null) },
+      retention: { class: option(args, "--retention", "project"), expiresAt: null }
     } : stdinRecordInput(request);
     const event = await appendEvent(input);
     process2.stdout.write(`${JSON.stringify(event, null, 2)}
@@ -16766,19 +15165,19 @@ async function run2(argv) {
     return;
   }
   if (command === "hook") {
-    const adapter = positionals(args2)[0];
+    const adapter = positionals(args)[0];
     if (!["codex", "claude"].includes(adapter)) throw new TypeError("hook requires the codex or claude adapter.");
     const input = JSON.parse(await readStdin());
     const result = adapter === "codex" ? await captureCodexHook(input) : await captureClaudeHook(input);
-    if (!args2.includes("--quiet")) process2.stdout.write(`${JSON.stringify(result)}
+    if (!args.includes("--quiet")) process2.stdout.write(`${JSON.stringify(result)}
 `);
     return;
   }
   if (command === "mcp") {
     const valueOptions = /* @__PURE__ */ new Set(["--workspace-id", "--policy-hash", "--max-chars", "--max-items"]);
     const parsed = { allowQuery: false, values: /* @__PURE__ */ new Map() };
-    for (let index = 0; index < args2.length; index += 1) {
-      const value = args2[index];
+    for (let index = 0; index < args.length; index += 1) {
+      const value = args[index];
       if (value === "--allow-query") {
         if (parsed.allowQuery) throw new TypeError("mcp received --allow-query more than once.");
         parsed.allowQuery = true;
@@ -16786,8 +15185,8 @@ async function run2(argv) {
       }
       if (!valueOptions.has(value)) throw new TypeError(`mcp does not support ${value}.`);
       if (parsed.values.has(value)) throw new TypeError(`mcp received ${value} more than once.`);
-      if (index === args2.length - 1 || args2[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
-      parsed.values.set(value, args2[index + 1]);
+      if (index === args.length - 1 || args[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
+      parsed.values.set(value, args[index + 1]);
       index += 1;
     }
     const allowQuery = parsed.allowQuery;
@@ -16817,7 +15216,7 @@ async function run2(argv) {
     return;
   }
   if (command === "scan") {
-    const parsed = strictValueOptions(args2, "scan", ["--max-files", "--max-file-bytes", "--max-total-bytes", "--max-depth"]);
+    const parsed = strictValueOptions(args, "scan", ["--max-files", "--max-file-bytes", "--max-total-bytes", "--max-depth"]);
     if (parsed.positionals.length !== 0) throw new TypeError("scan accepts options only and always uses the trusted workspace root.");
     const integer5 = (name) => {
       const value = parsed.values.get(name);
@@ -16838,7 +15237,7 @@ async function run2(argv) {
     return;
   }
   if (command === "import") {
-    const parsed = strictValueOptions(args2, "import", ["--format", "--mode", "--max-bytes", "--max-files", "--max-records", "--max-line-bytes"]);
+    const parsed = strictValueOptions(args, "import", ["--format", "--mode", "--max-bytes", "--max-files", "--max-records", "--max-line-bytes"]);
     if (parsed.positionals.length !== 1) throw new TypeError("import requires exactly one archive file or directory.");
     const integer5 = (name) => {
       const value = parsed.values.get(name);
@@ -16860,7 +15259,7 @@ async function run2(argv) {
     return;
   }
   if (command === "backup") {
-    const parsed = strictValueOptions(args2, "backup", ["--destination", "--max-bytes", "--max-files"]);
+    const parsed = strictValueOptions(args, "backup", ["--destination", "--max-bytes", "--max-files"]);
     if (parsed.positionals.length === 0) throw new TypeError("backup requires at least one archive file or directory.");
     const destination = parsed.values.get("--destination");
     if (!destination) throw new TypeError("backup requires --destination <external-directory>.");
@@ -16884,7 +15283,7 @@ async function run2(argv) {
     return;
   }
   if (command === "archive") {
-    const [action, ...archiveArgs] = args2;
+    const [action, ...archiveArgs] = args;
     if (action === "create") {
       const parsed = strictValueOptions(archiveArgs, "archive create", ["--label", "--max-files", "--max-file-bytes", "--max-total-bytes"]);
       if (parsed.positionals.length !== 1) throw new TypeError("archive create requires exactly one workspace path.");
@@ -16957,7 +15356,7 @@ async function run2(argv) {
     throw new TypeError("archive requires create, list, verify, restore, delete, gc, or erase-key.");
   }
   if (command === "symbols") {
-    const [action, ...symbolArgs] = args2;
+    const [action, ...symbolArgs] = args;
     if (action === "build") {
       if (symbolArgs.length !== 0) throw new TypeError("symbols build accepts no arguments.");
       process2.stdout.write(`${JSON.stringify(await buildSymbolGraph({ cwd: process2.cwd() }), null, 2)}
@@ -16983,24 +15382,24 @@ async function run2(argv) {
     throw new TypeError("symbols requires build or query.");
   }
   if (command === "facts") {
-    const flags2 = /* @__PURE__ */ new Set(["--record"]);
+    const flags = /* @__PURE__ */ new Set(["--record"]);
     const values = /* @__PURE__ */ new Set(["--max-facts", "--max-chars", "--max-tokens", "--limit"]);
     const parsed = { positionals: [], flags: /* @__PURE__ */ new Set(), values: /* @__PURE__ */ new Map() };
-    for (let index = 0; index < args2.length; index += 1) {
-      const value = args2[index];
+    for (let index = 0; index < args.length; index += 1) {
+      const value = args[index];
       if (!value.startsWith("--")) {
         parsed.positionals.push(value);
         continue;
       }
-      if (flags2.has(value)) {
+      if (flags.has(value)) {
         if (parsed.flags.has(value)) throw new TypeError(`facts received ${value} more than once.`);
         parsed.flags.add(value);
         continue;
       }
       if (!values.has(value)) throw new TypeError(`facts does not support ${value}.`);
       if (parsed.values.has(value)) throw new TypeError(`facts received ${value} more than once.`);
-      if (index === args2.length - 1 || args2[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
-      parsed.values.set(value, args2[index + 1]);
+      if (index === args.length - 1 || args[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
+      parsed.values.set(value, args[index + 1]);
       index += 1;
     }
     if (parsed.positionals.length > 1) throw new TypeError("facts accepts at most one query string.");
@@ -17025,20 +15424,20 @@ async function run2(argv) {
     return;
   }
   if (command === "watch") {
-    const flags2 = /* @__PURE__ */ new Set(["--once", "--no-compact", "--no-symbols", "--no-rebuild"]);
+    const flags = /* @__PURE__ */ new Set(["--once", "--no-compact", "--no-symbols", "--no-rebuild"]);
     const values = /* @__PURE__ */ new Set(["--interval-ms", "--query"]);
     const parsed = { flags: /* @__PURE__ */ new Set(), values: /* @__PURE__ */ new Map() };
-    for (let index = 0; index < args2.length; index += 1) {
-      const value = args2[index];
-      if (flags2.has(value)) {
+    for (let index = 0; index < args.length; index += 1) {
+      const value = args[index];
+      if (flags.has(value)) {
         if (parsed.flags.has(value)) throw new TypeError(`watch received ${value} more than once.`);
         parsed.flags.add(value);
         continue;
       }
       if (!values.has(value)) throw new TypeError(`watch does not support ${value}.`);
       if (parsed.values.has(value)) throw new TypeError(`watch received ${value} more than once.`);
-      if (index === args2.length - 1 || args2[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
-      parsed.values.set(value, args2[index + 1]);
+      if (index === args.length - 1 || args[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
+      parsed.values.set(value, args[index + 1]);
       index += 1;
     }
     const interval = parsed.values.get("--interval-ms");
@@ -17058,9 +15457,9 @@ async function run2(argv) {
       return;
     }
     const controller = new AbortController();
-    const stop2 = () => controller.abort();
-    process2.once("SIGINT", stop2);
-    process2.once("SIGTERM", stop2);
+    const stop = () => controller.abort();
+    process2.once("SIGINT", stop);
+    process2.once("SIGTERM", stop);
     const watcher = createProjectMemoryWatcher({
       ...options,
       intervalMs: interval === void 0 ? void 0 : Number(interval),
@@ -17079,13 +15478,13 @@ async function run2(argv) {
     } catch (error) {
       if (!controller.signal.aborted) throw error;
     } finally {
-      process2.removeListener("SIGINT", stop2);
-      process2.removeListener("SIGTERM", stop2);
+      process2.removeListener("SIGINT", stop);
+      process2.removeListener("SIGTERM", stop);
     }
     return;
   }
   if (command === "overview") {
-    const parsed = strictValueOptions(args2, "overview", ["--format"]);
+    const parsed = strictValueOptions(args, "overview", ["--format"]);
     if (parsed.positionals.length !== 0) throw new TypeError("overview accepts options only.");
     const format = parsed.values.get("--format") ?? "markdown";
     if (!["json", "markdown"].includes(format)) throw new TypeError("overview --format must be json or markdown.");
@@ -17095,7 +15494,7 @@ async function run2(argv) {
     return;
   }
   if (command === "footprint") {
-    const parsed = strictValueOptions(args2, "footprint", ["--baseline-tokens", "--rate-per-million", "--max-chars", "--max-tokens"]);
+    const parsed = strictValueOptions(args, "footprint", ["--baseline-tokens", "--rate-per-million", "--max-chars", "--max-tokens"]);
     const integer5 = (name) => {
       const value = parsed.values.get(name);
       if (value === void 0) return void 0;
@@ -17120,24 +15519,24 @@ async function run2(argv) {
     return;
   }
   if (command === "receipts") {
-    const flags2 = /* @__PURE__ */ new Set(["--write"]);
+    const flags = /* @__PURE__ */ new Set(["--write"]);
     const values = /* @__PURE__ */ new Set(["--session", "--max-chars", "--max-tokens", "--limit"]);
     const parsed = { positionals: [], flags: /* @__PURE__ */ new Set(), values: /* @__PURE__ */ new Map() };
-    for (let index = 0; index < args2.length; index += 1) {
-      const value = args2[index];
+    for (let index = 0; index < args.length; index += 1) {
+      const value = args[index];
       if (!value.startsWith("--")) {
         parsed.positionals.push(value);
         continue;
       }
-      if (flags2.has(value)) {
+      if (flags.has(value)) {
         if (parsed.flags.has(value)) throw new TypeError(`receipts received ${value} more than once.`);
         parsed.flags.add(value);
         continue;
       }
       if (!values.has(value)) throw new TypeError(`receipts does not support ${value}.`);
       if (parsed.values.has(value)) throw new TypeError(`receipts received ${value} more than once.`);
-      if (index === args2.length - 1 || args2[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
-      parsed.values.set(value, args2[index + 1]);
+      if (index === args.length - 1 || args[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
+      parsed.values.set(value, args[index + 1]);
       index += 1;
     }
     const bounded = (name, minimum, maximum) => {
@@ -17165,8 +15564,8 @@ async function run2(argv) {
     let currentOnly = false;
     let limit;
     const query = [];
-    for (let index = 0; index < args2.length; index += 1) {
-      const value = args2[index];
+    for (let index = 0; index < args.length; index += 1) {
+      const value = args[index];
       if (value === "--current-only") {
         if (currentOnly) throw new TypeError("panel received --current-only more than once.");
         currentOnly = true;
@@ -17174,7 +15573,7 @@ async function run2(argv) {
       }
       if (value === "--limit") {
         if (limit !== void 0) throw new TypeError("panel received --limit more than once.");
-        const selected3 = args2[index + 1];
+        const selected3 = args[index + 1];
         if (!selected3 || !/^[0-9]+$/u.test(selected3) || Number(selected3) < 1 || Number(selected3) > 100) {
           throw new TypeError("--limit must be an integer from 1 to 100.");
         }
@@ -17195,10 +15594,10 @@ async function run2(argv) {
     return;
   }
   if (command === "export") {
-    if (args2[0] !== "okf" || ![1, 3].includes(args2.length) || args2.length === 3 && (args2[1] !== "--output" || args2[2].startsWith("--"))) {
+    if (args[0] !== "okf" || ![1, 3].includes(args.length) || args.length === 3 && (args[1] !== "--output" || args[2].startsWith("--"))) {
       throw new TypeError("export requires `okf` followed by an optional --output <path>.");
     }
-    const output = args2.length === 3 ? args2[2] : void 0;
+    const output = args.length === 3 ? args[2] : void 0;
     process2.stdout.write(`${JSON.stringify(await exportOkf({ cwd: process2.cwd(), output }), null, 2)}
 `);
     return;
@@ -17211,23 +15610,23 @@ async function run2(argv) {
   }
   if (command === "query" || command === "context") {
     const request = await readStdinJsonRequest(
-      args2,
+      args,
       "query",
       QUERY_STDIN_JSON_MAX_BYTES,
       QUERY_STDIN_JSON_FIELDS
     );
     const input = request === null ? {
-      query: positionals(args2).join(" "),
-      format: option(args2, "--format", "json"),
-      limit: integerOption(args2, "--limit", 20),
-      maxChars: integerOption(args2, "--max-chars", void 0),
-      maxTokens: integerOption(args2, "--max-tokens", void 0),
-      reserveTokens: integerOption(args2, "--reserve-tokens", void 0),
-      asOf: option(args2, "--as-of", void 0),
-      minimumCoverage: option(args2, "--minimum-coverage", "any"),
-      minimumEvidence: option(args2, "--minimum-evidence", "any"),
-      rankingProfile: option(args2, "--ranking-profile", "admission-first-v2"),
-      temporalBoundary: option(args2, "--temporal-boundary", "inclusive")
+      query: positionals(args).join(" "),
+      format: option(args, "--format", "json"),
+      limit: integerOption(args, "--limit", 20),
+      maxChars: integerOption(args, "--max-chars", void 0),
+      maxTokens: integerOption(args, "--max-tokens", void 0),
+      reserveTokens: integerOption(args, "--reserve-tokens", void 0),
+      asOf: option(args, "--as-of", void 0),
+      minimumCoverage: option(args, "--minimum-coverage", "any"),
+      minimumEvidence: option(args, "--minimum-evidence", "any"),
+      rankingProfile: option(args, "--ranking-profile", "admission-first-v2"),
+      temporalBoundary: option(args, "--temporal-boundary", "inclusive")
     } : stdinQueryInput(request);
     const pack = await compileContext(input.query, {
       cwd: process2.cwd(),
@@ -17255,34 +15654,34 @@ async function run2(argv) {
     return;
   }
   if (command === "task-pack") {
-    const values = positionals(args2);
+    const values = positionals(args);
     const task = values[0];
     if (!task) throw new TypeError("task-pack requires a task name.");
-    if (args2.some((value) => value.startsWith("--"))) throw new TypeError("task-pack accepts a task name and optional query text only.");
+    if (args.some((value) => value.startsWith("--"))) throw new TypeError("task-pack accepts a task name and optional query text only.");
     const pack = await compileTaskMemoryPack(task, values.slice(1).join(" "), { cwd: process2.cwd() });
     process2.stdout.write(`${JSON.stringify(pack, null, 2)}
 `);
     return;
   }
   if (command === "harness") {
-    const flags2 = /* @__PURE__ */ new Set(["--worktrees", "--record", "--no-rebuild", "--quiet"]);
+    const flags = /* @__PURE__ */ new Set(["--worktrees", "--record", "--no-rebuild", "--quiet"]);
     const values = /* @__PURE__ */ new Set(["--format", "--max-chars", "--max-tokens", "--reserve-tokens", "--limit", "--max-summary-chars"]);
     const parsed = { positionals: [], flags: /* @__PURE__ */ new Set(), values: /* @__PURE__ */ new Map() };
-    for (let index = 0; index < args2.length; index += 1) {
-      const value = args2[index];
+    for (let index = 0; index < args.length; index += 1) {
+      const value = args[index];
       if (!value.startsWith("--")) {
         parsed.positionals.push(value);
         continue;
       }
-      if (flags2.has(value)) {
+      if (flags.has(value)) {
         if (parsed.flags.has(value)) throw new TypeError(`harness received ${value} more than once.`);
         parsed.flags.add(value);
         continue;
       }
       if (!values.has(value)) throw new TypeError(`harness does not support ${value}.`);
       if (parsed.values.has(value)) throw new TypeError(`harness received ${value} more than once.`);
-      if (index === args2.length - 1 || args2[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
-      parsed.values.set(value, args2[index + 1]);
+      if (index === args.length - 1 || args[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
+      parsed.values.set(value, args[index + 1]);
       index += 1;
     }
     const boundedInteger6 = (name, minimum, maximum) => {
@@ -17314,7 +15713,7 @@ async function run2(argv) {
     return;
   }
   if (command === "map") {
-    const parsed = strictValueOptions(args2, "map", ["--limit", "--type", "--repository", "--scope", "--as-of"]);
+    const parsed = strictValueOptions(args, "map", ["--limit", "--type", "--repository", "--scope", "--as-of"]);
     const limitText = parsed.values.get("--limit");
     if (limitText !== void 0 && (!/^[0-9]+$/u.test(limitText) || Number(limitText) < 1 || Number(limitText) > 100)) {
       throw new TypeError("--limit must be an integer from 1 to 100.");
@@ -17335,13 +15734,13 @@ async function run2(argv) {
     return;
   }
   if (command === "freshness") {
-    if (args2.length !== 0) throw new TypeError("freshness accepts no arguments.");
+    if (args.length !== 0) throw new TypeError("freshness accepts no arguments.");
     process2.stdout.write(`${JSON.stringify(await inspectMemoryFreshness({ cwd: process2.cwd() }), null, 2)}
 `);
     return;
   }
   if (command === "worktrees") {
-    if (args2.length !== 0) throw new TypeError("worktrees accepts no arguments.");
+    if (args.length !== 0) throw new TypeError("worktrees accepts no arguments.");
     const worktrees = await listGitWorktrees(process2.cwd());
     process2.stdout.write(`${JSON.stringify({
       ok: true,
@@ -17353,7 +15752,7 @@ async function run2(argv) {
     return;
   }
   if (command === "dashboard") {
-    const parsed = dashboardOptions(args2);
+    const parsed = dashboardOptions(args);
     const usage = (name) => {
       const value = parsed.values.get(name);
       if (value === void 0) return void 0;
@@ -17431,7 +15830,7 @@ async function run2(argv) {
 
 ${help()}`);
 }
-run2(process2.argv.slice(2)).catch((error) => {
+run(process2.argv.slice(2)).catch((error) => {
   const payload = {
     ok: false,
     code: error instanceof QarinahError ? error.code : "QARINAH_ERROR",
