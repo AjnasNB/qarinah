@@ -7,9 +7,9 @@ It makes no network request and does not read the ledger directly. It invokes th
 Install Qarinah in the project or on `PATH`, initialize the project, then install the packaged VSIX:
 
 ```sh
-npm install --save-dev qarinah@0.4.0
+npm install --save-dev qarinah@next
 npx qarinah setup . --cursor --auto-compact
-code --install-extension qarinah-developer-memory-0.4.0.vsix
+code --install-extension qarinah-developer-memory-0.5.0-rc.1.vsix
 ```
 
 Cursor accepts the same VSIX through its Extensions view or compatible command-line installer.

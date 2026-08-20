@@ -87,7 +87,7 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 - [Troubleshooting](https://qarinah.io/docs/troubleshooting/): Diagnose trust, capture, rebuild, query, MCP, and host-integration failures.
 - [FAQ](https://qarinah.io/docs/faq/): Direct answers about storage, privacy, context reduction, hosts, and operating boundaries.
 - [Migration guide](https://qarinah.io/docs/migrations/): Upgrade persisted Qarinah workspaces safely.
-- [Technical white paper](https://qarinah.io/paper/): Implementation-backed paper version 1.6 for Qarinah 0.4.0. Version 1.6 has no version DOI until separately deposited; the persistent paper-series DOI is 10.5281/zenodo.21547684 and published v1.4 remains historical.
+- [Technical white paper](https://qarinah.io/paper/): Implementation-backed paper version 1.7 for Qarinah 0.5.0-rc.1. Version 1.7 has no version DOI until separately deposited; the persistent paper-series DOI is 10.5281/zenodo.21547684 and published v1.4 remains historical.
 
 ## Publication and support
 

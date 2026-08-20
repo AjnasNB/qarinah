@@ -559,24 +559,24 @@ The repository also runs `npm run mcp:smoke` against the exact bundled Codex and
 
 ### Install once, initialize each project
 
-Install the reviewed `v0.4.0` plugin once in each host after that release is published:
+Install the reviewed `v0.5.0-rc.1` plugin once in each host after the release candidate is published:
 
 ```sh
 # Codex: personal installation, available to opted-in projects.
-codex plugin marketplace add AjnasNB/qarinah --ref v0.4.0
+codex plugin marketplace add AjnasNB/qarinah --ref v0.5.0-rc.1
 codex plugin add qarinah@qarinah
 
 # Claude Code: personal installation across projects.
-claude plugin marketplace add AjnasNB/qarinah@v0.4.0 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.5.0-rc.1 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 
 Then opt in from the root of each project that should retain context:
 
 ```sh
-npx -y qarinah@latest init . --capture content
-npx -y qarinah@latest scan
-npx -y qarinah@latest doctor
+npx -y qarinah@next init . --capture content
+npx -y qarinah@next scan
+npx -y qarinah@next doctor
 ```
 
 Use `--capture metadata` when event bodies should not be retained. Content mode records only bounded, redacted fields exposed by supported hooks; it does not parse hidden transcripts or reasoning. At the start of a later task, ask the installed Qarinah context skill for direct evidence related to the task, or run a bounded query:

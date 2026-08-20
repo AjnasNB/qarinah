@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { copyFile, mkdtemp, readFile, rm } from "node:fs/promises";
+import { builtinModules } from "node:module";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -8,6 +9,7 @@ import { build } from "esbuild";
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const packageJson = JSON.parse(await readFile(path.join(repositoryRoot, "package.json"), "utf8"));
 const versionSource = await readFile(path.join(repositoryRoot, "src", "version.js"), "utf8");
+const builtinSpecifiers = new Set(builtinModules.flatMap((specifier) => [specifier, `node:${specifier}`]));
 assert.match(versionSource, new RegExp(`QARINAH_VERSION\\s*=\\s*[\"']${packageJson.version.replaceAll(".", "\\.")}[\"']`), "Runtime and package versions must match.");
 
 const plugins = [
@@ -51,7 +53,7 @@ try {
       .flatMap((output) => output.imports)
       .filter((entry) => entry.external)
       .map((entry) => entry.path)
-      .filter((specifier) => !specifier.startsWith("node:"));
+      .filter((specifier) => !builtinSpecifiers.has(specifier));
     assert.deepEqual(unsafeExternal, [], `${plugin.name} bundle has non-Node external imports: ${unsafeExternal.join(", ")}`);
     const generated = await readFile(outputFile);
     assert.equal(generated.includes(Buffer.from(repositoryRoot)), false, `${plugin.name} bundle contains an absolute repository path.`);

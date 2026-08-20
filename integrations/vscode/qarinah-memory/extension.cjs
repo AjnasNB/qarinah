@@ -93,7 +93,7 @@ class DeveloperMemoryProvider {
     try {
       this.view.webview.html = render(this.view.webview, await readPanel(root))
     } catch (error) {
-      this.view.webview.html = renderMessage(this.view.webview, "Developer memory unavailable", `${error.message} Install Qarinah 0.4.0, then run: npx qarinah setup . --cursor --auto-compact`)
+      this.view.webview.html = renderMessage(this.view.webview, "Developer memory unavailable", `${error.message} Install qarinah@next, then run: npx qarinah setup . --cursor --auto-compact`)
     }
   }
 }

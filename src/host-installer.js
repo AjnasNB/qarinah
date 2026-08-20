@@ -55,7 +55,7 @@ function assertHost(host) {
 }
 
 function assertScope(scope) {
-  if (scope !== "project") throw new TypeError("Only the explicit project scope is supported in Qarinah 0.4.0.");
+  if (scope !== "project") throw new TypeError(`Only the explicit project scope is supported in Qarinah ${QARINAH_VERSION}.`);
   return scope;
 }
 

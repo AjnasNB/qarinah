@@ -31,7 +31,7 @@ npx qarinah setup . --capture content --allow-query
 ## Install
 
 ```sh
-npm install --save-dev qarinah
+npm install --save-dev qarinah@next
 ```
 
 Qarinah has no hosted memory service, embedding bill, vector database, or Qarinah API key.
