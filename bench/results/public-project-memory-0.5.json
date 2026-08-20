@@ -10,20 +10,20 @@
     "timingClaimed": false,
     "sourceManifest": {
       "fileCount": 87,
-      "bytes": 1065083,
-      "manifestHash": "sha256:27b2197d484a1b7fa5bcb65427b547a38aee8ba157a11bc8f22c942392b49906"
+      "bytes": 1066277,
+      "manifestHash": "sha256:116eed88312c7398401a834ffa5f1f815af585d136edf5f78acbb6a541894ce3"
     },
     "evaluatorSha256": "sha256:6338f2bd85e2acfb8531014a86a9966b34b34d577722bada3a82ca95caafb736"
   },
   "implementation": {
     "package": "qarinah",
-    "version": "0.4.0",
+    "version": "0.5.0-rc.1",
     "symbolGraph": "qarinah.symbol-graph.v2",
     "sessionReceipt": "qarinah.session-context-receipt.v2"
   },
   "observed": {
-    "projectFiles": 379,
-    "projectDirectories": 52,
+    "projectFiles": 385,
+    "projectDirectories": 54,
     "supportedSymbolLanguages": [
       "c",
       "cpp",
@@ -41,10 +41,10 @@
       "python",
       "typescript"
     ],
-    "eligibleSymbolFiles": 179,
-    "indexedSymbolFiles": 179,
-    "declarations": 46320,
-    "references": 97688,
+    "eligibleSymbolFiles": 181,
+    "indexedSymbolFiles": 181,
+    "declarations": 46395,
+    "references": 98184,
     "definitions": [
       {
         "query": "appendEvent",
@@ -130,5 +130,5 @@
     "No provider model, learned embedding service, wall-clock performance, billing, or private agent history is measured.",
     "A passing result proves these exact structural scenarios, not universal task success or semantic correctness."
   ],
-  "manifestHash": "sha256:000879409b043df06ba1d27a58dd0f2cc7f94ed1e551d19b537ae03536009de6"
+  "manifestHash": "sha256:f98c7e7c7d089e2da892d1b1016d4cdb87c1e1d5261a194b03ba6964b089ac44"
 }

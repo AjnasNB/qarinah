@@ -1,5 +1,22 @@
 # Migrations
 
+## 0.4.0 to 0.5.0-rc.1: proof-carrying multi-language memory
+
+The release candidate preserves the authoritative `qarinah.event.v1` ledger and upgrades only disposable, rebuildable projections. It adds `qarinah.symbol-graph.v2`, `qarinah.session-context-receipt.v2`, `qarinah.session-context-receipt-index.v2`, `qarinah.project-memory-cycle.v2`, and the atomic `qarinah.project-memory-cycle-state.v1` recovery journal.
+
+Install the prerelease from the `next` channel, then rebuild the current checkout:
+
+```sh
+npm install --save-dev qarinah@next
+npx qarinah scan
+npx qarinah symbols build
+npx qarinah build
+npx qarinah receipts "current task" --write
+npx qarinah dashboard --serve --worktrees
+```
+
+The v2 symbol graph covers ten language families through pinned parser assets. Existing v1 symbol graphs and v1 session or cycle receipts remain historical disposable artifacts; Qarinah does not rewrite the event log. Each Git worktree remains a separate initialized workspace. Self-hosted team sync is opt-in and starts no listener during installation, initialization, query, or dashboard generation.
+
 ## 0.3.0 to 0.4.0: visible developer memory
 
 Version 0.4.0 does not change the authoritative `qarinah.event.v1` ledger. It adds disposable session receipts, developer-memory views, host-install manifests, editor packaging, and a real-worktree acceptance artifact. Existing initialized workspaces remain readable.

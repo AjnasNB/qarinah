@@ -371,7 +371,7 @@ if (!home.includes("Verifiable project memory, exact source recovery, and cited 
   errors.push("Homepage is missing the worktree-aware category or the separate historical benchmark scope.");
 }
 if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
-  || publicMetrics.productVersion !== "0.4.0"
+  || publicMetrics.productVersion !== "0.5.0-rc.1"
   || publicMetrics.updatedAt !== "2026-08-20"
   || publicMetrics.providerBillingMeasurement !== false
   || publicMetrics.metrics?.realGitWorktreeContinuity?.scenarios !== 16

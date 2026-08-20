@@ -1,7 +1,7 @@
 {
   "name": "qarinah",
-  "version": "0.4.0",
-  "description": "Visible, worktree-aware project memory with cited context graphs, session receipts, and incremental compaction for coding agents.",
+  "version": "0.5.0-rc.1",
+  "description": "Proof-carrying project memory with multi-language graphs, session receipts, recovery, and cited context for coding agents.",
   "license": "Apache-2.0",
   "author": "Ajnas NB",
   "mcpName": "io.github.AjnasNB/qarinah",
@@ -301,7 +301,7 @@
   "publishConfig": {
     "access": "public",
     "provenance": true,
-    "tag": "latest"
+    "tag": "next"
   },
   "keywords": [
     "agent-context",
