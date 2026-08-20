@@ -6,7 +6,6 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const output = path.join(root, "site-dist");
 const required = [
   "index.html",
-  "alternatives/index.html",
   "articles/git-worktree-context-for-coding-agents/index.html",
   "articles/open-source-agent-memory-stack/index.html",
   "docs/index.html",
@@ -255,9 +254,6 @@ for (const route of availableRoutes) {
     errors.push(`search-index.json is missing ${route}`);
   }
 }
-if (!indexedRoutes.has("/alternatives/")) {
-  errors.push("search-index.json is missing /alternatives/");
-}
 if (!indexedRoutes.has("/articles/open-source-agent-memory-stack/")) {
   errors.push("search-index.json is missing /articles/open-source-agent-memory-stack/");
 }
@@ -283,7 +279,6 @@ for (const canonicalResource of [
   "https://qarinah.io/docs/faq/",
   "https://qarinah.io/docs/public-metrics/",
   "https://qarinah.io/metrics.json",
-  "https://qarinah.io/alternatives/",
   "https://qarinah.io/articles/git-worktree-context-for-coding-agents/",
   "https://qarinah.io/articles/open-source-agent-memory-stack/",
   "https://www.npmjs.com/package/qarinah",
@@ -294,7 +289,6 @@ for (const canonicalResource of [
 }
 
 const home = await readFile(path.join(output, "index.html"), "utf8");
-const alternatives = await readFile(path.join(output, "alternatives", "index.html"), "utf8");
 const worktreeArticle = await readFile(path.join(output, "articles", "git-worktree-context-for-coding-agents", "index.html"), "utf8");
 const toolkit = await readFile(path.join(output, "articles", "open-source-agent-memory-stack", "index.html"), "utf8");
 const paper = await readFile(path.join(output, "paper", "index.html"), "utf8");
@@ -465,31 +459,6 @@ for (const imageOrigin of ["https://api.producthunt.com", "https://launchnest.io
   if (!headerPolicy.includes(imageOrigin)) {
     errors.push(`Site image policy is missing launch-directory origin ${imageOrigin}`);
   }
-}
-for (const requiredAlternative of [
-  "Qarinah alternatives and coding-agent memory comparison",
-  "Application personalization memory",
-  "Letta",
-  "LangMem and LangGraph memory",
-  "General temporal knowledge graph",
-  "GitHub Copilot Memory",
-  "Claude Code memory",
-  "Cursor Memories",
-  "One category choice, not a universal winner",
-  "It is not a performance ranking"
-]) {
-  if (!alternatives.includes(requiredAlternative)) {
-    errors.push(`Alternatives page is missing ${requiredAlternative}`);
-  }
-}
-if (!alternatives.includes('"@type":"ItemList"')
-  || !alternatives.includes('"itemListOrder":"https://schema.org/ItemListUnordered"')
-  || !alternatives.includes('"@type":"FAQPage"')) {
-  errors.push("Alternatives page is missing unordered comparison or answer-oriented structured data.");
-}
-const alternativesClaimCopy = alternatives.replaceAll("Is Qarinah better than every adjacent memory category?", "");
-if (/Qarinah is (?:the )?(?:best|only)|Qarinah (?:is )?better than|Qarinah outperforms?/iu.test(alternativesClaimCopy)) {
-  errors.push("Alternatives page contains an unsupported superiority term.");
 }
 for (const requiredToolkitCopy of [
   "Give agents memory, web reach, and a browser.",

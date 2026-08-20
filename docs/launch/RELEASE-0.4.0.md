@@ -12,7 +12,7 @@ Qarinah 0.4.0 makes coding-agent project memory visible, searchable, and worktre
 - incremental automatic compaction with initial, unchanged, delta, and rebuild receipts;
 - reversible project-scoped installation for Codex, Claude Code, Cursor, Kimi, Antigravity, and Freebuff;
 - a 16/16 real-Git-worktree acceptance evaluation; and
-- technical white paper v1.5 plus a current market comparison and explicit gap ledger.
+- technical white paper v1.5 plus an explicit, evidence-scoped limitations ledger.
 
 ## Strongest release result
 
@@ -44,7 +44,7 @@ The release supports Node.js 22, 24, and 26. Codex and Claude Code have reviewed
 
 ## Known gaps
 
-Qarinah 0.4.0 does not ship a managed cross-device memory cloud, OS-wide passive activity capture, a default embedding service, a Tree-sitter/LSP-scale symbol graph, automatic LLM fact extraction, or a matched independent benchmark against another memory product. These are documented in the current market comparison rather than hidden behind a parity claim.
+Qarinah 0.4.0 does not ship a managed cross-device memory cloud, OS-wide passive activity capture, a default embedding service, a Tree-sitter/LSP-scale symbol graph, automatic LLM fact extraction, or a matched independent benchmark against another memory product. The release notes state these limits directly rather than hiding them behind a parity claim.
 
 ## Release discipline
 

@@ -1014,7 +1014,7 @@ The author gratefully acknowledges Shahin Ahammed, Qarinah's non-technical cofou
 | Host integrations | [HOST-INTEGRATIONS.md](HOST-INTEGRATIONS.md) |
 | Real-worktree continuity result | [`worktree-continuity-v0.4.0.json`](../bench/results/worktree-continuity-v0.4.0.json) |
 | Linked project memory | [LINKED-PROJECT-MEMORY.md](LINKED-PROJECT-MEMORY.md) |
-| Current market comparison and gaps | [MARKET-COMPARISON-2026.md](MARKET-COMPARISON-2026.md) |
+| Current release limits and roadmap | [ROADMAP.md](ROADMAP.md) |
 | Maqam, crawler, ProductLoop, and OKF boundaries | [INTEROPERABILITY.md](INTEROPERABILITY.md) |
 | Migration notes | [MIGRATIONS.md](MIGRATIONS.md) |
 | Release gates | [LAUNCH.md](LAUNCH.md) |

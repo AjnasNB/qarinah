@@ -15,7 +15,6 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 - [Machine-readable public metrics](https://qarinah.io/metrics.json): Exact release numbers, evidence source, estimator, and claim boundaries.
 - [Verified cross-agent handoffs](https://qarinah.io/docs/cross-agent-handoffs/): Switch coding agents and continue a real task with compact, cited project context.
 - [Direct answers](https://qarinah.io/docs/faq/): Concise answers about Qarinah, context reduction, cost boundaries, Codex, Claude Code, privacy, and open-source licensing.
-- [Qarinah alternatives](https://qarinah.io/alternatives/): Product-boundary comparison across personalization, stateful-agent, programmable-memory, temporal-graph, and native coding-host approaches.
 - [Open-source agent memory stack](https://qarinah.io/articles/open-source-agent-memory-stack/): How Qarinah, Cockroach Browser, and Cockroach Crawler compose for agent memory, web discovery, and interactive work, with Maqam as an optional approval add-on.
 - [Getting started](https://qarinah.io/docs/getting-started/): Install Qarinah, opt in one workspace, connect a supported host, and compile a cited context pack.
 - [Features](https://qarinah.io/docs/features/): Complete product capability map for project-owned memory, cited retrieval, integrations, dashboards, team memory, portability, and boundaries.
@@ -35,7 +34,6 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 - Qarinah is a worktree-aware context system for software projects and an independent local tool; Maqam is an optional approval integration.
 - Each initialized Git worktree receives its own workspace ID, worktree ID, ledger, derived SQLite state, graph, and cited context packs. Related worktrees share a repository ID and can be inspected together without merging their records.
 - Qarinah is a local, evidence-linked project-memory compiler for coding agents. It is not a complete autonomous-agent runtime or a general personalization service.
-- The alternatives guide is a representative category comparison, not a performance ranking or a claim that Qarinah is universally better than adjacent products.
 - Qarinah, Maqam, Cockroach Browser, and Cockroach Crawler are separate projects by Ajnas N B. The ecosystem guide distinguishes them from third-party tools maintained by their own projects.
 - Cockroach Browser uses Playwright. Cockroach Crawler discloses Trafilatura as the optional quality dependency. The ecosystem guide does not claim that those established projects were created by Qarinah's author.
 - Qarinah's primary workflow is verified handoffs between coding agents.

@@ -53,7 +53,7 @@ The 0.4.0 evaluator creates **three actual Git worktree checkouts** and passes *
 npm run check:worktree-continuity
 ```
 
-Inspect the [machine-readable result](bench/results/worktree-continuity-v0.4.0.json), [evaluator](scripts/evaluate-worktree-continuity.mjs), and [current market comparison](docs/MARKET-COMPARISON-2026.md). This is product-acceptance evidence, not an external comparative benchmark.
+Inspect the [machine-readable result](bench/results/worktree-continuity-v0.4.0.json) and [evaluator](scripts/evaluate-worktree-continuity.mjs). This is product-acceptance evidence, not an external comparative benchmark.
 
 <p align="center">
   <img src="assets/launch/qarinah-worktree-context-graph.png" width="100%" alt="Qarinah local developer-memory graph showing one worktree, its files, memories, concepts, relationships, ranked results, and selected evidence hash.">
@@ -73,7 +73,6 @@ The historical six-fixture estimator reports 442,113 portable estimated full-his
   <a href="https://qarinah.io/docs/"><strong>Documentation</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://qarinah.io/docs/public-metrics/"><strong>Public metrics</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://qarinah.io/paper/"><strong>White paper</strong></a>&nbsp;&middot;&nbsp;
-  <a href="https://qarinah.io/docs/market-comparison/"><strong>Market comparison</strong></a>&nbsp;&middot;&nbsp;
   <a href="docs/RESEARCH-BENCHMARK.md"><strong>Research benchmark</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://doi.org/10.5281/zenodo.21547684"><strong>Paper series DOI</strong></a>
 </p>

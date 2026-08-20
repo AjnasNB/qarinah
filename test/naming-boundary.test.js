@@ -2,28 +2,19 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import test from "node:test";
 
-test("competitor names remain confined to the explicit comparison surface", () => {
+test("competitor comparison names remain absent from public product surfaces", () => {
   const comparedSystems = [
     ["me", "m", "0"].join(""),
     ["gr", "aphi", "ti"].join(""),
     ["get", "zep"].join(""),
     ["ai", "der"].join("")
   ];
-  const allowedPaths = new Set([
-    "docs/MARKET-COMPARISON-2026.md",
-    "scripts/build-site.mjs"
-  ]);
   for (const value of comparedSystems) {
     const result = spawnSync("git", ["grep", "-I", "-n", "-i", "--fixed-strings", value, "--", "."], {
       cwd: new URL("..", import.meta.url),
       encoding: "utf8"
     });
-    assert.equal(result.status, 0, result.stderr || `Missing comparison reference: ${value}`);
-    const paths = result.stdout.trim().split(/\r?\n/u).map((line) => line.split(":", 1)[0]);
-    assert.ok(paths.length > 0, `Missing comparison reference: ${value}`);
-    for (const relativePath of paths) {
-      assert.ok(allowedPaths.has(relativePath), `Unexpected product-copy reference to ${value}: ${relativePath}`);
-    }
+    assert.equal(result.status, 1, result.stdout || result.stderr || `Unexpected public comparison reference: ${value}`);
   }
 });
 
