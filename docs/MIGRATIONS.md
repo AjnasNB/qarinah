@@ -58,7 +58,7 @@ Qarinah graph schema `qarinah.graph.v2` keeps every v1 event node and relation e
 
 The event chain is unchanged. Run `qarinah build` to regenerate `graph/graph.json`, `index/index.json`, and `records/CONTEXT.md` from the verified log. A project structure does not appear until a trusted user explicitly runs `qarinah scan`.
 
-`qarinah scan` does not claim compiler or language-server equivalence. Version 1 records a bounded filesystem snapshot and conservative ECMAScript/TypeScript module and Markdown-link observations with exact source spans. Deeper AST symbol extraction remains separately versioned work.
+`qarinah scan` remains the bounded filesystem and conservative module/link observation layer. Qarinah 0.4.0 adds a separate additive `qarinah.symbol-graph.v1` projection for JavaScript, JSX, TypeScript, and TSX, built only after the latest scan hash is verified. Run `qarinah symbols build` or the explicit `qarinah watch` loop to create it. The `qarinah-lsp` process reads that projection for workspace definitions and references. Unsupported languages remain explicit coverage gaps; no ledger migration is required.
 
 ## Linked project memory v1
 

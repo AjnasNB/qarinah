@@ -12,30 +12,43 @@ const conceptDoi = "https://doi.org/10.5281/zenodo.21547684";
 const doi = conceptDoi;
 const publishedV14Doi = "https://doi.org/10.5281/zenodo.21850747";
 const historicalVersionDoi = "https://doi.org/10.5281/zenodo.21843240";
-const paperVersion = "1.5";
+const paperVersion = "1.6";
 const paperPdf = `/paper/Qarinah-Technical-White-Paper-v${paperVersion}.pdf`;
 const historicalPaperPdfs = new Map([
   ["Qarinah-Technical-White-Paper-v1.2.pdf", "/paper/Qarinah-Technical-White-Paper-v1.2.pdf"],
   ["Qarinah-Technical-White-Paper-v1.3.pdf", "/paper/Qarinah-Technical-White-Paper-v1.3.pdf"],
-  ["Qarinah-Technical-White-Paper-v1.4.pdf", "/paper/Qarinah-Technical-White-Paper-v1.4.pdf"]
+  ["Qarinah-Technical-White-Paper-v1.4.pdf", "/paper/Qarinah-Technical-White-Paper-v1.4.pdf"],
+  ["Qarinah-Technical-White-Paper-v1.5.pdf", "/paper/Qarinah-Technical-White-Paper-v1.5.pdf"]
 ]);
 const releaseDate = "2026-08-19";
-const paperPublishedDate = "2026-08-19";
-const publicMetricsUpdatedDate = "2026-08-19";
+const paperPublishedDate = "2026-08-20";
+const publicMetricsUpdatedDate = "2026-08-20";
 const toolkitArticleDate = "2026-08-16";
 const worktreeArticleDate = "2026-08-16";
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 const benchmarkRelease = JSON.parse(await readFile(path.join(root, "bench", "results", "benchmark-release-0.1.6.json"), "utf8"));
 const worktreeContinuity = JSON.parse(await readFile(path.join(root, "bench", "results", "worktree-continuity-v0.4.0.json"), "utf8"));
+const deepMemoryPlatform = JSON.parse(await readFile(path.join(root, "bench", "results", "deep-memory-platform-v0.4.0.json"), "utf8"));
 const productVersion = packageJson.version;
-const productPositioning = "Worktree-aware project memory and cited context graphs for coding agents.";
-const productExplanation = "Qarinah gives every Git checkout an isolated evidence-linked ledger, groups sibling worktrees into one repository context graph, and automatically compiles compact cited checkpoints for Codex, Claude Code, Cursor, and compatible tools.";
+const productPositioning = "Verifiable project memory, exact source recovery, and cited context for coding agents.";
+const productExplanation = "Qarinah keeps permitted project evidence and explicitly archived source bytes beside the repository, connects symbols, decisions, outcomes, and Git worktrees in one searchable graph, and compiles the cited context needed by Codex, Claude Code, Cursor, and compatible tools.";
 if (worktreeContinuity.schemaVersion !== "qarinah.worktree-continuity-evaluation.v1"
   || worktreeContinuity.aggregate.scenarioCount !== 16
   || worktreeContinuity.aggregate.passed !== 16
   || worktreeContinuity.aggregate.failed !== 0
   || worktreeContinuity.artifactHash !== "sha256:0a610a0c2f6503d4b3c53c2e8bfc187c2159c70906e1bc7e828693cc34b6be9d") {
   throw new Error("The worktree-continuity website claim does not match the checked release artifact.");
+}
+if (deepMemoryPlatform.schemaVersion !== "qarinah.deep-memory-platform-evaluation.v1"
+  || deepMemoryPlatform.aggregate.scenarioCount !== 12
+  || deepMemoryPlatform.aggregate.passed !== 12
+  || deepMemoryPlatform.aggregate.failed !== 0
+  || deepMemoryPlatform.observed.secondSnapshotSourceBytes !== 390226
+  || deepMemoryPlatform.observed.secondSnapshotReusedChunks !== 2
+  || deepMemoryPlatform.observed.indexedSymbols !== 4
+  || deepMemoryPlatform.observed.resolvedReferences !== 3
+  || deepMemoryPlatform.artifactHash !== "sha256:bb801a59d5c1822b87bda5596237a126a064e62ac6f588e3351ebe949551ff46") {
+  throw new Error("The deep-memory website claim does not match the checked release artifact.");
 }
 const repeatedContextMetric = benchmarkRelease.headlineContextResults.find((result) => result.id === "six-task-repeated-context");
 if (!repeatedContextMetric
@@ -74,6 +87,19 @@ const publicMetrics = {
       evidenceSource: `${github}/blob/main/bench/results/worktree-continuity-v0.4.0.json`,
       boundary: worktreeContinuity.protocol.scope
     },
+    deepMemoryProductAcceptance: {
+      protocol: deepMemoryPlatform.protocol.id,
+      scenarios: deepMemoryPlatform.aggregate.scenarioCount,
+      passed: deepMemoryPlatform.aggregate.passed,
+      failed: deepMemoryPlatform.aggregate.failed,
+      restoredSourceBytes: deepMemoryPlatform.observed.secondSnapshotSourceBytes,
+      reusedChunks: deepMemoryPlatform.observed.secondSnapshotReusedChunks,
+      indexedSymbols: deepMemoryPlatform.observed.indexedSymbols,
+      resolvedReferences: deepMemoryPlatform.observed.resolvedReferences,
+      artifactHash: deepMemoryPlatform.artifactHash,
+      evidenceSource: `${github}/blob/main/bench/results/deep-memory-platform-v0.4.0.json`,
+      boundary: deepMemoryPlatform.protocol.scope
+    },
     repeatedProjectContext: {
       fixture: "six committed software-task fixtures",
       baselineEstimatedTokens: repeatedContextMetric.baselineEstimatedTokens,
@@ -111,6 +137,12 @@ const publicMetrics = {
   methodology: `${siteOrigin}/docs/benchmarks/`
 };
 const qarinahFeatures = [
+  "Encrypted lossless source snapshots with exact-byte restore",
+  "TypeScript and JavaScript symbol and reference graph",
+  "Built-in deterministic lexical and local-vector retrieval",
+  "Language Server Protocol symbol navigation",
+  "Explicit automatic project-memory watcher",
+  "Cited deterministic and optional model-assisted fact consolidation",
   "First-class Git worktree context with isolated ledgers",
   "Searchable developer-memory graph and timeline",
   "Exact per-session context receipts",
@@ -135,6 +167,18 @@ const answerEngineQuestions = [
   {
     name: "What is Qarinah?",
     text: `${productPositioning} ${productExplanation}`
+  },
+  {
+    name: "Can Qarinah recover exact project files?",
+    text: "Yes, for source content the operator explicitly archives. The project-scoped encrypted archive uses content-defined chunks, verifies every manifest and object, and restores exact bytes. This recovery archive is separate from the smaller, lossy context pack sent to a model."
+  },
+  {
+    name: "Does Qarinah understand code symbols?",
+    text: "Qarinah 0.4.0 builds a source-hash-bound symbol and reference graph for JavaScript, JSX, TypeScript, and TSX, exposes deterministic lexical and local subword-vector ranking, and ships a Language Server Protocol process for editor symbol navigation. Unsupported languages are reported rather than guessed."
+  },
+  {
+    name: "Can Qarinah update project memory automatically?",
+    text: "Yes, after the operator starts the explicit foreground watcher. It detects source changes, refreshes the symbol graph, records an idempotent cited checkpoint, and rebuilds derived SQLite, graph, and Markdown views. It is not a hidden system-wide activity monitor."
   },
   {
     name: "Does Qarinah understand Git worktrees?",
@@ -377,6 +421,30 @@ const docPages = [
     aliases: ["codex jsonl backup", "external archive", "agent history backup", "verified transcript export"]
   },
   {
+    route: "docs/content-archive",
+    source: "docs/CONTENT-ARCHIVE.md",
+    title: "Lossless encrypted content archive",
+    description: "Store explicitly selected project source bytes in a content-addressed encrypted archive, verify snapshots, and restore exact files independently of model context packs.",
+    section: "Operate",
+    aliases: ["lossless source archive", "exact byte restore", "content addressed storage", "encrypted project backup", "deduplicated snapshots"]
+  },
+  {
+    route: "docs/automatic-project-memory",
+    source: "docs/AUTOMATIC-PROJECT-MEMORY.md",
+    title: "Automatic project-memory watcher",
+    description: "Run an explicit foreground watcher that detects source changes, refreshes symbols, records cited checkpoints, and rebuilds local read models without duplicate unchanged events.",
+    section: "Use",
+    aliases: ["file watcher", "automatic memory", "incremental project refresh", "continuous code memory"]
+  },
+  {
+    route: "docs/cited-facts",
+    source: "docs/CITED-FACT-CONSOLIDATION.md",
+    title: "Cited fact consolidation",
+    description: "Consolidate bounded project evidence into strict cited facts with deterministic local extraction or an optional host-model adapter.",
+    section: "Use",
+    aliases: ["fact extraction", "memory consolidation", "cited project facts", "model assisted memory"]
+  },
+  {
     route: "docs/private-projects",
     source: "docs/PRIVATE-PROJECTS.md",
     title: "Private and NDA projects",
@@ -463,6 +531,14 @@ const docPages = [
     description: "Inspect Qarinah's deterministic searchable graph, temporal and disclosure projection, repository map, evidence edges, ranking basis, and boundedness.",
     section: "Understand",
     aliases: ["memory graph", "searchable nodes", "repository graph", "concept graph", "evidence edges", "graph ranking"]
+  },
+  {
+    route: "docs/symbol-graph",
+    source: "docs/SYMBOL-GRAPH.md",
+    title: "Symbol graph and language server",
+    description: "Build and query a source-hash-bound JavaScript and TypeScript symbol/reference graph and use the shipped Language Server Protocol process.",
+    section: "Understand",
+    aliases: ["language server", "typescript symbol graph", "javascript references", "repository map", "code intelligence"]
   },
   {
     route: "docs/memory-footprint",
@@ -654,6 +730,7 @@ for (const filename of [
   "Qarinah-Technical-White-Paper-v1.2.pdf",
   "Qarinah-Technical-White-Paper-v1.3.pdf",
   "Qarinah-Technical-White-Paper-v1.4.pdf",
+  "Qarinah-Technical-White-Paper-v1.5.pdf",
   `Qarinah-Technical-White-Paper-v${paperVersion}.pdf`
 ]) {
   await cp(path.join(root, "output", "pdf", filename), path.join(output, "paper", filename));
@@ -1172,8 +1249,8 @@ function commandBlock(command, label = "Terminal") {
 
 function homePage() {
   return layout({
-    title: "Qarinah - One Memory System for Every Git Worktree",
-    description: "Qarinah keeps isolated project memory per Git checkout and automatically compiles bounded, cited context checkpoints for coding agents.",
+    title: "Qarinah - Verifiable Project Memory for Coding Agents",
+    description: "Qarinah preserves permitted project evidence and exact archived source bytes, connects code and decisions in a searchable graph, and compiles cited context for coding agents.",
     active: "home",
     canonical: "/",
     kind: "home",
@@ -1181,16 +1258,16 @@ function homePage() {
       <section class="hero">
         <div class="shell hero-grid">
           <div class="hero-copy">
-            <p class="eyebrow">Project memory for parallel coding-agent work</p>
-            <h1>One memory system for every Git worktree.</h1>
-            <p class="hero-lede">Give each checkout its own evidence-linked ledger. Qarinah groups sibling worktrees into one branch-and-commit-aware context graph, then automatically compiles the cited files, decisions, outcomes, and history relevant to the next coding task.</p>
-            <a class="hero-context-proof" href="/docs/worktree-context/" aria-label="16 of 16 real Git worktree continuity scenarios passed. Read the method and artifact.">
-              <strong>16 / 16</strong>
-              <span><b>real Git worktree continuity checks passed</b><small>isolation, retrieval, receipts, conflicts, and incremental compaction</small></span>
+            <p class="eyebrow">Verifiable memory for coding agents</p>
+            <h1>Your project remembers. Every agent gets the proof.</h1>
+            <p class="hero-lede">Preserve permitted project evidence and explicitly archived source bytes beside the code. Qarinah links symbols, decisions, outcomes, sessions, and Git worktrees in one searchable graph, then delivers a bounded cited context pack for the next task.</p>
+            <a class="hero-context-proof" href="/docs/benchmarks/" aria-label="12 of 12 deep-memory product acceptance scenarios passed. Read the method and artifact.">
+              <strong>12 / 12</strong>
+              <span><b>deep-memory product checks passed</b><small>exact recovery, chunk reuse, symbols, references, cited facts, and incremental refresh</small></span>
             </a>
             <div class="hero-actions">
               <a class="btn btn-primary btn-large" href="/docs/getting-started/">Set up this worktree</a>
-              <a class="hero-text-link" href="/articles/git-worktree-context-for-coding-agents/">See how the graph works</a>
+              <a class="hero-text-link" href="/docs/content-archive/">See what Qarinah preserves</a>
             </div>
           </div>
           <aside class="worktree-hero-map" aria-label="How Qarinah groups isolated Git worktree memory">
@@ -1203,6 +1280,23 @@ function homePage() {
             <div class="worktree-map-footer"><span>branch + commit in snapshot hash</span><span>files + decisions in cited graph</span></div>
           </aside>
         </div>
+      </section>
+
+      <section class="front-proof section shell" aria-labelledby="durable-code-memory-title">
+        <div class="section-heading split-heading">
+          <div>
+            <p class="eyebrow">Recovery, understanding, and recall</p>
+            <h2 id="durable-code-memory-title">Keep the exact source. Retrieve only the evidence the task needs.</h2>
+          </div>
+          <p>The encrypted archive and the model context pack serve different jobs. One restores explicitly captured files byte for byte. The other is a bounded, cited, lossy view designed to avoid replaying the whole project history.</p>
+        </div>
+        <div class="use-mode-grid visible-memory-grid">
+          <article class="use-mode-card"><span>Recover</span><h3>Exact encrypted snapshots</h3><p>Content-defined chunks reuse unchanged project bytes across snapshots. Verification and restore fail closed on missing, altered, or wrongly keyed objects.</p><a href="/docs/content-archive/">Read the archive contract</a></article>
+          <article class="use-mode-card"><span>Understand</span><h3>Symbols and references</h3><p>Parse JavaScript and TypeScript declarations and cross-file references into a source-hash-bound graph with deterministic local ranking.</p><a href="/docs/symbol-graph/">Inspect code intelligence</a></article>
+          <article class="use-mode-card"><span>Refresh</span><h3>Explicit automatic memory</h3><p>A foreground watcher detects source changes, refreshes symbols, records an idempotent checkpoint, and rebuilds local read models.</p><a href="/docs/automatic-project-memory/">Run the watcher</a></article>
+          <article class="use-mode-card"><span>Recall</span><h3>Strict cited facts</h3><p>Use deterministic extraction or an optional host model over a bounded untrusted pack. Every accepted fact must cite retained event IDs.</p><a href="/docs/cited-facts/">Review consolidation</a></article>
+        </div>
+        <p class="benchmark-ribbon-note"><strong>Acceptance result:</strong> the committed evaluator restored 390,226 source bytes exactly, reused two of three chunks in the second snapshot, indexed four symbols and three resolved references, and preserved three cited facts across 12/12 passing scenarios. This is local product-acceptance evidence, not a cross-product ranking. <a href="/docs/benchmarks/">Reproduce it</a>.</p>
       </section>
 
       <section class="front-proof section shell" aria-labelledby="visible-memory-title">
@@ -1884,7 +1978,7 @@ async function markdownPage(page) {
             ? "install"
             : "docs";
   const publicationLink = page.route === "paper"
-    ? `<a href="${paperPdf}">Download v1.5 PDF</a> · <a href="${conceptDoi}">Paper series DOI</a> · <a href="${publishedV14Doi}">Published v1.4</a> · <a href="${historicalVersionDoi}">Published v1.3</a>`
+    ? `<a href="${paperPdf}">Download v1.6 PDF</a> · <a href="${conceptDoi}">Paper series DOI</a> · <a href="${publishedV14Doi}">Published v1.4</a> · <a href="${historicalVersionDoi}">Published v1.3</a>`
     : "";
 
   return layout({

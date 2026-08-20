@@ -2,7 +2,25 @@
 
 Qarinah reports context-volume and retrieval-regression measurements. It does not convert character estimates into claims about provider billing, model reasoning, answer correctness, latency on every machine, or total application cost.
 
-## Exact release headline
+## Deep-memory product acceptance
+
+The current product headline is an end-to-end implementation result, not a compression percentage. A deterministic evaluator creates a temporary initialized Qarinah project with two TypeScript source files, records cited project evidence, runs initial and unchanged memory cycles, builds the symbol graph, consolidates cited facts, creates two encrypted content snapshots, verifies the second snapshot, and restores it to a clean directory.
+
+| Measurement | Observed result |
+| --- | ---: |
+| Acceptance scenarios passed | **12 / 12** |
+| Second-snapshot source bytes verified and restored exactly | **390,226** |
+| Second-snapshot chunks reused from the first snapshot | **2 / 3** |
+| Symbols indexed | **4** |
+| Cross-file references resolved | **3** |
+| Cited facts retained | **3** |
+| Restored files matching the second snapshot byte for byte | **2 / 2** |
+
+Reproduce it with `npm run check:deep-memory`. The evaluator is [`scripts/evaluate-deep-memory-platform.mjs`](../scripts/evaluate-deep-memory-platform.mjs), and the checked result is [`bench/results/deep-memory-platform-v0.4.0.json`](../bench/results/deep-memory-platform-v0.4.0.json) with artifact hash `sha256:bb801a59d5c1822b87bda5596237a126a064e62ac6f588e3351ebe949551ff46`.
+
+The source-byte result concerns the exact encrypted archive and restore path. It is not the size of a model context pack and it does not claim that arbitrary archives compress by a fixed ratio. The symbol and fact counts describe this deliberately small acceptance fixture, not language-wide coverage or universal retrieval quality.
+
+## Separate context-volume measurements
 
 | Result | Baseline | Qarinah output | Exact reduction | What the output preserves |
 | --- | ---: | ---: | ---: | --- |

@@ -4,10 +4,10 @@
 
 <h1 align="center">Qarinah</h1>
 
-<p align="center"><strong>One memory system for every Git worktree.</strong></p>
+<p align="center"><strong>Your project remembers. Every agent gets the proof.</strong></p>
 
 <p align="center">
-  Qarinah gives every checkout its own evidence-linked memory and groups sibling worktrees into one searchable context graph. Codex, Claude Code, Cursor, Kimi, Antigravity, CLI tools, and compatible MCP clients can continue from the right branch, commit, decisions, outcomes, and files instead of replaying the whole project history.
+  Qarinah preserves permitted project evidence and explicitly archived source bytes beside the code. It connects symbols, decisions, outcomes, sessions, and Git worktrees in one searchable graph, then compiles bounded cited context for Codex, Claude Code, Cursor, Kimi, Antigravity, CLI tools, and compatible MCP clients.
 </p>
 
 ```sh
@@ -46,6 +46,16 @@ npx qarinah dashboard --serve --worktrees
 | Cross-worktree comparison | Separate writable ledgers, branch and commit identities, divergent heads, event totals, and current decisions |
 | Incremental compaction | Initial, unchanged, delta, and full-rebuild states with the exact prior checkpoint and changed-event count |
 | VS Code/Cursor panel | A local sandboxed read-only webview backed by the Qarinah CLI |
+
+### Reproducible deep-memory product result
+
+The 0.4.0 product evaluator runs the full local path in a temporary initialized project: incremental source refresh, symbol and cross-file-reference indexing, cited fact consolidation, two encrypted content snapshots, integrity verification, and exact byte restoration. It passes **12 / 12** scenarios, restores **390,226 source bytes exactly**, reuses **2 of 3** chunks in the second snapshot, indexes **4 symbols** and **3 resolved references**, and retains **3 cited facts**.
+
+```sh
+npm run check:deep-memory
+```
+
+Inspect the [machine-readable result](bench/results/deep-memory-platform-v0.4.0.json) and [evaluator](scripts/evaluate-deep-memory-platform.mjs). This is local product-acceptance evidence, not a cross-product comparison or a promise about arbitrary repositories.
 
 ### Reproducible real-Git-worktree acceptance result
 
@@ -221,7 +231,7 @@ The JSONL chain remains authoritative. Graph, index, Markdown, dashboard, and OK
 
 <p align="center">
   <a href="docs/WHITEPAPER.md">Technical paper</a>&nbsp;&middot;&nbsp;
-  <a href="output/pdf/Qarinah-Technical-White-Paper-v1.5.pdf">Technical white paper v1.5</a>&nbsp;&middot;&nbsp;
+  <a href="output/pdf/Qarinah-Technical-White-Paper-v1.6.pdf">Technical white paper v1.6</a>&nbsp;&middot;&nbsp;
   <a href="https://doi.org/10.5281/zenodo.21547684">Paper series DOI</a>&nbsp;&middot;&nbsp;
   <a href="https://doi.org/10.5281/zenodo.21850747">Published historical v1.4</a>&nbsp;&middot;&nbsp;
   <a href="docs/ARCHITECTURE.md">Architecture</a>&nbsp;&middot;&nbsp;
@@ -311,10 +321,10 @@ Supported event classes include prompts, tool requests, tool completions, approv
 ## Architecture
 
 <p align="center">
-  <img src="assets/architecture/qarinah-flow.svg" width="920" alt="Detailed Qarinah architecture showing capture controls, authoritative JSONL, temporal memory, rebuildable SQLite and graph projections, Maqam scopes, deterministic retrieval, cited packs, and evaluation.">
+  <img src="assets/architecture/qarinah-flow.svg" width="920" alt="Qarinah core evidence architecture showing capture controls, authoritative JSONL, temporal memory, rebuildable SQLite and graph projections, optional Maqam scopes, deterministic retrieval, cited packs, and evaluation.">
 </p>
 
-The project graph covers directories, files, content hashes, JavaScript and TypeScript module references, Markdown links, exact source spans, additions, changes, renames, and deletions. See the [architecture guide](docs/ARCHITECTURE.md) or the [editable diagram source](docs/architecture.mmd).
+The project graph covers directories, files, content hashes, JavaScript and TypeScript module references, Markdown links, exact source spans, additions, changes, renames, and deletions. The separate symbol graph adds declarations and resolved references for JavaScript, JSX, TypeScript, and TSX, while the encrypted archive preserves explicitly selected source bytes outside model context. See the [architecture guide](docs/ARCHITECTURE.md) or the [editable core-evidence diagram source](docs/architecture.mmd).
 
 ## Technology
 
