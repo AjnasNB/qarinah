@@ -69,6 +69,7 @@ try {
     "  cryptographicallyEraseContentArchiveVault,",
     "  buildSymbolGraph,",
     "  loadSymbolGraph,",
+    "  parseTreeSitterSymbols,",
     "  parseTypeScriptSymbols,",
     "  querySymbolGraph,",
     "  searchSymbols,",
@@ -155,6 +156,8 @@ try {
     "void cryptographicallyEraseContentArchiveVault;",
     "const parsedSymbols = parseTypeScriptSymbols('consumer.ts', 'export function consumer() {}');",
     "void parsedSymbols;",
+    "const parsedPythonSymbols = parseTreeSitterSymbols('consumer.py', 'python', 'def consumer():\\n    return True\\n');",
+    "void parsedPythonSymbols;",
     "const symbolGraphPromise: Promise<QarinahSymbolGraph> = buildSymbolGraph({ persist: false });",
     "void symbolGraphPromise;",
     "void loadSymbolGraph;",
@@ -333,6 +336,8 @@ try {
   );
   assert.equal(installedPackage.bin["qarinah-lsp"], "bin/qarinah-lsp.js");
   assert.equal(installedPackage.dependencies["typescript-classic"], "npm:typescript@5.9.3");
+  assert.equal(installedPackage.dependencies["web-tree-sitter"], "0.20.8");
+  assert.equal(installedPackage.dependencies["tree-sitter-wasms"], "0.1.13");
   await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "symbol-graph.schema.json"), "utf8");
   assert.equal(
     installedPackage.exports["./schemas/project-memory-cycle.json"],

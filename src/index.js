@@ -39,6 +39,7 @@ export {
   SYMBOL_GRAPH_SCHEMA_VERSION,
   buildSymbolGraph,
   loadSymbolGraph,
+  parseTreeSitterSymbols,
   parseTypeScriptSymbols,
   querySymbolGraph,
   searchSymbols

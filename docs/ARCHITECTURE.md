@@ -48,7 +48,7 @@ A machine-local permit binds the trusted real path, workspace ID, enabled state,
 | --- | --- | --- |
 | `events/events.jsonl` | Canonical append-only event envelopes | Authoritative |
 | `graph/graph.json` | Event nodes, typed relations, and the latest project-structure projection | Rebuildable |
-| `graph/symbol-graph.json` | Source-hash-bound JavaScript/TypeScript declarations and unambiguous references | Rebuildable |
+| `graph/symbol-graph.json` | Source-hash-bound multi-language declarations and unambiguous references | Rebuildable |
 | `index/index.json` | Lexical postings, trigram terms, and graph adjacency | Rebuildable |
 | `index/qarinah.db` | SQLite WAL read model with FTS5, typed tables, temporal state, citations, disclosures, and pack metadata | Disposable and rebuildable from the ledger |
 | `records/CONTEXT.md` | Bounded human-readable current record | Rebuildable |

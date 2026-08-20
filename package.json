@@ -336,6 +336,8 @@
   },
   "dependencies": {
     "ignore": "7.0.6",
-    "typescript-classic": "npm:typescript@5.9.3"
+    "tree-sitter-wasms": "0.1.13",
+    "typescript-classic": "npm:typescript@5.9.3",
+    "web-tree-sitter": "0.20.8"
   }
 }

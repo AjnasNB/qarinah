@@ -324,7 +324,7 @@ Supported event classes include prompts, tool requests, tool completions, approv
   <img src="assets/architecture/qarinah-flow.svg" width="920" alt="Qarinah core evidence architecture showing capture controls, authoritative JSONL, temporal memory, rebuildable SQLite and graph projections, optional Maqam scopes, deterministic retrieval, cited packs, and evaluation.">
 </p>
 
-The project graph covers directories, files, content hashes, JavaScript and TypeScript module references, Markdown links, exact source spans, additions, changes, renames, and deletions. The separate symbol graph adds declarations and resolved references for JavaScript, JSX, TypeScript, and TSX, while the encrypted archive preserves explicitly selected source bytes outside model context. See the [architecture guide](docs/ARCHITECTURE.md) or the [editable core-evidence diagram source](docs/architecture.mmd).
+The project graph covers directories, files, content hashes, module references, Markdown links, exact source spans, additions, changes, renames, and deletions. The separate symbol graph adds source-hash-bound declarations and unambiguous references for JavaScript, TypeScript, Python, Go, Rust, Java, Kotlin, C, C++, and C#, while the encrypted archive preserves explicitly selected source bytes outside model context. See the [architecture guide](docs/ARCHITECTURE.md) or the [editable core-evidence diagram source](docs/architecture.mmd).
 
 ## Technology
 

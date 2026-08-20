@@ -82,7 +82,7 @@ Invalid JavaScript argument shapes generally throw `TypeError`. Storage, trust, 
 | `AGENT_ARCHIVE_BACKUP_SCHEMA_VERSION` | `"qarinah.agent-archive-backup.v1"` |
 | `CONTENT_ARCHIVE_SCHEMA_VERSION` | `"qarinah.content-archive.v1"` |
 | `CONTENT_ARCHIVE_KEY_SCHEMA_VERSION` | `"qarinah.content-archive-key.v1"` |
-| `SYMBOL_GRAPH_SCHEMA_VERSION` | `"qarinah.symbol-graph.v1"` |
+| `SYMBOL_GRAPH_SCHEMA_VERSION` | `"qarinah.symbol-graph.v2"` |
 | `QARINAH_LSP_PROTOCOL_VERSION` | `"qarinah-lsp.v1"` |
 | `MEMORY_FOOTPRINT_SCHEMA_VERSION` | `"qarinah.memory-footprint.v1"` |
 | `CODING_CONTEXT_HARNESS_SCHEMA_VERSION` | `"qarinah.coding-context-harness.v1"` |
@@ -479,7 +479,7 @@ function createLanguageServer(options?: QarinahLanguageServerOptions): QarinahLa
 function runLanguageServer(options?: QarinahLanguageServerOptions): QarinahLanguageServer;
 ```
 
-`buildSymbolGraph` reads only JavaScript/TypeScript-family files whose exact hashes remain current in the latest validated project snapshot. The query API returns an explicit lexical/local-vector/structural score basis. The language server implements bounded LSP stdio requests for symbols, definitions, and references. The strict graph contract is exported as `qarinah/schemas/symbol-graph.json`. See [Symbol graph and language server](SYMBOL-GRAPH.md).
+`buildSymbolGraph` reads only registered language files whose exact hashes remain current in the latest validated project snapshot. JavaScript and TypeScript use the TypeScript compiler parser; the additional language set uses pinned Tree-sitter WASM grammars. The query API returns an explicit lexical/local-vector/structural score basis. The language server implements bounded LSP stdio requests for symbols, definitions, and references. The strict graph contract is exported as `qarinah/schemas/symbol-graph.json`. See [Symbol graph and language server](SYMBOL-GRAPH.md).
 
 ### `buildProjectOverview(options?)`
 

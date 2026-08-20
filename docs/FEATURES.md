@@ -44,11 +44,12 @@ Qarinah is evidence-linked project memory for coding agents. It keeps an inspect
 
 ## Code-aware symbol memory
 
-- A real TypeScript compiler parser indexes JavaScript, JSX, TypeScript, and TSX declarations, containers, exports, exact spans, signature hashes, and unambiguous references.
+- The TypeScript compiler parser indexes JavaScript, JSX, TypeScript, and TSX; pinned and runtime-compatible Tree-sitter WASM grammars index Python, Go, Rust, Java, Kotlin, C, C++, and C# source.
+- Both parser lanes emit the same bounded declaration, container, export-evidence, exact-span, signature-hash, and unambiguous-reference contract without storing source bodies in the graph.
 - Every parsed file must still match the content hash in the latest explicit project scan; stale or linked files abstain.
 - Default symbol search combines lexical matching, a deterministic local subword vector, and resolved-reference structure with a visible score basis.
 - `qarinah-lsp` exposes document symbols, workspace symbols, definitions, and references through bounded stdio JSON-RPC.
-- The strict symbol-graph schema is public and additive. Other language grammars are future adapters, not silently approximated by the v1 parser.
+- The strict `qarinah.symbol-graph.v2` schema publishes parser versions, supported languages, indexed languages, file-level parser identity, and explicit coverage gaps.
 
 See [Coding context harness](CODING-CONTEXT-HARNESS.md), [Automatic project memory](AUTOMATIC-PROJECT-MEMORY.md), and [Cited fact consolidation](CITED-FACT-CONSOLIDATION.md).
 

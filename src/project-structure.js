@@ -17,9 +17,10 @@ const DEFAULT_MAX_TOTAL_BYTES = 16 * 1024 * 1024;
 const DEFAULT_MAX_DEPTH = 24;
 const MAX_PATH_CHARS = 512;
 const SOURCE_EXTENSIONS = new Set([
-  ".cjs", ".css", ".html", ".java", ".js", ".json", ".jsonc", ".jsx", ".kt", ".md",
-  ".mjs", ".py", ".rb", ".rs", ".sh", ".sql", ".svelte", ".toml", ".ts", ".tsx",
-  ".vue", ".xml", ".yaml", ".yml"
+  ".c", ".cc", ".cjs", ".cpp", ".cs", ".css", ".cxx", ".dart", ".go", ".h", ".hpp",
+  ".html", ".java", ".js", ".json", ".jsonc", ".jsx", ".kt", ".kts", ".lua", ".md",
+  ".mjs", ".php", ".py", ".rb", ".rs", ".scala", ".sh", ".sol", ".sql", ".svelte",
+  ".swift", ".toml", ".ts", ".tsx", ".vue", ".xml", ".yaml", ".yml", ".zig"
 ]);
 const SOURCE_FILENAMES = new Set([
   "Dockerfile", "LICENSE", "Makefile", "Procfile", "README", "SECURITY"
@@ -79,7 +80,10 @@ function languageFor(filePath) {
     ".cjs": "javascript", ".js": "javascript", ".jsx": "javascript",
     ".mjs": "javascript", ".ts": "typescript", ".tsx": "typescript",
     ".md": "markdown", ".json": "json", ".jsonc": "jsonc", ".py": "python",
-    ".rs": "rust", ".java": "java", ".kt": "kotlin", ".rb": "ruby",
+    ".rs": "rust", ".java": "java", ".kt": "kotlin", ".kts": "kotlin", ".rb": "ruby",
+    ".c": "c", ".h": "c", ".cc": "cpp", ".cpp": "cpp", ".cxx": "cpp", ".hpp": "cpp",
+    ".cs": "csharp", ".dart": "dart", ".go": "go", ".lua": "lua", ".php": "php",
+    ".scala": "scala", ".sol": "solidity", ".swift": "swift", ".zig": "zig",
     ".css": "css", ".html": "html", ".svelte": "svelte", ".vue": "vue",
     ".yaml": "yaml", ".yml": "yaml", ".toml": "toml", ".sql": "sql",
     ".xml": "xml", ".sh": "shell"

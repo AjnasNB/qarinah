@@ -323,7 +323,7 @@ export function scanProjectStructure(options?: {
   maxTotalBytes?: number;
   maxDepth?: number;
 }): Promise<QarinahProjectStructureScanResult>;
-export const SYMBOL_GRAPH_SCHEMA_VERSION: "qarinah.symbol-graph.v1";
+export const SYMBOL_GRAPH_SCHEMA_VERSION: "qarinah.symbol-graph.v2";
 export const QARINAH_LSP_PROTOCOL_VERSION: "qarinah-lsp.v1";
 export interface QarinahSymbolSpan {
   readonly start: number;
@@ -333,7 +333,8 @@ export interface QarinahSymbolSpan {
   readonly endLine: number;
   readonly endColumn: number;
 }
-export type QarinahSymbolKind = "function" | "class" | "interface" | "type" | "enum" | "namespace" | "method" | "property" | "getter" | "setter" | "parameter" | "variable" | "import";
+export type QarinahSymbolKind = "function" | "class" | "interface" | "type" | "enum" | "namespace" | "method" | "property" | "getter" | "setter" | "parameter" | "variable" | "import" | "constructor" | "struct" | "trait" | "module" | "constant";
+export type QarinahSymbolLanguage = "c" | "cpp" | "csharp" | "go" | "java" | "javascript" | "kotlin" | "python" | "rust" | "typescript";
 export interface QarinahSymbol {
   readonly id: `symbol_${string}`;
   readonly name: string;
@@ -346,13 +347,19 @@ export interface QarinahSymbol {
   readonly references: readonly Readonly<{ path: string; span: QarinahSymbolSpan }>[];
 }
 export interface QarinahSymbolGraph {
-  readonly schemaVersion: "qarinah.symbol-graph.v1";
+  readonly schemaVersion: "qarinah.symbol-graph.v2";
   readonly workspaceId: string;
   readonly generatedAt: string;
   readonly source: Readonly<{ eventId: string; eventHash: `sha256:${string}`; snapshotHash: `sha256:${string}` }>;
-  readonly extractor: Readonly<{ id: "qarinah.typescript-symbols"; version: "1"; parser: string }>;
+  readonly extractor: Readonly<{
+    id: "qarinah.multilanguage-symbols";
+    version: "2";
+    parsers: readonly Readonly<{ id: "typescript" | "tree-sitter-wasm"; version: string; grammarVersion?: string; languages: readonly QarinahSymbolLanguage[] }>[];
+  }>;
   readonly coverage: Readonly<{
     sourceFiles: number;
+    supportedLanguages: readonly QarinahSymbolLanguage[];
+    indexedLanguages: readonly QarinahSymbolLanguage[];
     eligibleFiles: number;
     indexedFiles: number;
     skippedFiles: number;
@@ -363,7 +370,7 @@ export interface QarinahSymbolGraph {
     ambiguousReferences: number;
     complete: boolean;
   }>;
-  readonly files: readonly Readonly<{ path: string; language: "javascript" | "typescript"; contentHash: `sha256:${string}`; diagnosticCount: number; symbolIds: readonly string[] }>[];
+  readonly files: readonly Readonly<{ path: string; language: QarinahSymbolLanguage; parser: "typescript" | "tree-sitter-wasm"; contentHash: `sha256:${string}`; diagnosticCount: number; symbolIds: readonly string[] }>[];
   readonly skipped: readonly Readonly<{ path: string; reason: "unsupported-language" | "binary" | "oversized" | "unhashed" | "stale-or-linked" }>[];
   readonly symbols: readonly QarinahSymbol[];
   readonly edges: readonly Readonly<{ source: string; type: "defines" | "references"; target: string; span?: QarinahSymbolSpan }>[];
@@ -386,6 +393,11 @@ export function parseTypeScriptSymbols(filePath: string, text: string, options?:
   references: readonly Readonly<{ name: string; path: string; span: QarinahSymbolSpan }>[];
   diagnostics: readonly Readonly<{ code: number; start: number; length: number; category: string }>[];
 }>;
+export function parseTreeSitterSymbols(filePath: string, language: Exclude<QarinahSymbolLanguage, "javascript" | "typescript">, text: string, options?: { maxCharacters?: number }): Promise<Readonly<{
+  symbols: readonly QarinahSymbol[];
+  references: readonly Readonly<{ name: string; path: string; span: QarinahSymbolSpan }>[];
+  diagnostics: readonly Readonly<{ code: number; start: number; length: number; category: string }>[];
+}>>;
 export function buildSymbolGraph(options?: { cwd?: string; persist?: boolean; signal?: AbortSignal }): Promise<QarinahSymbolGraph>;
 export function loadSymbolGraph(options?: { cwd?: string }): Promise<QarinahSymbolGraph>;
 export function querySymbolGraph(graph: QarinahSymbolGraph, query?: string, options?: { limit?: number; kinds?: readonly QarinahSymbolKind[] }): QarinahSymbolQuery;
@@ -1306,7 +1318,7 @@ export interface QarinahDeveloperMemoryView {
   readonly symbols: Readonly<{
     available: boolean;
     reason?: string;
-    schemaVersion?: "qarinah.symbol-graph.v1";
+    schemaVersion?: "qarinah.symbol-graph.v2";
     manifestHash?: `sha256:${string}`;
     extractor?: QarinahSymbolGraph["extractor"];
     coverage: QarinahSymbolGraph["coverage"] | null;

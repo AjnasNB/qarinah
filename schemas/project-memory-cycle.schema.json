@@ -106,7 +106,7 @@
       "additionalProperties": false,
       "required": ["schemaVersion", "manifestHash", "files", "symbols", "references", "complete"],
       "properties": {
-        "schemaVersion": { "const": "qarinah.symbol-graph.v1" },
+        "schemaVersion": { "const": "qarinah.symbol-graph.v2" },
         "manifestHash": { "$ref": "#/$defs/hash" },
         "files": { "type": "integer", "minimum": 0 },
         "symbols": { "type": "integer", "minimum": 0 },

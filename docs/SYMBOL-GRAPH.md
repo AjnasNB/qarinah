@@ -1,6 +1,6 @@
 # Symbol graph and language server
 
-Qarinah 0.4 adds a code-aware layer beside its event, worktree, and evidence graphs. It uses the TypeScript compiler parser to index JavaScript, JSX, TypeScript, and TSX declarations and references from the latest explicit `qarinah scan` snapshot.
+Qarinah 0.5 extends the code-aware layer beside its event, worktree, and evidence graphs. It uses the TypeScript compiler parser for JavaScript, JSX, TypeScript, and TSX and pinned, runtime-compatible Tree-sitter WASM grammars for Python, Go, Rust, Java, Kotlin, C, C++, and C# source from the latest explicit `qarinah scan` snapshot.
 
 This is not a stored copy of source code. The derived graph stores symbol names, kinds, containers, exported status, exact spans, signature hashes, file content hashes, and resolved reference locations. Before parsing a file, Qarinah verifies that its bytes still match the recorded project-snapshot hash. Stale, linked, binary, oversized, and unsupported files are reported in coverage instead of silently indexed.
 
@@ -46,6 +46,6 @@ VS Code and Cursor use the shipped Qarinah memory panel. Other editors can attac
 
 ## Coverage and limits
 
-The built-in parser currently covers JavaScript and TypeScript language families. The schema is public so future language adapters can emit the same closed, hash-linked graph without changing the event ledger. Python, Go, Rust, Java, Kotlin, Ruby, C/C++, and other grammars are reported as unsupported in this v1 extractor rather than parsed by regular expressions or presented as complete.
+The v2 extractor records its exact parser and grammar package versions, the registered language set, the languages actually indexed, and the parser lane used for each file. JavaScript and TypeScript retain compiler-grade declaration handling. The WASM lane intentionally extracts high-signal declarations and identifier references; it does not claim full language-server semantic analysis, type inference, or compiler parity. Unsupported file types and stale source hashes remain explicit coverage gaps.
 
 The graph is capped at 100,000 declarations and 500,000 reference observations. LSP messages are capped at 4 MiB. Ambiguous names do not resolve to a guessed definition. The graph file is a disposable read model under `.qarinah/graph/symbol-graph.json`; the event ledger and project snapshot remain authoritative.
