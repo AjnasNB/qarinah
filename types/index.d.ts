@@ -1229,6 +1229,15 @@ export interface QarinahTeamManifest {
   github: { organization: string; repository: string } | null;
   manifestHash: string;
 }
+export interface QarinahEncryptedSyncBundle {
+  readonly schemaVersion: "qarinah.encrypted-sync-bundle.v1";
+  readonly algorithm: "AES-256-GCM";
+  readonly workspaceId: `ws_${string}`;
+  readonly teamManifestHash: `sha256:${string}`;
+  readonly nonce: string;
+  readonly ciphertext: string;
+  readonly authenticationTag: string;
+}
 export function createTeamManifest(input: {
   workspaceId: string;
   teamId: string;
@@ -1240,9 +1249,9 @@ export function createEncryptedSyncBundle(options: {
   manifest: Parameters<typeof createTeamManifest>[0];
   memberId: string;
   key: Uint8Array;
-}): Promise<Readonly<Record<string, unknown>>>;
+}): Promise<Readonly<QarinahEncryptedSyncBundle>>;
 export function decryptEncryptedSyncBundle(
-  bundle: Record<string, unknown>,
+  bundle: QarinahEncryptedSyncBundle,
   options: {
     manifest: Parameters<typeof createTeamManifest>[0];
     memberId: string;
@@ -1256,6 +1265,33 @@ export function createSignedCheckpoint(options: {
   clock?: () => Date;
 }): Promise<Readonly<Record<string, unknown>>>;
 export function verifySignedCheckpoint(checkpoint: Record<string, unknown>, publicKey?: string): boolean;
+export const TEAM_SYNC_SERVICE_SCHEMA_VERSION: "qarinah.team-sync-service.v1";
+export interface QarinahTeamSyncToken {
+  token: string;
+  teamId: string;
+  memberId: string;
+  role: "owner" | "maintainer" | "reader";
+}
+export interface QarinahTeamSyncServerOptions {
+  root: string;
+  tokens: QarinahTeamSyncToken[];
+  host?: "127.0.0.1" | "::1";
+  port?: number;
+  maxBundleBytes?: number;
+  requestsPerMinute?: number;
+  clock?: () => Date;
+}
+export interface QarinahTeamSyncServer {
+  start(): Promise<Readonly<{
+    schemaVersion: "qarinah.team-sync-service.v1";
+    host: "127.0.0.1" | "::1";
+    port: number;
+    root: string;
+  }>>;
+  close(): Promise<void>;
+}
+export function encryptedSyncBundleId(bundle: QarinahEncryptedSyncBundle): `bundle_${string}`;
+export function createTeamSyncServer(options: QarinahTeamSyncServerOptions): QarinahTeamSyncServer;
 export function createCausalReceipt(input: Record<
   "evidence" | "memory" | "policy" | "execution" | "observation",
   { id: string; hash: `sha256:${string}`; system: string; timestamp: string }

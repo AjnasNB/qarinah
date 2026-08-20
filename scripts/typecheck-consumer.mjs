@@ -100,6 +100,8 @@ try {
     "  registerMaqamContextAdapters,",
     "  uninstallHostIntegration,",
     "  createMcpServer,",
+    "  createTeamSyncServer,",
+    "  encryptedSyncBundleId,",
     "  validateCockroachBrowserMemoryOutcome,",
     "  validateCockroachSourceRecordBoundary,",
     "  type CockroachBrowserMemoryOutcomeBoundary,",
@@ -126,7 +128,9 @@ try {
     "  type QarinahLinkedProjectMemory,",
     "  type QarinahLinkedProjectQuery,",
     "  type QarinahGitWorktree,",
-    "  type QarinahHostIntegration",
+    "  type QarinahHostIntegration,",
+    "  type QarinahEncryptedSyncBundle,",
+    "  type QarinahTeamSyncServer",
     "} from \"qarinah\";",
     "import type { QarinahBrowserSink as PublicCockroachBrowserSink } from \"cockroach-browser/qarinah\";",
     "import { captureCodexHook } from \"qarinah/codex\";",
@@ -199,6 +203,10 @@ try {
     "void captureClaudeHook;",
     "void createMcpServer;",
     "void createSubpathMcpServer;",
+    "const encryptedBundle: QarinahEncryptedSyncBundle = { schemaVersion: 'qarinah.encrypted-sync-bundle.v1', algorithm: 'AES-256-GCM', workspaceId: `ws_${'a'.repeat(32)}`, teamManifestHash: `sha256:${'b'.repeat(64)}`, nonce: 'AAAAAAAAAAAAAAAA', ciphertext: 'YQ==', authenticationTag: 'AAAAAAAAAAAAAAAAAAAAAA==' };",
+    "void encryptedSyncBundleId(encryptedBundle);",
+    "const teamSyncServer: QarinahTeamSyncServer = createTeamSyncServer({ root: './opaque-sync', tokens: [{ token: 'a'.repeat(32), teamId: 'core', memberId: 'consumer', role: 'owner' }] });",
+    "void teamSyncServer;",
     "void invalidCodexExport;",
     "const browserOutcome: CockroachBrowserMemoryOutcomeBoundary = validateCockroachBrowserMemoryOutcome({",
     "  schemaVersion: 'cockroach.browser-memory.v1',",
@@ -308,6 +316,12 @@ try {
     path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "cockroach-browser-memory.schema.json"),
     "utf8"
   );
+  assert.equal(
+    installedPackage.exports["./schemas/team-sync-service.json"],
+    "./schemas/team-sync-service.schema.json"
+  );
+  await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "team-sync-service.schema.json"), "utf8");
+  await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "docs", "TEAM-SYNC-SERVICE.md"), "utf8");
   assert.equal(
     installedPackage.exports["./schemas/linked-project-memory.json"],
     "./schemas/linked-project-memory.schema.json"

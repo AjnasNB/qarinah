@@ -66,6 +66,8 @@ The event chain is unchanged. Run `qarinah build` to regenerate `graph/graph.jso
 
 Qarinah 0.5.0 replaces that disposable projection with `qarinah.symbol-graph.v2`. Version 2 retains the TypeScript compiler lane and adds pinned Tree-sitter WASM grammars, parser identities, supported/indexed language coverage, and a parser identity on every indexed file. The event ledger and project-snapshot contracts are unchanged. Existing v1 graph files should be rebuilt with `qarinah symbols build`; consumers that validate the closed graph schema must add v2 support before upgrading.
 
+Qarinah 0.5.0 also adds the optional `qarinah.team-sync-service.v1` HTTP boundary. It does not modify the event ledger or existing encrypted-bundle bytes. Deployments opt in by creating a separate storage root and token set. No network listener starts during package install, workspace initialization, query, or dashboard generation.
+
 ## Linked project memory v1
 
 Qarinah now derives `.qarinah/graph/linked-memory.json` alongside the existing graph, index, SQLite, and Markdown views. This is an additive, disposable `qarinah.linked-project-memory.v1` projection; the authoritative JSONL event contract is unchanged. Run `qarinah build` to create or repair it. Consumers can use `qarinah map` or the exported JavaScript APIs without migrating the ledger.

@@ -342,6 +342,7 @@ Qarinah is intentionally small, local, and inspectable:
 | Human-readable views | Rebuildable Markdown, JSON, graph, index, and Google OKF 0.1 Draft exports |
 | Agent integration | One-command Codex, Claude Code, Cursor, Kimi, and Antigravity setup; reviewed Codex/Claude lifecycle hooks; strict JSON stdin; typed JavaScript API; and consent-gated stdio MCP retrieval |
 | Optional adapters | Local or customer-provided embeddings, query expansion, and rerankers may reorder admitted cited evidence without replacing ledger authority |
+| Team continuity | Client-side encrypted immutable bundles, a self-hosted opaque sync service, tenant-bound roles, exact bundle identities, bounded rate limits, and token-free audit evidence |
 | Infrastructure | No required vector database, hosted backend, embedding bill, model provider, daemon, analytics endpoint, or Qarinah API key |
 
 ## Install
@@ -377,11 +378,11 @@ The public package now includes:
 - task packs for debugging, code review, feature work, database migration, incident response, release preparation, and security review;
 - multi-repository context with typed cross-repository relationships and separate cited authority;
 - optional semantic reranking that cannot introduce unadmitted sources;
-- an encrypted team-sync protocol with roles, GitHub binding, and signed checkpoints;
+- an encrypted self-hosted team-sync service with roles, immutable bundle IDs, audit evidence, GitHub binding, and signed checkpoints;
 - evaluation for recall, citation accuracy, stale rejection, conflict and supersession correctness, repository isolation, unauthorized-disclosure rejection, supplied tokens, net task cost, latency, completion, and repeated mistakes; and
 - causal receipts connecting Cockroach evidence, Qarinah memory, Maqam policy, execution, and observed results.
 
-See [Shared and verifiable team memory](docs/TEAM-MEMORY.md) for commands, APIs, and security boundaries.
+See [Shared and verifiable team memory](docs/TEAM-MEMORY.md) and the [self-hosted opaque sync guide](docs/TEAM-SYNC-SERVICE.md) for commands, APIs, and security boundaries.
 
 ## Inspect project memory in the local dashboard
 

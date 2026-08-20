@@ -132,6 +132,11 @@ export {
   decryptEncryptedSyncBundle,
   verifySignedCheckpoint
 } from "./team-sync.js";
+export {
+  TEAM_SYNC_SERVICE_SCHEMA_VERSION,
+  createTeamSyncServer,
+  encryptedSyncBundleId
+} from "./team-sync-server.js";
 export { createCausalReceipt } from "./receipts.js";
 export {
   SESSION_CONTEXT_RECEIPT_INDEX_SCHEMA_VERSION,

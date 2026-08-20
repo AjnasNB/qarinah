@@ -28,6 +28,20 @@ import { createMcpServer, runMcpServer } from "qarinah/mcp";
 
 The declarations shipped in `types/index.d.ts`, `types/codex.d.ts`, `types/claude.d.ts`, and `types/mcp.d.ts` are the exact compile-time contract for version 0.4.0. JSON Schemas are available through package exports such as `qarinah/schemas/event.json`.
 
+## Opaque encrypted team sync
+
+```ts
+import {
+  createEncryptedSyncBundle,
+  createTeamSyncServer,
+  encryptedSyncBundleId,
+  type QarinahEncryptedSyncBundle,
+  type QarinahTeamSyncServer
+} from "qarinah";
+```
+
+`createTeamSyncServer()` creates an explicit loopback-only service. It starts only after `start()` is called and returns a closeable handle. The service persists strict `QarinahEncryptedSyncBundle` envelopes without decryption and exposes immutable tenant-bound PUT/GET routes plus bounded status and audit routes. See [TEAM-SYNC-SERVICE.md](TEAM-SYNC-SERVICE.md) and `qarinah/schemas/team-sync-service.json`.
+
 ## Runtime boundary
 
 - Node.js 22, 24, or 26.
