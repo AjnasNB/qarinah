@@ -27,7 +27,7 @@ test("deterministic consolidation produces cited facts and reuses an exact recor
     cwd: root,
     query: "release artifact checks",
     record: true,
-    clock: () => new Date("2026-08-20T12:00:00.000Z")
+    clock: () => new Date("2099-08-20T12:00:00.000Z")
   });
   assert.equal(first.schemaVersion, "qarinah.fact-consolidation.v1");
   assert.equal(first.method, "deterministic-cited-v1");
@@ -39,7 +39,7 @@ test("deterministic consolidation produces cited facts and reuses an exact recor
     cwd: root,
     query: "release artifact checks",
     record: true,
-    clock: () => new Date("2026-08-21T12:00:00.000Z")
+    clock: () => new Date("2099-08-21T12:00:00.000Z")
   });
   assert.equal(replay.recording.status, "reused");
   assert.equal(replay.recording.eventId, first.recording.eventId);
