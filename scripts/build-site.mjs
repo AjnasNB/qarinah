@@ -12,13 +12,14 @@ const conceptDoi = "https://doi.org/10.5281/zenodo.21547684";
 const doi = conceptDoi;
 const publishedV14Doi = "https://doi.org/10.5281/zenodo.21850747";
 const historicalVersionDoi = "https://doi.org/10.5281/zenodo.21843240";
-const paperVersion = "1.6";
+const paperVersion = "1.7";
 const paperPdf = `/paper/Qarinah-Technical-White-Paper-v${paperVersion}.pdf`;
 const historicalPaperPdfs = new Map([
   ["Qarinah-Technical-White-Paper-v1.2.pdf", "/paper/Qarinah-Technical-White-Paper-v1.2.pdf"],
   ["Qarinah-Technical-White-Paper-v1.3.pdf", "/paper/Qarinah-Technical-White-Paper-v1.3.pdf"],
   ["Qarinah-Technical-White-Paper-v1.4.pdf", "/paper/Qarinah-Technical-White-Paper-v1.4.pdf"],
-  ["Qarinah-Technical-White-Paper-v1.5.pdf", "/paper/Qarinah-Technical-White-Paper-v1.5.pdf"]
+  ["Qarinah-Technical-White-Paper-v1.5.pdf", "/paper/Qarinah-Technical-White-Paper-v1.5.pdf"],
+  ["Qarinah-Technical-White-Paper-v1.6.pdf", "/paper/Qarinah-Technical-White-Paper-v1.6.pdf"]
 ]);
 const releaseDate = "2026-08-19";
 const paperPublishedDate = "2026-08-20";
@@ -2024,7 +2025,7 @@ async function markdownPage(page) {
             ? "install"
             : "docs";
   const publicationLink = page.route === "paper"
-    ? `<a href="${paperPdf}">Download v1.6 PDF</a> · <a href="${conceptDoi}">Paper series DOI</a> · <a href="${publishedV14Doi}">Published v1.4</a> · <a href="${historicalVersionDoi}">Published v1.3</a>`
+    ? `<a href="${paperPdf}">Download v${paperVersion} PDF</a> · <a href="${conceptDoi}">Paper series DOI</a> · <a href="${publishedV14Doi}">Published v1.4</a> · <a href="${historicalVersionDoi}">Published v1.3</a>`
     : "";
 
   return layout({
