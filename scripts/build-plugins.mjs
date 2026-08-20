@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { copyFile, mkdir, mkdtemp, readFile, rm } from "node:fs/promises";
+import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { builtinModules } from "node:module";
 import os from "node:os";
 import path from "node:path";
@@ -23,6 +23,15 @@ const vendoredRuntimeFiles = [
   ["typescript-classic", "ThirdPartyNoticeText.txt"],
   ["typescript-classic", "lib", "typescript.js"]
 ];
+
+function canonicalVendoredBytes(bytes, segments) {
+  if (path.extname(segments.at(-1)) === ".wasm") return bytes;
+  const text = bytes.toString("utf8")
+    .replaceAll("\r\n", "\n")
+    .replace(/[ \t]+(?=\n|$)/gu, "")
+    .replace(/\n*$/u, "\n");
+  return Buffer.from(text, "utf8");
+}
 assert.match(versionSource, new RegExp(`QARINAH_VERSION\\s*=\\s*[\"']${packageJson.version.replaceAll(".", "\\.")}[\"']`), "Runtime and package versions must match.");
 
 const plugins = [
@@ -95,11 +104,12 @@ try {
       const source = path.join(repositoryRoot, "node_modules", ...segments);
       const target = path.join(plugin.root, "runtime", "vendor", ...segments);
       await mkdir(path.dirname(target), { recursive: true });
+      const expected = canonicalVendoredBytes(await readFile(source), segments);
       if (checking) {
-        const [expected, committed] = await Promise.all([readFile(source), readFile(target)]);
+        const committed = await readFile(target);
         assert.ok(expected.equals(committed), `${plugin.name} vendored ${segments.join("/")} is stale. Run \`npm run build:plugins\`.`);
       } else {
-        await copyFile(source, target);
+        await writeFile(target, expected);
       }
     }
     for (const legalFile of ["LICENSE", "THIRD_PARTY_NOTICES.md"]) {
