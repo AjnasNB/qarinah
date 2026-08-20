@@ -8,6 +8,7 @@ import {
   backupAgentArchives,
   buildSessionContextReceipts,
   buildDeveloperMemoryView,
+  buildSymbolGraph,
   buildProjectOverview,
   captureClaudeHook,
   captureCodexHook,
@@ -36,6 +37,7 @@ import {
   renderContextPackMarkdown,
   renderCodingContextHarnessMarkdown,
   restoreContentArchive,
+  searchSymbols,
   revokeWorkspaceTrust,
   runMcpServer,
   scanProjectStructure,
@@ -302,6 +304,8 @@ Usage:
   qarinah archive delete <archive-id> --confirm <archive-id>
   qarinah archive gc --confirm-workspace <workspace-id>
   qarinah archive erase-key --confirm-workspace <workspace-id>
+  qarinah symbols build
+  qarinah symbols query [text] [--limit n] [--kind function,class,...]
   qarinah overview [--format json|markdown]
   qarinah footprint [query] [--baseline-tokens n] [--rate-per-million n] [--max-chars n] [--max-tokens n]
   qarinah receipts [query] [--session <id>] [--write] [--max-chars n] [--max-tokens n] [--limit n]
@@ -677,6 +681,30 @@ async function run(argv) {
       return;
     }
     throw new TypeError("archive requires create, list, verify, restore, delete, gc, or erase-key.");
+  }
+  if (command === "symbols") {
+    const [action, ...symbolArgs] = args;
+    if (action === "build") {
+      if (symbolArgs.length !== 0) throw new TypeError("symbols build accepts no arguments.");
+      process.stdout.write(`${JSON.stringify(await buildSymbolGraph({ cwd: process.cwd() }), null, 2)}\n`);
+      return;
+    }
+    if (action === "query") {
+      const parsed = strictValueOptions(symbolArgs, "symbols query", ["--limit", "--kind"]);
+      if (parsed.positionals.length > 1) throw new TypeError("symbols query accepts at most one query string.");
+      const limitValue = parsed.values.get("--limit");
+      if (limitValue !== undefined && (!/^[0-9]+$/u.test(limitValue) || Number(limitValue) < 1 || Number(limitValue) > 500)) {
+        throw new TypeError("symbols query --limit must be from 1 to 500.");
+      }
+      const kinds = parsed.values.get("--kind")?.split(",").map((value) => value.trim()).filter(Boolean);
+      process.stdout.write(`${JSON.stringify(await searchSymbols(parsed.positionals[0] ?? "", {
+        cwd: process.cwd(),
+        limit: limitValue === undefined ? undefined : Number(limitValue),
+        kinds
+      }), null, 2)}\n`);
+      return;
+    }
+    throw new TypeError("symbols requires build or query.");
   }
   if (command === "overview") {
     const parsed = strictValueOptions(args, "overview", ["--format"]);

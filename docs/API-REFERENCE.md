@@ -82,6 +82,8 @@ Invalid JavaScript argument shapes generally throw `TypeError`. Storage, trust, 
 | `AGENT_ARCHIVE_BACKUP_SCHEMA_VERSION` | `"qarinah.agent-archive-backup.v1"` |
 | `CONTENT_ARCHIVE_SCHEMA_VERSION` | `"qarinah.content-archive.v1"` |
 | `CONTENT_ARCHIVE_KEY_SCHEMA_VERSION` | `"qarinah.content-archive-key.v1"` |
+| `SYMBOL_GRAPH_SCHEMA_VERSION` | `"qarinah.symbol-graph.v1"` |
+| `QARINAH_LSP_PROTOCOL_VERSION` | `"qarinah-lsp.v1"` |
 | `MEMORY_FOOTPRINT_SCHEMA_VERSION` | `"qarinah.memory-footprint.v1"` |
 | `CODING_CONTEXT_HARNESS_SCHEMA_VERSION` | `"qarinah.coding-context-harness.v1"` |
 | `PROJECT_OVERVIEW_SCHEMA_VERSION` | `"qarinah.project-overview.v1"` |
@@ -464,6 +466,20 @@ function cryptographicallyEraseContentArchiveVault(options: { cwd?: string; conf
 ```
 
 The archive is an opt-in, bounded, local content store for workspaces whose capture mode is `content`. It uses content-defined chunks, cross-manifest deduplication, conditional Brotli compression, AES-256-GCM authentication, SHA-256 identities, exact restore verification, and explicit destructive confirmations. The adjacent local key is not an OS keystore or KMS. The strict manifest contract is exported as `qarinah/schemas/content-archive.json`. See [Lossless content archive](CONTENT-ARCHIVE.md).
+
+## Symbol graph and language server
+
+```ts
+function parseTypeScriptSymbols(filePath: string, text: string, options?: { maxCharacters?: number }): QarinahParsedSymbols;
+function buildSymbolGraph(options?: { cwd?: string; persist?: boolean; signal?: AbortSignal }): Promise<QarinahSymbolGraph>;
+function loadSymbolGraph(options?: { cwd?: string }): Promise<QarinahSymbolGraph>;
+function querySymbolGraph(graph: QarinahSymbolGraph, query?: string, options?: { limit?: number; kinds?: readonly QarinahSymbolKind[] }): QarinahSymbolQuery;
+function searchSymbols(query?: string, options?: QarinahSymbolSearchOptions): Promise<QarinahSymbolQuery>;
+function createLanguageServer(options?: QarinahLanguageServerOptions): QarinahLanguageServer;
+function runLanguageServer(options?: QarinahLanguageServerOptions): QarinahLanguageServer;
+```
+
+`buildSymbolGraph` reads only JavaScript/TypeScript-family files whose exact hashes remain current in the latest validated project snapshot. The query API returns an explicit lexical/local-vector/structural score basis. The language server implements bounded LSP stdio requests for symbols, definitions, and references. The strict graph contract is exported as `qarinah/schemas/symbol-graph.json`. See [Symbol graph and language server](SYMBOL-GRAPH.md).
 
 ### `buildProjectOverview(options?)`
 

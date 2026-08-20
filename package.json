@@ -8,7 +8,8 @@
   "type": "module",
   "sideEffects": false,
   "bin": {
-    "qarinah": "bin/qarinah.js"
+    "qarinah": "bin/qarinah.js",
+    "qarinah-lsp": "bin/qarinah-lsp.js"
   },
   "main": "src/index.js",
   "types": "types/index.d.ts",
@@ -47,7 +48,8 @@
     "./schemas/coding-context-harness.json": "./schemas/coding-context-harness.schema.json",
     "./schemas/session-context-receipt.json": "./schemas/session-context-receipt.schema.json",
     "./schemas/host-install-manifest.json": "./schemas/host-install-manifest.schema.json",
-    "./schemas/content-archive.json": "./schemas/content-archive.schema.json"
+    "./schemas/content-archive.json": "./schemas/content-archive.schema.json",
+    "./schemas/symbol-graph.json": "./schemas/symbol-graph.schema.json"
   },
   "files": [
     "bin/",
@@ -107,6 +109,7 @@
     "docs/SQLITE-READ-MODEL.md",
     "docs/TEMPORAL-AUTHORITY.md",
     "docs/LINKED-PROJECT-MEMORY.md",
+    "docs/SYMBOL-GRAPH.md",
     "docs/WORKTREE-CONTEXT.md",
     "docs/CODING-CONTEXT-HARNESS.md",
     "bench/fixtures/software-task-scenarios.mjs",
@@ -324,6 +327,7 @@
     "typescript": "7.0.2"
   },
   "dependencies": {
-    "ignore": "7.0.6"
+    "ignore": "7.0.6",
+    "typescript-classic": "npm:typescript@5.9.3"
   }
 }

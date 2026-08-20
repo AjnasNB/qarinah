@@ -35,6 +35,15 @@ export {
   renderContextPackMarkdown
 } from "./compiler.js";
 export { PROJECT_STRUCTURE_SCHEMA_VERSION, scanProjectStructure } from "./project-structure.js";
+export {
+  SYMBOL_GRAPH_SCHEMA_VERSION,
+  buildSymbolGraph,
+  loadSymbolGraph,
+  parseTypeScriptSymbols,
+  querySymbolGraph,
+  searchSymbols
+} from "./symbol-graph.js";
+export { QARINAH_LSP_PROTOCOL_VERSION, createLanguageServer, runLanguageServer } from "./lsp-server.js";
 export { AGENT_ARCHIVE_IMPORT_SCHEMA_VERSION, importAgentArchive } from "./archive-import.js";
 export { AGENT_ARCHIVE_BACKUP_SCHEMA_VERSION, backupAgentArchives } from "./archive-backup.js";
 export {

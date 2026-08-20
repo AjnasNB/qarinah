@@ -89,6 +89,8 @@ test("developer view joins graph, timeline, decisions, tools, receipts, and work
   assert.equal(view.boundaries.readOnly, true);
   assert.equal(view.worktreeComparison.worktreeCount, 1);
   assert.equal(view.sessions.receiptCount, 1);
+  assert.equal(view.symbols.available, false);
+  assert.match(view.symbols.reason, /qarinah scan/u);
   assert.equal(view.timeline.some((entry) => entry.category === "decision"), true);
   assert.equal(view.timeline.some((entry) => entry.category === "tool"), true);
   assert.match(view.manifestHash, /^sha256:[0-9a-f]{64}$/u);

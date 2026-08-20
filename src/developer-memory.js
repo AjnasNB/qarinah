@@ -3,6 +3,7 @@ import { buildMemoryDashboard } from "./dashboard.js";
 import { listGitWorktrees } from "./git-worktrees.js";
 import { queryLinkedProjectMemory } from "./linked-memory.js";
 import { buildSessionContextReceipts } from "./session-receipts.js";
+import { buildSymbolGraph, querySymbolGraph } from "./symbol-graph.js";
 import { loadWorkspace } from "./workspace.js";
 
 export const DEVELOPER_MEMORY_VIEW_SCHEMA_VERSION = "qarinah.developer-memory-view.v1";
@@ -82,6 +83,29 @@ export async function buildDeveloperMemoryView(options = {}) {
     write: false,
     clock: () => new Date(normalized.generatedAt)
   });
+  let symbolMemory;
+  try {
+    const symbolGraph = await buildSymbolGraph({ cwd: workspace.root, persist: false });
+    const symbolQuery = querySymbolGraph(symbolGraph, normalized.query, { limit: normalized.limit });
+    symbolMemory = {
+      available: true,
+      schemaVersion: symbolGraph.schemaVersion,
+      manifestHash: symbolGraph.manifestHash,
+      extractor: symbolGraph.extractor,
+      coverage: symbolGraph.coverage,
+      files: symbolGraph.files,
+      results: symbolQuery.results
+    };
+  } catch (error) {
+    if (error?.code !== "SYMBOL_SCAN_REQUIRED") throw error;
+    symbolMemory = {
+      available: false,
+      reason: "Run qarinah scan, then qarinah symbols build to enable JavaScript and TypeScript symbol memory.",
+      coverage: null,
+      files: [],
+      results: []
+    };
+  }
   const worktrees = [];
   if (normalized.includeWorktrees && workspace.worktree !== null) {
     for (const descriptor of await listGitWorktrees(workspace.root)) {
@@ -124,6 +148,7 @@ export async function buildDeveloperMemoryView(options = {}) {
     tools: dashboard.tools,
     outcomes: dashboard.majorChanges,
     sessions: receiptIndex,
+    symbols: symbolMemory,
     worktreeComparison: comparison,
     boundaries: {
       readOnly: true,

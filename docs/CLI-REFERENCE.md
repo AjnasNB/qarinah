@@ -87,6 +87,8 @@ qarinah archive restore <archive-id> --destination <directory>
 qarinah archive delete <archive-id> --confirm <archive-id>
 qarinah archive gc --confirm-workspace <workspace-id>
 qarinah archive erase-key --confirm-workspace <workspace-id>
+qarinah symbols build
+qarinah symbols query [text] [--limit n] [--kind function,class,...]
 qarinah harness [query] [--worktrees] [--record] [--no-rebuild] [--format json|markdown] [options]
 qarinah query [text] [options]
 qarinah query --stdin-json
@@ -506,6 +508,16 @@ qarinah archive erase-key --confirm-workspace <workspace-id>
 ```
 
 Creation requires a workspace initialized with `--capture content`. Sources remain inside the workspace and outside `.qarinah`; links, generated/dependency trees, ignored paths, and common secret filenames are not archived. Verify reconstructs and hashes every file. Restore refuses existing output files. Delete removes only the manifest, while garbage collection removes objects no remaining manifest references. Key destruction is a local cryptographic-erasure operation with explicit backup and physical-media caveats. See [Lossless content archive](CONTENT-ARCHIVE.md).
+
+## Symbols and language server
+
+```text
+qarinah symbols build
+qarinah symbols query [text] [--limit n] [--kind function,class,...]
+qarinah-lsp
+```
+
+Run `qarinah scan` before the first symbol build. The v1 built-in parser covers JavaScript, JSX, TypeScript, and TSX and verifies each file against the latest snapshot hash. Query returns the lexical, local-subword-vector, and structural score components. `qarinah-lsp` starts the bounded stdio language server. See [Symbol graph and language server](SYMBOL-GRAPH.md).
 
 `compact` is the default. It writes one cited summary per session and is appropriate for large exports. `full` writes each supported visible item separately and requires content-authorized capture. Hidden reasoning and encrypted reasoning blocks are ignored in either mode. The result reports source bytes, files, records, visible items, sessions, newly imported events, formats, and rebuilt-state identity.
 

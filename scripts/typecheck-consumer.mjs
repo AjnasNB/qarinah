@@ -67,6 +67,12 @@ try {
     "  deleteContentArchive,",
     "  garbageCollectContentArchive,",
     "  cryptographicallyEraseContentArchiveVault,",
+    "  buildSymbolGraph,",
+    "  loadSymbolGraph,",
+    "  parseTypeScriptSymbols,",
+    "  querySymbolGraph,",
+    "  searchSymbols,",
+    "  createLanguageServer,",
     "  ingestCockroachSourceRecord,",
     "  importAgentArchive,",
     "  buildProjectOverview,",
@@ -103,6 +109,8 @@ try {
     "  type QarinahCapturePolicy,",
     "  type QarinahContentArchiveManifest,",
     "  type QarinahContentArchiveOptions,",
+    "  type QarinahSymbolGraph,",
+    "  type QarinahSymbolQuery,",
     "  type QarinahOkfExportResult,",
     "  type QarinahAgentArchiveImportResult,",
     "  type QarinahProjectOverview,",
@@ -139,6 +147,15 @@ try {
     "void deleteContentArchive;",
     "void garbageCollectContentArchive;",
     "void cryptographicallyEraseContentArchiveVault;",
+    "const parsedSymbols = parseTypeScriptSymbols('consumer.ts', 'export function consumer() {}');",
+    "void parsedSymbols;",
+    "const symbolGraphPromise: Promise<QarinahSymbolGraph> = buildSymbolGraph({ persist: false });",
+    "void symbolGraphPromise;",
+    "void loadSymbolGraph;",
+    "const symbolGraph: QarinahSymbolGraph | null = null;",
+    "if (symbolGraph) { const symbolQuery: QarinahSymbolQuery = querySymbolGraph(symbolGraph, 'consumer'); void symbolQuery; }",
+    "void searchSymbols;",
+    "void createLanguageServer;",
     "const projectOverview: Promise<QarinahProjectOverview> = buildProjectOverview();",
     "void projectOverview;",
     "void renderProjectOverviewMarkdown;",
@@ -297,6 +314,14 @@ try {
   );
   await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "content-archive.schema.json"), "utf8");
   await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "docs", "CONTENT-ARCHIVE.md"), "utf8");
+  assert.equal(
+    installedPackage.exports["./schemas/symbol-graph.json"],
+    "./schemas/symbol-graph.schema.json"
+  );
+  assert.equal(installedPackage.bin["qarinah-lsp"], "bin/qarinah-lsp.js");
+  assert.equal(installedPackage.dependencies["typescript-classic"], "npm:typescript@5.9.3");
+  await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "symbol-graph.schema.json"), "utf8");
+  await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "docs", "SYMBOL-GRAPH.md"), "utf8");
   process.stdout.write("Exact cockroach-browser@0.1.0 TypeScript and registry-integrity contract passed.\n");
 } finally {
   await rm(temporaryDirectory, { recursive: true, force: true });

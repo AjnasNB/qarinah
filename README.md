@@ -79,6 +79,19 @@ npx qarinah archive verify archive_<sha256>
 
 The 98.7148% result above is a context-volume estimate, not an archive-compression claim. The archive is local and opt-in, excludes common secret filenames and ignored/generated paths, rejects links, and has hard resource ceilings. Read [Lossless content archive](docs/CONTENT-ARCHIVE.md) before enabling content capture.
 
+### Code-aware memory, not only chat summaries
+
+After `qarinah scan`, the built-in JavaScript/TypeScript parser can create a hash-linked symbol graph with declarations, exact spans, exported status, and unambiguous references. The local search path combines lexical matching, deterministic subword vectors, and reference structure without downloading a model or calling a hosted vector database. Qarinah also ships `qarinah-lsp` for workspace symbols, document symbols, definitions, and references over the Language Server Protocol.
+
+```powershell
+npx qarinah scan
+npx qarinah symbols build
+npx qarinah symbols query "context compiler"
+npx qarinah-lsp
+```
+
+The v1 parser covers JavaScript, JSX, TypeScript, and TSX. Other languages are reported as unsupported instead of being guessed. Read [Symbol graph and language server](docs/SYMBOL-GRAPH.md) for the exact coverage boundary.
+
 <p align="center">
   <a href="https://qarinah.io"><strong>Website</strong></a>&nbsp;&middot;&nbsp;
   <a href="https://qarinah.io/docs/features/"><strong>Features</strong></a>&nbsp;&middot;&nbsp;
@@ -230,7 +243,7 @@ npx qarinah query "release provenance" \
   --format markdown
 ```
 
-Start with the [feature map](docs/FEATURES.md) and [five-minute installation guide](docs/GETTING-STARTED.md), then use the [coding context harness](docs/CODING-CONTEXT-HARNESS.md), [worktree context](docs/WORKTREE-CONTEXT.md), [host compatibility](docs/HOST-COMPATIBILITY.md), the [project overview](docs/PROJECT-OVERVIEW.md), [agent archive import](docs/AGENT-ARCHIVE-IMPORT.md), [lossless content archive](docs/CONTENT-ARCHIVE.md), [external archive backup](docs/AGENT-ARCHIVE-BACKUP.md), [private-project guide](docs/PRIVATE-PROJECTS.md), [cross-agent handoff guide](docs/CROSS-AGENT-HANDOFFS.md), [dashboard guide](docs/DASHBOARD.md), [team-memory guide](docs/TEAM-MEMORY.md), [CLI reference](docs/CLI-REFERENCE.md), [JavaScript API reference](docs/API-REFERENCE.md), [MCP guide](docs/MCP-GUIDE.md), [task recipes](docs/RECIPES.md), or [troubleshooting guide](docs/TROUBLESHOOTING.md).
+Start with the [feature map](docs/FEATURES.md) and [five-minute installation guide](docs/GETTING-STARTED.md), then use the [coding context harness](docs/CODING-CONTEXT-HARNESS.md), [worktree context](docs/WORKTREE-CONTEXT.md), [symbol graph and language server](docs/SYMBOL-GRAPH.md), [host compatibility](docs/HOST-COMPATIBILITY.md), the [project overview](docs/PROJECT-OVERVIEW.md), [agent archive import](docs/AGENT-ARCHIVE-IMPORT.md), [lossless content archive](docs/CONTENT-ARCHIVE.md), [external archive backup](docs/AGENT-ARCHIVE-BACKUP.md), [private-project guide](docs/PRIVATE-PROJECTS.md), [cross-agent handoff guide](docs/CROSS-AGENT-HANDOFFS.md), [dashboard guide](docs/DASHBOARD.md), [team-memory guide](docs/TEAM-MEMORY.md), [CLI reference](docs/CLI-REFERENCE.md), [JavaScript API reference](docs/API-REFERENCE.md), [MCP guide](docs/MCP-GUIDE.md), [task recipes](docs/RECIPES.md), or [troubleshooting guide](docs/TROUBLESHOOTING.md).
 
 Your project already contains the decisions and evidence behind its changes. Qarinah lets the next agent query that record and receive a bounded, cited pack selected for the current task. The same local memory can support Codex, Claude Code, CLI workflows, and compatible MCP clients instead of locking project context to one editor.
 
@@ -576,6 +589,8 @@ Content-mode redaction cannot prove that arbitrary tool output contains no secre
 | `qarinah build` | Verify and rebuild graph, index, and Markdown |
 | `qarinah map` | Search admitted memory and the repository map with temporal, repository, scope, and node-type filters |
 | `qarinah archive` | Create, list, verify, restore, delete, garbage-collect, or cryptographically erase an explicit local content archive |
+| `qarinah symbols` | Build or search the hash-linked JavaScript/TypeScript symbol and reference graph |
+| `qarinah-lsp` | Serve document/workspace symbols, definitions, and references to an LSP client over stdio |
 | `qarinah query` | Compile a coverage-aware, cited, budgeted context pack |
 | `qarinah export okf` | Build a deterministic Markdown interoperability bundle |
 | `qarinah doctor` / `qarinah status` | Verify integrity or inspect current state |

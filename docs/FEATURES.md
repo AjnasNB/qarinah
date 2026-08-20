@@ -28,6 +28,14 @@ Qarinah is evidence-linked project memory for coding agents. It keeps an inspect
 - Ignore rules, secret-filename rejection, link rejection, and hard resource ceilings keep the archive opt-in and project-scoped.
 - This is a local project archive, not a managed backup cloud, device-wide passive capture service, or physical-media erasure guarantee.
 
+## Code-aware symbol memory
+
+- A real TypeScript compiler parser indexes JavaScript, JSX, TypeScript, and TSX declarations, containers, exports, exact spans, signature hashes, and unambiguous references.
+- Every parsed file must still match the content hash in the latest explicit project scan; stale or linked files abstain.
+- Default symbol search combines lexical matching, a deterministic local subword vector, and resolved-reference structure with a visible score basis.
+- `qarinah-lsp` exposes document symbols, workspace symbols, definitions, and references through bounded stdio JSON-RPC.
+- The strict symbol-graph schema is public and additive. Other language grammars are future adapters, not silently approximated by the v1 parser.
+
 See [Coding context harness](CODING-CONTEXT-HARNESS.md).
 
 ## Project-owned memory
