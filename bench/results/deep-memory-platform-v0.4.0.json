@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "qarinah.deep-memory-platform-evaluation.v1",
+  "protocol": {
+    "id": "deep-memory-product-acceptance-v1",
+    "generatedAt": "2026-08-20T14:00:00.000Z",
+    "environment": "temporary initialized Qarinah project with two TypeScript files and two encrypted content snapshots",
+    "scope": "Product acceptance evidence for exact source recovery, snapshot reuse, symbol/reference retrieval, cited fact consolidation, and incremental project refresh. It is not an external comparative benchmark."
+  },
+  "aggregate": {
+    "scenarioCount": 12,
+    "passed": 12,
+    "failed": 0,
+    "passRate": 1
+  },
+  "observed": {
+    "sourceFiles": 2,
+    "secondSnapshotSourceBytes": 390226,
+    "firstSnapshotChunks": 3,
+    "secondSnapshotChunks": 3,
+    "secondSnapshotReusedChunks": 2,
+    "indexedSymbols": 4,
+    "resolvedReferences": 3,
+    "citedFacts": 3,
+    "restoredFiles": 2
+  },
+  "scenarios": [
+    {
+      "id": "initial-source-change-is-captured",
+      "passed": true,
+      "observation": "2 source files captured"
+    },
+    {
+      "id": "unchanged-cycle-creates-no-derived-write",
+      "passed": true,
+      "observation": "unchanged cycle suppressed"
+    },
+    {
+      "id": "changed-file-is-detected",
+      "passed": true,
+      "observation": "src/math.ts changed"
+    },
+    {
+      "id": "symbol-graph-is-complete-for-eligible-files",
+      "passed": true,
+      "observation": "2 eligible files indexed"
+    },
+    {
+      "id": "function-symbol-is-retrievable",
+      "passed": true,
+      "observation": "add function returned"
+    },
+    {
+      "id": "cross-file-reference-is-resolved",
+      "passed": true,
+      "observation": "consumer reference resolved"
+    },
+    {
+      "id": "facts-are-source-cited",
+      "passed": true,
+      "observation": "3 cited facts"
+    },
+    {
+      "id": "decision-and-outcome-remain-retrievable",
+      "passed": true,
+      "observation": "decision and outcome cited"
+    },
+    {
+      "id": "second-archive-reuses-existing-objects",
+      "passed": true,
+      "observation": "2 chunks reused"
+    },
+    {
+      "id": "archive-verification-passes",
+      "passed": true,
+      "observation": "390226 source bytes verified"
+    },
+    {
+      "id": "restored-file-list-is-exact",
+      "passed": true,
+      "observation": "2 files restored"
+    },
+    {
+      "id": "restored-bytes-match-second-snapshot",
+      "passed": true,
+      "observation": "all restored source bytes match"
+    }
+  ],
+  "artifactHash": "sha256:bb801a59d5c1822b87bda5596237a126a064e62ac6f588e3351ebe949551ff46"
+}
