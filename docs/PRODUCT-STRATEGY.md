@@ -1,80 +1,39 @@
 # Product strategy
 
-## One product, four boundaries
+Qarinah is the durable project memory that coding agents can inspect and cite.
 
-The product is a governed control plane for software agents. Its first customer promise is:
+Its first customer promise is simple:
 
-> Deploy agents that can research and act without losing control of source evidence, context, approval, or execution receipts.
+> Initialize a repository once, preserve the project evidence you permit, and let each supported coding agent recover the relevant decisions, outcomes, code relationships, session receipts, and Git-worktree context without replaying the complete retained history.
 
-The repositories are implementation boundaries, not four competing product pitches:
+## Product center
 
-- **Maqam** is the control plane. It evaluates policy, binds approval to exact tool input, dispatches registered capabilities, and records execution evidence.
-- **Cockroach Crawler** acquires bounded public evidence and reports the real capability and credential boundary of each source.
-- **Qarinah** retains explicit events and decisions, compiles small cited context packs, and exports portable knowledge documents.
-- **ProductLoop** is the composable workflow and integration SDK around those contracts.
+1. **The project owns the memory.** The authoritative ledger lives beside the repository and is independent of one model vendor or chat window.
+2. **Every compact answer keeps its proof.** Selected memory carries event identities, hashes, coverage, conflicts, and supersession state.
+3. **Current code and historical intent stay connected.** Source-hash-bound symbol graphs connect files and definitions to the decisions and outcomes around them.
+4. **Parallel worktrees remain precise.** Every initialized checkout owns a separate writable ledger and consent record while repository identity enables read-only comparison.
+5. **Memory is visible.** The CLI, local dashboard, VS Code/Cursor panel, standard LSP, and JetBrains LSP4IJ template expose the same rebuildable project view.
+6. **Capture remains explicit.** Qarinah does not silently collect unrelated desktop activity or pretend unsupported private host formats are available.
 
-An in-page form or browser actuator is a future governed capability, not another authority layer. It should propose a bounded DOM action; Maqam should authorize the exact action; Cockroach should capture relevant before/after evidence; and Qarinah should retain the resulting receipt.
+## Optional composition
 
-## The differentiating object: a causal receipt
+Qarinah works as a standalone local package. It can additionally receive cited web records, browser outcomes, or workflow provenance through strict passive adapters. Maqam can add policy or human approval to selected operations when a team needs that layer; normal Qarinah memory and retrieval do not require it.
 
-A useful receipt connects the whole chain instead of logging only the final tool call:
+The integration rule is consistent: external systems may submit versioned evidence records, but they do not inherit Qarinah's workspace authority, source archive keys, or disclosure permissions. Qarinah does not inherit their execution authority either.
 
-```text
-source evidence
-  -> retained event
-  -> selected context and citations
-  -> policy decision
-  -> exact human approval, when required
-  -> exact tool input
-  -> observed effect
-  -> outcome evidence
-```
+## Retrieval and model choices
 
-Every link needs an identity, hash, timestamp, confidence class, and explicit relation. Conflicting evidence remains visible. A newer decision may supersede an older one, but history is not silently rewritten. Authority is scoped and revocable; it is not inferred from confident wording.
+The built-in default remains deterministic and local: lexical matching, typo tolerance, graph evidence, term-derived vectors, source freshness, temporal state, authority admission, and coverage checks. Provider tokenizers, learned embeddings, or model-assisted fact extraction may be explicit adapters. They must identify their model/version, preserve cited source identities, respect the same disclosure boundary, and keep a deterministic fallback.
 
-This is the product-level proof: an operator can answer *what acted, for whom, using which context, under which rule, with whose approval, and what changed?*
+## Distribution
 
-## Context economics
+- Apache-2.0 npm package and source repository;
+- project-local Codex, Claude, Cursor, Kimi, Antigravity, and Freebuff setup surfaces with explicitly documented differences;
+- VS Code/Cursor extension and a standard LSP process;
+- JetBrains LSP4IJ custom template;
+- reproducible schemas, evaluations, machine-readable results, and technical paper; and
+- optional self-hosted opaque encrypted-bundle transport.
 
-Qarinah should remember decisions, evidence, outcomes, and relationships. It should not duplicate an agent host by copying every source file or complete transcript into every prompt.
+## Evidence standard
 
-The local no-key baseline is deterministic:
-
-1. verify the append-only event chain and machine-local capture permit;
-2. filter expired and future-at-checkpoint records;
-3. rank with lexical relevance, typo tolerance, and one-hop graph evidence;
-4. preserve contradictions and apply explicit supersession;
-5. diversify repeated results;
-6. compile only what fits the caller's character and token budget, leaving output headroom;
-7. mark retrieved material as untrusted data and carry citations and hashes forward.
-
-Provider tokenizers or embedding services can be optional adapters. They must declare their identity and version and cannot replace source records, policy, or deterministic fallback behavior.
-
-## Path to a governed agent operating layer
-
-The credible path is incremental:
-
-1. **Agent control plane:** registered tools, policy, exact approvals, evidence, compact context, and replayable receipts.
-2. **Cross-platform user-space supervisor:** process launch, sandbox profiles, filesystem/network capability brokers, secrets mediation, quotas, revocation, and Windows/macOS/Linux adapters.
-3. **Team control plane:** signed policy distribution, encrypted synchronization, identity federation, centralized audit, and incident response.
-4. **Deeper operating-system integration:** privileged brokers and device controls only where a platform-specific threat model, installer, rollback, and recovery design exist.
-
-Until the second stage is real, describe the product as an agent control plane, not an operating-system replacement.
-
-## Proof milestones
-
-- A new developer installs one package and initializes one project in under five minutes.
-- Codex and Claude Code can record the same explicit project decision without storing hidden reasoning.
-- A later session retrieves a smaller cited pack that includes the current decision and any unresolved conflict.
-- A Maqam-controlled write binds policy and approval to the exact tool input and emits one causal receipt.
-- The same event head reproduces the same portable knowledge bundle and context evaluation metrics.
-- Three design partners use the system on real agent workflows and can identify one failure, review, or audit task that became materially faster or safer.
-
-## Non-goals
-
-- universal access to private websites without authentication;
-- bypassing robots policy, paywalls, CAPTCHA, or provider terms;
-- collecting hidden model reasoning;
-- treating browser cookies as ambient shared credentials;
-- claiming that hooks observe events a host does not expose;
-- claiming that an open-source license prohibits commercial use.
+Marketing language follows the checked artifact, not the roadmap. A measured fixture claim names its denominator and limitations. A supported host claim identifies whether the surface is a reviewed lifecycle adapter, MCP configuration, portable import, editor extension, or standard LSP. A feature becomes stable only when its exact packed bytes pass the protected release workflow.
