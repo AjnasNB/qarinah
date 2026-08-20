@@ -385,7 +385,8 @@ if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.reusedChunks !== 2
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.indexedSymbols !== 4
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.resolvedReferences !== 3
-  || publicMetrics.metrics?.deepMemoryProductAcceptance?.artifactHash !== "sha256:bb801a59d5c1822b87bda5596237a126a064e62ac6f588e3351ebe949551ff46"
+  || publicMetrics.metrics?.deepMemoryProductAcceptance?.citedFacts !== 2
+  || publicMetrics.metrics?.deepMemoryProductAcceptance?.artifactHash !== "sha256:3183af0c8ce57ac63d49a4ee930ca93286d2767509b53f2d613444e8735e920f"
   || publicMetrics.metrics?.publicProjectMemory?.scenarios !== 10
   || publicMetrics.metrics?.publicProjectMemory?.passed !== 10
   || publicMetrics.metrics?.publicProjectMemory?.indexedSymbolFiles !== publicMetrics.metrics?.publicProjectMemory?.eligibleSymbolFiles

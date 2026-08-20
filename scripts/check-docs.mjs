@@ -269,8 +269,8 @@ const currentReleaseDocRequirements = new Map([
   ["docs/MCP-GUIDE.md", ["Qarinah 0.5.0-rc.1 includes", "qarinah@0.5.0-rc.1"]],
   ["docs/TOKEN-EFFICIENT-CONTEXT.md", ["--ref v0.5.0-rc.1", "qarinah@v0.5.0-rc.1"]],
   ["docs/RECIPES.md", ["--ref v0.5.0-rc.1", "qarinah@v0.5.0-rc.1"]],
-  ["docs/BENCHMARKS.md", ["current 0.5.0-rc.1 machine-readable result", "multifile-context-0.5.0-rc.1.json"]],
-  ["docs/PUBLIC-METRICS.md", ["multifile-context-0.5.0-rc.1.json"]]
+  ["docs/BENCHMARKS.md", ["deep-memory-platform-v0.5.0-rc.1.json", "current 0.5.0-rc.1 machine-readable result", "multifile-context-0.5.0-rc.1.json"]],
+  ["docs/PUBLIC-METRICS.md", ["deep-memory-platform-v0.5.0-rc.1.json", "multifile-context-0.5.0-rc.1.json"]]
 ]);
 for (const [relativePath, requiredSnippets] of currentReleaseDocRequirements) {
   const markdown = await read(relativePath);

@@ -29,7 +29,7 @@ const worktreeArticleDate = "2026-08-16";
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 const benchmarkRelease = JSON.parse(await readFile(path.join(root, "bench", "results", "benchmark-release-0.1.6.json"), "utf8"));
 const worktreeContinuity = JSON.parse(await readFile(path.join(root, "bench", "results", "worktree-continuity-v0.4.0.json"), "utf8"));
-const deepMemoryPlatform = JSON.parse(await readFile(path.join(root, "bench", "results", "deep-memory-platform-v0.4.0.json"), "utf8"));
+const deepMemoryPlatform = JSON.parse(await readFile(path.join(root, "bench", "results", "deep-memory-platform-v0.5.0-rc.1.json"), "utf8"));
 const publicProjectMemory = JSON.parse(await readFile(path.join(root, "bench", "results", "public-project-memory-0.5.json"), "utf8"));
 const productVersion = packageJson.version;
 const productPositioning = "Verifiable project memory, exact source recovery, and cited context for coding agents.";
@@ -42,6 +42,7 @@ if (worktreeContinuity.schemaVersion !== "qarinah.worktree-continuity-evaluation
   throw new Error("The worktree-continuity website claim does not match the checked release artifact.");
 }
 if (deepMemoryPlatform.schemaVersion !== "qarinah.deep-memory-platform-evaluation.v1"
+  || deepMemoryPlatform.packageVersion !== "0.5.0-rc.1"
   || deepMemoryPlatform.aggregate.scenarioCount !== 12
   || deepMemoryPlatform.aggregate.passed !== 12
   || deepMemoryPlatform.aggregate.failed !== 0
@@ -49,7 +50,8 @@ if (deepMemoryPlatform.schemaVersion !== "qarinah.deep-memory-platform-evaluatio
   || deepMemoryPlatform.observed.secondSnapshotReusedChunks !== 2
   || deepMemoryPlatform.observed.indexedSymbols !== 4
   || deepMemoryPlatform.observed.resolvedReferences !== 3
-  || deepMemoryPlatform.artifactHash !== "sha256:bb801a59d5c1822b87bda5596237a126a064e62ac6f588e3351ebe949551ff46") {
+  || deepMemoryPlatform.observed.citedFacts !== 2
+  || deepMemoryPlatform.artifactHash !== "sha256:3183af0c8ce57ac63d49a4ee930ca93286d2767509b53f2d613444e8735e920f") {
   throw new Error("The deep-memory website claim does not match the checked release artifact.");
 }
 if (publicProjectMemory.schemaVersion !== "qarinah.public-project-memory-evaluation.v1"
@@ -108,8 +110,9 @@ const publicMetrics = {
       reusedChunks: deepMemoryPlatform.observed.secondSnapshotReusedChunks,
       indexedSymbols: deepMemoryPlatform.observed.indexedSymbols,
       resolvedReferences: deepMemoryPlatform.observed.resolvedReferences,
+      citedFacts: deepMemoryPlatform.observed.citedFacts,
       artifactHash: deepMemoryPlatform.artifactHash,
-      evidenceSource: `${github}/blob/main/bench/results/deep-memory-platform-v0.4.0.json`,
+      evidenceSource: `${github}/blob/main/bench/results/deep-memory-platform-v0.5.0-rc.1.json`,
       boundary: deepMemoryPlatform.protocol.scope
     },
     publicProjectMemory: {
