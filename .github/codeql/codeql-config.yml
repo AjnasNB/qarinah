@@ -1,0 +1,8 @@
+name: Qarinah authored-source analysis
+
+# The plugin runtimes are deterministic copies of authored `src/` code plus
+# pinned third-party language tooling. Scan the authored sources and build
+# scripts once; do not spend the analysis budget re-scanning generated copies.
+paths-ignore:
+  - integrations/codex/qarinah/runtime/**
+  - integrations/claude/qarinah/runtime/**
