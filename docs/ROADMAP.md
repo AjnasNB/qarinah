@@ -1,5 +1,36 @@
 # Roadmap
 
+## Qarinah 0.6: proof-carrying task context
+
+The 0.5 release candidate established durable developer memory. The 0.6 line turns that memory into a bounded, query-specific task packet that explains what it selected, what it rejected, and which exact repository and ledger state produced the result.
+
+### P0 - implemented in 0.6.0-alpha.1
+
+- the versioned `qarinah.proof-context.v1` contract and public JavaScript/TypeScript API;
+- the `qarinah proof <query>` CLI surface for portable agent and harness integration;
+- query-ranked repository files and symbols joined with current project events and temporal facts;
+- explicit selection and exclusion reasons, including stale and superseded evidence;
+- a deterministic manifest hash over the delivered packet and its source state;
+- a strict context budget with exact token accounting when a compatible tokenizer is supplied and a named deterministic estimator otherwise; and
+- a searchable Task proof view in the VS Code and Cursor-compatible developer-memory panel.
+
+### P1 - beta release gates
+
+- verify the packed npm artifact, editor extension, CLI, MCP transport, schemas, migrations, and local dashboard from one reviewed commit;
+- repeat clean-install and project-upgrade coverage on Linux, macOS, and Windows;
+- expand task-packet fixtures across repository layouts, language mixes, worktrees, stale evidence, and budget boundaries; and
+- publish exact benchmark receipts and a reproducible verifier with every beta build.
+
+### P2 - stable release gates
+
+- complete an independent security and privacy review and close release-blocking findings;
+- obtain an independent reproduction of the task-packet evaluation;
+- publish long-running real-project installation, recovery, migration, and retention reports;
+- freeze the interoperability contract only after adapter authors have tested it; and
+- promote only the exact reviewed package, editor artifact, paper, evidence, and website bytes.
+
+The maintainer-run 0.6 alpha evaluation accepts 12 / 12 multilingual task-packet scenarios. It checks expected file and symbol retrieval, current-evidence recall, stale-evidence rejection, citation validity, context-budget conformance, deterministic manifest reproduction, and manifest-tamper rejection. This is a bounded release receipt, not a claim that every repository task is solved.
+
 ## Qarinah 0.5: proof-carrying developer memory
 
 Qarinah is a project-memory system for coding agents. It keeps the durable record beside the repository, links evidence to code and Git worktrees, and compiles a small cited pack for the next task. Policy and approval are optional integrations, not the product's primary identity.
@@ -28,7 +59,7 @@ The 0.5 release candidate is organized as three implementation layers.
 - package-contained integration templates, schemas, documentation, editor artifact, evaluation data, and technical-paper source; and
 - a release process that publishes an RC first, verifies fresh installs and migrations on Linux, macOS, and Windows, then promotes only the reviewed bytes.
 
-These layers are implemented on the 0.5 candidate branch. They become a published release claim only after protected review, the full repository gate, hosted cross-platform CI, packed-artifact installation, and release verification pass on one exact commit.
+These layers shipped as the 0.5 release candidate after protected review and exact-commit release verification. They are the foundation consumed by the 0.6 task-packet contract.
 
 ## Current product foundation
 
