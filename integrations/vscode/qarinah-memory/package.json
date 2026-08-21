@@ -1,7 +1,7 @@
 {
   "name": "qarinah-developer-memory",
   "displayName": "Qarinah Developer Memory",
-  "description": "A local, searchable project-memory graph, timeline, session receipts, and Git worktree comparison for VS Code and Cursor.",
+  "description": "A local, searchable proof-carrying task context, project-memory graph, timeline, receipts, and Git worktree comparison for VS Code and Cursor.",
   "version": "0.5.0-rc.1",
   "publisher": "ajnasnb",
   "license": "Apache-2.0",
@@ -9,7 +9,7 @@
     "vscode": "^1.95.0"
   },
   "categories": ["Visualization", "Other"],
-  "keywords": ["ai", "agents", "memory", "context", "git", "worktree"],
+  "keywords": ["ai", "agents", "memory", "context", "proof", "git", "worktree"],
   "main": "./extension.cjs",
   "activationEvents": ["onView:qarinah.developerMemory"],
   "contributes": {

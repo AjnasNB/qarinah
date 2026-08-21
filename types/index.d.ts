@@ -1501,6 +1501,7 @@ export interface QarinahDeveloperMemoryView {
   readonly tools: readonly Record<string, unknown>[];
   readonly outcomes: readonly Record<string, unknown>[];
   readonly sessions: QarinahSessionContextReceiptIndex;
+  readonly proof: QarinahProofContext;
   readonly symbols: Readonly<{
     available: boolean;
     reason?: string;
@@ -1520,6 +1521,7 @@ export function buildDeveloperMemoryView(options?: {
   query?: string;
   includeWorktrees?: boolean;
   limit?: number;
+  proofMaxTokens?: number;
   clock?: () => Date;
 }): Promise<Readonly<QarinahDeveloperMemoryView>>;
 export interface QarinahMemoryDashboard {

@@ -2,6 +2,7 @@ import { deepFreezeJson, sha256 } from "./canonical.js";
 import { buildMemoryDashboard } from "./dashboard.js";
 import { listGitWorktrees } from "./git-worktrees.js";
 import { queryLinkedProjectMemory } from "./linked-memory.js";
+import { buildProofContext } from "./proof-context.js";
 import { buildSessionContextReceipts } from "./session-receipts.js";
 import { buildSymbolGraph, querySymbolGraph } from "./symbol-graph.js";
 import { loadWorkspace } from "./workspace.js";
@@ -10,7 +11,7 @@ export const DEVELOPER_MEMORY_VIEW_SCHEMA_VERSION = "qarinah.developer-memory-vi
 
 function normalizedOptions(options) {
   if (!options || typeof options !== "object" || Array.isArray(options)) throw new TypeError("Developer memory options must be a record.");
-  const allowed = new Set(["cwd", "query", "includeWorktrees", "limit", "clock"]);
+  const allowed = new Set(["cwd", "query", "includeWorktrees", "limit", "proofMaxTokens", "clock"]);
   const unknown = Object.keys(options).filter((key) => !allowed.has(key));
   if (unknown.length) throw new TypeError(`Developer memory options contain unknown field(s): ${unknown.join(", ")}.`);
   const query = options.query ?? "project decisions tools outcomes conflicts changes";
@@ -18,10 +19,14 @@ function normalizedOptions(options) {
   if (options.includeWorktrees !== undefined && typeof options.includeWorktrees !== "boolean") throw new TypeError("includeWorktrees must be a boolean.");
   const limit = options.limit ?? 40;
   if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100) throw new TypeError("limit must be an integer from 1 to 100.");
+  const proofMaxTokens = options.proofMaxTokens ?? 4_096;
+  if (!Number.isSafeInteger(proofMaxTokens) || proofMaxTokens < 1_024 || proofMaxTokens > 64_000) {
+    throw new TypeError("proofMaxTokens must be an integer from 1024 to 64000.");
+  }
   if (options.clock !== undefined && typeof options.clock !== "function") throw new TypeError("clock must be a function.");
   const now = options.clock?.() ?? new Date();
   if (!(now instanceof Date) || !Number.isFinite(now.getTime())) throw new TypeError("clock must return a valid Date.");
-  return { cwd: options.cwd ?? process.cwd(), query, includeWorktrees: options.includeWorktrees !== false, limit, generatedAt: now.toISOString() };
+  return { cwd: options.cwd ?? process.cwd(), query, includeWorktrees: options.includeWorktrees !== false, limit, proofMaxTokens, generatedAt: now.toISOString() };
 }
 
 function compactWorkspace(dashboard, current) {
@@ -81,6 +86,15 @@ export async function buildDeveloperMemoryView(options = {}) {
     query: normalized.query,
     limit: Math.min(20, normalized.limit),
     write: false,
+    clock: () => new Date(normalized.generatedAt)
+  });
+  const proof = await buildProofContext(normalized.query, {
+    cwd: workspace.root,
+    maxTokens: normalized.proofMaxTokens,
+    limit: Math.min(32, normalized.limit),
+    symbolLimit: Math.min(100, normalized.limit * 2),
+    fileLimit: Math.min(20, normalized.limit),
+    factLimit: Math.min(32, normalized.limit),
     clock: () => new Date(normalized.generatedAt)
   });
   let symbolMemory;
@@ -148,6 +162,7 @@ export async function buildDeveloperMemoryView(options = {}) {
     tools: dashboard.tools,
     outcomes: dashboard.majorChanges,
     sessions: receiptIndex,
+    proof,
     symbols: symbolMemory,
     worktreeComparison: comparison,
     boundaries: {
