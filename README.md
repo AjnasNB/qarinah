@@ -53,7 +53,7 @@ npx qarinah dashboard --serve --worktrees
 
 ### Reproducible public-checkout memory result
 
-The 0.5 evaluator copies Qarinah's public source into an isolated temporary Git repository and runs the current product end to end. It passes **10 / 10** structural scenarios, indexes **all 181 eligible source files**, resolves four exact implementation definitions, records one completed session lifecycle, writes a minimized v2 receipt, compiles cited continuation context, and verifies the complete ledger chain. It uses no private data or provider calls.
+The 0.5 evaluator copies Qarinah's public source into an isolated temporary Git repository and runs the current product end to end. It passes **10 / 10** structural scenarios, indexes **all 182 eligible source files**, resolves four exact implementation definitions, records one completed session lifecycle, writes a minimized v2 receipt, compiles cited continuation context, and verifies the complete ledger chain. It uses no private data or provider calls.
 
 ```sh
 npm run check:public-project-memory

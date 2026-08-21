@@ -24,7 +24,7 @@ The 0.5 release candidate is organized as three implementation layers.
 ### P2 - portable collaboration and public proof
 
 - a self-hosted loopback service for immutable, tenant-bound encrypted team bundles with exact roles, rate limits, and token-free audit evidence;
-- a 10/10 maintainer-run evaluation over an isolated copy of Qarinah's own public checkout, including all 179 eligible source files, exact symbol-definition queries, one completed session receipt, cited retrieval, and store verification;
+- a 10/10 maintainer-run evaluation over an isolated copy of Qarinah's own public checkout, including all 182 eligible source files, exact symbol-definition queries, one completed session receipt, cited retrieval, and store verification;
 - package-contained integration templates, schemas, documentation, editor artifact, evaluation data, and technical-paper source; and
 - a release process that publishes an RC first, verifies fresh installs and migrations on Linux, macOS, and Windows, then promotes only the reviewed bytes.
 
