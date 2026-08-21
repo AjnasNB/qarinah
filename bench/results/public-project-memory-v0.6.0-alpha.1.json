@@ -1,0 +1,134 @@
+{
+  "schemaVersion": "qarinah.public-project-memory-evaluation.v1",
+  "evaluationId": "public-qarinah-checkout-0.6.0-alpha.1",
+  "scope": {
+    "repository": "https://github.com/AjnasNB/qarinah",
+    "source": "current public checkout copied into an isolated temporary Git repository",
+    "independence": "maintainer-run self-evaluation; not an independent benchmark",
+    "privateDataUsed": false,
+    "providerCalls": 0,
+    "timingClaimed": false,
+    "sourceManifest": {
+      "fileCount": 89,
+      "bytes": 1106844,
+      "manifestHash": "sha256:94ea8187b4b5475811e346e185cda6bae1c8225a02950fb8cb77b511199b8a5c"
+    },
+    "evaluatorSha256": "sha256:5a4f8a705f1890ec39acdc85d2e8320312e724d649e908024bf59592cc12e3ca"
+  },
+  "implementation": {
+    "package": "qarinah",
+    "version": "0.6.0-alpha.1",
+    "symbolGraph": "qarinah.symbol-graph.v2",
+    "sessionReceipt": "qarinah.session-context-receipt.v2"
+  },
+  "observed": {
+    "projectFiles": 400,
+    "projectDirectories": 57,
+    "supportedSymbolLanguages": [
+      "c",
+      "cpp",
+      "csharp",
+      "go",
+      "java",
+      "javascript",
+      "kotlin",
+      "python",
+      "rust",
+      "typescript"
+    ],
+    "indexedSymbolLanguages": [
+      "javascript",
+      "python",
+      "typescript"
+    ],
+    "eligibleSymbolFiles": 187,
+    "indexedSymbolFiles": 187,
+    "declarations": 48338,
+    "references": 102016,
+    "definitions": [
+      {
+        "query": "appendEvent",
+        "expectedPath": "src/store.js",
+        "found": true,
+        "returnedPath": "src/store.js"
+      },
+      {
+        "query": "buildMemoryDashboard",
+        "expectedPath": "src/dashboard.js",
+        "found": true,
+        "returnedPath": "src/dashboard.js"
+      },
+      {
+        "query": "createMcpServer",
+        "expectedPath": "src/mcp/server.js",
+        "found": true,
+        "returnedPath": "src/mcp/server.js"
+      },
+      {
+        "query": "inspectGitWorktree",
+        "expectedPath": "src/git-worktrees.js",
+        "found": true,
+        "returnedPath": "src/git-worktrees.js"
+      }
+    ],
+    "session": {
+      "sourceEvents": 4,
+      "completedTurns": 1,
+      "outcomeEvents": 3,
+      "deliveredItems": 2,
+      "deliveredCitations": 2
+    }
+  },
+  "scenarios": {
+    "total": 10,
+    "passed": 10,
+    "items": [
+      {
+        "id": "project-scan",
+        "passed": true
+      },
+      {
+        "id": "eligible-symbol-files",
+        "passed": true
+      },
+      {
+        "id": "definition:appendEvent",
+        "passed": true
+      },
+      {
+        "id": "definition:buildMemoryDashboard",
+        "passed": true
+      },
+      {
+        "id": "definition:createMcpServer",
+        "passed": true
+      },
+      {
+        "id": "definition:inspectGitWorktree",
+        "passed": true
+      },
+      {
+        "id": "session-lifecycle",
+        "passed": true
+      },
+      {
+        "id": "receipt-minimization",
+        "passed": true
+      },
+      {
+        "id": "cited-continuation",
+        "passed": true
+      },
+      {
+        "id": "ledger-integrity",
+        "passed": true
+      }
+    ]
+  },
+  "boundaries": [
+    "This evaluates Qarinah on its own public source checkout; it is not independent reproduction.",
+    "No provider model, learned embedding service, wall-clock performance, billing, or private agent history is measured.",
+    "A passing result proves these exact structural scenarios, not universal task success or semantic correctness."
+  ],
+  "manifestHash": "sha256:113c871c559e4fd2227d62518f6c0273d4696e78bd3db6e83ae6bfa689993c6b"
+}

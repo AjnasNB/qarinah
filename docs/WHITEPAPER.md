@@ -974,7 +974,7 @@ The relevant evidence is committed at:
 - [`bench/results/context-efficiency-comparison-0.1.6-v2.json`](../bench/results/context-efficiency-comparison-0.1.6-v2.json);
 - [`bench/results/benchmark-release-0.1.6.json`](../bench/results/benchmark-release-0.1.6.json);
 - [`bench/results/deep-memory-platform-v0.6.0-alpha.1.json`](../bench/results/deep-memory-platform-v0.6.0-alpha.1.json);
-- [`bench/results/public-project-memory-0.5.json`](../bench/results/public-project-memory-0.5.json);
+- [`bench/results/public-project-memory-v0.6.0-alpha.1.json`](../bench/results/public-project-memory-v0.6.0-alpha.1.json);
 - [`bench/results/proof-context-0.6.0-alpha.1.json`](../bench/results/proof-context-0.6.0-alpha.1.json);
 - [`scripts/evaluate-software-tasks.mjs`](../scripts/evaluate-software-tasks.mjs);
 - [`scripts/evaluate-long-document.mjs`](../scripts/evaluate-long-document.mjs);
@@ -1093,7 +1093,7 @@ The author gratefully acknowledges Shahin Ahammed, Qarinah's non-technical cofou
 
 | Public claim | Evidence | Qualification |
 | --- | --- | --- |
-| 10 / 10 public-checkout memory scenarios | `bench/results/public-project-memory-0.5.json` and deterministic evaluator | Current public repository, supported-source indexing, receipt/recovery/editor/sync acceptance; not independent validation or a universal accuracy benchmark |
+| 10 / 10 public-checkout memory scenarios | `bench/results/public-project-memory-v0.6.0-alpha.1.json` and deterministic evaluator | Current public repository, supported-source indexing, receipt/recovery/editor/sync acceptance; not independent validation or a universal accuracy benchmark |
 | 12 / 12 deep-memory product scenarios | `bench/results/deep-memory-platform-v0.6.0-alpha.1.json` and deterministic evaluator | Local exact-recovery, incremental-refresh, symbol/reference, and cited-fact acceptance; not a cross-product benchmark |
 | 12 / 12 proof-carrying task-context scenarios | `bench/results/proof-context-0.6.0-alpha.1.json` and deterministic evaluator | Generated ten-language repository; expected code and current evidence selected, stale evidence excluded, complete packet bounded, deterministic manifest reproduced; not independent validation |
 | 390,226 selected source bytes restored exactly | Same deep-memory fixture | Byte equality for the two-file fixture; not universal archive compression or passive capture |
@@ -1130,7 +1130,7 @@ The author gratefully acknowledges Shahin Ahammed, Qarinah's non-technical cofou
 | Host integrations | [HOST-INTEGRATIONS.md](HOST-INTEGRATIONS.md) |
 | Real-worktree continuity result | [`worktree-continuity-v0.4.0.json`](../bench/results/worktree-continuity-v0.4.0.json) |
 | Deep-memory product result | [`deep-memory-platform-v0.6.0-alpha.1.json`](../bench/results/deep-memory-platform-v0.6.0-alpha.1.json) |
-| Public-checkout memory result | [`public-project-memory-0.5.json`](../bench/results/public-project-memory-0.5.json) |
+| Public-checkout memory result | [`public-project-memory-v0.6.0-alpha.1.json`](../bench/results/public-project-memory-v0.6.0-alpha.1.json) |
 | Proof-carrying task-context result | [`proof-context-0.6.0-alpha.1.json`](../bench/results/proof-context-0.6.0-alpha.1.json) |
 | Proof-context contract | [PROOF-CARRYING-CONTEXT.md](PROOF-CARRYING-CONTEXT.md) |
 | Lossless content archive | [CONTENT-ARCHIVE.md](CONTENT-ARCHIVE.md) |

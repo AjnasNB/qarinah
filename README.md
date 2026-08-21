@@ -67,13 +67,13 @@ Inspect the [machine-readable result](bench/results/proof-context-0.6.0-alpha.1.
 
 ### Reproducible public-checkout memory result
 
-The 0.5 evaluator copies Qarinah's public source into an isolated temporary Git repository and runs the current product end to end. It passes **10 / 10** structural scenarios, indexes **all 182 eligible source files**, resolves four exact implementation definitions, records one completed session lifecycle, writes a minimized v2 receipt, compiles cited continuation context, and verifies the complete ledger chain. It uses no private data or provider calls.
+The current evaluator copies Qarinah's public source into an isolated temporary Git repository and runs the product end to end. It passes **10 / 10** structural scenarios, indexes **all 187 eligible source files**, resolves four exact implementation definitions, records one completed session lifecycle, writes a minimized v2 receipt, compiles cited continuation context, and verifies the complete ledger chain. It uses no private data or provider calls.
 
 ```sh
 npm run check:public-project-memory
 ```
 
-Read the [method and boundaries](docs/PUBLIC-PROJECT-MEMORY-EVALUATION.md) or inspect the [machine-readable result](bench/results/public-project-memory-0.5.json). The exact file counts are refreshed before the release commit.
+Read the [method and boundaries](docs/PUBLIC-PROJECT-MEMORY-EVALUATION.md) or inspect the [0.6.0-alpha.1 machine-readable result](bench/results/public-project-memory-v0.6.0-alpha.1.json). Historical receipts remain unchanged, and exact file counts are refreshed before each release commit.
 
 ### Reproducible deep-memory product result
 

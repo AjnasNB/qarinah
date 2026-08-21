@@ -31,7 +31,7 @@ const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "
 const benchmarkRelease = JSON.parse(await readFile(path.join(root, "bench", "results", "benchmark-release-0.1.6.json"), "utf8"));
 const worktreeContinuity = JSON.parse(await readFile(path.join(root, "bench", "results", "worktree-continuity-v0.4.0.json"), "utf8"));
 const deepMemoryPlatform = JSON.parse(await readFile(path.join(root, "bench", "results", `deep-memory-platform-v${packageJson.version}.json`), "utf8"));
-const publicProjectMemory = JSON.parse(await readFile(path.join(root, "bench", "results", "public-project-memory-0.5.json"), "utf8"));
+const publicProjectMemory = JSON.parse(await readFile(path.join(root, "bench", "results", `public-project-memory-v${packageJson.version}.json`), "utf8"));
 const proofContext = JSON.parse(await readFile(path.join(root, "bench", "results", "proof-context-0.6.0-alpha.1.json"), "utf8"));
 const productVersion = packageJson.version;
 const productPositioning = "Verifiable project memory, exact source recovery, and cited context for coding agents.";
@@ -57,6 +57,7 @@ if (deepMemoryPlatform.schemaVersion !== "qarinah.deep-memory-platform-evaluatio
   throw new Error("The deep-memory website claim does not match the checked release artifact.");
 }
 if (publicProjectMemory.schemaVersion !== "qarinah.public-project-memory-evaluation.v1"
+  || publicProjectMemory.implementation.version !== packageJson.version
   || publicProjectMemory.scenarios.total !== 10
   || publicProjectMemory.scenarios.passed !== 10
   || publicProjectMemory.scenarios.items.some((scenario) => scenario.passed !== true)
@@ -156,7 +157,7 @@ const publicMetrics = {
       providerCalls: publicProjectMemory.scope.providerCalls,
       privateDataUsed: publicProjectMemory.scope.privateDataUsed,
       manifestHash: publicProjectMemory.manifestHash,
-      evidenceSource: `${github}/blob/main/bench/results/public-project-memory-0.5.json`,
+      evidenceSource: `${github}/blob/main/bench/results/public-project-memory-v${packageJson.version}.json`,
       boundary: publicProjectMemory.boundaries
     },
     repeatedProjectContext: {

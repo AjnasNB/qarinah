@@ -20,14 +20,15 @@ import { canonicalStringify, sha256 } from "../src/canonical.js";
 
 const execute = promisify(execFile);
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const resultPath = path.join(repositoryRoot, "bench", "results", "public-project-memory-0.5.json");
+const packageJson = JSON.parse(await readFile(path.join(repositoryRoot, "package.json"), "utf8"));
+const resultPath = path.join(repositoryRoot, "bench", "results", `public-project-memory-v${packageJson.version}.json`);
 const write = process.argv.includes("--write");
 const fixedClock = () => new Date("2099-08-20T12:00:00.000Z");
 
 async function trackedPaths() {
   const { stdout } = await execute("git", ["ls-files", "--cached", "--others", "--exclude-standard", "-z"], { cwd: repositoryRoot, encoding: "buffer", maxBuffer: 16 * 1024 * 1024 });
   return stdout.toString("utf8").split("\0").filter(Boolean).filter((relative) =>
-    relative !== "bench/results/public-project-memory-0.5.json"
+    !relative.startsWith("bench/results/public-project-memory-")
     && !relative.startsWith("website/dist/")
   ).sort();
 }
@@ -75,7 +76,6 @@ async function sourceManifest(paths) {
 }
 
 async function evaluate() {
-  const packageJson = JSON.parse(await readFile(path.join(repositoryRoot, "package.json"), "utf8"));
   const scriptBytes = await readFile(fileURLToPath(import.meta.url));
   const paths = await trackedPaths();
   const publicSource = await sourceManifest(paths);
@@ -128,7 +128,7 @@ async function evaluate() {
     ];
     const core = {
       schemaVersion: "qarinah.public-project-memory-evaluation.v1",
-      evaluationId: "public-qarinah-checkout-0.5",
+      evaluationId: `public-qarinah-checkout-${packageJson.version}`,
       scope: {
         repository: "https://github.com/AjnasNB/qarinah",
         source: "current public checkout copied into an isolated temporary Git repository",
