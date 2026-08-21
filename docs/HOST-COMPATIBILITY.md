@@ -6,7 +6,8 @@ Qarinah keeps one project-owned memory record and exposes a bounded, read-only M
 | --- | --- | --- | --- |
 | Codex | Project MCP config, lifecycle hooks, and Qarinah skills | Reviewed lifecycle adapter records permitted prompts, tools, approvals, compactions, turns, and subagents | Native Codex JSONL import |
 | Claude Code | Project MCP config, lifecycle hooks, and Qarinah skills | Reviewed lifecycle adapter records permitted visible events | Native Claude JSONL import |
-| Cursor | Project MCP config and always-on project rule | MCP retrieval; no claimed native transcript hook | Portable JSONL/NDJSON import |
+| Cursor | Project MCP config, always-on project rule, and VS Code-compatible panel | MCP retrieval; no claimed native transcript hook | Portable JSONL/NDJSON import |
+| JetBrains IDEs | Packaged LSP4IJ custom template | Symbols, definitions, and references through project-local `qarinah-lsp` | No native plugin or IDE-history capture claim |
 | Kimi Code | Project-local `.kimi-code/mcp.json` | MCP retrieval; no claimed native transcript hook | Explicit `--format kimi` for official stream-json message output |
 | Classic Kimi CLI | Generated `.kimi/qarinah-mcp.json`, loaded with `--mcp-config-file` | MCP retrieval; no silent edits to the user-global config | Explicit `--format kimi` for official stream-json output |
 | Google Antigravity | Workspace plugin under `.agents/plugins/qarinah/` with MCP and a project-memory rule | MCP retrieval; no claimed native transcript hook | Portable JSONL/NDJSON import after an operator-controlled export |
@@ -15,15 +16,15 @@ Qarinah keeps one project-owned memory record and exposes a bounded, read-only M
 
 ## Editor symbol integration
 
-The shipped VS Code extension provides the interactive Qarinah memory panel and runs in Cursor-compatible extension hosts. Qarinah also ships a separate standards-compatible `qarinah-lsp` stdio server for JavaScript/TypeScript document symbols, workspace symbols, definitions, and references. Editors with a generic Language Server Protocol client can start that executable at the initialized project root.
+The shipped VS Code extension provides the interactive Qarinah memory panel and runs in Cursor-compatible extension hosts. Qarinah also ships a separate standards-compatible `qarinah-lsp` stdio server for multi-language document symbols, workspace symbols, definitions, and references. Editors with a generic Language Server Protocol client can start that executable at the initialized project root. JetBrains users can import the packaged LSP4IJ template from `integrations/jetbrains/qarinah-lsp`.
 
-Qarinah does not silently install editor-wide extensions. It does not yet ship a dedicated native JetBrains, Neovim, Emacs, or Visual Studio package; those hosts use their generic LSP client and the project-local MCP setup where available. See [Symbol graph and language server](SYMBOL-GRAPH.md).
+Qarinah does not silently install editor-wide extensions. It does not ship a dedicated native JetBrains, Neovim, Emacs, or Visual Studio package; those hosts use their generic LSP client and the project-local MCP setup where available. The JetBrains template follows LSP4IJ's documented custom-template format and invokes only the dependency already installed in the project. See [Symbol graph and language server](SYMBOL-GRAPH.md).
 
 Qarinah does not capture hidden reasoning, credentials, private browser state, or unsupported internal host files. A host without a reviewed event adapter still gets retrieval through MCP, but its chat/tool history enters Qarinah only through an explicit supported export.
 
 ## Preview, install, and remove one host safely
 
-The 0.4.0 installer is deliberately narrower than `setup`: it handles one reviewed project-scoped host surface and records exact ownership. Always inspect the dry run first.
+The 0.5.0-rc.1 installer is deliberately narrower than `setup`: it handles one reviewed project-scoped host surface and records exact ownership. Always inspect the dry run first.
 
 ```sh
 npx qarinah install . --host freebuff --scope project --dry-run --allow-query

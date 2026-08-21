@@ -1,7 +1,7 @@
 {
   "name": "qarinah",
-  "version": "0.4.0",
-  "description": "Visible, worktree-aware project memory with cited context graphs, session receipts, and incremental compaction for coding agents.",
+  "version": "0.5.0-rc.1",
+  "description": "Proof-carrying project memory with multi-language graphs, session receipts, recovery, and cited context for coding agents.",
   "license": "Apache-2.0",
   "author": "Ajnas NB",
   "mcpName": "io.github.AjnasNB/qarinah",
@@ -40,6 +40,7 @@
     "./schemas/cockroach-browser-memory.json": "./schemas/cockroach-browser-memory.schema.json",
     "./schemas/productloop-runtime-event.json": "./schemas/productloop-runtime-event.schema.json",
     "./schemas/team-manifest.json": "./schemas/team-manifest.schema.json",
+    "./schemas/team-sync-service.json": "./schemas/team-sync-service.schema.json",
     "./schemas/causal-receipt.json": "./schemas/causal-receipt.schema.json",
     "./schemas/federated-context.json": "./schemas/federated-context.schema.json",
     "./schemas/memory-attachment.json": "./schemas/memory-attachment.schema.json",
@@ -98,6 +99,7 @@
     "docs/LICENSE-STRATEGY.md",
     "docs/MIGRATIONS.md",
     "docs/TEAM-MEMORY.md",
+    "docs/TEAM-SYNC-SERVICE.md",
     "docs/PROJECT-OVERVIEW.md",
     "docs/AGENT-ARCHIVE-IMPORT.md",
     "docs/AGENT-ARCHIVE-BACKUP.md",
@@ -116,6 +118,7 @@
     "docs/CODING-CONTEXT-HARNESS.md",
     "docs/AUTOMATIC-PROJECT-MEMORY.md",
     "docs/CITED-FACT-CONSOLIDATION.md",
+    "docs/PUBLIC-PROJECT-MEMORY-EVALUATION.md",
     "bench/fixtures/software-task-scenarios.mjs",
     "bench/research/",
     "bench/results/",
@@ -124,6 +127,7 @@
     "scripts/evaluate-software-tasks.mjs",
     "scripts/evaluate-worktree-continuity.mjs",
     "scripts/evaluate-deep-memory-platform.mjs",
+    "scripts/evaluate-public-project-memory.mjs",
     "scripts/evaluate-long-document.mjs",
     "scripts/evaluate-multifile-context.mjs",
     "scripts/evaluate-context-efficiency-comparison-v1.mjs",
@@ -168,6 +172,10 @@
     "output/pdf/Qarinah-Technical-White-Paper-v1.6.source.sha256",
     "output/pdf/Qarinah-Technical-White-Paper-v1.6.pdf.sha256",
     "output/pdf/Qarinah-Technical-White-Paper-v1.6.build.json",
+    "output/pdf/Qarinah-Technical-White-Paper-v1.7.pdf",
+    "output/pdf/Qarinah-Technical-White-Paper-v1.7.source.sha256",
+    "output/pdf/Qarinah-Technical-White-Paper-v1.7.pdf.sha256",
+    "output/pdf/Qarinah-Technical-White-Paper-v1.7.build.json",
     "LICENSE",
     "NOTICE",
     "THIRD_PARTY_NOTICES.md",
@@ -185,6 +193,7 @@
     "integrations/codex/qarinah/",
     "integrations/claude/qarinah/",
     "integrations/vscode/qarinah-memory/",
+    "integrations/jetbrains/qarinah-lsp/",
     "server.json",
     "README.md"
   ],
@@ -202,7 +211,7 @@
     "prepublishOnly": "npm run check",
     "test": "node scripts/run-tests.mjs",
     "typecheck": "node scripts/typecheck-consumer.mjs",
-    "check": "npm run check:plugins && npm run check:docs && npm run build:site && npm run check:site && npm run build:vscode-extension && npm run mcp:smoke && npm test && npm run typecheck && npm run check:benchmark-evidence && npm run check:multifile-context && npm run check:context-efficiency-comparison && npm run check:context-efficiency-comparison:v2 && npm run check:benchmark-release && npm run check:continuation-evidence && npm run check:worktree-continuity && npm run check:deep-memory && npm run check:research-evidence && npm run check:research-development-evidence && npm run check:research-sufficiency && npm run check:research-production-evidence && npm run check:research-protocol && npm run check:research-final-manifest && npm run check:research-abstention-controls && npm run check:research-contamination && npm run check:research-power && npm run check:research-pilot && npm run check:research-readiness && npm run benchmark && npm run evaluate:context && npm run evaluate:continuation && npm run evaluate:software-tasks && npm run evaluate:long-document && npm run evaluate:multifile-context && npm pack --dry-run --ignore-scripts",
+    "check": "npm run check:plugins && npm run check:docs && npm run build:site && npm run check:site && npm run build:vscode-extension && npm run mcp:smoke && npm test && npm run typecheck && npm run check:benchmark-evidence && npm run check:multifile-context && npm run check:context-efficiency-comparison && npm run check:context-efficiency-comparison:v2 && npm run check:benchmark-release && npm run check:continuation-evidence && npm run check:worktree-continuity && npm run check:deep-memory && npm run check:public-project-memory && npm run check:research-evidence && npm run check:research-development-evidence && npm run check:research-sufficiency && npm run check:research-production-evidence && npm run check:research-protocol && npm run check:research-final-manifest && npm run check:research-abstention-controls && npm run check:research-contamination && npm run check:research-power && npm run check:research-pilot && npm run check:research-readiness && npm run benchmark && npm run evaluate:context && npm run evaluate:continuation && npm run evaluate:software-tasks && npm run evaluate:long-document && npm run evaluate:multifile-context && npm pack --dry-run --ignore-scripts",
     "check:benchmark-evidence": "node scripts/verify-benchmark-evidence.mjs",
     "check:multifile-context": "node scripts/verify-multifile-context.mjs",
     "check:context-efficiency-comparison": "node scripts/verify-context-efficiency-comparison-v1-result.mjs",
@@ -231,6 +240,8 @@
     "evaluate:deep-memory": "node scripts/evaluate-deep-memory-platform.mjs",
     "evaluate:deep-memory:write": "node scripts/evaluate-deep-memory-platform.mjs --write",
     "check:deep-memory": "node scripts/evaluate-deep-memory-platform.mjs",
+    "evaluate:public-project-memory": "node scripts/evaluate-public-project-memory.mjs --write",
+    "check:public-project-memory": "node scripts/evaluate-public-project-memory.mjs",
     "smoke:codex-continuation": "node scripts/run-codex-continuation-smoke.mjs",
     "smoke:codex-continuation:record": "node scripts/run-codex-continuation-smoke.mjs --write",
     "evaluate:software-tasks": "node scripts/evaluate-software-tasks.mjs",
@@ -290,7 +301,7 @@
   "publishConfig": {
     "access": "public",
     "provenance": true,
-    "tag": "latest"
+    "tag": "next"
   },
   "keywords": [
     "agent-context",
@@ -336,6 +347,8 @@
   },
   "dependencies": {
     "ignore": "7.0.6",
-    "typescript-classic": "npm:typescript@5.9.3"
+    "tree-sitter-wasms": "0.1.13",
+    "typescript-classic": "npm:typescript@5.9.3",
+    "web-tree-sitter": "0.20.8"
   }
 }

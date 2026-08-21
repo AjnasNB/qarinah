@@ -1,0 +1,65 @@
+{
+  "combinedSourceSha256": "sha256:77d96285267968c3bb2e7633b6ed9b8e617514ace05cd743ce164ad1496b13bb",
+  "generator": {
+    "command": "python scripts/build-whitepaper-pdf-v1.7.py",
+    "fonts": [
+      {
+        "fileName": "arial.ttf",
+        "registeredName": "QBody",
+        "role": "body",
+        "sha256": "b3658eadae55e682b5f69eb64c439c1ecc8f196c0bb8d4756d145d13bc86476a"
+      },
+      {
+        "fileName": "arialbd.ttf",
+        "registeredName": "QBody-Bold",
+        "role": "bold",
+        "sha256": "e8f4e3baf6cc35fed6fcce3a540e8b39e8f6cda1d22a28f2ec8f526fef7a43f5"
+      },
+      {
+        "fileName": "ariali.ttf",
+        "registeredName": "QBody-Italic",
+        "role": "italic",
+        "sha256": "86b32db9a06f9694e2a3760c42e5117bcdc5cc1255bb5186ca8ce0305e22f288"
+      },
+      {
+        "fileName": "consola.ttf",
+        "registeredName": "QMono",
+        "role": "monospace",
+        "sha256": "cf00b507b3286870cc5064ebd0633c303f70b491a4af25eec2d32df413db0179"
+      }
+    ],
+    "platform": "win32",
+    "pythonImplementation": "CPython",
+    "pythonVersion": "3.12.13",
+    "reportlabVersion": "4.4.9"
+  },
+  "paperVersion": "1.7",
+  "schemaVersion": "qarinah.white-paper-build.v1",
+  "sourceDigestAlgorithm": "sha256(file-bytes + NUL separators; listed order)",
+  "sources": [
+    {
+      "path": "docs/WHITEPAPER.md",
+      "sha256": "sha256:0d6cd39ea03b512f7ca47c01efc398ae8a19af9ae9d63a76011a8a4e35546637"
+    },
+    {
+      "path": "scripts/build-whitepaper-pdf.py",
+      "sha256": "sha256:bab8180794f7d5416c06d394a215ea3b85cc5520073fd1f860e1bea169155bdf"
+    },
+    {
+      "path": "scripts/build-whitepaper-pdf-v1.4.py",
+      "sha256": "sha256:55121bb3a781a23c1486abca97b71d374475ca59bc97b736c0f68baebab3c77e"
+    },
+    {
+      "path": "scripts/build-whitepaper-pdf-v1.5.py",
+      "sha256": "sha256:2cfe126c690e6202a92b1c0b7a9350d3ef0b3e012758763416c3e0d507165913"
+    },
+    {
+      "path": "scripts/build-whitepaper-pdf-v1.6.py",
+      "sha256": "sha256:5169ff0fa44284a18a6fe3a8bcc44eadf6ad22a4a40b2573c7f296dc3213d53a"
+    },
+    {
+      "path": "scripts/build-whitepaper-pdf-v1.7.py",
+      "sha256": "sha256:d350801a94a21fe64a2e9cbb5b998d8da9d1389b758b5e3cc6f850678dac146d"
+    }
+  ]
+}

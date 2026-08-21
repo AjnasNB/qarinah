@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { copyFile, mkdtemp, readFile, rm } from "node:fs/promises";
+import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { builtinModules } from "node:module";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -8,6 +9,35 @@ import { build } from "esbuild";
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const packageJson = JSON.parse(await readFile(path.join(repositoryRoot, "package.json"), "utf8"));
 const versionSource = await readFile(path.join(repositoryRoot, "src", "version.js"), "utf8");
+const builtinSpecifiers = new Set([
+  ...builtinModules.flatMap((specifier) => [specifier, `node:${specifier}`]),
+  // Node 22.13+ provides the built-in SQLite module, but some maintained Node 22
+  // releases omit it from `builtinModules`. The bundle must still preserve the
+  // runtime import instead of misclassifying it as a third-party dependency.
+  "node:sqlite"
+]);
+const treeSitterWasmFiles = ["c", "cpp", "c_sharp", "go", "java", "kotlin", "python", "rust"]
+  .map((grammar) => `tree-sitter-${grammar}.wasm`);
+const treeSitterWasmRoot = path.join(repositoryRoot, "node_modules", "tree-sitter-wasms", "out");
+const vendoredRuntimeFiles = [
+  ["web-tree-sitter", "LICENSE"],
+  ["web-tree-sitter", "package.json"],
+  ["web-tree-sitter", "tree-sitter.js"],
+  ["web-tree-sitter", "tree-sitter.wasm"],
+  ["typescript-classic", "LICENSE.txt"],
+  ["typescript-classic", "package.json"],
+  ["typescript-classic", "ThirdPartyNoticeText.txt"],
+  ["typescript-classic", "lib", "typescript.js"]
+];
+
+function canonicalVendoredBytes(bytes, segments) {
+  if (path.extname(segments.at(-1)) === ".wasm") return bytes;
+  const text = bytes.toString("utf8")
+    .replaceAll("\r\n", "\n")
+    .replace(/[ \t]+(?=\n|$)/gu, "")
+    .replace(/\n*$/u, "\n");
+  return Buffer.from(text, "utf8");
+}
 assert.match(versionSource, new RegExp(`QARINAH_VERSION\\s*=\\s*[\"']${packageJson.version.replaceAll(".", "\\.")}[\"']`), "Runtime and package versions must match.");
 
 const plugins = [
@@ -51,7 +81,7 @@ try {
       .flatMap((output) => output.imports)
       .filter((entry) => entry.external)
       .map((entry) => entry.path)
-      .filter((specifier) => !specifier.startsWith("node:"));
+      .filter((specifier) => !builtinSpecifiers.has(specifier));
     assert.deepEqual(unsafeExternal, [], `${plugin.name} bundle has non-Node external imports: ${unsafeExternal.join(", ")}`);
     const generated = await readFile(outputFile);
     assert.equal(generated.includes(Buffer.from(repositoryRoot)), false, `${plugin.name} bundle contains an absolute repository path.`);
@@ -63,6 +93,30 @@ try {
       );
     } else {
       process.stdout.write(`Built ${path.relative(repositoryRoot, outputFile)}\n`);
+    }
+    const pluginWasmRoot = path.join(plugin.root, "runtime", "tree-sitter-wasms");
+    await mkdir(pluginWasmRoot, { recursive: true });
+    for (const file of treeSitterWasmFiles) {
+      const source = path.join(treeSitterWasmRoot, file);
+      const target = path.join(pluginWasmRoot, file);
+      if (checking) {
+        const [expected, committed] = await Promise.all([readFile(source), readFile(target)]);
+        assert.ok(expected.equals(committed), `${plugin.name} ${file} is stale. Run \`npm run build:plugins\`.`);
+      } else {
+        await copyFile(source, target);
+      }
+    }
+    for (const segments of vendoredRuntimeFiles) {
+      const source = path.join(repositoryRoot, "node_modules", ...segments);
+      const target = path.join(plugin.root, "runtime", "vendor", ...segments);
+      await mkdir(path.dirname(target), { recursive: true });
+      const expected = canonicalVendoredBytes(await readFile(source), segments);
+      if (checking) {
+        const committed = await readFile(target);
+        assert.ok(expected.equals(committed), `${plugin.name} vendored ${segments.join("/")} is stale. Run \`npm run build:plugins\`.`);
+      } else {
+        await writeFile(target, expected);
+      }
     }
     for (const legalFile of ["LICENSE", "THIRD_PARTY_NOTICES.md"]) {
       const source = path.join(repositoryRoot, legalFile);

@@ -1,8 +1,29 @@
 # Migrations
 
+## 0.4.0 to 0.5.0-rc.1: proof-carrying multi-language memory
+
+The release candidate preserves the authoritative `qarinah.event.v1` ledger and upgrades only disposable, rebuildable projections. It adds `qarinah.symbol-graph.v2`, `qarinah.session-context-receipt.v2`, `qarinah.session-context-receipt-index.v2`, `qarinah.project-memory-cycle.v2`, and the atomic `qarinah.project-memory-cycle-state.v1` recovery journal.
+
+Install the prerelease from the `next` channel, then rebuild the current checkout:
+
+```sh
+npm install --save-dev qarinah@next
+npx qarinah scan
+npx qarinah symbols build
+npx qarinah build
+npx qarinah receipts "current task" --write
+npx qarinah dashboard --serve --worktrees
+```
+
+The v2 symbol graph covers ten language families through pinned parser assets. Existing v1 symbol graphs and v1 session or cycle receipts remain historical disposable artifacts; Qarinah does not rewrite the event log. Each Git worktree remains a separate initialized workspace. Self-hosted team sync is opt-in and starts no listener during installation, initialization, query, or dashboard generation.
+
 ## 0.3.0 to 0.4.0: visible developer memory
 
 Version 0.4.0 does not change the authoritative `qarinah.event.v1` ledger. It adds disposable session receipts, developer-memory views, host-install manifests, editor packaging, and a real-worktree acceptance artifact. Existing initialized workspaces remain readable.
+
+Qarinah 0.5.0 upgrades disposable session receipts to `qarinah.session-context-receipt.v2` and their index to `qarinah.session-context-receipt-index.v2`. Version 2 adds an ordered event-manifest hash, observed lifecycle counts, exact turn identities, typed event counts, and an outcome manifest. It still retains no event bodies. Run `qarinah receipts --write` to replace v1 receipt projections; the authoritative ledger is unchanged.
+
+Project-memory cycle receipts advance to `qarinah.project-memory-cycle.v2`. The v2 cycle adds explicit incremental mode and crash-recovery metadata and writes a disposable atomic `qarinah.project-memory-cycle-state.v1` phase record. Existing event, scan, harness, symbol, and derived-state authority is unchanged; old v1 cycle results are historical receipts and are not rewritten.
 
 Run these commands in each initialized checkout after upgrading:
 
@@ -59,6 +80,10 @@ Qarinah graph schema `qarinah.graph.v2` keeps every v1 event node and relation e
 The event chain is unchanged. Run `qarinah build` to regenerate `graph/graph.json`, `index/index.json`, and `records/CONTEXT.md` from the verified log. A project structure does not appear until a trusted user explicitly runs `qarinah scan`.
 
 `qarinah scan` remains the bounded filesystem and conservative module/link observation layer. Qarinah 0.4.0 adds a separate additive `qarinah.symbol-graph.v1` projection for JavaScript, JSX, TypeScript, and TSX, built only after the latest scan hash is verified. Run `qarinah symbols build` or the explicit `qarinah watch` loop to create it. The `qarinah-lsp` process reads that projection for workspace definitions and references. Unsupported languages remain explicit coverage gaps; no ledger migration is required.
+
+Qarinah 0.5.0 replaces that disposable projection with `qarinah.symbol-graph.v2`. Version 2 retains the TypeScript compiler lane and adds pinned Tree-sitter WASM grammars, parser identities, supported/indexed language coverage, and a parser identity on every indexed file. The event ledger and project-snapshot contracts are unchanged. Existing v1 graph files should be rebuilt with `qarinah symbols build`; consumers that validate the closed graph schema must add v2 support before upgrading.
+
+Qarinah 0.5.0 also adds the optional `qarinah.team-sync-service.v1` HTTP boundary. It does not modify the event ledger or existing encrypted-bundle bytes. Deployments opt in by creating a separate storage root and token set. No network listener starts during package install, workspace initialization, query, or dashboard generation.
 
 ## Linked project memory v1
 

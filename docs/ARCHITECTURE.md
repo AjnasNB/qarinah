@@ -48,7 +48,7 @@ A machine-local permit binds the trusted real path, workspace ID, enabled state,
 | --- | --- | --- |
 | `events/events.jsonl` | Canonical append-only event envelopes | Authoritative |
 | `graph/graph.json` | Event nodes, typed relations, and the latest project-structure projection | Rebuildable |
-| `graph/symbol-graph.json` | Source-hash-bound JavaScript/TypeScript declarations and unambiguous references | Rebuildable |
+| `graph/symbol-graph.json` | Source-hash-bound multi-language declarations and unambiguous references | Rebuildable |
 | `index/index.json` | Lexical postings, trigram terms, and graph adjacency | Rebuildable |
 | `index/qarinah.db` | SQLite WAL read model with FTS5, typed tables, temporal state, citations, disclosures, and pack metadata | Disposable and rebuildable from the ledger |
 | `records/CONTEXT.md` | Bounded human-readable current record | Rebuildable |
@@ -65,7 +65,7 @@ The event-memory compiler normalizes bounded query terms, uses SQLite FTS5 and t
 
 ## Automatic refresh and fact consolidation
 
-The explicit foreground watcher serializes project cycles. A changed project snapshot refreshes the symbol graph, records one cited context checkpoint, and rebuilds derived views. An unchanged snapshot performs no duplicate append or rebuild. This is project-scoped automation initiated by the operator, not passive desktop-wide monitoring.
+The explicit foreground watcher serializes project cycles. A changed project snapshot refreshes the symbol graph, records one cited context checkpoint, and rebuilds derived views. An unchanged snapshot performs no duplicate append or rebuild. Each phase atomically replaces a hash-bound cycle-state file; a later run detects an interrupted or invalid prior state and safely replays the idempotent cycle. This is project-scoped automation initiated by the operator, not passive desktop-wide monitoring.
 
 Fact consolidation operates only on an admitted verified pack. The deterministic extractor or optional host-model adapter must return bounded typed facts citing retained source event IDs. Model output is schema-validated untrusted data; it cannot add uncited sources or replace the ledger.
 

@@ -12,13 +12,14 @@ const conceptDoi = "https://doi.org/10.5281/zenodo.21547684";
 const doi = conceptDoi;
 const publishedV14Doi = "https://doi.org/10.5281/zenodo.21850747";
 const historicalVersionDoi = "https://doi.org/10.5281/zenodo.21843240";
-const paperVersion = "1.6";
+const paperVersion = "1.7";
 const paperPdf = `/paper/Qarinah-Technical-White-Paper-v${paperVersion}.pdf`;
 const historicalPaperPdfs = new Map([
   ["Qarinah-Technical-White-Paper-v1.2.pdf", "/paper/Qarinah-Technical-White-Paper-v1.2.pdf"],
   ["Qarinah-Technical-White-Paper-v1.3.pdf", "/paper/Qarinah-Technical-White-Paper-v1.3.pdf"],
   ["Qarinah-Technical-White-Paper-v1.4.pdf", "/paper/Qarinah-Technical-White-Paper-v1.4.pdf"],
-  ["Qarinah-Technical-White-Paper-v1.5.pdf", "/paper/Qarinah-Technical-White-Paper-v1.5.pdf"]
+  ["Qarinah-Technical-White-Paper-v1.5.pdf", "/paper/Qarinah-Technical-White-Paper-v1.5.pdf"],
+  ["Qarinah-Technical-White-Paper-v1.6.pdf", "/paper/Qarinah-Technical-White-Paper-v1.6.pdf"]
 ]);
 const releaseDate = "2026-08-19";
 const paperPublishedDate = "2026-08-20";
@@ -28,7 +29,8 @@ const worktreeArticleDate = "2026-08-16";
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 const benchmarkRelease = JSON.parse(await readFile(path.join(root, "bench", "results", "benchmark-release-0.1.6.json"), "utf8"));
 const worktreeContinuity = JSON.parse(await readFile(path.join(root, "bench", "results", "worktree-continuity-v0.4.0.json"), "utf8"));
-const deepMemoryPlatform = JSON.parse(await readFile(path.join(root, "bench", "results", "deep-memory-platform-v0.4.0.json"), "utf8"));
+const deepMemoryPlatform = JSON.parse(await readFile(path.join(root, "bench", "results", "deep-memory-platform-v0.5.0-rc.1.json"), "utf8"));
+const publicProjectMemory = JSON.parse(await readFile(path.join(root, "bench", "results", "public-project-memory-0.5.json"), "utf8"));
 const productVersion = packageJson.version;
 const productPositioning = "Verifiable project memory, exact source recovery, and cited context for coding agents.";
 const productExplanation = "Qarinah keeps permitted project evidence and explicitly archived source bytes beside the repository, connects symbols, decisions, outcomes, and Git worktrees in one searchable graph, and compiles the cited context needed by Codex, Claude Code, Cursor, and compatible tools.";
@@ -40,6 +42,7 @@ if (worktreeContinuity.schemaVersion !== "qarinah.worktree-continuity-evaluation
   throw new Error("The worktree-continuity website claim does not match the checked release artifact.");
 }
 if (deepMemoryPlatform.schemaVersion !== "qarinah.deep-memory-platform-evaluation.v1"
+  || deepMemoryPlatform.packageVersion !== "0.5.0-rc.1"
   || deepMemoryPlatform.aggregate.scenarioCount !== 12
   || deepMemoryPlatform.aggregate.passed !== 12
   || deepMemoryPlatform.aggregate.failed !== 0
@@ -47,8 +50,19 @@ if (deepMemoryPlatform.schemaVersion !== "qarinah.deep-memory-platform-evaluatio
   || deepMemoryPlatform.observed.secondSnapshotReusedChunks !== 2
   || deepMemoryPlatform.observed.indexedSymbols !== 4
   || deepMemoryPlatform.observed.resolvedReferences !== 3
-  || deepMemoryPlatform.artifactHash !== "sha256:bb801a59d5c1822b87bda5596237a126a064e62ac6f588e3351ebe949551ff46") {
+  || deepMemoryPlatform.observed.citedFacts !== 2
+  || deepMemoryPlatform.artifactHash !== "sha256:3183af0c8ce57ac63d49a4ee930ca93286d2767509b53f2d613444e8735e920f") {
   throw new Error("The deep-memory website claim does not match the checked release artifact.");
+}
+if (publicProjectMemory.schemaVersion !== "qarinah.public-project-memory-evaluation.v1"
+  || publicProjectMemory.scenarios.total !== 10
+  || publicProjectMemory.scenarios.passed !== 10
+  || publicProjectMemory.scenarios.items.some((scenario) => scenario.passed !== true)
+  || publicProjectMemory.observed.eligibleSymbolFiles < 1
+  || publicProjectMemory.observed.indexedSymbolFiles !== publicProjectMemory.observed.eligibleSymbolFiles
+  || publicProjectMemory.scope.privateDataUsed !== false
+  || publicProjectMemory.scope.providerCalls !== 0) {
+  throw new Error("The public-project website claim does not match the checked release artifact.");
 }
 const repeatedContextMetric = benchmarkRelease.headlineContextResults.find((result) => result.id === "six-task-repeated-context");
 if (!repeatedContextMetric
@@ -96,9 +110,25 @@ const publicMetrics = {
       reusedChunks: deepMemoryPlatform.observed.secondSnapshotReusedChunks,
       indexedSymbols: deepMemoryPlatform.observed.indexedSymbols,
       resolvedReferences: deepMemoryPlatform.observed.resolvedReferences,
+      citedFacts: deepMemoryPlatform.observed.citedFacts,
       artifactHash: deepMemoryPlatform.artifactHash,
-      evidenceSource: `${github}/blob/main/bench/results/deep-memory-platform-v0.4.0.json`,
+      evidenceSource: `${github}/blob/main/bench/results/deep-memory-platform-v0.5.0-rc.1.json`,
       boundary: deepMemoryPlatform.protocol.scope
+    },
+    publicProjectMemory: {
+      evaluationId: publicProjectMemory.evaluationId,
+      scenarios: publicProjectMemory.scenarios.total,
+      passed: publicProjectMemory.scenarios.passed,
+      projectFiles: publicProjectMemory.observed.projectFiles,
+      eligibleSymbolFiles: publicProjectMemory.observed.eligibleSymbolFiles,
+      indexedSymbolFiles: publicProjectMemory.observed.indexedSymbolFiles,
+      declarations: publicProjectMemory.observed.declarations,
+      references: publicProjectMemory.observed.references,
+      providerCalls: publicProjectMemory.scope.providerCalls,
+      privateDataUsed: publicProjectMemory.scope.privateDataUsed,
+      manifestHash: publicProjectMemory.manifestHash,
+      evidenceSource: `${github}/blob/main/bench/results/public-project-memory-0.5.json`,
+      boundary: publicProjectMemory.boundaries
     },
     repeatedProjectContext: {
       fixture: "six committed software-task fixtures",
@@ -138,15 +168,17 @@ const publicMetrics = {
 };
 const qarinahFeatures = [
   "Encrypted lossless source snapshots with exact-byte restore",
-  "TypeScript and JavaScript symbol and reference graph",
+  "Pinned multi-language symbol and reference graph",
   "Built-in deterministic lexical and local-vector retrieval",
   "Language Server Protocol symbol navigation",
+  "JetBrains LSP4IJ project template",
   "Explicit automatic project-memory watcher",
   "Cited deterministic and optional model-assisted fact consolidation",
   "First-class Git worktree context with isolated ledgers",
   "Searchable developer-memory graph and timeline",
   "Exact per-session context receipts",
   "Incremental automatic context checkpoints",
+  "Crash-recoverable project-memory cycle journal",
   "VS Code and Cursor-compatible memory panel",
   "Verified handoffs between coding agents",
   "Local append-only project memory",
@@ -161,6 +193,7 @@ const qarinahFeatures = [
   "Immediate SQLite/FTS5 project search",
   "Beginner-readable project and outcome overview",
   "Encrypted team bundles and signed checkpoints",
+  "Self-hosted opaque encrypted-bundle transport",
   "Deterministic Markdown, JSON, graph, and OKF exports"
 ];
 const answerEngineQuestions = [
@@ -174,7 +207,7 @@ const answerEngineQuestions = [
   },
   {
     name: "Does Qarinah understand code symbols?",
-    text: "Qarinah 0.4.0 builds a source-hash-bound symbol and reference graph for JavaScript, JSX, TypeScript, and TSX, exposes deterministic lexical and local subword-vector ranking, and ships a Language Server Protocol process for editor symbol navigation. Unsupported languages are reported rather than guessed."
+    text: "Qarinah 0.5 builds a source-hash-bound symbol and reference graph for JavaScript, JSX, TypeScript, TSX, Python, Go, Rust, Java, Kotlin, C, C++, and C#. It uses pinned parsers, deterministic local ranking, and a bounded Language Server Protocol process. Unsupported languages are reported rather than guessed."
   },
   {
     name: "Can Qarinah update project memory automatically?",
@@ -501,6 +534,14 @@ const docPages = [
     aliases: ["team memory", "dashboard", "freshness", "multi repo", "encrypted sync", "context query", "task packs"]
   },
   {
+    route: "docs/team-sync-service",
+    source: "docs/TEAM-SYNC-SERVICE.md",
+    title: "Self-hosted opaque team sync",
+    description: "Move immutable encrypted project-memory bundles between trusted devices through a bounded, tenant-bound self-hosted service without exposing plaintext memory.",
+    section: "Connect",
+    aliases: ["self hosted memory sync", "encrypted bundle server", "team sync", "opaque storage", "sync audit"]
+  },
+  {
     route: "docs/dashboard",
     source: "docs/DASHBOARD.md",
     title: "Local memory dashboard",
@@ -536,7 +577,7 @@ const docPages = [
     route: "docs/symbol-graph",
     source: "docs/SYMBOL-GRAPH.md",
     title: "Symbol graph and language server",
-    description: "Build and query a source-hash-bound JavaScript and TypeScript symbol/reference graph and use the shipped Language Server Protocol process.",
+    description: "Build and query a source-hash-bound multi-language symbol/reference graph and use the shipped Language Server Protocol process with VS Code, Cursor, JetBrains, or another LSP client.",
     section: "Understand",
     aliases: ["language server", "typescript symbol graph", "javascript references", "repository map", "code intelligence"]
   },
@@ -611,6 +652,14 @@ const docPages = [
     description: "Use Qarinah's verified context-volume and retrieval metrics with exact evidence links, approved wording, and explicit claim boundaries.",
     section: "Verify",
     aliases: ["Qarinah metrics", "launch claims", "98.71 percent", "token savings", "benchmark evidence", "marketing claims"]
+  },
+  {
+    route: "docs/public-project-memory-evaluation",
+    source: "docs/PUBLIC-PROJECT-MEMORY-EVALUATION.md",
+    title: "Public-project memory evaluation",
+    description: "Rebuild Qarinah memory over an isolated copy of its own public checkout and verify complete eligible-file indexing, exact definitions, session lifecycle, cited continuation, and ledger integrity.",
+    section: "Verify",
+    aliases: ["public repository evaluation", "real codebase memory", "10 of 10", "symbol indexing", "session receipt evaluation"]
   },
   {
     route: "docs/security",
@@ -1261,9 +1310,9 @@ function homePage() {
             <p class="eyebrow">Verifiable memory for coding agents</p>
             <h1>Your project remembers. Every agent gets the proof.</h1>
             <p class="hero-lede">Preserve permitted project evidence and explicitly archived source bytes beside the code. Qarinah links symbols, decisions, outcomes, sessions, and Git worktrees in one searchable graph, then delivers a bounded cited context pack for the next task.</p>
-            <a class="hero-context-proof" href="/docs/benchmarks/" aria-label="12 of 12 deep-memory product acceptance scenarios passed. Read the method and artifact.">
-              <strong>12 / 12</strong>
-              <span><b>deep-memory product checks passed</b><small>exact recovery, chunk reuse, symbols, references, cited facts, and incremental refresh</small></span>
+            <a class="hero-context-proof" href="/docs/public-project-memory-evaluation/" aria-label="10 of 10 public-project memory scenarios passed. Read the method and artifact.">
+              <strong>${publicProjectMemory.scenarios.passed} / ${publicProjectMemory.scenarios.total}</strong>
+              <span><b>public-project memory checks passed</b><small>${publicProjectMemory.observed.indexedSymbolFiles} of ${publicProjectMemory.observed.eligibleSymbolFiles} eligible source files indexed, exact definitions found, session receipt and cited continuation verified</small></span>
             </a>
             <div class="hero-actions">
               <a class="btn btn-primary btn-large" href="/docs/getting-started/">Set up this worktree</a>
@@ -1292,11 +1341,11 @@ function homePage() {
         </div>
         <div class="use-mode-grid visible-memory-grid">
           <article class="use-mode-card"><span>Recover</span><h3>Exact encrypted snapshots</h3><p>Content-defined chunks reuse unchanged project bytes across snapshots. Verification and restore fail closed on missing, altered, or wrongly keyed objects.</p><a href="/docs/content-archive/">Read the archive contract</a></article>
-          <article class="use-mode-card"><span>Understand</span><h3>Symbols and references</h3><p>Parse JavaScript and TypeScript declarations and cross-file references into a source-hash-bound graph with deterministic local ranking.</p><a href="/docs/symbol-graph/">Inspect code intelligence</a></article>
-          <article class="use-mode-card"><span>Refresh</span><h3>Explicit automatic memory</h3><p>A foreground watcher detects source changes, refreshes symbols, records an idempotent checkpoint, and rebuilds local read models.</p><a href="/docs/automatic-project-memory/">Run the watcher</a></article>
+          <article class="use-mode-card"><span>Understand</span><h3>Multi-language symbols and references</h3><p>Parse JavaScript, TypeScript, Python, Go, Rust, Java, Kotlin, C, C++, and C# into a source-hash-bound graph with pinned parsers and deterministic local ranking.</p><a href="/docs/symbol-graph/">Inspect code intelligence</a></article>
+          <article class="use-mode-card"><span>Refresh</span><h3>Crash-recoverable automatic memory</h3><p>A foreground watcher detects source changes, refreshes symbols, records an idempotent checkpoint, and journals each phase so an interrupted cycle can recover safely.</p><a href="/docs/automatic-project-memory/">Run the watcher</a></article>
           <article class="use-mode-card"><span>Recall</span><h3>Strict cited facts</h3><p>Use deterministic extraction or an optional host model over a bounded untrusted pack. Every accepted fact must cite retained event IDs.</p><a href="/docs/cited-facts/">Review consolidation</a></article>
         </div>
-        <p class="benchmark-ribbon-note"><strong>Acceptance result:</strong> the committed evaluator restored 390,226 source bytes exactly, reused two of three chunks in the second snapshot, indexed four symbols and three resolved references, and preserved three cited facts across 12/12 passing scenarios. This is local product-acceptance evidence, not a cross-product ranking. <a href="/docs/benchmarks/">Reproduce it</a>.</p>
+        <p class="benchmark-ribbon-note"><strong>Public-checkout result:</strong> the committed evaluator copies Qarinah's public source into a clean temporary Git repository, indexes all ${publicProjectMemory.observed.indexedSymbolFiles} eligible source files, resolves four exact implementation definitions, binds a completed session receipt, compiles cited continuation context, and verifies the ledger across ${publicProjectMemory.scenarios.passed}/${publicProjectMemory.scenarios.total} passing scenarios. It uses no private data or provider calls. <a href="/docs/public-project-memory-evaluation/">Reproduce it</a>.</p>
       </section>
 
       <section class="front-proof section shell" aria-labelledby="visible-memory-title">
@@ -1310,8 +1359,8 @@ function homePage() {
         <div class="use-mode-grid visible-memory-grid">
           <article class="use-mode-card"><span>Graph</span><h3>Search nodes and evidence</h3><p>Inspect memories, files, concepts, worktrees, typed relationships, ranking components, and hashes.</p><a href="/docs/linked-project-memory/">Open the graph model</a></article>
           <article class="use-mode-card"><span>Timeline</span><h3>Decisions, tools, outcomes, conflicts</h3><p>Follow the visible execution history without flattening disagreement or superseded decisions.</p><a href="/docs/dashboard/">Open the dashboard guide</a></article>
-          <article class="use-mode-card"><span>Receipts</span><h3>Exact session context delivery</h3><p>Bind source event IDs, source and pack hashes, selected items, and measured context without copying event bodies.</p><a href="/docs/coding-context-harness/">Inspect session handoffs</a></article>
-          <article class="use-mode-card"><span>Editor</span><h3>VS Code and Cursor panel</h3><p>Search the same local developer-memory view from a sandboxed, read-only editor webview.</p><a href="/docs/host-compatibility/">Install the panel</a></article>
+          <article class="use-mode-card"><span>Receipts</span><h3>Exact session lifecycle and delivery</h3><p>Bind the ordered event manifest, observed lifecycle, turn outcomes, source head, selected evidence, and delivered pack without copying event bodies.</p><a href="/docs/coding-context-harness/">Inspect session handoffs</a></article>
+          <article class="use-mode-card"><span>Editors</span><h3>VS Code, Cursor, and standard LSP</h3><p>Replay session details in the sandboxed panel or attach the multi-language LSP through the packaged JetBrains LSP4IJ template and other compatible clients.</p><a href="/docs/host-compatibility/">Connect an editor</a></article>
         </div>
         <p class="benchmark-ribbon-note"><strong>Reproducible acceptance result:</strong> a fresh local evaluator creates three actual Git worktrees and passes all 16 isolation, retrieval, receipt, conflict, and incremental-compaction scenarios. <a href="/docs/worktree-context/">Method and machine-readable artifact</a>.</p>
       </section>
@@ -1335,7 +1384,7 @@ function homePage() {
               <strong>IDs + hashes</strong>
               <span>source, selection, and delivered pack</span>
             </div>
-            <p>The body-free receipt identifies the exact host session, source head, selected events, pack manifest, evidence coverage, and portable context estimate.</p>
+            <p>The body-free v2 receipt identifies the exact host session, ordered source-event manifest, observed lifecycle, outcomes, source head, selected events, pack manifest, evidence coverage, and portable context estimate.</p>
             <a href="/docs/coding-context-harness/">Read the receipt and compaction contract</a>
           </aside>
         </div>
@@ -1427,10 +1476,10 @@ function homePage() {
 
       <section class="proof-strip" aria-label="Qarinah proof points">
         <div class="shell proof-strip-grid">
-          <div><strong>16 / 16</strong><span>real-Git-worktree continuity scenarios passed</span></div>
-          <div><strong>6 hosts</strong><span>project-local setup for Codex, Claude, Cursor, Kimi, Antigravity, and Freebuff</span></div>
-          <div><strong>4 modes</strong><span>initial, unchanged, delta, and full-rebuild compaction receipts</span></div>
-          <div><strong>0 bodies</strong><span>retained inside per-session delivery receipts</span></div>
+          <div><strong>${publicProjectMemory.scenarios.passed} / ${publicProjectMemory.scenarios.total}</strong><span>public-project memory scenarios passed</span></div>
+          <div><strong>${publicProjectMemory.observed.indexedSymbolFiles} / ${publicProjectMemory.observed.eligibleSymbolFiles}</strong><span>eligible public-checkout source files indexed</span></div>
+          <div><strong>10 languages</strong><span>registered source-hash-bound symbol coverage</span></div>
+          <div><strong>0 bodies</strong><span>retained inside lifecycle-bound session receipts</span></div>
         </div>
       </section>
 
@@ -1458,8 +1507,8 @@ function homePage() {
           <article class="use-mode-card">
             <span>Teams</span>
             <h3>Share memory without flattening authority</h3>
-            <p>Connect repositories with typed relationships, preserve their separate access boundaries, and exchange encrypted bundles with signed checkpoints and explicit membership.</p>
-            <a href="/docs/team-memory/">Open the team guide</a>
+            <p>Connect repositories with typed relationships, preserve their separate access boundaries, and exchange immutable encrypted bundles through the optional self-hosted opaque sync service.</p>
+            <a href="/docs/team-sync-service/">Open the sync contract</a>
           </article>
           <article class="use-mode-card">
             <span>Optional add-on</span>
@@ -1530,6 +1579,7 @@ function homePage() {
           <a href="/docs/integrations/"><span>Codex</span><strong>Lifecycle hooks and a Qarinah context skill</strong><i>Open guide</i></a>
           <a href="/docs/integrations/"><span>Claude Code</span><strong>Reviewed plugin runtime with project-specific opt-in</strong><i>Open guide</i></a>
           <a href="/docs/integrations/"><span>Cursor</span><strong>Project MCP configuration and an always-on memory rule</strong><i>Open guide</i></a>
+          <a href="/docs/host-compatibility/"><span>JetBrains</span><strong>Packaged LSP4IJ template for project-local multi-language symbols and references</strong><i>Open guide</i></a>
           <a href="/docs/mcp/"><span>MCP</span><strong>Diagnostics by default, cited context only after explicit workspace authorization</strong><i>Open guide</i></a>
           <a href="/docs/team-memory/"><span>Teams</span><strong>Dashboard, freshness, multi-repo packs, encrypted sync, evaluation, and causal receipts</strong><i>Open guide</i></a>
           <a href="/docs/interoperability/"><span>Open formats</span><strong>Markdown, JSON, typed graph, and Google OKF export</strong><i>Open guide</i></a>
@@ -1978,7 +2028,7 @@ async function markdownPage(page) {
             ? "install"
             : "docs";
   const publicationLink = page.route === "paper"
-    ? `<a href="${paperPdf}">Download v1.6 PDF</a> · <a href="${conceptDoi}">Paper series DOI</a> · <a href="${publishedV14Doi}">Published v1.4</a> · <a href="${historicalVersionDoi}">Published v1.3</a>`
+    ? `<a href="${paperPdf}">Download v${paperVersion} PDF</a> · <a href="${conceptDoi}">Paper series DOI</a> · <a href="${publishedV14Doi}">Published v1.4</a> · <a href="${historicalVersionDoi}">Published v1.3</a>`
     : "";
 
   return layout({

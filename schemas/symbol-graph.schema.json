@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/AjnasNB/qarinah/schemas/symbol-graph.schema.json",
-  "title": "Qarinah JavaScript and TypeScript symbol graph",
+  "title": "Qarinah deterministic multi-language symbol graph",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "workspaceId", "generatedAt", "source", "extractor", "coverage", "files", "skipped", "symbols", "edges", "manifestHash"],
   "properties": {
-    "schemaVersion": { "const": "qarinah.symbol-graph.v1" },
+    "schemaVersion": { "const": "qarinah.symbol-graph.v2" },
     "workspaceId": { "type": "string", "pattern": "^ws_[0-9a-f]{32}$" },
     "generatedAt": { "type": "string", "format": "date-time" },
     "source": {
@@ -16,8 +16,32 @@
     },
     "extractor": {
       "type": "object", "additionalProperties": false,
-      "required": ["id", "version", "parser"],
-      "properties": { "id": { "const": "qarinah.typescript-symbols" }, "version": { "const": "1" }, "parser": { "type": "string" } }
+      "required": ["id", "version", "parsers"],
+      "properties": {
+        "id": { "const": "qarinah.multilanguage-symbols" },
+        "version": { "const": "2" },
+        "parsers": {
+          "type": "array", "minItems": 2, "maxItems": 2,
+          "prefixItems": [
+            {
+              "type": "object", "additionalProperties": false, "required": ["id", "version", "languages"],
+              "properties": {
+                "id": { "const": "typescript" }, "version": { "type": "string", "minLength": 1, "maxLength": 64 },
+                "languages": { "type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true, "items": { "enum": ["javascript", "typescript"] } }
+              }
+            },
+            {
+              "type": "object", "additionalProperties": false, "required": ["id", "version", "grammarVersion", "languages"],
+              "properties": {
+                "id": { "const": "tree-sitter-wasm" }, "version": { "type": "string", "minLength": 1, "maxLength": 64 },
+                "grammarVersion": { "type": "string", "minLength": 1, "maxLength": 64 },
+                "languages": { "type": "array", "minItems": 1, "maxItems": 32, "uniqueItems": true, "items": { "$ref": "#/$defs/language" } }
+              }
+            }
+          ],
+          "items": false
+        }
+      }
     },
     "coverage": { "$ref": "#/$defs/coverage" },
     "files": { "type": "array", "maxItems": 5000, "items": { "$ref": "#/$defs/file" } },
@@ -46,16 +70,16 @@
       "required": ["id", "name", "kind", "path", "container", "exported", "span", "signatureHash", "references"],
       "properties": {
         "id": { "type": "string", "pattern": "^symbol_[0-9a-f]{64}$" }, "name": { "type": "string", "minLength": 1, "maxLength": 256 },
-        "kind": { "enum": ["function", "class", "interface", "type", "enum", "namespace", "method", "property", "getter", "setter", "parameter", "variable", "import"] },
+        "kind": { "enum": ["function", "class", "interface", "type", "enum", "namespace", "method", "property", "getter", "setter", "parameter", "variable", "import", "constructor", "struct", "trait", "module", "constant"] },
         "path": { "type": "string" }, "container": { "type": ["string", "null"] }, "exported": { "type": "boolean" },
         "span": { "$ref": "#/$defs/span" }, "signatureHash": { "$ref": "#/$defs/hash" },
         "references": { "type": "array", "maxItems": 500000, "items": { "$ref": "#/$defs/reference" } }
       }
     },
     "file": {
-      "type": "object", "additionalProperties": false, "required": ["path", "language", "contentHash", "diagnosticCount", "symbolIds"],
+      "type": "object", "additionalProperties": false, "required": ["path", "language", "parser", "contentHash", "diagnosticCount", "symbolIds"],
       "properties": {
-        "path": { "type": "string" }, "language": { "enum": ["javascript", "typescript"] }, "contentHash": { "$ref": "#/$defs/hash" },
+        "path": { "type": "string" }, "language": { "$ref": "#/$defs/language" }, "parser": { "enum": ["typescript", "tree-sitter-wasm"] }, "contentHash": { "$ref": "#/$defs/hash" },
         "diagnosticCount": { "type": "integer", "minimum": 0, "maximum": 128 },
         "symbolIds": { "type": "array", "maxItems": 100000, "items": { "type": "string", "pattern": "^symbol_[0-9a-f]{64}$" }, "uniqueItems": true }
       }
@@ -73,14 +97,17 @@
     },
     "coverage": {
       "type": "object", "additionalProperties": false,
-      "required": ["sourceFiles", "eligibleFiles", "indexedFiles", "skippedFiles", "declarations", "references", "resolvedReferences", "unresolvedReferences", "ambiguousReferences", "complete"],
+      "required": ["sourceFiles", "supportedLanguages", "indexedLanguages", "eligibleFiles", "indexedFiles", "skippedFiles", "declarations", "references", "resolvedReferences", "unresolvedReferences", "ambiguousReferences", "complete"],
       "properties": {
         "sourceFiles": { "type": "integer", "minimum": 0 }, "eligibleFiles": { "type": "integer", "minimum": 0 },
+        "supportedLanguages": { "type": "array", "minItems": 1, "maxItems": 32, "uniqueItems": true, "items": { "$ref": "#/$defs/language" } },
+        "indexedLanguages": { "type": "array", "maxItems": 32, "uniqueItems": true, "items": { "$ref": "#/$defs/language" } },
         "indexedFiles": { "type": "integer", "minimum": 0 }, "skippedFiles": { "type": "integer", "minimum": 0 },
         "declarations": { "type": "integer", "minimum": 0, "maximum": 100000 }, "references": { "type": "integer", "minimum": 0, "maximum": 500000 },
         "resolvedReferences": { "type": "integer", "minimum": 0, "maximum": 500000 }, "unresolvedReferences": { "type": "integer", "minimum": 0, "maximum": 500000 },
         "ambiguousReferences": { "type": "integer", "minimum": 0, "maximum": 500000 }, "complete": { "type": "boolean" }
       }
-    }
+    },
+    "language": { "enum": ["c", "cpp", "csharp", "go", "java", "javascript", "kotlin", "python", "rust", "typescript"] }
   }
 }

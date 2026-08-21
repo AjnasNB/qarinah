@@ -240,7 +240,7 @@ export const PROJECT_STRUCTURE_SCHEMA_VERSION: "qarinah.project-structure.v2";
 export const SQLITE_READ_MODEL_SCHEMA_VERSION: 1;
 export const SQLITE_READ_MODEL_FILENAME: "qarinah.db";
 export const MEMORY_ATTACHMENT_SCHEMA_VERSION: "qarinah.memory-attachment.v1";
-export const QARINAH_VERSION: "0.4.0";
+export const QARINAH_VERSION: "0.5.0-rc.1";
 export const EVENT_KINDS: readonly QarinahEventKind[];
 export const RELATION_TYPES: readonly QarinahRelationType[];
 export function inspectGitWorktree(start?: string): Promise<QarinahGitWorktree | null>;
@@ -323,7 +323,7 @@ export function scanProjectStructure(options?: {
   maxTotalBytes?: number;
   maxDepth?: number;
 }): Promise<QarinahProjectStructureScanResult>;
-export const SYMBOL_GRAPH_SCHEMA_VERSION: "qarinah.symbol-graph.v1";
+export const SYMBOL_GRAPH_SCHEMA_VERSION: "qarinah.symbol-graph.v2";
 export const QARINAH_LSP_PROTOCOL_VERSION: "qarinah-lsp.v1";
 export interface QarinahSymbolSpan {
   readonly start: number;
@@ -333,7 +333,8 @@ export interface QarinahSymbolSpan {
   readonly endLine: number;
   readonly endColumn: number;
 }
-export type QarinahSymbolKind = "function" | "class" | "interface" | "type" | "enum" | "namespace" | "method" | "property" | "getter" | "setter" | "parameter" | "variable" | "import";
+export type QarinahSymbolKind = "function" | "class" | "interface" | "type" | "enum" | "namespace" | "method" | "property" | "getter" | "setter" | "parameter" | "variable" | "import" | "constructor" | "struct" | "trait" | "module" | "constant";
+export type QarinahSymbolLanguage = "c" | "cpp" | "csharp" | "go" | "java" | "javascript" | "kotlin" | "python" | "rust" | "typescript";
 export interface QarinahSymbol {
   readonly id: `symbol_${string}`;
   readonly name: string;
@@ -346,13 +347,19 @@ export interface QarinahSymbol {
   readonly references: readonly Readonly<{ path: string; span: QarinahSymbolSpan }>[];
 }
 export interface QarinahSymbolGraph {
-  readonly schemaVersion: "qarinah.symbol-graph.v1";
+  readonly schemaVersion: "qarinah.symbol-graph.v2";
   readonly workspaceId: string;
   readonly generatedAt: string;
   readonly source: Readonly<{ eventId: string; eventHash: `sha256:${string}`; snapshotHash: `sha256:${string}` }>;
-  readonly extractor: Readonly<{ id: "qarinah.typescript-symbols"; version: "1"; parser: string }>;
+  readonly extractor: Readonly<{
+    id: "qarinah.multilanguage-symbols";
+    version: "2";
+    parsers: readonly Readonly<{ id: "typescript" | "tree-sitter-wasm"; version: string; grammarVersion?: string; languages: readonly QarinahSymbolLanguage[] }>[];
+  }>;
   readonly coverage: Readonly<{
     sourceFiles: number;
+    supportedLanguages: readonly QarinahSymbolLanguage[];
+    indexedLanguages: readonly QarinahSymbolLanguage[];
     eligibleFiles: number;
     indexedFiles: number;
     skippedFiles: number;
@@ -363,7 +370,7 @@ export interface QarinahSymbolGraph {
     ambiguousReferences: number;
     complete: boolean;
   }>;
-  readonly files: readonly Readonly<{ path: string; language: "javascript" | "typescript"; contentHash: `sha256:${string}`; diagnosticCount: number; symbolIds: readonly string[] }>[];
+  readonly files: readonly Readonly<{ path: string; language: QarinahSymbolLanguage; parser: "typescript" | "tree-sitter-wasm"; contentHash: `sha256:${string}`; diagnosticCount: number; symbolIds: readonly string[] }>[];
   readonly skipped: readonly Readonly<{ path: string; reason: "unsupported-language" | "binary" | "oversized" | "unhashed" | "stale-or-linked" }>[];
   readonly symbols: readonly QarinahSymbol[];
   readonly edges: readonly Readonly<{ source: string; type: "defines" | "references"; target: string; span?: QarinahSymbolSpan }>[];
@@ -386,6 +393,11 @@ export function parseTypeScriptSymbols(filePath: string, text: string, options?:
   references: readonly Readonly<{ name: string; path: string; span: QarinahSymbolSpan }>[];
   diagnostics: readonly Readonly<{ code: number; start: number; length: number; category: string }>[];
 }>;
+export function parseTreeSitterSymbols(filePath: string, language: Exclude<QarinahSymbolLanguage, "javascript" | "typescript">, text: string, options?: { maxCharacters?: number }): Promise<Readonly<{
+  symbols: readonly QarinahSymbol[];
+  references: readonly Readonly<{ name: string; path: string; span: QarinahSymbolSpan }>[];
+  diagnostics: readonly Readonly<{ code: number; start: number; length: number; category: string }>[];
+}>>;
 export function buildSymbolGraph(options?: { cwd?: string; persist?: boolean; signal?: AbortSignal }): Promise<QarinahSymbolGraph>;
 export function loadSymbolGraph(options?: { cwd?: string }): Promise<QarinahSymbolGraph>;
 export function querySymbolGraph(graph: QarinahSymbolGraph, query?: string, options?: { limit?: number; kinds?: readonly QarinahSymbolKind[] }): QarinahSymbolQuery;
@@ -595,7 +607,7 @@ export function measureMemoryFootprint(options?: {
   inMemory?: boolean;
   updateCheckpoint?: boolean;
 }): Promise<Readonly<QarinahMemoryFootprint>>;
-export const PROJECT_MEMORY_CYCLE_SCHEMA_VERSION: "qarinah.project-memory-cycle.v1";
+export const PROJECT_MEMORY_CYCLE_SCHEMA_VERSION: "qarinah.project-memory-cycle.v2";
 export const FACT_CONSOLIDATION_SCHEMA_VERSION: "qarinah.fact-consolidation.v1";
 export type QarinahConsolidatedFactCategory = "decision" | "constraint" | "tool" | "outcome" | "evidence" | "conflict" | "summary";
 export interface QarinahConsolidatedFact {
@@ -652,11 +664,31 @@ export function consolidateProjectFacts(options?: {
   clock?: () => Date;
 }): Promise<Readonly<QarinahFactConsolidation>>;
 export interface QarinahProjectMemoryCycle {
-  readonly schemaVersion: "qarinah.project-memory-cycle.v1";
+  readonly schemaVersion: "qarinah.project-memory-cycle.v2";
   readonly generatedAt: string;
   readonly workspaceId: string;
   readonly worktreeId: string | null;
   readonly changed: boolean;
+  readonly incremental: Readonly<{ mode: "initial" | "delta" | "unchanged"; changeCount: number; snapshotHash: `sha256:${string}` }>;
+  readonly recovery: Readonly<{
+    detected: boolean;
+    priorStatus: "none" | "valid" | "invalid";
+    priorCycleId: string | null;
+    priorPhase: "invalid" | "started" | "scan-complete" | "symbols-complete" | "compaction-complete" | "derived-complete" | "completed" | "failed" | null;
+    priorStateHash: `sha256:${string}` | null;
+    action: "none" | "replayed-idempotent-cycle";
+  }>;
+  readonly state: Readonly<{
+    schemaVersion: "qarinah.project-memory-cycle-state.v1";
+    workspaceId: string;
+    cycleId: string;
+    generatedAt: string;
+    phase: "completed";
+    phaseOrdinal: 5;
+    sourceSnapshotHash: `sha256:${string}`;
+    failureCode: null;
+    stateHash: `sha256:${string}`;
+  }>;
   readonly scan: Readonly<Record<string, unknown>>;
   readonly symbols: null | Readonly<{ schemaVersion: string; manifestHash: string; files: number; symbols: number; references: number; complete: boolean }>;
   readonly harness: null | Readonly<{
@@ -1197,6 +1229,15 @@ export interface QarinahTeamManifest {
   github: { organization: string; repository: string } | null;
   manifestHash: string;
 }
+export interface QarinahEncryptedSyncBundle {
+  readonly schemaVersion: "qarinah.encrypted-sync-bundle.v1";
+  readonly algorithm: "AES-256-GCM";
+  readonly workspaceId: `ws_${string}`;
+  readonly teamManifestHash: `sha256:${string}`;
+  readonly nonce: string;
+  readonly ciphertext: string;
+  readonly authenticationTag: string;
+}
 export function createTeamManifest(input: {
   workspaceId: string;
   teamId: string;
@@ -1208,9 +1249,9 @@ export function createEncryptedSyncBundle(options: {
   manifest: Parameters<typeof createTeamManifest>[0];
   memberId: string;
   key: Uint8Array;
-}): Promise<Readonly<Record<string, unknown>>>;
+}): Promise<Readonly<QarinahEncryptedSyncBundle>>;
 export function decryptEncryptedSyncBundle(
-  bundle: Record<string, unknown>,
+  bundle: QarinahEncryptedSyncBundle,
   options: {
     manifest: Parameters<typeof createTeamManifest>[0];
     memberId: string;
@@ -1224,14 +1265,41 @@ export function createSignedCheckpoint(options: {
   clock?: () => Date;
 }): Promise<Readonly<Record<string, unknown>>>;
 export function verifySignedCheckpoint(checkpoint: Record<string, unknown>, publicKey?: string): boolean;
+export const TEAM_SYNC_SERVICE_SCHEMA_VERSION: "qarinah.team-sync-service.v1";
+export interface QarinahTeamSyncToken {
+  token: string;
+  teamId: string;
+  memberId: string;
+  role: "owner" | "maintainer" | "reader";
+}
+export interface QarinahTeamSyncServerOptions {
+  root: string;
+  tokens: QarinahTeamSyncToken[];
+  host?: "127.0.0.1" | "::1";
+  port?: number;
+  maxBundleBytes?: number;
+  requestsPerMinute?: number;
+  clock?: () => Date;
+}
+export interface QarinahTeamSyncServer {
+  start(): Promise<Readonly<{
+    schemaVersion: "qarinah.team-sync-service.v1";
+    host: "127.0.0.1" | "::1";
+    port: number;
+    root: string;
+  }>>;
+  close(): Promise<void>;
+}
+export function encryptedSyncBundleId(bundle: QarinahEncryptedSyncBundle): `bundle_${string}`;
+export function createTeamSyncServer(options: QarinahTeamSyncServerOptions): QarinahTeamSyncServer;
 export function createCausalReceipt(input: Record<
   "evidence" | "memory" | "policy" | "execution" | "observation",
   { id: string; hash: `sha256:${string}`; system: string; timestamp: string }
 >): Readonly<Record<string, unknown>>;
-export const SESSION_CONTEXT_RECEIPT_SCHEMA_VERSION: "qarinah.session-context-receipt.v1";
-export const SESSION_CONTEXT_RECEIPT_INDEX_SCHEMA_VERSION: "qarinah.session-context-receipt-index.v1";
+export const SESSION_CONTEXT_RECEIPT_SCHEMA_VERSION: "qarinah.session-context-receipt.v2";
+export const SESSION_CONTEXT_RECEIPT_INDEX_SCHEMA_VERSION: "qarinah.session-context-receipt-index.v2";
 export interface QarinahSessionContextReceipt {
-  readonly schemaVersion: "qarinah.session-context-receipt.v1";
+  readonly schemaVersion: "qarinah.session-context-receipt.v2";
   readonly generatedAt: string;
   readonly workspaceId: string;
   readonly sessionId: string;
@@ -1241,11 +1309,29 @@ export interface QarinahSessionContextReceipt {
   readonly source: Readonly<{
     eventCount: number;
     headHash: `sha256:${string}` | null;
+    eventManifestHash: `sha256:${string}`;
     characters: number;
     estimatedTokens: number;
     estimator: string;
     toolRequests: number;
     toolOutcomes: number;
+  }>;
+  readonly lifecycle: Readonly<{
+    observedState: "started" | "active" | "turn-completed";
+    firstEventId: string | null;
+    lastEventId: string | null;
+    sessionStartEvents: number;
+    promptEvents: number;
+    completedTurns: number;
+    compactionEvents: number;
+    turnIds: readonly string[];
+    kindCounts: readonly Readonly<{ kind: string; count: number }>[];
+    manifestHash: `sha256:${string}`;
+  }>;
+  readonly outcomes: Readonly<{
+    eventCount: number;
+    eventIds: readonly string[];
+    manifestHash: `sha256:${string}`;
   }>;
   readonly delivered: Readonly<{
     query: string;
@@ -1270,7 +1356,7 @@ export interface QarinahSessionContextReceipt {
   readonly receiptHash: `sha256:${string}`;
 }
 export interface QarinahSessionContextReceiptIndex {
-  readonly schemaVersion: "qarinah.session-context-receipt-index.v1";
+  readonly schemaVersion: "qarinah.session-context-receipt-index.v2";
   readonly generatedAt: string;
   readonly workspaceId: string;
   readonly query: string;
@@ -1306,7 +1392,7 @@ export interface QarinahDeveloperMemoryView {
   readonly symbols: Readonly<{
     available: boolean;
     reason?: string;
-    schemaVersion?: "qarinah.symbol-graph.v1";
+    schemaVersion?: "qarinah.symbol-graph.v2";
     manifestHash?: `sha256:${string}`;
     extractor?: QarinahSymbolGraph["extractor"];
     coverage: QarinahSymbolGraph["coverage"] | null;

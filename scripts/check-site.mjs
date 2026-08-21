@@ -36,7 +36,7 @@ const required = [
   "search-index.json",
   "metrics.json",
   "paper/index.html",
-  "paper/Qarinah-Technical-White-Paper-v1.6.pdf",
+  "paper/Qarinah-Technical-White-Paper-v1.7.pdf",
   "paper/Qarinah-Technical-White-Paper-v1.4.pdf",
   "paper/Qarinah-Technical-White-Paper-v1.5.pdf",
   "paper/Qarinah-Technical-White-Paper-v1.3.pdf",
@@ -322,16 +322,13 @@ for (const responsiveHeroRule of [
 if (home.includes('"@type":"SearchAction"') || home.includes("search_term_string")) {
   errors.push("Homepage must not emit the retired sitelinks-search SearchAction or its crawlable URL template.");
 }
-if (!home.includes("<strong>12 / 12</strong>")
-  || !home.includes("deep-memory product checks passed")
-  || !home.includes("restored 390,226 source bytes exactly")
-  || !home.includes("reused two of three chunks")
-  || !home.includes("Symbols and references")
+if (!home.includes("<strong>10 / 10</strong>")
+  || !home.includes("public-project memory checks passed")
+  || !home.includes("eligible source files indexed")
+  || !home.includes("Multi-language symbols and references")
   || !home.includes("Strict cited facts")
-  || !home.includes("<strong>16 / 16</strong>")
-  || !home.includes("real-Git-worktree continuity scenarios passed")
-  || !home.includes("<strong>6 hosts</strong>")
-  || !home.includes("<strong>4 modes</strong>")
+  || !home.includes("public-project memory scenarios passed")
+  || !home.includes("10 languages")
   || !home.includes("<strong>0 bodies</strong>")) {
   errors.push("Homepage is missing the plain-language visible-memory acceptance proof.");
 }
@@ -345,9 +342,9 @@ for (const worktreeHeroProof of [
   "Your project remembers. Every agent gets the proof.",
   "Verifiable memory for coding agents",
   'class="hero-context-proof"',
-  "12 / 12",
-  "deep-memory product checks passed",
-  "exact recovery, chunk reuse, symbols, references, cited facts, and incremental refresh",
+  "10 / 10",
+  "public-project memory checks passed",
+  "eligible source files indexed, exact definitions found, session receipt and cited continuation verified",
   "one repository · two isolated ledgers",
   "branch + commit in snapshot hash",
   'href="/docs/content-archive/"'
@@ -374,7 +371,7 @@ if (!home.includes("Verifiable project memory, exact source recovery, and cited 
   errors.push("Homepage is missing the worktree-aware category or the separate historical benchmark scope.");
 }
 if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
-  || publicMetrics.productVersion !== "0.4.0"
+  || publicMetrics.productVersion !== "0.5.0-rc.1"
   || publicMetrics.updatedAt !== "2026-08-20"
   || publicMetrics.providerBillingMeasurement !== false
   || publicMetrics.metrics?.realGitWorktreeContinuity?.scenarios !== 16
@@ -388,7 +385,13 @@ if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.reusedChunks !== 2
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.indexedSymbols !== 4
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.resolvedReferences !== 3
-  || publicMetrics.metrics?.deepMemoryProductAcceptance?.artifactHash !== "sha256:bb801a59d5c1822b87bda5596237a126a064e62ac6f588e3351ebe949551ff46"
+  || publicMetrics.metrics?.deepMemoryProductAcceptance?.citedFacts !== 2
+  || publicMetrics.metrics?.deepMemoryProductAcceptance?.artifactHash !== "sha256:3183af0c8ce57ac63d49a4ee930ca93286d2767509b53f2d613444e8735e920f"
+  || publicMetrics.metrics?.publicProjectMemory?.scenarios !== 10
+  || publicMetrics.metrics?.publicProjectMemory?.passed !== 10
+  || publicMetrics.metrics?.publicProjectMemory?.indexedSymbolFiles !== publicMetrics.metrics?.publicProjectMemory?.eligibleSymbolFiles
+  || publicMetrics.metrics?.publicProjectMemory?.providerCalls !== 0
+  || publicMetrics.metrics?.publicProjectMemory?.privateDataUsed !== false
   || publicMetrics.metrics?.repeatedProjectContext?.baselineEstimatedTokens !== 442113
   || publicMetrics.metrics?.repeatedProjectContext?.qarinahEstimatedTokens !== 5682
   || publicMetrics.metrics?.repeatedProjectContext?.estimatedTokensAvoided !== 436431
@@ -441,7 +444,7 @@ for (const capability of [
 }
 if (!features.includes('"@type":"CollectionPage"')
   || !features.includes('"@type":"ItemList"')
-  || !features.includes('"numberOfItems":25')) {
+  || !features.includes('"numberOfItems":28')) {
   errors.push("Features page is missing its visible capability collection structured data.");
 }
 for (const requiredWorktreeArticleCopy of [
@@ -531,7 +534,7 @@ if (!faq.includes('"@type":"FAQPage"') || !faq.includes('"mainEntity"')) {
 if (!paper.includes('src="/assets/qarinah-flow.svg"')) {
   errors.push("Paper architecture image is not bound to the deployed asset.");
 }
-if (!paper.includes("/paper/Qarinah-Technical-White-Paper-v1.6.pdf")) {
+if (!paper.includes("/paper/Qarinah-Technical-White-Paper-v1.7.pdf")) {
   errors.push("Paper download does not point to the versioned website PDF.");
 }
 if (!paper.includes("https://doi.org/10.5281/zenodo.21850747")
@@ -539,9 +542,9 @@ if (!paper.includes("https://doi.org/10.5281/zenodo.21850747")
   || !paper.includes("https://doi.org/10.5281/zenodo.21843240")
   || !paper.includes('"creativeWorkStatus":"Published"')
   || !paper.includes('"datePublished":"2026-08-20"')) {
-  errors.push("Paper page must bind current v1.6 to the paper series and preserve published v1.4/v1.3 DOIs.");
+  errors.push("Paper page must bind current v1.7 to the paper series and preserve published v1.4/v1.3 DOIs.");
 }
-if (/release[- ]candidate|activates on publication|not registered or published|DOI reserved|assigned only when this manuscript is deposited|assigned by Zenodo when v1\.4 is deposited|A version DOI is assigned/iu.test(paper)) {
+if (/activates on publication|not registered or published|DOI reserved|assigned only when this manuscript is deposited|assigned by Zenodo when v1\.4 is deposited|A version DOI is assigned/iu.test(paper)) {
   errors.push("Paper page contains stale pre-publication lifecycle wording.");
 }
 if (!paper.includes("View on GitHub") || paper.includes("Edit on GitHub")) {

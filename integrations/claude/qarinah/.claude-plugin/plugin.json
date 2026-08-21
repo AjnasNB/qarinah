@@ -1,7 +1,7 @@
 {
   "name": "qarinah",
-  "version": "0.4.0",
-  "description": "Qarinah is worktree-aware project memory for coding agents - isolated per checkout and linked through a cited repository graph.",
+  "version": "0.5.0-rc.1",
+  "description": "Qarinah is proof-carrying project memory for coding agents - multi-language, worktree-aware, recoverable, and cited.",
   "author": {
     "name": "Ajnas NB",
     "email": "ajnasnb@gmail.com",

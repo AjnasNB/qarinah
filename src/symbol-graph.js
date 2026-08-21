@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { createRequire } from "node:module";
 import { lstat, readFile, stat } from "node:fs/promises";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { throwIfAborted, validateAbortSignal } from "./abort.js";
 import { canonicalStringify, deepFreezeJson, sha256 } from "./canonical.js";
 import { QarinahError } from "./errors.js";
@@ -9,18 +10,70 @@ import { validateProjectStructureSnapshot } from "./project-structure.js";
 import { readEvents } from "./store.js";
 import { atomicWriteFile, loadWorkspace, resolveWithin, secureStoragePath } from "./workspace.js";
 
-export const SYMBOL_GRAPH_SCHEMA_VERSION = "qarinah.symbol-graph.v1";
+export const SYMBOL_GRAPH_SCHEMA_VERSION = "qarinah.symbol-graph.v2";
 const MAX_GRAPH_BYTES = 128 * 1024 * 1024;
 const MAX_SYMBOLS = 100_000;
 const MAX_REFERENCES = 500_000;
+const MAX_TREE_NODES_PER_FILE = 1_000_000;
 const SCRIPT_LANGUAGES = new Set(["javascript", "typescript"]);
+const TREE_SITTER_GRAMMARS = Object.freeze({
+  c: "c",
+  cpp: "cpp",
+  csharp: "c_sharp",
+  go: "go",
+  java: "java",
+  kotlin: "kotlin",
+  python: "python",
+  rust: "rust"
+});
+const SYMBOL_LANGUAGES = new Set([...SCRIPT_LANGUAGES, ...Object.keys(TREE_SITTER_GRAMMARS)]);
+const TREE_SITTER_LANGUAGE_NAMES = Object.freeze([...new Set(Object.keys(TREE_SITTER_GRAMMARS))].sort());
 const TYPESCRIPT_RUNTIME_SPECIFIER = "typescript-classic";
+const TREE_SITTER_RUNTIME_SPECIFIER = "web-tree-sitter";
 const runtimeRequire = createRequire(import.meta.url);
+const TREE_SITTER_RUNTIME_VERSION = "0.20.8";
+const TREE_SITTER_GRAMMAR_VERSION = "0.1.13";
 let ts;
+let Parser;
+let treeSitterReady;
+const treeSitterLanguages = new Map();
+
+function optionalRuntime(specifier, vendoredPath) {
+  try {
+    return runtimeRequire(specifier);
+  } catch (error) {
+    if (error?.code !== "MODULE_NOT_FOUND") throw error;
+    return runtimeRequire(fileURLToPath(new URL(vendoredPath, import.meta.url)));
+  }
+}
 
 function typeScriptRuntime() {
-  ts ??= runtimeRequire(TYPESCRIPT_RUNTIME_SPECIFIER);
+  ts ??= optionalRuntime(TYPESCRIPT_RUNTIME_SPECIFIER, "./vendor/typescript-classic/lib/typescript.js");
   return ts;
+}
+
+function treeSitterRuntime() {
+  Parser ??= optionalRuntime(TREE_SITTER_RUNTIME_SPECIFIER, "./vendor/web-tree-sitter/tree-sitter.js");
+  return Parser;
+}
+
+async function treeSitterLanguage(language) {
+  const grammar = TREE_SITTER_GRAMMARS[language];
+  if (!grammar) throw new QarinahError("SYMBOL_LANGUAGE_UNSUPPORTED", `${language} is not a registered symbol language.`);
+  const runtime = treeSitterRuntime();
+  treeSitterReady ??= runtime.init();
+  await treeSitterReady;
+  if (!treeSitterLanguages.has(grammar)) {
+    let wasmPath;
+    try {
+      wasmPath = runtimeRequire.resolve(`tree-sitter-wasms/out/tree-sitter-${grammar}.wasm`);
+    } catch (error) {
+      if (error?.code !== "MODULE_NOT_FOUND") throw error;
+      wasmPath = fileURLToPath(new URL(`./tree-sitter-wasms/tree-sitter-${grammar}.wasm`, import.meta.url));
+    }
+    treeSitterLanguages.set(grammar, runtime.Language.load(wasmPath));
+  }
+  return treeSitterLanguages.get(grammar);
 }
 
 function hashBytes(bytes) {
@@ -184,6 +237,170 @@ export function parseTypeScriptSymbols(filePath, text, options = {}) {
   })).slice(0, 128) });
 }
 
+const TREE_DECLARATION_KINDS = Object.freeze({
+  class_declaration: "class",
+  class_definition: "class",
+  class_specifier: "class",
+  const_item: "constant",
+  constructor_declaration: "constructor",
+  enum_declaration: "enum",
+  enum_item: "enum",
+  enum_specifier: "enum",
+  function_declaration: "function",
+  function_definition: "function",
+  function_item: "function",
+  interface_declaration: "interface",
+  method_declaration: "method",
+  method_definition: "method",
+  method_item: "method",
+  mod_item: "module",
+  module_declaration: "module",
+  namespace_declaration: "namespace",
+  namespace_definition: "namespace",
+  property_declaration: "property",
+  record_declaration: "class",
+  struct_declaration: "struct",
+  struct_item: "struct",
+  struct_specifier: "struct",
+  trait_item: "trait",
+  type_alias_declaration: "type",
+  type_definition: "type",
+  type_item: "type",
+  type_spec: "type"
+});
+const TREE_IDENTIFIER_TYPES = new Set([
+  "constant", "field_identifier", "identifier", "namespace_identifier", "property_identifier",
+  "simple_identifier", "type_identifier"
+]);
+const TREE_CONTAINER_KINDS = new Set([
+  "class", "constructor", "function", "interface", "method", "module", "namespace", "struct", "trait"
+]);
+
+function treeSpan(node) {
+  return Object.freeze({
+    start: node.startIndex,
+    end: node.endIndex,
+    line: node.startPosition.row + 1,
+    column: node.startPosition.column + 1,
+    endLine: node.endPosition.row + 1,
+    endColumn: node.endPosition.column + 1
+  });
+}
+
+function boundedTreeIdentifier(node, text, depth = 0) {
+  if (!node || depth > 5) return null;
+  if (TREE_IDENTIFIER_TYPES.has(node.type)) {
+    const value = text.slice(node.startIndex, node.endIndex).normalize("NFKC").trim();
+    return value.length >= 1 && value.length <= 256 ? Object.freeze({ node, value }) : null;
+  }
+  for (const child of node.namedChildren ?? []) {
+    const match = boundedTreeIdentifier(child, text, depth + 1);
+    if (match) return match;
+  }
+  return null;
+}
+
+function treeDeclarationName(node, text) {
+  const named = node.childForFieldName("name") ?? node.childForFieldName("declarator");
+  return boundedTreeIdentifier(named, text) ?? boundedTreeIdentifier(node, text);
+}
+
+function treeExported(language, name, sourceSlice) {
+  if (language === "python") return !name.startsWith("_");
+  if (language === "go") return /^\p{Lu}/u.test(name);
+  if (language === "rust") return /^\s*pub(?:\s*\([^)]*\))?\b/u.test(sourceSlice);
+  if (["csharp", "java", "kotlin", "php", "scala", "swift"].includes(language)) return /\bpublic\b/u.test(sourceSlice);
+  return false;
+}
+
+function treeSignatureHash(node, text) {
+  let value = text.slice(node.startIndex, Math.min(node.endIndex, node.startIndex + 8_192));
+  const body = value.search(/[{:]/u);
+  const newline = value.search(/[\r\n]/u);
+  const boundary = [body, newline].filter((index) => index >= 0).sort((left, right) => left - right)[0];
+  if (boundary !== undefined) value = value.slice(0, boundary + 1);
+  return sha256(value.normalize("NFKC").trim());
+}
+
+export async function parseTreeSitterSymbols(filePath, language, text, options = {}) {
+  if (typeof filePath !== "string" || filePath.length < 1 || filePath.length > 1_024) throw new TypeError("filePath is invalid.");
+  if (typeof language !== "string" || !Object.hasOwn(TREE_SITTER_GRAMMARS, language)) throw new TypeError("language is not supported by the Tree-sitter symbol parser.");
+  if (typeof text !== "string") throw new TypeError("text must be a string.");
+  if (text.length > (options.maxCharacters ?? 4 * 1024 * 1024)) throw new QarinahError("SYMBOL_FILE_LIMIT", `${filePath} exceeds the symbol parser character limit.`);
+  const loadedLanguage = await treeSitterLanguage(language);
+  const ParserRuntime = treeSitterRuntime();
+  const parser = new ParserRuntime();
+  parser.setLanguage(loadedLanguage);
+  const tree = parser.parse(text);
+  const symbols = [];
+  const references = [];
+  const containers = [];
+  const declarationNameSpans = new Set();
+  let errorNodes = 0;
+
+  try {
+    const pending = [{ node: tree.rootNode, exit: false }];
+    let visited = 0;
+    while (pending.length > 0) {
+      const current = pending.pop();
+      if (current.exit) {
+        containers.pop();
+        continue;
+      }
+      visited += 1;
+      if (visited > MAX_TREE_NODES_PER_FILE) throw new QarinahError("SYMBOL_GRAPH_LIMIT", `${filePath} exceeds the Tree-sitter node limit.`);
+      const node = current.node;
+      if (node.type === "ERROR" || (typeof node.isMissing === "function" ? node.isMissing() : node.isMissing === true)) errorNodes += 1;
+      const kind = TREE_DECLARATION_KINDS[node.type] ?? null;
+      const named = kind ? treeDeclarationName(node, text) : null;
+      let pushed = false;
+      if (named) {
+        const location = treeSpan(named.node);
+        declarationNameSpans.add(`${location.start}:${location.end}`);
+        const container = containers.join(".") || null;
+        const sourceSlice = text.slice(node.startIndex, Math.min(node.endIndex, node.startIndex + 512));
+        symbols.push({
+          id: symbolId(`${filePath}\0${container ?? ""}\0${kind}\0${named.value}\0${location.start}`),
+          name: named.value,
+          kind,
+          path: filePath,
+          container,
+          exported: treeExported(language, named.value, sourceSlice),
+          span: location,
+          signatureHash: treeSignatureHash(node, text),
+          references: []
+        });
+        if (symbols.length > MAX_SYMBOLS) throw new QarinahError("SYMBOL_GRAPH_LIMIT", `${filePath} exceeds the declaration limit.`);
+        if (TREE_CONTAINER_KINDS.has(kind)) {
+          containers.push(named.value);
+          pushed = true;
+        }
+      }
+      if (TREE_IDENTIFIER_TYPES.has(node.type)) {
+        const location = treeSpan(node);
+        const name = text.slice(node.startIndex, node.endIndex).normalize("NFKC").trim();
+        if (name.length >= 1 && name.length <= 256 && !declarationNameSpans.has(`${location.start}:${location.end}`)) {
+          references.push({ name, path: filePath, span: location });
+          if (references.length > MAX_REFERENCES) throw new QarinahError("SYMBOL_GRAPH_LIMIT", `${filePath} exceeds the reference limit.`);
+        }
+      }
+      if (pushed) pending.push({ node: null, exit: true });
+      const children = node.namedChildren ?? [];
+      for (let index = children.length - 1; index >= 0; index -= 1) pending.push({ node: children[index], exit: false });
+    }
+    symbols.sort((left, right) => left.span.start - right.span.start || left.id.localeCompare(right.id));
+    references.sort((left, right) => left.span.start - right.span.start || left.name.localeCompare(right.name));
+    return deepFreezeJson({
+      symbols,
+      references,
+      diagnostics: errorNodes === 0 ? [] : [{ code: 1, start: 0, length: 0, category: "error" }]
+    });
+  } finally {
+    tree.delete();
+    parser.delete();
+  }
+}
+
 function resolveReferences(symbols, rawReferences) {
   const byName = new Map();
   for (const symbol of symbols) {
@@ -281,8 +498,8 @@ export async function buildSymbolGraph(options = {}) {
   const skipped = [];
   for (const file of latest.structure.files) {
     throwIfAborted(signal);
-    if (!SCRIPT_LANGUAGES.has(file.language) || file.skipped !== null || !file.contentHash) {
-      skipped.push({ path: file.path, reason: SCRIPT_LANGUAGES.has(file.language) ? (file.skipped ?? "unhashed") : "unsupported-language" });
+    if (!SYMBOL_LANGUAGES.has(file.language) || file.skipped !== null || !file.contentHash) {
+      skipped.push({ path: file.path, reason: SYMBOL_LANGUAGES.has(file.language) ? (file.skipped ?? "unhashed") : "unsupported-language" });
       continue;
     }
     const candidate = resolveWithin(workspace.root, ...file.path.split("/"));
@@ -303,10 +520,18 @@ export async function buildSymbolGraph(options = {}) {
       skipped.push({ path: file.path, reason: "stale-or-linked" });
       continue;
     }
-    const parsed = parseTypeScriptSymbols(file.path, bytes.toString("utf8"));
+    const parsed = SCRIPT_LANGUAGES.has(file.language)
+      ? parseTypeScriptSymbols(file.path, bytes.toString("utf8"))
+      : await parseTreeSitterSymbols(file.path, file.language, bytes.toString("utf8"));
     declarations.push(...parsed.symbols);
     rawReferences.push(...parsed.references);
-    files.push({ path: file.path, language: file.language, contentHash: file.contentHash, diagnosticCount: parsed.diagnostics.length });
+    files.push({
+      path: file.path,
+      language: file.language,
+      parser: SCRIPT_LANGUAGES.has(file.language) ? "typescript" : "tree-sitter-wasm",
+      contentHash: file.contentHash,
+      diagnosticCount: parsed.diagnostics.length
+    });
     if (declarations.length > MAX_SYMBOLS || rawReferences.length > MAX_REFERENCES) throw new QarinahError("SYMBOL_GRAPH_LIMIT", "Symbol graph exceeds its declaration or reference limit.");
   }
   const resolved = resolveReferences(declarations, rawReferences);
@@ -325,10 +550,24 @@ export async function buildSymbolGraph(options = {}) {
     workspaceId: workspace.config.workspaceId,
     generatedAt: latest.event.timestamp,
     source: { eventId: latest.event.eventId, eventHash: latest.event.hash, snapshotHash: latest.structure.snapshotHash },
-    extractor: { id: "qarinah.typescript-symbols", version: "1", parser: `typescript@${ts.version}` },
+    extractor: {
+      id: "qarinah.multilanguage-symbols",
+      version: "2",
+      parsers: [
+        { id: "typescript", version: typeScriptRuntime().version, languages: [...SCRIPT_LANGUAGES].sort() },
+        {
+          id: "tree-sitter-wasm",
+          version: TREE_SITTER_RUNTIME_VERSION,
+          grammarVersion: TREE_SITTER_GRAMMAR_VERSION,
+          languages: TREE_SITTER_LANGUAGE_NAMES
+        }
+      ]
+    },
     coverage: {
       sourceFiles: latest.structure.files.length,
-      eligibleFiles: latest.structure.files.filter((file) => SCRIPT_LANGUAGES.has(file.language)).length,
+      supportedLanguages: [...SYMBOL_LANGUAGES].sort(),
+      indexedLanguages: [...new Set(finalFiles.map((file) => file.language))].sort(),
+      eligibleFiles: latest.structure.files.filter((file) => SYMBOL_LANGUAGES.has(file.language)).length,
       indexedFiles: finalFiles.length,
       skippedFiles: skipped.length,
       declarations: resolved.symbols.length,

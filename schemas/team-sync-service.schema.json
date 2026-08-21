@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qarinah.io/schemas/team-sync-service.schema.json",
+  "title": "Qarinah opaque team-sync service contracts",
+  "oneOf": [
+    { "$ref": "#/$defs/encryptedBundle" },
+    { "$ref": "#/$defs/writeReceipt" },
+    { "$ref": "#/$defs/status" },
+    { "$ref": "#/$defs/auditRecord" },
+    { "$ref": "#/$defs/auditPage" }
+  ],
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "workspaceId": { "type": "string", "pattern": "^ws_[a-f0-9]{32}$" },
+    "bundleId": { "type": "string", "pattern": "^bundle_[a-f0-9]{32}$" },
+    "identity": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{0,63}$" },
+    "requestId": { "type": "string", "format": "uuid" },
+    "encryptedBundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "algorithm", "workspaceId", "teamManifestHash", "nonce", "ciphertext", "authenticationTag"],
+      "properties": {
+        "schemaVersion": { "const": "qarinah.encrypted-sync-bundle.v1" },
+        "algorithm": { "const": "AES-256-GCM" },
+        "workspaceId": { "$ref": "#/$defs/workspaceId" },
+        "teamManifestHash": { "$ref": "#/$defs/hash" },
+        "nonce": { "type": "string", "pattern": "^[A-Za-z0-9+/]{16}$" },
+        "ciphertext": { "type": "string", "pattern": "^[A-Za-z0-9+/]*={0,2}$" },
+        "authenticationTag": { "type": "string", "pattern": "^[A-Za-z0-9+/]{22}==$" }
+      }
+    },
+    "writeReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "teamId", "workspaceId", "bundleId", "bundleHash", "created", "requestId", "receiptHash"],
+      "properties": {
+        "schemaVersion": { "const": "qarinah.team-sync-write-receipt.v1" },
+        "teamId": { "$ref": "#/$defs/identity" },
+        "workspaceId": { "$ref": "#/$defs/workspaceId" },
+        "bundleId": { "$ref": "#/$defs/bundleId" },
+        "bundleHash": { "$ref": "#/$defs/hash" },
+        "created": { "type": "boolean" },
+        "requestId": { "$ref": "#/$defs/requestId" },
+        "receiptHash": { "$ref": "#/$defs/hash" }
+      }
+    },
+    "status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "teamId", "workspaceCount", "storage", "requestId"],
+      "properties": {
+        "schemaVersion": { "const": "qarinah.team-sync-status.v1" },
+        "teamId": { "$ref": "#/$defs/identity" },
+        "workspaceCount": { "type": "integer", "minimum": 0 },
+        "storage": { "const": "opaque-encrypted-bundles" },
+        "requestId": { "$ref": "#/$defs/requestId" }
+      }
+    },
+    "auditRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "timestamp", "requestId", "teamId", "memberId", "role", "operation", "status", "workspaceId", "bundleId", "bundleHash", "auditHash"],
+      "properties": {
+        "schemaVersion": { "const": "qarinah.team-sync-audit.v1" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "requestId": { "$ref": "#/$defs/requestId" },
+        "teamId": { "$ref": "#/$defs/identity" },
+        "memberId": { "$ref": "#/$defs/identity" },
+        "role": { "enum": ["owner", "maintainer", "reader"] },
+        "operation": { "enum": ["bundle.write", "bundle.read", "status.read"] },
+        "status": { "enum": ["created", "idempotent", "ok"] },
+        "workspaceId": { "oneOf": [{ "$ref": "#/$defs/workspaceId" }, { "type": "null" }] },
+        "bundleId": { "oneOf": [{ "$ref": "#/$defs/bundleId" }, { "type": "null" }] },
+        "bundleHash": { "oneOf": [{ "$ref": "#/$defs/hash" }, { "type": "null" }] },
+        "auditHash": { "$ref": "#/$defs/hash" }
+      }
+    },
+    "auditPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "teamId", "recordCount", "records", "requestId"],
+      "properties": {
+        "schemaVersion": { "const": "qarinah.team-sync-audit-page.v1" },
+        "teamId": { "$ref": "#/$defs/identity" },
+        "recordCount": { "type": "integer", "minimum": 0, "maximum": 500 },
+        "records": { "type": "array", "maxItems": 500, "items": { "$ref": "#/$defs/auditRecord" } },
+        "requestId": { "$ref": "#/$defs/requestId" }
+      }
+    }
+  }
+}

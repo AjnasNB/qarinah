@@ -1,12 +1,16 @@
+import { readFile, stat } from "node:fs/promises";
 import { abortableDelay, throwIfAborted, validateAbortSignal } from "./abort.js";
 import { deepFreezeJson, sha256 } from "./canonical.js";
 import { runCodingContextHarness } from "./coding-harness.js";
 import { rebuildDerivedState } from "./indexer.js";
 import { scanProjectStructure } from "./project-structure.js";
 import { buildSymbolGraph } from "./symbol-graph.js";
-import { loadWorkspace } from "./workspace.js";
+import { atomicWriteFile, loadWorkspace, secureStoragePath } from "./workspace.js";
 
-export const PROJECT_MEMORY_CYCLE_SCHEMA_VERSION = "qarinah.project-memory-cycle.v1";
+export const PROJECT_MEMORY_CYCLE_SCHEMA_VERSION = "qarinah.project-memory-cycle.v2";
+const PROJECT_MEMORY_CYCLE_STATE_SCHEMA_VERSION = "qarinah.project-memory-cycle-state.v1";
+const MAX_CYCLE_STATE_BYTES = 64 * 1024;
+const CYCLE_PHASES = Object.freeze(["started", "scan-complete", "symbols-complete", "compaction-complete", "derived-complete", "completed", "failed"]);
 
 const DEFAULT_QUERY = "project decisions changes tool outcomes tests failures next steps";
 
@@ -84,83 +88,181 @@ function normalizeWatcherOptions(options = {}) {
   });
 }
 
+function cycleStateCore(workspace, cycleId, generatedAt, phase, sourceSnapshotHash = null, failureCode = null) {
+  return {
+    schemaVersion: PROJECT_MEMORY_CYCLE_STATE_SCHEMA_VERSION,
+    workspaceId: workspace.config.workspaceId,
+    cycleId,
+    generatedAt,
+    phase,
+    phaseOrdinal: CYCLE_PHASES.indexOf(phase),
+    sourceSnapshotHash,
+    failureCode
+  };
+}
+
+function validCycleState(value, workspaceId) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const keys = ["schemaVersion", "workspaceId", "cycleId", "generatedAt", "phase", "phaseOrdinal", "sourceSnapshotHash", "failureCode", "stateHash"];
+  if (Object.keys(value).sort().join("\0") !== keys.sort().join("\0")) return false;
+  if (value.schemaVersion !== PROJECT_MEMORY_CYCLE_STATE_SCHEMA_VERSION || value.workspaceId !== workspaceId
+    || !/^cycle_[0-9a-f]{32}$/u.test(value.cycleId) || !CYCLE_PHASES.includes(value.phase)
+    || value.phaseOrdinal !== CYCLE_PHASES.indexOf(value.phase)
+    || (value.sourceSnapshotHash !== null && !/^sha256:[0-9a-f]{64}$/u.test(value.sourceSnapshotHash))
+    || (value.failureCode !== null && (typeof value.failureCode !== "string" || value.failureCode.length > 128))
+    || !/^sha256:[0-9a-f]{64}$/u.test(value.stateHash)) return false;
+  const { stateHash, ...core } = value;
+  return sha256(core) === stateHash;
+}
+
+async function readCycleState(workspace) {
+  const candidate = await secureStoragePath(workspace, ["graph", "project-memory-cycle-state.json"], { type: "file", allowMissing: true });
+  let metadata;
+  try {
+    metadata = await stat(candidate);
+  } catch (error) {
+    if (error?.code === "ENOENT") return Object.freeze({ status: "none", state: null });
+    throw error;
+  }
+  if (!metadata.isFile() || metadata.nlink !== 1 || metadata.size > MAX_CYCLE_STATE_BYTES) return Object.freeze({ status: "invalid", state: null });
+  try {
+    const parsed = JSON.parse(await readFile(candidate, "utf8"));
+    return validCycleState(parsed, workspace.config.workspaceId)
+      ? Object.freeze({ status: "valid", state: deepFreezeJson(parsed) })
+      : Object.freeze({ status: "invalid", state: null });
+  } catch (error) {
+    if (error instanceof SyntaxError) return Object.freeze({ status: "invalid", state: null });
+    throw error;
+  }
+}
+
+async function writeCycleState(workspace, cycleId, generatedAt, phase, sourceSnapshotHash = null, failureCode = null) {
+  const core = cycleStateCore(workspace, cycleId, generatedAt, phase, sourceSnapshotHash, failureCode);
+  const state = deepFreezeJson({ ...core, stateHash: sha256(core) });
+  const candidate = await secureStoragePath(workspace, ["graph", "project-memory-cycle-state.json"], { type: "file", allowMissing: true });
+  await atomicWriteFile(candidate, `${JSON.stringify(state, null, 2)}\n`);
+  return state;
+}
+
 export async function runProjectMemoryCycle(options = {}) {
   const normalized = normalizeCycleOptions(options);
   throwIfAborted(normalized.signal);
   const workspace = await loadWorkspace(normalized.cwd);
-  const scan = await scanProjectStructure({
-    cwd: workspace.root,
-    ...normalized.scan
+  const previousState = await readCycleState(workspace);
+  const previousHash = previousState.state?.stateHash ?? null;
+  const cycleId = `cycle_${sha256({ workspaceId: workspace.config.workspaceId, generatedAt: normalized.generatedAt, previousHash }).slice("sha256:".length, "sha256:".length + 32)}`;
+  const recovery = Object.freeze({
+    detected: previousState.status === "invalid" || (previousState.status === "valid" && previousState.state.phase !== "completed"),
+    priorStatus: previousState.status,
+    priorCycleId: previousState.state?.cycleId ?? null,
+    priorPhase: previousState.status === "invalid" ? "invalid" : previousState.state?.phase ?? null,
+    priorStateHash: previousHash,
+    action: previousState.status === "invalid" || (previousState.state && previousState.state.phase !== "completed")
+      ? "replayed-idempotent-cycle"
+      : "none"
   });
-  throwIfAborted(normalized.signal);
+  let state = await writeCycleState(workspace, cycleId, normalized.generatedAt, "started");
+  let sourceSnapshotHash = null;
 
   let symbols = null;
   let harness = null;
   let derived = null;
-  if (scan.captured) {
-    if (normalized.symbols) {
-      const graph = await buildSymbolGraph({ cwd: workspace.root, persist: true });
-      symbols = Object.freeze({
-        schemaVersion: graph.schemaVersion,
-        manifestHash: graph.manifestHash,
-        files: graph.coverage.indexedFiles,
-        symbols: graph.coverage.declarations,
-        references: graph.coverage.resolvedReferences,
-        complete: graph.coverage.complete
-      });
-    }
-    if (normalized.compact) {
-      const result = await runCodingContextHarness({
-        cwd: workspace.root,
-        query: normalized.query,
-        maxChars: normalized.maxChars,
-        ...(normalized.maxTokens === undefined ? {} : { maxTokens: normalized.maxTokens }),
-        limit: normalized.limit,
-        maxSummaryChars: normalized.maxSummaryChars,
-        record: true,
-        rebuild: false,
-        updateCheckpoint: false,
-        signal: normalized.signal,
-        clock: () => new Date(normalized.generatedAt)
-      });
-      const current = result.worktrees.find((entry) => entry.status === "ready" && entry.current) ?? result.worktrees[0];
-      harness = Object.freeze({
-        manifestHash: result.manifestHash,
-        sourceHeadHash: current?.source?.sourceHeadHash ?? null,
-        packManifestHash: current?.pack?.manifestHash ?? null,
-        recording: current?.recording ?? null,
-        comparison: current?.comparison ?? null
-      });
-    }
-    if (normalized.rebuild) {
-      const state = await rebuildDerivedState(workspace.root, { signal: normalized.signal });
-      derived = Object.freeze({
-        headHash: state.headHash,
-        eventCount: state.eventCount,
-        linkedNodes: state.linkedMemory.nodes,
-        sqliteSchemaVersion: state.readModel.schemaVersion
-      });
-    }
-  }
+  try {
+    const scan = await scanProjectStructure({
+      cwd: workspace.root,
+      ...normalized.scan
+    });
+    sourceSnapshotHash = scan.snapshotHash;
+    state = await writeCycleState(workspace, cycleId, normalized.generatedAt, "scan-complete", sourceSnapshotHash);
+    throwIfAborted(normalized.signal);
 
-  const core = {
-    schemaVersion: PROJECT_MEMORY_CYCLE_SCHEMA_VERSION,
-    generatedAt: normalized.generatedAt,
-    workspaceId: workspace.config.workspaceId,
-    worktreeId: workspace.worktree?.worktreeId ?? null,
-    changed: scan.captured,
-    scan,
-    symbols,
-    harness,
-    derived,
-    boundaries: {
-      activation: "Explicit long-running command or API call only; Qarinah does not install a hidden background service.",
-      scope: "Only the initialized project and its configured capture policy are observed.",
-      content: "Ignored, linked, secret-named, dependency, generated, and out-of-root paths remain excluded by the project scanner.",
-      compaction: "Compact checkpoints are cited projections; the verified ledger and optional encrypted archive remain the recoverable sources."
+    if (scan.captured) {
+      if (normalized.symbols) {
+        const graph = await buildSymbolGraph({ cwd: workspace.root, persist: true, signal: normalized.signal });
+        symbols = Object.freeze({
+          schemaVersion: graph.schemaVersion,
+          manifestHash: graph.manifestHash,
+          files: graph.coverage.indexedFiles,
+          symbols: graph.coverage.declarations,
+          references: graph.coverage.resolvedReferences,
+          complete: graph.coverage.complete
+        });
+      }
+      state = await writeCycleState(workspace, cycleId, normalized.generatedAt, "symbols-complete", sourceSnapshotHash);
+      if (normalized.compact) {
+        const result = await runCodingContextHarness({
+          cwd: workspace.root,
+          query: normalized.query,
+          maxChars: normalized.maxChars,
+          ...(normalized.maxTokens === undefined ? {} : { maxTokens: normalized.maxTokens }),
+          limit: normalized.limit,
+          maxSummaryChars: normalized.maxSummaryChars,
+          record: true,
+          rebuild: false,
+          updateCheckpoint: false,
+          signal: normalized.signal,
+          clock: () => new Date(normalized.generatedAt)
+        });
+        const current = result.worktrees.find((entry) => entry.status === "ready" && entry.current) ?? result.worktrees[0];
+        harness = Object.freeze({
+          manifestHash: result.manifestHash,
+          sourceHeadHash: current?.source?.sourceHeadHash ?? null,
+          packManifestHash: current?.pack?.manifestHash ?? null,
+          recording: current?.recording ?? null,
+          comparison: current?.comparison ?? null
+        });
+      }
+      state = await writeCycleState(workspace, cycleId, normalized.generatedAt, "compaction-complete", sourceSnapshotHash);
+      if (normalized.rebuild) {
+        const rebuilt = await rebuildDerivedState(workspace.root, { signal: normalized.signal });
+        derived = Object.freeze({
+          headHash: rebuilt.headHash,
+          eventCount: rebuilt.eventCount,
+          linkedNodes: rebuilt.linkedMemory.nodes,
+          sqliteSchemaVersion: rebuilt.readModel.schemaVersion
+        });
+      }
+      state = await writeCycleState(workspace, cycleId, normalized.generatedAt, "derived-complete", sourceSnapshotHash);
     }
-  };
-  return deepFreezeJson({ ...core, cycleHash: sha256(core) });
+    const changeCount = scan.captured
+      ? scan.changes.added.length + scan.changes.changed.length + scan.changes.deleted.length + scan.changes.renamed.length
+      : 0;
+    const incremental = Object.freeze({
+      mode: scan.captured ? (previousState.status === "none" ? "initial" : "delta") : "unchanged",
+      changeCount,
+      snapshotHash: scan.snapshotHash
+    });
+    state = await writeCycleState(workspace, cycleId, normalized.generatedAt, "completed", sourceSnapshotHash);
+    const core = {
+      schemaVersion: PROJECT_MEMORY_CYCLE_SCHEMA_VERSION,
+      generatedAt: normalized.generatedAt,
+      workspaceId: workspace.config.workspaceId,
+      worktreeId: workspace.worktree?.worktreeId ?? null,
+      changed: scan.captured,
+      incremental,
+      recovery,
+      state,
+      scan,
+      symbols,
+      harness,
+      derived,
+      boundaries: {
+        activation: "Explicit long-running command or API call only; Qarinah does not install a hidden background service.",
+        scope: "Only the initialized project and its configured capture policy are observed.",
+        content: "Ignored, linked, secret-named, dependency, generated, and out-of-root paths remain excluded by the project scanner.",
+        compaction: "Compact checkpoints are cited projections; the verified ledger and optional encrypted archive remain the recoverable sources."
+      }
+    };
+    return deepFreezeJson({ ...core, cycleHash: sha256(core) });
+  } catch (error) {
+    const failureCode = typeof error?.code === "string" ? error.code.slice(0, 128) : typeof error?.name === "string" ? error.name.slice(0, 128) : "ERROR";
+    try {
+      await writeCycleState(workspace, cycleId, normalized.generatedAt, "failed", sourceSnapshotHash, failureCode);
+    } catch {
+      // Preserve the primary operation error; an interrupted journal write is detected on the next cycle.
+    }
+    throw error;
+  }
 }
 
 export function createProjectMemoryWatcher(options = {}) {

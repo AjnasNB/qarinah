@@ -26,7 +26,21 @@ import { captureClaudeHook } from "qarinah/claude";
 import { createMcpServer, runMcpServer } from "qarinah/mcp";
 ```
 
-The declarations shipped in `types/index.d.ts`, `types/codex.d.ts`, `types/claude.d.ts`, and `types/mcp.d.ts` are the exact compile-time contract for version 0.4.0. JSON Schemas are available through package exports such as `qarinah/schemas/event.json`.
+The declarations shipped in `types/index.d.ts`, `types/codex.d.ts`, `types/claude.d.ts`, and `types/mcp.d.ts` are the exact compile-time contract for version 0.5.0-rc.1. JSON Schemas are available through package exports such as `qarinah/schemas/event.json`.
+
+## Opaque encrypted team sync
+
+```ts
+import {
+  createEncryptedSyncBundle,
+  createTeamSyncServer,
+  encryptedSyncBundleId,
+  type QarinahEncryptedSyncBundle,
+  type QarinahTeamSyncServer
+} from "qarinah";
+```
+
+`createTeamSyncServer()` creates an explicit loopback-only service. It starts only after `start()` is called and returns a closeable handle. The service persists strict `QarinahEncryptedSyncBundle` envelopes without decryption and exposes immutable tenant-bound PUT/GET routes plus bounded status and audit routes. See [TEAM-SYNC-SERVICE.md](TEAM-SYNC-SERVICE.md) and `qarinah/schemas/team-sync-service.json`.
 
 ## Runtime boundary
 
@@ -69,9 +83,9 @@ Invalid JavaScript argument shapes generally throw `TypeError`. Storage, trust, 
 
 ## Version and contract constants
 
-| Export | Value in 0.4.0 |
+| Export | Value in 0.5.0-rc.1 |
 | --- | --- |
-| `QARINAH_VERSION` | `"0.4.0"` |
+| `QARINAH_VERSION` | `"0.5.0-rc.1"` |
 | `EVENT_SCHEMA_VERSION` | `"qarinah.event.v1"` |
 | `CONTEXT_PACK_SCHEMA_VERSION` | `"qarinah.context-pack.v2"` |
 | `CONFIG_SCHEMA_VERSION` | `"qarinah.config.v1"` |
@@ -82,7 +96,7 @@ Invalid JavaScript argument shapes generally throw `TypeError`. Storage, trust, 
 | `AGENT_ARCHIVE_BACKUP_SCHEMA_VERSION` | `"qarinah.agent-archive-backup.v1"` |
 | `CONTENT_ARCHIVE_SCHEMA_VERSION` | `"qarinah.content-archive.v1"` |
 | `CONTENT_ARCHIVE_KEY_SCHEMA_VERSION` | `"qarinah.content-archive-key.v1"` |
-| `SYMBOL_GRAPH_SCHEMA_VERSION` | `"qarinah.symbol-graph.v1"` |
+| `SYMBOL_GRAPH_SCHEMA_VERSION` | `"qarinah.symbol-graph.v2"` |
 | `QARINAH_LSP_PROTOCOL_VERSION` | `"qarinah-lsp.v1"` |
 | `MEMORY_FOOTPRINT_SCHEMA_VERSION` | `"qarinah.memory-footprint.v1"` |
 | `CODING_CONTEXT_HARNESS_SCHEMA_VERSION` | `"qarinah.coding-context-harness.v1"` |
@@ -479,7 +493,7 @@ function createLanguageServer(options?: QarinahLanguageServerOptions): QarinahLa
 function runLanguageServer(options?: QarinahLanguageServerOptions): QarinahLanguageServer;
 ```
 
-`buildSymbolGraph` reads only JavaScript/TypeScript-family files whose exact hashes remain current in the latest validated project snapshot. The query API returns an explicit lexical/local-vector/structural score basis. The language server implements bounded LSP stdio requests for symbols, definitions, and references. The strict graph contract is exported as `qarinah/schemas/symbol-graph.json`. See [Symbol graph and language server](SYMBOL-GRAPH.md).
+`buildSymbolGraph` reads only registered language files whose exact hashes remain current in the latest validated project snapshot. JavaScript and TypeScript use the TypeScript compiler parser; the additional language set uses pinned Tree-sitter WASM grammars. The query API returns an explicit lexical/local-vector/structural score basis. The language server implements bounded LSP stdio requests for symbols, definitions, and references. The strict graph contract is exported as `qarinah/schemas/symbol-graph.json`. See [Symbol graph and language server](SYMBOL-GRAPH.md).
 
 ### `buildProjectOverview(options?)`
 
@@ -1143,7 +1157,7 @@ The accepted structural record schema is exported as `qarinah/schemas/cockroach-
 
 ### `runProjectMemoryCycle(options?)`
 
-Runs one bounded source scan. When the snapshot changed, it optionally rebuilds the local symbol graph, records one idempotent cited harness checkpoint, and regenerates derived views. It returns a `qarinah.project-memory-cycle.v1` receipt whose `cycleHash` binds the complete cycle result.
+Runs one bounded source scan. When the snapshot changed, it optionally rebuilds the local symbol graph, records one idempotent cited harness checkpoint, and regenerates derived views. It returns a `qarinah.project-memory-cycle.v2` receipt whose `cycleHash` binds the complete cycle result. The v2 receipt exposes initial/delta/unchanged mode, exact change count, a hash-chained atomic phase state, and detected interrupted-cycle recovery.
 
 ### `createProjectMemoryWatcher(options?)`
 

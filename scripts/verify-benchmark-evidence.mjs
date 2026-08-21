@@ -91,13 +91,13 @@ for (const [surface, content] of [
 ]) {
   assert.ok(content.includes(publicPercent), `${surface} must carry the evidence-derived ${publicPercent} claim.`);
 }
-for (const term of ["Visible", "worktree-aware", "session receipts", "incremental compaction"]) {
-  assert.ok(packageJson.description.includes(term), `package.json description must carry the 0.4.0 visible-memory category: ${term}`);
+for (const term of ["Proof-carrying", "multi-language graphs", "session receipts", "recovery"]) {
+  assert.ok(packageJson.description.includes(term), `package.json description must carry the 0.5 proof-carrying-memory category: ${term}`);
 }
 assert.equal(
   packageJson.description.includes(publicPercent),
   false,
-  "package.json description must lead with the 0.4.0 product category, not the historical benchmark percentage."
+  "package.json description must lead with the 0.5 product category, not the historical benchmark percentage."
 );
 assert.equal(
   `${readme}\n${whitePaper}\n${packageJson.description}\n${platformCopy}`.toLowerCase().includes("in our six-task benchmark"),

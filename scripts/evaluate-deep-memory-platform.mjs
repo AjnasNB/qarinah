@@ -17,7 +17,8 @@ import {
 import { sha256 } from "../src/canonical.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const OUTPUT = path.join(ROOT, "bench", "results", "deep-memory-platform-v0.4.0.json");
+const packageJson = JSON.parse(await readFile(path.join(ROOT, "package.json"), "utf8"));
+const OUTPUT = path.join(ROOT, "bench", "results", `deep-memory-platform-v${packageJson.version}.json`);
 const WRITE = process.argv.includes("--write");
 const CLOCK = () => new Date("2026-08-20T14:00:00.000Z");
 
@@ -116,6 +117,7 @@ async function evaluate() {
     assert.equal(scenarios.every((entry) => entry.passed), true);
     const base = {
       schemaVersion: "qarinah.deep-memory-platform-evaluation.v1",
+      packageVersion: packageJson.version,
       protocol: {
         id: "deep-memory-product-acceptance-v1",
         generatedAt: CLOCK().toISOString(),

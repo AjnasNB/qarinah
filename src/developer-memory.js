@@ -100,7 +100,7 @@ export async function buildDeveloperMemoryView(options = {}) {
     if (error?.code !== "SYMBOL_SCAN_REQUIRED") throw error;
     symbolMemory = {
       available: false,
-      reason: "Run qarinah scan, then qarinah symbols build to enable JavaScript and TypeScript symbol memory.",
+      reason: "Run qarinah scan, then qarinah symbols build to enable deterministic multi-language symbol memory.",
       coverage: null,
       files: [],
       results: []

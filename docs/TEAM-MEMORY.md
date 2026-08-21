@@ -159,16 +159,18 @@ const reranked = await rerankContextPack(pack, {
 
 The adapter may reorder only the already admitted, already cited candidate set. It cannot introduce a new event, source, repository, credential, or authority.
 
-## Encrypted team and cross-device protocol
+## Encrypted team and cross-device service
 
-The public package provides a self-hostable protocol foundation:
+The public package provides a self-hostable opaque storage service and protocol:
 
 - workspace membership with `owner`, `maintainer`, and `reader` roles;
 - read access for every listed member, with mutation authority reserved for owners and maintainers;
 - optional GitHub organization and repository binding;
 - AES-256-GCM encrypted export bundles;
 - signed checkpoints using Ed25519-compatible Node keys; and
-- manifest and workspace identity verification before import.
+- manifest and workspace identity verification before import;
+- tenant-bound bearer roles, immutable content IDs, bounded rate limits, and token-free audit evidence; and
+- a loopback-only built-in HTTP service that can sit behind an operator-owned authenticated TLS proxy.
 
 ```js
 import {
@@ -195,7 +197,9 @@ const bundle = await createEncryptedSyncBundle({
 });
 ```
 
-Key generation, key custody, transport, object storage, device enrollment, identity-provider integration, and a hosted control plane remain deployment responsibilities. A managed encrypted sync service can be added later without changing the local record format.
+Store that opaque bundle with `createTeamSyncServer()` and derive its immutable route identity with `encryptedSyncBundleId()`. The [team-sync service guide](TEAM-SYNC-SERVICE.md) documents every route, limit, role, audit field, and remote deployment responsibility.
+
+Key generation, key custody, TLS termination, durable storage, backup testing, device enrollment, and identity-provider integration remain operator responsibilities. Qarinah does not silently upload a workspace and does not claim a managed cloud account.
 
 ## Evaluation beyond context reduction
 

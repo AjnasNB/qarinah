@@ -11,6 +11,9 @@
 </p>
 
 ```sh
+# Install the reviewed 0.5 release candidate from npm's next channel.
+npm install --save-dev qarinah@next
+
 # Preview an exact project-local host installation without changing files.
 npx qarinah install . --host codex --scope project --dry-run
 
@@ -42,20 +45,31 @@ npx qarinah dashboard --serve --worktrees
 | --- | --- |
 | Searchable graph | Files, concepts, memories, typed relations, ranking components, and evidence hashes |
 | Decisions/tools/outcomes/conflicts timeline | What changed, why it changed, which tool ran, and what disagrees |
-| Exact session receipts | The host session, selected event IDs, source and pack hashes, measured selection, and no retained event bodies |
+| Exact session receipts | The host session, observed lifecycle, turn and outcome identities, source and pack hashes, measured selection, and no retained event bodies |
 | Cross-worktree comparison | Separate writable ledgers, branch and commit identities, divergent heads, event totals, and current decisions |
 | Incremental compaction | Initial, unchanged, delta, and full-rebuild states with the exact prior checkpoint and changed-event count |
-| VS Code/Cursor panel | A local sandboxed read-only webview backed by the Qarinah CLI |
+| VS Code/Cursor panel | A local sandboxed read-only webview with searchable graph, timeline, worktree comparison, and detailed session replay |
+| Standard LSP + JetBrains template | Multi-language symbols, definitions, and references through project-local `qarinah-lsp` |
+
+### Reproducible public-checkout memory result
+
+The 0.5 evaluator copies Qarinah's public source into an isolated temporary Git repository and runs the current product end to end. It passes **10 / 10** structural scenarios, indexes **all 182 eligible source files**, resolves four exact implementation definitions, records one completed session lifecycle, writes a minimized v2 receipt, compiles cited continuation context, and verifies the complete ledger chain. It uses no private data or provider calls.
+
+```sh
+npm run check:public-project-memory
+```
+
+Read the [method and boundaries](docs/PUBLIC-PROJECT-MEMORY-EVALUATION.md) or inspect the [machine-readable result](bench/results/public-project-memory-0.5.json). The exact file counts are refreshed before the release commit.
 
 ### Reproducible deep-memory product result
 
-The 0.4.0 product evaluator runs the full local path in a temporary initialized project: incremental source refresh, symbol and cross-file-reference indexing, cited fact consolidation, two encrypted content snapshots, integrity verification, and exact byte restoration. It passes **12 / 12** scenarios, restores **390,226 source bytes exactly**, reuses **2 of 3** chunks in the second snapshot, indexes **4 symbols** and **3 resolved references**, and retains **3 cited facts**.
+The 0.5.0-rc.1 product evaluator runs the full local path in a temporary initialized project: incremental source refresh, symbol and cross-file-reference indexing, cited fact consolidation, two encrypted content snapshots, integrity verification, and exact byte restoration. It passes **12 / 12** scenarios, restores **390,226 source bytes exactly**, reuses **2 of 3** chunks in the second snapshot, indexes **4 symbols** and **3 resolved references**, and retains **2 cited facts**.
 
 ```sh
 npm run check:deep-memory
 ```
 
-Inspect the [machine-readable result](bench/results/deep-memory-platform-v0.4.0.json) and [evaluator](scripts/evaluate-deep-memory-platform.mjs). This is local product-acceptance evidence, not a cross-product comparison or a promise about arbitrary repositories.
+Inspect the [machine-readable result](bench/results/deep-memory-platform-v0.5.0-rc.1.json) and [evaluator](scripts/evaluate-deep-memory-platform.mjs). The historical 0.4.0 receipt remains unchanged. This is local product-acceptance evidence, not a cross-product comparison or a promise about arbitrary repositories.
 
 ### Reproducible real-Git-worktree acceptance result
 
@@ -93,7 +107,7 @@ The 98.7148% result above is a context-volume estimate, not an archive-compressi
 
 ### Code-aware memory, not only chat summaries
 
-After `qarinah scan`, the built-in JavaScript/TypeScript parser can create a hash-linked symbol graph with declarations, exact spans, exported status, and unambiguous references. The local search path combines lexical matching, deterministic subword vectors, and reference structure without downloading a model or calling a hosted vector database. Qarinah also ships `qarinah-lsp` for workspace symbols, document symbols, definitions, and references over the Language Server Protocol.
+After `qarinah scan`, the pinned TypeScript and Tree-sitter parser lanes create a hash-linked symbol graph with declarations, exact spans, exported status, and unambiguous references across ten registered languages. The local search path combines lexical matching, deterministic subword vectors, and reference structure without downloading a model or calling a hosted vector database. Qarinah also ships `qarinah-lsp` for workspace symbols, multi-language document symbols, definitions, and references over the Language Server Protocol.
 
 ```powershell
 npx qarinah scan
@@ -103,7 +117,7 @@ npx qarinah-lsp
 npx qarinah watch --interval-ms 2000
 ```
 
-The v1 parser covers JavaScript, JSX, TypeScript, and TSX. Other languages are reported as unsupported instead of being guessed. Read [Symbol graph and language server](docs/SYMBOL-GRAPH.md) for the exact coverage boundary.
+The v2 symbol graph covers JavaScript, JSX, TypeScript, TSX, Python, Go, Rust, Java, Kotlin, C, C++, and C# through pinned parsers. Unsupported languages are reported instead of guessed. VS Code and Cursor use the packaged memory panel; JetBrains IDEs can import the packaged LSP4IJ template. Read [Symbol graph and language server](docs/SYMBOL-GRAPH.md) for the exact coverage boundary.
 
 ### Facts that can be checked, not a free-floating AI summary
 
@@ -231,7 +245,7 @@ The JSONL chain remains authoritative. Graph, index, Markdown, dashboard, and OK
 
 <p align="center">
   <a href="docs/WHITEPAPER.md">Technical paper</a>&nbsp;&middot;&nbsp;
-  <a href="output/pdf/Qarinah-Technical-White-Paper-v1.6.pdf">Technical white paper v1.6</a>&nbsp;&middot;&nbsp;
+  <a href="output/pdf/Qarinah-Technical-White-Paper-v1.7.pdf">Technical white paper v1.7</a>&nbsp;&middot;&nbsp;
   <a href="https://doi.org/10.5281/zenodo.21547684">Paper series DOI</a>&nbsp;&middot;&nbsp;
   <a href="https://doi.org/10.5281/zenodo.21850747">Published historical v1.4</a>&nbsp;&middot;&nbsp;
   <a href="docs/ARCHITECTURE.md">Architecture</a>&nbsp;&middot;&nbsp;
@@ -324,7 +338,7 @@ Supported event classes include prompts, tool requests, tool completions, approv
   <img src="assets/architecture/qarinah-flow.svg" width="920" alt="Qarinah core evidence architecture showing capture controls, authoritative JSONL, temporal memory, rebuildable SQLite and graph projections, optional Maqam scopes, deterministic retrieval, cited packs, and evaluation.">
 </p>
 
-The project graph covers directories, files, content hashes, JavaScript and TypeScript module references, Markdown links, exact source spans, additions, changes, renames, and deletions. The separate symbol graph adds declarations and resolved references for JavaScript, JSX, TypeScript, and TSX, while the encrypted archive preserves explicitly selected source bytes outside model context. See the [architecture guide](docs/ARCHITECTURE.md) or the [editable core-evidence diagram source](docs/architecture.mmd).
+The project graph covers directories, files, content hashes, module references, Markdown links, exact source spans, additions, changes, renames, and deletions. The separate symbol graph adds source-hash-bound declarations and unambiguous references for JavaScript, TypeScript, Python, Go, Rust, Java, Kotlin, C, C++, and C#, while the encrypted archive preserves explicitly selected source bytes outside model context. See the [architecture guide](docs/ARCHITECTURE.md) or the [editable core-evidence diagram source](docs/architecture.mmd).
 
 ## Technology
 
@@ -342,6 +356,7 @@ Qarinah is intentionally small, local, and inspectable:
 | Human-readable views | Rebuildable Markdown, JSON, graph, index, and Google OKF 0.1 Draft exports |
 | Agent integration | One-command Codex, Claude Code, Cursor, Kimi, and Antigravity setup; reviewed Codex/Claude lifecycle hooks; strict JSON stdin; typed JavaScript API; and consent-gated stdio MCP retrieval |
 | Optional adapters | Local or customer-provided embeddings, query expansion, and rerankers may reorder admitted cited evidence without replacing ledger authority |
+| Team continuity | Client-side encrypted immutable bundles, a self-hosted opaque sync service, tenant-bound roles, exact bundle identities, bounded rate limits, and token-free audit evidence |
 | Infrastructure | No required vector database, hosted backend, embedding bill, model provider, daemon, analytics endpoint, or Qarinah API key |
 
 ## Install
@@ -377,11 +392,11 @@ The public package now includes:
 - task packs for debugging, code review, feature work, database migration, incident response, release preparation, and security review;
 - multi-repository context with typed cross-repository relationships and separate cited authority;
 - optional semantic reranking that cannot introduce unadmitted sources;
-- an encrypted team-sync protocol with roles, GitHub binding, and signed checkpoints;
+- an encrypted self-hosted team-sync service with roles, immutable bundle IDs, audit evidence, GitHub binding, and signed checkpoints;
 - evaluation for recall, citation accuracy, stale rejection, conflict and supersession correctness, repository isolation, unauthorized-disclosure rejection, supplied tokens, net task cost, latency, completion, and repeated mistakes; and
 - causal receipts connecting Cockroach evidence, Qarinah memory, Maqam policy, execution, and observed results.
 
-See [Shared and verifiable team memory](docs/TEAM-MEMORY.md) for commands, APIs, and security boundaries.
+See [Shared and verifiable team memory](docs/TEAM-MEMORY.md) and the [self-hosted opaque sync guide](docs/TEAM-SYNC-SERVICE.md) for commands, APIs, and security boundaries.
 
 ## Inspect project memory in the local dashboard
 
@@ -544,24 +559,24 @@ The repository also runs `npm run mcp:smoke` against the exact bundled Codex and
 
 ### Install once, initialize each project
 
-Install the reviewed `v0.4.0` plugin once in each host after that release is published:
+Install the reviewed `v0.5.0-rc.1` plugin once in each host after the release candidate is published:
 
 ```sh
 # Codex: personal installation, available to opted-in projects.
-codex plugin marketplace add AjnasNB/qarinah --ref v0.4.0
+codex plugin marketplace add AjnasNB/qarinah --ref v0.5.0-rc.1
 codex plugin add qarinah@qarinah
 
 # Claude Code: personal installation across projects.
-claude plugin marketplace add AjnasNB/qarinah@v0.4.0 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.5.0-rc.1 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 
 Then opt in from the root of each project that should retain context:
 
 ```sh
-npx -y qarinah@latest init . --capture content
-npx -y qarinah@latest scan
-npx -y qarinah@latest doctor
+npx -y qarinah@next init . --capture content
+npx -y qarinah@next scan
+npx -y qarinah@next doctor
 ```
 
 Use `--capture metadata` when event bodies should not be retained. Content mode records only bounded, redacted fields exposed by supported hooks; it does not parse hidden transcripts or reasoning. At the start of a later task, ask the installed Qarinah context skill for direct evidence related to the task, or run a bounded query:

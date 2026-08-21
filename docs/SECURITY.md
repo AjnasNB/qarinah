@@ -22,10 +22,12 @@
 - Providing a privileged operating-system sandbox in the library process.
 - Proving that a retained claim is true merely because its hash is valid.
 - Guaranteeing that best-effort pattern redaction finds every secret in arbitrary content-mode tool output.
+- Supplying a managed identity, TLS, key-custody, backup, or multi-region service for the optional opaque team-sync server.
 
 ## Known foundation limits
 
 - The initial lock is single-host and single-workspace; network filesystems need a different coordination design.
+- The built-in opaque team-sync server is deliberately loopback-only. Remote operators must provide an authenticated TLS proxy, independent credential lifecycle, durable storage, tested recovery, and monitoring. Its bearer tokens authorize only tenant-bound encrypted-object operations; they do not decrypt project memory.
 - Hash chaining plus the machine-local checkpoint is tamper-evident, not tamper-proof. Signed, independently anchored checkpoints are roadmap work.
 - Appends validate the current head for bounded latency. `doctor`, rebuild, and query validate every canonical record and the complete chain.
 - Hybrid local retrieval is deterministic, but BM25, typo-tolerant character matching, and one-hop graph evidence do not prove semantic equivalence or factual truth. Optional dense/model adapters must remain explicitly versioned and cannot replace the authoritative record.

@@ -11,6 +11,7 @@ import {
   createLanguageServer,
   initializeWorkspace,
   loadSymbolGraph,
+  parseTreeSitterSymbols,
   parseTypeScriptSymbols,
   querySymbolGraph,
   scanProjectStructure
@@ -33,7 +34,31 @@ async function fixture(t) {
     "export const total = add(2, 3);",
     ""
   ].join("\n"));
-  await writeFile(path.join(root, "notes.py"), "def ignored_for_v1():\n    return True\n");
+  await writeFile(path.join(root, "notes.py"), [
+    "class ContextPack:",
+    "    def compile(self):",
+    "        return compact_evidence()",
+    "",
+    "def compact_evidence():",
+    "    return True",
+    ""
+  ].join("\n"));
+  await writeFile(path.join(root, "worker.go"), [
+    "package memory",
+    "type Receipt struct{}",
+    "func VerifyReceipt() bool { return true }",
+    ""
+  ].join("\n"));
+  await writeFile(path.join(root, "index.rs"), [
+    "pub struct EvidenceIndex {}",
+    "pub fn rebuild_index() -> bool { true }",
+    ""
+  ].join("\n"));
+  await writeFile(path.join(root, "hash.c"), "int hash_receipt(int value) { return value; }\n");
+  await writeFile(path.join(root, "graph.cpp"), "class GraphProjection {};\n");
+  await writeFile(path.join(root, "Ledger.cs"), "public class LedgerStore {}\n");
+  await writeFile(path.join(root, "MemoryService.java"), "public class MemoryService {}\n");
+  await writeFile(path.join(root, "ContextView.kt"), "class ContextView {}\n");
   await initializeWorkspace(root, { capture: "metadata" });
   await scanProjectStructure({ cwd: root });
   return root;
@@ -42,10 +67,12 @@ async function fixture(t) {
 test("symbol graph parses declarations, resolves references, and ranks with a transparent built-in vector basis", async (t) => {
   const root = await fixture(t);
   const graph = await buildSymbolGraph({ cwd: root });
-  assert.equal(graph.schemaVersion, "qarinah.symbol-graph.v1");
-  assert.equal(graph.coverage.indexedFiles, 2);
-  assert.equal(graph.coverage.eligibleFiles, 2);
-  assert.equal(graph.skipped.some((entry) => entry.path === "notes.py" && entry.reason === "unsupported-language"), true);
+  assert.equal(graph.schemaVersion, "qarinah.symbol-graph.v2");
+  assert.equal(graph.coverage.indexedFiles, 10);
+  assert.equal(graph.coverage.eligibleFiles, 10);
+  assert.deepEqual(graph.coverage.indexedLanguages, ["c", "cpp", "csharp", "go", "java", "kotlin", "python", "rust", "typescript"]);
+  assert.equal(graph.coverage.supportedLanguages.includes("csharp"), true);
+  assert.equal(graph.extractor.parsers.some((parser) => parser.id === "tree-sitter-wasm" && parser.version === "0.20.8" && parser.grammarVersion === "0.1.13"), true);
   const add = graph.symbols.find((symbol) => symbol.name === "add" && symbol.kind === "function");
   assert.ok(add);
   assert.equal(add.exported, true);
@@ -54,6 +81,16 @@ test("symbol graph parses declarations, resolves references, and ranks with a tr
   assert.equal(parameter.exported, false);
   assert.equal(graph.edges.some((edge) => edge.type === "defines" && edge.target === add.id), true);
   assert.equal(graph.edges.some((edge) => edge.type === "references" && edge.target === add.id), true);
+  const compactEvidence = graph.symbols.find((symbol) => symbol.name === "compact_evidence" && symbol.kind === "function");
+  assert.ok(compactEvidence);
+  assert.equal(compactEvidence.references.some((reference) => reference.path === "notes.py"), true);
+  assert.equal(graph.symbols.some((symbol) => symbol.name === "VerifyReceipt" && symbol.kind === "function"), true);
+  assert.equal(graph.symbols.some((symbol) => symbol.name === "EvidenceIndex" && symbol.kind === "struct"), true);
+  assert.equal(graph.symbols.some((symbol) => symbol.name === "hash_receipt" && symbol.kind === "function"), true);
+  assert.equal(graph.symbols.some((symbol) => symbol.name === "GraphProjection" && symbol.kind === "class"), true);
+  assert.equal(graph.symbols.some((symbol) => symbol.name === "LedgerStore" && symbol.kind === "class"), true);
+  assert.equal(graph.symbols.some((symbol) => symbol.name === "MemoryService" && symbol.kind === "class"), true);
+  assert.equal(graph.symbols.some((symbol) => symbol.name === "ContextView" && symbol.kind === "class"), true);
 
   const query = querySymbolGraph(graph, "addition helper", { limit: 5 });
   assert.equal(query.formula, "0.62*lexical + 0.28*local-subword-vector + 0.10*reference-structure");
@@ -73,6 +110,35 @@ test("TypeScript parser returns bounded diagnostics without storing source bodie
   const parsed = parseTypeScriptSymbols("broken.ts", "export function broken( { return 1; }");
   assert.ok(parsed.diagnostics.length > 0);
   assert.equal(parsed.symbols.every((symbol) => !Object.hasOwn(symbol, "body")), true);
+});
+
+test("Tree-sitter parser indexes bounded declarations without storing source bodies", async () => {
+  const parsed = await parseTreeSitterSymbols(
+    "memory.py",
+    "python",
+    "class Ledger:\n    def append(self):\n        return verify()\n\ndef verify():\n    return True\n"
+  );
+  assert.deepEqual(parsed.symbols.map((symbol) => `${symbol.kind}:${symbol.name}`), ["class:Ledger", "function:append", "function:verify"]);
+  assert.equal(parsed.symbols.every((symbol) => !Object.hasOwn(symbol, "body")), true);
+  assert.equal(parsed.references.some((reference) => reference.name === "verify"), true);
+});
+
+test("every advertised Tree-sitter grammar loads and emits a declaration", async () => {
+  const fixtures = {
+    c: "int add(int left, int right) { return left + right; }",
+    cpp: "class Worker {};",
+    csharp: "public class Worker {}",
+    go: "package memory\nfunc Build() {}\n",
+    java: "public class Worker {}",
+    kotlin: "class Worker {}",
+    python: "def build(): return True\n",
+    rust: "pub fn build() {}\n"
+  };
+  for (const [language, source] of Object.entries(fixtures)) {
+    const parsed = await parseTreeSitterSymbols(`fixture.${language}`, language, source);
+    assert.equal(parsed.symbols.length > 0, true, `${language} should emit a symbol`);
+    assert.equal(parsed.diagnostics.length, 0, `${language} should parse without diagnostics`);
+  }
 });
 
 function frame(message) {
@@ -103,7 +169,7 @@ function responseReader(output) {
   });
 }
 
-test("language server exposes initialize, workspace symbols, and document symbols over bounded JSON-RPC", async (t) => {
+test("language server exposes bounded multi-language symbols over JSON-RPC", async (t) => {
   const root = await fixture(t);
   const input = new PassThrough();
   const output = new PassThrough();
@@ -126,12 +192,25 @@ test("language server exposes initialize, workspace symbols, and document symbol
   input.write(frame({ jsonrpc: "2.0", id: 3, method: "textDocument/documentSymbol", params: { textDocument: { uri: pathToFileURL(path.join(root, "math.ts")).href } } }));
   const documentSymbols = await responsePromise;
   assert.equal(documentSymbols.result.some((symbol) => symbol.name === "Calculator"), true);
+
+  responsePromise = waitFor(4);
+  input.write(frame({ jsonrpc: "2.0", id: 4, method: "textDocument/documentSymbol", params: { textDocument: { uri: pathToFileURL(path.join(root, "notes.py")).href } } }));
+  const pythonSymbols = await responsePromise;
+  assert.equal(pythonSymbols.result.some((symbol) => symbol.name === "ContextPack"), true);
+  assert.equal(pythonSymbols.result.some((symbol) => symbol.name === "compact_evidence"), true);
+
+  await writeFile(path.join(root, "unsupported.rb"), "class Ignored\nend\n");
+  responsePromise = waitFor(5);
+  input.write(frame({ jsonrpc: "2.0", id: 5, method: "textDocument/documentSymbol", params: { textDocument: { uri: pathToFileURL(path.join(root, "unsupported.rb")).href } } }));
+  const unsupportedSymbols = await responsePromise;
+  assert.deepEqual(unsupportedSymbols.result, []);
 });
 
 test("symbol graph schema is strict at the public boundary", async () => {
   const schema = JSON.parse(await readFile(new URL("../schemas/symbol-graph.schema.json", import.meta.url), "utf8"));
   assert.equal(schema.additionalProperties, false);
-  assert.equal(schema.properties.schemaVersion.const, "qarinah.symbol-graph.v1");
+  assert.equal(schema.properties.schemaVersion.const, "qarinah.symbol-graph.v2");
+  assert.equal(schema.$defs.language.enum.includes("python"), true);
   assert.equal(schema.$defs.symbol.additionalProperties, false);
   assert.equal(schema.$defs.edge.additionalProperties, false);
 });

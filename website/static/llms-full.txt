@@ -10,14 +10,14 @@ This file is a convenience map for tools that choose to read it. It does not con
 
 - Name: Qarinah
 - Package: `qarinah`
-- Current release: `0.4.0`
+- Current release: `0.5.0-rc.1`
 - Website: https://qarinah.io/
 - npm: https://www.npmjs.com/package/qarinah
 - Source: https://github.com/AjnasNB/qarinah
 - Issues: https://github.com/AjnasNB/qarinah/issues
 - Discussions: https://github.com/AjnasNB/qarinah/discussions
 - License: Apache-2.0
-- Current technical paper: v1.6 for Qarinah 0.4.0; no version DOI until separately deposited
+- Current technical paper: v1.7 for Qarinah 0.5.0-rc.1; no version DOI until separately deposited
 - Paper-series concept DOI: https://doi.org/10.5281/zenodo.21547684
 - Published historical v1.4 DOI: https://doi.org/10.5281/zenodo.21850747
 
