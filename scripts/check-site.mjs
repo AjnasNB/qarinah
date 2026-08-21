@@ -402,7 +402,7 @@ if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.indexedSymbols !== 4
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.resolvedReferences !== 3
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.citedFacts !== 2
-  || publicMetrics.metrics?.deepMemoryProductAcceptance?.artifactHash !== "sha256:3183af0c8ce57ac63d49a4ee930ca93286d2767509b53f2d613444e8735e920f"
+  || publicMetrics.metrics?.deepMemoryProductAcceptance?.artifactHash !== "sha256:a9c6a3e131678bdb2006f731d5e2750d29d5518d08f8b36182f27afdfd3cbc50"
   || publicMetrics.metrics?.publicProjectMemory?.scenarios !== 10
   || publicMetrics.metrics?.publicProjectMemory?.passed !== 10
   || publicMetrics.metrics?.publicProjectMemory?.indexedSymbolFiles !== publicMetrics.metrics?.publicProjectMemory?.eligibleSymbolFiles

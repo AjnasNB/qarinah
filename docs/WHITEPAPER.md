@@ -35,7 +35,7 @@ The release also separates three responsibilities that are often collapsed into 
 
 A separate public-checkout evaluator runs against Qarinah's own repository without private fixtures, provider calls, or model-written summaries. It passes 10 of 10 scenarios, indexes every eligible regular source file, resolves exact definitions and references across the supported language set, verifies receipt and cycle recovery invariants, exercises the editor replay contract, and proves that an encrypted sync bundle can be stored and retrieved without exposing event bodies or bearer tokens. This is a reproducible product acceptance result, not an independent benchmark or a universal accuracy claim.
 
-A committed deep-memory acceptance evaluator exercises this complete local path in a temporary initialized project. It passes 12 of 12 scenarios, verifies and restores 390,226 source bytes exactly, reuses two of three chunks in the second snapshot, indexes four symbols and three resolved references, and retains three cited facts. This is deliberately small end-to-end product evidence, not a cross-product benchmark or a universal storage, language, or retrieval result.
+A committed deep-memory acceptance evaluator exercises this complete local path in a temporary initialized project. It passes 12 of 12 scenarios, verifies and restores 390,226 source bytes exactly, reuses two of three chunks in the second snapshot, indexes four symbols and three resolved references, and retains two cited facts. This is deliberately small end-to-end product evidence, not a cross-product benchmark or a universal storage, language, or retrieval result.
 
 The committed software-task evaluation compares full-history replay with Qarinah packs while keeping the same current-task source material on both sides. Across 240 retained records and six software scenarios, the measured context falls from 442,113 to 5,682 estimated input-context tokens: a 98.7148% reduction and a 77.81:1 compression ratio. Every required target ranks in the top five with direct evidence coverage, and no model-written summaries are used. A separate 42-record, two-session continuation fixture measures two outputs against the same 9,489-token history: a 119-token model-facing capsule (98.7459% reduction) and a 1,039-token complete cited audit pack (89.0505% reduction). The capsule retains the selected summary identity and audit-pack manifest pointer; the larger pack retains all summary-source identities and hashes.
 
@@ -878,9 +878,9 @@ The evaluation verifies that sibling worktrees remain distinct writable memories
 | Second-snapshot chunks reused | 2 |
 | Symbols indexed | 4 |
 | Cross-file references resolved | 3 |
-| Cited facts retained | 3 |
+| Cited facts retained | 2 |
 | Files restored byte for byte | 2 / 2 |
-| Result artifact SHA-256 | `bb801a59d5c1822b87bda5596237a126a064e62ac6f588e3351ebe949551ff46` |
+| Result artifact SHA-256 | `a9c6a3e131678bdb2006f731d5e2750d29d5518d08f8b36182f27afdfd3cbc50` |
 
 The observed chunk reuse shows that a bounded source edit can reuse unchanged encrypted content objects inside the same vault. It is not a universal deduplication or compression percentage. The exact-byte assertion establishes reconstruction for this fixture; it does not extend capture to ignored files, links, common secret filenames, unsupported binary content, or data that the operator did not authorize.
 
@@ -973,7 +973,7 @@ The relevant evidence is committed at:
 - [`bench/results/research-retrieval-development-v0.5.json`](../bench/results/research-retrieval-development-v0.5.json);
 - [`bench/results/context-efficiency-comparison-0.1.6-v2.json`](../bench/results/context-efficiency-comparison-0.1.6-v2.json);
 - [`bench/results/benchmark-release-0.1.6.json`](../bench/results/benchmark-release-0.1.6.json);
-- [`bench/results/deep-memory-platform-v0.4.0.json`](../bench/results/deep-memory-platform-v0.4.0.json);
+- [`bench/results/deep-memory-platform-v0.6.0-alpha.1.json`](../bench/results/deep-memory-platform-v0.6.0-alpha.1.json);
 - [`bench/results/public-project-memory-0.5.json`](../bench/results/public-project-memory-0.5.json);
 - [`bench/results/proof-context-0.6.0-alpha.1.json`](../bench/results/proof-context-0.6.0-alpha.1.json);
 - [`scripts/evaluate-software-tasks.mjs`](../scripts/evaluate-software-tasks.mjs);
@@ -1094,7 +1094,7 @@ The author gratefully acknowledges Shahin Ahammed, Qarinah's non-technical cofou
 | Public claim | Evidence | Qualification |
 | --- | --- | --- |
 | 10 / 10 public-checkout memory scenarios | `bench/results/public-project-memory-0.5.json` and deterministic evaluator | Current public repository, supported-source indexing, receipt/recovery/editor/sync acceptance; not independent validation or a universal accuracy benchmark |
-| 12 / 12 deep-memory product scenarios | `bench/results/deep-memory-platform-v0.4.0.json` and deterministic evaluator | Local exact-recovery, incremental-refresh, symbol/reference, and cited-fact acceptance; not a cross-product benchmark |
+| 12 / 12 deep-memory product scenarios | `bench/results/deep-memory-platform-v0.6.0-alpha.1.json` and deterministic evaluator | Local exact-recovery, incremental-refresh, symbol/reference, and cited-fact acceptance; not a cross-product benchmark |
 | 12 / 12 proof-carrying task-context scenarios | `bench/results/proof-context-0.6.0-alpha.1.json` and deterministic evaluator | Generated ten-language repository; expected code and current evidence selected, stale evidence excluded, complete packet bounded, deterministic manifest reproduced; not independent validation |
 | 390,226 selected source bytes restored exactly | Same deep-memory fixture | Byte equality for the two-file fixture; not universal archive compression or passive capture |
 | 98.71% less estimated context | Software-task result: 442,113 to 5,682 estimated tokens | Compared with the named full-history baseline using `ceil(characters / 4)` |
@@ -1129,7 +1129,7 @@ The author gratefully acknowledges Shahin Ahammed, Qarinah's non-technical cofou
 | Security model | [SECURITY.md](SECURITY.md) |
 | Host integrations | [HOST-INTEGRATIONS.md](HOST-INTEGRATIONS.md) |
 | Real-worktree continuity result | [`worktree-continuity-v0.4.0.json`](../bench/results/worktree-continuity-v0.4.0.json) |
-| Deep-memory product result | [`deep-memory-platform-v0.4.0.json`](../bench/results/deep-memory-platform-v0.4.0.json) |
+| Deep-memory product result | [`deep-memory-platform-v0.6.0-alpha.1.json`](../bench/results/deep-memory-platform-v0.6.0-alpha.1.json) |
 | Public-checkout memory result | [`public-project-memory-0.5.json`](../bench/results/public-project-memory-0.5.json) |
 | Proof-carrying task-context result | [`proof-context-0.6.0-alpha.1.json`](../bench/results/proof-context-0.6.0-alpha.1.json) |
 | Proof-context contract | [PROOF-CARRYING-CONTEXT.md](PROOF-CARRYING-CONTEXT.md) |

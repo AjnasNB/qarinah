@@ -1,5 +1,5 @@
 {
-  "combinedSourceSha256": "sha256:8bcf0e5358391040a8ad9f87de279782d0672fa2c2dc4000b4d64e70f725cdef",
+  "combinedSourceSha256": "sha256:0b34be9ae168ca5cc9064854fbfc4e078c46a9ac454440d28ee4b0e15aa67c3c",
   "generator": {
     "command": "python scripts/build-whitepaper-pdf-v1.8.py",
     "fonts": [
@@ -39,7 +39,7 @@
   "sources": [
     {
       "path": "docs/WHITEPAPER.md",
-      "sha256": "sha256:d4105e8fd99d4a0a1b5c8dcdb26efdc7db061822dba396f099b8d812e6600c67"
+      "sha256": "sha256:3dfbe1b1ac5072b3bc6cabdecd8757a8afcf4b0c9d9298ed026af07b1467b1b1"
     },
     {
       "path": "scripts/build-whitepaper-pdf.py",

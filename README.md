@@ -77,13 +77,13 @@ Read the [method and boundaries](docs/PUBLIC-PROJECT-MEMORY-EVALUATION.md) or in
 
 ### Reproducible deep-memory product result
 
-The 0.5.0-rc.1 product evaluator runs the full local path in a temporary initialized project: incremental source refresh, symbol and cross-file-reference indexing, cited fact consolidation, two encrypted content snapshots, integrity verification, and exact byte restoration. It passes **12 / 12** scenarios, restores **390,226 source bytes exactly**, reuses **2 of 3** chunks in the second snapshot, indexes **4 symbols** and **3 resolved references**, and retains **2 cited facts**.
+The 0.6.0-alpha.1 product evaluator runs the full local path in a temporary initialized project: incremental source refresh, symbol and cross-file-reference indexing, cited fact consolidation, two encrypted content snapshots, integrity verification, and exact byte restoration. It passes **12 / 12** scenarios, restores **390,226 source bytes exactly**, reuses **2 of 3** chunks in the second snapshot, indexes **4 symbols** and **3 resolved references**, and retains **2 cited facts**.
 
 ```sh
 npm run check:deep-memory
 ```
 
-Inspect the [machine-readable result](bench/results/deep-memory-platform-v0.5.0-rc.1.json) and [evaluator](scripts/evaluate-deep-memory-platform.mjs). The historical 0.4.0 receipt remains unchanged. This is local product-acceptance evidence, not a cross-product comparison or a promise about arbitrary repositories.
+Inspect the [machine-readable result](bench/results/deep-memory-platform-v0.6.0-alpha.1.json) and [evaluator](scripts/evaluate-deep-memory-platform.mjs). Historical receipts remain unchanged. This is local product-acceptance evidence, not a cross-product comparison or a promise about arbitrary repositories.
 
 ### Reproducible real-Git-worktree acceptance result
 
