@@ -10,8 +10,8 @@
     "timingClaimed": false,
     "sourceManifest": {
       "fileCount": 89,
-      "bytes": 1109208,
-      "manifestHash": "sha256:40013d7da37022c526a00340476894b305f2e2bd864c48d9555156b170825eae"
+      "bytes": 1114311,
+      "manifestHash": "sha256:2b2f6a67c35a63101cd66013cae123bb3521119e64824d83afe6024e09b54856"
     },
     "evaluatorSha256": "sha256:5a4f8a705f1890ec39acdc85d2e8320312e724d649e908024bf59592cc12e3ca"
   },
@@ -44,7 +44,7 @@
     "eligibleSymbolFiles": 187,
     "indexedSymbolFiles": 187,
     "declarations": 48367,
-    "references": 102079,
+    "references": 102087,
     "definitions": [
       {
         "query": "appendEvent",
@@ -130,5 +130,5 @@
     "No provider model, learned embedding service, wall-clock performance, billing, or private agent history is measured.",
     "A passing result proves these exact structural scenarios, not universal task success or semantic correctness."
   ],
-  "manifestHash": "sha256:047af66f4ef49f1a6536437dd1a4e5b141ea5b1e29d10449ef6c5355d3aef740"
+  "manifestHash": "sha256:b86ac9a2987b86490b0af4b721ed94c04ab81a2f758b00faf85c79a0a34a57fc"
 }

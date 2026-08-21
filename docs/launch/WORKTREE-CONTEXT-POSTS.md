@@ -1,6 +1,6 @@
 # Worktree context launch drafts
 
-Use `assets/launch/qarinah-worktree-context-graph.png`. It is a real capture from two initialized Git worktrees in one temporary demo repository. The selected feature-worktree node exposes its graph type, status, structural rank, connections, and source event hash.
+Use `assets/launch/qarinah-worktree-context-graph.png`. It is a real capture from two initialized Git worktrees in one temporary demo repository. The selected `feature/context` node anchors a circular evidence graph and exposes its graph type, status, structural rank, connections, and source event hash.
 
 ## Product Hunt update
 

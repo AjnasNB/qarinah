@@ -36,7 +36,10 @@ test("a single-project dashboard opens the interactive project view directly", a
 
   const projectPage = await fetch(live.url).then((response) => response.text());
   assert.match(projectPage, /Worktree context graph/u);
-  assert.match(projectPage, /Interactive linked project-memory graph/u);
+  assert.match(projectPage, /Interactive circular project-memory graph/u);
+  assert.match(projectPage, /Real local ledger data/u);
+  assert.match(projectPage, /data-graph-orbits/u);
+  assert.match(projectPage, /graph-node-label/u);
   assert.match(projectPage, /Ranked project-memory search/u);
 });
 
