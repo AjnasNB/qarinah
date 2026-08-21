@@ -52,7 +52,8 @@
     "./schemas/content-archive.json": "./schemas/content-archive.schema.json",
     "./schemas/symbol-graph.json": "./schemas/symbol-graph.schema.json",
     "./schemas/project-memory-cycle.json": "./schemas/project-memory-cycle.schema.json",
-    "./schemas/fact-consolidation.json": "./schemas/fact-consolidation.schema.json"
+    "./schemas/fact-consolidation.json": "./schemas/fact-consolidation.schema.json",
+    "./schemas/proof-context.json": "./schemas/proof-context.schema.json"
   },
   "files": [
     "bin/",
