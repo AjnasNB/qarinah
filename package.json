@@ -1,7 +1,7 @@
 {
   "name": "qarinah",
   "version": "0.6.0-alpha.1",
-  "description": "Proof-carrying task context with cited project memory, temporal facts, and query-ranked repository symbols.",
+  "description": "Proof-carrying task context with cited project memory, multi-language graphs, session receipts, recovery, temporal facts, and query-ranked repository symbols.",
   "license": "Apache-2.0",
   "author": "Ajnas NB",
   "mcpName": "io.github.AjnasNB/qarinah",
