@@ -3,7 +3,7 @@
   "@type": "SoftwareSourceCode",
   "name": "Qarinah",
   "description": "Proof-carrying project memory with isolated worktree ledgers, multi-language graphs, lifecycle receipts, recovery, and cited context.",
-  "version": "0.5.0-rc.1",
+  "version": "0.6.0-alpha.1",
   "license": "https://spdx.org/licenses/Apache-2.0",
   "codeRepository": "https://github.com/AjnasNB/qarinah",
   "issueTracker": "https://github.com/AjnasNB/qarinah/issues",

@@ -512,7 +512,7 @@ Context disclosure is not an ambient MCP side effect. A direct local query must 
 
 ### 11.6 Editor panel and project-scoped host lifecycle
 
-Qarinah 0.5.0-rc.1 includes a VS Code extension that also runs in Cursor. The panel is a local projection of the initialized workspace rather than a second memory store. It shows the current worktree, decisions, tool outcomes, conflicts, a searchable linked graph, and a selected session's ordered observed lifecycle. Receipt inspection exposes event IDs, hashes, kinds, times, outcomes, and declared boundaries without retaining transcript bodies or hidden reasoning. The webview receives a bounded message contract and cannot read arbitrary files or execute workspace commands.
+Qarinah 0.6.0-alpha.1 includes a VS Code extension that also runs in Cursor. The panel is a local projection of the initialized workspace rather than a second memory store. It shows the current worktree, decisions, tool outcomes, conflicts, a searchable linked graph, a selected session's ordered observed lifecycle, and the current task-proof packet. Receipt inspection exposes event IDs, hashes, kinds, times, outcomes, and declared boundaries without retaining transcript bodies or hidden reasoning. The webview receives a bounded message contract and cannot read arbitrary files or execute workspace commands.
 
 JetBrains users can attach the same `qarinah-lsp` process through the packaged LSP4IJ project template. This is a standard-LSP integration rather than a native JetBrains plugin, so it provides bounded symbols, definitions, and references while the full graph and session replay remain in Qarinah's local dashboard or VS Code-compatible panel.
 
