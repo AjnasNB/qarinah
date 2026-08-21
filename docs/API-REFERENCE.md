@@ -13,6 +13,7 @@ Qarinah is an ESM package. The public implementation is exported from `qarinah`;
 ```js
 import {
   appendEvent,
+  buildProofContext,
   compileContext,
   createContextHandoffCapsule,
   initializeWorkspace,
@@ -26,7 +27,24 @@ import { captureClaudeHook } from "qarinah/claude";
 import { createMcpServer, runMcpServer } from "qarinah/mcp";
 ```
 
-The declarations shipped in `types/index.d.ts`, `types/codex.d.ts`, `types/claude.d.ts`, and `types/mcp.d.ts` are the exact compile-time contract for version 0.5.0-rc.1. JSON Schemas are available through package exports such as `qarinah/schemas/event.json`.
+The declarations shipped in `types/index.d.ts`, `types/codex.d.ts`, `types/claude.d.ts`, and `types/mcp.d.ts` are the exact compile-time contract for version 0.6.0-alpha.1. JSON Schemas are available through package exports such as `qarinah/schemas/event.json` and `qarinah/schemas/proof-context.json`.
+
+## Proof-carrying task context
+
+```js
+import { buildProofContext, renderProofContextMarkdown, validateProofContext } from "qarinah";
+
+const proof = await buildProofContext("verify signed release receipts", {
+  cwd: process.cwd(),
+  maxTokens: 4096,
+  fileLimit: 8
+});
+
+validateProofContext(proof);
+process.stdout.write(renderProofContextMarkdown(proof));
+```
+
+`buildProofContext()` compiles one `qarinah.proof-context.v1` packet containing the cited context pack, query-ranked file and symbol identities, temporal cited facts, explicit superseded-source exclusions, selection reasons, budget metadata, provenance manifests, and a complete manifest hash. It does not persist the rebuilt symbol graph unless `persistSymbols: true` is passed. A caller may provide a synchronous `QarinahTokenEstimator`; the output records whether that estimator is exact.
 
 ## Opaque encrypted team sync
 
@@ -83,9 +101,9 @@ Invalid JavaScript argument shapes generally throw `TypeError`. Storage, trust, 
 
 ## Version and contract constants
 
-| Export | Value in 0.5.0-rc.1 |
+| Export | Value in 0.6.0-alpha.1 |
 | --- | --- |
-| `QARINAH_VERSION` | `"0.5.0-rc.1"` |
+| `QARINAH_VERSION` | `"0.6.0-alpha.1"` |
 | `EVENT_SCHEMA_VERSION` | `"qarinah.event.v1"` |
 | `CONTEXT_PACK_SCHEMA_VERSION` | `"qarinah.context-pack.v2"` |
 | `CONFIG_SCHEMA_VERSION` | `"qarinah.config.v1"` |
@@ -98,6 +116,7 @@ Invalid JavaScript argument shapes generally throw `TypeError`. Storage, trust, 
 | `CONTENT_ARCHIVE_KEY_SCHEMA_VERSION` | `"qarinah.content-archive-key.v1"` |
 | `SYMBOL_GRAPH_SCHEMA_VERSION` | `"qarinah.symbol-graph.v2"` |
 | `QARINAH_LSP_PROTOCOL_VERSION` | `"qarinah-lsp.v1"` |
+| `PROOF_CONTEXT_SCHEMA_VERSION` | `"qarinah.proof-context.v1"` |
 | `MEMORY_FOOTPRINT_SCHEMA_VERSION` | `"qarinah.memory-footprint.v1"` |
 | `CODING_CONTEXT_HARNESS_SCHEMA_VERSION` | `"qarinah.coding-context-harness.v1"` |
 | `PROJECT_OVERVIEW_SCHEMA_VERSION` | `"qarinah.project-overview.v1"` |

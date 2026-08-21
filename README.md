@@ -26,6 +26,8 @@ Each worktree keeps a separate `.qarinah` ledger and consent record. Qarinah der
 
 With `--auto-compact`, the completed-turn hook compiles a bounded cited pack and records one idempotent checkpoint for the latest non-harness source event. The checkpoint can be expanded through exact event IDs, hashes, and the pack manifest. Run `npx qarinah harness "your task" --worktrees` to measure and inspect separate packs across every initialized sibling checkout. [Read the coding context harness guide.](docs/CODING-CONTEXT-HARNESS.md)
 
+For one task-aware packet that joins current decisions, temporal facts, and query-ranked code symbols, run `npx qarinah proof "your task" --format markdown`. Every selected event, file, symbol, and fact includes its selection basis and verifiable identity under one packet manifest. [Read the proof-carrying context guide.](docs/PROOF-CARRYING-CONTEXT.md)
+
 For an explicit foreground loop that also notices source changes, refreshes the symbol graph, and regenerates every local read model, run `npx qarinah watch`. Unchanged cycles create no duplicate checkpoints. Qarinah does not install a hidden background service or passively inspect unrelated applications. [Read the automatic project-memory guide.](docs/AUTOMATIC-PROJECT-MEMORY.md)
 
 ## Resume the work, not the whole chat
@@ -50,6 +52,18 @@ npx qarinah dashboard --serve --worktrees
 | Incremental compaction | Initial, unchanged, delta, and full-rebuild states with the exact prior checkpoint and changed-event count |
 | VS Code/Cursor panel | A local sandboxed read-only webview with searchable graph, timeline, worktree comparison, and detailed session replay |
 | Standard LSP + JetBrains template | Multi-language symbols, definitions, and references through project-local `qarinah-lsp` |
+| Proof-carrying task context | One bounded packet of current events, temporal facts, ranked files and symbols, explicit exclusions, selection reasons, and a tamper-evident manifest |
+
+### Reproducible proof-context result
+
+The 0.6.0-alpha.1 evaluator creates a 12-file repository across ten registered language families and pairs every current decision with a superseded predecessor. It passes **12 / 12** task-packet scenarios: the expected file and symbol are selected, current evidence is retrieved, stale evidence is excluded and identified, hashes remain valid, the packet stays inside 4,096 portable estimated tokens, and an unchanged rerun reproduces the same manifest. A separate mutation is rejected by `validateProofContext()`.
+
+```sh
+npm run evaluate:proof-context
+npm run check:proof-context-evidence
+```
+
+Inspect the [machine-readable result](bench/results/proof-context-0.6.0-alpha.1.json) and [evaluator](scripts/evaluate-proof-context.mjs). This is deterministic acceptance evidence over a generated repository, not a universal accuracy, cost, or cross-product claim.
 
 ### Reproducible public-checkout memory result
 
@@ -245,7 +259,7 @@ The JSONL chain remains authoritative. Graph, index, Markdown, dashboard, and OK
 
 <p align="center">
   <a href="docs/WHITEPAPER.md">Technical paper</a>&nbsp;&middot;&nbsp;
-  <a href="output/pdf/Qarinah-Technical-White-Paper-v1.7.pdf">Technical white paper v1.7</a>&nbsp;&middot;&nbsp;
+  <a href="output/pdf/Qarinah-Technical-White-Paper-v1.8.pdf">Technical white paper v1.8</a>&nbsp;&middot;&nbsp;
   <a href="https://doi.org/10.5281/zenodo.21547684">Paper series DOI</a>&nbsp;&middot;&nbsp;
   <a href="https://doi.org/10.5281/zenodo.21850747">Published historical v1.4</a>&nbsp;&middot;&nbsp;
   <a href="docs/ARCHITECTURE.md">Architecture</a>&nbsp;&middot;&nbsp;

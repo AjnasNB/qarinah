@@ -2,6 +2,17 @@
 
 Qarinah is evidence-linked project memory for coding agents. It keeps an inspectable record beside a software project and compiles bounded, cited context packs for Codex, Claude Code, Cursor, CLI workflows, and compatible MCP clients.
 
+## Proof-carrying task context
+
+- `qarinah proof "task"` joins the admitted memory pack, query-ranked repository files and symbols, temporal cited facts, and explicit stale-source exclusions under one manifest.
+- Every event preserves its retrieval reason and event hash. Every file preserves its verified scan hash. Every symbol preserves its exact span, signature hash, reference count, score, and score basis.
+- Fact sources expose current, superseded, conflicted, expired, or mixed lifecycle state without silently promoting old evidence.
+- The complete JSON or Markdown packet is token-bounded, declares whether its estimator is exact, and rejects manifest or nested-pack tampering.
+- The VS Code/Cursor panel opens on a searchable Task proof view instead of forcing developers to correlate memory, symbols, and facts by hand.
+- The committed 12-scenario evaluator requires expected file and symbol selection, current-evidence retrieval, stale-evidence rejection, citation validity, budget conformance, deterministic reproduction, and tamper rejection.
+
+See [Proof-carrying task context](PROOF-CARRYING-CONTEXT.md).
+
 ## Git worktrees as first-class context
 
 - Every initialized worktree owns a separate `.qarinah` ledger, consent record, SQLite view, graph, and generated Markdown.
