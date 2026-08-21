@@ -246,7 +246,7 @@ function finalize(base, normalized, truncated) {
     const usedTokens = estimateTokens(normalized.tokenEstimator, JSON.stringify(candidate));
     if (usedTokens === budget.usedTokens) {
       const withBudget = { ...base, budget };
-      return deepFreezeJson({ ...withBudget, manifestHash: sha256(withBudget) });
+      return { ...withBudget, manifestHash: sha256(withBudget) };
     }
     budget = { ...budget, usedTokens };
   }
@@ -274,7 +274,7 @@ export function validateProofContext(value) {
 export async function buildProofContext(query, options = {}) {
   const normalized = normalizedOptions(query, options);
   const workspace = await loadWorkspace(normalized.cwd);
-  const memoryBudget = Math.max(512, Math.floor(normalized.maxTokens * 0.58));
+  const memoryBudget = Math.max(512, Math.floor(normalized.maxTokens * 0.4));
   const maxChars = Math.min(normalized.maxChars, workspace.config.contextMaxChars, memoryBudget * 4);
   const context = await compileContext(normalized.query, {
     cwd: workspace.root,
@@ -334,7 +334,16 @@ export async function buildProofContext(query, options = {}) {
   while (true) {
     const result = finalize(base, normalized, truncated);
     if (result.budget.usedTokens <= normalized.maxTokens) return validateProofContext(result);
-    if (base.repository.files.length > 0) {
+    if (base.facts.items.length > 4) {
+      base.facts.items.pop();
+      base.selection.factCount = base.facts.items.length;
+      for (const status of Object.keys(base.facts.statusCounts)) {
+        base.facts.statusCounts[status] = base.facts.items.filter((fact) => fact.status === status).length;
+      }
+      truncated = true;
+      continue;
+    }
+    if (base.repository.files.length > 1) {
       base.repository.files.pop();
       base.selection.fileCount = base.repository.files.length;
       base.selection.symbolCount = base.repository.files.reduce((total, file) => total + file.symbols.length, 0);
@@ -350,6 +359,14 @@ export async function buildProofContext(query, options = {}) {
       for (const status of Object.keys(base.facts.statusCounts)) {
         base.facts.statusCounts[status] = base.facts.items.filter((fact) => fact.status === status).length;
       }
+      truncated = true;
+      continue;
+    }
+    if (base.repository.files.length > 0) {
+      base.repository.files.pop();
+      base.selection.fileCount = 0;
+      base.selection.symbolCount = 0;
+      base.selection.fileReasons = [];
       truncated = true;
       continue;
     }
