@@ -24,6 +24,22 @@ function requestStatus(url, host) {
   });
 }
 
+test("a single-project dashboard opens the interactive project view directly", async (t) => {
+  const root = await temporaryDirectory(t);
+  const workspace = await initializeWorkspace(root, { capture: "content" });
+  const live = await serveMemoryDashboard({ cwd: root, port: 0 });
+  t.after(() => live.close());
+
+  const entry = await fetch(live.url, { redirect: "manual" });
+  assert.equal(entry.status, 302);
+  assert.equal(entry.headers.get("location"), `/project/${workspace.config.workspaceId}/`);
+
+  const projectPage = await fetch(live.url).then((response) => response.text());
+  assert.match(projectPage, /Worktree context graph/u);
+  assert.match(projectPage, /Interactive linked project-memory graph/u);
+  assert.match(projectPage, /Ranked project-memory search/u);
+});
+
 test("live dashboard reads real events from separate explicitly selected projects", async (t) => {
   const parent = await temporaryDirectory(t);
   const frontend = path.join(parent, "frontend");
@@ -52,6 +68,7 @@ test("live dashboard reads real events from separate explicitly selected project
   assert.match(indexHtml, /Live from authorized local ledgers/u);
   assert.match(indexHtml, />frontend</u);
   assert.match(indexHtml, />backend</u);
+  assert.equal((indexHtml.match(/Open interactive graph/gu) ?? []).length, 2);
 
   const frontendId = frontendWorkspace.config.workspaceId;
   const initial = await fetch(`${live.url}api/status/${frontendId}`).then((response) => response.json());
