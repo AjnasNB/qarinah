@@ -89,6 +89,7 @@ qarinah archive gc --confirm-workspace <workspace-id>
 qarinah archive erase-key --confirm-workspace <workspace-id>
 qarinah symbols build
 qarinah symbols query [text] [--limit n] [--kind function,class,...]
+qarinah proof <query> [--format json|markdown] [--max-tokens n] [--max-chars n] [--limit n] [--symbol-limit n] [--file-limit n] [--fact-limit n] [--persist-symbols]
 qarinah harness [query] [--worktrees] [--record] [--no-rebuild] [--format json|markdown] [options]
 qarinah query [text] [options]
 qarinah query --stdin-json
@@ -100,6 +101,28 @@ qarinah mcp
 ```
 
 `query` and `context` are aliases.
+
+## `proof`
+
+Compile one tamper-evident task packet from admitted project memory, temporal cited facts, and query-ranked repository symbols:
+
+```sh
+npx qarinah scan
+npx qarinah proof "verify signed release receipts" --format markdown --max-tokens 4096
+```
+
+| Option | Default | Meaning |
+| --- | --- | --- |
+| `--format` | `json` | Emit strict JSON or inspectable Markdown. |
+| `--max-tokens` | `4096` | Bound the complete packet from 1,024 to 1,000,000 declared estimator tokens. |
+| `--max-chars` | `64000` | Bound memory compilation before the complete packet budget is enforced. |
+| `--limit` | `24` | Maximum admitted memory events before packet trimming. |
+| `--symbol-limit` | `80` | Maximum symbol-query candidates before file grouping. |
+| `--file-limit` | `16` | Maximum ranked repository files before complete-budget trimming. |
+| `--fact-limit` | `24` | Maximum cited facts before complete-budget trimming. |
+| `--persist-symbols` | Off | Persist the rebuilt symbol graph. Without it, proof compilation is read-only. |
+
+The result uses schema `qarinah.proof-context.v1`. When no verified project scan exists, the memory and fact sections remain available and the repository section explicitly explains why symbols are absent. Run `qarinah scan` to include code identities. Read [PROOF-CARRYING-CONTEXT.md](PROOF-CARRYING-CONTEXT.md).
 
 ## `help`
 

@@ -15,7 +15,6 @@ const readHistoricalBlob = (relativePath) => execFileSync(
   { cwd: root, encoding: "buffer", windowsHide: true }
 );
 
-const packageJson = await readJson("package.json");
 const release = await readJson("bench/results/benchmark-release-0.1.6.json");
 const software = await readJson("bench/results/software-task-context-0.1.0.json");
 const continuation = await readJson("bench/results/continuation-context-0.1.6.json");
@@ -46,7 +45,6 @@ execFileSync("git", ["merge-base", "--is-ancestor", historicalPaperSourceCommit,
 });
 
 assert.equal(release.schemaVersion, "qarinah.benchmark-release.v2");
-assert.equal(packageJson.version, "0.5.0-rc.1");
 assert.equal(release.packageVersion, "0.1.6");
 assert.equal(release.paperVersion, "1.3");
 assert.equal(release.status, "release-candidate-locally-verified-not-published");

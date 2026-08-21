@@ -1,0 +1,240 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qarinah.io/schemas/proof-context.schema.json",
+  "title": "Qarinah proof-carrying task context",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "generatedAt", "workspaceId", "query", "queryHash", "contentRole", "context", "repository", "facts", "selection", "provenance", "boundaries", "budget", "manifestHash"],
+  "properties": {
+    "schemaVersion": { "const": "qarinah.proof-context.v1" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "workspaceId": { "type": "string", "pattern": "^ws_[0-9a-f]{32}$" },
+    "query": { "type": "string", "minLength": 1, "maxLength": 4096 },
+    "queryHash": { "$ref": "#/$defs/hash" },
+    "contentRole": { "const": "untrusted-data" },
+    "context": { "$ref": "context-pack.schema.json" },
+    "repository": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["available", "reason", "files"],
+          "properties": {
+            "available": { "const": false },
+            "reason": { "type": "string", "minLength": 1, "maxLength": 512 },
+            "files": { "type": "array", "maxItems": 0 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["available", "graphSchemaVersion", "graphManifestHash", "querySchemaVersion", "queryManifestHash", "formula", "coverage", "files"],
+          "properties": {
+            "available": { "const": true },
+            "graphSchemaVersion": { "const": "qarinah.symbol-graph.v2" },
+            "graphManifestHash": { "$ref": "#/$defs/hash" },
+            "querySchemaVersion": { "const": "qarinah.symbol-query.v1" },
+            "queryManifestHash": { "$ref": "#/$defs/hash" },
+            "formula": { "type": "string", "minLength": 1, "maxLength": 256 },
+            "coverage": { "type": "object" },
+            "files": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/file" } }
+          }
+        }
+      ]
+    },
+    "facts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "method", "adapter", "model", "sourcePackManifestHash", "items", "excludedSources", "statusCounts"],
+      "properties": {
+        "schemaVersion": { "const": "qarinah.fact-consolidation.v1" },
+        "method": { "enum": ["deterministic-cited-v1", "model-assisted-cited-v1"] },
+        "adapter": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "model": { "type": ["string", "null"], "maxLength": 256 },
+        "sourcePackManifestHash": { "$ref": "#/$defs/hash" },
+        "items": { "type": "array", "maxItems": 64, "items": { "$ref": "#/$defs/fact" } },
+        "excludedSources": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/excludedSource" } },
+        "statusCounts": { "$ref": "#/$defs/statusCounts" }
+      }
+    },
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eventCount", "fileCount", "symbolCount", "factCount", "eventReasons", "fileReasons"],
+      "properties": {
+        "eventCount": { "type": "integer", "minimum": 0, "maximum": 64 },
+        "fileCount": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "symbolCount": { "type": "integer", "minimum": 0, "maximum": 1200 },
+        "factCount": { "type": "integer", "minimum": 0, "maximum": 64 },
+        "eventReasons": { "type": "array", "maxItems": 64, "items": { "$ref": "#/$defs/eventReason" } },
+        "fileReasons": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/fileReason" } }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ledgerHeadHash", "contextManifestHash", "symbolGraphManifestHash", "symbolQueryManifestHash", "factManifestHash"],
+      "properties": {
+        "ledgerHeadHash": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/hash" }] },
+        "contextManifestHash": { "$ref": "#/$defs/hash" },
+        "symbolGraphManifestHash": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/hash" }] },
+        "symbolQueryManifestHash": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/hash" }] },
+        "factManifestHash": { "$ref": "#/$defs/hash" }
+      }
+    },
+    "boundaries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence", "repository", "retrieval", "tokens", "trust"],
+      "properties": {
+        "evidence": { "type": "string", "minLength": 1 },
+        "repository": { "type": "string", "minLength": 1 },
+        "retrieval": { "type": "string", "minLength": 1 },
+        "tokens": { "type": "string", "minLength": 1 },
+        "trust": { "type": "string", "minLength": 1 }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxTokens", "usedTokens", "estimator", "truncated"],
+      "properties": {
+        "maxTokens": { "type": "integer", "minimum": 1024, "maximum": 1000000 },
+        "usedTokens": { "type": "integer", "minimum": 0, "maximum": 100000000 },
+        "estimator": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "version", "exact"],
+          "properties": {
+            "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" },
+            "version": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "exact": { "type": "boolean" }
+          }
+        },
+        "truncated": { "type": "boolean" }
+      }
+    },
+    "manifestHash": { "$ref": "#/$defs/hash" }
+  },
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "status": { "enum": ["current", "superseded", "conflicted", "expired", "mixed"] },
+    "statusCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["current", "superseded", "conflicted", "expired", "mixed"],
+      "properties": {
+        "current": { "type": "integer", "minimum": 0, "maximum": 64 },
+        "superseded": { "type": "integer", "minimum": 0, "maximum": 64 },
+        "conflicted": { "type": "integer", "minimum": 0, "maximum": 64 },
+        "expired": { "type": "integer", "minimum": 0, "maximum": 64 },
+        "mixed": { "type": "integer", "minimum": 0, "maximum": 64 }
+      }
+    },
+    "symbol": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "kind", "container", "exported", "span", "signatureHash", "referenceCount", "score", "basis"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^symbol_[0-9a-f]{64}$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "kind": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "container": { "type": ["string", "null"], "maxLength": 1024 },
+        "exported": { "type": "boolean" },
+        "span": { "type": "object" },
+        "signatureHash": { "$ref": "#/$defs/hash" },
+        "referenceCount": { "type": "integer", "minimum": 0, "maximum": 500000 },
+        "score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "basis": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["lexical", "localVector", "structural"],
+          "properties": {
+            "lexical": { "type": "number", "minimum": 0, "maximum": 1 },
+            "localVector": { "type": "number", "minimum": 0, "maximum": 1 },
+            "structural": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        }
+      }
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "language", "contentHash", "parser", "score", "reasons", "symbols"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1, "maxLength": 1024 },
+        "language": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "contentHash": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/hash" }] },
+        "parser": { "type": ["string", "null"], "maxLength": 64 },
+        "score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "reasons": { "type": "array", "maxItems": 3, "uniqueItems": true, "items": { "enum": ["query-term-match", "local-subword-similarity", "reference-structure"] } },
+        "symbols": { "type": "array", "maxItems": 12, "items": { "$ref": "#/$defs/symbol" } }
+      }
+    },
+    "factSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eventId", "eventHash", "status", "validFrom", "validUntil", "supersededBy", "contradictedBy"],
+      "properties": {
+        "eventId": { "type": "string" },
+        "eventHash": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/hash" }] },
+        "status": { "enum": ["current", "superseded", "conflicted", "expired"] },
+        "validFrom": { "type": ["string", "null"], "format": "date-time" },
+        "validUntil": { "type": ["string", "null"], "format": "date-time" },
+        "supersededBy": { "type": "array", "maxItems": 64, "uniqueItems": true, "items": { "type": "string" } },
+        "contradictedBy": { "type": "array", "maxItems": 64, "uniqueItems": true, "items": { "type": "string" } }
+      }
+    },
+    "fact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "category", "statement", "confidence", "sourceEventIds", "status", "validFrom", "validUntil", "sources"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^fact_[0-9a-f]{32}$" },
+        "category": { "enum": ["decision", "constraint", "tool", "outcome", "evidence", "conflict", "summary"] },
+        "statement": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "confidence": { "enum": ["extracted", "inferred"] },
+        "sourceEventIds": { "type": "array", "minItems": 1, "maxItems": 8, "uniqueItems": true, "items": { "type": "string" } },
+        "status": { "$ref": "#/$defs/status" },
+        "validFrom": { "type": ["string", "null"], "format": "date-time" },
+        "validUntil": { "type": ["string", "null"], "format": "date-time" },
+        "sources": { "type": "array", "minItems": 1, "maxItems": 8, "items": { "$ref": "#/$defs/factSource" } }
+      }
+    },
+    "excludedSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eventId", "eventHash", "title", "reason", "validFrom", "validUntil", "supersededBy"],
+      "properties": {
+        "eventId": { "type": "string" },
+        "eventHash": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/hash" }] },
+        "title": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "reason": { "const": "superseded" },
+        "validFrom": { "type": ["string", "null"], "format": "date-time" },
+        "validUntil": { "type": ["string", "null"], "format": "date-time" },
+        "supersededBy": { "type": "array", "maxItems": 64, "uniqueItems": true, "items": { "type": "string" } }
+      }
+    },
+    "eventReason": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eventId", "reason", "hash"],
+      "properties": {
+        "eventId": { "type": "string" },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "hash": { "$ref": "#/$defs/hash" }
+      }
+    },
+    "fileReason": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "score", "reasons", "contentHash"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1, "maxLength": 1024 },
+        "score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "reasons": { "type": "array", "maxItems": 3, "uniqueItems": true, "items": { "type": "string" } },
+        "contentHash": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/hash" }] }
+      }
+    }
+  }
+}

@@ -3,15 +3,15 @@
 ## Multi-language developer memory with inspectable context receipts
 
 **Author:** Ajnas N B<br>
-**Paper version:** 1.7<br>
-**Implementation:** Qarinah `0.5.0-rc.1`<br>
-**Date:** 20 August 2026<br>
+**Paper version:** 1.8<br>
+**Implementation:** Qarinah `0.6.0-alpha.1`<br>
+**Date:** 21 August 2026<br>
 **License:** Apache License 2.0<br>
-**Status:** Implementation-backed technical white paper for the Qarinah 0.5.0 release candidate. This version is not peer-reviewed. All measured claims identify their benchmark, denominator, estimator, and limits. Version 1.7 has no version DOI until a separate Zenodo deposit is completed; the persistent paper series uses concept DOI [10.5281/zenodo.21547684](https://doi.org/10.5281/zenodo.21547684).
+**Status:** Implementation-backed technical white paper for the Qarinah 0.6.0 alpha. This version is not peer-reviewed. All measured claims identify their benchmark, denominator, estimator, and limits. Version 1.8 has no version DOI until a separate Zenodo deposit is completed; the persistent paper series uses concept DOI [10.5281/zenodo.21547684](https://doi.org/10.5281/zenodo.21547684).
 
-**Version note:** v1.7 adds source-hash-bound symbol memory across ten language families, lifecycle-bound session receipts, crash-recoverable incremental cycles, detailed editor replay, a packaged JetBrains LSP4IJ template, self-hosted opaque team synchronization, and a 10-scenario public-checkout memory evaluation. Version 1.6 remains an immutable repository artifact; published v1.4, version DOI [10.5281/zenodo.21850747](https://doi.org/10.5281/zenodo.21850747), remains an immutable historical publication.
+**Version note:** v1.8 adds proof-carrying task context: one bounded artifact that joins current project memory, temporal facts, ranked files and symbols, explicit selection and exclusion reasons, and reproducible manifests. Its committed acceptance evaluator passes 12 of 12 predefined scenarios across ten registered language families. Version 1.7 remains an immutable repository artifact; published v1.4, version DOI [10.5281/zenodo.21850747](https://doi.org/10.5281/zenodo.21850747), remains an immutable historical publication.
 
-[Download the v1.7 PDF](https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.7.pdf)
+[Download the v1.8 PDF](https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v1.8.pdf)
 
 > Qarinah turns permitted agent activity, project structure, decisions, approvals, and source evidence into a local, verifiable record. When a later task needs context, Qarinah compiles a small cited pack instead of replaying the complete project history.
 
@@ -27,13 +27,15 @@ Qarinah treats project memory as a compilation problem rather than a transcript-
 
 The implementation is local-first, model-agnostic, and explicit about capture. A repository configuration does not grant consent by itself. Capture also requires machine-local trust for the repository's real path, and metadata-only capture is the default. Content capture is a separate reviewed choice. Derived files are disposable and can be rebuilt from the verified event chain.
 
-Qarinah 0.5.0-rc.1 makes that memory visible during everyday development. Each initialized Git checkout retains a separate writable ledger and consent state. A shared repository identity lets the local dashboard compare initialized sibling worktrees without merging their stores. The developer view combines a searchable linked graph, decisions, tool outcomes, conflicts, lifecycle-bound session receipts, and branch/commit state. A sandboxed VS Code/Cursor panel reads the same local projection and can replay the exact observed session event sequence. Completed-turn hooks record idempotent incremental checkpoints in four explicit states: initial, unchanged, delta, and full rebuild.
+Qarinah 0.6.0-alpha.1 makes that memory directly usable as a task-scoped developer artifact. Each initialized Git checkout retains a separate writable ledger and consent state. A shared repository identity lets the local dashboard compare initialized sibling worktrees without merging their stores. The developer view combines a searchable linked graph, decisions, tool outcomes, conflicts, lifecycle-bound session receipts, branch/commit state, and a proof tab for the task packet. A sandboxed VS Code/Cursor panel reads the same local projection and can replay the exact observed session event sequence. Completed-turn hooks record idempotent incremental checkpoints in four explicit states: initial, unchanged, delta, and full rebuild.
+
+The proof-context compiler joins the current memory pack, admitted temporal facts, and source-hash-verified symbols into one bounded JSON or Markdown artifact. Every included memory item, file, and fact exposes why it was selected. Superseded evidence remains explicitly listed as excluded rather than silently disappearing. The manifest binds the query, workspace, source head, nested context-pack manifest, selected identities, and byte representation so a later host can reject tampering before using the packet.
 
 The release also separates three responsibilities that are often collapsed into one memory store. An explicit content archive preserves selected project files as authenticated content-defined chunks and restores them byte for byte. Source-hash-bound Tree-sitter parsers add declarations and unambiguous references for JavaScript, JSX, TypeScript, TSX, Python, Go, Rust, Java, Kotlin, C, C++, and C#, with a bounded Language Server Protocol surface. A cited consolidation layer turns admitted evidence into strict facts whose source event identities remain inspectable. An explicit foreground watcher joins these parts into a journaled incremental refresh cycle that can recover an interrupted projection rebuild without installing a hidden desktop-wide collector.
 
 A separate public-checkout evaluator runs against Qarinah's own repository without private fixtures, provider calls, or model-written summaries. It passes 10 of 10 scenarios, indexes every eligible regular source file, resolves exact definitions and references across the supported language set, verifies receipt and cycle recovery invariants, exercises the editor replay contract, and proves that an encrypted sync bundle can be stored and retrieved without exposing event bodies or bearer tokens. This is a reproducible product acceptance result, not an independent benchmark or a universal accuracy claim.
 
-A committed deep-memory acceptance evaluator exercises this complete local path in a temporary initialized project. It passes 12 of 12 scenarios, verifies and restores 390,226 source bytes exactly, reuses two of three chunks in the second snapshot, indexes four symbols and three resolved references, and retains three cited facts. This is deliberately small end-to-end product evidence, not a cross-product benchmark or a universal storage, language, or retrieval result.
+A committed deep-memory acceptance evaluator exercises this complete local path in a temporary initialized project. It passes 12 of 12 scenarios, verifies and restores 390,226 source bytes exactly, reuses two of three chunks in the second snapshot, indexes four symbols and three resolved references, and retains two cited facts. This is deliberately small end-to-end product evidence, not a cross-product benchmark or a universal storage, language, or retrieval result.
 
 The committed software-task evaluation compares full-history replay with Qarinah packs while keeping the same current-task source material on both sides. Across 240 retained records and six software scenarios, the measured context falls from 442,113 to 5,682 estimated input-context tokens: a 98.7148% reduction and a 77.81:1 compression ratio. Every required target ranks in the top five with direct evidence coverage, and no model-written summaries are used. A separate 42-record, two-session continuation fixture measures two outputs against the same 9,489-token history: a 119-token model-facing capsule (98.7459% reduction) and a 1,039-token complete cited audit pack (89.0505% reduction). The capsule retains the selected summary identity and audit-pack manifest pointer; the larger pack retains all summary-source identities and hashes.
 
@@ -65,6 +67,7 @@ A coding agent should not have to reread months of unrelated project history to 
 6. **Selected memory remains inspectable.** Every returned item identifies the event and hash that support it.
 7. **Approval remains an optional composition.** Maqam can add policy or human approval to selected reads and writes; Qarinah remains useful without it.
 8. **Developer memory is visible.** The CLI, local dashboard, and VS Code/Cursor panel expose the same searchable graph, timeline, worktree comparison, and exact session receipts.
+9. **Task context carries its own proof.** One deterministic packet joins current memory, temporal facts, files, symbols, exclusions, selection reasons, budgets, and a verifiable manifest.
 
 The project does not claim to read hidden reasoning, monitor every host action, prove the truth of a stored claim, or turn a user-space package into an operating-system security boundary. It provides a narrower and more useful primitive: a verifiable local record and a deterministic way to compile the smallest evidence-backed context appropriate for a task.
 
@@ -408,6 +411,23 @@ Each context item carries the retained identity required to trace it to the even
 
 This is the central user-facing behavior: the next agent receives a small working set and can still inspect why every selected item was included.
 
+### 9.6 Proof-carrying task context
+
+The `qarinah proof` command compiles the parts of developer memory that a coding task needs into one `qarinah.proof-context.v1` artifact. The compiler starts from the verified context pack, then joins temporal facts and source-hash-verified symbol search without granting either derived view independent authority. The result contains:
+
+- the bounded memory pack and its nested manifest;
+- ranked files and symbols with exact content or signature hashes;
+- current temporal facts with their cited source event identities;
+- lifecycle labels for current, superseded, and conflicting evidence;
+- explicit selection reasons for every included item;
+- an excluded-source list for evidence removed by supersession;
+- portable character and estimated-token budgets; and
+- an outer manifest that binds the query, workspace identity, source head, nested manifest, selected identities, and canonical packet bytes.
+
+Validation recomputes both the outer packet hash and the nested context-pack hash. A packet whose query, selected evidence, file hashes, fact citations, or serialized content changes no longer validates. This makes the packet independently checkable by another host without claiming that hashes establish semantic truth.
+
+The default build is read-only with respect to the persisted symbol projection. Callers may explicitly request symbol persistence when they want the verified source graph updated. This keeps a task-context read from being silently turned into a workspace mutation.
+
 ## 10. Human-readable and portable records
 
 ### 10.1 Markdown and JSON
@@ -492,7 +512,7 @@ Context disclosure is not an ambient MCP side effect. A direct local query must 
 
 ### 11.6 Editor panel and project-scoped host lifecycle
 
-Qarinah 0.5.0-rc.1 includes a VS Code extension that also runs in Cursor. The panel is a local projection of the initialized workspace rather than a second memory store. It shows the current worktree, decisions, tool outcomes, conflicts, a searchable linked graph, and a selected session's ordered observed lifecycle. Receipt inspection exposes event IDs, hashes, kinds, times, outcomes, and declared boundaries without retaining transcript bodies or hidden reasoning. The webview receives a bounded message contract and cannot read arbitrary files or execute workspace commands.
+Qarinah 0.6.0-alpha.1 includes a VS Code extension that also runs in Cursor. The panel is a local projection of the initialized workspace rather than a second memory store. It shows the current worktree, decisions, tool outcomes, conflicts, a searchable linked graph, a selected session's ordered observed lifecycle, and the current task-proof packet. Receipt inspection exposes event IDs, hashes, kinds, times, outcomes, and declared boundaries without retaining transcript bodies or hidden reasoning. The webview receives a bounded message contract and cannot read arbitrary files or execute workspace commands.
 
 JetBrains users can attach the same `qarinah-lsp` process through the packaged LSP4IJ project template. This is a standard-LSP integration rather than a native JetBrains plugin, so it provides bounded symbols, definitions, and references while the full graph and session replay remain in Qarinah's local dashboard or VS Code-compatible panel.
 
@@ -718,6 +738,12 @@ The deep-memory evaluator creates a temporary content-authorized Qarinah workspa
 
 Twelve assertions cover initial change capture, no-change suppression, changed-file detection, complete eligible-file indexing, function-symbol retrieval, cross-file reference resolution, cited-fact integrity, decision/outcome retrieval, cross-snapshot object reuse, archive verification, exact restored file membership, and byte-for-byte reconstruction. The result is deterministic and release-gated. It is a compact end-to-end acceptance fixture, not a storage-efficiency benchmark, a language-coverage benchmark, or independent validation.
 
+### 14.11 Proof-carrying task-context acceptance
+
+The 0.6.0-alpha.1 evaluator creates a deterministic 12-file repository with C, C++, C#, Go, Java, JavaScript, Kotlin, Python, Rust, and TypeScript sources. Each task has a named target file and symbol, a current decision, and a deliberately superseded decision. The evaluator compiles the same packet twice, checks the manifest is identical, mutates a packet copy, and confirms validation rejects it.
+
+Each of the 12 scenarios is accepted only when its expected file appears in the top five, its expected symbol is attached to a selected top-five file, current evidence is retained, stale evidence is explicitly excluded, all citations resolve, the complete artifact stays within 4,096 portable estimated tokens, and the manifest reproduces exactly. This is generated multi-language acceptance evidence for the packet contract. It is not an independent benchmark, a provider-token receipt, a semantic code-understanding score, or a comparison with another product.
+
 ## 15. Results
 
 ### 15.1 Software-task context volume
@@ -852,17 +878,36 @@ The evaluation verifies that sibling worktrees remain distinct writable memories
 | Second-snapshot chunks reused | 2 |
 | Symbols indexed | 4 |
 | Cross-file references resolved | 3 |
-| Cited facts retained | 3 |
+| Cited facts retained | 2 |
 | Files restored byte for byte | 2 / 2 |
-| Result artifact SHA-256 | `bb801a59d5c1822b87bda5596237a126a064e62ac6f588e3351ebe949551ff46` |
+| Result artifact SHA-256 | `a9c6a3e131678bdb2006f731d5e2750d29d5518d08f8b36182f27afdfd3cbc50` |
 
 The observed chunk reuse shows that a bounded source edit can reuse unchanged encrypted content objects inside the same vault. It is not a universal deduplication or compression percentage. The exact-byte assertion establishes reconstruction for this fixture; it does not extend capture to ignored files, links, common secret filenames, unsupported binary content, or data that the operator did not authorize.
 
+### 15.9 Task-context acceptance result
+
+| Measurement | Result |
+| --- | ---: |
+| Task packets accepted | 12 / 12 |
+| Registered language families exercised | 10 |
+| Expected file hit@5 | 1.0 |
+| Expected symbol hit within selected top-five files | 1.0 |
+| Current-evidence recall | 1.0 |
+| Stale-evidence rejection | 1.0 |
+| Citation validity | 1.0 |
+| Complete-packet budget conformance | 1.0 |
+| Deterministic manifest reproduction | 1.0 |
+| Mutated manifest rejected | true |
+| Maximum portable estimated tokens | 4,096 |
+| Result artifact SHA-256 | `001c10e3d01e056346b786d2eddfd43b88c4c2a6e1106984380d73f092a40f48` |
+
+All 12 predefined packets satisfy the combined evidence, code-location, lifecycle, budget, and reproducibility contract. The result is more operationally meaningful than a compression percentage alone because it tests whether a bounded packet contains the expected code and current decision while refusing stale evidence. Its scope remains the generated repository and predefined expectations.
+
 ## 16. Interpretation
 
-The results support eight conclusions about the tested implementation.
+The results support nine conclusions about the tested implementation.
 
-First, accumulated project history can be separated from current-task source material and replaced with a much smaller cited pack. Second, the selected evidence can retain the required decision targets without relying on model-written summaries. Third, a minimal model-facing continuation capsule can remain cryptographically linked to a larger inspectable audit pack. Fourth, unsupported questions can fail closed when the caller requires direct coverage, although the conservative gate's low coverage and wide confidence intervals matter. Fifth, strong lexical ranking remains competitive; Qarinah's measured contribution in the real-repository study comes from admission boundaries and evidence semantics rather than a novel ranker. Sixth, exact and typo-tolerant retrieval can preserve answer-bearing evidence across 40-, 50-, and 100-file workspaces while SQLite, graph, Markdown, conflict, supersession, and repair invariants remain intact. Seventh, citations, conflict handling, and coverage metadata can fit inside a strict output budget rather than being added after selection. Eighth, exact selected-source recovery, code-symbol retrieval, cited consolidation, and incremental refresh can coexist in one verified local workflow without treating the compact model pack as the lossless archive.
+First, accumulated project history can be separated from current-task source material and replaced with a much smaller cited pack. Second, the selected evidence can retain the required decision targets without relying on model-written summaries. Third, a minimal model-facing continuation capsule can remain cryptographically linked to a larger inspectable audit pack. Fourth, unsupported questions can fail closed when the caller requires direct coverage, although the conservative gate's low coverage and wide confidence intervals matter. Fifth, strong lexical ranking remains competitive; Qarinah's measured contribution in the real-repository study comes from admission boundaries and evidence semantics rather than a novel ranker. Sixth, exact and typo-tolerant retrieval can preserve answer-bearing evidence across 40-, 50-, and 100-file workspaces while SQLite, graph, Markdown, conflict, supersession, and repair invariants remain intact. Seventh, citations, conflict handling, and coverage metadata can fit inside a strict output budget rather than being added after selection. Eighth, exact selected-source recovery, code-symbol retrieval, cited consolidation, and incremental refresh can coexist in one verified local workflow without treating the compact model pack as the lossless archive. Ninth, the memory pack, current facts, selected code locations, exclusions, and manifests can be joined into one bounded artifact that another host can verify before use.
 
 The later audits add two narrower conclusions. The current product can reproduce the complete v0.4 development projection exactly under the bound v0.5 protocol. The stricter v2 comparison also demonstrates why missing evidence must cancel a superlative: five token-identical eligible cases do not repair one jointly ineligible case.
 
@@ -883,6 +928,10 @@ The appropriate public statement is therefore precise:
 
 > Qarinah's committed deep-memory evaluator passes 12 of 12 exact recovery, incremental refresh, symbol/reference, and cited-fact scenarios, including byte-for-byte restoration of 390,226 selected source bytes. Separately, the committed six-task repeated-context fixture reduces 442,113 estimated tokens to a 5,682-token cited pack (98.7148%) under its stated portable estimator and fixture boundary.
 
+For the 0.6 alpha task-context surface, the appropriate statement is:
+
+> All 12 predefined proof-context scenarios produce a bounded, reproducible packet containing the expected file, symbol, current evidence, valid citations, and explicit stale-evidence exclusion. This is deterministic generated-repository acceptance evidence, not an independent or universal accuracy result.
+
 ## 17. Reproducibility
 
 Use a maintained Node.js 22, 24, or 26 release and a reviewed source checkout:
@@ -899,6 +948,7 @@ npm run evaluate:software-tasks
 npm run evaluate:continuation
 npm run evaluate:long-document
 npm run evaluate:multifile-context
+npm run evaluate:proof-context
 npm run check:deep-memory
 npm run evaluate:context
 npm run evaluate:research-retrieval:v0.4
@@ -923,14 +973,17 @@ The relevant evidence is committed at:
 - [`bench/results/research-retrieval-development-v0.5.json`](../bench/results/research-retrieval-development-v0.5.json);
 - [`bench/results/context-efficiency-comparison-0.1.6-v2.json`](../bench/results/context-efficiency-comparison-0.1.6-v2.json);
 - [`bench/results/benchmark-release-0.1.6.json`](../bench/results/benchmark-release-0.1.6.json);
-- [`bench/results/deep-memory-platform-v0.4.0.json`](../bench/results/deep-memory-platform-v0.4.0.json);
-- [`bench/results/public-project-memory-0.5.json`](../bench/results/public-project-memory-0.5.json);
+- [`bench/results/deep-memory-platform-v0.6.0-alpha.1.json`](../bench/results/deep-memory-platform-v0.6.0-alpha.1.json);
+- [`bench/results/public-project-memory-v0.6.0-alpha.1.json`](../bench/results/public-project-memory-v0.6.0-alpha.1.json);
+- [`bench/results/proof-context-0.6.0-alpha.1.json`](../bench/results/proof-context-0.6.0-alpha.1.json);
 - [`scripts/evaluate-software-tasks.mjs`](../scripts/evaluate-software-tasks.mjs);
 - [`scripts/evaluate-long-document.mjs`](../scripts/evaluate-long-document.mjs);
 - [`scripts/evaluate-multifile-context.mjs`](../scripts/evaluate-multifile-context.mjs);
 - [`scripts/evaluate-context.mjs`](../scripts/evaluate-context.mjs); and
 - [`scripts/evaluate-deep-memory-platform.mjs`](../scripts/evaluate-deep-memory-platform.mjs);
 - [`scripts/evaluate-public-project-memory.mjs`](../scripts/evaluate-public-project-memory.mjs);
+- [`scripts/evaluate-proof-context.mjs`](../scripts/evaluate-proof-context.mjs);
+- [`scripts/verify-proof-context-evidence.mjs`](../scripts/verify-proof-context-evidence.mjs);
 - [`scripts/verify-benchmark-evidence.mjs`](../scripts/verify-benchmark-evidence.mjs);
 - [`scripts/verify-research-retrieval-v0.5-result.mjs`](../scripts/verify-research-retrieval-v0.5-result.mjs);
 - [`scripts/verify-context-efficiency-comparison-v2-result.mjs`](../scripts/verify-context-efficiency-comparison-v2-result.mjs); and
@@ -972,9 +1025,9 @@ Recommended publication metadata:
 - **Title:** *Qarinah: Proof-Carrying Project Memory*
 - **Subtitle:** *Multi-language developer memory with inspectable context receipts*
 - **Author:** Ajnas N B
-- **Implementation version:** `0.5.0-rc.1`
-- **Paper version:** 1.7
-- **Version DOI:** unassigned until v1.7 is separately deposited
+- **Implementation version:** `0.6.0-alpha.1`
+- **Paper version:** 1.8
+- **Version DOI:** unassigned until v1.8 is separately deposited
 - **Concept DOI:** `10.5281/zenodo.21547684`
 - **License:** Apache-2.0
 - **Canonical source:** this repository at one reviewed commit
@@ -993,14 +1046,14 @@ Security vulnerabilities should be reported privately according to the repositor
 
 ## 20. Roadmap and research agenda
 
-The post-0.5 release-candidate research and hardening roadmap includes:
+The post-0.6-alpha research and hardening roadmap includes:
 
 - at least 100 held-out positive and negative retrieval queries;
 - paraphrase, typo, conflict, supersession, time, authority, and unsupported-query coverage;
 - provider-reported Codex and Claude token measurements under matched models and tools;
 - task-success, unsupported-answer, latency, and cost review;
 - ablations for lexical, trigram, graph, diversity, conflict, and coverage components;
-- signed context-pack manifests;
+- signature policies and optional independent anchoring for the current deterministic proof-context manifest;
 - signed or independently anchored ledger checkpoints;
 - explicit deletion and retention workflows;
 - stronger multi-host coordination;
@@ -1018,7 +1071,7 @@ Coding agents need continuity, but continuity should not require replaying every
 
 Qarinah keeps durable evidence and task-time context as two different artifacts. The append-only ledger preserves the permitted project record. Deterministic projections make that record searchable and inspectable. The context compiler selects a small cited working set under an explicit budget. Conflicts, supersession, authority, retention, and evidence coverage remain visible rather than being compressed away.
 
-Qarinah 0.5.0-rc.1 demonstrates this design end to end across local storage, encrypted exact-source snapshots, SQLite retrieval, evidence and multi-language symbol graphs, deterministic local vector ranking, a bounded language server, cited fact consolidation, crash-recoverable automatic cycles, Markdown projections, project structure, Codex and Claude Code adapters, MCP diagnostics, six project-scoped host setups, a VS Code/Cursor panel with session replay, a JetBrains LSP4IJ template, worktree discovery, incremental compaction, lifecycle-bound session receipts, self-hosted opaque sync, optional Maqam composition, crawler evidence, workflow provenance, and portable OKF export. Its 10/10 public-checkout result verifies the current product on public source; the 12/12 deep-memory result establishes the combined recovery-and-retrieval path; and the 16/16 real-worktree result establishes the operational continuity contract. Historical retrieval experiments remain scoped evidence rather than product-ranking claims.
+Qarinah 0.6.0-alpha.1 demonstrates this design end to end across local storage, encrypted exact-source snapshots, SQLite retrieval, evidence and multi-language symbol graphs, deterministic local vector ranking, a bounded language server, cited fact consolidation, crash-recoverable automatic cycles, Markdown projections, project structure, Codex and Claude Code adapters, MCP diagnostics, six project-scoped host setups, a VS Code/Cursor panel with session replay and task proof, a JetBrains LSP4IJ template, worktree discovery, incremental compaction, lifecycle-bound session receipts, proof-carrying task context, self-hosted opaque sync, optional Maqam composition, crawler evidence, workflow provenance, and portable OKF export. Its 12/12 proof-context result verifies the combined task packet contract; the 10/10 public-checkout result verifies the product on public source; the 12/12 deep-memory result establishes the combined recovery-and-retrieval path; and the 16/16 real-worktree result establishes the operational continuity contract. Historical retrieval experiments remain scoped evidence rather than product-ranking claims.
 
 The central promise is intentionally simple:
 
@@ -1040,8 +1093,9 @@ The author gratefully acknowledges Shahin Ahammed, Qarinah's non-technical cofou
 
 | Public claim | Evidence | Qualification |
 | --- | --- | --- |
-| 10 / 10 public-checkout memory scenarios | `bench/results/public-project-memory-0.5.json` and deterministic evaluator | Current public repository, supported-source indexing, receipt/recovery/editor/sync acceptance; not independent validation or a universal accuracy benchmark |
-| 12 / 12 deep-memory product scenarios | `bench/results/deep-memory-platform-v0.4.0.json` and deterministic evaluator | Local exact-recovery, incremental-refresh, symbol/reference, and cited-fact acceptance; not a cross-product benchmark |
+| 10 / 10 public-checkout memory scenarios | `bench/results/public-project-memory-v0.6.0-alpha.1.json` and deterministic evaluator | Current public repository, supported-source indexing, receipt/recovery/editor/sync acceptance; not independent validation or a universal accuracy benchmark |
+| 12 / 12 deep-memory product scenarios | `bench/results/deep-memory-platform-v0.6.0-alpha.1.json` and deterministic evaluator | Local exact-recovery, incremental-refresh, symbol/reference, and cited-fact acceptance; not a cross-product benchmark |
+| 12 / 12 proof-carrying task-context scenarios | `bench/results/proof-context-0.6.0-alpha.1.json` and deterministic evaluator | Generated ten-language repository; expected code and current evidence selected, stale evidence excluded, complete packet bounded, deterministic manifest reproduced; not independent validation |
 | 390,226 selected source bytes restored exactly | Same deep-memory fixture | Byte equality for the two-file fixture; not universal archive compression or passive capture |
 | 98.71% less estimated context | Software-task result: 442,113 to 5,682 estimated tokens | Compared with the named full-history baseline using `ceil(characters / 4)` |
 | 98.75% continuation-capsule reduction | Continuation result: 9,489 to 119 estimated tokens | Model-facing pointer to the complete pack, not the complete evidence payload |
@@ -1075,8 +1129,10 @@ The author gratefully acknowledges Shahin Ahammed, Qarinah's non-technical cofou
 | Security model | [SECURITY.md](SECURITY.md) |
 | Host integrations | [HOST-INTEGRATIONS.md](HOST-INTEGRATIONS.md) |
 | Real-worktree continuity result | [`worktree-continuity-v0.4.0.json`](../bench/results/worktree-continuity-v0.4.0.json) |
-| Deep-memory product result | [`deep-memory-platform-v0.4.0.json`](../bench/results/deep-memory-platform-v0.4.0.json) |
-| Public-checkout memory result | [`public-project-memory-0.5.json`](../bench/results/public-project-memory-0.5.json) |
+| Deep-memory product result | [`deep-memory-platform-v0.6.0-alpha.1.json`](../bench/results/deep-memory-platform-v0.6.0-alpha.1.json) |
+| Public-checkout memory result | [`public-project-memory-v0.6.0-alpha.1.json`](../bench/results/public-project-memory-v0.6.0-alpha.1.json) |
+| Proof-carrying task-context result | [`proof-context-0.6.0-alpha.1.json`](../bench/results/proof-context-0.6.0-alpha.1.json) |
+| Proof-context contract | [PROOF-CARRYING-CONTEXT.md](PROOF-CARRYING-CONTEXT.md) |
 | Lossless content archive | [CONTENT-ARCHIVE.md](CONTENT-ARCHIVE.md) |
 | Symbol graph and language server | [SYMBOL-GRAPH.md](SYMBOL-GRAPH.md) |
 | Automatic project memory | [AUTOMATIC-PROJECT-MEMORY.md](AUTOMATIC-PROJECT-MEMORY.md) |
@@ -1088,12 +1144,12 @@ The author gratefully acknowledges Shahin Ahammed, Qarinah's non-technical cofou
 | Release gates | [LAUNCH.md](LAUNCH.md) |
 | Public package entry point | [README.md](../README.md) |
 
-## Appendix C. Suggested citation
+## Suggested citation
 
 ```text
 Ajnas N B. "Qarinah: Proof-Carrying Project Memory. Multi-language
 developer memory with inspectable context receipts." Technical white
-paper, version 1.7, August 2026. Qarinah 0.5.0-rc.1. Paper series concept DOI:
-https://doi.org/10.5281/zenodo.21547684. Version 1.7 has no version DOI
+paper, version 1.8, August 2026. Qarinah 0.6.0-alpha.1. Paper series concept DOI:
+https://doi.org/10.5281/zenodo.21547684. Version 1.8 has no version DOI
 until this manuscript is separately deposited.
 ```

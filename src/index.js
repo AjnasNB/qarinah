@@ -47,6 +47,12 @@ export {
 export { QARINAH_LSP_PROTOCOL_VERSION, createLanguageServer, runLanguageServer } from "./lsp-server.js";
 export { FACT_CONSOLIDATION_SCHEMA_VERSION, consolidateProjectFacts } from "./fact-consolidation.js";
 export {
+  PROOF_CONTEXT_SCHEMA_VERSION,
+  buildProofContext,
+  renderProofContextMarkdown,
+  validateProofContext
+} from "./proof-context.js";
+export {
   PROJECT_MEMORY_CYCLE_SCHEMA_VERSION,
   createProjectMemoryWatcher,
   runProjectMemoryCycle

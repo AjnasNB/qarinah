@@ -10,6 +10,7 @@ import {
   buildDeveloperMemoryView,
   buildSymbolGraph,
   buildProjectOverview,
+  buildProofContext,
   captureClaudeHook,
   captureCodexHook,
   compileContext,
@@ -36,6 +37,7 @@ import {
   readEvents,
   rebuildDerivedState,
   renderProjectOverviewMarkdown,
+  renderProofContextMarkdown,
   renderContextPackMarkdown,
   renderCodingContextHarnessMarkdown,
   restoreContentArchive,
@@ -310,6 +312,7 @@ Usage:
   qarinah symbols build
   qarinah symbols query [text] [--limit n] [--kind function,class,...]
   qarinah facts [query] [--record] [--max-facts n] [--max-chars n] [--max-tokens n] [--limit n]
+  qarinah proof <query> [--format json|markdown] [--max-tokens n] [--max-chars n] [--limit n] [--symbol-limit n] [--file-limit n] [--fact-limit n] [--persist-symbols]
   qarinah watch [--once] [--interval-ms n] [--no-compact] [--no-symbols] [--no-rebuild] [--query text]
   qarinah overview [--format json|markdown]
   qarinah footprint [query] [--baseline-tokens n] [--rate-per-million n] [--max-chars n] [--max-tokens n]
@@ -750,6 +753,51 @@ async function run(argv) {
       maxTokens: numeric("--max-tokens", 128, 1_000_000),
       limit: numeric("--limit", 1, 64)
     }), null, 2)}\n`);
+    return;
+  }
+  if (command === "proof") {
+    const flags = new Set(["--persist-symbols"]);
+    const values = new Set(["--format", "--max-tokens", "--max-chars", "--limit", "--symbol-limit", "--file-limit", "--fact-limit"]);
+    const parsed = { positionals: [], flags: new Set(), values: new Map() };
+    for (let index = 0; index < args.length; index += 1) {
+      const value = args[index];
+      if (!value.startsWith("--")) {
+        parsed.positionals.push(value);
+        continue;
+      }
+      if (flags.has(value)) {
+        if (parsed.flags.has(value)) throw new TypeError(`proof received ${value} more than once.`);
+        parsed.flags.add(value);
+        continue;
+      }
+      if (!values.has(value)) throw new TypeError(`proof does not support ${value}.`);
+      if (parsed.values.has(value)) throw new TypeError(`proof received ${value} more than once.`);
+      if (index === args.length - 1 || args[index + 1].startsWith("--")) throw new TypeError(`${value} requires a value.`);
+      parsed.values.set(value, args[index + 1]);
+      index += 1;
+    }
+    if (parsed.positionals.length !== 1) throw new TypeError("proof requires exactly one quoted query string.");
+    const format = parsed.values.get("--format") ?? "json";
+    if (!["json", "markdown"].includes(format)) throw new TypeError("proof --format must be json or markdown.");
+    const numeric = (name, minimum, maximum) => {
+      const value = parsed.values.get(name);
+      if (value === undefined) return undefined;
+      if (!/^[0-9]+$/u.test(value) || Number(value) < minimum || Number(value) > maximum) {
+        throw new TypeError(`${name} must be from ${minimum} to ${maximum}.`);
+      }
+      return Number(value);
+    };
+    const proof = await buildProofContext(parsed.positionals[0], {
+      cwd: process.cwd(),
+      maxTokens: numeric("--max-tokens", 1_024, 1_000_000),
+      maxChars: numeric("--max-chars", 512, 1_000_000),
+      limit: numeric("--limit", 1, 64),
+      symbolLimit: numeric("--symbol-limit", 1, 500),
+      fileLimit: numeric("--file-limit", 1, 100),
+      factLimit: numeric("--fact-limit", 1, 64),
+      persistSymbols: parsed.flags.has("--persist-symbols")
+    });
+    process.stdout.write(format === "markdown" ? renderProofContextMarkdown(proof) : `${JSON.stringify(proof, null, 2)}\n`);
     return;
   }
   if (command === "watch") {

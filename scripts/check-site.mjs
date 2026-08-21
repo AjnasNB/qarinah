@@ -20,6 +20,7 @@ const required = [
   "docs/content-archive/index.html",
   "docs/automatic-project-memory/index.html",
   "docs/cited-facts/index.html",
+  "docs/proof-carrying-context/index.html",
   "docs/symbol-graph/index.html",
   "docs/worktree-context/index.html",
   "docs/token-efficient-context/index.html",
@@ -36,6 +37,7 @@ const required = [
   "search-index.json",
   "metrics.json",
   "paper/index.html",
+  "paper/Qarinah-Technical-White-Paper-v1.8.pdf",
   "paper/Qarinah-Technical-White-Paper-v1.7.pdf",
   "paper/Qarinah-Technical-White-Paper-v1.4.pdf",
   "paper/Qarinah-Technical-White-Paper-v1.5.pdf",
@@ -322,9 +324,13 @@ for (const responsiveHeroRule of [
 if (home.includes('"@type":"SearchAction"') || home.includes("search_term_string")) {
   errors.push("Homepage must not emit the retired sitelinks-search SearchAction or its crawlable URL template.");
 }
-if (!home.includes("<strong>10 / 10</strong>")
-  || !home.includes("public-project memory checks passed")
-  || !home.includes("eligible source files indexed")
+if (!home.includes("<strong>12 / 12</strong>")
+  || !home.includes("proof-carrying task packets passed")
+  || !home.includes("current evidence retained")
+  || !home.includes("stale evidence excluded")
+  || !home.includes("identical manifest reproduced")
+  || !home.includes("<strong>10 / 10</strong>")
+  || !home.includes("eligible public-checkout source files indexed")
   || !home.includes("Multi-language symbols and references")
   || !home.includes("Strict cited facts")
   || !home.includes("public-project memory scenarios passed")
@@ -332,7 +338,7 @@ if (!home.includes("<strong>10 / 10</strong>")
   || !home.includes("<strong>0 bodies</strong>")) {
   errors.push("Homepage is missing the plain-language visible-memory acceptance proof.");
 }
-for (const benchmarkProof of ["98.7148%", "98.75%", "89.05%", "Measured, reproducible, and explicitly scoped."]) {
+for (const benchmarkProof of ["12 / 12", "Proof-carrying task packets accepted", "98.75%", "89.05%", "Measured, reproducible, and explicitly scoped."]) {
   if (!home.includes(benchmarkProof)) errors.push(`Homepage benchmark ribbon is missing ${benchmarkProof}`);
 }
 if (!home.includes("What coding agents and developers need to know.") || !home.includes('href="/docs/faq/"')) {
@@ -342,9 +348,9 @@ for (const worktreeHeroProof of [
   "Your project remembers. Every agent gets the proof.",
   "Verifiable memory for coding agents",
   'class="hero-context-proof"',
-  "10 / 10",
-  "public-project memory checks passed",
-  "eligible source files indexed, exact definitions found, session receipt and cited continuation verified",
+  "12 / 12",
+  "proof-carrying task packets passed",
+  "expected file and symbol selected, current evidence retained, stale evidence excluded, budget held, identical manifest reproduced",
   "one repository · two isolated ledgers",
   "branch + commit in snapshot hash",
   'href="/docs/content-archive/"'
@@ -371,9 +377,19 @@ if (!home.includes("Verifiable project memory, exact source recovery, and cited 
   errors.push("Homepage is missing the worktree-aware category or the separate historical benchmark scope.");
 }
 if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
-  || publicMetrics.productVersion !== "0.5.0-rc.1"
-  || publicMetrics.updatedAt !== "2026-08-20"
+  || publicMetrics.productVersion !== "0.6.0-alpha.1"
+  || publicMetrics.updatedAt !== "2026-08-21"
   || publicMetrics.providerBillingMeasurement !== false
+  || publicMetrics.metrics?.proofCarryingTaskContext?.scenarios !== 12
+  || publicMetrics.metrics?.proofCarryingTaskContext?.accepted !== 12
+  || publicMetrics.metrics?.proofCarryingTaskContext?.expectedFileHitAt5 !== 1
+  || publicMetrics.metrics?.proofCarryingTaskContext?.expectedSymbolHitAt5Files !== 1
+  || publicMetrics.metrics?.proofCarryingTaskContext?.currentEvidenceRecall !== 1
+  || publicMetrics.metrics?.proofCarryingTaskContext?.staleEvidenceRejection !== 1
+  || publicMetrics.metrics?.proofCarryingTaskContext?.citationValidity !== 1
+  || publicMetrics.metrics?.proofCarryingTaskContext?.budgetConformance !== 1
+  || publicMetrics.metrics?.proofCarryingTaskContext?.deterministicManifestReproduction !== 1
+  || publicMetrics.metrics?.proofCarryingTaskContext?.manifestTamperRejection !== true
   || publicMetrics.metrics?.realGitWorktreeContinuity?.scenarios !== 16
   || publicMetrics.metrics?.realGitWorktreeContinuity?.passed !== 16
   || publicMetrics.metrics?.realGitWorktreeContinuity?.failed !== 0
@@ -386,7 +402,7 @@ if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.indexedSymbols !== 4
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.resolvedReferences !== 3
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.citedFacts !== 2
-  || publicMetrics.metrics?.deepMemoryProductAcceptance?.artifactHash !== "sha256:3183af0c8ce57ac63d49a4ee930ca93286d2767509b53f2d613444e8735e920f"
+  || publicMetrics.metrics?.deepMemoryProductAcceptance?.artifactHash !== "sha256:a9c6a3e131678bdb2006f731d5e2750d29d5518d08f8b36182f27afdfd3cbc50"
   || publicMetrics.metrics?.publicProjectMemory?.scenarios !== 10
   || publicMetrics.metrics?.publicProjectMemory?.passed !== 10
   || publicMetrics.metrics?.publicProjectMemory?.indexedSymbolFiles !== publicMetrics.metrics?.publicProjectMemory?.eligibleSymbolFiles
@@ -444,7 +460,7 @@ for (const capability of [
 }
 if (!features.includes('"@type":"CollectionPage"')
   || !features.includes('"@type":"ItemList"')
-  || !features.includes('"numberOfItems":28')) {
+  || !features.includes('"numberOfItems":29')) {
   errors.push("Features page is missing its visible capability collection structured data.");
 }
 for (const requiredWorktreeArticleCopy of [
@@ -534,15 +550,15 @@ if (!faq.includes('"@type":"FAQPage"') || !faq.includes('"mainEntity"')) {
 if (!paper.includes('src="/assets/qarinah-flow.svg"')) {
   errors.push("Paper architecture image is not bound to the deployed asset.");
 }
-if (!paper.includes("/paper/Qarinah-Technical-White-Paper-v1.7.pdf")) {
+if (!paper.includes("/paper/Qarinah-Technical-White-Paper-v1.8.pdf")) {
   errors.push("Paper download does not point to the versioned website PDF.");
 }
 if (!paper.includes("https://doi.org/10.5281/zenodo.21850747")
   || !paper.includes("https://doi.org/10.5281/zenodo.21547684")
   || !paper.includes("https://doi.org/10.5281/zenodo.21843240")
   || !paper.includes('"creativeWorkStatus":"Published"')
-  || !paper.includes('"datePublished":"2026-08-20"')) {
-  errors.push("Paper page must bind current v1.7 to the paper series and preserve published v1.4/v1.3 DOIs.");
+  || !paper.includes('"datePublished":"2026-08-21"')) {
+  errors.push("Paper page must bind current v1.8 to the paper series and preserve published v1.4/v1.3 DOIs.");
 }
 if (/activates on publication|not registered or published|DOI reserved|assigned only when this manuscript is deposited|assigned by Zenodo when v1\.4 is deposited|A version DOI is assigned/iu.test(paper)) {
   errors.push("Paper page contains stale pre-publication lifecycle wording.");

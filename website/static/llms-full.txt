@@ -10,20 +10,21 @@ This file is a convenience map for tools that choose to read it. It does not con
 
 - Name: Qarinah
 - Package: `qarinah`
-- Current release: `0.5.0-rc.1`
+- Current release: `0.6.0-alpha.1`
 - Website: https://qarinah.io/
 - npm: https://www.npmjs.com/package/qarinah
 - Source: https://github.com/AjnasNB/qarinah
 - Issues: https://github.com/AjnasNB/qarinah/issues
 - Discussions: https://github.com/AjnasNB/qarinah/discussions
 - License: Apache-2.0
-- Current technical paper: v1.7 for Qarinah 0.5.0-rc.1; no version DOI until separately deposited
+- Current technical paper: v1.8 for Qarinah 0.6.0-alpha.1; no version DOI until separately deposited
 - Paper-series concept DOI: https://doi.org/10.5281/zenodo.21547684
 - Published historical v1.4 DOI: https://doi.org/10.5281/zenodo.21850747
 
 ## What Qarinah does
 
 - Passed 12 / 12 deterministic deep-memory product scenarios covering exact encrypted source recovery, content-chunk reuse, incremental refresh, symbol/reference retrieval, and cited facts.
+- Passed 12 / 12 proof-carrying task-context scenarios across ten registered language families. Every packet selected the expected file and symbol, retrieved current evidence, identified the excluded superseded source, preserved valid citations, stayed within 4,096 portable estimated tokens, reproduced the same manifest, and rejected a changed packet.
 - Restored 390,226 source bytes exactly in the committed fixture and reused two of three chunks in the second snapshot; this is scoped local product-acceptance evidence.
 - Creates explicit project-scoped encrypted content snapshots with content-defined chunks, conditional Brotli compression, integrity verification, and exact-byte restore.
 - Builds a source-hash-bound JavaScript/TypeScript symbol and reference graph with deterministic lexical, local subword-vector, and structural ranking.
@@ -50,6 +51,7 @@ This file is a convenience map for tools that choose to read it. It does not con
 - Retrieves evidence with deterministic lexical, typo-tolerant, and one-hop graph signals.
 - Compiles bounded context packs with citations, evidence-coverage metadata, and conflict or supersession visibility.
 - Reports the actual estimated baseline, delivered context, reduction, and ratio for every harness run; the published 98.7148% result remains a separate six-fixture measurement.
+- Compiles one `qarinah.proof-context.v1` task packet from current cited events, temporal facts, query-ranked files and symbols, selection explanations, and a tamper-evident manifest.
 - Supports one-command Codex, Claude Code, and Cursor setup, local CLI workflows, MCP diagnostics, and explicitly consent-gated context retrieval.
 - Detects stale project files, compiles separate-authority multi-repository packs, and provides responsive static or live-loopback dashboards sourced from real retained local events.
 - Provides optional reranking adapters, encrypted team bundles, role manifests, signed checkpoints, expanded evaluation, and causal receipts.

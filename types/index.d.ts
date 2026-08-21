@@ -240,7 +240,7 @@ export const PROJECT_STRUCTURE_SCHEMA_VERSION: "qarinah.project-structure.v2";
 export const SQLITE_READ_MODEL_SCHEMA_VERSION: 1;
 export const SQLITE_READ_MODEL_FILENAME: "qarinah.db";
 export const MEMORY_ATTACHMENT_SCHEMA_VERSION: "qarinah.memory-attachment.v1";
-export const QARINAH_VERSION: "0.5.0-rc.1";
+export const QARINAH_VERSION: "0.6.0-alpha.1";
 export const EVENT_KINDS: readonly QarinahEventKind[];
 export const RELATION_TYPES: readonly QarinahRelationType[];
 export function inspectGitWorktree(start?: string): Promise<QarinahGitWorktree | null>;
@@ -663,6 +663,118 @@ export function consolidateProjectFacts(options?: {
   signal?: AbortSignal;
   clock?: () => Date;
 }): Promise<Readonly<QarinahFactConsolidation>>;
+export const PROOF_CONTEXT_SCHEMA_VERSION: "qarinah.proof-context.v1";
+export type QarinahProofFactStatus = "current" | "superseded" | "conflicted" | "expired" | "mixed";
+export interface QarinahProofContext {
+  readonly schemaVersion: "qarinah.proof-context.v1";
+  readonly generatedAt: string;
+  readonly workspaceId: string;
+  readonly query: string;
+  readonly queryHash: `sha256:${string}`;
+  readonly contentRole: "untrusted-data";
+  readonly context: QarinahContextPack;
+  readonly repository: Readonly<{
+    available: boolean;
+    reason?: string;
+    graphSchemaVersion?: "qarinah.symbol-graph.v2";
+    graphManifestHash?: `sha256:${string}`;
+    querySchemaVersion?: "qarinah.symbol-query.v1";
+    queryManifestHash?: `sha256:${string}`;
+    formula?: string;
+    coverage?: QarinahSymbolGraph["coverage"];
+    files: readonly Readonly<{
+      path: string;
+      language: string;
+      contentHash: `sha256:${string}` | null;
+      parser: string | null;
+      score: number;
+      reasons: readonly ("query-term-match" | "local-subword-similarity" | "reference-structure")[];
+      symbols: readonly Readonly<{
+        id: string;
+        name: string;
+        kind: string;
+        container: string | null;
+        exported: boolean;
+        span: QarinahSymbolSpan;
+        signatureHash: `sha256:${string}`;
+        referenceCount: number;
+        score: number;
+        basis: Readonly<{ lexical: number; localVector: number; structural: number }>;
+      }>[];
+    }>[];
+  }>;
+  readonly facts: Readonly<{
+    schemaVersion: "qarinah.fact-consolidation.v1";
+    method: QarinahFactConsolidation["method"];
+    adapter: string;
+    model: string | null;
+    sourcePackManifestHash: `sha256:${string}`;
+    items: readonly Readonly<QarinahConsolidatedFact & {
+      status: QarinahProofFactStatus;
+      validFrom: string | null;
+      validUntil: string | null;
+      sources: readonly Readonly<{
+        eventId: string;
+        eventHash: `sha256:${string}` | null;
+        status: Exclude<QarinahProofFactStatus, "mixed">;
+        validFrom: string | null;
+        validUntil: string | null;
+        supersededBy: readonly string[];
+        contradictedBy: readonly string[];
+      }>[];
+    }>[];
+    excludedSources: readonly Readonly<{
+      eventId: string;
+      eventHash: `sha256:${string}` | null;
+      title: string;
+      reason: "superseded";
+      validFrom: string | null;
+      validUntil: string | null;
+      supersededBy: readonly string[];
+    }>[];
+    statusCounts: Readonly<Record<QarinahProofFactStatus, number>>;
+  }>;
+  readonly selection: Readonly<{
+    eventCount: number;
+    fileCount: number;
+    symbolCount: number;
+    factCount: number;
+    eventReasons: readonly Readonly<{ eventId: string; reason: string; hash: `sha256:${string}` }>[];
+    fileReasons: readonly Readonly<{ path: string; score: number; reasons: readonly string[]; contentHash: `sha256:${string}` | null }>[];
+  }>;
+  readonly provenance: Readonly<{
+    ledgerHeadHash: `sha256:${string}` | null;
+    contextManifestHash: `sha256:${string}`;
+    symbolGraphManifestHash: `sha256:${string}` | null;
+    symbolQueryManifestHash: `sha256:${string}` | null;
+    factManifestHash: `sha256:${string}`;
+  }>;
+  readonly boundaries: Readonly<Record<"evidence" | "repository" | "retrieval" | "tokens" | "trust", string>>;
+  readonly budget: Readonly<{
+    maxTokens: number;
+    usedTokens: number;
+    estimator: Readonly<{ id: string; version: string; exact: boolean }>;
+    truncated: boolean;
+  }>;
+  readonly manifestHash: `sha256:${string}`;
+}
+export function buildProofContext(query: string, options?: {
+  cwd?: string;
+  maxTokens?: number;
+  maxChars?: number;
+  limit?: number;
+  symbolLimit?: number;
+  fileLimit?: number;
+  factLimit?: number;
+  authorityScopes?: readonly string[];
+  repositoryIds?: readonly string[];
+  persistSymbols?: boolean;
+  tokenEstimator?: QarinahTokenEstimator;
+  clock?: () => Date;
+  signal?: AbortSignal;
+}): Promise<Readonly<QarinahProofContext>>;
+export function validateProofContext(value: unknown): Readonly<QarinahProofContext>;
+export function renderProofContextMarkdown(proof: QarinahProofContext): string;
 export interface QarinahProjectMemoryCycle {
   readonly schemaVersion: "qarinah.project-memory-cycle.v2";
   readonly generatedAt: string;
@@ -1389,6 +1501,7 @@ export interface QarinahDeveloperMemoryView {
   readonly tools: readonly Record<string, unknown>[];
   readonly outcomes: readonly Record<string, unknown>[];
   readonly sessions: QarinahSessionContextReceiptIndex;
+  readonly proof: QarinahProofContext;
   readonly symbols: Readonly<{
     available: boolean;
     reason?: string;
@@ -1408,6 +1521,7 @@ export function buildDeveloperMemoryView(options?: {
   query?: string;
   includeWorktrees?: boolean;
   limit?: number;
+  proofMaxTokens?: number;
   clock?: () => Date;
 }): Promise<Readonly<QarinahDeveloperMemoryView>>;
 export interface QarinahMemoryDashboard {

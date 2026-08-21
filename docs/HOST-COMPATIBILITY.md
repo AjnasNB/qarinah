@@ -24,7 +24,7 @@ Qarinah does not capture hidden reasoning, credentials, private browser state, o
 
 ## Preview, install, and remove one host safely
 
-The 0.5.0-rc.1 installer is deliberately narrower than `setup`: it handles one reviewed project-scoped host surface and records exact ownership. Always inspect the dry run first.
+The 0.6.0-alpha.1 installer is deliberately narrower than `setup`: it handles one reviewed project-scoped host surface and records exact ownership. Always inspect the dry run first.
 
 ```sh
 npx qarinah install . --host freebuff --scope project --dry-run --allow-query

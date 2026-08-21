@@ -115,16 +115,17 @@ test("website worker permanently canonicalizes scheme and host before delegating
 });
 
 test("trusted npm publishing retries eventual-consistency signature checks", async () => {
-  const workflow = await readFile(
-    path.join(root, ".github", "workflows", "publish-npm.yml"),
-    "utf8"
-  );
+  const [workflow, packageSource] = await Promise.all([
+    readFile(path.join(root, ".github", "workflows", "publish-npm.yml"), "utf8"),
+    readFile(path.join(root, "package.json"), "utf8")
+  ]);
+  const packageVersion = JSON.parse(packageSource).version;
 
   assert.match(workflow, /for attempt in \{1\.\.10\}/);
   assert.match(workflow, /if npm audit signatures; then/);
   assert.match(workflow, /Registry signature verification was not ready/);
   assert.match(workflow, /Registry signature verification did not succeed/);
-  assert.match(workflow, /default: 0\.5\.0-rc\.1/);
+  assert.match(workflow, new RegExp(`default: ${packageVersion.replaceAll(".", "\\.")}`, "u"));
   assert.match(workflow, /dist_tag:[\s\S]*?default: next/);
   assert.match(workflow, /Stable releases must use the latest dist-tag/);
   assert.match(workflow, /Prereleases must use the next dist-tag/);

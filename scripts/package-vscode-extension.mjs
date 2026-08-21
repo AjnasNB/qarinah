@@ -1,13 +1,14 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdir, stat } from "node:fs/promises";
+import { mkdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const extensionRoot = path.join(repositoryRoot, "integrations", "vscode", "qarinah-memory");
 const outputDirectory = path.join(repositoryRoot, "artifacts");
-const outputPath = path.join(outputDirectory, "qarinah-developer-memory-0.5.0-rc.1.vsix");
+const extensionManifest = JSON.parse(await readFile(path.join(extensionRoot, "package.json"), "utf8"));
+const outputPath = path.join(outputDirectory, `qarinah-developer-memory-${extensionManifest.version}.vsix`);
 const vscePath = path.join(repositoryRoot, "node_modules", "@vscode", "vsce", "vsce");
 
 await mkdir(outputDirectory, { recursive: true });

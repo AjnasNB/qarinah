@@ -12,25 +12,27 @@ const conceptDoi = "https://doi.org/10.5281/zenodo.21547684";
 const doi = conceptDoi;
 const publishedV14Doi = "https://doi.org/10.5281/zenodo.21850747";
 const historicalVersionDoi = "https://doi.org/10.5281/zenodo.21843240";
-const paperVersion = "1.7";
+const paperVersion = "1.8";
 const paperPdf = `/paper/Qarinah-Technical-White-Paper-v${paperVersion}.pdf`;
 const historicalPaperPdfs = new Map([
   ["Qarinah-Technical-White-Paper-v1.2.pdf", "/paper/Qarinah-Technical-White-Paper-v1.2.pdf"],
   ["Qarinah-Technical-White-Paper-v1.3.pdf", "/paper/Qarinah-Technical-White-Paper-v1.3.pdf"],
   ["Qarinah-Technical-White-Paper-v1.4.pdf", "/paper/Qarinah-Technical-White-Paper-v1.4.pdf"],
   ["Qarinah-Technical-White-Paper-v1.5.pdf", "/paper/Qarinah-Technical-White-Paper-v1.5.pdf"],
-  ["Qarinah-Technical-White-Paper-v1.6.pdf", "/paper/Qarinah-Technical-White-Paper-v1.6.pdf"]
+  ["Qarinah-Technical-White-Paper-v1.6.pdf", "/paper/Qarinah-Technical-White-Paper-v1.6.pdf"],
+  ["Qarinah-Technical-White-Paper-v1.7.pdf", "/paper/Qarinah-Technical-White-Paper-v1.7.pdf"]
 ]);
-const releaseDate = "2026-08-19";
-const paperPublishedDate = "2026-08-20";
-const publicMetricsUpdatedDate = "2026-08-20";
+const releaseDate = "2026-08-21";
+const paperPublishedDate = "2026-08-21";
+const publicMetricsUpdatedDate = "2026-08-21";
 const toolkitArticleDate = "2026-08-16";
 const worktreeArticleDate = "2026-08-16";
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 const benchmarkRelease = JSON.parse(await readFile(path.join(root, "bench", "results", "benchmark-release-0.1.6.json"), "utf8"));
 const worktreeContinuity = JSON.parse(await readFile(path.join(root, "bench", "results", "worktree-continuity-v0.4.0.json"), "utf8"));
-const deepMemoryPlatform = JSON.parse(await readFile(path.join(root, "bench", "results", "deep-memory-platform-v0.5.0-rc.1.json"), "utf8"));
-const publicProjectMemory = JSON.parse(await readFile(path.join(root, "bench", "results", "public-project-memory-0.5.json"), "utf8"));
+const deepMemoryPlatform = JSON.parse(await readFile(path.join(root, "bench", "results", `deep-memory-platform-v${packageJson.version}.json`), "utf8"));
+const publicProjectMemory = JSON.parse(await readFile(path.join(root, "bench", "results", `public-project-memory-v${packageJson.version}.json`), "utf8"));
+const proofContext = JSON.parse(await readFile(path.join(root, "bench", "results", "proof-context-0.6.0-alpha.1.json"), "utf8"));
 const productVersion = packageJson.version;
 const productPositioning = "Verifiable project memory, exact source recovery, and cited context for coding agents.";
 const productExplanation = "Qarinah keeps permitted project evidence and explicitly archived source bytes beside the repository, connects symbols, decisions, outcomes, and Git worktrees in one searchable graph, and compiles the cited context needed by Codex, Claude Code, Cursor, and compatible tools.";
@@ -42,7 +44,7 @@ if (worktreeContinuity.schemaVersion !== "qarinah.worktree-continuity-evaluation
   throw new Error("The worktree-continuity website claim does not match the checked release artifact.");
 }
 if (deepMemoryPlatform.schemaVersion !== "qarinah.deep-memory-platform-evaluation.v1"
-  || deepMemoryPlatform.packageVersion !== "0.5.0-rc.1"
+  || deepMemoryPlatform.packageVersion !== packageJson.version
   || deepMemoryPlatform.aggregate.scenarioCount !== 12
   || deepMemoryPlatform.aggregate.passed !== 12
   || deepMemoryPlatform.aggregate.failed !== 0
@@ -51,10 +53,11 @@ if (deepMemoryPlatform.schemaVersion !== "qarinah.deep-memory-platform-evaluatio
   || deepMemoryPlatform.observed.indexedSymbols !== 4
   || deepMemoryPlatform.observed.resolvedReferences !== 3
   || deepMemoryPlatform.observed.citedFacts !== 2
-  || deepMemoryPlatform.artifactHash !== "sha256:3183af0c8ce57ac63d49a4ee930ca93286d2767509b53f2d613444e8735e920f") {
+  || deepMemoryPlatform.artifactHash !== "sha256:a9c6a3e131678bdb2006f731d5e2750d29d5518d08f8b36182f27afdfd3cbc50") {
   throw new Error("The deep-memory website claim does not match the checked release artifact.");
 }
 if (publicProjectMemory.schemaVersion !== "qarinah.public-project-memory-evaluation.v1"
+  || publicProjectMemory.implementation.version !== packageJson.version
   || publicProjectMemory.scenarios.total !== 10
   || publicProjectMemory.scenarios.passed !== 10
   || publicProjectMemory.scenarios.items.some((scenario) => scenario.passed !== true)
@@ -63,6 +66,19 @@ if (publicProjectMemory.schemaVersion !== "qarinah.public-project-memory-evaluat
   || publicProjectMemory.scope.privateDataUsed !== false
   || publicProjectMemory.scope.providerCalls !== 0) {
   throw new Error("The public-project website claim does not match the checked release artifact.");
+}
+if (proofContext.schemaVersion !== "qarinah.proof-context-evaluation.v1"
+  || proofContext.implementation !== "0.6.0-alpha.1"
+  || proofContext.metrics.acceptedTaskPackets !== 12
+  || proofContext.metrics.expectedFileHitAt5 !== 1
+  || proofContext.metrics.expectedSymbolHitAt5Files !== 1
+  || proofContext.metrics.currentEvidenceRecall !== 1
+  || proofContext.metrics.staleEvidenceRejection !== 1
+  || proofContext.metrics.citationValidity !== 1
+  || proofContext.metrics.budgetConformance !== 1
+  || proofContext.metrics.deterministicManifestReproduction !== 1
+  || proofContext.metrics.manifestTamperRejection !== true) {
+  throw new Error("The proof-context website claim does not match the checked release artifact.");
 }
 const repeatedContextMetric = benchmarkRelease.headlineContextResults.find((result) => result.id === "six-task-repeated-context");
 if (!repeatedContextMetric
@@ -92,6 +108,20 @@ const publicMetrics = {
   estimator: benchmarkRelease.portableTokenEstimator.method,
   providerBillingMeasurement: false,
   metrics: {
+    proofCarryingTaskContext: {
+      scenarios: proofContext.method.scenarioCount,
+      accepted: proofContext.metrics.acceptedTaskPackets,
+      expectedFileHitAt5: proofContext.metrics.expectedFileHitAt5,
+      expectedSymbolHitAt5Files: proofContext.metrics.expectedSymbolHitAt5Files,
+      currentEvidenceRecall: proofContext.metrics.currentEvidenceRecall,
+      staleEvidenceRejection: proofContext.metrics.staleEvidenceRejection,
+      citationValidity: proofContext.metrics.citationValidity,
+      budgetConformance: proofContext.metrics.budgetConformance,
+      deterministicManifestReproduction: proofContext.metrics.deterministicManifestReproduction,
+      manifestTamperRejection: proofContext.metrics.manifestTamperRejection,
+      evidenceSource: `${github}/blob/main/bench/results/proof-context-0.6.0-alpha.1.json`,
+      boundary: proofContext.boundaries
+    },
     realGitWorktreeContinuity: {
       protocol: worktreeContinuity.protocol.id,
       scenarios: worktreeContinuity.aggregate.scenarioCount,
@@ -112,7 +142,7 @@ const publicMetrics = {
       resolvedReferences: deepMemoryPlatform.observed.resolvedReferences,
       citedFacts: deepMemoryPlatform.observed.citedFacts,
       artifactHash: deepMemoryPlatform.artifactHash,
-      evidenceSource: `${github}/blob/main/bench/results/deep-memory-platform-v0.5.0-rc.1.json`,
+      evidenceSource: `${github}/blob/main/bench/results/deep-memory-platform-v${packageJson.version}.json`,
       boundary: deepMemoryPlatform.protocol.scope
     },
     publicProjectMemory: {
@@ -127,7 +157,7 @@ const publicMetrics = {
       providerCalls: publicProjectMemory.scope.providerCalls,
       privateDataUsed: publicProjectMemory.scope.privateDataUsed,
       manifestHash: publicProjectMemory.manifestHash,
-      evidenceSource: `${github}/blob/main/bench/results/public-project-memory-0.5.json`,
+      evidenceSource: `${github}/blob/main/bench/results/public-project-memory-v${packageJson.version}.json`,
       boundary: publicProjectMemory.boundaries
     },
     repeatedProjectContext: {
@@ -167,6 +197,7 @@ const publicMetrics = {
   methodology: `${siteOrigin}/docs/benchmarks/`
 };
 const qarinahFeatures = [
+  "Proof-carrying task packets joining current memory, temporal facts, and ranked code symbols",
   "Encrypted lossless source snapshots with exact-byte restore",
   "Pinned multi-language symbol and reference graph",
   "Built-in deterministic lexical and local-vector retrieval",
@@ -197,6 +228,10 @@ const qarinahFeatures = [
   "Deterministic Markdown, JSON, graph, and OKF exports"
 ];
 const answerEngineQuestions = [
+  {
+    name: "What is a proof-carrying Qarinah task context?",
+    text: "It is one bounded packet that joins current cited project events, temporal facts, and query-ranked files and symbols. Every selection includes a reason and verifiable identity, and the complete packet has a tamper-evident manifest."
+  },
   {
     name: "What is Qarinah?",
     text: `${productPositioning} ${productExplanation}`
@@ -476,6 +511,14 @@ const docPages = [
     description: "Consolidate bounded project evidence into strict cited facts with deterministic local extraction or an optional host-model adapter.",
     section: "Use",
     aliases: ["fact extraction", "memory consolidation", "cited project facts", "model assisted memory"]
+  },
+  {
+    route: "docs/proof-carrying-context",
+    source: "docs/PROOF-CARRYING-CONTEXT.md",
+    title: "Proof-carrying task context",
+    description: "Compile one bounded task packet from current cited memory, temporal facts, and query-ranked repository files and symbols with explicit selection reasons and a tamper-evident manifest.",
+    section: "Use",
+    aliases: ["task context", "proof context", "repository context", "selection receipt", "temporal facts", "code memory packet"]
   },
   {
     route: "docs/private-projects",
@@ -780,6 +823,8 @@ for (const filename of [
   "Qarinah-Technical-White-Paper-v1.3.pdf",
   "Qarinah-Technical-White-Paper-v1.4.pdf",
   "Qarinah-Technical-White-Paper-v1.5.pdf",
+  "Qarinah-Technical-White-Paper-v1.6.pdf",
+  "Qarinah-Technical-White-Paper-v1.7.pdf",
   `Qarinah-Technical-White-Paper-v${paperVersion}.pdf`
 ]) {
   await cp(path.join(root, "output", "pdf", filename), path.join(output, "paper", filename));
@@ -1310,9 +1355,9 @@ function homePage() {
             <p class="eyebrow">Verifiable memory for coding agents</p>
             <h1>Your project remembers. Every agent gets the proof.</h1>
             <p class="hero-lede">Preserve permitted project evidence and explicitly archived source bytes beside the code. Qarinah links symbols, decisions, outcomes, sessions, and Git worktrees in one searchable graph, then delivers a bounded cited context pack for the next task.</p>
-            <a class="hero-context-proof" href="/docs/public-project-memory-evaluation/" aria-label="10 of 10 public-project memory scenarios passed. Read the method and artifact.">
-              <strong>${publicProjectMemory.scenarios.passed} / ${publicProjectMemory.scenarios.total}</strong>
-              <span><b>public-project memory checks passed</b><small>${publicProjectMemory.observed.indexedSymbolFiles} of ${publicProjectMemory.observed.eligibleSymbolFiles} eligible source files indexed, exact definitions found, session receipt and cited continuation verified</small></span>
+            <a class="hero-context-proof" href="/docs/proof-carrying-context/" aria-label="12 of 12 proof-carrying task packets passed. Read the method and artifact.">
+              <strong>${proofContext.metrics.acceptedTaskPackets} / ${proofContext.method.scenarioCount}</strong>
+              <span><b>proof-carrying task packets passed</b><small>expected file and symbol selected, current evidence retained, stale evidence excluded, budget held, identical manifest reproduced</small></span>
             </a>
             <div class="hero-actions">
               <a class="btn btn-primary btn-large" href="/docs/getting-started/">Set up this worktree</a>
@@ -1361,6 +1406,7 @@ function homePage() {
           <article class="use-mode-card"><span>Timeline</span><h3>Decisions, tools, outcomes, conflicts</h3><p>Follow the visible execution history without flattening disagreement or superseded decisions.</p><a href="/docs/dashboard/">Open the dashboard guide</a></article>
           <article class="use-mode-card"><span>Receipts</span><h3>Exact session lifecycle and delivery</h3><p>Bind the ordered event manifest, observed lifecycle, turn outcomes, source head, selected evidence, and delivered pack without copying event bodies.</p><a href="/docs/coding-context-harness/">Inspect session handoffs</a></article>
           <article class="use-mode-card"><span>Editors</span><h3>VS Code, Cursor, and standard LSP</h3><p>Replay session details in the sandboxed panel or attach the multi-language LSP through the packaged JetBrains LSP4IJ template and other compatible clients.</p><a href="/docs/host-compatibility/">Connect an editor</a></article>
+          <article class="use-mode-card"><span>Task proof</span><h3>One packet, every selection explained</h3><p>Join current events, temporal facts, ranked files, and exact code symbols under one budget and tamper-evident manifest.</p><a href="/docs/proof-carrying-context/">Inspect the task packet</a></article>
         </div>
         <p class="benchmark-ribbon-note"><strong>Reproducible acceptance result:</strong> a fresh local evaluator creates three actual Git worktrees and passes all 16 isolation, retrieval, receipt, conflict, and incremental-compaction scenarios. <a href="/docs/worktree-context/">Method and machine-readable artifact</a>.</p>
       </section>
@@ -1455,9 +1501,9 @@ function homePage() {
           </div>
           <div class="benchmark-ribbon-grid">
             <article>
-              <strong>98.7148%</strong>
-              <span>Six-task repeated-context reduction</span>
-              <small>442,113 -&gt; 5,682 estimated tokens</small>
+              <strong>12 / 12</strong>
+              <span>Proof-carrying task packets accepted</span>
+              <small>expected code + current evidence + stale rejection</small>
             </article>
             <article>
               <strong>98.75%</strong>
