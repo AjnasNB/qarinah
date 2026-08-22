@@ -2,7 +2,7 @@
   "name": "qarinah-developer-memory",
   "displayName": "Qarinah Developer Memory",
   "description": "A local, searchable proof-carrying task context, project-memory graph, timeline, receipts, and Git worktree comparison for VS Code and Cursor.",
-  "version": "0.6.0-alpha.1",
+  "version": "0.6.0",
   "publisher": "ajnasnb",
   "license": "Apache-2.0",
   "engines": {

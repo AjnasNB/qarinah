@@ -22,9 +22,9 @@ const historicalPaperPdfs = new Map([
   ["Qarinah-Technical-White-Paper-v1.6.pdf", "/paper/Qarinah-Technical-White-Paper-v1.6.pdf"],
   ["Qarinah-Technical-White-Paper-v1.7.pdf", "/paper/Qarinah-Technical-White-Paper-v1.7.pdf"]
 ]);
-const releaseDate = "2026-08-21";
-const paperPublishedDate = "2026-08-21";
-const publicMetricsUpdatedDate = "2026-08-21";
+const releaseDate = "2026-08-22";
+const paperPublishedDate = "2026-08-22";
+const publicMetricsUpdatedDate = "2026-08-22";
 const toolkitArticleDate = "2026-08-16";
 const worktreeArticleDate = "2026-08-16";
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
@@ -32,7 +32,7 @@ const benchmarkRelease = JSON.parse(await readFile(path.join(root, "bench", "res
 const worktreeContinuity = JSON.parse(await readFile(path.join(root, "bench", "results", "worktree-continuity-v0.4.0.json"), "utf8"));
 const deepMemoryPlatform = JSON.parse(await readFile(path.join(root, "bench", "results", `deep-memory-platform-v${packageJson.version}.json`), "utf8"));
 const publicProjectMemory = JSON.parse(await readFile(path.join(root, "bench", "results", `public-project-memory-v${packageJson.version}.json`), "utf8"));
-const proofContext = JSON.parse(await readFile(path.join(root, "bench", "results", "proof-context-0.6.0-alpha.1.json"), "utf8"));
+const proofContext = JSON.parse(await readFile(path.join(root, "bench", "results", "proof-context-0.6.0.json"), "utf8"));
 const productVersion = packageJson.version;
 const productPositioning = "Verifiable project memory, exact source recovery, and cited context for coding agents.";
 const productExplanation = "Qarinah keeps permitted project evidence and explicitly archived source bytes beside the repository, connects symbols, decisions, outcomes, and Git worktrees in one searchable graph, and compiles the cited context needed by Codex, Claude Code, Cursor, and compatible tools.";
@@ -53,7 +53,7 @@ if (deepMemoryPlatform.schemaVersion !== "qarinah.deep-memory-platform-evaluatio
   || deepMemoryPlatform.observed.indexedSymbols !== 4
   || deepMemoryPlatform.observed.resolvedReferences !== 3
   || deepMemoryPlatform.observed.citedFacts !== 2
-  || deepMemoryPlatform.artifactHash !== "sha256:a9c6a3e131678bdb2006f731d5e2750d29d5518d08f8b36182f27afdfd3cbc50") {
+  || deepMemoryPlatform.artifactHash !== "sha256:4736652101ffde46e450983285be3f41c74f850728bc4b59848c45b063afb112") {
   throw new Error("The deep-memory website claim does not match the checked release artifact.");
 }
 if (publicProjectMemory.schemaVersion !== "qarinah.public-project-memory-evaluation.v1"
@@ -68,7 +68,7 @@ if (publicProjectMemory.schemaVersion !== "qarinah.public-project-memory-evaluat
   throw new Error("The public-project website claim does not match the checked release artifact.");
 }
 if (proofContext.schemaVersion !== "qarinah.proof-context-evaluation.v1"
-  || proofContext.implementation !== "0.6.0-alpha.1"
+  || proofContext.implementation !== "0.6.0"
   || proofContext.metrics.acceptedTaskPackets !== 12
   || proofContext.metrics.expectedFileHitAt5 !== 1
   || proofContext.metrics.expectedSymbolHitAt5Files !== 1
@@ -119,7 +119,7 @@ const publicMetrics = {
       budgetConformance: proofContext.metrics.budgetConformance,
       deterministicManifestReproduction: proofContext.metrics.deterministicManifestReproduction,
       manifestTamperRejection: proofContext.metrics.manifestTamperRejection,
-      evidenceSource: `${github}/blob/main/bench/results/proof-context-0.6.0-alpha.1.json`,
+      evidenceSource: `${github}/blob/main/bench/results/proof-context-0.6.0.json`,
       boundary: proofContext.boundaries
     },
     realGitWorktreeContinuity: {

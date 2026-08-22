@@ -8,7 +8,7 @@ function payload(overrides = {}) {
     consentVersion: "2026-08-22",
     installationId: "b21c8f80-c23a-4ea1-b997-7b4928261a9f",
     event: "first_retrieval",
-    version: "0.6.0-alpha.1",
+    version: "0.6.0",
     platform: "win32",
     occurredAt: "2026-08-22T10:00:00.000Z",
     ...overrides
@@ -34,7 +34,7 @@ test("activation worker accepts one bounded content-free event", async () => {
   assert.equal(points.length, 1);
   assert.deepEqual(points[0], {
     indexes: ["b21c8f80-c23a-4ea1-b997-7b4928261a9f"],
-    blobs: ["first_retrieval", "0.6.0-alpha.1", "win32", "2026-08-22"],
+    blobs: ["first_retrieval", "0.6.0", "win32", "2026-08-22"],
     doubles: [1]
   });
 });

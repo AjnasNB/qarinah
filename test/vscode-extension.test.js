@@ -7,7 +7,7 @@ const root = new URL("../integrations/vscode/qarinah-memory/", import.meta.url);
 test("VS Code and Cursor panel package is local, read-only, searchable, and exact-versioned", async () => {
   const manifest = JSON.parse(await readFile(new URL("package.json", root), "utf8"));
   const source = await readFile(new URL("extension.cjs", root), "utf8");
-  assert.equal(manifest.version, "0.6.0-alpha.1");
+  assert.equal(manifest.version, "0.6.0");
   assert.equal(manifest.main, "./extension.cjs");
   assert.equal(manifest.contributes.views.qarinah[0].id, "qarinah.developerMemory");
   assert.match(source, /"panel", "--limit", "80"/u);

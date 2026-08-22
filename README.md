@@ -86,14 +86,14 @@ npx qarinah dashboard --serve --worktrees
 
 ### Reproducible proof-context result
 
-The 0.6.0-alpha.1 evaluator creates a 12-file repository across ten registered language families and pairs every current decision with a superseded predecessor. It passes **12 / 12** task-packet scenarios: the expected file and symbol are selected, current evidence is retrieved, stale evidence is excluded and identified, hashes remain valid, the packet stays inside 4,096 portable estimated tokens, and an unchanged rerun reproduces the same manifest. A separate mutation is rejected by `validateProofContext()`.
+The 0.6.0 evaluator creates a 12-file repository across ten registered language families and pairs every current decision with a superseded predecessor. It passes **12 / 12** task-packet scenarios: the expected file and symbol are selected, current evidence is retrieved, stale evidence is excluded and identified, hashes remain valid, the packet stays inside 4,096 portable estimated tokens, and an unchanged rerun reproduces the same manifest. A separate mutation is rejected by `validateProofContext()`.
 
 ```sh
 npm run evaluate:proof-context
 npm run check:proof-context-evidence
 ```
 
-Inspect the [machine-readable result](bench/results/proof-context-0.6.0-alpha.1.json) and [evaluator](scripts/evaluate-proof-context.mjs). This is deterministic acceptance evidence over a generated repository, not a universal accuracy, cost, or cross-product claim.
+Inspect the [machine-readable result](bench/results/proof-context-0.6.0.json) and [evaluator](scripts/evaluate-proof-context.mjs). This is deterministic acceptance evidence over a generated repository, not a universal accuracy, cost, or cross-product claim.
 
 ### Reproducible public-checkout memory result
 
@@ -103,17 +103,17 @@ The current evaluator copies Qarinah's public source into an isolated temporary 
 npm run check:public-project-memory
 ```
 
-Read the [method and boundaries](docs/PUBLIC-PROJECT-MEMORY-EVALUATION.md) or inspect the [0.6.0-alpha.1 machine-readable result](bench/results/public-project-memory-v0.6.0-alpha.1.json). Historical receipts remain unchanged, and exact file counts are refreshed before each release commit.
+Read the [method and boundaries](docs/PUBLIC-PROJECT-MEMORY-EVALUATION.md) or inspect the [0.6.0 machine-readable result](bench/results/public-project-memory-v0.6.0.json). Historical receipts remain unchanged, and exact file counts are refreshed before each release commit.
 
 ### Reproducible deep-memory product result
 
-The 0.6.0-alpha.1 product evaluator runs the full local path in a temporary initialized project: incremental source refresh, symbol and cross-file-reference indexing, cited fact consolidation, two encrypted content snapshots, integrity verification, and exact byte restoration. It passes **12 / 12** scenarios, restores **390,226 source bytes exactly**, reuses **2 of 3** chunks in the second snapshot, indexes **4 symbols** and **3 resolved references**, and retains **2 cited facts**.
+The 0.6.0 product evaluator runs the full local path in a temporary initialized project: incremental source refresh, symbol and cross-file-reference indexing, cited fact consolidation, two encrypted content snapshots, integrity verification, and exact byte restoration. It passes **12 / 12** scenarios, restores **390,226 source bytes exactly**, reuses **2 of 3** chunks in the second snapshot, indexes **4 symbols** and **3 resolved references**, and retains **2 cited facts**.
 
 ```sh
 npm run check:deep-memory
 ```
 
-Inspect the [machine-readable result](bench/results/deep-memory-platform-v0.6.0-alpha.1.json) and [evaluator](scripts/evaluate-deep-memory-platform.mjs). Historical receipts remain unchanged. This is local product-acceptance evidence, not a cross-product comparison or a promise about arbitrary repositories.
+Inspect the [machine-readable result](bench/results/deep-memory-platform-v0.6.0.json) and [evaluator](scripts/evaluate-deep-memory-platform.mjs). Historical receipts remain unchanged. This is local product-acceptance evidence, not a cross-product comparison or a promise about arbitrary repositories.
 
 ### Reproducible real-Git-worktree acceptance result
 
@@ -603,15 +603,15 @@ The repository also runs `npm run mcp:smoke` against the exact bundled Codex and
 
 ### Install once, initialize each project
 
-Install the reviewed `v0.6.0-alpha.1` plugin once in each host after the alpha is published:
+Install the reviewed `v0.6.0` plugin once in each host after the alpha is published:
 
 ```sh
 # Codex: personal installation, available to opted-in projects.
-codex plugin marketplace add AjnasNB/qarinah --ref v0.6.0-alpha.1
+codex plugin marketplace add AjnasNB/qarinah --ref v0.6.0
 codex plugin add qarinah@qarinah
 
 # Claude Code: personal installation across projects.
-claude plugin marketplace add AjnasNB/qarinah@v0.6.0-alpha.1 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.6.0 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 

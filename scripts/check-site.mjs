@@ -374,8 +374,8 @@ if (!home.includes("Verifiable project memory, exact source recovery, and cited 
   errors.push("Homepage is missing the worktree-aware category or the separate historical benchmark scope.");
 }
 if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
-  || publicMetrics.productVersion !== "0.6.0-alpha.1"
-  || publicMetrics.updatedAt !== "2026-08-21"
+  || publicMetrics.productVersion !== "0.6.0"
+  || publicMetrics.updatedAt !== "2026-08-22"
   || publicMetrics.providerBillingMeasurement !== false
   || publicMetrics.metrics?.proofCarryingTaskContext?.scenarios !== 12
   || publicMetrics.metrics?.proofCarryingTaskContext?.accepted !== 12
@@ -399,7 +399,7 @@ if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.indexedSymbols !== 4
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.resolvedReferences !== 3
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.citedFacts !== 2
-  || publicMetrics.metrics?.deepMemoryProductAcceptance?.artifactHash !== "sha256:a9c6a3e131678bdb2006f731d5e2750d29d5518d08f8b36182f27afdfd3cbc50"
+  || publicMetrics.metrics?.deepMemoryProductAcceptance?.artifactHash !== "sha256:4736652101ffde46e450983285be3f41c74f850728bc4b59848c45b063afb112"
   || publicMetrics.metrics?.publicProjectMemory?.scenarios !== 10
   || publicMetrics.metrics?.publicProjectMemory?.passed !== 10
   || publicMetrics.metrics?.publicProjectMemory?.indexedSymbolFiles !== publicMetrics.metrics?.publicProjectMemory?.eligibleSymbolFiles
@@ -554,7 +554,7 @@ if (!paper.includes("https://doi.org/10.5281/zenodo.21850747")
   || !paper.includes("https://doi.org/10.5281/zenodo.21547684")
   || !paper.includes("https://doi.org/10.5281/zenodo.21843240")
   || !paper.includes('"creativeWorkStatus":"Published"')
-  || !paper.includes('"datePublished":"2026-08-21"')) {
+  || !paper.includes('"datePublished":"2026-08-22"')) {
   errors.push("Paper page must bind current v1.8 to the paper series and preserve published v1.4/v1.3 DOIs.");
 }
 if (/activates on publication|not registered or published|DOI reserved|assigned only when this manuscript is deposited|assigned by Zenodo when v1\.4 is deposited|A version DOI is assigned/iu.test(paper)) {

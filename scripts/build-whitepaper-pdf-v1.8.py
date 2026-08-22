@@ -89,7 +89,7 @@ def cover_story():
             "Multi-language developer memory with verifiable task packets"
         ),
         "Paper version 1.7 - August 2026": "Paper version 1.8 - August 2026",
-        "Qarinah 0.5.0-rc.1": "Qarinah 0.6.0-alpha.1",
+        "Qarinah 0.5.0-rc.1": "Qarinah 0.6.0",
         "Version 1.7 has no version DOI until a separate deposit is completed.": (
             "Version 1.8 has no version DOI until a separate deposit is completed."
         ),

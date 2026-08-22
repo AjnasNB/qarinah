@@ -9,7 +9,7 @@ Install Qarinah in the project or on `PATH`, initialize the project, then instal
 ```sh
 npm install --save-dev qarinah@next
 npx qarinah setup . --cursor --auto-compact
-code --install-extension qarinah-developer-memory-0.6.0-alpha.1.vsix
+code --install-extension qarinah-developer-memory-0.6.0.vsix
 ```
 
 Cursor accepts the same VSIX through its Extensions view or compatible command-line installer.

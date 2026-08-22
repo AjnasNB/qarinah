@@ -130,7 +130,8 @@ test("trusted npm publishing retries eventual-consistency signature checks", asy
   assert.match(workflow, /Registry signature verification was not ready/);
   assert.match(workflow, /Registry signature verification did not succeed/);
   assert.match(workflow, new RegExp(`default: ${packageVersion.replaceAll(".", "\\.")}`, "u"));
-  assert.match(workflow, /dist_tag:[\s\S]*?default: next/);
+  const expectedDefaultTag = packageVersion.includes("-") ? "next" : "latest";
+  assert.match(workflow, new RegExp(`dist_tag:[\\s\\S]*?default: ${expectedDefaultTag}`, "u"));
   assert.match(workflow, /Stable releases must use the latest dist-tag/);
   assert.match(workflow, /Prereleases must use the next dist-tag/);
 });
