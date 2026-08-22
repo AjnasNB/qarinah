@@ -19,7 +19,11 @@ test("website deployment is bound to exact published Qarinah assets", async () =
   assert.equal(config.assets.binding, "ASSETS");
   assert.equal(config.assets.html_handling, "auto-trailing-slash");
   assert.equal(config.assets.run_worker_first, true);
-  assert.equal(config.compatibility_date, "2026-08-08");
+  assert.equal(config.compatibility_date, "2026-08-22");
+  assert.deepEqual(config.compatibility_flags, ["nodejs_compat"]);
+  assert.deepEqual(config.analytics_engine_datasets, [
+    { binding: "ACTIVATION", dataset: "qarinah_activation" }
+  ]);
   assert.equal(config.workers_dev, false);
   assert.equal(config.preview_urls, false);
   assert.deepEqual(config.routes, [
@@ -51,7 +55,7 @@ test("website deployment is bound to exact published Qarinah assets", async () =
   assert.match(workflow, /refusing to build or deploy the site/);
   assert.match(workflow, /npm run build:site/);
   assert.match(workflow, /npm run check:site/);
-  assert.match(workflow, /wranglerVersion: "4\.120\.0"/);
+  assert.match(workflow, /wranglerVersion: "4\.125\.0"/);
   assert.match(workflow, /secrets\.CLOUDFLARE_API_TOKEN/);
   assert.match(workflow, /secrets\.CLOUDFLARE_ACCOUNT_ID/);
   assert.doesNotMatch(workflow, /gitHubToken:/);
