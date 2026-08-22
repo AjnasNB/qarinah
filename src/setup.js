@@ -9,6 +9,7 @@ import { writeProjectOverview } from "./project-overview.js";
 import { scanProjectStructure } from "./project-structure.js";
 import { verifyStore } from "./store.js";
 import { QARINAH_VERSION } from "./version.js";
+import { configureActivationTracking, recordActivationEvent } from "./activation.js";
 import {
   atomicWriteFile,
   initializeWorkspace,
@@ -417,6 +418,15 @@ export async function setupWorkspace(options = {}) {
   const overview = await writeProjectOverview({ cwd: workspace.root });
   const dashboard = await writeMemoryDashboard({ cwd: workspace.root });
   const health = await verifyStore(workspace.root, { updateCheckpoint: false });
+  let activation = Object.freeze({ enabled: false, sent: false, reason: "not-enabled" });
+  if (options.shareActivation === true) {
+    await configureActivationTracking({ cwd: workspace.root, enabled: true });
+    const setupEvent = await recordActivationEvent("setup_completed", { cwd: workspace.root });
+    const captureEvent = projectStructure.captured
+      ? await recordActivationEvent("first_capture", { cwd: workspace.root })
+      : null;
+    activation = Object.freeze({ enabled: true, setupEvent, captureEvent });
+  }
   return Object.freeze({
     ok: true,
     root: workspace.root,
@@ -430,6 +440,15 @@ export async function setupWorkspace(options = {}) {
     backup,
     overview: overview.output,
     dashboard: dashboard.output,
-    health
+    health,
+    activation,
+    firstRun: Object.freeze({
+      message: projectStructure.captured
+        ? `Qarinah is ready. It mapped ${projectStructure.fileCount} project files and built a cited local memory graph.`
+        : "Qarinah is ready. Its local memory graph is current.",
+      dashboard: dashboard.output,
+      tryNow: "npx qarinah query \"What decisions and outcomes should the next coding-agent session know?\" --format markdown",
+      openGraph: "npx qarinah dashboard --serve"
+    })
   });
 }

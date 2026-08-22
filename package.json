@@ -72,6 +72,7 @@
     "docs/WHITEPAPER.md",
     "docs/BENCHMARKS.md",
     "docs/PUBLIC-METRICS.md",
+    "docs/ADOPTION-METRICS.md",
     "docs/CONTEXT-EFFICIENCY-COMPARISON-v1.md",
     "docs/CONTEXT-EFFICIENCY-COMPARISON-v2-PROTOCOL.md",
     "docs/CONTEXT-EFFICIENCY-COMPARISON-v2-AMENDMENT-001.md",
@@ -126,6 +127,7 @@
     "bench/results/",
     "bench/results/research-retrieval-development-v0.5.json",
     "bench/final/",
+    "scripts/query-activation-funnel.mjs",
     "scripts/evaluate-software-tasks.mjs",
     "scripts/evaluate-worktree-continuity.mjs",
     "scripts/evaluate-deep-memory-platform.mjs",
@@ -204,6 +206,7 @@
     "README.md"
   ],
   "scripts": {
+    "adoption:funnel": "node scripts/query-activation-funnel.mjs",
     "build:plugins": "node scripts/build-plugins.mjs",
     "build:codex-plugin": "npm run build:plugins",
     "check:plugins": "node scripts/build-plugins.mjs --check",
@@ -351,7 +354,8 @@
     "cockroach-browser": "0.1.0",
     "esbuild": "0.28.1",
     "marked": "^18.0.7",
-    "typescript": "7.0.2"
+    "typescript": "7.0.2",
+    "wrangler": "^4.125.0"
   },
   "dependencies": {
     "ignore": "7.0.6",
