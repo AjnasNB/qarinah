@@ -1369,7 +1369,7 @@ function homePage() {
             <div class="worktree-repository"><small>repository group</small><strong>Qarinah project</strong><code>repo_27c94f…</code></div>
             <div class="worktree-branches">
               <article><span>main</span><strong>release context</strong><code>639ee4787a</code><small>own ledger · own consent</small></article>
-              <article><span>feature/worktree-context</span><strong>graph implementation</strong><code>3d1619c910</code><small>own ledger · own consent</small></article>
+              <article><span>feature/context</span><strong>graph implementation</strong><code>721a841379</code><small>own ledger · own consent</small></article>
             </div>
             <div class="worktree-map-footer"><span>branch + commit in snapshot hash</span><span>files + decisions in cited graph</span></div>
           </aside>
@@ -1442,10 +1442,10 @@ function homePage() {
             <p class="eyebrow">A real worktree context graph</p>
             <h2 id="dashboard-proof-title">See the branch, files, decisions, relationships, and hashes together.</h2>
           </div>
-          <p>This generated screenshot comes from two initialized Git worktrees in one real demo repository. Each checkout owns a separate ledger; the local dashboard groups their repository identity and lets a developer inspect each branch-specific graph.</p>
+          <p>This generated screenshot comes from two initialized Git worktrees in one real demo repository. The active worktree anchors the circular map while retained files, memories, and concepts occupy labeled evidence rings. Click a node to expose its status, structural importance, connections, and exact evidence identity.</p>
         </div>
         <figure class="what-you-save-figure dashboard-proof-figure">
-          <img src="/assets/qarinah-worktree-context-graph.png" width="1265" height="712" loading="lazy" decoding="async" alt="Qarinah local worktree context graph showing the feature worktree node, files, memories, concepts, evidence relationships, ranked results, and the selected node's evidence hash.">
+          <img src="/assets/qarinah-worktree-context-graph.png" width="1180" height="720" loading="lazy" decoding="async" alt="Qarinah circular local worktree context graph showing the selected feature worktree, labeled real-data nodes, evidence relationships, ranked results, and the selected node's evidence hash.">
           <figcaption>Generated from real local CLI setup, retained decisions, a project-structure v2 scan, and the hash-chained ledger. No fictional graph data or hosted account is involved.</figcaption>
         </figure>
         <div class="hero-actions dashboard-proof-actions">
@@ -1903,12 +1903,12 @@ function worktreeContextArticlePage() {
 
         <section class="dashboard-proof section shell" id="proof" aria-labelledby="worktree-proof-title">
           <div class="section-heading split-heading">
-            <div><p class="eyebrow">Generated proof</p><h2 id="worktree-proof-title">The worktree is a node, not a label pasted onto a screenshot.</h2></div>
-            <p>This image was captured from a real two-worktree demo using the release code. The selected node exposes its kind, current status, importance, connections, ranking basis, and event evidence hash.</p>
+            <div><p class="eyebrow">Generated proof</p><h2 id="worktree-proof-title">The worktree sits at the center of a real evidence graph.</h2></div>
+            <p>This image was captured from a real two-worktree demo using the release code. The circular renderer labels important nodes, highlights the selected node's relationships, and exposes its kind, status, importance, connections, ranking basis, and event evidence hash.</p>
           </div>
           <figure class="what-you-save-figure dashboard-proof-figure">
-            <img src="/assets/qarinah-worktree-context-graph.png" width="1265" height="712" loading="lazy" decoding="async" alt="Qarinah worktree context graph with the feature worktree selected and its evidence-linked files, memories, concepts, and ranked results visible.">
-            <figcaption>Real local data from branch <code>feature/worktree-context</code>. The demo repository and ledgers were created only for this public capture.</figcaption>
+            <img src="/assets/qarinah-worktree-context-graph.png" width="1180" height="720" loading="lazy" decoding="async" alt="Qarinah circular worktree context graph with the feature worktree selected and labeled evidence-linked files, memories, concepts, and ranked results visible.">
+            <figcaption>Real local data from branch <code>feature/context</code>. The demo repository and separate ledgers were created only for this public capture.</figcaption>
           </figure>
         </section>
 

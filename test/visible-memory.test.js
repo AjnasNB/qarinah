@@ -114,7 +114,8 @@ test("developer view joins graph, timeline, decisions, tools, receipts, and work
   const html = renderMemoryDashboard(dashboard);
   assert.match(html, /Exact per-session context receipts/u);
   assert.match(html, /session-panel/u);
-  assert.match(html, /Interactive linked project-memory graph/u);
+  assert.match(html, /Interactive circular project-memory graph/u);
+  assert.match(html, /Real local ledger data/u);
 });
 
 test("session receipt schema is closed and exposes only bounded measurement fields", async () => {
