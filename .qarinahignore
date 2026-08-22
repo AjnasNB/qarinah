@@ -1,0 +1,9 @@
+# Generated evaluation and publication artifacts are not implementation source.
+bench/results/
+docs/
+media/
+output/
+website/static/assets/
+
+# Host packages are regenerated from src/ and include vendored parser runtimes.
+integrations/*/qarinah/runtime/
