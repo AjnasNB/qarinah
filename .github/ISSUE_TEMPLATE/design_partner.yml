@@ -1,0 +1,66 @@
+name: Qarinah design partner
+description: Test one real fresh-session coding-agent handoff with the maintainer.
+title: "[Design partner]: "
+labels:
+  - feedback
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping test Qarinah. Do not paste source code, credentials, private repository names, or agent transcripts here. We will agree on one non-sensitive decision to recover in a fresh session.
+  - type: dropdown
+    id: workflow
+    attributes:
+      label: Coding-agent workflow
+      options:
+        - Codex to Codex
+        - Claude Code to Claude Code
+        - Codex and Claude Code
+        - Cursor or VS Code
+        - Git worktrees or parallel agents
+        - Another supported workflow
+    validations:
+      required: true
+  - type: input
+    id: public-project
+    attributes:
+      label: Public project URL, if applicable
+      description: Leave blank for a private project. Never disclose a private repository identity.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What do you repeatedly have to re-explain?
+      description: Describe the workflow, not private project content.
+    validations:
+      required: true
+  - type: dropdown
+    id: format
+    attributes:
+      label: Preferred onboarding format
+      options:
+        - Asynchronous GitHub walkthrough
+        - 20-minute setup call
+    validations:
+      required: true
+  - type: dropdown
+    id: outcome
+    attributes:
+      label: One outcome we can measure together
+      description: We will record a before and after value only after the test.
+      options:
+        - Time spent re-explaining the task
+        - Characters or tokens supplied to the fresh session
+        - Decisions correctly recovered with citations
+        - Fresh-session setup steps completed
+        - Another concrete workflow outcome
+    validations:
+      required: true
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: Boundaries
+      options:
+        - label: I understand that public quotes or attribution require my separate explicit approval.
+          required: true
+        - label: I will not include secrets or private project content in this issue.
+          required: true

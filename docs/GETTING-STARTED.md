@@ -6,6 +6,26 @@ Its primary job is verified handoffs between coding agents: start a task in one 
 
 Qarinah gives an agent a small, cited slice of project memory instead of replaying the full retained history. The record stays in the project and the generated SQLite index, graph, Markdown, JSON, dashboard, and OKF views can be rebuilt from it.
 
+## Try the isolated demo first
+
+Run one command before giving Qarinah access to a real project:
+
+```sh
+npx qarinah demo
+```
+
+The command creates a populated workspace under the operating-system temporary directory. It does not edit the current repository, configure an agent host, enable telemetry, or send project data anywhere. The JSON result includes:
+
+- the temporary workspace and dashboard paths;
+- the number of mapped fixture files;
+- a retained retry-policy decision with its event ID and SHA-256 hash;
+- the exact query that reconstructs that decision;
+- commands to open the real interactive circular graph.
+
+The expected decision is **Retry checkout requests three times**. Its cited body explains that only HTTP 429 and 503 use exponential backoff. This is the smallest reproducible fresh-session handoff Qarinah provides.
+
+Watch the exact flow in the [two-minute fresh-session handoff](https://qarinah.io/assets/qarinah-fresh-session-handoff.mp4). The recording uses the isolated fixture's real output and graph; it does not display a fictional product screen or claim that an external provider session was deleted.
+
 If the repository uses Git worktrees, run setup inside each checkout that should remember its own activity. Qarinah keeps those ledgers isolated and can group the initialized siblings later:
 
 ```sh
@@ -16,11 +36,13 @@ npx qarinah dashboard --serve --worktrees
 
 The setup command never silently initializes sibling worktrees. This prevents parallel branches from writing to the same ledger while still giving the dashboard a shared repository view.
 
-For the supported hosts, the quickest complete setup is:
+For a real project, the safe default setup is:
 
 ```sh
-npx qarinah setup . --capture content --allow-query
+npx qarinah@latest setup .
 ```
+
+This uses metadata capture, keeps context disclosure disabled, and does not share activation measurements. It maps the bounded project structure, creates the local ledger and reproducible read models, writes the dashboard, and prints the exact query and dashboard commands to try next.
 
 ## Requirements
 
@@ -28,10 +50,10 @@ npx qarinah setup . --capture content --allow-query
 - a local project you are allowed to index
 - explicit initialization in that project
 
-## Install
+## Install a pinned development dependency when needed
 
 ```sh
-npm install --save-dev qarinah@next
+npm install --save-dev qarinah@latest
 ```
 
 Qarinah has no hosted memory service, embedding bill, vector database, or Qarinah API key.
@@ -52,14 +74,23 @@ npx qarinah init . --capture content
 
 Initialization creates the portable project configuration, an empty SQLite/FTS5 read model, graph, retrieval index, and readable Markdown view. It also requests machine-local trust. Trust and revocation stay outside the repository so a cloned configuration cannot silently grant itself permission.
 
-For a complete first setup that also maps the codebase and connects supported hosts, use:
+For a content-enabled setup connected to selected supported hosts, make every broader permission explicit:
 
 ```sh
-npx qarinah setup . --capture content --allow-query
+npx qarinah setup . --codex --claude --cursor --capture content --allow-query
 npx qarinah overview
 ```
 
 `setup` records a bounded project-structure snapshot before it reports success. `overview` explains the retained work, latest outcomes, codebase areas, languages, relationships, and durable files in one readable page.
+
+To help the maintainer measure adoption without receiving project data, optionally add `--share-activation`. This is off by default and emits five once-only content-free milestones. Inspect or revoke the choice locally:
+
+```sh
+npx qarinah activation status
+npx qarinah activation disable
+```
+
+Read the [privacy contract](../PRIVACY.md#optional-content-free-activation-measurement) before opting in.
 
 ## Record one durable decision
 

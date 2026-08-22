@@ -4,23 +4,53 @@
 
 <h1 align="center">Qarinah</h1>
 
-<p align="center"><strong>Your project remembers. Every agent gets the proof.</strong></p>
+<p align="center"><strong>Start a new coding-agent session without re-explaining your project.</strong></p>
 
 <p align="center">
-  Qarinah preserves permitted project evidence and explicitly archived source bytes beside the code. It connects symbols, decisions, outcomes, sessions, and Git worktrees in one searchable graph, then compiles bounded cited context for Codex, Claude Code, Cursor, Kimi, Antigravity, CLI tools, and compatible MCP clients.
+  Qarinah remembers the decisions, code relationships, tool outcomes, and Git worktree history your project is allowed to retain. A fresh Codex, Claude Code, Cursor, Kimi, Antigravity, Freebuff, CLI, or compatible MCP session receives only the relevant cited context instead of another full-history replay.
 </p>
 
 ```sh
-# Install the reviewed 0.5 release candidate from npm's next channel.
-npm install --save-dev qarinah@next
-
-# Preview an exact project-local host installation without changing files.
-npx qarinah install . --host codex --scope project --dry-run
-
-# Initialize this checkout, install all supported project integrations,
-# map the project, and enable incremental completed-turn checkpoints.
-npx qarinah setup . --capture content --allow-query --auto-compact
+# Safe default: local project memory, metadata-only capture, no hosted account,
+# no content disclosure, and no activation metrics.
+npx qarinah@latest setup .
 ```
+
+Successful setup now ends with the result to try next:
+
+```json
+{
+  "capture": "metadata",
+  "firstRun": {
+    "message": "Qarinah is ready. It mapped your project and built a cited local memory graph.",
+    "tryNow": "npx qarinah query \"What decisions and outcomes should the next coding-agent session know?\" --format markdown",
+    "openGraph": "npx qarinah dashboard --serve"
+  }
+}
+```
+
+Want to see the complete experience without touching your repository?
+
+```sh
+# Creates a populated isolated workspace in the operating-system temp directory.
+# It does not configure your coding agents and does not enable telemetry.
+npx qarinah demo
+```
+
+The demo returns its local dashboard path, a real retained decision, its event ID and SHA-256 evidence hash, plus the exact query that reconstructs the decision in a fresh terminal. [Follow the reproducible steps.](docs/GETTING-STARTED.md#try-the-isolated-demo-first)
+
+[![Watch a real fresh-session handoff](website/static/assets/qarinah-fresh-session-handoff-poster.png)](https://qarinah.io/assets/qarinah-fresh-session-handoff.mp4)
+
+The two-minute recording removes the fixture's temporary Session A transcript, opens a fresh Session B, and retrieves the same tested retry boundary with its cited event and evidence hash. [Watch or download the MP4.](https://qarinah.io/assets/qarinah-fresh-session-handoff.mp4)
+
+Need a specific host or a content-enabled workflow? Keep that choice explicit:
+
+```sh
+npx qarinah install . --host codex --scope project --dry-run
+npx qarinah setup . --codex --capture content --allow-query --auto-compact
+```
+
+Optional, content-free activation measurement is disabled by default. Pass `--share-activation` only if you choose to share five once-only milestones: setup, first capture, first retrieval, first cross-session handoff, and seven-day return. No project name, path, repository, query, event body, file, agent transcript, hostname, username, or IP-derived field is included in the application payload. [Read the privacy contract and disable it at any time.](PRIVACY.md#optional-content-free-activation-measurement)
 
 Each worktree keeps a separate `.qarinah` ledger and consent record. Qarinah derives a shared repository identity, hashes branch and commit context into the project snapshot, and links each checkout to the files and memories it actually produced. It never replaces worktree ledgers with symlinks or a shared writable database. [Read the worktree context guide.](docs/WORKTREE-CONTEXT.md)
 
