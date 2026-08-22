@@ -314,21 +314,17 @@ for (const responsiveTableRule of [
   if (!responsiveCss.includes(responsiveTableRule)) errors.push(`site.css is missing responsive table behavior: ${responsiveTableRule}`);
 }
 for (const responsiveHeroRule of [
-  ".hero-context-proof {",
-  "grid-template-columns: auto minmax(0, 1fr);",
+  ".hero-copy .command-block {",
+  ".hero-privacy {",
   ".hero-copy {\n    text-align: center;",
-  "grid-template-columns: 1fr;\n    gap: 10px;\n    padding: 20px 16px;\n    text-align: center;"
+  ".hero-actions {\n    justify-content: center;"
 ]) {
-  if (!responsiveCss.includes(responsiveHeroRule)) errors.push(`site.css is missing centered responsive hero proof: ${responsiveHeroRule}`);
+  if (!responsiveCss.includes(responsiveHeroRule)) errors.push(`site.css is missing responsive first-run hero behavior: ${responsiveHeroRule}`);
 }
 if (home.includes('"@type":"SearchAction"') || home.includes("search_term_string")) {
   errors.push("Homepage must not emit the retired sitelinks-search SearchAction or its crawlable URL template.");
 }
 if (!home.includes("<strong>12 / 12</strong>")
-  || !home.includes("proof-carrying task packets passed")
-  || !home.includes("current evidence retained")
-  || !home.includes("stale evidence excluded")
-  || !home.includes("identical manifest reproduced")
   || !home.includes("<strong>10 / 10</strong>")
   || !home.includes("eligible public-checkout source files indexed")
   || !home.includes("Multi-language symbols and references")
@@ -345,17 +341,18 @@ if (!home.includes("What coding agents and developers need to know.") || !home.i
   errors.push("Homepage is missing the direct answer-engine surface.");
 }
 for (const worktreeHeroProof of [
-  "Your project remembers. Every agent gets the proof.",
-  "Verifiable memory for coding agents",
-  'class="hero-context-proof"',
-  "12 / 12",
-  "proof-carrying task packets passed",
-  "expected file and symbol selected, current evidence retained, stale evidence excluded, budget held, identical manifest reproduced",
+  "Start a new coding-agent session without re-explaining your project.",
+  "Project memory for coding agents",
+  "npx qarinah@latest setup .",
+  "Metadata-only by default.",
+  "npx qarinah demo",
+  "Try the two-minute demo",
+  "Join the first 10 maintainers",
   "one repository · two isolated ledgers",
   "branch + commit in snapshot hash",
-  'href="/docs/content-archive/"'
+  'href="/docs/getting-started/#try-the-isolated-demo-first"'
 ]) {
-  if (!home.includes(worktreeHeroProof)) errors.push(`Homepage is missing the deep-memory product story: ${worktreeHeroProof}`);
+  if (!home.includes(worktreeHeroProof)) errors.push(`Homepage is missing the activation-first product story: ${worktreeHeroProof}`);
 }
 if (home.indexOf('class="front-proof section shell"') > home.indexOf('class="handoff-stage"')) {
   errors.push("Homepage must place the verified claim and cost table directly after the hero, before the setup workflow.");
@@ -377,8 +374,8 @@ if (!home.includes("Verifiable project memory, exact source recovery, and cited 
   errors.push("Homepage is missing the worktree-aware category or the separate historical benchmark scope.");
 }
 if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
-  || publicMetrics.productVersion !== "0.6.0-alpha.1"
-  || publicMetrics.updatedAt !== "2026-08-21"
+  || publicMetrics.productVersion !== "0.6.0"
+  || publicMetrics.updatedAt !== "2026-08-22"
   || publicMetrics.providerBillingMeasurement !== false
   || publicMetrics.metrics?.proofCarryingTaskContext?.scenarios !== 12
   || publicMetrics.metrics?.proofCarryingTaskContext?.accepted !== 12
@@ -402,7 +399,7 @@ if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.indexedSymbols !== 4
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.resolvedReferences !== 3
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.citedFacts !== 2
-  || publicMetrics.metrics?.deepMemoryProductAcceptance?.artifactHash !== "sha256:a9c6a3e131678bdb2006f731d5e2750d29d5518d08f8b36182f27afdfd3cbc50"
+  || publicMetrics.metrics?.deepMemoryProductAcceptance?.artifactHash !== "sha256:4736652101ffde46e450983285be3f41c74f850728bc4b59848c45b063afb112"
   || publicMetrics.metrics?.publicProjectMemory?.scenarios !== 10
   || publicMetrics.metrics?.publicProjectMemory?.passed !== 10
   || publicMetrics.metrics?.publicProjectMemory?.indexedSymbolFiles !== publicMetrics.metrics?.publicProjectMemory?.eligibleSymbolFiles
@@ -557,7 +554,7 @@ if (!paper.includes("https://doi.org/10.5281/zenodo.21850747")
   || !paper.includes("https://doi.org/10.5281/zenodo.21547684")
   || !paper.includes("https://doi.org/10.5281/zenodo.21843240")
   || !paper.includes('"creativeWorkStatus":"Published"')
-  || !paper.includes('"datePublished":"2026-08-21"')) {
+  || !paper.includes('"datePublished":"2026-08-22"')) {
   errors.push("Paper page must bind current v1.8 to the paper series and preserve published v1.4/v1.3 DOIs.");
 }
 if (/activates on publication|not registered or published|DOI reserved|assigned only when this manuscript is deposited|assigned by Zenodo when v1\.4 is deposited|A version DOI is assigned/iu.test(paper)) {

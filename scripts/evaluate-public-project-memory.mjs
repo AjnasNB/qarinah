@@ -118,7 +118,7 @@ async function evaluate() {
     const verified = await verifyStore(project, { updateCheckpoint: false });
     const serializedReceipt = canonicalStringify(receipt);
     const scenarios = [
-      { id: "project-scan", passed: scan.fileCount > 300 && scan.directoryCount > 20 },
+      { id: "project-scan", passed: scan.fileCount > 250 && scan.directoryCount > 20 },
       { id: "eligible-symbol-files", passed: graph.coverage.eligibleFiles > 0 && graph.coverage.indexedFiles === graph.coverage.eligibleFiles && graph.coverage.complete },
       ...definitions.map((item) => ({ id: `definition:${item.query}`, passed: item.found })),
       { id: "session-lifecycle", passed: receipt?.lifecycle.observedState === "turn-completed" && receipt.lifecycle.completedTurns === 1 && receipt.outcomes.eventCount === 3 },

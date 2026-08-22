@@ -232,7 +232,7 @@ if (currentWhitePaperPdfReceipt !== `${currentWhitePaperPdfDigest}  output/pdf/Q
   throw new Error("The v1.8 white-paper PDF receipt is stale.");
 }
 if (!whitePaperSource.includes("**Paper version:** 1.8")
-  || !whitePaperSource.includes("**Implementation:** Qarinah `0.6.0-alpha.1`")
+  || !whitePaperSource.includes("**Implementation:** Qarinah `0.6.0`")
   || !whitePaperSource.includes("10 / 10 public-checkout memory scenarios")
   || !whitePaperSource.includes("12 / 12 proof-carrying task-context scenarios")
   || !whitePaperSource.includes("Acceptance scenarios passed | 16 / 16")
@@ -284,15 +284,15 @@ for (const relativePath of publicMarkdown) {
 }
 
 const currentReleaseDocRequirements = new Map([
-  ["docs/API-REFERENCE.md", ["version 0.6.0-alpha.1", "| `QARINAH_VERSION` | `\"0.6.0-alpha.1\"` |"]],
-  ["docs/FAQ.md", ["Qarinah 0.6.0-alpha.1 supports", "multifile-context-0.6.0-alpha.1.json"]],
-  ["docs/HOST-COMPATIBILITY.md", ["The 0.6.0-alpha.1 installer"]],
-  ["docs/HOST-INTEGRATIONS.md", ["--ref v0.6.0-alpha.1", "qarinah@v0.6.0-alpha.1"]],
-  ["docs/MCP-GUIDE.md", ["Qarinah 0.6.0-alpha.1 includes", "qarinah@0.6.0-alpha.1"]],
-  ["docs/TOKEN-EFFICIENT-CONTEXT.md", ["--ref v0.6.0-alpha.1", "qarinah@v0.6.0-alpha.1"]],
-  ["docs/RECIPES.md", ["--ref v0.6.0-alpha.1", "qarinah@v0.6.0-alpha.1"]],
-  ["docs/BENCHMARKS.md", ["deep-memory-platform-v0.6.0-alpha.1.json", "0.6.0-alpha.1 machine-readable result", "multifile-context-0.6.0-alpha.1.json"]],
-  ["docs/PUBLIC-METRICS.md", ["deep-memory-platform-v0.6.0-alpha.1.json", "multifile-context-0.6.0-alpha.1.json"]]
+  ["docs/API-REFERENCE.md", ["version 0.6.0", "| `QARINAH_VERSION` | `\"0.6.0\"` |"]],
+  ["docs/FAQ.md", ["Qarinah 0.6.0 supports", "multifile-context-0.6.0.json"]],
+  ["docs/HOST-COMPATIBILITY.md", ["The 0.6.0 installer"]],
+  ["docs/HOST-INTEGRATIONS.md", ["--ref v0.6.0", "qarinah@v0.6.0"]],
+  ["docs/MCP-GUIDE.md", ["Qarinah 0.6.0 includes", "qarinah@0.6.0"]],
+  ["docs/TOKEN-EFFICIENT-CONTEXT.md", ["--ref v0.6.0", "qarinah@v0.6.0"]],
+  ["docs/RECIPES.md", ["--ref v0.6.0", "qarinah@v0.6.0"]],
+  ["docs/BENCHMARKS.md", ["deep-memory-platform-v0.6.0.json", "0.6.0 machine-readable result", "multifile-context-0.6.0.json"]],
+  ["docs/PUBLIC-METRICS.md", ["deep-memory-platform-v0.6.0.json", "multifile-context-0.6.0.json"]]
 ]);
 for (const [relativePath, requiredSnippets] of currentReleaseDocRequirements) {
   const markdown = await read(relativePath);

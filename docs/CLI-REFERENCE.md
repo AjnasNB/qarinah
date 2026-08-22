@@ -66,7 +66,9 @@ All commands that omit a path use the current working directory. Workspace looku
 
 ```text
 qarinah init [path] [--capture metadata|content]
-qarinah setup [path] [--codex] [--claude] [--cursor] [--kimi] [--antigravity] [--auto-compact]
+qarinah setup [path] [--codex] [--claude] [--cursor] [--kimi] [--antigravity] [--freebuff] [--auto-compact] [--share-activation]
+qarinah demo [--output <empty-directory>]
+qarinah activation status | enable | disable
 qarinah policy [path]
 qarinah trust [path] --capture metadata|content --policy-hash sha256:<digest>
 qarinah untrust
@@ -781,6 +783,30 @@ npx qarinah setup . --codex --claude --cursor --kimi --antigravity --capture con
 Omit host flags to configure all five supported project integrations. Omit `--allow-query` for diagnostic-only MCP. With `--allow-query`, setup binds the zero-write `context.query` tool to the exact workspace's current consent-policy hash and response ceilings. Codex and Claude Code receive reviewed lifecycle hooks; Cursor, Kimi, and Antigravity receive their documented project-local MCP/configuration surfaces. See [Coding-agent host compatibility](HOST-COMPATIBILITY.md).
 
 `--auto-compact` is opt-in and applies to Codex and Claude Code Stop hooks. It runs after ordinary lifecycle capture and invokes `harness --record --no-rebuild --quiet`, producing one idempotent cited checkpoint without forcing a full projection rebuild after every turn.
+
+`--share-activation` is also opt-in. It reports only the once-per-installation milestone names documented in [PRIVACY.md](../PRIVACY.md#optional-content-free-activation-measurement). Omitting it performs no activation request. The setup result includes `firstRun.message`, `firstRun.tryNow`, and `firstRun.openGraph` so a clean installation has an immediate verifiable next step.
+
+## `demo`
+
+Create a populated isolated workspace under the operating-system temporary directory:
+
+```sh
+npx qarinah demo
+```
+
+Use `--output <empty-directory>` when a deterministic location is required. Qarinah refuses to overwrite an existing path. The result includes the generated dashboard, a reconstructable decision, its event ID and evidence hash, and the exact next commands. Demo creation never enables activation measurement or installs host configuration.
+
+## `activation`
+
+Inspect, enable, or disable optional content-free activation measurement:
+
+```sh
+npx qarinah activation status
+npx qarinah activation enable
+npx qarinah activation disable
+```
+
+This choice is local to the initialized workspace. Disabling it preserves the prior once-only receipt locally but prevents future milestone requests.
 
 ## `watch`
 

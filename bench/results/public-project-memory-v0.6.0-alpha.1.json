@@ -9,11 +9,11 @@
     "providerCalls": 0,
     "timingClaimed": false,
     "sourceManifest": {
-      "fileCount": 89,
-      "bytes": 1114311,
-      "manifestHash": "sha256:2b2f6a67c35a63101cd66013cae123bb3521119e64824d83afe6024e09b54856"
+      "fileCount": 91,
+      "bytes": 1127696,
+      "manifestHash": "sha256:3149527c933bdeb9e3cf8167f3ceb40c6b9fc983d85d99f6d3ff9df8dae474d1"
     },
-    "evaluatorSha256": "sha256:5a4f8a705f1890ec39acdc85d2e8320312e724d649e908024bf59592cc12e3ca"
+    "evaluatorSha256": "sha256:4040a669a6d6d7c34531d15ebc2e563fc8605e0ec79f506337b3ca398d8217ac"
   },
   "implementation": {
     "package": "qarinah",
@@ -22,8 +22,8 @@
     "sessionReceipt": "qarinah.session-context-receipt.v2"
   },
   "observed": {
-    "projectFiles": 400,
-    "projectDirectories": 57,
+    "projectFiles": 286,
+    "projectDirectories": 47,
     "supportedSymbolLanguages": [
       "c",
       "cpp",
@@ -41,10 +41,10 @@
       "python",
       "typescript"
     ],
-    "eligibleSymbolFiles": 187,
-    "indexedSymbolFiles": 187,
-    "declarations": 48367,
-    "references": 102087,
+    "eligibleSymbolFiles": 191,
+    "indexedSymbolFiles": 191,
+    "declarations": 36282,
+    "references": 63738,
     "definitions": [
       {
         "query": "appendEvent",
@@ -130,5 +130,5 @@
     "No provider model, learned embedding service, wall-clock performance, billing, or private agent history is measured.",
     "A passing result proves these exact structural scenarios, not universal task success or semantic correctness."
   ],
-  "manifestHash": "sha256:b86ac9a2987b86490b0af4b721ed94c04ab81a2f758b00faf85c79a0a34a57fc"
+  "manifestHash": "sha256:a535731062801b5b23269e9f9b2fa2ce8de71ea94ef2a20e3804635adfc6850f"
 }

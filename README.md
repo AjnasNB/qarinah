@@ -4,23 +4,53 @@
 
 <h1 align="center">Qarinah</h1>
 
-<p align="center"><strong>Your project remembers. Every agent gets the proof.</strong></p>
+<p align="center"><strong>Start a new coding-agent session without re-explaining your project.</strong></p>
 
 <p align="center">
-  Qarinah preserves permitted project evidence and explicitly archived source bytes beside the code. It connects symbols, decisions, outcomes, sessions, and Git worktrees in one searchable graph, then compiles bounded cited context for Codex, Claude Code, Cursor, Kimi, Antigravity, CLI tools, and compatible MCP clients.
+  Qarinah remembers the decisions, code relationships, tool outcomes, and Git worktree history your project is allowed to retain. A fresh Codex, Claude Code, Cursor, Kimi, Antigravity, Freebuff, CLI, or compatible MCP session receives only the relevant cited context instead of another full-history replay.
 </p>
 
 ```sh
-# Install the reviewed 0.5 release candidate from npm's next channel.
-npm install --save-dev qarinah@next
-
-# Preview an exact project-local host installation without changing files.
-npx qarinah install . --host codex --scope project --dry-run
-
-# Initialize this checkout, install all supported project integrations,
-# map the project, and enable incremental completed-turn checkpoints.
-npx qarinah setup . --capture content --allow-query --auto-compact
+# Safe default: local project memory, metadata-only capture, no hosted account,
+# no content disclosure, and no activation metrics.
+npx qarinah@latest setup .
 ```
+
+Successful setup now ends with the result to try next:
+
+```json
+{
+  "capture": "metadata",
+  "firstRun": {
+    "message": "Qarinah is ready. It mapped your project and built a cited local memory graph.",
+    "tryNow": "npx qarinah query \"What decisions and outcomes should the next coding-agent session know?\" --format markdown",
+    "openGraph": "npx qarinah dashboard --serve"
+  }
+}
+```
+
+Want to see the complete experience without touching your repository?
+
+```sh
+# Creates a populated isolated workspace in the operating-system temp directory.
+# It does not configure your coding agents and does not enable telemetry.
+npx qarinah demo
+```
+
+The demo returns its local dashboard path, a real retained decision, its event ID and SHA-256 evidence hash, plus the exact query that reconstructs the decision in a fresh terminal. [Follow the reproducible steps.](docs/GETTING-STARTED.md#try-the-isolated-demo-first)
+
+[![Watch a real fresh-session handoff](website/static/assets/qarinah-fresh-session-handoff-poster.png)](https://qarinah.io/assets/qarinah-fresh-session-handoff.mp4)
+
+The two-minute recording removes the fixture's temporary Session A transcript, opens a fresh Session B, and retrieves the same tested retry boundary with its cited event and evidence hash. [Watch or download the MP4.](https://qarinah.io/assets/qarinah-fresh-session-handoff.mp4)
+
+Need a specific host or a content-enabled workflow? Keep that choice explicit:
+
+```sh
+npx qarinah install . --host codex --scope project --dry-run
+npx qarinah setup . --codex --capture content --allow-query --auto-compact
+```
+
+Optional, content-free activation measurement is disabled by default. Pass `--share-activation` only if you choose to share five once-only milestones: setup, first capture, first retrieval, first cross-session handoff, and seven-day return. No project name, path, repository, query, event body, file, agent transcript, hostname, username, or IP-derived field is included in the application payload. [Read the privacy contract and disable it at any time.](PRIVACY.md#optional-content-free-activation-measurement)
 
 Each worktree keeps a separate `.qarinah` ledger and consent record. Qarinah derives a shared repository identity, hashes branch and commit context into the project snapshot, and links each checkout to the files and memories it actually produced. It never replaces worktree ledgers with symlinks or a shared writable database. [Read the worktree context guide.](docs/WORKTREE-CONTEXT.md)
 
@@ -56,14 +86,14 @@ npx qarinah dashboard --serve --worktrees
 
 ### Reproducible proof-context result
 
-The 0.6.0-alpha.1 evaluator creates a 12-file repository across ten registered language families and pairs every current decision with a superseded predecessor. It passes **12 / 12** task-packet scenarios: the expected file and symbol are selected, current evidence is retrieved, stale evidence is excluded and identified, hashes remain valid, the packet stays inside 4,096 portable estimated tokens, and an unchanged rerun reproduces the same manifest. A separate mutation is rejected by `validateProofContext()`.
+The 0.6.0 evaluator creates a 12-file repository across ten registered language families and pairs every current decision with a superseded predecessor. It passes **12 / 12** task-packet scenarios: the expected file and symbol are selected, current evidence is retrieved, stale evidence is excluded and identified, hashes remain valid, the packet stays inside 4,096 portable estimated tokens, and an unchanged rerun reproduces the same manifest. A separate mutation is rejected by `validateProofContext()`.
 
 ```sh
 npm run evaluate:proof-context
 npm run check:proof-context-evidence
 ```
 
-Inspect the [machine-readable result](bench/results/proof-context-0.6.0-alpha.1.json) and [evaluator](scripts/evaluate-proof-context.mjs). This is deterministic acceptance evidence over a generated repository, not a universal accuracy, cost, or cross-product claim.
+Inspect the [machine-readable result](bench/results/proof-context-0.6.0.json) and [evaluator](scripts/evaluate-proof-context.mjs). This is deterministic acceptance evidence over a generated repository, not a universal accuracy, cost, or cross-product claim.
 
 ### Reproducible public-checkout memory result
 
@@ -73,17 +103,17 @@ The current evaluator copies Qarinah's public source into an isolated temporary 
 npm run check:public-project-memory
 ```
 
-Read the [method and boundaries](docs/PUBLIC-PROJECT-MEMORY-EVALUATION.md) or inspect the [0.6.0-alpha.1 machine-readable result](bench/results/public-project-memory-v0.6.0-alpha.1.json). Historical receipts remain unchanged, and exact file counts are refreshed before each release commit.
+Read the [method and boundaries](docs/PUBLIC-PROJECT-MEMORY-EVALUATION.md) or inspect the [0.6.0 machine-readable result](bench/results/public-project-memory-v0.6.0.json). Historical receipts remain unchanged, and exact file counts are refreshed before each release commit.
 
 ### Reproducible deep-memory product result
 
-The 0.6.0-alpha.1 product evaluator runs the full local path in a temporary initialized project: incremental source refresh, symbol and cross-file-reference indexing, cited fact consolidation, two encrypted content snapshots, integrity verification, and exact byte restoration. It passes **12 / 12** scenarios, restores **390,226 source bytes exactly**, reuses **2 of 3** chunks in the second snapshot, indexes **4 symbols** and **3 resolved references**, and retains **2 cited facts**.
+The 0.6.0 product evaluator runs the full local path in a temporary initialized project: incremental source refresh, symbol and cross-file-reference indexing, cited fact consolidation, two encrypted content snapshots, integrity verification, and exact byte restoration. It passes **12 / 12** scenarios, restores **390,226 source bytes exactly**, reuses **2 of 3** chunks in the second snapshot, indexes **4 symbols** and **3 resolved references**, and retains **2 cited facts**.
 
 ```sh
 npm run check:deep-memory
 ```
 
-Inspect the [machine-readable result](bench/results/deep-memory-platform-v0.6.0-alpha.1.json) and [evaluator](scripts/evaluate-deep-memory-platform.mjs). Historical receipts remain unchanged. This is local product-acceptance evidence, not a cross-product comparison or a promise about arbitrary repositories.
+Inspect the [machine-readable result](bench/results/deep-memory-platform-v0.6.0.json) and [evaluator](scripts/evaluate-deep-memory-platform.mjs). Historical receipts remain unchanged. This is local product-acceptance evidence, not a cross-product comparison or a promise about arbitrary repositories.
 
 ### Reproducible real-Git-worktree acceptance result
 
@@ -573,15 +603,15 @@ The repository also runs `npm run mcp:smoke` against the exact bundled Codex and
 
 ### Install once, initialize each project
 
-Install the reviewed `v0.6.0-alpha.1` plugin once in each host after the alpha is published:
+Install the reviewed `v0.6.0` plugin once in each host after the alpha is published:
 
 ```sh
 # Codex: personal installation, available to opted-in projects.
-codex plugin marketplace add AjnasNB/qarinah --ref v0.6.0-alpha.1
+codex plugin marketplace add AjnasNB/qarinah --ref v0.6.0
 codex plugin add qarinah@qarinah
 
 # Claude Code: personal installation across projects.
-claude plugin marketplace add AjnasNB/qarinah@v0.6.0-alpha.1 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.6.0 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 

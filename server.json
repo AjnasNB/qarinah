@@ -6,12 +6,12 @@
     "url": "https://github.com/AjnasNB/qarinah",
     "source": "github"
   },
-  "version": "0.6.0-alpha.1",
+  "version": "0.6.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "qarinah",
-      "version": "0.6.0-alpha.1",
+      "version": "0.6.0",
       "transport": {
         "type": "stdio"
       }

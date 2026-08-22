@@ -22,9 +22,9 @@ const historicalPaperPdfs = new Map([
   ["Qarinah-Technical-White-Paper-v1.6.pdf", "/paper/Qarinah-Technical-White-Paper-v1.6.pdf"],
   ["Qarinah-Technical-White-Paper-v1.7.pdf", "/paper/Qarinah-Technical-White-Paper-v1.7.pdf"]
 ]);
-const releaseDate = "2026-08-21";
-const paperPublishedDate = "2026-08-21";
-const publicMetricsUpdatedDate = "2026-08-21";
+const releaseDate = "2026-08-22";
+const paperPublishedDate = "2026-08-22";
+const publicMetricsUpdatedDate = "2026-08-22";
 const toolkitArticleDate = "2026-08-16";
 const worktreeArticleDate = "2026-08-16";
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
@@ -32,7 +32,7 @@ const benchmarkRelease = JSON.parse(await readFile(path.join(root, "bench", "res
 const worktreeContinuity = JSON.parse(await readFile(path.join(root, "bench", "results", "worktree-continuity-v0.4.0.json"), "utf8"));
 const deepMemoryPlatform = JSON.parse(await readFile(path.join(root, "bench", "results", `deep-memory-platform-v${packageJson.version}.json`), "utf8"));
 const publicProjectMemory = JSON.parse(await readFile(path.join(root, "bench", "results", `public-project-memory-v${packageJson.version}.json`), "utf8"));
-const proofContext = JSON.parse(await readFile(path.join(root, "bench", "results", "proof-context-0.6.0-alpha.1.json"), "utf8"));
+const proofContext = JSON.parse(await readFile(path.join(root, "bench", "results", "proof-context-0.6.0.json"), "utf8"));
 const productVersion = packageJson.version;
 const productPositioning = "Verifiable project memory, exact source recovery, and cited context for coding agents.";
 const productExplanation = "Qarinah keeps permitted project evidence and explicitly archived source bytes beside the repository, connects symbols, decisions, outcomes, and Git worktrees in one searchable graph, and compiles the cited context needed by Codex, Claude Code, Cursor, and compatible tools.";
@@ -53,7 +53,7 @@ if (deepMemoryPlatform.schemaVersion !== "qarinah.deep-memory-platform-evaluatio
   || deepMemoryPlatform.observed.indexedSymbols !== 4
   || deepMemoryPlatform.observed.resolvedReferences !== 3
   || deepMemoryPlatform.observed.citedFacts !== 2
-  || deepMemoryPlatform.artifactHash !== "sha256:a9c6a3e131678bdb2006f731d5e2750d29d5518d08f8b36182f27afdfd3cbc50") {
+  || deepMemoryPlatform.artifactHash !== "sha256:4736652101ffde46e450983285be3f41c74f850728bc4b59848c45b063afb112") {
   throw new Error("The deep-memory website claim does not match the checked release artifact.");
 }
 if (publicProjectMemory.schemaVersion !== "qarinah.public-project-memory-evaluation.v1"
@@ -68,7 +68,7 @@ if (publicProjectMemory.schemaVersion !== "qarinah.public-project-memory-evaluat
   throw new Error("The public-project website claim does not match the checked release artifact.");
 }
 if (proofContext.schemaVersion !== "qarinah.proof-context-evaluation.v1"
-  || proofContext.implementation !== "0.6.0-alpha.1"
+  || proofContext.implementation !== "0.6.0"
   || proofContext.metrics.acceptedTaskPackets !== 12
   || proofContext.metrics.expectedFileHitAt5 !== 1
   || proofContext.metrics.expectedSymbolHitAt5Files !== 1
@@ -119,7 +119,7 @@ const publicMetrics = {
       budgetConformance: proofContext.metrics.budgetConformance,
       deterministicManifestReproduction: proofContext.metrics.deterministicManifestReproduction,
       manifestTamperRejection: proofContext.metrics.manifestTamperRejection,
-      evidenceSource: `${github}/blob/main/bench/results/proof-context-0.6.0-alpha.1.json`,
+      evidenceSource: `${github}/blob/main/bench/results/proof-context-0.6.0.json`,
       boundary: proofContext.boundaries
     },
     realGitWorktreeContinuity: {
@@ -695,6 +695,14 @@ const docPages = [
     description: "Use Qarinah's verified context-volume and retrieval metrics with exact evidence links, approved wording, and explicit claim boundaries.",
     section: "Verify",
     aliases: ["Qarinah metrics", "launch claims", "98.71 percent", "token savings", "benchmark evidence", "marketing claims"]
+  },
+  {
+    route: "docs/adoption-metrics",
+    source: "docs/ADOPTION-METRICS.md",
+    title: "Adoption measurement and design partners",
+    description: "Measure successful Qarinah setup, retrieval, fresh-session handoffs, seven-day return, and approved user outcomes without collecting project content.",
+    section: "Operate",
+    aliases: ["activation metrics", "design partners", "onboarding", "user funnel", "fresh session handoff", "testimonials"]
   },
   {
     route: "docs/public-project-memory-evaluation",
@@ -1343,8 +1351,8 @@ function commandBlock(command, label = "Terminal") {
 
 function homePage() {
   return layout({
-    title: "Qarinah - Verifiable Project Memory for Coding Agents",
-    description: "Qarinah preserves permitted project evidence and exact archived source bytes, connects code and decisions in a searchable graph, and compiles cited context for coding agents.",
+    title: "Qarinah - Start a New Coding-Agent Session Without Starting Over",
+    description: "Qarinah keeps permitted decisions, code relationships, tool outcomes, and worktree history beside your project so a fresh coding-agent session can resume with cited context.",
     active: "home",
     canonical: "/",
     kind: "home",
@@ -1352,16 +1360,14 @@ function homePage() {
       <section class="hero">
         <div class="shell hero-grid">
           <div class="hero-copy">
-            <p class="eyebrow">Verifiable memory for coding agents</p>
-            <h1>Your project remembers. Every agent gets the proof.</h1>
-            <p class="hero-lede">Preserve permitted project evidence and explicitly archived source bytes beside the code. Qarinah links symbols, decisions, outcomes, sessions, and Git worktrees in one searchable graph, then delivers a bounded cited context pack for the next task.</p>
-            <a class="hero-context-proof" href="/docs/proof-carrying-context/" aria-label="12 of 12 proof-carrying task packets passed. Read the method and artifact.">
-              <strong>${proofContext.metrics.acceptedTaskPackets} / ${proofContext.method.scenarioCount}</strong>
-              <span><b>proof-carrying task packets passed</b><small>expected file and symbol selected, current evidence retained, stale evidence excluded, budget held, identical manifest reproduced</small></span>
-            </a>
+            <p class="eyebrow">Project memory for coding agents</p>
+            <h1>Start a new coding-agent session without re-explaining your project.</h1>
+            <p class="hero-lede">Qarinah keeps permitted decisions, code relationships, tool outcomes, and Git worktree history beside your repository. A fresh Codex, Claude Code, Cursor, or compatible agent retrieves only the relevant cited context instead of replaying the whole chat.</p>
+            ${commandBlock("npx qarinah@latest setup .", "Safe local setup")}
+            <p class="hero-privacy"><strong>Metadata-only by default.</strong> No account, hosted memory service, content disclosure, or activation metrics. Try <code>npx qarinah demo</code> first to create an isolated populated graph outside your project.</p>
             <div class="hero-actions">
-              <a class="btn btn-primary btn-large" href="/docs/getting-started/">Set up this worktree</a>
-              <a class="hero-text-link" href="/docs/content-archive/">See what Qarinah preserves</a>
+              <a class="btn btn-primary btn-large" href="/docs/getting-started/#try-the-isolated-demo-first">Try the two-minute demo</a>
+              <a class="hero-text-link" href="https://github.com/AjnasNB/qarinah/issues/new?template=design_partner.yml">Join the first 10 maintainers</a>
             </div>
           </div>
           <aside class="worktree-hero-map" aria-label="How Qarinah groups isolated Git worktree memory">
@@ -1373,6 +1379,26 @@ function homePage() {
             </div>
             <div class="worktree-map-footer"><span>branch + commit in snapshot hash</span><span>files + decisions in cited graph</span></div>
           </aside>
+        </div>
+      </section>
+
+      <section class="handoff-video section shell" aria-labelledby="handoff-video-title">
+        <div class="section-heading split-heading">
+          <div>
+            <p class="eyebrow">A real fresh-session handoff</p>
+            <h2 id="handoff-video-title">Watch the old session disappear. See the next one recover the exact decision.</h2>
+          </div>
+          <p>This two-minute reproducible fixture creates an isolated project, records a tested retry boundary, removes the temporary Session A transcript, and retrieves the cited decision in a fresh Session B. The video uses the real generated dashboard, event ID, and evidence hash.</p>
+        </div>
+        <div class="handoff-video-frame">
+          <video controls preload="metadata" playsinline poster="/assets/qarinah-fresh-session-handoff-poster.png">
+            <source src="/assets/qarinah-fresh-session-handoff.mp4" type="video/mp4">
+            Your browser does not support embedded video. <a href="/assets/qarinah-fresh-session-handoff.mp4">Download the MP4</a>.
+          </video>
+        </div>
+        <div class="handoff-video-actions">
+          <a class="btn btn-primary" href="/docs/getting-started/#try-the-isolated-demo-first">Reproduce the demo</a>
+          <a class="text-link" href="/assets/qarinah-fresh-session-handoff.mp4">Download the two-minute MP4</a>
         </div>
       </section>
 

@@ -124,7 +124,7 @@ try {
   const count = (field) => results.filter((result) => result.observed[field]).length;
   const artifact = {
     schemaVersion: "qarinah.proof-context-evaluation.v1",
-    implementation: "0.6.0-alpha.1",
+    implementation: "0.6.0",
     generatedAt,
     method: {
       fixture: "generated 12-file multi-language repository with paired current and superseded decisions",
@@ -156,7 +156,7 @@ try {
   };
   const output = `${JSON.stringify(artifact, null, 2)}\n`;
   if (process.argv.includes("--write")) {
-    const destination = path.join(root, "bench", "results", "proof-context-0.6.0-alpha.1.json");
+    const destination = path.join(root, "bench", "results", "proof-context-0.6.0.json");
     await writeFile(destination, output);
     process.stdout.write(`${destination}\n`);
   } else {

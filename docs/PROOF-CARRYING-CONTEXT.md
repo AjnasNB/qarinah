@@ -84,7 +84,7 @@ The committed evaluator creates a 12-file repository across ten registered langu
 
 The evaluator separately changes a completed packet and verifies that validation rejects it. This is deterministic product-acceptance evidence over a generated repository. It is not an independent accuracy benchmark, a provider usage receipt, or a comparison with another product.
 
-Inspect the [machine-readable result](../bench/results/proof-context-0.6.0-alpha.1.json) and [evaluation source](../scripts/evaluate-proof-context.mjs).
+Inspect the [machine-readable result](../bench/results/proof-context-0.6.0.json) and [evaluation source](../scripts/evaluate-proof-context.mjs).
 
 ## Boundary
 

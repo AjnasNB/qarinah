@@ -27,7 +27,7 @@ import { captureClaudeHook } from "qarinah/claude";
 import { createMcpServer, runMcpServer } from "qarinah/mcp";
 ```
 
-The declarations shipped in `types/index.d.ts`, `types/codex.d.ts`, `types/claude.d.ts`, and `types/mcp.d.ts` are the exact compile-time contract for version 0.6.0-alpha.1. JSON Schemas are available through package exports such as `qarinah/schemas/event.json` and `qarinah/schemas/proof-context.json`.
+The declarations shipped in `types/index.d.ts`, `types/codex.d.ts`, `types/claude.d.ts`, and `types/mcp.d.ts` are the exact compile-time contract for version 0.6.0. JSON Schemas are available through package exports such as `qarinah/schemas/event.json` and `qarinah/schemas/proof-context.json`.
 
 ## Proof-carrying task context
 
@@ -101,9 +101,9 @@ Invalid JavaScript argument shapes generally throw `TypeError`. Storage, trust, 
 
 ## Version and contract constants
 
-| Export | Value in 0.6.0-alpha.1 |
+| Export | Value in 0.6.0 |
 | --- | --- |
-| `QARINAH_VERSION` | `"0.6.0-alpha.1"` |
+| `QARINAH_VERSION` | `"0.6.0"` |
 | `EVENT_SCHEMA_VERSION` | `"qarinah.event.v1"` |
 | `CONTEXT_PACK_SCHEMA_VERSION` | `"qarinah.context-pack.v2"` |
 | `CONFIG_SCHEMA_VERSION` | `"qarinah.config.v1"` |

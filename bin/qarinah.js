@@ -56,6 +56,12 @@ import {
   verifyContentArchive,
   writeMemoryDashboard
 } from "../src/index.js";
+import {
+  activationTrackingStatus,
+  configureActivationTracking,
+  recordActivationEvent
+} from "../src/activation.js";
+import { createDemoWorkspace } from "../src/demo.js";
 
 function option(args, name, fallback = undefined) {
   const index = args.indexOf(name);
@@ -291,7 +297,9 @@ function help() {
 
 Usage:
   qarinah init [path] [--capture metadata|content]
-  qarinah setup [path] [--codex] [--claude] [--cursor] [--kimi] [--antigravity] [--freebuff] [--capture metadata|content] [--allow-query] [--auto-compact] [--backup-source <export>] [--backup-destination <external-directory>]
+  qarinah setup [path] [--codex] [--claude] [--cursor] [--kimi] [--antigravity] [--freebuff] [--capture metadata|content] [--allow-query] [--auto-compact] [--share-activation] [--backup-source <export>] [--backup-destination <external-directory>]
+  qarinah demo [--output <empty-directory>]
+  qarinah activation status | enable | disable
   qarinah install [path] --host codex|claude|cursor|kimi|antigravity|freebuff --scope project [--dry-run] [--capture metadata|content] [--allow-query] [--auto-compact]
   qarinah uninstall [path] --host codex|claude|cursor|kimi|antigravity|freebuff --scope project
   qarinah record --kind <kind> --title <title> [--body <text>] [--data-json <json>] [--relation type:target]
@@ -347,6 +355,25 @@ async function run(argv) {
     process.stdout.write(help());
     return;
   }
+  if (!["setup", "demo", "activation", "mcp", "hook"].includes(command)) {
+    await recordActivationEvent("seven_day_return", { cwd: process.cwd() });
+  }
+  if (command === "demo") {
+    const parsed = strictValueOptions(args, "demo", ["--output"]);
+    if (parsed.positionals.length !== 0) throw new TypeError("demo accepts --output <empty-directory> only.");
+    process.stdout.write(`${JSON.stringify(await createDemoWorkspace({ output: parsed.values.get("--output") }), null, 2)}\n`);
+    return;
+  }
+  if (command === "activation") {
+    if (args.length !== 1 || !["status", "enable", "disable"].includes(args[0])) {
+      throw new TypeError("activation requires status, enable, or disable.");
+    }
+    const result = args[0] === "status"
+      ? await activationTrackingStatus({ cwd: process.cwd() })
+      : await configureActivationTracking({ cwd: process.cwd(), enabled: args[0] === "enable" });
+    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+    return;
+  }
   if (command === "init") {
     const target = positionals(args)[0] || process.cwd();
     const workspace = await initializeWorkspace(target, { capture: option(args, "--capture", "metadata") });
@@ -354,7 +381,7 @@ async function run(argv) {
     return;
   }
   if (command === "setup") {
-    const flags = new Set(["--codex", "--claude", "--cursor", "--kimi", "--antigravity", "--freebuff", "--allow-query", "--auto-compact"]);
+    const flags = new Set(["--codex", "--claude", "--cursor", "--kimi", "--antigravity", "--freebuff", "--allow-query", "--auto-compact", "--share-activation"]);
     const values = new Set(["--capture", "--max-chars", "--max-items", "--backup-source", "--backup-destination", "--backup-max-bytes", "--backup-max-files"]);
     const parsed = { positionals: [], flags: new Set(), values: new Map() };
     for (let index = 0; index < args.length; index += 1) {
@@ -392,6 +419,7 @@ async function run(argv) {
       freebuff: parsed.flags.has("--freebuff"),
       allowQuery: parsed.flags.has("--allow-query"),
       autoCompact: parsed.flags.has("--auto-compact"),
+      shareActivation: parsed.flags.has("--share-activation"),
       maxChars: positive("--max-chars"),
       maxItems: positive("--max-items"),
       backupSources: parsed.values.has("--backup-source") ? [path.resolve(parsed.values.get("--backup-source"))] : undefined,
@@ -580,6 +608,7 @@ async function run(argv) {
       maxDepth: integer("--max-depth")
     });
     if (result.captured) await rebuildDerivedState(process.cwd());
+    if (result.captured) await recordActivationEvent("first_capture", { cwd: process.cwd() });
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
     return;
   }
@@ -1015,11 +1044,13 @@ async function run(argv) {
       authorityScopes: input.authorityScopes,
       repositoryIds: input.repositoryIds
     });
+    await recordActivationEvent("first_retrieval", { cwd: process.cwd() });
     const format = input.format;
     if (format === "json") process.stdout.write(`${JSON.stringify(pack, null, 2)}\n`);
     else if (format === "markdown") process.stdout.write(renderContextPackMarkdown(pack));
     else if (format === "handoff") {
       const events = await readEvents(process.cwd());
+      await recordActivationEvent("first_cross_session_handoff", { cwd: process.cwd() });
       process.stdout.write(createContextHandoffCapsule(pack, events).text);
     } else throw new TypeError("--format must be json, markdown, or handoff.");
     return;

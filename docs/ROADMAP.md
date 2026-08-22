@@ -4,7 +4,7 @@
 
 The 0.5 release candidate established durable developer memory. The 0.6 line turns that memory into a bounded, query-specific task packet that explains what it selected, what it rejected, and which exact repository and ledger state produced the result.
 
-### P0 - implemented in 0.6.0-alpha.1
+### P0 - implemented in 0.6.0
 
 - the versioned `qarinah.proof-context.v1` contract and public JavaScript/TypeScript API;
 - the `qarinah proof <query>` CLI surface for portable agent and harness integration;
@@ -29,7 +29,7 @@ The 0.5 release candidate established durable developer memory. The 0.6 line tur
 - freeze the interoperability contract only after adapter authors have tested it; and
 - promote only the exact reviewed package, editor artifact, paper, evidence, and website bytes.
 
-The maintainer-run 0.6 alpha evaluation accepts 12 / 12 multilingual task-packet scenarios. It checks expected file and symbol retrieval, current-evidence recall, stale-evidence rejection, citation validity, context-budget conformance, deterministic manifest reproduction, and manifest-tamper rejection. This is a bounded release receipt, not a claim that every repository task is solved.
+The maintainer-run stable 0.6 evaluation accepts 12 / 12 multilingual task-packet scenarios. It checks expected file and symbol retrieval, current-evidence recall, stale-evidence rejection, citation validity, context-budget conformance, deterministic manifest reproduction, and manifest-tamper rejection. This is a bounded release receipt, not a claim that every repository task is solved.
 
 ## Qarinah 0.5: proof-carrying developer memory
 
