@@ -351,7 +351,7 @@
   "devDependencies": {
     "@primer/css": "^22.3.0",
     "@vscode/vsce": "3.9.2",
-    "cockroach-browser": "0.1.0",
+    "cockroach-browser": "0.4.1",
     "esbuild": "0.28.1",
     "marked": "^18.0.7",
     "typescript": "7.0.2",
