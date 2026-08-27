@@ -9,7 +9,7 @@ This release adds the local and protocol foundations for consent-gated retrieval
 From the project root:
 
 ```sh
-npx qarinah setup . --codex --claude --cursor --capture content --allow-query
+npx qarinah setup . --codex --claude --cursor --capture content
 ```
 
 The command:
@@ -18,30 +18,30 @@ The command:
 2. verifies a maintained Node 22, 24, or 26 runtime;
 3. installs project-local Codex and Claude hooks and skills;
 4. writes Codex, Claude, and Cursor MCP configuration without replacing unrelated settings;
-5. binds `context.query` to the workspace's exact reviewed consent-policy hash;
+5. exposes `context.query` only for the exact initialized and machine-trusted workspace;
 6. rebuilds deterministic views; and
 7. runs an integrity health check.
 
-Omit `--allow-query` to install diagnostic-only MCP access. Setup is idempotent for Qarinah-managed files and refuses to overwrite a conflicting skill or unsafe linked configuration.
+Setup is idempotent for Qarinah-managed files and refuses to overwrite a conflicting skill or unsafe linked configuration.
 
 Project-local configuration makes Qarinah available to new supported agent sessions opened in that folder. It cannot retroactively recover events a host never emitted, read hidden reasoning, or stop a model provider from compacting its own conversation.
 
-## Consent-gated MCP context retrieval
+## Workspace-authorized MCP context retrieval
 
-The native MCP server always exposes zero-write `context_status` and `context_doctor`. It exposes `context.query` only when the user installs an explicit query permit:
+The native MCP server exposes zero-write `context_status`, `context_doctor`, and `context.query` for an exact initialized, enabled, machine-trusted workspace:
 
 ```sh
-npx qarinah setup . --codex --claude --cursor --allow-query
+npx qarinah setup . --codex --claude --cursor
 ```
 
-The permit is bound to:
+Retrieval is bound to:
 
 - the exact absolute initialized workspace;
-- the current workspace consent-policy hash;
-- a maximum returned character count; and
-- a maximum returned item count.
+- the current machine-approved workspace policy;
+- the workspace's maximum returned character count; and
+- a bounded maximum returned item count.
 
-`context.query` cannot initialize a project, grant trust, walk into a parent workspace, write an event, repair state, advance a checkpoint, or expand its own origin. It compiles a cited pack using verified read-only state.
+`context.query` cannot initialize a project, grant trust, walk into a parent workspace, write an event, repair state, advance a checkpoint, or expand its own origin. It compiles a cited pack from a verified in-memory view, so a stale disposable index is diagnostic information rather than a retrieval blocker.
 
 ## Visual memory dashboard
 

@@ -57,7 +57,7 @@ The boundary intentionally retains only cited metadata projections. The sink ign
 
 The following additions do not change the authoritative event-ledger schema:
 
-- consent-gated MCP `context.query`;
+- workspace-authorized MCP `context.query`;
 - `qarinah setup` for Codex, Claude Code, and Cursor;
 - local dashboards and freshness inspection;
 - task-specific memory packs;
@@ -67,7 +67,7 @@ The following additions do not change the authoritative event-ledger schema:
 - context-quality evaluation; and
 - causal receipt chains.
 
-Existing workspaces need no ledger migration. Run `qarinah setup . --codex --claude --cursor` to install project-local integrations. Add `--allow-query` only after reviewing the workspace's current consent policy. See [Shared and verifiable team memory](TEAM-MEMORY.md).
+Existing workspaces need no ledger migration. Run `qarinah setup . --codex --claude --cursor` to refresh project-local integrations. Initialized, enabled, machine-trusted workspaces can then use bounded `context.query` without a duplicate MCP disclosure permit. See [Shared and verifiable team memory](TEAM-MEMORY.md).
 
 ## Context pack v1 to v2
 

@@ -52,7 +52,7 @@ const DIAGNOSTIC_TOOLS = Object.freeze([
 const CONTEXT_QUERY_TOOL = Object.freeze({
   name: "context.query",
   title: "Compile cited project memory",
-  description: "Compile a bounded, cited context pack from an explicitly trusted workspace. This tool is exposed only when the server starts with a matching disclosure permit.",
+  description: "Compile a bounded, cited context pack from an explicitly initialized, enabled, and machine-trusted workspace.",
   inputSchema: {
     type: "object",
     properties: {
@@ -222,9 +222,7 @@ export function createMcpServer(options = {}) {
   const write = options.write ?? ((message) => process.stdout.write(`${JSON.stringify(message)}\n`));
   if (typeof write !== "function") throw new TypeError("MCP server options.write must be a function.");
   const queryPermit = normalizeQueryPermit(options.queryPermit);
-  const tools = Object.freeze(queryPermit
-    ? [...DIAGNOSTIC_TOOLS, CONTEXT_QUERY_TOOL]
-    : [...DIAGNOSTIC_TOOLS]);
+  const tools = Object.freeze([...DIAGNOSTIC_TOOLS, CONTEXT_QUERY_TOOL]);
   let initialized = false;
   let clientCapabilities = Object.create(null);
   let rootsCache = null;
@@ -335,9 +333,6 @@ export function createMcpServer(options = {}) {
         return textResult({ ...store, ok: derived === "current", derived });
       }
       if (name === "context.query") {
-        if (!queryPermit) {
-          throw new QarinahError("MCP_DISCLOSURE_NOT_AUTHORIZED", "The MCP server was not started with a disclosure permit.");
-        }
         const input = validateToolInput(rawArguments, [
           "workspace", "query", "maxChars", "limit", "minimumCoverage", "minimumEvidence", "format", "temporalBoundary", "asOf"
         ]);
@@ -348,23 +343,28 @@ export function createMcpServer(options = {}) {
           throw new TypeError("context.query query must be a string up to 4096 characters.");
         }
         const workspace = await resolveWorkspace(input.workspace);
-        if (
+        if (queryPermit && (
           workspace.config.workspaceId !== queryPermit.workspaceId
           || workspace.consent?.policyHash !== queryPermit.policyHash
-        ) {
+        )) {
           throw new QarinahError(
             "MCP_DISCLOSURE_NOT_AUTHORIZED",
             "The disclosure permit does not match this workspace's reviewed capture policy."
           );
         }
+        const maximumChars = Math.min(
+          workspace.config.contextMaxChars,
+          queryPermit?.maxChars ?? workspace.config.contextMaxChars
+        );
+        const maximumItems = queryPermit?.maxItems ?? 20;
         const maxChars = boundedQueryInteger(
           input.maxChars,
-          Math.min(workspace.config.contextMaxChars, queryPermit.maxChars),
+          maximumChars,
           512,
-          queryPermit.maxChars,
+          maximumChars,
           "maxChars"
         );
-        const limit = boundedQueryInteger(input.limit, queryPermit.maxItems, 1, queryPermit.maxItems, "limit");
+        const limit = boundedQueryInteger(input.limit, maximumItems, 1, maximumItems, "limit");
         const minimumCoverage = input.minimumCoverage ?? "direct";
         if (!["any", "partial", "direct"].includes(minimumCoverage)) {
           throw new TypeError("minimumCoverage must be any, partial, or direct.");
@@ -422,9 +422,7 @@ export function createMcpServer(options = {}) {
         protocolVersion,
         capabilities: { tools: { listChanged: false } },
         serverInfo: { name: SERVER_NAME, title: "Qarinah Context", version: QARINAH_VERSION },
-        instructions: queryPermit
-          ? "Qarinah exposes zero-write diagnostics plus consent-gated context.query. Every query requires the exact absolute workspace and a server disclosure permit matching that workspace's reviewed machine-local policy."
-          : "Context Ledger MCP tools provide zero-write status and integrity diagnostics only. Pass the current task's absolute workspace path in the workspace argument unless this client advertises filesystem roots. Start a separately reviewed server disclosure permit to expose context.query."
+        instructions: "Qarinah exposes zero-write diagnostics and bounded context.query for explicitly initialized, enabled, machine-trusted workspaces. Every call requires the exact absolute workspace path unless the client advertises an exact filesystem root."
       });
     }
     if (!initialized) return jsonRpcError(message.id, -32002, "The MCP server has not been initialized.");

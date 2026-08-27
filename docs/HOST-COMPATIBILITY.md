@@ -27,8 +27,8 @@ Qarinah does not capture hidden reasoning, credentials, private browser state, o
 The 0.6.0 installer is deliberately narrower than `setup`: it handles one reviewed project-scoped host surface and records exact ownership. Always inspect the dry run first.
 
 ```sh
-npx qarinah install . --host freebuff --scope project --dry-run --allow-query
-npx qarinah install . --host freebuff --scope project --allow-query
+npx qarinah install . --host freebuff --scope project --dry-run
+npx qarinah install . --host freebuff --scope project
 npx qarinah uninstall . --host freebuff --scope project
 ```
 
@@ -37,13 +37,13 @@ Supported `--host` values are `codex`, `claude`, `cursor`, `kimi`, `antigravity`
 ## Configure all supported project integrations
 
 ```sh
-npx qarinah setup . --capture content --allow-query
+npx qarinah setup . --capture content
 ```
 
 With no host flags, setup configures Codex, Claude Code, Cursor, Kimi Code/classic Kimi, and Antigravity. To configure only selected hosts:
 
 ```sh
-npx qarinah setup . --kimi --antigravity --allow-query
+npx qarinah setup . --kimi --antigravity
 ```
 
 ## Kimi

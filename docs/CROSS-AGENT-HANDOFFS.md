@@ -24,7 +24,7 @@ The durable record belongs to the project, not to a private chat or one editor. 
 Run this once from the repository you want the agents to share:
 
 ```sh
-npx qarinah setup . --codex --claude --cursor --capture content --allow-query
+npx qarinah setup . --codex --claude --cursor --capture content
 ```
 
 The setup initializes the local workspace, installs the reviewed project integrations, configures consent-gated MCP retrieval, and runs the first health check.

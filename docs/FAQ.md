@@ -138,7 +138,7 @@ The stable release provides a local CLI, typed JavaScript API, one-command Codex
 
 No. The default MCP server exposes only zero-write status and integrity diagnostics.
 
-The `context.query` tool appears only after explicit setup with `--allow-query`. Its permit is bound to the exact workspace, current consent-policy hash, and response ceilings. It cannot initialize a workspace, grant trust, repair state, append events, or disclose another workspace. Retrieve context explicitly with that tool, `qarinah query`, the JavaScript API, or a separately reviewed Maqam capability.
+The `context.query` tool is available for an explicitly initialized, enabled, machine-trusted workspace. Every request names the exact absolute workspace and is bounded by its approved response ceiling. It cannot initialize a workspace, grant trust, repair state, append events, or disclose another workspace. A stale derived index does not block retrieval because the read-only tool compiles a verified in-memory view of the authoritative ledger. Retrieve context explicitly with that tool, `qarinah query`, the JavaScript API, or a separately reviewed Maqam capability.
 
 ## Does Qarinah require an API key, cloud account, or hosted database?
 

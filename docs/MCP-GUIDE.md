@@ -1,12 +1,12 @@
 # MCP guide
 
-Qarinah 0.6.0 includes a native, zero-write Model Context Protocol server. It always provides local ledger status and integrity diagnostics. It provides `context.query` only after the user creates an explicit permit bound to the exact workspace, current consent-policy hash, and response ceilings.
+Qarinah 0.6.0 includes a native, zero-write Model Context Protocol server. It provides local ledger status, integrity diagnostics, and bounded `context.query` retrieval for an explicitly initialized, enabled, machine-trusted workspace.
 
 That narrow boundary is intentional:
 
 - project capture is explicit;
 - durable writes remain CLI operations or separately governed Maqam capabilities;
-- model-facing context disclosure is explicit and consent-gated;
+- model-facing context disclosure requires the exact authorized workspace root;
 - diagnostic tools cannot expand their own authority.
 
 ## Package and registry identity
@@ -18,10 +18,9 @@ That narrow boundary is intentional:
 | Version | `0.6.0` |
 | Transport | `stdio` |
 | CLI entry | `npx qarinah mcp` |
-| Default tools | `context_status`, `context_doctor` |
-| Permitted tool | `context.query` |
+| Read-only tools | `context_status`, `context_doctor`, `context.query` |
 
-Authorized `context.query` calls accept `format: "pack"` (default) or `format: "handoff"`. The handoff representation is a bounded model-facing summary pointer linked to the selected event and complete pack manifest. It does not weaken disclosure permits or replace the auditable pack.
+Authorized `context.query` calls accept `format: "pack"` (default) or `format: "handoff"`. The handoff representation is a bounded model-facing summary pointer linked to the selected event and complete pack manifest. It does not weaken workspace trust or replace the auditable pack.
 
 The registry declaration is stored in the repository's `server.json`. The npm package also publishes `mcpName: "io.github.AjnasNB/qarinah"`.
 
@@ -33,21 +32,21 @@ The registry declaration is stored in the repository's `server.json`. The npm pa
 - Valid machine-local trust for that exact workspace and policy.
 - A host that supports newline-delimited stdio MCP.
 
-Initialize, install the three supported host integrations, authorize bounded retrieval, and verify the project:
+Initialize, install the supported host integrations, and verify the project:
 
 ```sh
-npx -y qarinah@latest setup . --codex --claude --cursor --capture content --allow-query
+npx -y qarinah@latest setup . --codex --claude --cursor --capture content
 ```
 
 ## Direct stdio command
 
-The diagnostic-only server command is:
+The workspace-authorized read-only server command is:
 
 ```sh
 npx qarinah mcp
 ```
 
-An authorized query server must receive the exact reviewed policy hash:
+For backwards compatibility, a direct server can receive an additional process-level permit that further narrows the exact workspace and response limits:
 
 ```sh
 npx qarinah mcp \
@@ -250,7 +249,7 @@ The tool does not repair this condition. Review it locally and run `npx qarinah 
 
 ## Tool: `context.query`
 
-Compiles a bounded, cited context pack without writing to the workspace. This tool is listed only when the server has the exact disclosure permit described below.
+Compiles a bounded, cited context pack without writing to the workspace. The call succeeds only for the exact initialized, enabled, machine-trusted workspace selected by the request.
 
 ```json
 {
@@ -409,23 +408,21 @@ await runMcpServer({
 });
 ```
 
-## Context retrieval is explicit and consent-gated
+## Context retrieval is explicit and workspace-authorized
 
-The MCP server exposes `context.query` only when all of these conditions hold:
+The MCP server executes `context.query` only when all of these conditions hold:
 
 1. the exact workspace is initialized, enabled, and trusted;
-2. setup or the caller passes `--allow-query`;
-3. the supplied `--policy-hash` matches the workspace's current consent policy;
-4. the request selects the exact workspace rather than an opted-in parent; and
-5. the requested item and character limits remain within the permit.
+2. the request selects the exact absolute workspace rather than an opted-in parent; and
+3. the requested item and character limits remain within the workspace's approved ceiling.
 
-The tool performs a verified, zero-write compilation with no implicit rebuild or checkpoint advancement. It returns a bounded cited context pack and cannot initialize, grant trust, append, repair, walk into another workspace, or enlarge its own permit.
+The tool performs a verified, zero-write in-memory compilation with no implicit rebuild or checkpoint advancement. A stale disposable index therefore does not block retrieval from the authoritative event log. It returns a bounded cited context pack and cannot initialize, grant trust, append, repair, walk into another workspace, or enlarge its own authority.
 
-Without a query permit, only `context_status` and `context_doctor` are listed. Users may also run `qarinah query`, call `compileContext`, or register Qarinah's separately exported Maqam `context.query` capability.
+The legacy `--allow-query`, `--workspace-id`, and `--policy-hash` server arguments remain supported only as an additional restriction for existing integrations. Normal `qarinah setup` does not need them. Users may also run `qarinah query`, call `compileContext`, or register Qarinah's separately exported Maqam `context.query` capability.
 
 Durable append remains absent from MCP. The Maqam `context.append` adapter is a high-risk write capability with exact execution verification and required approval.
 
-Do not describe the diagnostic tools as model memory injection or describe permitted `context.query` as ambient disclosure.
+Do not describe the diagnostic tools as model memory injection or describe workspace-authorized `context.query` as ambient disclosure.
 
 ## Verification
 
@@ -442,8 +439,8 @@ The smoke suite:
 - negotiates lifecycle;
 - tests Codex without advertised roots using an explicit workspace;
 - tests Claude with negotiated roots;
-- verifies the default diagnostic tools;
-- verifies that `context.query` is absent without a permit and bounded by an exact permit when enabled;
+- verifies all three read-only tools;
+- verifies that `context.query` works for an exact trusted workspace without a duplicate permit;
 - requires the process to remain alive until the client closes stdin;
 - rejects unexpected standard-error output.
 
