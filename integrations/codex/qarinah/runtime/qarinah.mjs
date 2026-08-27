@@ -12715,7 +12715,7 @@ var DIAGNOSTIC_TOOLS = Object.freeze([
 var CONTEXT_QUERY_TOOL = Object.freeze({
   name: "context.query",
   title: "Compile cited project memory",
-  description: "Compile a bounded, cited context pack from an explicitly trusted workspace. This tool is exposed only when the server starts with a matching disclosure permit.",
+  description: "Compile a bounded, cited context pack from an explicitly initialized, enabled, and machine-trusted workspace.",
   inputSchema: {
     type: "object",
     properties: {
@@ -12876,7 +12876,7 @@ function createMcpServer(options = {}) {
 `));
   if (typeof write !== "function") throw new TypeError("MCP server options.write must be a function.");
   const queryPermit = normalizeQueryPermit(options.queryPermit);
-  const tools = Object.freeze(queryPermit ? [...DIAGNOSTIC_TOOLS, CONTEXT_QUERY_TOOL] : [...DIAGNOSTIC_TOOLS]);
+  const tools = Object.freeze([...DIAGNOSTIC_TOOLS, CONTEXT_QUERY_TOOL]);
   let initialized = false;
   let clientCapabilities = /* @__PURE__ */ Object.create(null);
   let rootsCache = null;
@@ -12980,9 +12980,6 @@ function createMcpServer(options = {}) {
         return textResult({ ...store, ok: derived === "current", derived });
       }
       if (name === "context.query") {
-        if (!queryPermit) {
-          throw new QarinahError("MCP_DISCLOSURE_NOT_AUTHORIZED", "The MCP server was not started with a disclosure permit.");
-        }
         const input = validateToolInput(rawArguments, [
           "workspace",
           "query",
@@ -13001,20 +12998,25 @@ function createMcpServer(options = {}) {
           throw new TypeError("context.query query must be a string up to 4096 characters.");
         }
         const workspace = await resolveWorkspace(input.workspace);
-        if (workspace.config.workspaceId !== queryPermit.workspaceId || workspace.consent?.policyHash !== queryPermit.policyHash) {
+        if (queryPermit && (workspace.config.workspaceId !== queryPermit.workspaceId || workspace.consent?.policyHash !== queryPermit.policyHash)) {
           throw new QarinahError(
             "MCP_DISCLOSURE_NOT_AUTHORIZED",
             "The disclosure permit does not match this workspace's reviewed capture policy."
           );
         }
+        const maximumChars = Math.min(
+          workspace.config.contextMaxChars,
+          queryPermit?.maxChars ?? workspace.config.contextMaxChars
+        );
+        const maximumItems = queryPermit?.maxItems ?? 20;
         const maxChars = boundedQueryInteger(
           input.maxChars,
-          Math.min(workspace.config.contextMaxChars, queryPermit.maxChars),
+          maximumChars,
           512,
-          queryPermit.maxChars,
+          maximumChars,
           "maxChars"
         );
-        const limit = boundedQueryInteger(input.limit, queryPermit.maxItems, 1, queryPermit.maxItems, "limit");
+        const limit = boundedQueryInteger(input.limit, maximumItems, 1, maximumItems, "limit");
         const minimumCoverage = input.minimumCoverage ?? "direct";
         if (!["any", "partial", "direct"].includes(minimumCoverage)) {
           throw new TypeError("minimumCoverage must be any, partial, or direct.");
@@ -13069,7 +13071,7 @@ function createMcpServer(options = {}) {
         protocolVersion,
         capabilities: { tools: { listChanged: false } },
         serverInfo: { name: SERVER_NAME, title: "Qarinah Context", version: QARINAH_VERSION },
-        instructions: queryPermit ? "Qarinah exposes zero-write diagnostics plus consent-gated context.query. Every query requires the exact absolute workspace and a server disclosure permit matching that workspace's reviewed machine-local policy." : "Context Ledger MCP tools provide zero-write status and integrity diagnostics only. Pass the current task's absolute workspace path in the workspace argument unless this client advertises filesystem roots. Start a separately reviewed server disclosure permit to expose context.query."
+        instructions: "Qarinah exposes zero-write diagnostics and bounded context.query for explicitly initialized, enabled, machine-trusted workspaces. Every call requires the exact absolute workspace path unless the client advertises an exact filesystem root."
       });
     }
     if (!initialized) return jsonRpcError(message.id, -32002, "The MCP server has not been initialized.");
@@ -14087,22 +14089,8 @@ async function writeExactManaged(candidate, root, label, contents) {
   }
   if (existing === null) await atomicWriteFile(candidate, contents);
 }
-function mcpArguments(workspace, options) {
-  const args = [BIN_PATH, "mcp"];
-  if (options.allowQuery) {
-    args.push(
-      "--allow-query",
-      "--workspace-id",
-      workspace.config.workspaceId,
-      "--policy-hash",
-      workspace.consent.policyHash,
-      "--max-chars",
-      String(options.maxChars ?? Math.min(workspace.config.contextMaxChars, 12e3)),
-      "--max-items",
-      String(options.maxItems ?? 20)
-    );
-  }
-  return args;
+function mcpArguments() {
+  return [BIN_PATH, "mcp"];
 }
 function qarinahHook(adapter) {
   return {
@@ -14184,7 +14172,7 @@ async function configureCodex(workspace, options) {
   const configPath = resolveWithin(root, "config.toml");
   const existing = await safeRead(configPath, ".codex/config.toml") ?? "";
   const args = mcpArguments(workspace, options);
-  const enabledTools = options.allowQuery ? ["context_status", "context_doctor", "context.query"] : ["context_status", "context_doctor"];
+  const enabledTools = ["context_status", "context_doctor", "context.query"];
   const block = [
     MANAGED_TOML_START,
     "[mcp_servers.qarinah]",
@@ -14339,7 +14327,7 @@ Before replaying broad project history, use the Qarinah MCP server for a bounded
 async function configureFreebuff(workspace, options) {
   const agentsRoot = resolveWithin(workspace.root, ".agents");
   await ensureDirectory(agentsRoot, workspace.root, ".agents");
-  const tools = options.allowQuery ? ["qarinah/context_status", "qarinah/context_doctor", "qarinah/context.query"] : ["qarinah/context_status", "qarinah/context_doctor"];
+  const tools = ["qarinah/context_status", "qarinah/context_doctor", "qarinah/context.query"];
   const definition = `// Managed by Qarinah. Freebuff discovers local agent definitions in .agents/.
 const definition = {
   id: "qarinah-memory",
@@ -14379,9 +14367,6 @@ async function setupWorkspace(options = {}) {
     if (error?.code !== "ENOENT") throw error;
   }
   workspace = exactConfigExists ? await loadWorkspace(target) : await initializeWorkspace(target, { capture: options.capture ?? "metadata", ifNeeded: true });
-  if (options.allowQuery === true && !workspace.consent?.policyHash) {
-    throw new QarinahError("MCP_DISCLOSURE_NOT_AUTHORIZED", "Workspace authorization is required before enabling context.query.");
-  }
   const targets = normalizeTargets(options);
   const files = [];
   if (targets.includes("codex")) files.push(...await configureCodex(workspace, options));
@@ -14429,7 +14414,7 @@ async function setupWorkspace(options = {}) {
     root: workspace.root,
     workspaceId: workspace.config.workspaceId,
     capture: workspace.config.capture,
-    queryEnabled: options.allowQuery === true,
+    queryEnabled: true,
     autoCompact: options.autoCompact === true,
     targets,
     files,
@@ -15639,10 +15624,10 @@ function help() {
 
 Usage:
   qarinah init [path] [--capture metadata|content]
-  qarinah setup [path] [--codex] [--claude] [--cursor] [--kimi] [--antigravity] [--freebuff] [--capture metadata|content] [--allow-query] [--auto-compact] [--share-activation] [--backup-source <export>] [--backup-destination <external-directory>]
+  qarinah setup [path] [--codex] [--claude] [--cursor] [--kimi] [--antigravity] [--freebuff] [--capture metadata|content] [--auto-compact] [--share-activation] [--backup-source <export>] [--backup-destination <external-directory>]
   qarinah demo [--output <empty-directory>]
   qarinah activation status | enable | disable
-  qarinah install [path] --host codex|claude|cursor|kimi|antigravity|freebuff --scope project [--dry-run] [--capture metadata|content] [--allow-query] [--auto-compact]
+  qarinah install [path] --host codex|claude|cursor|kimi|antigravity|freebuff --scope project [--dry-run] [--capture metadata|content] [--auto-compact]
   qarinah uninstall [path] --host codex|claude|cursor|kimi|antigravity|freebuff --scope project
   qarinah record --kind <kind> --title <title> [--body <text>] [--data-json <json>] [--relation type:target]
   qarinah record --stdin-json

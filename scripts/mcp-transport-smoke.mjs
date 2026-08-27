@@ -110,7 +110,7 @@ async function probe(host, workspaceRoot, stateRoot) {
     send({ jsonrpc: "2.0", method: "notifications/initialized" });
 
     const listed = await request("tools/list", {});
-    assert.deepEqual(listed.tools.map((tool) => tool.name), ["context_status", "context_doctor"]);
+    assert.deepEqual(listed.tools.map((tool) => tool.name), ["context_status", "context_doctor", "context.query"]);
     for (const tool of listed.tools) {
       assert.deepEqual(tool.annotations, { readOnlyHint: true, destructiveHint: false, openWorldHint: false });
     }
@@ -125,6 +125,18 @@ async function probe(host, workspaceRoot, stateRoot) {
     assert.equal(doctor.isError, undefined, `${host.name}: ${JSON.stringify(doctor)}`);
     assert.equal(doctor.structuredContent.ok, true);
     assert.equal(doctor.structuredContent.derived, "current");
+
+    const query = await request("tools/call", {
+      name: "context.query",
+      arguments: {
+        workspace: workspaceRoot,
+        query: "Verify packaged MCP transport",
+        minimumCoverage: "any"
+      }
+    });
+    assert.equal(query.isError, undefined, `${host.name}: ${JSON.stringify(query)}`);
+    assert.ok(query.structuredContent.items.length > 0, `${host.name}: query returned no cited items.`);
+    assert.equal(query.structuredContent.workspaceId, status.structuredContent.workspaceId);
     assert.equal(child.exitCode, null, `${host.name} MCP process exited before the client closed stdin.`);
   } finally {
     child.stdin.end();
@@ -133,7 +145,7 @@ async function probe(host, workspaceRoot, stateRoot) {
   const exit = await withTimeout(new Promise((resolve) => child.once("close", (code, signal) => resolve({ code, signal }))), `${host.name} shutdown`);
   assert.deepEqual(exit, { code: 0, signal: null }, stderr);
   assert.equal(stderr, "", `${host.name} wrote unexpected stderr output.`);
-  return { host: host.name, server: "qarinah-context", version: packageJson.version, tools: 2 };
+  return { host: host.name, server: "qarinah-context", version: packageJson.version, tools: 3 };
 }
 
 const sandbox = await mkdtemp(path.join(os.tmpdir(), "qarinah-mcp-smoke-"));
