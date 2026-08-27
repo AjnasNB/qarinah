@@ -84,9 +84,9 @@ async function initialize(server, messages, capabilities = {}) {
   await server.handle({ jsonrpc: "2.0", method: "notifications/initialized" });
 }
 
-test("MCP exposes only accurately annotated zero-write diagnostic tools", async (t) => {
+test("MCP exposes bounded query for an initialized and trusted workspace without a second permit", async (t) => {
   const root = await temporaryDirectory(t);
-  const workspace = await initializeWorkspace(root);
+  const workspace = await initializeWorkspace(root, { capture: "content" });
   await appendEvent(eventInput(), { workspace });
   await rebuildDerivedState(root);
   const messages = [];
@@ -94,7 +94,7 @@ test("MCP exposes only accurately annotated zero-write diagnostic tools", async 
   await initialize(server, messages);
   await server.handle({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} });
   const tools = response(messages, 2).result.tools;
-  assert.deepEqual(tools.map((tool) => tool.name), ["context_status", "context_doctor"]);
+  assert.deepEqual(tools.map((tool) => tool.name), ["context_status", "context_doctor", "context.query"]);
   for (const tool of tools) {
     assert.deepEqual(tool.annotations, { readOnlyHint: true, destructiveHint: false, openWorldHint: false });
   }
@@ -102,16 +102,36 @@ test("MCP exposes only accurately annotated zero-write diagnostic tools", async 
     jsonrpc: "2.0",
     id: 3,
     method: "tools/call",
-    params: { name: "context_query", arguments: { query: "browser approval", maxChars: 4000, limit: 5 } }
+    params: {
+      name: "context.query",
+      arguments: { workspace: root, query: "Govern browser writes", maxChars: 4000, limit: 5, minimumCoverage: "any" }
+    }
   });
   const result = response(messages, 3).result;
-  assert.equal(result.isError, true);
-  assert.equal(result.structuredContent.code, "MCP_TOOL_NOT_FOUND");
-  assert.equal(JSON.stringify(result).includes("Govern browser writes"), false);
+  assert.equal(result.isError, undefined, JSON.stringify(result));
+  assert.equal(result.structuredContent.workspaceId, workspace.config.workspaceId);
+  assert.equal(result.structuredContent.items[0].title, "Govern browser writes");
   server.close();
 });
 
-test("MCP exposes bounded cited retrieval only with an exact workspace disclosure permit", async (t) => {
+test("MCP query still refuses an uninitialized workspace", async (t) => {
+  const root = await temporaryDirectory(t);
+  const messages = [];
+  const server = createMcpServer({ cwd: root, write: (message) => messages.push(message) });
+  await initialize(server, messages);
+  await server.handle({
+    jsonrpc: "2.0",
+    id: 4,
+    method: "tools/call",
+    params: { name: "context.query", arguments: { workspace: root, query: "private project" } }
+  });
+  const result = response(messages, 4).result;
+  assert.equal(result.isError, true);
+  assert.equal(result.structuredContent.code, "WORKSPACE_NOT_INITIALIZED");
+  server.close();
+});
+
+test("MCP accepts a legacy exact-workspace permit as an additional response bound", async (t) => {
   const root = await temporaryDirectory(t);
   const workspace = await initializeWorkspace(root, { capture: "content" });
   const source = await appendEvent(eventInput(), { workspace });
@@ -244,12 +264,6 @@ test("MCP query reads a verified in-memory view when lifecycle capture makes der
   const messages = [];
   const server = createMcpServer({
     cwd: root,
-    queryPermit: {
-      workspaceId: workspace.config.workspaceId,
-      policyHash: workspace.consent.policyHash,
-      maxChars: 4_000,
-      maxItems: 5
-    },
     write: (message) => messages.push(message)
   });
   await initialize(server, messages);
@@ -473,6 +487,6 @@ test("stdio transport rejects oversized frames without buffering them into tool 
   assert.equal(messages.filter((message) => message.error?.code === -32700).length, 1);
   assert.match(messages.find((message) => message.error?.code === -32700).error.message, /1024-byte limit/);
   assert.equal(response(messages, 1).result.protocolVersion, "2025-06-18");
-  assert.deepEqual(response(messages, 2).result.tools.map((tool) => tool.name), ["context_status", "context_doctor"]);
+  assert.deepEqual(response(messages, 2).result.tools.map((tool) => tool.name), ["context_status", "context_doctor", "context.query"]);
   assert.equal(JSON.stringify(messages).includes("x".repeat(64)), false);
 });

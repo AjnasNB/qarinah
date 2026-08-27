@@ -32,12 +32,11 @@ async function contentWorkspace(t) {
   return root;
 }
 
-test("one-command setup configures Codex, Claude, Cursor, Kimi, Antigravity, Freebuff, hooks, skills, and consent-gated MCP", async (t) => {
+test("one-command setup configures hosts with workspace-authorized bounded MCP retrieval", async (t) => {
   const root = await temporaryDirectory(t);
   const result = await setupWorkspace({
     cwd: root,
-    capture: "content",
-    allowQuery: true
+    capture: "content"
   });
   assert.equal(result.ok, true);
   assert.deepEqual(result.targets, ["codex", "claude", "cursor", "kimi", "antigravity", "freebuff"]);
@@ -45,27 +44,27 @@ test("one-command setup configures Codex, Claude, Cursor, Kimi, Antigravity, Fre
   const codexConfig = await readFile(path.join(root, ".codex", "config.toml"), "utf8");
   assert.match(codexConfig, /\[mcp_servers\.qarinah\]/);
   assert.match(codexConfig, /context\.query/);
-  assert.match(codexConfig, /workspace-id/);
-  assert.match(codexConfig, /policy-hash/);
+  assert.doesNotMatch(codexConfig, /workspace-id/);
+  assert.doesNotMatch(codexConfig, /policy-hash/);
   assert.match(codexConfig, /default_tools_approval_mode = "writes"/);
   const claudeMcp = JSON.parse(await readFile(path.join(root, ".mcp.json"), "utf8"));
   assert.equal(claudeMcp.mcpServers.qarinah.type, "stdio");
-  assert.ok(claudeMcp.mcpServers.qarinah.args.includes("--allow-query"));
+  assert.equal(claudeMcp.mcpServers.qarinah.args.includes("--allow-query"), false);
   const cursorMcp = JSON.parse(await readFile(path.join(root, ".cursor", "mcp.json"), "utf8"));
-  assert.ok(cursorMcp.mcpServers.qarinah.args.includes("--policy-hash"));
+  assert.equal(cursorMcp.mcpServers.qarinah.args.includes("--policy-hash"), false);
   assert.match(await readFile(path.join(root, ".codex", "skills", "qarinah", "SKILL.md"), "utf8"), /name: qarinah/);
   assert.match(await readFile(path.join(root, ".codex", "skills", "qarinah-context", "SKILL.md"), "utf8"), /Qarinah/);
   assert.match(await readFile(path.join(root, ".claude", "skills", "qarinah", "SKILL.md"), "utf8"), /\$ARGUMENTS/);
   assert.match(await readFile(path.join(root, ".claude", "settings.json"), "utf8"), /UserPromptSubmit/);
   assert.match(await readFile(path.join(root, ".cursor", "rules", "qarinah.mdc"), "utf8"), /bounded, cited memory pack/);
   const kimiMcp = JSON.parse(await readFile(path.join(root, ".kimi-code", "mcp.json"), "utf8"));
-  assert.ok(kimiMcp.mcpServers.qarinah.args.includes("--workspace-id"));
+  assert.equal(kimiMcp.mcpServers.qarinah.args.includes("--workspace-id"), false);
   const classicKimiMcp = JSON.parse(await readFile(path.join(root, ".kimi", "qarinah-mcp.json"), "utf8"));
-  assert.ok(classicKimiMcp.mcpServers.qarinah.args.includes("--allow-query"));
+  assert.equal(classicKimiMcp.mcpServers.qarinah.args.includes("--allow-query"), false);
   assert.match(await readFile(path.join(root, ".kimi", "README-QARINAH.md"), "utf8"), /--mcp-config-file/);
   assert.deepEqual(JSON.parse(await readFile(path.join(root, ".agents", "plugins", "qarinah", "plugin.json"), "utf8")), { name: "qarinah" });
   const antigravityMcp = JSON.parse(await readFile(path.join(root, ".agents", "plugins", "qarinah", "mcp_config.json"), "utf8"));
-  assert.ok(antigravityMcp.mcpServers.qarinah.args.includes("--policy-hash"));
+  assert.equal(antigravityMcp.mcpServers.qarinah.args.includes("--policy-hash"), false);
   assert.match(await readFile(path.join(root, ".agents", "plugins", "qarinah", "rules", "qarinah.md"), "utf8"), /untrusted evidence/);
   const freebuff = await readFile(path.join(root, ".agents", "qarinah-memory.ts"), "utf8");
   assert.match(freebuff, /id: "qarinah-memory"/u);
@@ -77,7 +76,7 @@ test("one-command setup configures Codex, Claude, Cursor, Kimi, Antigravity, Fre
   assert.match(await readFile(path.join(root, ".qarinah", "records", "CHANGES.md"), "utf8"), /Major project changes/);
   assert.match(await readFile(path.join(root, ".qarinah", "dashboard", "index.html"), "utf8"), /Shared memory your team can inspect/);
 
-  const repeated = await setupWorkspace({ cwd: root, codex: true, claude: true, cursor: true, allowQuery: true });
+  const repeated = await setupWorkspace({ cwd: root, codex: true, claude: true, cursor: true });
   assert.equal(repeated.ok, true);
   assert.equal((await readFile(path.join(root, ".codex", "config.toml"), "utf8")).match(/qarinah:managed:start/g).length, 1);
 });
