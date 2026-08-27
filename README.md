@@ -47,7 +47,7 @@ Need a specific host or a content-enabled workflow? Keep that choice explicit:
 
 ```sh
 npx qarinah install . --host codex --scope project --dry-run
-npx qarinah setup . --codex --capture content --allow-query --auto-compact
+npx qarinah setup . --codex --capture content --auto-compact
 ```
 
 Optional, content-free activation measurement is disabled by default. Pass `--share-activation` only if you choose to share five once-only milestones: setup, first capture, first retrieval, first cross-session handoff, and seven-day return. No project name, path, repository, query, event body, file, agent transcript, hostname, username, or IP-derived field is included in the application payload. [Read the privacy contract and disable it at any time.](PRIVACY.md#optional-content-free-activation-measurement)
@@ -200,7 +200,7 @@ Metadata-only projects retain a content-free consolidation receipt. Content proj
 </p>
 
 ```sh
-npx qarinah setup . --capture content --allow-query --auto-compact
+npx qarinah setup . --capture content --auto-compact
 ```
 
 <p align="center">
@@ -210,7 +210,7 @@ npx qarinah setup . --capture content --allow-query --auto-compact
 </p>
 
 <p align="center">
-  Run the setup command once from a repository. It installs project-local integrations and consent-gated MCP retrieval for that exact workspace. Qarinah works independently; connect Maqam only when a workflow also needs policy or human approval.
+  Run the setup command once from a repository. It installs project-local integrations and bounded MCP retrieval for that exact initialized and machine-trusted workspace. Qarinah works independently; connect Maqam only when a workflow also needs policy or human approval.
 </p>
 
 ---
@@ -227,7 +227,7 @@ npx qarinah setup . --capture content --allow-query --auto-compact
 
 ```sh
 # Set up memory, map the project, and connect all supported coding agents.
-npx qarinah setup . --capture content --allow-query
+npx qarinah setup . --capture content
 
 # See the whole project in one readable page.
 npx qarinah overview
@@ -368,7 +368,7 @@ npx qarinah dashboard --serve
 
 When a host or orchestrator queries Qarinah before constructing a model request, Qarinah compiles the retained project history into a bounded cited pack first. That same pack can be supplied to a small local model, a large-context model, or a high-reasoning Codex or Claude session. The compiler itself does not need an embedding API, a hosted memory service, or a Qarinah API key.
 
-Packs are requested explicitly. Hosts can call the CLI or JavaScript API, enable Qarinah's zero-write MCP `context.query` tool with a permit bound to the exact workspace and current consent-policy hash, or optionally route a query through Maqam when policy or approval is useful. Without that permit, the built-in MCP server exposes diagnostics only.
+Packs are requested explicitly. Hosts can call the CLI or JavaScript API, use Qarinah's zero-write MCP `context.query` tool for an explicitly initialized, enabled, machine-trusted workspace, or optionally route a query through Maqam when policy or approval is useful. Every MCP query names the exact absolute workspace and remains bounded by that workspace's approved context ceiling.
 
 ## What it records
 
@@ -398,7 +398,7 @@ Qarinah is intentionally small, local, and inspectable:
 | Retrieval | SQLite FTS5, BM25, typo tolerance, graph traversal, reciprocal-rank fusion, time and freshness filters, host-owned authority scopes, repository isolation, conflict/supersession handling, and diversity |
 | Context compiler | Complete-output character and token budgets, explicit output headroom, evidence-coverage gates, deterministic citations, and reproducible manifests |
 | Human-readable views | Rebuildable Markdown, JSON, graph, index, and Google OKF 0.1 Draft exports |
-| Agent integration | One-command Codex, Claude Code, Cursor, Kimi, and Antigravity setup; reviewed Codex/Claude lifecycle hooks; strict JSON stdin; typed JavaScript API; and consent-gated stdio MCP retrieval |
+| Agent integration | One-command Codex, Claude Code, Cursor, Kimi, and Antigravity setup; reviewed Codex/Claude lifecycle hooks; strict JSON stdin; typed JavaScript API; and workspace-authorized stdio MCP retrieval |
 | Optional adapters | Local or customer-provided embeddings, query expansion, and rerankers may reorder admitted cited evidence without replacing ledger authority |
 | Team continuity | Client-side encrypted immutable bundles, a self-hosted opaque sync service, tenant-bound roles, exact bundle identities, bounded rate limits, and token-free audit evidence |
 | Infrastructure | No required vector database, hosted backend, embedding bill, model provider, daemon, analytics endpoint, or Qarinah API key |
@@ -409,14 +409,14 @@ Qarinah requires a maintained Node.js 22, 24, or 26 release.
 
 ```sh
 npm install --save-dev qarinah
-npx qarinah setup . --capture content --allow-query
+npx qarinah setup . --capture content
 ```
 
 The package is designed for local use. It does not require a hosted Qarinah account, embedding service, or Qarinah API key.
 
 ## Initialize once, remember across supported sessions
 
-`npx qarinah setup . --capture content --allow-query` is the one-time, explicit opt-in for that exact workspace and capture policy. It initializes SQLite and the other derived views, records a bounded map of the codebase, installs project-local integrations, configures consent-gated MCP retrieval, and runs a health check. Codex and Claude Code have reviewed lifecycle capture adapters. Cursor, Kimi, and Antigravity use their documented project-level MCP surfaces; their host history is imported only from an explicit supported export. Qarinah can then compile a small cited pack on demand, so a new task in that folder does not need the whole retained history replayed into its prompt.
+`npx qarinah setup . --capture content` is the one-time, explicit opt-in for that exact workspace and capture policy. It initializes SQLite and the other derived views, records a bounded map of the codebase, installs project-local integrations, configures workspace-authorized MCP retrieval, and runs a health check. Codex and Claude Code have reviewed lifecycle capture adapters. Cursor, Kimi, and Antigravity use their documented project-level MCP surfaces; their host history is imported only from an explicit supported export. Qarinah can then compile a small cited pack on demand, so a new task in that folder does not need the whole retained history replayed into its prompt.
 
 Qarinah is project memory, not an always-running agent or application supervisor. It does not keep an agent running, prevent provider-side context compaction, or capture host activity the host does not expose. When a host compacts its own conversation, Qarinah preserves only the permitted evidence it actually received and makes it available to an explicit CLI/API query or a workspace-authorized, bounded MCP query.
 
@@ -426,7 +426,7 @@ Existing visible Codex, Claude, Kimi stream-json, or portable agent exports can 
 
 The public package now includes:
 
-- consent-gated, zero-write MCP `context.query` with exact workspace and policy-hash authorization;
+- workspace-authorized, zero-write MCP `context.query` with exact-root selection and machine-local trust;
 - one-command Codex, Claude Code, Cursor, Kimi, and Antigravity setup;
 - a local visual dashboard for decisions, supersession, conflicts, citations, activity, savings, and affected files;
 - freshness checks for changed, missing, or unsafe cited files;
@@ -592,12 +592,12 @@ The repository includes generated, dependency-free plugin runtimes for Codex and
 
 - allowlisted lifecycle hooks;
 - a Qarinah context skill;
-- zero-write `context_status` and `context_doctor` MCP tools plus optional consent-gated `context.query`, all with exact workspace selection;
+- zero-write `context_status`, `context_doctor`, and bounded `context.query` MCP tools, all with exact workspace selection;
 - explicit CLI querying for user-directed local workflows.
 
 Codex and Claude Code plugin caches are immutable copies. Reinstall the reviewed plugin and start a new task after an upgrade. Claude requires an explicitly selected absolute Node 22, 24, or 26 executable. Codex still inherits the host's reviewed Node `PATH` boundary because its current plugin schema does not expose an equivalent file setting. See [host integrations](docs/HOST-INTEGRATIONS.md).
 
-Ambient MCP context disclosure remains disabled. `context.query` appears only after explicit setup with `--allow-query`; its permit is bound to the exact workspace policy hash and strict item and character limits. Durable MCP writes remain unavailable.
+Ambient MCP context disclosure remains disabled. `context.query` requires an exact initialized, enabled, machine-trusted workspace and enforces strict item and character limits. A legacy server-start permit may further narrow those limits, but it is no longer a second prerequisite. Durable MCP writes remain unavailable.
 
 The repository also runs `npm run mcp:smoke` against the exact bundled Codex and Claude runtimes. The smoke test starts each stdio server from its packaged manifest, exercises Codex without MCP roots using an exact trusted workspace selector, exercises Claude with negotiated roots, lists the two annotated tools, calls both tools against a temporary trusted ledger, and verifies clean shutdown without stderr output.
 

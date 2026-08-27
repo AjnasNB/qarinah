@@ -19,7 +19,7 @@ Sibling checkouts share only a non-secret repository group ID derived from Git h
 Run setup in every checkout that should retain its own activity:
 
 ```sh
-npx qarinah setup . --capture content --allow-query --auto-compact
+npx qarinah setup . --capture content --auto-compact
 npx qarinah scan
 npx qarinah build
 ```

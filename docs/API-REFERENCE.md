@@ -930,7 +930,7 @@ function runMcpServer(options?: {
 
 Runs newline-delimited stdio transport. Default maximum frame size is 1 MiB; the accepted configured range is 1,024 through 16,777,216 bytes.
 
-The server always exposes zero-write `context_status` and `context_doctor`. A matching `queryPermit` adds bounded, zero-write `context.query`. It never exposes ledger writes. See [MCP guide](MCP-GUIDE.md).
+The server exposes zero-write `context_status`, `context_doctor`, and bounded `context.query` for an exact initialized, enabled, machine-trusted workspace. An optional legacy `queryPermit` can further restrict the workspace policy and response limits. It never exposes ledger writes. See [MCP guide](MCP-GUIDE.md).
 
 ## Team-memory platform APIs
 

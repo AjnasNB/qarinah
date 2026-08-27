@@ -29,7 +29,7 @@ Watch the exact flow in the [two-minute fresh-session handoff](https://qarinah.i
 If the repository uses Git worktrees, run setup inside each checkout that should remember its own activity. Qarinah keeps those ledgers isolated and can group the initialized siblings later:
 
 ```sh
-npx qarinah setup . --capture content --allow-query
+npx qarinah setup . --capture content
 npx qarinah worktrees
 npx qarinah dashboard --serve --worktrees
 ```
@@ -77,7 +77,7 @@ Initialization creates the portable project configuration, an empty SQLite/FTS5 
 For a content-enabled setup connected to selected supported hosts, make every broader permission explicit:
 
 ```sh
-npx qarinah setup . --codex --claude --cursor --capture content --allow-query
+npx qarinah setup . --codex --claude --cursor --capture content
 npx qarinah overview
 ```
 

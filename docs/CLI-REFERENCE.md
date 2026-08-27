@@ -777,10 +777,10 @@ The result includes store verification fields plus `enabled` and `maxLogBytes`. 
 Initialize one project, install selected project-local coding-agent integrations, configure MCP, initialize SQLite/graph/readable views/dashboard, and run an integrity check:
 
 ```sh
-npx qarinah setup . --codex --claude --cursor --kimi --antigravity --capture content --allow-query --auto-compact
+npx qarinah setup . --codex --claude --cursor --kimi --antigravity --capture content --auto-compact
 ```
 
-Omit host flags to configure all five supported project integrations. Omit `--allow-query` for diagnostic-only MCP. With `--allow-query`, setup binds the zero-write `context.query` tool to the exact workspace's current consent-policy hash and response ceilings. Codex and Claude Code receive reviewed lifecycle hooks; Cursor, Kimi, and Antigravity receive their documented project-local MCP/configuration surfaces. See [Coding-agent host compatibility](HOST-COMPATIBILITY.md).
+Omit host flags to configure all supported project integrations. Setup exposes zero-write `context.query` only for the exact initialized, enabled, machine-trusted workspace and bounds it by the workspace response ceiling. Codex and Claude Code receive reviewed lifecycle hooks; Cursor, Kimi, and Antigravity receive their documented project-local MCP/configuration surfaces. See [Coding-agent host compatibility](HOST-COMPATIBILITY.md).
 
 `--auto-compact` is opt-in and applies to Codex and Claude Code Stop hooks. It runs after ordinary lifecycle capture and invokes `harness --record --no-rebuild --quiet`, producing one idempotent cited checkpoint without forcing a full projection rebuild after every turn.
 
@@ -835,8 +835,8 @@ Options are `--record`, `--max-facts 1..64`, `--max-chars 512..1000000`, `--max-
 Preview or write one reversible, project-scoped host integration:
 
 ```sh
-npx qarinah install . --host cursor --scope project --dry-run --allow-query --auto-compact
-npx qarinah install . --host cursor --scope project --allow-query --auto-compact
+npx qarinah install . --host cursor --scope project --dry-run --auto-compact
+npx qarinah install . --host cursor --scope project --auto-compact
 ```
 
 `--host` is required and accepts `codex`, `claude`, `cursor`, `kimi`, `antigravity`, or `freebuff`. `--scope project` is also required. The result lists every planned file, whether it is created or structurally merged, and the exact ownership manifest path. Dry-run performs no writes.
@@ -870,7 +870,7 @@ Enable bounded context retrieval only with an exact reviewed permit:
 npx qarinah mcp --allow-query --policy-hash sha256:<digest> --max-chars 12000 --max-items 20
 ```
 
-This adds the zero-write `context.query` tool. Ledger writes remain unavailable. See [MCP guide](MCP-GUIDE.md).
+This legacy direct-server form adds an extra process-level restriction to the zero-write `context.query` tool. Normal project setup does not need it because exact workspace initialization and machine-local trust already authorize and bound retrieval. Ledger writes remain unavailable. See [MCP guide](MCP-GUIDE.md).
 
 ## `dashboard`
 

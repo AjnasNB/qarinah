@@ -7,7 +7,7 @@ Qarinah can sit between a coding agent's visible lifecycle events and its next m
 Run setup in each checkout that should retain its own activity:
 
 ```sh
-npx qarinah setup . --capture content --allow-query --auto-compact
+npx qarinah setup . --capture content --auto-compact
 ```
 
 `--auto-compact` adds an ordered Stop hook for Codex and Claude Code. The normal capture hook records the completed turn first. The harness then compiles a bounded pack and records one evidence-linked checkpoint for that source head. Replaying the hook without a new source event reuses the existing checkpoint instead of creating a chain of duplicate summaries.

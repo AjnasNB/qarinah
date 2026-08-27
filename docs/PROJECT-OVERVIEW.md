@@ -3,7 +3,7 @@
 Qarinah can give a new coding agent a simple project overview before it starts work. The overview combines the latest codebase map with the permitted history already recorded for the project.
 
 ```sh
-npx qarinah setup . --codex --claude --cursor --capture content --allow-query
+npx qarinah setup . --codex --claude --cursor --capture content
 npx qarinah overview
 ```
 

@@ -24,7 +24,7 @@ npx qarinah doctor
 Review the proposed policy before authorizing content capture. If visible content is permitted:
 
 ```sh
-npx qarinah setup . --codex --claude --cursor --capture content --allow-query
+npx qarinah setup . --codex --claude --cursor --capture content
 ```
 
 The project owner remains responsible for legal agreements, repository access, backups, endpoint security, host telemetry, model-provider policies, and deciding which content may be recorded or disclosed.

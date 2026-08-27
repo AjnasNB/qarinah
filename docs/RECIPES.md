@@ -254,7 +254,7 @@ Start the stdio server only from a reviewed package or plugin runtime:
 npx qarinah mcp
 ```
 
-The server provides zero-write workspace status and integrity diagnostics by default. Explicit setup with `--allow-query` adds bounded `context.query` retrieval tied to the exact current policy hash. It still cannot initialize workspaces, grant trust, repair state, or record events.
+The server provides zero-write workspace status, integrity diagnostics, and bounded `context.query` retrieval for the exact initialized, enabled, machine-trusted workspace. It still cannot initialize workspaces, grant trust, repair state, or record events.
 
 For context retrieval, use an explicit `query` operation or a separately reviewed host capability.
 

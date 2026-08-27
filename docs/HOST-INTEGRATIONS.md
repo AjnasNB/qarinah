@@ -157,7 +157,7 @@ Both tools accept an optional `workspace` string containing an absolute local pa
 
 Both tools advertise `readOnlyHint: true`, `openWorldHint: false`, and `destructiveHint: false`. They do not advance the machine-local checkpoint, repair derived state, or disclose absolute workspace paths. The server negotiates MCP lifecycle/version, supports client filesystem roots, caps newline-delimited JSON-RPC frames, emits protocol messages only on stdout, and sends no credentials over the protocol.
 
-Durable MCP writes and ambient context disclosure are intentionally absent. Writes remain explicit CLI operations or Maqam `ToolGateway` calls with exact one-use approval. Context packs are available through a workspace-authorized MCP `context.query`, a Maqam-scoped capability, or the CLI/API. Model-facing CLI calls use only `record --stdin-json` and `query --stdin-json`: the bounded request object travels through process stdin, never through shell-interpolated text or model-controlled argv.
+Durable MCP writes and ambient context disclosure are intentionally absent. Writes remain explicit CLI operations or Maqam `ToolGateway` calls with exact one-use approval. Context packs are available through a workspace-authorized MCP `context.query`, a Maqam-scoped capability, or the CLI/API. MCP retrieval requires the exact initialized, enabled, machine-trusted workspace; it does not require a second disclosure permit. Model-facing CLI calls use only `record --stdin-json` and `query --stdin-json`: the bounded request object travels through process stdin, never through shell-interpolated text or model-controlled argv.
 
 ## Context and model budgets
 
