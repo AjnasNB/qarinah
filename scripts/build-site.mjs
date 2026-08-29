@@ -2,6 +2,7 @@ import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { marked } from "marked";
+import { plainTextFromHtml } from "./html-text.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const output = path.join(root, "site-dist");
@@ -2017,14 +2018,14 @@ function searchPage() {
 function tableOfContents(html) {
   const headings = [...html.matchAll(/<h([23]) id="([^"]+)">([\s\S]*?)<\/h\1>/g)]
     .slice(0, 18)
-    .map((match) => `<a class="toc-level-${match[1]}" href="#${match[2]}">${match[3].replace(/<[^>]+>/g, "")}</a>`);
+    .map((match) => `<a class="toc-level-${match[1]}" href="#${match[2]}">${plainTextFromHtml(match[3])}</a>`);
   return headings.join("");
 }
 
 function addHeadingIds(html) {
   const seen = new Map();
   return html.replace(/<h([1-3])>([\s\S]*?)<\/h\1>/g, (match, level, content) => {
-    const plain = content.replace(/<[^>]+>/g, "").trim().toLowerCase();
+    const plain = plainTextFromHtml(content).toLowerCase();
     const base = plain
       .normalize("NFKD")
       .replace(/[^\w\s-]/g, "")
@@ -2036,21 +2037,6 @@ function addHeadingIds(html) {
     const id = count === 0 ? base : `${base}-${count + 1}`;
     return `<h${level} id="${id}">${content}</h${level}>`;
   });
-}
-
-function plainText(html) {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/gi, " ")
-    .replace(/<style[\s\S]*?<\/style>/gi, " ")
-    .replace(/<[^>]+>/g, " ")
-    .replaceAll("&amp;", "&")
-    .replaceAll("&lt;", "<")
-    .replaceAll("&gt;", ">")
-    .replaceAll("&quot;", '"')
-    .replaceAll("&#39;", "'")
-    .replaceAll("&nbsp;", " ")
-    .replace(/\s+/g, " ")
-    .trim();
 }
 
 function documentationSidebar(currentRoute) {
@@ -2079,14 +2065,14 @@ async function markdownPage(page) {
   );
   const rendered = addHeadingIds(marked.parse(markdown));
   const headings = [...rendered.matchAll(/<h([1-3]) id="([^"]+)">([\s\S]*?)<\/h\1>/g)]
-    .map((match) => ({ id: match[2], text: plainText(match[3]) }));
+    .map((match) => ({ id: match[2], text: plainTextFromHtml(match[3]) }));
   searchEntries.push({
     route: `/${page.route}/`,
     title: page.title,
     description: page.description,
     headings,
     keywords: page.aliases,
-    content: plainText(rendered).slice(0, 30_000)
+    content: plainTextFromHtml(rendered).slice(0, 30_000)
   });
   const active = page.route === "paper"
     ? "paper"
