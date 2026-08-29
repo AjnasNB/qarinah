@@ -6,7 +6,7 @@ on:
       version:
         description: Exact package version to publish
         required: true
-        default: 0.6.0
+        default: 0.6.0-alpha.2
         type: string
       expected_git_commit:
         description: Exact reviewed lowercase 40-character commit SHA
@@ -15,7 +15,7 @@ on:
       dist_tag:
         description: npm dist-tag
         required: true
-        default: latest
+        default: next
         type: choice
         options: [next, latest]
       expected_size_bytes:

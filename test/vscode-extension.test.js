@@ -3,11 +3,13 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const root = new URL("../integrations/vscode/qarinah-memory/", import.meta.url);
+const repositoryRoot = new URL("../", import.meta.url);
 
 test("VS Code and Cursor panel package is local, read-only, searchable, and exact-versioned", async () => {
   const manifest = JSON.parse(await readFile(new URL("package.json", root), "utf8"));
+  const packageManifest = JSON.parse(await readFile(new URL("package.json", repositoryRoot), "utf8"));
   const source = await readFile(new URL("extension.cjs", root), "utf8");
-  assert.equal(manifest.version, "0.6.0");
+  assert.equal(manifest.version, packageManifest.version);
   assert.equal(manifest.main, "./extension.cjs");
   assert.equal(manifest.contributes.views.qarinah[0].id, "qarinah.developerMemory");
   assert.match(source, /"panel", "--limit", "80"/u);
