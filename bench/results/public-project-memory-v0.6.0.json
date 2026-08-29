@@ -10,8 +10,8 @@
     "timingClaimed": false,
     "sourceManifest": {
       "fileCount": 91,
-      "bytes": 1126466,
-      "manifestHash": "sha256:82d82655ded0dbdb660df5d5ca475b2bfd46faee67bb7d22c964a25e4b48aefb"
+      "bytes": 1126495,
+      "manifestHash": "sha256:dcfd1fa73e1d5206851c9ae7d19b29e8d9592bf257ada9d5a8afb4195ed76f9f"
     },
     "evaluatorSha256": "sha256:4040a669a6d6d7c34531d15ebc2e563fc8605e0ec79f506337b3ca398d8217ac"
   },
@@ -22,7 +22,7 @@
     "sessionReceipt": "qarinah.session-context-receipt.v2"
   },
   "observed": {
-    "projectFiles": 286,
+    "projectFiles": 288,
     "projectDirectories": 47,
     "supportedSymbolLanguages": [
       "c",
@@ -41,10 +41,10 @@
       "python",
       "typescript"
     ],
-    "eligibleSymbolFiles": 191,
-    "indexedSymbolFiles": 191,
-    "declarations": 36300,
-    "references": 63758,
+    "eligibleSymbolFiles": 193,
+    "indexedSymbolFiles": 193,
+    "declarations": 36309,
+    "references": 63795,
     "definitions": [
       {
         "query": "appendEvent",
@@ -130,5 +130,5 @@
     "No provider model, learned embedding service, wall-clock performance, billing, or private agent history is measured.",
     "A passing result proves these exact structural scenarios, not universal task success or semantic correctness."
   ],
-  "manifestHash": "sha256:ef5535e2d3385e2ef9a5eb64040b5d8a5dac73ab8edd7d7b3ba6fa7a02760b26"
+  "manifestHash": "sha256:b1df20baec502c8d060a5d4822b292afcce3ddcb496884b6edf7233c48e0b52f"
 }
