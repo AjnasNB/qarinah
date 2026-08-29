@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const output = path.join(root, "site-dist");
+const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 const required = [
   "index.html",
   "articles/git-worktree-context-for-coding-agents/index.html",
@@ -343,7 +344,7 @@ if (!home.includes("What coding agents and developers need to know.") || !home.i
 for (const worktreeHeroProof of [
   "Start a new coding-agent session without re-explaining your project.",
   "Project memory for coding agents",
-  "npx qarinah@latest setup .",
+  "npx qarinah@next setup .",
   "Metadata-only by default.",
   "npx qarinah demo",
   "Try the two-minute demo",
@@ -374,8 +375,8 @@ if (!home.includes("Verifiable project memory, exact source recovery, and cited 
   errors.push("Homepage is missing the worktree-aware category or the separate historical benchmark scope.");
 }
 if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
-  || publicMetrics.productVersion !== "0.6.0"
-  || publicMetrics.updatedAt !== "2026-08-22"
+  || publicMetrics.productVersion !== packageJson.version
+  || publicMetrics.updatedAt !== "2026-08-29"
   || publicMetrics.providerBillingMeasurement !== false
   || publicMetrics.metrics?.proofCarryingTaskContext?.scenarios !== 12
   || publicMetrics.metrics?.proofCarryingTaskContext?.accepted !== 12
@@ -399,7 +400,7 @@ if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.indexedSymbols !== 4
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.resolvedReferences !== 3
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.citedFacts !== 2
-  || publicMetrics.metrics?.deepMemoryProductAcceptance?.artifactHash !== "sha256:4736652101ffde46e450983285be3f41c74f850728bc4b59848c45b063afb112"
+  || publicMetrics.metrics?.deepMemoryProductAcceptance?.artifactHash !== "sha256:cc4cf1e68449ceb7e991683928dc74dfec05fa9c819cb1e23e093fb0e0da1551"
   || publicMetrics.metrics?.publicProjectMemory?.scenarios !== 10
   || publicMetrics.metrics?.publicProjectMemory?.passed !== 10
   || publicMetrics.metrics?.publicProjectMemory?.indexedSymbolFiles !== publicMetrics.metrics?.publicProjectMemory?.eligibleSymbolFiles
@@ -549,6 +550,11 @@ if (!paper.includes('src="/assets/qarinah-flow.svg"')) {
 }
 if (!paper.includes("/paper/Qarinah-Technical-White-Paper-v1.8.pdf")) {
   errors.push("Paper download does not point to the versioned website PDF.");
+}
+if (!paper.includes("It is not evidence that npm stable 0.6.0 has shipped")
+  || !paper.includes(packageJson.version)
+  || !paper.includes("npm <code>latest</code> remains <code>0.4.0</code>")) {
+  errors.push("Paper page must distinguish the immutable implementation paper from the current prerelease and stable npm channel.");
 }
 if (!paper.includes("https://doi.org/10.5281/zenodo.21850747")
   || !paper.includes("https://doi.org/10.5281/zenodo.21547684")

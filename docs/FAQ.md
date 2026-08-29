@@ -132,7 +132,7 @@ See [Codex and Claude Code integrations](HOST-INTEGRATIONS.md).
 
 No universal compatibility claim is made.
 
-The stable release provides a local CLI, typed JavaScript API, one-command Codex, Claude Code, and Cursor setup, strict JSON stdin interfaces, MCP diagnostics, and optional consent-gated MCP context retrieval. Other hosts need a reviewed adapter or an explicit CLI/API integration.
+The 0.6.0-alpha.2 prerelease provides a local CLI, typed JavaScript API, one-command Codex, Claude Code, and Cursor setup, strict JSON stdin interfaces, MCP diagnostics, and optional consent-gated MCP context retrieval. Other hosts need a reviewed adapter or an explicit CLI/API integration. The npm `latest` channel remains 0.4.0 until the documented stable-release gates are complete.
 
 ## Does the MCP server automatically give an agent project context?
 
@@ -148,7 +148,7 @@ Installing models or using external AI providers remains outside Qarinah's respo
 
 ## Which Node.js versions are supported?
 
-Qarinah 0.6.0 supports maintained Node.js 22, 24, and 26 releases:
+Qarinah 0.6.0-alpha.2 supports maintained Node.js 22, 24, and 26 releases:
 
 ```sh
 node --version
@@ -294,7 +294,7 @@ npm run evaluate:context
 npm run benchmark
 ```
 
-See [BENCHMARKS.md](BENCHMARKS.md), [software-task results](../bench/results/software-task-context-0.1.1.json), [long-document results](../bench/results/long-document-context-0.1.1.json), and the [current 40/50/100-file project-context result](../bench/results/multifile-context-0.6.0.json). Historical results remain available unchanged.
+See [BENCHMARKS.md](BENCHMARKS.md), [software-task results](../bench/results/software-task-context-0.1.1.json), [long-document results](../bench/results/long-document-context-0.1.1.json), and the [current 40/50/100-file project-context result](../bench/results/multifile-context-0.6.0-alpha.2.json). Historical results remain available unchanged.
 
 ## Where should I start?
 

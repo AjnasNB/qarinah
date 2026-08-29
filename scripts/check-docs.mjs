@@ -6,7 +6,14 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relativePath) => readFile(path.join(root, relativePath), "utf8");
 const packageJson = JSON.parse(await read("package.json"));
+const packageLock = JSON.parse(await read("package-lock.json"));
 const serverManifest = JSON.parse(await read("server.json"));
+const codeMeta = JSON.parse(await read("codemeta.json"));
+const codexPluginManifest = JSON.parse(await read("integrations/codex/qarinah/.codex-plugin/plugin.json"));
+const claudePluginManifest = JSON.parse(await read("integrations/claude/qarinah/.claude-plugin/plugin.json"));
+const vscodeExtensionManifest = JSON.parse(await read("integrations/vscode/qarinah-memory/package.json"));
+const citationSource = await read("CITATION.cff");
+const publishWorkflow = await read(".github/workflows/publish-npm.yml");
 const runtimeVersion = await read("src/version.js");
 const typeDeclarations = await read("types/index.d.ts");
 const llmsFullSource = await read("website/static/llms-full.txt");
@@ -110,6 +117,9 @@ const currentWhitePaperSourceBytes = await Promise.all(
 );
 
 const escapedVersion = packageJson.version.replaceAll(".", "\\.");
+if (packageLock.version !== packageJson.version || packageLock.packages?.[""]?.version !== packageJson.version) {
+  throw new Error("package-lock.json root versions must match package.json.");
+}
 if (!new RegExp(`QARINAH_VERSION\\s*=\\s*["']${escapedVersion}["']`, "u").test(runtimeVersion)) {
   throw new Error("src/version.js must match package.json.");
 }
@@ -119,7 +129,28 @@ if (!new RegExp(`QARINAH_VERSION:\\s*["']${escapedVersion}["']`, "u").test(typeD
 if (serverManifest.version !== packageJson.version || serverManifest.packages?.[0]?.version !== packageJson.version) {
   throw new Error("server.json package and server versions must match package.json.");
 }
-if (!llmsFullSource.includes(`Current release: \`${packageJson.version}\``)) {
+if (codeMeta.version !== packageJson.version) {
+  throw new Error("codemeta.json must match package.json.");
+}
+if (!new RegExp(`^version:\\s*["']?${escapedVersion}["']?\\s*$`, "mu").test(citationSource)) {
+  throw new Error("CITATION.cff must match package.json.");
+}
+for (const [name, manifest] of [
+  ["Codex plugin", codexPluginManifest],
+  ["Claude plugin", claudePluginManifest],
+  ["VS Code extension", vscodeExtensionManifest]
+]) {
+  if (manifest.version !== packageJson.version) throw new Error(`${name} must match package.json.`);
+}
+const expectedDistTag = packageJson.version.includes("-") ? "next" : "latest";
+if (packageJson.publishConfig?.tag !== expectedDistTag
+  || !new RegExp(`default:\\s*${escapedVersion}(?:\\s|$)`, "u").test(publishWorkflow)
+  || !new RegExp(`dist_tag:[\\s\\S]*?default:\\s*${expectedDistTag}(?:\\s|$)`, "u").test(publishWorkflow)) {
+  throw new Error("Trusted publish defaults and publishConfig must match the package release channel.");
+}
+const expectedReleaseLabel = packageJson.version.includes("-") ? "Current prerelease" : "Current release";
+if (!llmsFullSource.includes(`${expectedReleaseLabel}: \`${packageJson.version}\``)
+  || (packageJson.version.includes("-") && !llmsFullSource.includes("Current stable npm `latest`: `0.4.0`"))) {
   throw new Error("website/static/llms-full.txt must match package.json.");
 }
 if (packageJson.scripts?.["build:whitepaper"] !== undefined
@@ -284,15 +315,15 @@ for (const relativePath of publicMarkdown) {
 }
 
 const currentReleaseDocRequirements = new Map([
-  ["docs/API-REFERENCE.md", ["version 0.6.0", "| `QARINAH_VERSION` | `\"0.6.0\"` |"]],
-  ["docs/FAQ.md", ["Qarinah 0.6.0 supports", "multifile-context-0.6.0.json"]],
-  ["docs/HOST-COMPATIBILITY.md", ["The 0.6.0 installer"]],
-  ["docs/HOST-INTEGRATIONS.md", ["--ref v0.6.0", "qarinah@v0.6.0"]],
-  ["docs/MCP-GUIDE.md", ["Qarinah 0.6.0 includes", "qarinah@0.6.0"]],
-  ["docs/TOKEN-EFFICIENT-CONTEXT.md", ["--ref v0.6.0", "qarinah@v0.6.0"]],
-  ["docs/RECIPES.md", ["--ref v0.6.0", "qarinah@v0.6.0"]],
-  ["docs/BENCHMARKS.md", ["deep-memory-platform-v0.6.0.json", "0.6.0 machine-readable result", "multifile-context-0.6.0.json"]],
-  ["docs/PUBLIC-METRICS.md", ["deep-memory-platform-v0.6.0.json", "multifile-context-0.6.0.json"]]
+  ["docs/API-REFERENCE.md", [`version ${packageJson.version}`, `| \`QARINAH_VERSION\` | \`"${packageJson.version}"\` |`]],
+  ["docs/FAQ.md", [`Qarinah ${packageJson.version} supports`, `multifile-context-${packageJson.version}.json`]],
+  ["docs/HOST-COMPATIBILITY.md", [`The ${packageJson.version} installer`]],
+  ["docs/HOST-INTEGRATIONS.md", [`--ref v${packageJson.version}`, `qarinah@v${packageJson.version}`]],
+  ["docs/MCP-GUIDE.md", [`Qarinah ${packageJson.version} includes`, `qarinah@${packageJson.version}`]],
+  ["docs/TOKEN-EFFICIENT-CONTEXT.md", [`--ref v${packageJson.version}`, `qarinah@v${packageJson.version}`]],
+  ["docs/RECIPES.md", [`--ref v${packageJson.version}`, `qarinah@v${packageJson.version}`]],
+  ["docs/BENCHMARKS.md", [`deep-memory-platform-v${packageJson.version}.json`, `${packageJson.version} machine-readable result`, `multifile-context-${packageJson.version}.json`]],
+  ["docs/PUBLIC-METRICS.md", [`deep-memory-platform-v${packageJson.version}.json`, `multifile-context-${packageJson.version}.json`]]
 ]);
 for (const [relativePath, requiredSnippets] of currentReleaseDocRequirements) {
   const markdown = await read(relativePath);

@@ -39,7 +39,7 @@ The setup command never silently initializes sibling worktrees. This prevents pa
 For a real project, the safe default setup is:
 
 ```sh
-npx qarinah@latest setup .
+npx qarinah@next setup .
 ```
 
 This uses metadata capture, keeps context disclosure disabled, and does not share activation measurements. It maps the bounded project structure, creates the local ledger and reproducible read models, writes the dashboard, and prints the exact query and dashboard commands to try next.
@@ -53,7 +53,7 @@ This uses metadata capture, keeps context disclosure disabled, and does not shar
 ## Install a pinned development dependency when needed
 
 ```sh
-npm install --save-dev qarinah@latest
+npm install --save-dev qarinah@next
 ```
 
 Qarinah has no hosted memory service, embedding bill, vector database, or Qarinah API key.

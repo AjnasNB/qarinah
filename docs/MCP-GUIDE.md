@@ -1,6 +1,6 @@
 # MCP guide
 
-Qarinah 0.6.0 includes a native, zero-write Model Context Protocol server. It provides local ledger status, integrity diagnostics, and bounded `context.query` retrieval for an explicitly initialized, enabled, machine-trusted workspace.
+Qarinah 0.6.0-alpha.2 includes a native, zero-write Model Context Protocol server. It provides local ledger status, integrity diagnostics, and bounded `context.query` retrieval for an explicitly initialized, enabled, machine-trusted workspace.
 
 That narrow boundary is intentional:
 
@@ -15,7 +15,7 @@ That narrow boundary is intentional:
 | --- | --- |
 | MCP name | `io.github.AjnasNB/qarinah` |
 | npm package | `qarinah` |
-| Version | `0.6.0` |
+| Version | `0.6.0-alpha.2` |
 | Transport | `stdio` |
 | CLI entry | `npx qarinah mcp` |
 | Read-only tools | `context_status`, `context_doctor`, `context.query` |
@@ -35,7 +35,7 @@ The registry declaration is stored in the repository's `server.json`. The npm pa
 Initialize, install the supported host integrations, and verify the project:
 
 ```sh
-npx -y qarinah@latest setup . --codex --claude --cursor --capture content
+npx -y qarinah@next setup . --codex --claude --cursor --capture content
 ```
 
 ## Direct stdio command
@@ -63,7 +63,7 @@ For a host configuration that accepts an MCP command object:
   "mcpServers": {
     "qarinah-context": {
       "command": "npx",
-      "args": ["-y", "qarinah@0.6.0", "mcp"]
+      "args": ["-y", "qarinah@0.6.0-alpha.2", "mcp"]
     }
   }
 }
@@ -104,7 +104,7 @@ The packaged Codex integration defines:
 Install the reviewed release:
 
 ```sh
-codex plugin marketplace add AjnasNB/qarinah --ref v0.6.0
+codex plugin marketplace add AjnasNB/qarinah --ref v0.6.0-alpha.2
 codex plugin add qarinah@qarinah
 ```
 
@@ -146,14 +146,14 @@ The packaged Claude integration defines:
 Install:
 
 ```sh
-claude plugin marketplace add AjnasNB/qarinah@v0.6.0 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.6.0-alpha.2 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 
 Project and local scopes are also supported by Claude Code:
 
 ```sh
-claude plugin marketplace add AjnasNB/qarinah@v0.6.0 --scope project
+claude plugin marketplace add AjnasNB/qarinah@v0.6.0-alpha.2 --scope project
 claude plugin install qarinah@qarinah --scope project
 ```
 

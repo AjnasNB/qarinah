@@ -11,11 +11,11 @@ npm run check:public-project-memory
 
 The evaluator copies only Git-tracked public files into a temporary directory, initializes a new Git repository and a content-authorized Qarinah workspace there, scans the project, builds the multi-language symbol graph, queries four exact public definitions, records one bounded session lifecycle, builds a v2 session receipt, compiles a cited continuation pack, and verifies the complete event chain. It removes the temporary checkout after the run.
 
-The current committed JSON result is [public-project-memory-v0.6.0.json](../bench/results/public-project-memory-v0.6.0.json). It binds the evaluator hash, package version, source-file manifest, exact observed counts, scenario outputs, implementation schemas, and limitations. Historical receipts remain unchanged.
+The current committed JSON result is [public-project-memory-v0.6.0-alpha.2.json](../bench/results/public-project-memory-v0.6.0-alpha.2.json). It binds the evaluator hash, package version, source-file manifest, exact observed counts, scenario outputs, implementation schemas, and limitations. Historical receipts remain unchanged.
 
 ## Current observed result
 
-The checked artifact records 10/10 passing structural scenarios on 379 scanned public-project files and 52 directories. The symbol graph indexed all 179 eligible files in that checkout and observed 46,320 declarations and 97,688 identifier references. Exact definition queries found:
+The checked artifact records 10/10 passing structural scenarios on 288 scanned public-project files and 47 directories. The symbol graph indexed all 193 eligible files in that checkout and observed 36,324 declarations and 63,896 identifier references. Exact definition queries found:
 
 - `appendEvent` in `src/store.js`;
 - `buildMemoryDashboard` in `src/dashboard.js`;

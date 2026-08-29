@@ -1,0 +1,344 @@
+{
+  "schemaVersion": "qarinah.proof-context-evaluation.v1",
+  "implementation": "0.6.0-alpha.2",
+  "generatedAt": "2027-01-15T12:00:00.000Z",
+  "method": {
+    "fixture": "generated 12-file multi-language repository with paired current and superseded decisions",
+    "languages": [
+      "c",
+      "cpp",
+      "csharp",
+      "go",
+      "java",
+      "javascript",
+      "kotlin",
+      "python",
+      "rust",
+      "typescript"
+    ],
+    "scenarioCount": 12,
+    "maxTokens": 4096,
+    "tokenEstimator": "portable-chars-div-4@1",
+    "selectionContract": "expected file + expected symbol + current evidence + stale exclusion + cited hashes + bounded budget + deterministic manifest",
+    "source": "scripts/evaluate-proof-context.mjs"
+  },
+  "metrics": {
+    "acceptedTaskPackets": 12,
+    "expectedFileHitAt5": 1,
+    "expectedSymbolHitAt5Files": 1,
+    "currentEvidenceRecall": 1,
+    "staleEvidenceRejection": 1,
+    "citationValidity": 1,
+    "budgetConformance": 1,
+    "deterministicManifestReproduction": 1,
+    "manifestTamperRejection": true
+  },
+  "scenarios": [
+    {
+      "id": "typescript-receipt",
+      "query": "SessionReceiptVerifier proof-carrying context",
+      "expected": {
+        "path": "src/session-receipt.ts",
+        "symbol": "SessionReceiptVerifier",
+        "currentEventId": "evt_00000000-0000-4000-8001-000000000001",
+        "staleEventId": "evt_00000000-0000-4000-8000-000000000001"
+      },
+      "observed": {
+        "expectedFileSelected": true,
+        "expectedSymbolSelected": true,
+        "currentEvidenceSelected": true,
+        "staleEvidenceExcluded": true,
+        "citationsValid": true,
+        "budgetConformant": true,
+        "deterministicManifest": true,
+        "usedTokens": 3988,
+        "selectedEvents": 4,
+        "selectedFiles": 1,
+        "selectedSymbols": 3,
+        "selectedFacts": 3
+      },
+      "accepted": true
+    },
+    {
+      "id": "javascript-compaction",
+      "query": "compactTaskContext proof-carrying context",
+      "expected": {
+        "path": "src/compact-context.js",
+        "symbol": "compactTaskContext",
+        "currentEventId": "evt_00000000-0000-4000-8001-000000000002",
+        "staleEventId": "evt_00000000-0000-4000-8000-000000000002"
+      },
+      "observed": {
+        "expectedFileSelected": true,
+        "expectedSymbolSelected": true,
+        "currentEvidenceSelected": true,
+        "staleEvidenceExcluded": true,
+        "citationsValid": true,
+        "budgetConformant": true,
+        "deterministicManifest": true,
+        "usedTokens": 4035,
+        "selectedEvents": 4,
+        "selectedFiles": 1,
+        "selectedSymbols": 2,
+        "selectedFacts": 4
+      },
+      "accepted": true
+    },
+    {
+      "id": "python-temporal",
+      "query": "TemporalFactIndex proof-carrying context",
+      "expected": {
+        "path": "src/temporal_fact.py",
+        "symbol": "TemporalFactIndex",
+        "currentEventId": "evt_00000000-0000-4000-8001-000000000003",
+        "staleEventId": "evt_00000000-0000-4000-8000-000000000003"
+      },
+      "observed": {
+        "expectedFileSelected": true,
+        "expectedSymbolSelected": true,
+        "currentEvidenceSelected": true,
+        "staleEvidenceExcluded": true,
+        "citationsValid": true,
+        "budgetConformant": true,
+        "deterministicManifest": true,
+        "usedTokens": 4020,
+        "selectedEvents": 4,
+        "selectedFiles": 1,
+        "selectedSymbols": 2,
+        "selectedFacts": 4
+      },
+      "accepted": true
+    },
+    {
+      "id": "go-repository-map",
+      "query": "BuildRepositoryMap proof-carrying context",
+      "expected": {
+        "path": "src/repository_map.go",
+        "symbol": "BuildRepositoryMap",
+        "currentEventId": "evt_00000000-0000-4000-8001-000000000004",
+        "staleEventId": "evt_00000000-0000-4000-8000-000000000004"
+      },
+      "observed": {
+        "expectedFileSelected": true,
+        "expectedSymbolSelected": true,
+        "currentEvidenceSelected": true,
+        "staleEvidenceExcluded": true,
+        "citationsValid": true,
+        "budgetConformant": true,
+        "deterministicManifest": true,
+        "usedTokens": 3914,
+        "selectedEvents": 4,
+        "selectedFiles": 1,
+        "selectedSymbols": 1,
+        "selectedFacts": 4
+      },
+      "accepted": true
+    },
+    {
+      "id": "rust-manifest",
+      "query": "validate_manifest proof-carrying context",
+      "expected": {
+        "path": "src/manifest.rs",
+        "symbol": "validate_manifest",
+        "currentEventId": "evt_00000000-0000-4000-8001-000000000005",
+        "staleEventId": "evt_00000000-0000-4000-8000-000000000005"
+      },
+      "observed": {
+        "expectedFileSelected": true,
+        "expectedSymbolSelected": true,
+        "currentEvidenceSelected": true,
+        "staleEvidenceExcluded": true,
+        "citationsValid": true,
+        "budgetConformant": true,
+        "deterministicManifest": true,
+        "usedTokens": 3910,
+        "selectedEvents": 4,
+        "selectedFiles": 1,
+        "selectedSymbols": 1,
+        "selectedFacts": 4
+      },
+      "accepted": true
+    },
+    {
+      "id": "java-worktree",
+      "query": "WorktreeResolver proof-carrying context",
+      "expected": {
+        "path": "src/WorktreeResolver.java",
+        "symbol": "WorktreeResolver",
+        "currentEventId": "evt_00000000-0000-4000-8001-000000000006",
+        "staleEventId": "evt_00000000-0000-4000-8000-000000000006"
+      },
+      "observed": {
+        "expectedFileSelected": true,
+        "expectedSymbolSelected": true,
+        "currentEvidenceSelected": true,
+        "staleEvidenceExcluded": true,
+        "citationsValid": true,
+        "budgetConformant": true,
+        "deterministicManifest": true,
+        "usedTokens": 3806,
+        "selectedEvents": 3,
+        "selectedFiles": 1,
+        "selectedSymbols": 2,
+        "selectedFacts": 3
+      },
+      "accepted": true
+    },
+    {
+      "id": "kotlin-budget",
+      "query": "ContextBudget proof-carrying context",
+      "expected": {
+        "path": "src/ContextBudget.kt",
+        "symbol": "ContextBudget",
+        "currentEventId": "evt_00000000-0000-4000-8001-000000000007",
+        "staleEventId": "evt_00000000-0000-4000-8000-000000000007"
+      },
+      "observed": {
+        "expectedFileSelected": true,
+        "expectedSymbolSelected": true,
+        "currentEvidenceSelected": true,
+        "staleEvidenceExcluded": true,
+        "citationsValid": true,
+        "budgetConformant": true,
+        "deterministicManifest": true,
+        "usedTokens": 3936,
+        "selectedEvents": 4,
+        "selectedFiles": 1,
+        "selectedSymbols": 2,
+        "selectedFacts": 3
+      },
+      "accepted": true
+    },
+    {
+      "id": "c-hash",
+      "query": "verify_hash proof-carrying context",
+      "expected": {
+        "path": "src/verify_hash.c",
+        "symbol": "verify_hash",
+        "currentEventId": "evt_00000000-0000-4000-8001-000000000008",
+        "staleEventId": "evt_00000000-0000-4000-8000-000000000008"
+      },
+      "observed": {
+        "expectedFileSelected": true,
+        "expectedSymbolSelected": true,
+        "currentEvidenceSelected": true,
+        "staleEvidenceExcluded": true,
+        "citationsValid": true,
+        "budgetConformant": true,
+        "deterministicManifest": true,
+        "usedTokens": 4023,
+        "selectedEvents": 3,
+        "selectedFiles": 2,
+        "selectedSymbols": 3,
+        "selectedFacts": 3
+      },
+      "accepted": true
+    },
+    {
+      "id": "cpp-graph",
+      "query": "EvidenceGraph proof-carrying context",
+      "expected": {
+        "path": "src/EvidenceGraph.cpp",
+        "symbol": "EvidenceGraph",
+        "currentEventId": "evt_00000000-0000-4000-8001-000000000009",
+        "staleEventId": "evt_00000000-0000-4000-8000-000000000009"
+      },
+      "observed": {
+        "expectedFileSelected": true,
+        "expectedSymbolSelected": true,
+        "currentEvidenceSelected": true,
+        "staleEvidenceExcluded": true,
+        "citationsValid": true,
+        "budgetConformant": true,
+        "deterministicManifest": true,
+        "usedTokens": 3798,
+        "selectedEvents": 3,
+        "selectedFiles": 1,
+        "selectedSymbols": 2,
+        "selectedFacts": 3
+      },
+      "accepted": true
+    },
+    {
+      "id": "csharp-provenance",
+      "query": "ProvenanceReceipt proof-carrying context",
+      "expected": {
+        "path": "src/ProvenanceReceipt.cs",
+        "symbol": "ProvenanceReceipt",
+        "currentEventId": "evt_00000000-0000-4000-8001-000000000010",
+        "staleEventId": "evt_00000000-0000-4000-8000-000000000010"
+      },
+      "observed": {
+        "expectedFileSelected": true,
+        "expectedSymbolSelected": true,
+        "currentEvidenceSelected": true,
+        "staleEvidenceExcluded": true,
+        "citationsValid": true,
+        "budgetConformant": true,
+        "deterministicManifest": true,
+        "usedTokens": 3808,
+        "selectedEvents": 3,
+        "selectedFiles": 1,
+        "selectedSymbols": 2,
+        "selectedFacts": 3
+      },
+      "accepted": true
+    },
+    {
+      "id": "typescript-conflict",
+      "query": "detectContextConflict proof-carrying context",
+      "expected": {
+        "path": "src/conflict.ts",
+        "symbol": "detectContextConflict",
+        "currentEventId": "evt_00000000-0000-4000-8001-000000000011",
+        "staleEventId": "evt_00000000-0000-4000-8000-000000000011"
+      },
+      "observed": {
+        "expectedFileSelected": true,
+        "expectedSymbolSelected": true,
+        "currentEvidenceSelected": true,
+        "staleEvidenceExcluded": true,
+        "citationsValid": true,
+        "budgetConformant": true,
+        "deterministicManifest": true,
+        "usedTokens": 3976,
+        "selectedEvents": 4,
+        "selectedFiles": 1,
+        "selectedSymbols": 3,
+        "selectedFacts": 3
+      },
+      "accepted": true
+    },
+    {
+      "id": "python-restore",
+      "query": "restore_context proof-carrying context",
+      "expected": {
+        "path": "src/restore_context.py",
+        "symbol": "restore_context",
+        "currentEventId": "evt_00000000-0000-4000-8001-000000000012",
+        "staleEventId": "evt_00000000-0000-4000-8000-000000000012"
+      },
+      "observed": {
+        "expectedFileSelected": true,
+        "expectedSymbolSelected": true,
+        "currentEvidenceSelected": true,
+        "staleEvidenceExcluded": true,
+        "citationsValid": true,
+        "budgetConformant": true,
+        "deterministicManifest": true,
+        "usedTokens": 3836,
+        "selectedEvents": 4,
+        "selectedFiles": 1,
+        "selectedSymbols": 1,
+        "selectedFacts": 3
+      },
+      "accepted": true
+    }
+  ],
+  "boundaries": {
+    "scope": "This is a deterministic acceptance evaluation over a generated repository, not a claim of universal production accuracy.",
+    "tokens": "The portable estimator is deterministic but is not a provider tokenizer or billing receipt.",
+    "comparison": "No external product is evaluated and no cross-product superiority is claimed.",
+    "independence": "The script, fixture construction, expected identities, and committed result are public so another party can rerun the method."
+  }
+}

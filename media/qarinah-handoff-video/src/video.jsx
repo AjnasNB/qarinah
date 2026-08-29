@@ -100,7 +100,7 @@ function DemoScene() {
         <Terminal
           title="PowerShell · empty temporary workspace"
           lines={[
-            { prefix: "> ", text: "npx qarinah@latest demo", gap: 26 },
+            { prefix: "> ", text: "npx qarinah@next demo", gap: 26 },
             { text: "✓ isolated workspace created", color: COLORS.green },
             { text: "✓ 3 project files mapped", color: COLORS.green },
             { text: "✓ 1 decision and 1 verified tool result captured", color: COLORS.green },
@@ -209,7 +209,7 @@ function CallToActionScene() {
         <div style={{ position: "absolute", left: 160, right: 160, top: 260, textAlign: "center" }}>
           <h2 style={{ fontSize: 100, letterSpacing: -4, lineHeight: 1.02, margin: 0 }}>Your next session should know where the last one stopped.</h2>
           <div style={{ display: "inline-block", marginTop: 65, padding: "28px 42px", border: `2px solid ${COLORS.green}`, backgroundColor: COLORS.panel, color: COLORS.green, fontFamily: "Consolas, monospace", fontSize: 33 }}>
-            npx qarinah@latest demo
+            npx qarinah@next demo
           </div>
         </div>
       </Shell>

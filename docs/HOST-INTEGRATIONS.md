@@ -23,33 +23,33 @@ The host plugin and the project ledger have different scopes:
 - initialize only the repository roots that are allowed to retain Qarinah records; and
 - request a cited pack when a task needs prior evidence. Qarinah does not inject the complete history automatically.
 
-Install the version-pinned stable release for personal use across projects:
+Install the version-pinned prerelease for personal use across projects:
 
 ```powershell
-codex plugin marketplace add AjnasNB/qarinah --ref v0.6.0
+codex plugin marketplace add AjnasNB/qarinah --ref v0.6.0-alpha.2
 codex plugin add qarinah@qarinah
 
-claude plugin marketplace add AjnasNB/qarinah@v0.6.0 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.6.0-alpha.2 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 
 Claude Code also supports repository-shared `project` scope and gitignored per-user `local` scope:
 
 ```powershell
-claude plugin marketplace add AjnasNB/qarinah@v0.6.0 --scope project
+claude plugin marketplace add AjnasNB/qarinah@v0.6.0-alpha.2 --scope project
 claude plugin install qarinah@qarinah --scope project
 
 # Or keep the enablement personal to this repository.
-claude plugin marketplace add AjnasNB/qarinah@v0.6.0 --scope local
+claude plugin marketplace add AjnasNB/qarinah@v0.6.0-alpha.2 --scope local
 claude plugin install qarinah@qarinah --scope local
 ```
 
 Codex plugin installation is personal rather than repository-scoped. The Qarinah workspace boundary supplies the per-project opt-in. From each project root:
 
 ```powershell
-npx -y qarinah@latest init . --capture content
-npx -y qarinah@latest scan
-npx -y qarinah@latest doctor
+npx -y qarinah@next init . --capture content
+npx -y qarinah@next scan
+npx -y qarinah@next doctor
 ```
 
 Choose `metadata` instead of `content` when prompt, tool-output, source, and completion bodies should not be retained. Content capture is bounded and redacted but remains security-sensitive.
@@ -57,7 +57,7 @@ Choose `metadata` instead of `content` when prompt, tool-output, source, and com
 To recover context in a later task, use the installed `qarinah-context` skill and request direct evidence for the task terms. The equivalent explicit local command is:
 
 ```powershell
-npx -y qarinah@latest query "orders idempotency migration" `
+npx -y qarinah@next query "orders idempotency migration" `
   --minimum-coverage direct `
   --max-tokens 1500 `
   --reserve-tokens 200 `
@@ -125,10 +125,10 @@ claude plugin install qarinah@qarinah --scope local
 The version-pinned install flow is:
 
 ```powershell
-codex plugin marketplace add AjnasNB/qarinah --ref v0.6.0
+codex plugin marketplace add AjnasNB/qarinah --ref v0.6.0-alpha.2
 codex plugin add qarinah@qarinah
 
-claude plugin marketplace add AjnasNB/qarinah@v0.6.0
+claude plugin marketplace add AjnasNB/qarinah@v0.6.0-alpha.2
 claude plugin install qarinah@qarinah
 ```
 

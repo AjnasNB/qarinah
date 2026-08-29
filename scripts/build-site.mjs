@@ -23,9 +23,9 @@ const historicalPaperPdfs = new Map([
   ["Qarinah-Technical-White-Paper-v1.6.pdf", "/paper/Qarinah-Technical-White-Paper-v1.6.pdf"],
   ["Qarinah-Technical-White-Paper-v1.7.pdf", "/paper/Qarinah-Technical-White-Paper-v1.7.pdf"]
 ]);
-const releaseDate = "2026-08-22";
+const releaseDate = "2026-08-29";
 const paperPublishedDate = "2026-08-22";
-const publicMetricsUpdatedDate = "2026-08-22";
+const publicMetricsUpdatedDate = "2026-08-29";
 const toolkitArticleDate = "2026-08-16";
 const worktreeArticleDate = "2026-08-16";
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
@@ -33,7 +33,7 @@ const benchmarkRelease = JSON.parse(await readFile(path.join(root, "bench", "res
 const worktreeContinuity = JSON.parse(await readFile(path.join(root, "bench", "results", "worktree-continuity-v0.4.0.json"), "utf8"));
 const deepMemoryPlatform = JSON.parse(await readFile(path.join(root, "bench", "results", `deep-memory-platform-v${packageJson.version}.json`), "utf8"));
 const publicProjectMemory = JSON.parse(await readFile(path.join(root, "bench", "results", `public-project-memory-v${packageJson.version}.json`), "utf8"));
-const proofContext = JSON.parse(await readFile(path.join(root, "bench", "results", "proof-context-0.6.0.json"), "utf8"));
+const proofContext = JSON.parse(await readFile(path.join(root, "bench", "results", `proof-context-${packageJson.version}.json`), "utf8"));
 const productVersion = packageJson.version;
 const productPositioning = "Verifiable project memory, exact source recovery, and cited context for coding agents.";
 const productExplanation = "Qarinah keeps permitted project evidence and explicitly archived source bytes beside the repository, connects symbols, decisions, outcomes, and Git worktrees in one searchable graph, and compiles the cited context needed by Codex, Claude Code, Cursor, and compatible tools.";
@@ -54,7 +54,7 @@ if (deepMemoryPlatform.schemaVersion !== "qarinah.deep-memory-platform-evaluatio
   || deepMemoryPlatform.observed.indexedSymbols !== 4
   || deepMemoryPlatform.observed.resolvedReferences !== 3
   || deepMemoryPlatform.observed.citedFacts !== 2
-  || deepMemoryPlatform.artifactHash !== "sha256:4736652101ffde46e450983285be3f41c74f850728bc4b59848c45b063afb112") {
+  || deepMemoryPlatform.artifactHash !== "sha256:cc4cf1e68449ceb7e991683928dc74dfec05fa9c819cb1e23e093fb0e0da1551") {
   throw new Error("The deep-memory website claim does not match the checked release artifact.");
 }
 if (publicProjectMemory.schemaVersion !== "qarinah.public-project-memory-evaluation.v1"
@@ -69,7 +69,7 @@ if (publicProjectMemory.schemaVersion !== "qarinah.public-project-memory-evaluat
   throw new Error("The public-project website claim does not match the checked release artifact.");
 }
 if (proofContext.schemaVersion !== "qarinah.proof-context-evaluation.v1"
-  || proofContext.implementation !== "0.6.0"
+  || proofContext.implementation !== packageJson.version
   || proofContext.metrics.acceptedTaskPackets !== 12
   || proofContext.metrics.expectedFileHitAt5 !== 1
   || proofContext.metrics.expectedSymbolHitAt5Files !== 1
@@ -120,7 +120,7 @@ const publicMetrics = {
       budgetConformance: proofContext.metrics.budgetConformance,
       deterministicManifestReproduction: proofContext.metrics.deterministicManifestReproduction,
       manifestTamperRejection: proofContext.metrics.manifestTamperRejection,
-      evidenceSource: `${github}/blob/main/bench/results/proof-context-0.6.0.json`,
+      evidenceSource: `${github}/blob/main/bench/results/proof-context-${packageJson.version}.json`,
       boundary: proofContext.boundaries
     },
     realGitWorktreeContinuity: {
@@ -850,10 +850,7 @@ function normalizeVisibleCopy(value) {
   return value
     .replaceAll("—", " - ")
     .replaceAll("–", "-")
-    .replaceAll("0.1.0-alpha.3", "0.1.0")
-    .replaceAll("@next", "@latest")
-    .replaceAll("public prerelease", "public release")
-    .replaceAll("technical preview", "stable release");
+    .replaceAll("0.1.0-alpha.3", "0.1.0");
 }
 
 function rewriteMarkdownLinks(markdown, source) {
@@ -1364,7 +1361,7 @@ function homePage() {
             <p class="eyebrow">Project memory for coding agents</p>
             <h1>Start a new coding-agent session without re-explaining your project.</h1>
             <p class="hero-lede">Qarinah keeps permitted decisions, code relationships, tool outcomes, and Git worktree history beside your repository. A fresh Codex, Claude Code, Cursor, or compatible agent retrieves only the relevant cited context instead of replaying the whole chat.</p>
-            ${commandBlock("npx qarinah@latest setup .", "Safe local setup")}
+            ${commandBlock("npx qarinah@next setup .", "Safe local prerelease setup")}
             <p class="hero-privacy"><strong>Metadata-only by default.</strong> No account, hosted memory service, content disclosure, or activation metrics. Try <code>npx qarinah demo</code> first to create an isolated populated graph outside your project.</p>
             <div class="hero-actions">
               <a class="btn btn-primary btn-large" href="/docs/getting-started/#try-the-isolated-demo-first">Try the two-minute demo</a>
@@ -2088,6 +2085,9 @@ async function markdownPage(page) {
   const publicationLink = page.route === "paper"
     ? `<a href="${paperPdf}">Download v${paperVersion} PDF</a> · <a href="${conceptDoi}">Paper series DOI</a> · <a href="${publishedV14Doi}">Published v1.4</a> · <a href="${historicalVersionDoi}">Published v1.3</a>`
     : "";
+  const releaseStatusNotice = page.route === "paper"
+    ? `<p class="benchmark-ribbon-note"><strong>Release status:</strong> v${paperVersion} is retained as an immutable implementation paper for the 0.6.0 feature line. It is not evidence that npm stable 0.6.0 has shipped. The reviewed package candidate is <code>${productVersion}</code> on <code>next</code>; npm <code>latest</code> remains <code>0.4.0</code> until the stable-release gates are complete.</p>`
+    : "";
 
   return layout({
     title: page.title,
@@ -2117,6 +2117,7 @@ async function markdownPage(page) {
             <span>Qarinah ${productVersion}</span>
             <span class="doc-meta-links">${publicationLink}<a href="${github}/blob/main/${page.source}">View on GitHub</a></span>
           </div>
+          ${releaseStatusNotice}
           ${rendered}
         </article>
         <aside class="page-toc" aria-label="On this page">
