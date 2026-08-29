@@ -16,7 +16,7 @@ The current product headline is an end-to-end implementation result, not a compr
 | Cited facts retained | **2** |
 | Restored files matching the second snapshot byte for byte | **2 / 2** |
 
-Reproduce it with `npm run check:deep-memory`. The evaluator is [`scripts/evaluate-deep-memory-platform.mjs`](../scripts/evaluate-deep-memory-platform.mjs), and the checked result is [`bench/results/deep-memory-platform-v0.6.0.json`](../bench/results/deep-memory-platform-v0.6.0.json) with artifact hash `sha256:4736652101ffde46e450983285be3f41c74f850728bc4b59848c45b063afb112`. Historical results remain unchanged.
+Reproduce it with `npm run check:deep-memory`. The evaluator is [`scripts/evaluate-deep-memory-platform.mjs`](../scripts/evaluate-deep-memory-platform.mjs), and the checked result is [`bench/results/deep-memory-platform-v0.6.0-alpha.2.json`](../bench/results/deep-memory-platform-v0.6.0-alpha.2.json) with artifact hash `sha256:cc4cf1e68449ceb7e991683928dc74dfec05fa9c819cb1e23e093fb0e0da1551`. Historical results remain unchanged.
 
 The source-byte result concerns the exact encrypted archive and restore path. It is not the size of a model context pack and it does not claim that arbitrary archives compress by a fixed ratio. The symbol and fact counts describe this deliberately small acceptance fixture, not language-wide coverage or universal retrieval quality.
 
@@ -145,7 +145,7 @@ All three scales additionally verify:
 
 “Fail closed” therefore does not mean that long-document or multi-file retrieval failed. It means Qarinah refused to label unsupported evidence as direct. In this benchmark, **9 / 9 unsupported controls were successful fail-closed behavior**.
 
-The fixture is synthetic so relevance and answers are completely auditable. It measures local retrieval, bounded evidence preservation, and projection integrity; it does not measure provider-reported tokens or coding-task completion. The context-volume values use portable `ceil(characters / 4)` estimates. See the [0.6.0 machine-readable result](../bench/results/multifile-context-0.6.0.json), [historical 0.1.6 result](../bench/results/multifile-context-0.1.6.json), [evaluator](../scripts/evaluate-multifile-context.mjs), and [artifact verifier](../scripts/verify-multifile-context.mjs).
+The fixture is synthetic so relevance and answers are completely auditable. It measures local retrieval, bounded evidence preservation, and projection integrity; it does not measure provider-reported tokens or coding-task completion. The context-volume values use portable `ceil(characters / 4)` estimates. See the [0.6.0-alpha.2 machine-readable result](../bench/results/multifile-context-0.6.0-alpha.2.json), [historical 0.1.6 result](../bench/results/multifile-context-0.1.6.json), [evaluator](../scripts/evaluate-multifile-context.mjs), and [artifact verifier](../scripts/verify-multifile-context.mjs).
 
 ## Retrieval-regression fixture
 

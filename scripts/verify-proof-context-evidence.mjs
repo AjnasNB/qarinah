@@ -3,9 +3,13 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const result = JSON.parse(await readFile(path.join(root, "bench", "results", "proof-context-0.6.0.json"), "utf8"));
+const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
+const result = JSON.parse(await readFile(
+  path.join(root, "bench", "results", `proof-context-${packageJson.version}.json`),
+  "utf8"
+));
 
-if (result.schemaVersion !== "qarinah.proof-context-evaluation.v1" || result.implementation !== "0.6.0") {
+if (result.schemaVersion !== "qarinah.proof-context-evaluation.v1" || result.implementation !== packageJson.version) {
   throw new Error("Proof-context evidence has the wrong public identity.");
 }
 if (result.method?.source !== "scripts/evaluate-proof-context.mjs" || result.method?.scenarioCount !== 12

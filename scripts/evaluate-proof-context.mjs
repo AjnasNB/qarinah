@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -11,6 +11,8 @@ import {
 } from "../src/index.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
+const resultPath = path.join(root, "bench", "results", `proof-context-${packageJson.version}.json`);
 const generatedAt = "2027-01-15T12:00:00.000Z";
 const MAX_TOKENS = 4_096;
 const scenarios = Object.freeze([
@@ -124,7 +126,7 @@ try {
   const count = (field) => results.filter((result) => result.observed[field]).length;
   const artifact = {
     schemaVersion: "qarinah.proof-context-evaluation.v1",
-    implementation: "0.6.0",
+    implementation: packageJson.version,
     generatedAt,
     method: {
       fixture: "generated 12-file multi-language repository with paired current and superseded decisions",
@@ -156,9 +158,8 @@ try {
   };
   const output = `${JSON.stringify(artifact, null, 2)}\n`;
   if (process.argv.includes("--write")) {
-    const destination = path.join(root, "bench", "results", "proof-context-0.6.0.json");
-    await writeFile(destination, output);
-    process.stdout.write(`${destination}\n`);
+    await writeFile(resultPath, output);
+    process.stdout.write(`${resultPath}\n`);
   } else {
     process.stdout.write(output);
   }
