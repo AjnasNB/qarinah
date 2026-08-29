@@ -65,27 +65,27 @@ If direct coverage fails, inspect the error instead of silently relaxing the gat
 Install the reviewed host integrations:
 
 ```sh
-codex plugin marketplace add AjnasNB/qarinah --ref v0.6.0
+codex plugin marketplace add AjnasNB/qarinah --ref v0.6.0-alpha.2
 codex plugin add qarinah@qarinah
 ```
 
 ```sh
-claude plugin marketplace add AjnasNB/qarinah@v0.6.0 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.6.0-alpha.2 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 
 Initialize the shared project once, using its reviewed capture policy:
 
 ```sh
-npx -y qarinah@latest init . --capture metadata
-npx -y qarinah@latest scan
-npx -y qarinah@latest doctor
+npx -y qarinah@next init . --capture metadata
+npx -y qarinah@next scan
+npx -y qarinah@next doctor
 ```
 
 At the start of a later task in either host, explicitly request evidence for that task or run:
 
 ```sh
-npx -y qarinah@latest query "payment retry idempotency" \
+npx -y qarinah@next query "payment retry idempotency" \
   --minimum-coverage direct \
   --max-tokens 1500 \
   --format markdown

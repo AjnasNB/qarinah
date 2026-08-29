@@ -90,7 +90,7 @@ Qarinah keeps a local, append-only record of permitted agent activity and explic
 
 The Qarinah path used 436,431 fewer portable estimated tokens - 98.71% less repeated context - than replaying the full history while keeping every required target directly covered in the top five. A separate deterministic scale regression ranked the correct target first for 380 / 380 file-specific exact and typo-tolerant queries. These measurements use a transparent characters-divided-by-four estimate and zero provider model calls; they are not provider billing or universal task-quality evidence.
 
-The stable release supports Codex and Claude Code plugins, a CLI, and read-only MCP diagnostics. Capture is opt-in per project, metadata-only by default, and requires machine-local trust. I am looking for developers willing to reproduce the fixture and report the first missing piece of evidence on a real codebase.
+The 0.6.0-alpha.2 prerelease supports Codex and Claude Code plugins, a CLI, and read-only MCP diagnostics. Capture is opt-in per project, metadata-only by default, and requires machine-local trust. The npm `latest` channel remains 0.4.0 while the stable-release gates are open. I am looking for developers willing to reproduce the fixture and report the first missing piece of evidence on a real codebase.
 
 ## Reddit or technical forum
 

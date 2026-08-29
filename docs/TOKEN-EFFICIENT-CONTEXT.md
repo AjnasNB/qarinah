@@ -158,21 +158,21 @@ Qarinah stores memory in the opted-in project, not in one editor's private conve
 Install the reviewed plugins once per host:
 
 ```sh
-codex plugin marketplace add AjnasNB/qarinah --ref v0.6.0
+codex plugin marketplace add AjnasNB/qarinah --ref v0.6.0-alpha.2
 codex plugin add qarinah@qarinah
 ```
 
 ```sh
-claude plugin marketplace add AjnasNB/qarinah@v0.6.0 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.6.0-alpha.2 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 
 Then initialize each project separately:
 
 ```sh
-npx -y qarinah@latest init . --capture metadata
-npx -y qarinah@latest scan
-npx -y qarinah@latest doctor
+npx -y qarinah@next init . --capture metadata
+npx -y qarinah@next scan
+npx -y qarinah@next doctor
 ```
 
 Plugin installation can be host-wide; capture permission remains project-specific. Restart the host after installing or upgrading a plugin.
