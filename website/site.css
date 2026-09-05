@@ -2754,3 +2754,8 @@ a {
     gap: 12px;
   }
 }
+
+.fikeya-family { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px 24px; padding: 12px 24px; border-bottom: 1px solid currentColor; font-size: 14px; }
+.fikeya-family a { color: inherit; text-underline-offset: 0.2em; }
+.fikeya-family a:first-child { font-weight: 600; }
+.fikeya-family a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
