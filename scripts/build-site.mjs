@@ -919,6 +919,7 @@ function nav(active = "") {
   ];
 
   return `
+<aside class="fikeya-family" aria-label="Fikeya platform"><a href="https://fikeya.com/">Fikeya</a><span> / Qarinah · Project context component</span><a href="https://fikeya.com/platform/#qarinah">Explore the platform →</a></aside>
     <header class="site-header">
       <div class="shell header-inner">
         <a class="brand" href="/" aria-label="Qarinah home">
