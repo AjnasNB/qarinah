@@ -35,6 +35,8 @@ import {
   measureMemoryFootprint,
   queryLinkedProjectMemory,
   readEvents,
+  readProviderUsage,
+  recordProviderUsage,
   rebuildDerivedState,
   renderProjectOverviewMarkdown,
   renderProofContextMarkdown,
@@ -304,6 +306,8 @@ Usage:
   qarinah uninstall [path] --host codex|claude|cursor|kimi|antigravity|freebuff --scope project
   qarinah record --kind <kind> --title <title> [--body <text>] [--data-json <json>] [--relation type:target]
   qarinah record --stdin-json
+  qarinah usage
+  qarinah usage record --stdin-json
   qarinah hook codex|claude
   qarinah mcp [--allow-query --workspace-id ws_<id> --policy-hash sha256:<digest>] [--max-chars n] [--max-items n]
   qarinah build | rebuild
@@ -512,6 +516,20 @@ async function run(argv) {
   }
   if (command === "untrust") {
     process.stdout.write(`${JSON.stringify(await revokeWorkspaceTrust(process.cwd()), null, 2)}\n`);
+    return;
+  }
+  if (command === "usage") {
+    if (args.length === 0) {
+      process.stdout.write(`${JSON.stringify(await readProviderUsage(), null, 2)}\n`);
+      return;
+    }
+    if (args[0] !== "record") throw new TypeError("Usage: qarinah usage [record --stdin-json]");
+    const request = await readStdinJsonRequest(args.slice(1), "usage record", 4096, new Set([
+      "schemaVersion", "provider", "model", "callId", "attempt", "sessionId", "purpose", "outcome",
+      "inputTokens", "outputTokens", "cachedInputTokens", "reasoningTokens"
+    ]));
+    if (request === null) throw new TypeError("usage record requires --stdin-json.");
+    process.stdout.write(`${JSON.stringify(await recordProviderUsage(request), null, 2)}\n`);
     return;
   }
   if (command === "record") {

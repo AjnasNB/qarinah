@@ -188,3 +188,5 @@ export {
   productLoopRuntimeEventToEventInput,
   validateProductLoopRuntimeEvent
 } from "./interoperability/productloop.js";
+
+export { PROVIDER_USAGE_SCHEMA_VERSION, validateProviderUsage, recordProviderUsage, summarizeProviderUsage, readProviderUsage } from "./provider-usage.js";

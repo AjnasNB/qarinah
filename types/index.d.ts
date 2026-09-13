@@ -1525,6 +1525,7 @@ export function buildDeveloperMemoryView(options?: {
   clock?: () => Date;
 }): Promise<Readonly<QarinahDeveloperMemoryView>>;
 export interface QarinahMemoryDashboard {
+  providerUsage: ProviderUsageSummary;
   schemaVersion: "qarinah.memory-dashboard.v2";
   workspaceId: string;
   workspace: Readonly<{
@@ -1990,3 +1991,31 @@ export function productLoopRuntimeEventToEventInput(value: unknown, options?: {
   retentionClass?: "session" | "project" | "durable";
 }): QarinahEventInput;
 export function createProductLoopProvenanceSink(options?: { cwd?: string; workspace?: QarinahWorkspace }): ProductLoopProvenanceSink;
+
+/** Per-attempt counts supplied by a host; cache/reasoning are subsets, never additions. */
+export interface ProviderUsage {
+  schemaVersion: "qarinah.provider-usage.v1";
+  provider: string; model: string; callId: string; sessionId: string;
+  attempt: number; purpose: "production" | "test";
+  outcome: "completed" | "failed" | "cancelled";
+  inputTokens: number | null; outputTokens: number | null;
+  cachedInputTokens: number | null; reasoningTokens: number | null;
+}
+export interface ProviderUsageTotals {
+  attempts: number; completed: number; failed: number; cancelled: number; missingUsageAttempts: number;
+  inputTokens: number | null; outputTokens: number | null; cachedInputTokens: number | null; reasoningTokens: number | null;
+  totalTokens: number | null;
+  knownInputTokens: number; knownOutputTokens: number; knownCachedInputTokens: number; knownReasoningTokens: number;
+}
+export interface ProviderUsageSummary {
+  schemaVersion: "qarinah.provider-usage-summary.v1";
+  production: ProviderUsageTotals; test: ProviderUsageTotals;
+  models: readonly (ProviderUsageTotals & { provider: string; model: string })[];
+  records: readonly (ProviderUsage & { eventId: string; eventHash: string; timestamp: string })[];
+  invalidEventIds: readonly string[]; savingsPercent: null; costUsd: null; note: string;
+}
+export const PROVIDER_USAGE_SCHEMA_VERSION: "qarinah.provider-usage.v1";
+export function validateProviderUsage(value: unknown): Readonly<ProviderUsage>;
+export function recordProviderUsage(value: ProviderUsage, options?: { cwd?: string }): Promise<Readonly<QarinahEvent>>;
+export function summarizeProviderUsage(events: readonly QarinahEvent[]): Readonly<ProviderUsageSummary>;
+export function readProviderUsage(options?: { cwd?: string }): Promise<Readonly<ProviderUsageSummary>>;

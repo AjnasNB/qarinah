@@ -217,6 +217,16 @@ function snapshotJsonBoundary(value, options = {}) {
   if (bytes > limits.maximumBytes) throw new TypeError(`${limits.label || "value"} exceeds ${limits.maximumBytes} JSON bytes.`);
   return deepFreeze(snapshot);
 }
+function snapshotRecordBoundary(value, options) {
+  const snapshot = snapshotJsonBoundary(value, options);
+  if (!snapshot || typeof snapshot !== "object" || Array.isArray(snapshot)) {
+    throw new TypeError(`${options.label} must be a record.`);
+  }
+  const knownKeys = new Set(options.keys);
+  const unknown = Object.keys(snapshot).filter((key) => !knownKeys.has(key));
+  if (unknown.length > 0) throw new TypeError(`${options.label} contains unknown field(s): ${unknown.join(", ")}.`);
+  return snapshot;
+}
 function stringField(value, label, options = {}) {
   if (options.nullable && value === null) return null;
   if (typeof value !== "string" || !options.allowEmpty && value.length === 0) {
@@ -13202,9 +13212,115 @@ import path19 from "node:path";
 import { fileURLToPath as fileURLToPath3 } from "node:url";
 
 // src/dashboard.js
+import path17 from "node:path";
+
+// src/provider-usage.js
+init_canonical();
+init_capture_policy();
+init_boundary();
+init_store();
+init_workspace();
+var PROVIDER_USAGE_SCHEMA_VERSION = "qarinah.provider-usage.v1";
+var KEYS = ["schemaVersion", "provider", "model", "callId", "attempt", "sessionId", "purpose", "outcome", "inputTokens", "outputTokens", "cachedInputTokens", "reasoningTokens"];
+var COUNTS = ["inputTokens", "outputTokens", "cachedInputTokens", "reasoningTokens"];
+function validateProviderUsage(value) {
+  const input = snapshotRecordBoundary(value, { label: "Provider usage", keys: KEYS, maximumBytes: 4096, maximumStringLength: 256 });
+  if (input.schemaVersion !== PROVIDER_USAGE_SCHEMA_VERSION) throw new TypeError("Unsupported provider usage schemaVersion.");
+  for (const key of ["provider", "model", "callId", "sessionId"]) {
+    if (typeof input[key] !== "string" || !input[key].trim() || input[key].length > 256 || /[\x00-\x1f]/u.test(input[key])) throw new TypeError(`${key} must be a bounded identifier.`);
+  }
+  if (!Number.isSafeInteger(input.attempt) || input.attempt < 1 || input.attempt > 1e4) throw new TypeError("attempt must be an integer from 1 to 10000.");
+  if (!["production", "test"].includes(input.purpose)) throw new TypeError("purpose must be production or test.");
+  if (!["completed", "failed", "cancelled"].includes(input.outcome)) throw new TypeError("Invalid usage outcome.");
+  for (const key of COUNTS) {
+    if (input[key] !== null && (!Number.isSafeInteger(input[key]) || input[key] < 0 || input[key] > 1e9)) throw new TypeError(`${key} must be null or an integer from 0 to 1000000000.`);
+  }
+  if (input.cachedInputTokens !== null && (input.inputTokens === null || input.cachedInputTokens > input.inputTokens)) throw new TypeError("cachedInputTokens must be a subset of inputTokens.");
+  if (input.reasoningTokens !== null && (input.outputTokens === null || input.reasoningTokens > input.outputTokens)) throw new TypeError("reasoningTokens must be a subset of outputTokens.");
+  return deepFreezeJson(input);
+}
+async function recordProviderUsage(value, options = {}) {
+  const usage = validateProviderUsage(value);
+  const workspace = await loadWorkspace(options.cwd ?? process.cwd());
+  const identity = sha256([usage.provider, usage.model, usage.sessionId, usage.callId, usage.attempt, usage.purpose]).slice(7, 39).split("");
+  identity[12] = "4";
+  identity[16] = "8";
+  const id = identity.join("");
+  const event2 = reviewMetadataEventInput({
+    eventId: `evt_${id.slice(0, 8)}-${id.slice(8, 12)}-${id.slice(12, 16)}-${id.slice(16, 20)}-${id.slice(20)}`,
+    kind: "tool.completed",
+    actor: { type: "tool", id: "provider-usage" },
+    title: "Model call usage recorded",
+    body: "",
+    data: { providerUsage: usage },
+    confidence: "claimed",
+    sessionId: usage.sessionId,
+    provenance: { adapter: "qarinah-provider-usage", sourceId: sha256([usage.callId, usage.attempt]) },
+    retention: { class: workspace.config.retentionClass, expiresAt: null }
+  });
+  return appendEvent(event2, { workspace, capture: workspace.config.capture, idempotent: true });
+}
+function totals(rows) {
+  const result = { attempts: rows.length, completed: 0, failed: 0, cancelled: 0, missingUsageAttempts: 0 };
+  for (const row of rows) {
+    result[row.outcome]++;
+    if (row.inputTokens === null || row.outputTokens === null) result.missingUsageAttempts++;
+  }
+  for (const key of COUNTS) {
+    const known = rows.reduce((sum, row) => sum + (row[key] ?? 0), 0);
+    if (!Number.isSafeInteger(known)) throw new RangeError("Aggregated token usage exceeds the safe integer range.");
+    result[`known${key[0].toUpperCase()}${key.slice(1)}`] = known;
+    result[key] = rows.length && rows.every((row) => row[key] !== null) ? known : null;
+  }
+  result.totalTokens = result.inputTokens === null || result.outputTokens === null ? null : result.inputTokens + result.outputTokens;
+  if (result.totalTokens !== null && !Number.isSafeInteger(result.totalTokens)) throw new RangeError("Total usage exceeds the safe integer range.");
+  return result;
+}
+function summarizeProviderUsage(events) {
+  const records = [], invalidEventIds = [], identities = /* @__PURE__ */ new Map();
+  for (const event2 of events) {
+    if (!event2.data?.providerUsage) continue;
+    try {
+      const usage = validateProviderUsage(event2.data.providerUsage);
+      const key = sha256([usage.provider, usage.model, usage.sessionId, usage.callId, usage.attempt, usage.purpose]);
+      if (identities.has(key)) {
+        invalidEventIds.push(event2.eventId);
+        continue;
+      }
+      identities.set(key, true);
+      records.push({ ...usage, eventId: event2.eventId, eventHash: event2.hash, timestamp: event2.timestamp });
+    } catch {
+      invalidEventIds.push(event2.eventId);
+    }
+  }
+  const live = records.filter((row) => row.purpose === "production");
+  const groups = /* @__PURE__ */ new Map();
+  for (const row of live) {
+    const key = JSON.stringify([row.provider, row.model]);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(row);
+  }
+  return deepFreezeJson({
+    schemaVersion: "qarinah.provider-usage-summary.v1",
+    production: totals(live),
+    test: totals(records.filter((row) => row.purpose === "test")),
+    models: [...groups.values()].map((rows) => ({ provider: rows[0].provider, model: rows[0].model, ...totals(rows) })),
+    invalidEventIds,
+    records,
+    savingsPercent: null,
+    costUsd: null,
+    note: "Host-supplied provider counts, not independently verified invoices. Cache is included in input; reasoning is included in output. Missing counts remain unknown. Savings require a matched baseline; token counts alone do not establish cost or quality."
+  });
+}
+async function readProviderUsage(options = {}) {
+  const workspace = await loadWorkspace(options.cwd ?? process.cwd());
+  const events = await readEvents(workspace, { updateCheckpoint: false });
+  return summarizeProviderUsage(events);
+}
+
+// src/dashboard.js
 init_canonical();
 init_linked_memory();
-import path17 from "node:path";
 init_project_views();
 
 // src/session-receipts.js
@@ -13545,6 +13661,7 @@ async function buildMemoryDashboard(options = {}) {
       savingsPercent,
       baselineToPackRatio
     },
+    providerUsage: summarizeProviderUsage(events),
     sessionReceipts,
     memoryFootprint,
     currentDecisions: projectRecords.decisions.filter((decision) => decision.status === "current"),
@@ -13598,6 +13715,16 @@ function tableRegion(label, content) {
   return `<div class="table-scroll" role="region" aria-label="${escapeHtml(label)} table" tabindex="0">${content}</div>`;
 }
 function renderMemoryDashboard(data, options = {}) {
+  const usage = data.providerUsage ?? summarizeProviderUsage([]);
+  const count = (value) => value === null ? "Unknown" : value.toLocaleString();
+  const usagePanel = `<section class="wide"><h2>Model token usage</h2>
+<p>Recorded production attempts: ${usage.production.attempts}. Failed: ${usage.production.failed}. Cancelled: ${usage.production.cancelled}. Attempts missing input or output: ${usage.production.missingUsageAttempts}.</p>
+<p>Input: <strong>${count(usage.production.inputTokens)}</strong> \xB7 Output: <strong>${count(usage.production.outputTokens)}</strong> \xB7 Total: <strong>${count(usage.production.totalTokens)}</strong></p>
+<p>Known subtotals: ${count(usage.production.knownInputTokens)} input / ${count(usage.production.knownOutputTokens)} output. These cover retained calls only; unreported calls cannot be counted.</p>
+${usage.invalidEventIds.length ? `<p role="alert">Incomplete report: ${usage.invalidEventIds.length} invalid or duplicate usage records excluded. Do not treat these subtotals as complete consumption.</p>` : ""}
+${paginatedTable({ id: "provider-usage", label: "Model token usage", headings: ["Provider", "Model", "Attempts", "Input", "Output", "Cached input (included)", "Reasoning output (included)"], rows: usage.models.map((row) => [escapeHtml(row.provider), escapeHtml(row.model), count(row.attempts), count(row.inputTokens), count(row.outputTokens), count(row.cachedInputTokens), count(row.reasoningTokens)]) })}
+<p>Test attempts (excluded above): ${usage.test.attempts}; test tokens: ${count(usage.test.totalTokens)}.</p>
+<p>${escapeHtml(usage.note)}</p><p>API cost and savings: <strong>Not measured</strong>. Context-pack estimates elsewhere on this page are not billed token savings.</p></section>`;
   const footprint = data.memoryFootprint;
   const savingsBasis = data.contextSavings.source === "caller-supplied" ? "supplied baseline \u2192 task pack" : data.contextSavings.source === "portable-chars-div-4-from-compact-import-receipts" ? "import receipt \u2192 task pack" : "authoritative ledger \u2192 task pack";
   const savingsValue = data.contextSavings.status === "measured" && data.contextSavings.savingsPercent !== null ? `${data.contextSavings.savingsPercent}%` : footprint.deliveredPack.estimatedTokens.toLocaleString();
@@ -13706,6 +13833,7 @@ li:first-child{border-top:0}li strong{min-width:0;overflow-wrap:anywhere}li span
 </div></header>
 <main><div class="grid">
 ${worktreeComparison}
+${usagePanel}
 <section class="wide"><h2>Worktree context graph</h2><p>Explore the active Git worktree, current memories, concepts, files, and their evidence-backed relationships in a circular project map. Drag nodes to untangle a cluster, click any point for its source identity, or run ranked search to see the exact score basis.</p>
 <div class="graph-toolbar"><label>Ranked project-memory search<input type="search" data-graph-search data-search-path="${escapeHtml(options.searchPath ?? "")}" maxlength="256" placeholder="Try a branch, decision, or src/index.js"></label><label>Node type<select data-graph-type><option value="all">All node types</option><option value="worktree">Git worktrees</option><option value="memory">Memories</option><option value="file">Files</option><option value="concept">Concepts</option><option value="directory">Directories</option><option value="reference">References</option></select></label><button class="graph-reset" type="button" data-graph-reset>Reset map</button><output class="graph-summary" data-graph-summary aria-live="polite"></output></div>
 <div class="graph-shell"><div class="graph-stage"><span class="graph-live-badge">Real local ledger data</span><svg class="graph-canvas" data-linked-graph viewBox="0 0 1040 620" role="img" aria-label="Interactive circular project-memory graph"><g data-graph-orbits></g><g data-graph-edges></g><g data-graph-nodes></g></svg></div><aside class="graph-details" aria-live="polite"><div><span class="graph-details-kicker">Selected graph node</span><h3 data-graph-title>Choose a node</h3><p data-graph-description>Click a labeled node or a result to inspect its real retained data, rank, connections, and evidence identity.</p><dl><dt>Type</dt><dd data-graph-detail="type">-</dd><dt>Status</dt><dd data-graph-detail="status">-</dd><dt>Importance</dt><dd data-graph-detail="importance">-</dd><dt>Connections</dt><dd data-graph-detail="connections">-</dd><dt>Score basis</dt><dd data-graph-detail="basis">Browse rank</dd><dt>Evidence</dt><dd data-graph-detail="evidence">-</dd></dl></div><div><strong>Visible or ranked results</strong><ol class="graph-results" data-graph-results aria-label="Linked project-memory results"></ol></div></aside></div>
@@ -15631,6 +15759,8 @@ Usage:
   qarinah uninstall [path] --host codex|claude|cursor|kimi|antigravity|freebuff --scope project
   qarinah record --kind <kind> --title <title> [--body <text>] [--data-json <json>] [--relation type:target]
   qarinah record --stdin-json
+  qarinah usage
+  qarinah usage record --stdin-json
   qarinah hook codex|claude
   qarinah mcp [--allow-query --workspace-id ws_<id> --policy-hash sha256:<digest>] [--max-chars n] [--max-items n]
   qarinah build | rebuild
@@ -15842,6 +15972,32 @@ async function run(argv) {
   }
   if (command === "untrust") {
     process2.stdout.write(`${JSON.stringify(await revokeWorkspaceTrust(process2.cwd()), null, 2)}
+`);
+    return;
+  }
+  if (command === "usage") {
+    if (args.length === 0) {
+      process2.stdout.write(`${JSON.stringify(await readProviderUsage(), null, 2)}
+`);
+      return;
+    }
+    if (args[0] !== "record") throw new TypeError("Usage: qarinah usage [record --stdin-json]");
+    const request = await readStdinJsonRequest(args.slice(1), "usage record", 4096, /* @__PURE__ */ new Set([
+      "schemaVersion",
+      "provider",
+      "model",
+      "callId",
+      "attempt",
+      "sessionId",
+      "purpose",
+      "outcome",
+      "inputTokens",
+      "outputTokens",
+      "cachedInputTokens",
+      "reasoningTokens"
+    ]));
+    if (request === null) throw new TypeError("usage record requires --stdin-json.");
+    process2.stdout.write(`${JSON.stringify(await recordProviderUsage(request), null, 2)}
 `);
     return;
   }

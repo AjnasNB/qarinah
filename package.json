@@ -53,13 +53,15 @@
     "./schemas/symbol-graph.json": "./schemas/symbol-graph.schema.json",
     "./schemas/project-memory-cycle.json": "./schemas/project-memory-cycle.schema.json",
     "./schemas/fact-consolidation.json": "./schemas/fact-consolidation.schema.json",
-    "./schemas/proof-context.json": "./schemas/proof-context.schema.json"
+    "./schemas/proof-context.json": "./schemas/proof-context.schema.json",
+    "./schemas/provider-usage.json": "./schemas/provider-usage.schema.json"
   },
   "files": [
     "bin/",
     "src/",
     "types/",
     "schemas/",
+    "docs/PROVIDER-USAGE.md",
     "docs/ARCHITECTURE.md",
     "docs/GETTING-STARTED.md",
     "docs/FEATURES.md",

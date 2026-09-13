@@ -57,6 +57,7 @@ try {
     "import {",
     "  appendCockroachBrowserOutcome,",
     "  appendEvent,",
+    "  recordProviderUsage, readProviderUsage, validateProviderUsage, summarizeProviderUsage,",
     "  createCockroachBrowserMemorySink,",
     "  cockroachSourceRecordToAcquisitionEventInput,",
     "  createProductLoopProvenanceSink,",
@@ -248,7 +249,10 @@ try {
     "void ingestion;",
     "const appendInput: MaqamContextAppendInput = { event: { kind: 'decision', title: 'ship' }, capture: 'content' };",
     "void appendInput;",
-    ""
+    "",
+    "void recordProviderUsage({schemaVersion:'qarinah.provider-usage.v1',provider:'azure',model:'model',callId:'call',sessionId:'session',attempt:1,purpose:'test',outcome:'completed',inputTokens:1,outputTokens:2,cachedInputTokens:null,reasoningTokens:null},{cwd:'/workspace'});",
+    "void readProviderUsage({cwd:'/workspace'}).then(r => r.production.inputTokens);",
+    "void validateProviderUsage({}); void summarizeProviderUsage([]);",
   ].join("\n"));
 
   const installed = await runNode([
@@ -364,6 +368,11 @@ try {
   );
   await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "fact-consolidation.schema.json"), "utf8");
   await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "docs", "SYMBOL-GRAPH.md"), "utf8");
+  assert.equal(installedPackage.exports["./schemas/provider-usage.json"], "./schemas/provider-usage.schema.json");
+  const usageSchema = JSON.parse(await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", "provider-usage.schema.json"), "utf8"));
+  assert.equal(usageSchema.additionalProperties, false);
+  assert.ok(usageSchema.required.includes("outputTokens"));
+  await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "docs", "PROVIDER-USAGE.md"), "utf8");
   process.stdout.write("Exact cockroach-browser@0.1.0 TypeScript and registry-integrity contract passed.\n");
 } finally {
   await rm(temporaryDirectory, { recursive: true, force: true });

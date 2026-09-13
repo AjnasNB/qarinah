@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/AjnasNB/qarinah/schemas/provider-usage.schema.json",
+  "title": "Qarinah provider usage v1",
+  "description": "Cache input and reasoning output are subsets. Cross-field subset constraints are enforced by validateProviderUsage. Counts are host-supplied, not independently verified.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "provider",
+    "model",
+    "callId",
+    "sessionId",
+    "attempt",
+    "purpose",
+    "outcome",
+    "inputTokens",
+    "outputTokens",
+    "cachedInputTokens",
+    "reasoningTokens"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "qarinah.provider-usage.v1"
+    },
+    "provider": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^(?!.*[\\u0000-\\u001f]).*\\S.*$"
+    },
+    "model": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^(?!.*[\\u0000-\\u001f]).*\\S.*$"
+    },
+    "callId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^(?!.*[\\u0000-\\u001f]).*\\S.*$"
+    },
+    "sessionId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^(?!.*[\\u0000-\\u001f]).*\\S.*$"
+    },
+    "attempt": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10000
+    },
+    "purpose": {
+      "enum": [
+        "production",
+        "test"
+      ]
+    },
+    "outcome": {
+      "enum": [
+        "completed",
+        "failed",
+        "cancelled"
+      ]
+    },
+    "inputTokens": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1000000000
+    },
+    "outputTokens": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1000000000
+    },
+    "cachedInputTokens": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1000000000
+    },
+    "reasoningTokens": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1000000000
+    }
+  }
+}
