@@ -60,6 +60,7 @@ try {
     "  configureAutoInit, ensureAutoWorkspace, readAutoInitPolicy, autoInitPolicyPath,",
     "  recallChatMemory, recordModelChatSummary, renderChatMarkdown, writeChatMarkdown,",
     "  capturePortableHook, setupUser,",
+    "  recordProviderUsage, readProviderUsage, validateProviderUsage, summarizeProviderUsage,",
     "  createCockroachBrowserMemorySink,",
     "  cockroachSourceRecordToAcquisitionEventInput,",
     "  createProductLoopProvenanceSink,",
@@ -260,6 +261,9 @@ try {
     "const appendInput: MaqamContextAppendInput = { event: { kind: 'decision', title: 'ship' }, capture: 'content' };",
     "void appendInput;",
     ""
+    "void recordProviderUsage({schemaVersion:'qarinah.provider-usage.v1',provider:'azure',model:'model',callId:'call',sessionId:'session',attempt:1,purpose:'test',outcome:'completed',inputTokens:1,outputTokens:2,cachedInputTokens:null,reasoningTokens:null},{cwd:'/workspace'});",
+    "void readProviderUsage({cwd:'/workspace'}).then(r => r.production.inputTokens);",
+    "void validateProviderUsage({}); void summarizeProviderUsage([]);",
   ].join("\n"));
 
   const installed = await runNode([
