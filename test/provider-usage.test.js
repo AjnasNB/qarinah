@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+import { buildMemoryDashboard, renderMemoryDashboard } from "../src/dashboard.js";
 import { initializeWorkspace, readEvents, recordProviderUsage, readProviderUsage, summarizeProviderUsage, validateProviderUsage } from "../src/index.js";
 import { temporaryDirectory } from "../test-support/helpers.js";
 
@@ -44,4 +47,30 @@ test("usage boundary rejects payload content, invalid counts, getters and subset
 
 test("usage recording does not initialize an unapproved workspace", async t => {
   const cwd = await temporaryDirectory(t); await assert.rejects(recordProviderUsage(usage(), { cwd }), /qarinah init/);
+});
+
+
+test("CLI records bounded JSON and dashboard separates real usage from estimates", async t => {
+  const cwd = await temporaryDirectory(t); await initializeWorkspace(cwd);
+  const cli = fileURLToPath(new URL("../bin/qarinah.js", import.meta.url));
+  const run = (args, input) => spawnSync(process.execPath, [cli, "usage", ...args], { cwd, input, encoding: "utf8", timeout: 30000 });
+  const receipt = usage({ model: "<img src=x onerror=alert(1)>" });
+  const recorded = run(["record", "--stdin-json"], JSON.stringify(receipt));
+  assert.equal(recorded.status, 0, recorded.stderr);
+  assert.equal(run(["record", "--stdin-json"], JSON.stringify(receipt)).status, 0);
+  assert.equal(run(["record", "--stdin-json", "--extra"], JSON.stringify(receipt)).status, 1);
+  assert.equal(run(["record", "--stdin-json"], JSON.stringify({ ...receipt, prompt: "secret" })).status, 1);
+  const report = run([]); assert.equal(report.status, 0, report.stderr);
+  assert.equal(JSON.parse(report.stdout).production.totalTokens, 120);
+  const ledger = path.join(cwd, ".qarinah/events/events.jsonl"); const before = await readFile(ledger);
+  const data = await buildMemoryDashboard({ cwd });
+  assert.equal(data.providerUsage.production.attempts, 1);
+  const html = renderMemoryDashboard(data);
+  assert.match(html, /Model token usage/); assert.match(html, /API cost and savings: <strong>Not measured/);
+  assert.ok(!html.includes(receipt.model)); assert.match(html, /&lt;img src=x/);
+  assert.deepEqual(await readFile(ledger), before);
+  await recordProviderUsage(usage({ callId: "missing", inputTokens: null, outputTokens: null, cachedInputTokens: null, reasoningTokens: null }), { cwd });
+  const incomplete = renderMemoryDashboard(await buildMemoryDashboard({ cwd }));
+  assert.match(incomplete, /Input: <strong>Unknown/);
+  assert.match(incomplete, /Attempts missing input or output: 1/);
 });

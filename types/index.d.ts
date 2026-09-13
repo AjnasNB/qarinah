@@ -1525,6 +1525,7 @@ export function buildDeveloperMemoryView(options?: {
   clock?: () => Date;
 }): Promise<Readonly<QarinahDeveloperMemoryView>>;
 export interface QarinahMemoryDashboard {
+  providerUsage: ProviderUsageSummary;
   schemaVersion: "qarinah.memory-dashboard.v2";
   workspaceId: string;
   workspace: Readonly<{

@@ -1,4 +1,5 @@
 import path from "node:path";
+import { summarizeProviderUsage } from "./provider-usage.js";
 import { deepFreezeJson } from "./canonical.js";
 import { buildLinkedProjectMemory, rankLinkedProjectMemory } from "./linked-memory.js";
 import { measureMemoryFootprint } from "./memory-footprint.js";
@@ -159,6 +160,7 @@ export async function buildMemoryDashboard(options = {}) {
       savingsPercent,
       baselineToPackRatio
     },
+    providerUsage: summarizeProviderUsage(events),
     sessionReceipts,
     memoryFootprint,
     currentDecisions: projectRecords.decisions.filter((decision) => decision.status === "current"),
@@ -224,6 +226,16 @@ function tableRegion(label, content) {
 }
 
 export function renderMemoryDashboard(data, options = {}) {
+  const usage = data.providerUsage ?? summarizeProviderUsage([]);
+  const count = value => value === null ? "Unknown" : value.toLocaleString();
+  const usagePanel = `<section class="wide"><h2>Model token usage</h2>
+<p>Recorded production attempts: ${usage.production.attempts}. Failed: ${usage.production.failed}. Cancelled: ${usage.production.cancelled}. Attempts missing input or output: ${usage.production.missingUsageAttempts}.</p>
+<p>Input: <strong>${count(usage.production.inputTokens)}</strong> · Output: <strong>${count(usage.production.outputTokens)}</strong> · Total: <strong>${count(usage.production.totalTokens)}</strong></p>
+<p>Known subtotals: ${count(usage.production.knownInputTokens)} input / ${count(usage.production.knownOutputTokens)} output. These cover retained calls only; unreported calls cannot be counted.</p>
+${usage.invalidEventIds.length ? `<p role="alert">Incomplete report: ${usage.invalidEventIds.length} invalid or duplicate usage records excluded. Do not treat these subtotals as complete consumption.</p>` : ""}
+${paginatedTable({ id: "provider-usage", label: "Model token usage", headings: ["Provider", "Model", "Attempts", "Input", "Output", "Cached input (included)", "Reasoning output (included)"], rows: usage.models.map(row => [escapeHtml(row.provider), escapeHtml(row.model), count(row.attempts), count(row.inputTokens), count(row.outputTokens), count(row.cachedInputTokens), count(row.reasoningTokens)]) })}
+<p>Test attempts (excluded above): ${usage.test.attempts}; test tokens: ${count(usage.test.totalTokens)}.</p>
+<p>${escapeHtml(usage.note)}</p><p>API cost and savings: <strong>Not measured</strong>. Context-pack estimates elsewhere on this page are not billed token savings.</p></section>`;
   const footprint = data.memoryFootprint;
   const savingsBasis = data.contextSavings.source === "caller-supplied"
     ? "supplied baseline → task pack"
@@ -353,6 +365,7 @@ li:first-child{border-top:0}li strong{min-width:0;overflow-wrap:anywhere}li span
 </div></header>
 <main><div class="grid">
 ${worktreeComparison}
+${usagePanel}
 <section class="wide"><h2>Worktree context graph</h2><p>Explore the active Git worktree, current memories, concepts, files, and their evidence-backed relationships in a circular project map. Drag nodes to untangle a cluster, click any point for its source identity, or run ranked search to see the exact score basis.</p>
 <div class="graph-toolbar"><label>Ranked project-memory search<input type="search" data-graph-search data-search-path="${escapeHtml(options.searchPath ?? "")}" maxlength="256" placeholder="Try a branch, decision, or src/index.js"></label><label>Node type<select data-graph-type><option value="all">All node types</option><option value="worktree">Git worktrees</option><option value="memory">Memories</option><option value="file">Files</option><option value="concept">Concepts</option><option value="directory">Directories</option><option value="reference">References</option></select></label><button class="graph-reset" type="button" data-graph-reset>Reset map</button><output class="graph-summary" data-graph-summary aria-live="polite"></output></div>
 <div class="graph-shell"><div class="graph-stage"><span class="graph-live-badge">Real local ledger data</span><svg class="graph-canvas" data-linked-graph viewBox="0 0 1040 620" role="img" aria-label="Interactive circular project-memory graph"><g data-graph-orbits></g><g data-graph-edges></g><g data-graph-nodes></g></svg></div><aside class="graph-details" aria-live="polite"><div><span class="graph-details-kicker">Selected graph node</span><h3 data-graph-title>Choose a node</h3><p data-graph-description>Click a labeled node or a result to inspect its real retained data, rank, connections, and evidence identity.</p><dl><dt>Type</dt><dd data-graph-detail="type">-</dd><dt>Status</dt><dd data-graph-detail="status">-</dd><dt>Importance</dt><dd data-graph-detail="importance">-</dd><dt>Connections</dt><dd data-graph-detail="connections">-</dd><dt>Score basis</dt><dd data-graph-detail="basis">Browse rank</dd><dt>Evidence</dt><dd data-graph-detail="evidence">-</dd></dl></div><div><strong>Visible or ranked results</strong><ol class="graph-results" data-graph-results aria-label="Linked project-memory results"></ol></div></aside></div>

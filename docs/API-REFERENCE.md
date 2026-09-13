@@ -1254,3 +1254,14 @@ Anything outside this export map is internal and may change without becoming a p
 `recallChatMemory(query, { cwd, detail, eventIds, offset, maxChars, limit })` performs bounded, zero-write recall. Summary mode is the default. Full mode requires genuine source event IDs and supports pagination. `recordModelChatSummary({ cwd, title, text, eventIds })` verifies those sources and appends an inferred summary; summaries never grant approval. `renderChatMarkdown(events, workspaceId)` and `writeChatMarkdown(start)` rebuild the visible-chat projection. `capturePortableHook(adapter, input, { eventName })` captures only the visible public fields exposed by the selected host.
 
 The published contracts are `qarinah/schemas/auto-init.json` (`qarinah.auto-init.v1`) and `qarinah/schemas/chat-memory.json` (`qarinah.chat-memory.v1`). See [automatic initialization](AUTO-INITIALIZATION.md) for CLI, host coverage, exclusions, and remote setup.
+
+## Provider token usage
+
+`recordProviderUsage(receipt, { cwd })` appends an idempotent metadata-only
+usage event; conflicting counts for the same attempt are rejected.
+`readProviderUsage({ cwd })` verifies and reads the ledger without updating
+its checkpoint. `summarizeProviderUsage(events)` separates production/test
+usage, identifies invalid records, and reports known subtotals when some
+attempts have no usage. `validateProviderUsage(receipt)` checks and freezes
+the bounded contract. See [Provider usage](PROVIDER-USAGE.md) for migration
+notes and host integration requirements.
