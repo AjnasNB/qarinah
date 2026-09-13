@@ -61,6 +61,7 @@
     "src/",
     "types/",
     "schemas/",
+    "docs/PROVIDER-USAGE.md",
     "docs/ARCHITECTURE.md",
     "docs/GETTING-STARTED.md",
     "docs/FEATURES.md",

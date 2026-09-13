@@ -1244,3 +1244,15 @@ qarinah/schemas/fact-consolidation.json
 ```
 
 Anything outside this export map is internal and may change without becoming a public API.
+
+
+## Provider token usage
+
+`recordProviderUsage(receipt, { cwd })` appends an idempotent metadata-only
+usage event; conflicting counts for the same attempt are rejected.
+`readProviderUsage({ cwd })` verifies and reads the ledger without updating
+its checkpoint. `summarizeProviderUsage(events)` separates production/test
+usage, identifies invalid records, and reports known subtotals when some
+attempts have no usage. `validateProviderUsage(receipt)` checks and freezes
+the bounded contract. See [Provider usage](PROVIDER-USAGE.md) for migration
+notes and host integration requirements.

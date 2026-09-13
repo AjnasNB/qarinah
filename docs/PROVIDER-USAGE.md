@@ -27,3 +27,17 @@ The read API is zero-write and cites event IDs and hashes. Capturing numbers is 
 For an Azure host, map `prompt_tokens` to `inputTokens`, `completion_tokens` to `outputTokens`, and explicitly reported cached/reasoning details to their matching subset fields. Qarinah cannot obtain billing usage from a host that does not expose it. Installing Qarinah alone does not grant access to Codex/Claude account billing or retroactively recover missing counters.
 
 Savings need a matched OFF/ON workload with the same requirements and quality checks. Dollar estimates additionally need model-specific dated rates and cache billing. A context-pack estimate and provider cost savings are different measurements.
+
+## CLI and dashboard
+
+Run `qarinah usage` inside an initialized workspace for a read-only JSON report.
+Pass one receipt as JSON on standard input to `qarinah usage record --stdin-json`.
+The dashboard's **Model token usage** section shows production input/output,
+model breakdowns, failed and cancelled attempts, incomplete counts, and test
+usage separately. Context-pack estimates elsewhere are not provider billing.
+
+Hosts must call this API for each completed, failed, or cancelled attempt.
+Installing Qarinah alone cannot observe usage from an unrelated application's
+private API client. Persist a null-count receipt when a provider returns no usage;
+never omit failed calls just because they have no completion. Record no prompts,
+responses, API keys, or hidden reasoning in a usage receipt.
