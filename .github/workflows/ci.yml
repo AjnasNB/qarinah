@@ -27,6 +27,15 @@ jobs:
         run: npm audit --audit-level=high
       - name: Verify registry signatures and attestations
         run: npm audit signatures
+      - name: Install video-build dependencies without lifecycle scripts
+        working-directory: media/qarinah-handoff-video
+        run: npm ci --ignore-scripts
+      - name: Audit video-build dependencies
+        working-directory: media/qarinah-handoff-video
+        run: npm audit --audit-level=high
+      - name: Verify video-build registry signatures
+        working-directory: media/qarinah-handoff-video
+        run: npm audit signatures
 
   dependency-review:
     name: Dependency review
