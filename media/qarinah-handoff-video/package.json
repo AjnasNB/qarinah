@@ -4,14 +4,15 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "check": "remotion versions && remotion still src/index.jsx QarinahHandoff ../../tmp/qarinah-video-smoke.png --frame=2940",
     "render": "remotion render src/index.jsx QarinahHandoff ../../website/static/assets/qarinah-fresh-session-handoff.mp4 --codec=h264 --crf=22 --pixel-format=yuv420p",
     "still": "remotion still src/index.jsx QarinahHandoff ../../website/static/assets/qarinah-fresh-session-handoff-poster.png --frame=2940"
   },
   "dependencies": {
-    "@remotion/cli": "4.0.479",
-    "react": "19.1.1",
-    "react-dom": "19.1.1",
-    "remotion": "4.0.479",
-    "typescript": "5.9.3"
+    "@remotion/cli": "4.0.527",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "remotion": "4.0.527",
+    "typescript": "7.0.2"
   }
 }

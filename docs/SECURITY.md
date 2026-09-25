@@ -50,4 +50,33 @@
 - Maqam adapters require the private, one-dispatch verifier supplied by `ToolGateway.registerGuardedTool`. It binds the exact active input and context objects, tool registration, run, input hash, decision, and consumed approvals; retained handlers and fabricated plain contexts fail before Qarinah access. [Maqam issue #24](https://github.com/AjnasNB/maqam/issues/24) records this contract. This does not mediate unregistered code or direct host side effects.
 - Qarinah and Maqam evidence are separate append-only systems. A successful `context.append` emits both records, but there is no cross-ledger transaction: if Maqam's evidence ledger fails after the Qarinah append, the governed call fails while the context event remains reviewable.
 
+## Dependency updates
+
+Dependabot checks both npm projects and GitHub Actions. CI audits runtime,
+development, and video-build dependencies, verifies their registry signatures,
+and renders a video smoke frame after checking Remotion package alignment.
+React, React DOM, and the Remotion packages update in one video-toolchain group.
+The CodeQL initialization and analysis actions update together and use the same
+reviewed commit.
+
+Two dependencies require an explicit compatibility migration before routine
+version updates:
+
+| Dependency | Reviewed pin | Migration requirements |
+| --- | --- | --- |
+| `cockroach-browser` | `0.1.0` | This development-only fixture verifies the original public browser-memory contract. A replacement must preserve that conformance coverage and update the exact registry-integrity checks, consumer type checks, and interoperability documentation together. It is not installed as a Qarinah runtime dependency. |
+| `web-tree-sitter` | `0.20.8` | The symbol-graph adapter, `tree-sitter-wasms@0.1.13` grammars, vendored plugin runtime, and packed-consumer assertions use this exact runtime. An upgrade must migrate its module/API layout, verify every supported grammar, rebuild both plugins, and refresh the current-checkout evaluation receipt. |
+
+The `ignore.update-types` entries for these pins suppress routine version
+updates only. They do not suppress Dependabot security updates or vulnerability
+alerts. A security advisory affecting either pin requires fixing or migrating
+the dependency and passing the complete release checks; the pin is not a reason
+to dismiss an alert.
+
+Run `npm ci` and `npm run check` at the repository root, then `npm ci`,
+`npm audit`, `npm audit signatures`, and `npm run check` in
+`media/qarinah-handoff-video` before merging dependency updates. Regenerate
+current-checkout evaluation results when their source manifest changes, while
+preserving historical release receipts.
+
 Report vulnerabilities privately to the repository owner before opening a public issue.

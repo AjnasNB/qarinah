@@ -36,6 +36,9 @@ jobs:
       - name: Verify video-build registry signatures
         working-directory: media/qarinah-handoff-video
         run: npm audit signatures
+      - name: Verify video package alignment and render a smoke frame
+        working-directory: media/qarinah-handoff-video
+        run: npm run check
 
   dependency-review:
     name: Dependency review
