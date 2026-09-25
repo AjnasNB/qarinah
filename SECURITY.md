@@ -6,10 +6,11 @@ Qarinah is a local project-memory library and CLI. It is designed to make captur
 
 | Version | Security fixes |
 | --- | --- |
-| Current `0.1.x` release | Supported |
+| Latest stable release on npm's `latest` tag | Supported |
 | Older prereleases and unreleased source snapshots | Upgrade required |
 
-Confirm the current public version with `npm view qarinah version`.
+Confirm the current stable version with `npm view qarinah dist-tags.latest`.
+Prereleases on the `next` tag are evaluation builds, not the stable security baseline.
 
 ## Report a vulnerability privately
 
@@ -41,3 +42,6 @@ Reports are especially useful when they demonstrate:
 Claims that a retained statement is factually true, model-provider behavior, and unregistered host side effects are outside Qarinah's security guarantee unless Qarinah itself violates a documented boundary.
 
 The detailed threat model, defaults, non-goals, and known limits are maintained in [docs/SECURITY.md](docs/SECURITY.md). Privacy behavior is documented in [PRIVACY.md](PRIVACY.md).
+
+Repository access, branch protection, CI, and release controls are documented in
+[the repository security policy](.github/REPOSITORY-SECURITY.md).

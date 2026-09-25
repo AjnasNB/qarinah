@@ -354,6 +354,7 @@
     "cockroach-browser": "0.1.0",
     "esbuild": "0.28.1",
     "marked": "^18.0.7",
+    "parse5": "8.0.1",
     "typescript": "7.0.2",
     "wrangler": "^4.125.0"
   },

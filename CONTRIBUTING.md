@@ -75,6 +75,8 @@ Do not add permissive fallbacks for unknown event shapes. Reject or ignore unkno
 
 ## Pull requests
 
+- Start from `main`, push to a feature branch or fork, and open a pull request.
+  Follow [the pull/push and repository security policy](.github/REPOSITORY-SECURITY.md).
 - Keep one pull request focused on one reviewable outcome.
 - Explain user impact, security impact, compatibility, tests, and documentation.
 - Link the issue or design discussion when one exists.
