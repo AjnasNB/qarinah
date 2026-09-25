@@ -11,7 +11,7 @@
     "@remotion/cli": "4.0.479",
     "react": "19.1.1",
     "react-dom": "19.1.1",
-    "remotion": "4.0.479",
+    "remotion": "4.0.527",
     "typescript": "5.9.3"
   }
 }
