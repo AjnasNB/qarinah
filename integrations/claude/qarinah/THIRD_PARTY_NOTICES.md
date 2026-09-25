@@ -2,7 +2,7 @@
 
 Qarinah's standalone Codex and Claude Code plugin runtimes bundle the following dependencies.
 
-## ignore 7.0.6
+## ignore 7.0.10
 
 Copyright (c) 2013 Kael Zhang <i@kael.me>, contributors
 http://kael.me/

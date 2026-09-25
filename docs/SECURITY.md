@@ -59,13 +59,14 @@ React, React DOM, and the Remotion packages update in one video-toolchain group.
 The CodeQL initialization and analysis actions update together and use the same
 reviewed commit.
 
-Two dependencies require an explicit compatibility migration before routine
+Three dependencies require an explicit compatibility migration before routine
 version updates:
 
 | Dependency | Reviewed pin | Migration requirements |
 | --- | --- | --- |
 | `cockroach-browser` | `0.1.0` | This development-only fixture verifies the original public browser-memory contract. A replacement must preserve that conformance coverage and update the exact registry-integrity checks, consumer type checks, and interoperability documentation together. It is not installed as a Qarinah runtime dependency. |
 | `web-tree-sitter` | `0.20.8` | The symbol-graph adapter, `tree-sitter-wasms@0.1.13` grammars, vendored plugin runtime, and packed-consumer assertions use this exact runtime. An upgrade must migrate its module/API layout, verify every supported grammar, rebuild both plugins, and refresh the current-checkout evaluation receipt. |
+| `typescript-classic` | `npm:typescript@5.9.3` | The symbol graph loads the JavaScript compiler API and vendors `lib/typescript.js` into both plugins. This alias is separate from the current TypeScript CLI used for development. A replacement must preserve the compiler API, update vendored assets, and pass symbol-graph and packed-consumer checks. |
 
 The `ignore.update-types` entries for these pins suppress routine version
 updates only. They do not suppress Dependabot security updates or vulnerability
