@@ -7,6 +7,19 @@ updates:
       day: monday
       time: "04:00"
       timezone: Asia/Kolkata
+    # These exact versions are compatibility contracts; see docs/SECURITY.md.
+    # update-types affects version updates only, so security updates stay enabled.
+    ignore:
+      - dependency-name: cockroach-browser
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
+          - "version-update:semver-patch"
+      - dependency-name: web-tree-sitter
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
+          - "version-update:semver-patch"
     open-pull-requests-limit: 5
     commit-message:
       prefix: "deps"
@@ -18,6 +31,10 @@ updates:
       day: monday
       time: "04:15"
       timezone: Asia/Kolkata
+    groups:
+      video-toolchain:
+        patterns:
+          - "*"
     open-pull-requests-limit: 5
     commit-message:
       prefix: "deps"
@@ -29,6 +46,10 @@ updates:
       day: monday
       time: "04:30"
       timezone: Asia/Kolkata
+    groups:
+      codeql:
+        patterns:
+          - "github/codeql-action*"
     open-pull-requests-limit: 5
     commit-message:
       prefix: "ci"
