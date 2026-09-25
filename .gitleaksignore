@@ -1,0 +1,7 @@
+# Reviewed historical false positives. These exact fingerprints do not exempt
+# a file, rule, new commit, or new secret. See .github/REPOSITORY-SECURITY.md.
+1c0260340a3d6d2e4f43b27d61530231b103354b:scripts/verify-benchmark-release-0.1.6.mjs:generic-api-key:234
+31a0c38be6e2f506e669e57dc30607a9f87dcc5b:scripts/verify-benchmark-release-0.1.6.mjs:generic-api-key:221
+5468ddc45dbfd371f11b3665c2f6a4bb3ea589bb:scripts/verify-benchmark-release-0.1.5.mjs:generic-api-key:115
+9382a0338b0fe421129e44564e2713b9f0714f3c:test/redact.test.js:private-key:9
+9382a0338b0fe421129e44564e2713b9f0714f3c:test/redact.test.js:private-key:21
