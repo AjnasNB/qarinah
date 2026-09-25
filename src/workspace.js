@@ -70,6 +70,10 @@ async function ensureSafeDirectory(candidate, root, label) {
   return actual;
 }
 
+function isTransientWindowsLockError(error) {
+  return process.platform === "win32" && ["EPERM", "EBUSY"].includes(error?.code);
+}
+
 async function acquireInitializationLock(qarinahDir, signal) {
   const locksDirectory = resolveWithin(qarinahDir, "locks");
   await ensureSafeDirectory(locksDirectory, qarinahDir, ".qarinah/locks");
@@ -81,12 +85,20 @@ async function acquireInitializationLock(qarinahDir, signal) {
       await mkdir(lockPath, { mode: 0o700 });
       return async () => rm(lockPath, { recursive: true, force: true });
     } catch (error) {
-      if (error?.code !== "EEXIST") throw error;
-      const metadata = await safeLstat(lockPath, ".qarinah/locks/initialize", { allowMissing: true });
+      // Windows can keep a released directory pending deletion while another
+      // initializer observes it. Only a successful mkdir grants lock ownership.
+      if (error?.code !== "EEXIST" && !isTransientWindowsLockError(error)) throw error;
+      let metadata;
+      try {
+        metadata = await safeLstat(lockPath, ".qarinah/locks/initialize", { allowMissing: true });
+      } catch (inspectionError) {
+        if (!isTransientWindowsLockError(inspectionError)) throw inspectionError;
+      }
       if (metadata && !metadata.isDirectory()) {
         throw new QarinahError("WORKSPACE_INVALID", ".qarinah/locks/initialize must be a directory.");
       }
       if (Date.now() - startedAt >= 15_000) {
+        if (isTransientWindowsLockError(error)) throw error;
         throw new QarinahError("WORKSPACE_INITIALIZE_BUSY", "Another process is still initializing this Qarinah workspace.");
       }
       await new Promise((resolve, reject) => {

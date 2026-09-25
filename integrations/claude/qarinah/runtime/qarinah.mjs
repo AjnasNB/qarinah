@@ -1473,13 +1473,15 @@ var require_ignore = __commonJS({
     var EMPTY = "";
     var SPACE = " ";
     var ESCAPE = "\\";
-    var REGEX_TEST_BLANK_LINE = /^\s+$/;
+    var REGEX_LITERAL_SPECIAL = /[.*+?()[\]{}^$|\\/]/;
+    var REGEX_TEST_BLANK_LINE = /^\uFEFF? *$/;
     var REGEX_INVALID_TRAILING_BACKSLASH = /(?:[^\\]|^)\\$/;
     var REGEX_REPLACE_LEADING_EXCAPED_EXCLAMATION = /^\\!/;
     var REGEX_REPLACE_LEADING_EXCAPED_HASH = /^\\#/;
     var REGEX_SPLITALL_CRLF = /\r?\n/g;
-    var REGEX_TEST_INVALID_PATH = /^\.{0,2}\/|^\.{1,2}$/;
-    var REGEX_TEST_TRAILING_SLASH = /\/$/;
+    var DOUBLE_SLASH = "//";
+    var SLASH_CODE = 47;
+    var DOT_CODE = 46;
     var SLASH = "/";
     var TMP_KEY_IGNORE = "node-ignore";
     if (typeof Symbol !== "undefined") {
@@ -1490,40 +1492,194 @@ var require_ignore = __commonJS({
       Object.defineProperty(object, key, { value });
       return value;
     };
-    var REGEX_REGEXP_RANGE = /([0-z])-([0-z])/g;
     var RETURN_FALSE = () => false;
-    var sanitizeRange = (range) => range.replace(
-      REGEX_REGEXP_RANGE,
-      (match, from, to) => from.charCodeAt(0) <= to.charCodeAt(0) ? match : EMPTY
-    );
-    var negateRange = (range) => range.startsWith("!") || range.startsWith("\\^") ? `^${range.slice(range[0] === "!" ? 1 : 2)}` : range;
     var cleanRangeBackSlash = (slashes) => {
       const { length } = slashes;
       return slashes.slice(0, length - length % 2);
     };
+    var POSIX_CLASSES = {
+      alnum: "0-9A-Za-z",
+      alpha: "A-Za-z",
+      blank: " \\t",
+      cntrl: "\\x00-\\x1f\\x7f",
+      digit: "0-9",
+      graph: "!-.0-~",
+      lower: "a-z",
+      print: " -.0-~",
+      punct: "!-.:-@\\[-`{-~",
+      // git's `sane-ctype.h` classifies \v and \f as control, not space,
+      //   unlike C's `isspace`
+      space: " \\t\\n\\r",
+      upper: "A-Z",
+      xdigit: "0-9A-Fa-f"
+    };
+    var CLASS_MEMBERS_TO_ESCAPE = "\\]^-[";
+    var escapeMember = (char) => CLASS_MEMBERS_TO_ESCAPE.indexOf(char) < 0 ? char : ESCAPE + char;
+    var NON_SLASH = "(?!\\/)";
+    var classSource = (negated, body) => {
+      if (negated) {
+        return `[^\\/${body}]`;
+      }
+      const source = `[${body}]`;
+      return new RegExp(source).test("/") ? NON_SLASH + source : source;
+    };
+    var scanBracket = (pattern, start) => {
+      const { length } = pattern;
+      let index = start + 1;
+      let negated = EMPTY;
+      const lead = pattern[index];
+      if (lead === "!" || lead === "^") {
+        negated = "^";
+        index++;
+      }
+      let body = EMPTY;
+      let prev = EMPTY;
+      for (; ; ) {
+        const char = pattern[index];
+        if (char === UNDEFINED) {
+          return null;
+        }
+        if (char === ESCAPE) {
+          const escaped = pattern[index + 1];
+          if (escaped === UNDEFINED) {
+            return null;
+          }
+          body += escapeMember(escaped);
+          prev = escaped;
+          index++;
+        } else if (char === "-" && prev && index + 1 < length && pattern[index + 1] !== "]") {
+          index++;
+          let to = pattern[index];
+          if (to === ESCAPE) {
+            to = pattern[index += 1];
+          }
+          if (prev <= to) {
+            body += `-${escapeMember(to)}`;
+          }
+          prev = EMPTY;
+        } else if (char === "[" && pattern[index + 1] === ":") {
+          const nameStart = index + 2;
+          let end = nameStart;
+          while (end < length && pattern[end] !== "]") {
+            end++;
+          }
+          if (end === length) {
+            return null;
+          }
+          if (end > nameStart && pattern[end - 1] === ":") {
+            const expanded = POSIX_CLASSES[pattern.slice(nameStart, end - 1)];
+            if (expanded === UNDEFINED) {
+              return null;
+            }
+            body += expanded;
+            prev = EMPTY;
+            index = end;
+          } else {
+            body += escapeMember("[");
+            prev = "[";
+            index = nameStart - 2;
+          }
+        } else {
+          body += escapeMember(char);
+          prev = char;
+        }
+        index++;
+        if (pattern[index] === "]") {
+          return {
+            end: index,
+            source: classSource(negated, body)
+          };
+        }
+      }
+    };
+    var NEVER_MATCH = "[]";
+    var PLACEHOLDER = "\0";
+    var REGEX_RESTORE_PLACEHOLDER = new RegExp(
+      `${PLACEHOLDER}(\\d+)${PLACEHOLDER}`,
+      "g"
+    );
+    var TRAILING_WILDCARD = "\uE000";
+    var extractBrackets = (pattern) => {
+      const sources = [];
+      const hold = (source) => `${PLACEHOLDER}${sources.push(source) - 1}${PLACEHOLDER}`;
+      const { length } = pattern;
+      let out = EMPTY;
+      let index = 0;
+      while (index < length) {
+        const char = pattern[index];
+        if (char === ESCAPE) {
+          const escaped = pattern[index + 1];
+          if (escaped === "*" || escaped === "[" || escaped === SPACE || escaped === ESCAPE) {
+            out += pattern.slice(index, index + 2);
+          } else {
+            out += hold(
+              REGEX_LITERAL_SPECIAL.test(escaped) ? ESCAPE + escaped : escaped
+            );
+          }
+          index += 2;
+        } else if (char === PLACEHOLDER) {
+          out += hold(`[${PLACEHOLDER}]`);
+          index++;
+        } else if (char === "[") {
+          const scanned = scanBracket(pattern, index);
+          if (scanned === null) {
+            out += hold(NEVER_MATCH);
+            index = length;
+          } else {
+            out += hold(scanned.source);
+            index = scanned.end + 1;
+          }
+        } else {
+          out += char;
+          index++;
+        }
+      }
+      return {
+        source: out,
+        sources
+      };
+    };
+    var DIRECT = null;
+    var REGEX_INNER_SLASH = /\/(?!$)/;
     var REPLACERS = [
       [
         // Remove BOM
         // TODO:
         // Other similar zero-width characters?
         /^\uFEFF/,
+        () => EMPTY,
+        "\uFEFF"
+      ],
+      [
+        // A trailing line terminator, left on when a whole file's contents are
+        //   added as one pattern rather than split into lines. git never sees one
+        //   -- it reads a `.gitignore` line by line -- so it is not part of the
+        //   pattern and is dropped here, apart from the trailing-space trimming,
+        //   which follows git in touching spaces and nothing else.
+        /[\r\n]+$/,
         () => EMPTY
       ],
       // > Trailing spaces are ignored unless they are quoted with backslash ("\")
       [
+        // Only spaces, never tabs or other whitespace: git trims a trailing run
+        //   of `' '` and nothing else (dir.c, `trim_trailing_spaces`, a single
+        //   `case ' '`), so a pattern ending in a tab keeps it as a literal.
         // (a\ ) -> (a )
         // (a  ) -> (a)
         // (a ) -> (a)
         // (a \ ) -> (a  )
-        /((?:\\\\)*?)(\\?\s+)$/,
+        /((?:\\\\)*?)(\\? +)$/,
         (_, m1, m2) => m1 + (m2.indexOf("\\") === 0 ? SPACE : EMPTY)
       ],
       // Replace (\ ) with ' '
+      // Only a space: an escaped tab or other whitespace is already a literal by
+      //   the time it reaches here, and a bare tab must be left as one, not turned
+      //   into a space.
       // (\ ) -> ' '
       // (\\ ) -> '\\ '
       // (\\\ ) -> '\\ '
       [
-        /(\\+?)\s/g,
+        /(\\+?) /g,
         (_, m1) => {
           const { length } = m1;
           return m1.slice(0, length - length % 2) + SPACE;
@@ -1552,7 +1708,8 @@ var require_ignore = __commonJS({
       [
         // > a question mark (?) matches a single character
         /(?!\\)\?/g,
-        () => "[^/]"
+        () => "[^/]",
+        "?"
       ],
       // leading slash
       [
@@ -1560,12 +1717,14 @@ var require_ignore = __commonJS({
         // > For example, "/*.c" matches "cat-file.c" but not "mozilla-sha1/sha1.c".
         // A leading slash matches the beginning of the pathname
         /^\//,
-        () => "^"
+        () => "^",
+        SLASH
       ],
       // replace special metacharacter slash after the leading slash
       [
         /\//g,
-        () => "\\/"
+        () => "\\/",
+        SLASH
       ],
       [
         // > A leading "**" followed by a slash means match in all directories.
@@ -1576,16 +1735,21 @@ var require_ignore = __commonJS({
         // Notice that the '*'s have been replaced as '\\*'
         /^\^*(?:\\\*\\\*\\\/)+/,
         // '**/foo' <-> 'foo'
-        () => "^(?:.*\\/)?"
+        () => "^(?:.*\\/)?",
+        "*"
       ],
       // starting
       [
         // there will be no leading '/'
         //   (which has been replaced by section "leading slash")
         // If starts with '**', adding a '^' to the regular expression also works
-        /^(?=[^^])/,
-        function startingReplacer() {
-          return !/\/(?!$)/.test(this) ? "(?:^|\\/)" : "^";
+        DIRECT,
+        (source, pattern) => {
+          if (!source || source[0] === "^") {
+            return source;
+          }
+          const anchor = !REGEX_INNER_SLASH.test(pattern) ? "(?:^|\\/)" : "^";
+          return anchor + source;
         }
       ],
       // two globstars
@@ -1595,7 +1759,8 @@ var require_ignore = __commonJS({
         // Zero, one or several directories
         // should not use '*', or it will be replaced by the next replacer
         // Check if it is not the last `'/**'`
-        (_, index, str) => index + 6 < str.length ? "(?:\\/[^\\/]+)*" : "\\/.+"
+        (_, index, str) => index + 6 < str.length ? str.slice(index + 6) === "\\/" ? "(?:\\/[^\\/]+)+" : "(?:\\/[^\\/]+)*" : "\\/.+",
+        "*"
       ],
       // normal intermediate wildcards
       [
@@ -1610,32 +1775,56 @@ var require_ignore = __commonJS({
         (_, p1, p2) => {
           const unescaped = p2.replace(/\\\*/g, "[^\\/]*");
           return p1 + unescaped;
-        }
+        },
+        "*"
+      ],
+      // trailing wildcard, held apart from a literal star
+      [
+        // The step above leaves a trailing `*` alone, so a single `\*` is all that
+        //   can be left at the end here. Whether it is a wildcard or a literal
+        //   turns on the backslashes the user put in front of it: the escaper has
+        //   since doubled every one, so what stands here is those `2N` doubled
+        //   backslashes and then the star's own escape. An even number of the
+        //   original `N` leaves the star unescaped -- a wildcard -- and an odd
+        //   number escapes it -- a literal. This runs while the two are still
+        //   distinct, before the unescape steps below collapse the literal onto
+        //   the very `\*` a wildcard leaves behind.
+        /(^|[^\\])((?:\\\\)*)\\\*$/,
+        (match, p1, p2) => (
+          // `p2` holds the doubled user backslashes; half of them is `N`.
+          p2.length / 2 % 2 === 0 ? p1 + p2 + TRAILING_WILDCARD : match
+        ),
+        "*"
       ],
       [
         // unescape, revert step 3 except for back slash
         // For example, if a user escape a '\\*',
         // after step 3, the result will be '\\\\\\*'
         /\\\\\\(?=[$.|*+(){^])/g,
-        () => ESCAPE
+        () => ESCAPE,
+        ESCAPE + ESCAPE
       ],
       [
         // '\\\\' -> '\\'
         /\\\\/g,
-        () => ESCAPE
+        () => ESCAPE,
+        ESCAPE + ESCAPE
       ],
       [
-        // > The range notation, e.g. [a-zA-Z],
-        // > can be used to match one of the characters in a range.
+        // Every real bracket expression -- POSIX classes included -- has already
+        //   been held aside by `extractBrackets`, so the only `[` left in the
+        //   pattern is an escaped, literal one.
         // `\` is escaped by step 3
-        /(\\)?\[([^\]/]*?)(\\*)($|\])/g,
-        (match, leadEscape, range, endEscape, close) => leadEscape === ESCAPE ? `\\[${range}${cleanRangeBackSlash(endEscape)}${close}` : close === "]" ? endEscape.length % 2 === 0 ? `[${negateRange(sanitizeRange(range))}${endEscape}]` : "[]" : "[]"
+        /\\\[([^\]/]*?)(\\*)($|\])/g,
+        // '\\[bar]' -> '\\\\[bar\\]'
+        (match, range, endEscape, close) => `\\[${range}${cleanRangeBackSlash(endEscape)}${close}`,
+        "["
       ],
       // ending
       [
         // 'js' will not match 'js.'
         // 'ab' will not match 'abc'
-        /(?:[^*])$/,
+        DIRECT,
         // WTF!
         // https://git-scm.com/docs/gitignore
         // changes in [2.22.1](https://git-scm.com/docs/gitignore/2.22.1)
@@ -1646,10 +1835,16 @@ var require_ignore = __commonJS({
         // 'js*' will not match 'a.js'
         // 'js/' will not match 'a.js'
         // 'js' will match 'a.js' and 'a.js/'
-        (match) => /\/$/.test(match) ? `${match}$` : `${match}(?=$|\\/$)`
+        (source) => {
+          const last = source[source.length - 1];
+          if (!last || last === TRAILING_WILDCARD) {
+            return source;
+          }
+          return last === SLASH ? `${source}$` : `${source}(?=$|\\/$)`;
+        }
       ]
     ];
-    var REGEX_REPLACE_TRAILING_WILDCARD = /(^|\\\/)?\\\*$/;
+    var REGEX_REPLACE_TRAILING_WILDCARD = /(^|\\\/)?\uE000$/;
     var MODE_IGNORE = "regex";
     var MODE_CHECK_IGNORE = "checkRegex";
     var UNDERSCORE = "_";
@@ -1663,10 +1858,146 @@ var require_ignore = __commonJS({
         return `${prefix}(?=$|\\/$)`;
       }
     };
-    var makeRegexPrefix = (pattern) => REPLACERS.reduce(
-      (prev, [matcher, replacer]) => prev.replace(matcher, replacer.bind(pattern)),
-      pattern
-    );
+    var WILDCARD = "[^\\/]*";
+    var separatorAfter = (run2, at) => {
+      let separator = EMPTY;
+      for (let index = at + 1; index < run2.length && !run2[index].wildcard; index++) {
+        separator += run2[index].single;
+      }
+      return separator;
+    };
+    var pinWildcards = (source) => {
+      if (source.indexOf(WILDCARD) < 0) {
+        return source;
+      }
+      const tokens = [];
+      const { length } = source;
+      let index = 0;
+      while (index < length) {
+        const char = source[index];
+        if (source.startsWith(WILDCARD, index)) {
+          tokens.push({ wildcard: true });
+          index += WILDCARD.length;
+        } else if (char === "[") {
+          let end = index + 1;
+          if (source[end] === "^") {
+            end++;
+          }
+          if (source[end] === "]") {
+            end++;
+          }
+          while (end < length && source[end] !== "]") {
+            end += source[end] === ESCAPE ? 2 : 1;
+          }
+          end++;
+          tokens.push({ single: source.slice(index, end) });
+          index = end;
+        } else if (char === ESCAPE) {
+          tokens.push({ single: source.slice(index, index + 2) });
+          index += 2;
+        } else if (char === "(") {
+          let depth = 0;
+          let end = index;
+          do {
+            if (source[end] === ESCAPE) {
+              end++;
+            } else if (source[end] === "(") {
+              depth++;
+            } else if (source[end] === ")") {
+              depth--;
+            }
+            end++;
+          } while (end < length && depth > 0);
+          if ("*+?".indexOf(source[end]) >= 0) {
+            end++;
+          }
+          tokens.push({ boundary: source.slice(index, end) });
+          index = end;
+        } else if (char === "^" || char === "$") {
+          tokens.push({ boundary: char });
+          index++;
+        } else {
+          tokens.push({ single: char });
+          index++;
+        }
+      }
+      let out = EMPTY;
+      let run2 = [];
+      const flush = () => {
+        let lastWildcard;
+        run2.forEach((token, at) => {
+          if (token.wildcard) {
+            lastWildcard = at;
+          }
+        });
+        run2.forEach((token, at) => {
+          if (!token.wildcard) {
+            out += token.single;
+            return;
+          }
+          out += at === lastWildcard ? WILDCARD : `(?:(?!${separatorAfter(run2, at)})[^\\/])*`;
+        });
+        run2 = [];
+      };
+      tokens.forEach((token) => {
+        if (token.boundary === void 0) {
+          run2.push(token);
+          return;
+        }
+        flush();
+        out += token.boundary;
+      });
+      flush();
+      return out;
+    };
+    var makeRegexPrefix = (pattern) => {
+      const { source, sources } = extractBrackets(pattern);
+      const replaced = REPLACERS.reduce(
+        // A pass whose matcher finds nothing hands back the very string it was
+        //   given, so asking first costs a search and saves a rewrite. Ten of the
+        //   fifteen passes never fire for a typical .gitignore line, and between
+        //   them they were 45% of this chain.
+        (prev, [matcher, replacer, required]) => {
+          if (matcher === DIRECT) {
+            return replacer(prev, pattern);
+          }
+          if (required !== UNDEFINED && prev.indexOf(required) < 0) {
+            return prev;
+          }
+          return matcher.test(prev) ? prev.replace(matcher, replacer.bind(pattern)) : prev;
+        },
+        source
+      );
+      return sources.length ? replaced.replace(
+        REGEX_RESTORE_PLACEHOLDER,
+        (match, index) => sources[index]
+      ) : replaced;
+    };
+    var matchesBasename = (body) => {
+      const index = body.indexOf(SLASH);
+      return index < 0 || index === body.length - 1;
+    };
+    var basenameOf = (path25) => {
+      const end = path25.length - 1;
+      const index = path25.lastIndexOf(
+        SLASH,
+        path25[end] === SLASH ? end - 1 : end
+      );
+      return index < 0 ? path25 : path25.slice(index + 1);
+    };
+    var parentOf = (path25) => {
+      if (path25.charCodeAt(0) === SLASH_CODE || path25.indexOf(DOUBLE_SLASH) >= 0) {
+        const slices = path25.split(SLASH).filter(Boolean);
+        slices.pop();
+        return slices.length ? slices.join(SLASH) + SLASH : EMPTY;
+      }
+      const end = path25.length - 1;
+      const cut = path25.lastIndexOf(
+        SLASH,
+        path25.charCodeAt(end) === SLASH_CODE ? end - 1 : end
+      );
+      return cut < 0 ? EMPTY : path25.slice(0, cut + 1);
+    };
     var isString = (subject) => typeof subject === "string";
     var checkPattern = (pattern) => pattern && isString(pattern) && !REGEX_TEST_BLANK_LINE.test(pattern) && !REGEX_INVALID_TRAILING_BACKSLASH.test(pattern) && pattern.indexOf("#") !== 0;
     var splitPattern = (pattern) => pattern.split(REGEX_SPLITALL_CRLF).filter(Boolean);
@@ -1678,6 +2009,14 @@ var require_ignore = __commonJS({
         define(this, "body", body);
         define(this, "ignoreCase", ignoreCase);
         define(this, "regexPrefix", prefix);
+      }
+      // Worked out on first use and kept behind an own property, the way `regex`
+      //   caches itself in `_regex`. Deciding it in the constructor instead would
+      //   add a fourth `defineProperty` to every rule ever built, which cost 4% of
+      //   every compile -- including the compiles of rules that are never matched
+      //   against anything.
+      get _basenameOnly() {
+        return define(this, "_basenameOnly", matchesBasename(this.body));
       }
       get regex() {
         const key = UNDERSCORE + MODE_IGNORE;
@@ -1694,11 +2033,11 @@ var require_ignore = __commonJS({
         return this._make(MODE_CHECK_IGNORE, key);
       }
       _make(mode, key) {
-        const str = this.regexPrefix.replace(
+        const str = pinWildcards(this.regexPrefix.replace(
           REGEX_REPLACE_TRAILING_WILDCARD,
           // It does not need to bind pattern
           TRAILING_WILD_CARD_REPLACERS[mode]
-        );
+        ));
         const regex = this.ignoreCase ? new RegExp(str, "i") : new RegExp(str);
         return define(this, key, regex);
       }
@@ -1728,10 +2067,12 @@ var require_ignore = __commonJS({
       constructor(ignoreCase) {
         this._ignoreCase = ignoreCase;
         this._rules = [];
+        this._basenameCount = 0;
       }
       _add(pattern) {
         if (pattern && pattern[KEY_IGNORE]) {
           this._rules = this._rules.concat(pattern._rules._rules);
+          this._basenameCount += pattern._rules._basenameCount;
           this._added = true;
           return;
         }
@@ -1744,6 +2085,9 @@ var require_ignore = __commonJS({
           const rule = createRule(pattern, this._ignoreCase);
           this._added = true;
           this._rules.push(rule);
+          if (matchesBasename(rule.body)) {
+            this._basenameCount++;
+          }
         }
       }
       // @param {Array<string> | string | Ignore} pattern
@@ -1765,19 +2109,22 @@ var require_ignore = __commonJS({
         let ignored = false;
         let unignored = false;
         let matchedRule;
-        this._rules.forEach((rule) => {
+        const rules = this._rules;
+        const { length } = rules;
+        const shortcut = this._basenameCount * 2 >= length;
+        const basename = shortcut ? basenameOf(path25) : path25;
+        for (let index = 0; index < length; index++) {
+          const rule = rules[index];
           const { negative } = rule;
-          if (unignored === negative && ignored !== unignored || negative && !ignored && !unignored && !checkUnignored) {
-            return;
+          const skip = unignored === negative && ignored !== unignored || negative && !ignored && !unignored && !checkUnignored;
+          if (!skip && rule[mode].test(
+            shortcut && rule._basenameOnly ? basename : path25
+          )) {
+            ignored = !negative;
+            unignored = negative;
+            matchedRule = negative ? UNDEFINED : rule;
           }
-          const matched = rule[mode].test(path25);
-          if (!matched) {
-            return;
-          }
-          ignored = !negative;
-          unignored = negative;
-          matchedRule = negative ? UNDEFINED : rule;
-        });
+        }
         const ret = {
           ignored,
           unignored
@@ -1810,7 +2157,26 @@ var require_ignore = __commonJS({
       }
       return true;
     };
-    var isNotRelative = (path25) => REGEX_TEST_INVALID_PATH.test(path25);
+    var isNotRelative = (path25) => {
+      const first = path25.charCodeAt(0);
+      if (first === SLASH_CODE) {
+        return true;
+      }
+      if (first !== DOT_CODE) {
+        return false;
+      }
+      if (path25.length === 1) {
+        return true;
+      }
+      const second = path25.charCodeAt(1);
+      if (second === SLASH_CODE) {
+        return true;
+      }
+      if (second !== DOT_CODE) {
+        return false;
+      }
+      return path25.length === 2 || path25.charCodeAt(2) === SLASH_CODE;
+    };
     checkPath.isNotRelative = isNotRelative;
     checkPath.convert = (p) => p;
     var Ignore = class {
@@ -1839,52 +2205,35 @@ var require_ignore = __commonJS({
         return this.add(pattern);
       }
       // @returns {TestResult}
-      _test(originalPath, cache, checkUnignored, slices) {
+      _test(originalPath, cache, checkUnignored) {
         const path25 = originalPath && checkPath.convert(originalPath);
         checkPath(
           path25,
           originalPath,
           this._strictPathCheck ? throwError : RETURN_FALSE
         );
-        return this._t(path25, cache, checkUnignored, slices);
+        return this._t(path25, cache, checkUnignored);
       }
       checkIgnore(path25) {
-        if (!REGEX_TEST_TRAILING_SLASH.test(path25)) {
+        if (path25.charCodeAt(path25.length - 1) !== SLASH_CODE) {
           return this.test(path25);
         }
-        const slices = path25.split(SLASH).filter(Boolean);
-        slices.pop();
-        if (slices.length) {
-          const parent = this._t(
-            slices.join(SLASH) + SLASH,
-            this._testCache,
-            true,
-            slices
-          );
+        const parentPath = parentOf(path25);
+        if (parentPath) {
+          const parent = this._t(parentPath, this._testCache, true);
           if (parent.ignored) {
             return parent;
           }
         }
         return this._rules.test(path25, false, MODE_CHECK_IGNORE);
       }
-      _t(path25, cache, checkUnignored, slices) {
+      _t(path25, cache, checkUnignored) {
         if (path25 in cache) {
           return cache[path25];
         }
-        if (!slices) {
-          slices = path25.split(SLASH).filter(Boolean);
-        }
-        slices.pop();
-        if (!slices.length) {
-          return cache[path25] = this._rules.test(path25, checkUnignored, MODE_IGNORE);
-        }
-        const parent = this._t(
-          slices.join(SLASH) + SLASH,
-          cache,
-          checkUnignored,
-          slices
-        );
-        return cache[path25] = parent.ignored ? parent : this._rules.test(path25, checkUnignored, MODE_IGNORE);
+        const parentPath = parentOf(path25);
+        const parent = parentPath ? this._t(parentPath, cache, checkUnignored) : UNDEFINED;
+        return cache[path25] = parent && parent.ignored ? parent : this._rules.test(path25, checkUnignored, MODE_IGNORE);
       }
       ignores(path25) {
         return this._test(path25, this._ignoreCache, false).ignored;
@@ -5004,6 +5353,9 @@ async function ensureSafeDirectory(candidate, root, label) {
   if (!isWithin2(root, actual)) throw new QarinahError("PATH_OUTSIDE_WORKSPACE", `${label} resolves outside the workspace root.`);
   return actual;
 }
+function isTransientWindowsLockError(error) {
+  return process.platform === "win32" && ["EPERM", "EBUSY"].includes(error?.code);
+}
 async function acquireInitializationLock(qarinahDir, signal) {
   const locksDirectory = resolveWithin(qarinahDir, "locks");
   await ensureSafeDirectory(locksDirectory, qarinahDir, ".qarinah/locks");
@@ -5015,12 +5367,18 @@ async function acquireInitializationLock(qarinahDir, signal) {
       await mkdir2(lockPath, { mode: 448 });
       return async () => rm3(lockPath, { recursive: true, force: true });
     } catch (error) {
-      if (error?.code !== "EEXIST") throw error;
-      const metadata = await safeLstat(lockPath, ".qarinah/locks/initialize", { allowMissing: true });
+      if (error?.code !== "EEXIST" && !isTransientWindowsLockError(error)) throw error;
+      let metadata;
+      try {
+        metadata = await safeLstat(lockPath, ".qarinah/locks/initialize", { allowMissing: true });
+      } catch (inspectionError) {
+        if (!isTransientWindowsLockError(inspectionError)) throw inspectionError;
+      }
       if (metadata && !metadata.isDirectory()) {
         throw new QarinahError("WORKSPACE_INVALID", ".qarinah/locks/initialize must be a directory.");
       }
       if (Date.now() - startedAt >= 15e3) {
+        if (isTransientWindowsLockError(error)) throw error;
         throw new QarinahError("WORKSPACE_INITIALIZE_BUSY", "Another process is still initializing this Qarinah workspace.");
       }
       await new Promise((resolve, reject) => {
@@ -5387,7 +5745,7 @@ async function injectStoreFault(options, point, details = {}) {
 function delay2(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
-function isTransientWindowsLockError(error) {
+function isTransientWindowsLockError2(error) {
   return process.platform === "win32" && ["EBUSY", "EPERM"].includes(error?.code);
 }
 function processIsAlive(pid) {
@@ -5779,7 +6137,7 @@ async function acquireWorkspaceWriteLock(workspace, options = {}) {
             moved = true;
             break;
           } catch (error) {
-            if (!isTransientWindowsLockError(error)) throw error;
+            if (!isTransientWindowsLockError2(error)) throw error;
             moveError = error;
             await delay2(10 + Math.min(attempt2, 10) * 5);
           }
@@ -5816,7 +6174,7 @@ async function acquireWorkspaceWriteLock(workspace, options = {}) {
           continue;
         }
       } catch (inspectionError) {
-        if (!["ENOENT", "EEXIST"].includes(inspectionError?.code) && !isTransientWindowsLockError(inspectionError)) throw inspectionError;
+        if (!["ENOENT", "EEXIST"].includes(inspectionError?.code) && !isTransientWindowsLockError2(inspectionError)) throw inspectionError;
       }
       await abortableDelay(25 + Math.min(attempt, 20) * 5, signal);
     }

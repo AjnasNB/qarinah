@@ -349,8 +349,8 @@
     "open-knowledge-format"
   ],
   "devDependencies": {
-    "@primer/css": "^22.3.0",
-    "@vscode/vsce": "3.9.2",
+    "@primer/css": "^22.3.2",
+    "@vscode/vsce": "4.0.0",
     "cockroach-browser": "0.1.0",
     "esbuild": "0.28.2",
     "marked": "^18.0.14",
@@ -359,7 +359,7 @@
     "wrangler": "^4.125.0"
   },
   "dependencies": {
-    "ignore": "7.0.6",
+    "ignore": "7.0.10",
     "tree-sitter-wasms": "0.1.13",
     "typescript-classic": "npm:typescript@5.9.3",
     "web-tree-sitter": "0.20.8"
