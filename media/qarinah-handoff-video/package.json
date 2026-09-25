@@ -8,7 +8,7 @@
     "still": "remotion still src/index.jsx QarinahHandoff ../../website/static/assets/qarinah-fresh-session-handoff-poster.png --frame=2940"
   },
   "dependencies": {
-    "@remotion/cli": "4.0.479",
+    "@remotion/cli": "4.0.527",
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "remotion": "4.0.479",
