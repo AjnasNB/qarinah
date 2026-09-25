@@ -5353,6 +5353,9 @@ async function ensureSafeDirectory(candidate, root, label) {
   if (!isWithin2(root, actual)) throw new QarinahError("PATH_OUTSIDE_WORKSPACE", `${label} resolves outside the workspace root.`);
   return actual;
 }
+function isTransientWindowsLockError(error) {
+  return process.platform === "win32" && ["EPERM", "EBUSY"].includes(error?.code);
+}
 async function acquireInitializationLock(qarinahDir, signal) {
   const locksDirectory = resolveWithin(qarinahDir, "locks");
   await ensureSafeDirectory(locksDirectory, qarinahDir, ".qarinah/locks");
@@ -5364,12 +5367,18 @@ async function acquireInitializationLock(qarinahDir, signal) {
       await mkdir2(lockPath, { mode: 448 });
       return async () => rm3(lockPath, { recursive: true, force: true });
     } catch (error) {
-      if (error?.code !== "EEXIST") throw error;
-      const metadata = await safeLstat(lockPath, ".qarinah/locks/initialize", { allowMissing: true });
+      if (error?.code !== "EEXIST" && !isTransientWindowsLockError(error)) throw error;
+      let metadata;
+      try {
+        metadata = await safeLstat(lockPath, ".qarinah/locks/initialize", { allowMissing: true });
+      } catch (inspectionError) {
+        if (!isTransientWindowsLockError(inspectionError)) throw inspectionError;
+      }
       if (metadata && !metadata.isDirectory()) {
         throw new QarinahError("WORKSPACE_INVALID", ".qarinah/locks/initialize must be a directory.");
       }
       if (Date.now() - startedAt >= 15e3) {
+        if (isTransientWindowsLockError(error)) throw error;
         throw new QarinahError("WORKSPACE_INITIALIZE_BUSY", "Another process is still initializing this Qarinah workspace.");
       }
       await new Promise((resolve, reject) => {
@@ -5736,7 +5745,7 @@ async function injectStoreFault(options, point, details = {}) {
 function delay2(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
-function isTransientWindowsLockError(error) {
+function isTransientWindowsLockError2(error) {
   return process.platform === "win32" && ["EBUSY", "EPERM"].includes(error?.code);
 }
 function processIsAlive(pid) {
@@ -6128,7 +6137,7 @@ async function acquireWorkspaceWriteLock(workspace, options = {}) {
             moved = true;
             break;
           } catch (error) {
-            if (!isTransientWindowsLockError(error)) throw error;
+            if (!isTransientWindowsLockError2(error)) throw error;
             moveError = error;
             await delay2(10 + Math.min(attempt2, 10) * 5);
           }
@@ -6165,7 +6174,7 @@ async function acquireWorkspaceWriteLock(workspace, options = {}) {
           continue;
         }
       } catch (inspectionError) {
-        if (!["ENOENT", "EEXIST"].includes(inspectionError?.code) && !isTransientWindowsLockError(inspectionError)) throw inspectionError;
+        if (!["ENOENT", "EEXIST"].includes(inspectionError?.code) && !isTransientWindowsLockError2(inspectionError)) throw inspectionError;
       }
       await abortableDelay(25 + Math.min(attempt, 20) * 5, signal);
     }
