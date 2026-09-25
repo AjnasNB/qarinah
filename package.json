@@ -350,7 +350,7 @@
   ],
   "devDependencies": {
     "@primer/css": "^22.3.0",
-    "@vscode/vsce": "3.9.2",
+    "@vscode/vsce": "4.0.0",
     "cockroach-browser": "0.1.0",
     "esbuild": "0.28.2",
     "marked": "^18.0.14",
