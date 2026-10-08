@@ -10,7 +10,7 @@ import {
 import { temporaryDirectory } from "../test-support/helpers.js";
 
 test("auto-init creates isolated projects once, preserves stops, and retains cited visible chat", async (t) => {
-  const sandbox = await temporaryDirectory(t);
+  const sandbox = await realpath(await temporaryDirectory(t));
   // Isolate global policy and trust as well as project files.
   const previousState = process.env.QARINAH_STATE_DIR;
   process.env.QARINAH_STATE_DIR = path.join(sandbox, "machine-state");
@@ -90,7 +90,7 @@ test("auto-init creates isolated projects once, preserves stops, and retains cit
 });
 
 test("auto-init policy cannot bless an existing untrusted ledger and diagnostics stay zero-write", async (t) => {
-  const sandbox = await temporaryDirectory(t);
+  const sandbox = await realpath(await temporaryDirectory(t));
   const previousState = process.env.QARINAH_STATE_DIR;
   process.env.QARINAH_STATE_DIR = path.join(sandbox, "machine-state");
   t.after(() => {
