@@ -7,7 +7,7 @@
 **Implementation:** Qarinah `0.7.0`<br>
 **Date:** 8 October 2026<br>
 **License:** Apache License 2.0<br>
-**Status:** Implementation-backed technical white paper for stable Qarinah 0.7.0. This version is not peer-reviewed. All measured claims identify their benchmark, denominator, estimator, and limits. Version 1.9 has no version DOI until a separate Zenodo deposit is completed; the persistent paper series uses concept DOI [10.5281/zenodo.21547684](https://doi.org/10.5281/zenodo.21547684).
+**Status:** Implementation-backed technical white paper for stable Qarinah 0.7.0. This version is not peer-reviewed. All measured claims identify their benchmark, denominator, estimator, and limits. Version DOI [10.5281/zenodo.23242919](https://doi.org/10.5281/zenodo.23242919) was reserved for this manuscript before deposit; DOI registration occurs when Zenodo publishes the record. The persistent paper series uses concept DOI [10.5281/zenodo.21547684](https://doi.org/10.5281/zenodo.21547684).
 
 **Version note:** v1.9 documents machine-local automatic initialization, summary-first visible-chat recall, bounded exact-source expansion, and explicitly separated MCP read/write tools. It corrects the hash formula to match canonical event envelopes. Historical v1.8 PDF and receipts remain immutable.
 
@@ -1041,7 +1041,7 @@ Recommended publication metadata:
 - **Author:** Ajnas N B
 - **Implementation version:** `0.7.0`
 - **Paper version:** 1.9
-- **Version DOI:** unassigned until v1.9 is separately deposited
+- **Version DOI:** `10.5281/zenodo.23242919` (reserved before deposit; registered on publication)
 - **Concept DOI:** `10.5281/zenodo.21547684`
 - **License:** Apache-2.0
 - **Canonical source:** this repository at one reviewed commit
@@ -1163,7 +1163,7 @@ The author gratefully acknowledges Shahin Ahammed, Qarinah's non-technical cofou
 ```text
 Ajnas N B. "Qarinah: Proof-Carrying Project Memory. Multi-language
 developer memory with inspectable context receipts." Technical white
-paper, version 1.9, October 2026. Qarinah 0.7.0. Paper series concept DOI:
-https://doi.org/10.5281/zenodo.21547684. Version 1.9 has no version DOI
-until this manuscript is separately deposited.
+paper, version 1.9, October 2026. Qarinah 0.7.0.
+Version DOI: https://doi.org/10.5281/zenodo.23242919.
+Paper series: https://doi.org/10.5281/zenodo.21547684.
 ```
