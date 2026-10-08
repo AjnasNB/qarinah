@@ -1,7 +1,7 @@
 {
   "name": "qarinah",
   "version": "0.7.0",
-  "description": "Automatic, project-local memory for coding agents: summary-first recall, SHA-256 evidence, portable OKF, and one inspectable dashboard.",
+  "description": "Proof-carrying automatic project memory with multi-language graphs, session receipts, exact recovery, summary-first recall, SHA-256 evidence, portable OKF, and one local dashboard.",
   "license": "Apache-2.0",
   "author": "Ajnas NB",
   "mcpName": "io.github.AjnasNB/qarinah",
