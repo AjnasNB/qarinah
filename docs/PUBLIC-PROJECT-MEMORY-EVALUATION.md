@@ -11,7 +11,7 @@ npm run check:public-project-memory
 
 The evaluator copies Git-tracked files and non-ignored local additions into a temporary directory, initializes a new Git repository and a content-authorized Qarinah workspace there, scans the project, builds the multi-language symbol graph, queries four exact public definitions, records one bounded session lifecycle, builds a v2 session receipt, compiles a cited continuation pack, and verifies the complete event chain. Run it from a reviewed public checkout without private local additions. It removes the temporary checkout after the run.
 
-The current committed JSON result is [public-project-memory-v0.6.0.json](../bench/results/public-project-memory-v0.6.0.json). It binds the evaluator hash, package version, source-file manifest, exact observed counts, scenario outputs, implementation schemas, and limitations. The original published 0.6.0 receipt is preserved byte-for-byte as [public-project-memory-v0.6.0-release.json](../bench/results/public-project-memory-v0.6.0-release.json); the current-checkout receipt is regenerated and reviewed when the source tree changes. Historical release receipts remain unchanged.
+The current committed JSON result is [public-project-memory-v0.7.0.json](../bench/results/public-project-memory-v0.7.0.json). It binds the evaluator hash, package version, source-file manifest, exact observed counts, scenario outputs, implementation schemas, and limitations. The original published 0.6.0 receipt is preserved byte-for-byte as [public-project-memory-v0.6.0-release.json](../bench/results/public-project-memory-v0.6.0-release.json); the current-checkout receipt is regenerated and reviewed when the source tree changes. Historical release receipts remain unchanged.
 
 ## Current observed result
 

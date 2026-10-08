@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/AjnasNB/qarinah/schemas/auto-init.schema.json",
+  "title": "Explicit machine-local Qarinah auto-initialization policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion", "enabled", "capture", "roots", "excludedRoots", "fullChat",
+    "compactSummaries", "summaryMaxChars", "contextMaxChars", "createdAt", "updatedAt", "policyHash"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "qarinah.auto-init.v1" },
+    "enabled": { "type": "boolean" },
+    "capture": { "enum": ["metadata", "content"] },
+    "roots": { "type": "array", "maxItems": 64, "items": { "type": "string", "minLength": 1 } },
+    "excludedRoots": { "type": "array", "maxItems": 64, "items": { "type": "string", "minLength": 1 } },
+    "fullChat": { "type": "boolean" },
+    "compactSummaries": { "type": "boolean" },
+    "summaryMaxChars": { "type": "integer", "minimum": 256, "maximum": 4096 },
+    "contextMaxChars": { "type": "integer", "minimum": 512, "maximum": 12000 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "policyHash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "capture": { "const": "metadata" } } },
+      "then": { "properties": { "fullChat": { "const": false } } }
+    }
+  ]
+}

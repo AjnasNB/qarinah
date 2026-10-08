@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="700" viewBox="0 0 1440 700" role="img" aria-labelledby="title desc">
+<title id="title">Qarinah: your project remembers, every agent gets the proof</title>
+<desc id="desc">Permitted project activity passes machine-local opt-in, enters a SHA-256 hash-chained JSONL ledger, produces rebuildable SQLite, graph, Markdown and OKF views, and becomes summary-first recall with exact cited source expansion and a bounded task packet. One local dashboard makes the evidence inspectable.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10" fill="none" stroke="#9baa96" stroke-width="1.8"/></marker></defs>
+<rect width="1440" height="700" rx="22" fill="#121b17"/>
+<g font-family="Arial, Helvetica, sans-serif">
+<text x="64" y="69" fill="#c8f2b0" font-size="17" letter-spacing="3">QARINAH / PROJECT MEMORY WITH PROOF</text>
+<text x="64" y="133" fill="#f6f5ec" font-size="46" font-weight="700">The next session starts with evidence.</text>
+<text x="64" y="176" fill="#b7c3b7" font-size="21">Record once. Recall the summary. Expand the exact source when it matters.</text>
+<g stroke="#5f745f" stroke-width="2" fill="none" marker-end="url(#arrow)"><path d="M290 322H325"/><path d="M548 322H585"/><path d="M808 322H845"/><path d="M1068 322H1105"/></g>
+<g fill="#1d2b22" stroke="#41543f"><rect x="64" y="237" width="226" height="190" rx="12"/><rect x="325" y="237" width="223" height="190" rx="12"/><rect x="585" y="237" width="223" height="190" rx="12"/><rect x="845" y="237" width="223" height="190" rx="12"/><rect x="1105" y="237" width="271" height="190" rx="12"/></g>
+<g fill="#c8f2b0" font-size="15" letter-spacing="2"><text x="87" y="271">01 / WORK</text><text x="348" y="271">02 / ADMIT</text><text x="608" y="271">03 / RETAIN</text><text x="868" y="271">04 / REBUILD</text><text x="1128" y="271">05 / RECALL</text></g>
+<g fill="#f6f5ec" font-size="24" font-weight="700"><text x="87" y="311">Permitted activity</text><text x="348" y="311">Local opt-in</text><text x="608" y="311">Evidence ledger</text><text x="868" y="311">Readable views</text><text x="1128" y="311">Cited task context</text></g>
+<g fill="#c0cabe" font-size="18"><text x="87" y="351">Visible prompts</text><text x="87" y="378">Decisions + outcomes</text><text x="87" y="405">Code relationships</text><text x="348" y="351">Exact project root</text><text x="348" y="378">Saved machine policy</text><text x="348" y="405">Stops + revocation</text><text x="608" y="351">Canonical JSONL</text><text x="608" y="378">SHA-256 content</text><text x="608" y="405">Previous-hash chain</text><text x="868" y="351">SQLite + graph</text><text x="868" y="378">Markdown + CHAT</text><text x="868" y="405">OKF 0.1 Draft</text><text x="1128" y="351">Summary-first retrieval</text><text x="1128" y="378">Bounded source expansion</text><text x="1128" y="405">IDs + hashes + manifest</text></g>
+<path d="M696 428V475" stroke="#9baa96" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+<rect x="325" y="487" width="743" height="102" rx="12" fill="#c8f2b0"/>
+<text x="354" y="529" fill="#172218" font-size="25" font-weight="700">One local dashboard. Every selected item inspectable.</text>
+<text x="354" y="562" fill="#334b31" font-size="18">Activity · decisions · conflicts · files · worktrees · evidence · context receipts</text>
+<text x="64" y="654" fill="#b7c3b7" font-size="16">Local by default. Automatic initialization requires explicit machine opt-in. Remote hosts opt in separately.</text>
+<text x="1376" y="654" text-anchor="end" fill="#c8f2b0" font-size="16">Built by Ajnas N B</text>
+</g></svg>

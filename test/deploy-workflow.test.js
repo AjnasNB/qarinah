@@ -55,7 +55,8 @@ test("website deployment is bound to exact published Qarinah assets", async () =
   assert.match(workflow, /refusing to build or deploy the site/);
   assert.match(workflow, /npm run build:site/);
   assert.match(workflow, /npm run check:site/);
-  assert.match(workflow, /wranglerVersion: "4\.125\.0"/);
+  const lock = JSON.parse(await readFile(path.join(root, "package-lock.json"), "utf8"));
+  assert.ok(workflow.includes(`wranglerVersion: "${lock.packages["node_modules/wrangler"].version}"`));
   assert.match(workflow, /secrets\.CLOUDFLARE_API_TOKEN/);
   assert.match(workflow, /secrets\.CLOUDFLARE_ACCOUNT_ID/);
   assert.doesNotMatch(workflow, /gitHubToken:/);

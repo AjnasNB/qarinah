@@ -13,7 +13,7 @@ const conceptDoi = "https://doi.org/10.5281/zenodo.21547684";
 const doi = conceptDoi;
 const publishedV14Doi = "https://doi.org/10.5281/zenodo.21850747";
 const historicalVersionDoi = "https://doi.org/10.5281/zenodo.21843240";
-const paperVersion = "1.8";
+const paperVersion = "1.9";
 const paperPdf = `/paper/Qarinah-Technical-White-Paper-v${paperVersion}.pdf`;
 const historicalPaperPdfs = new Map([
   ["Qarinah-Technical-White-Paper-v1.2.pdf", "/paper/Qarinah-Technical-White-Paper-v1.2.pdf"],
@@ -21,11 +21,12 @@ const historicalPaperPdfs = new Map([
   ["Qarinah-Technical-White-Paper-v1.4.pdf", "/paper/Qarinah-Technical-White-Paper-v1.4.pdf"],
   ["Qarinah-Technical-White-Paper-v1.5.pdf", "/paper/Qarinah-Technical-White-Paper-v1.5.pdf"],
   ["Qarinah-Technical-White-Paper-v1.6.pdf", "/paper/Qarinah-Technical-White-Paper-v1.6.pdf"],
-  ["Qarinah-Technical-White-Paper-v1.7.pdf", "/paper/Qarinah-Technical-White-Paper-v1.7.pdf"]
+  ["Qarinah-Technical-White-Paper-v1.7.pdf", "/paper/Qarinah-Technical-White-Paper-v1.7.pdf"],
+  ["Qarinah-Technical-White-Paper-v1.8.pdf", "/paper/Qarinah-Technical-White-Paper-v1.8.pdf"]
 ]);
-const releaseDate = "2026-08-22";
-const paperPublishedDate = "2026-08-22";
-const publicMetricsUpdatedDate = "2026-08-22";
+const releaseDate = "2026-10-08";
+const paperPublishedDate = "2026-10-08";
+const publicMetricsUpdatedDate = "2026-10-08";
 const toolkitArticleDate = "2026-08-16";
 const worktreeArticleDate = "2026-08-16";
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
@@ -33,10 +34,10 @@ const benchmarkRelease = JSON.parse(await readFile(path.join(root, "bench", "res
 const worktreeContinuity = JSON.parse(await readFile(path.join(root, "bench", "results", "worktree-continuity-v0.4.0.json"), "utf8"));
 const deepMemoryPlatform = JSON.parse(await readFile(path.join(root, "bench", "results", `deep-memory-platform-v${packageJson.version}.json`), "utf8"));
 const publicProjectMemory = JSON.parse(await readFile(path.join(root, "bench", "results", `public-project-memory-v${packageJson.version}.json`), "utf8"));
-const proofContext = JSON.parse(await readFile(path.join(root, "bench", "results", "proof-context-0.6.0.json"), "utf8"));
+const proofContext = JSON.parse(await readFile(path.join(root, "bench", "results", "proof-context-0.7.0.json"), "utf8"));
 const productVersion = packageJson.version;
 const productPositioning = "Verifiable project memory, exact source recovery, and cited context for coding agents.";
-const productExplanation = "Qarinah keeps permitted project evidence and explicitly archived source bytes beside the repository, connects symbols, decisions, outcomes, and Git worktrees in one searchable graph, and compiles the cited context needed by Codex, Claude Code, Cursor, and compatible tools.";
+const productExplanation = "Qarinah keeps permitted project evidence and explicitly archived source bytes beside the repository, connects symbols, decisions, outcomes, and Git worktrees in one searchable graph, and compiles the cited context needed by supported coding agents and compatible tools.";
 if (worktreeContinuity.schemaVersion !== "qarinah.worktree-continuity-evaluation.v1"
   || worktreeContinuity.aggregate.scenarioCount !== 16
   || worktreeContinuity.aggregate.passed !== 16
@@ -54,7 +55,7 @@ if (deepMemoryPlatform.schemaVersion !== "qarinah.deep-memory-platform-evaluatio
   || deepMemoryPlatform.observed.indexedSymbols !== 4
   || deepMemoryPlatform.observed.resolvedReferences !== 3
   || deepMemoryPlatform.observed.citedFacts !== 2
-  || deepMemoryPlatform.artifactHash !== "sha256:4736652101ffde46e450983285be3f41c74f850728bc4b59848c45b063afb112") {
+  || deepMemoryPlatform.artifactHash !== "sha256:43e4d3d61a4a3ab5fed5d59a30b8a16df02dcb5ea60e973a9fa906b61089dd2d") {
   throw new Error("The deep-memory website claim does not match the checked release artifact.");
 }
 if (publicProjectMemory.schemaVersion !== "qarinah.public-project-memory-evaluation.v1"
@@ -69,7 +70,7 @@ if (publicProjectMemory.schemaVersion !== "qarinah.public-project-memory-evaluat
   throw new Error("The public-project website claim does not match the checked release artifact.");
 }
 if (proofContext.schemaVersion !== "qarinah.proof-context-evaluation.v1"
-  || proofContext.implementation !== "0.6.0"
+  || proofContext.implementation !== "0.7.0"
   || proofContext.metrics.acceptedTaskPackets !== 12
   || proofContext.metrics.expectedFileHitAt5 !== 1
   || proofContext.metrics.expectedSymbolHitAt5Files !== 1
@@ -120,7 +121,7 @@ const publicMetrics = {
       budgetConformance: proofContext.metrics.budgetConformance,
       deterministicManifestReproduction: proofContext.metrics.deterministicManifestReproduction,
       manifestTamperRejection: proofContext.metrics.manifestTamperRejection,
-      evidenceSource: `${github}/blob/main/bench/results/proof-context-0.6.0.json`,
+      evidenceSource: `${github}/blob/main/bench/results/proof-context-0.7.0.json`,
       boundary: proofContext.boundaries
     },
     realGitWorktreeContinuity: {
@@ -217,11 +218,11 @@ const qarinahFeatures = [
   "Evidence-linked cited context packs",
   "Typed project and provenance graph",
   "Budgeted hybrid retrieval",
-  "Codex, Claude Code, Cursor, Kimi, Antigravity, and Freebuff integrations",
+  "Reviewed coding-agent integrations",
   "Consent-gated MCP context retrieval",
   "Multi-repository memory with separate authority",
   "Freshness checks and a visual memory dashboard",
-  "Streaming Codex, Claude, and portable agent-history import",
+  "Streaming visible agent-history import",
   "Immediate SQLite/FTS5 project search",
   "Beginner-readable project and outcome overview",
   "Encrypted team bundles and signed checkpoints",
@@ -682,6 +683,30 @@ const docPages = [
     aliases: ["knowledge graph", "bm25", "retrieval", "provenance", "hash chain"]
   },
   {
+    route: "docs/auto-initialization",
+    source: "docs/AUTO-INITIALIZATION.md",
+    title: "Automatic project initialization and chat recall",
+    description: "Install once on this machine, initialize safe active projects on use, and recall cited summaries before exact retained sources.",
+    section: "Start",
+    aliases: ["setup-user", "auto-init", "summary-first", "chat recall"]
+  },
+  {
+    route: "docs/cryptographic-evidence",
+    source: "docs/CRYPTOGRAPHIC-EVIDENCE.md",
+    title: "SHA-256 evidence and portable OKF",
+    description: "Inspect the canonical event hash contract, ledger continuity, context manifests, and deterministic Open Knowledge Format export.",
+    section: "Verify",
+    aliases: ["SHA-256", "cryptographic hash", "OKF", "event digest"]
+  },
+  {
+    route: "docs/release-0-7-0",
+    source: "docs/RELEASE-0.7.0.md",
+    title: "Qarinah 0.7.0 release",
+    description: "Automatic machine-local initialization, summary-first recall, host coverage, migration, and release verification.",
+    section: "Operate",
+    aliases: ["0.7.0", "latest release", "upgrade"]
+  },
+  {
     route: "docs/benchmarks",
     source: "docs/BENCHMARKS.md",
     title: "Context reduction benchmarks",
@@ -823,6 +848,7 @@ await cp(path.join(root, "website", "static"), output, { recursive: true });
 await cp(path.join(root, "node_modules", "@primer", "css", "dist", "primer.css"), path.join(output, "primer.css"));
 await cp(path.join(root, "assets", "brand", "qarinah-mark.svg"), path.join(output, "assets", "qarinah-mark.svg"));
 await cp(path.join(root, "assets", "architecture", "qarinah-flow.svg"), path.join(output, "assets", "qarinah-flow.svg"));
+await cp(path.join(root, "assets", "architecture", "qarinah-pipeline.svg"), path.join(output, "assets", "qarinah-pipeline.svg"));
 await cp(path.join(root, "assets", "launch", "qarinah-social-preview.png"), path.join(output, "assets", "qarinah-social-preview.png"));
 await cp(path.join(root, "assets", "launch", "qarinah-what-you-save.png"), path.join(output, "assets", "qarinah-what-you-save.png"));
 await cp(path.join(root, "assets", "launch", "qarinah-project-memory-dashboard.png"), path.join(output, "assets", "qarinah-project-memory-dashboard.png"));
@@ -1358,12 +1384,16 @@ function homePage() {
     canonical: "/",
     kind: "home",
     body: `
+      <section class="section shell" aria-label="Qarinah evidence pipeline">
+        <img src="/assets/qarinah-pipeline.svg" alt="Qarinah pipeline from permitted project activity through local opt-in and a SHA-256 ledger to readable OKF and summary-first cited recall" width="1440" height="700" style="display:block;width:100%;height:auto;border-radius:16px">
+        <p><a href="/docs/auto-initialization/">Automatic memory setup</a> · <a href="/docs/cryptographic-evidence/">Inspect SHA-256 and OKF</a> · <a href="/docs/release-0-7-0/">0.7.0 release details</a></p>
+      </section>
       <section class="hero">
         <div class="shell hero-grid">
           <div class="hero-copy">
             <p class="eyebrow">Project memory for coding agents</p>
             <h1>Start a new coding-agent session without re-explaining your project.</h1>
-            <p class="hero-lede">Qarinah keeps permitted decisions, code relationships, tool outcomes, and Git worktree history beside your repository. A fresh Codex, Claude Code, Cursor, or compatible agent retrieves only the relevant cited context instead of replaying the whole chat.</p>
+            <p class="hero-lede">Qarinah keeps permitted decisions, code relationships, tool outcomes, and Git worktree history beside your repository. A fresh coding agent retrieves only the relevant cited context instead of replaying the whole chat.</p>
             ${commandBlock("npx qarinah@latest setup .", "Safe local setup")}
             <p class="hero-privacy"><strong>Metadata-only by default.</strong> No account, hosted memory service, content disclosure, or activation metrics. Try <code>npx qarinah demo</code> first to create an isolated populated graph outside your project.</p>
             <div class="hero-actions">
@@ -1443,10 +1473,10 @@ function homePage() {
           <div class="handoff-stage-copy">
             <p class="eyebrow">One repository, precise checkout context</p>
             <h2 id="handoff-stage-title">Initialize the worktrees that should remember.</h2>
-            <p>Run setup inside each active checkout. Codex and Claude can record one idempotent compact checkpoint after a completed turn; every supported host can retrieve the cited pack, while the grouped dashboard keeps sibling writable stores separate.</p>
-            ${commandBlock("npx qarinah setup . --codex --claude --cursor --capture content --allow-query --auto-compact\nnpx qarinah harness \"current task\" --format markdown\nnpx qarinah dashboard --serve --worktrees", "Set up the automatic coding context harness")}
+            <p>Opt in once on this device. Supported hooks initialize safe active project roots and retain visible chat under the saved policy. Summary-first recall keeps source citations available, and the grouped dashboard keeps writable stores separate.</p>
+            ${commandBlock("npx qarinah setup-user --capture content --full-chat\nnpx qarinah auto-init status\nnpx qarinah dashboard --serve --worktrees", "Set up the automatic coding context harness")}
             <div class="host-shortcuts" aria-label="Qarinah host commands">
-              <span><strong>Codex</strong><code>$qarinah</code></span>
+              <span><strong>Supported agents</strong><code>$qarinah</code></span>
               <span><strong>Claude Code</strong><code>/qarinah &lt;task&gt;</code></span>
               <span><strong>Any terminal</strong><code>npx qarinah harness "&lt;task&gt;"</code></span>
             </div>
@@ -1505,7 +1535,7 @@ function homePage() {
           <article class="use-mode-card">
             <span>Recovery</span>
             <h3>Bring old visible agent history</h3>
-            <p>Stream Codex, Claude, or portable JSONL exports. Compact mode keeps one cited outcome summary per session while excluding hidden and encrypted reasoning blocks.</p>
+            <p>Stream supported visible-message JSONL exports. Compact mode keeps one cited outcome summary per session while excluding hidden and encrypted reasoning blocks.</p>
             <a href="/docs/agent-archive-import/">Import agent archives</a>
           </article>
           <article class="use-mode-card">
@@ -1568,7 +1598,7 @@ function homePage() {
           <article class="use-mode-card">
             <span>Personal</span>
             <h3>One developer, many agents and worktrees</h3>
-            <p>Give each checkout an isolated memory, then let Codex, Claude Code, Cursor, CLI tools, and compatible MCP clients retrieve the right cited branch context.</p>
+            <p>Give each checkout an isolated memory, then let coding agents, CLI tools, and compatible MCP clients retrieve the right cited branch context.</p>
             <a href="/docs/getting-started/">Set up one project</a>
           </article>
           <article class="use-mode-card">
@@ -1628,7 +1658,7 @@ function homePage() {
             <h2>Start in one agent. Finish in another.</h2>
             <p class="workflow-intro">The project keeps the shared record. Each agent receives only the cited context needed for the task in front of it.</p>
             <ol class="steps">
-              <li><span>1</span><div><strong>Begin a real task</strong><p>Work in Codex, Claude Code, Cursor, or another supported coding agent.</p></div></li>
+              <li><span>1</span><div><strong>Begin a real task</strong><p>Work in your supported coding agent.</p></div></li>
               <li><span>2</span><div><strong>Record the outcome</strong><p>Keep permitted decisions, changes, evidence, and tool results in the project-owned ledger.</p></div></li>
               <li><span>3</span><div><strong>Switch agents</strong><p>Open the same project in another supported host without copying the old chat.</p></div></li>
               <li><span>4</span><div><strong>Ask for the handoff</strong><p>Query Qarinah for the task that needs to continue.</p></div></li>
@@ -1646,10 +1676,10 @@ function homePage() {
       <section class="section shell">
         <div class="section-heading">
           <p class="eyebrow">Works where you code</p>
-          <h2>Keep one shared, verifiable project memory across Codex, Claude Code, Cursor, CLI workflows, and compatible MCP clients.</h2>
+          <h2>Keep one shared, verifiable project memory across coding agents, CLI workflows, and compatible MCP clients.</h2>
         </div>
         <div class="integration-list">
-          <a href="/docs/integrations/"><span>Codex</span><strong>Lifecycle hooks and a Qarinah context skill</strong><i>Open guide</i></a>
+          <a href="/docs/integrations/"><span>Coding agents</span><strong>Lifecycle hooks and a Qarinah context skill</strong><i>Open guide</i></a>
           <a href="/docs/integrations/"><span>Claude Code</span><strong>Reviewed plugin runtime with project-specific opt-in</strong><i>Open guide</i></a>
           <a href="/docs/integrations/"><span>Cursor</span><strong>Project MCP configuration and an always-on memory rule</strong><i>Open guide</i></a>
           <a href="/docs/host-compatibility/"><span>JetBrains</span><strong>Packaged LSP4IJ template for project-local multi-language symbols and references</strong><i>Open guide</i></a>
@@ -1681,7 +1711,7 @@ function homePage() {
             </article>
             <article class="feature-card">
               <span class="feature-index">03</span>
-              <h3>Does it work across Codex and Claude?</h3>
+              <h3>Does it work across coding agents?</h3>
               <p>Yes. Both reviewed integrations can use the same explicitly opted-in local project record.</p>
             </article>
           </div>

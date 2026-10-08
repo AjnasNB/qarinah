@@ -13,6 +13,7 @@ import {
   rebuildSqliteReadModel
 } from "./sqlite-read-model.js";
 import { atomicWriteFile, loadWorkspace, openSecureReadFile, secureStoragePath } from "./workspace.js";
+import { renderChatMarkdown } from "./chat-memory.js";
 
 export const INDEX_SCHEMA_VERSION = "qarinah.index.v2";
 export const GRAPH_SCHEMA_VERSION = "qarinah.graph.v2";
@@ -381,6 +382,7 @@ export async function rebuildDerivedState(start = process.cwd(), options = {}) {
   const decisionsPath = await secureStoragePath(workspace, ["records", "DECISIONS.md"], { type: "file", allowMissing: true });
   const flowPath = await secureStoragePath(workspace, ["records", "FLOW.md"], { type: "file", allowMissing: true });
   const changesPath = await secureStoragePath(workspace, ["records", "CHANGES.md"], { type: "file", allowMissing: true });
+  const chatPath = await secureStoragePath(workspace, ["records", "CHAT.md"], { type: "file", allowMissing: true });
   const recordViews = renderProjectRecordViews(buildProjectRecordViews(events, workspace.config.workspaceId));
   // Honor cancellation before replacing any derived file. Once replacement
   // starts, finish the coherent set rather than introducing partial output.
@@ -401,6 +403,7 @@ export async function rebuildDerivedState(start = process.cwd(), options = {}) {
   await atomicWriteFile(decisionsPath, recordViews.decisions);
   await atomicWriteFile(flowPath, recordViews.flow);
   await atomicWriteFile(changesPath, recordViews.changes);
+  await atomicWriteFile(chatPath, renderChatMarkdown(events, workspace.config.workspaceId));
   const readModel = await rebuildSqliteReadModel(workspace, events, derived);
   return Object.freeze({
     workspaceId: workspace.config.workspaceId,

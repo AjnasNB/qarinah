@@ -1,7 +1,7 @@
 {
   "name": "qarinah",
-  "version": "0.6.0",
-  "description": "Proof-carrying task context with cited project memory, multi-language graphs, session receipts, recovery, temporal facts, and query-ranked repository symbols.",
+  "version": "0.7.0",
+  "description": "Proof-carrying automatic project memory with multi-language graphs, session receipts, exact recovery, summary-first recall, SHA-256 evidence, portable OKF, and one local dashboard.",
   "license": "Apache-2.0",
   "author": "Ajnas NB",
   "mcpName": "io.github.AjnasNB/qarinah",
@@ -53,7 +53,9 @@
     "./schemas/symbol-graph.json": "./schemas/symbol-graph.schema.json",
     "./schemas/project-memory-cycle.json": "./schemas/project-memory-cycle.schema.json",
     "./schemas/fact-consolidation.json": "./schemas/fact-consolidation.schema.json",
-    "./schemas/proof-context.json": "./schemas/proof-context.schema.json"
+    "./schemas/proof-context.json": "./schemas/proof-context.schema.json",
+    "./schemas/auto-init.json": "./schemas/auto-init.schema.json",
+    "./schemas/chat-memory.json": "./schemas/chat-memory.schema.json"
   },
   "files": [
     "bin/",
@@ -100,6 +102,7 @@
     "docs/ECOSYSTEM-LAUNCH.md",
     "docs/LICENSE-STRATEGY.md",
     "docs/MIGRATIONS.md",
+    "docs/AUTO-INITIALIZATION.md",
     "docs/TEAM-MEMORY.md",
     "docs/TEAM-SYNC-SERVICE.md",
     "docs/PROJECT-OVERVIEW.md",
@@ -180,10 +183,10 @@
     "output/pdf/Qarinah-Technical-White-Paper-v1.7.source.sha256",
     "output/pdf/Qarinah-Technical-White-Paper-v1.7.pdf.sha256",
     "output/pdf/Qarinah-Technical-White-Paper-v1.7.build.json",
-    "output/pdf/Qarinah-Technical-White-Paper-v1.8.pdf",
-    "output/pdf/Qarinah-Technical-White-Paper-v1.8.source.sha256",
-    "output/pdf/Qarinah-Technical-White-Paper-v1.8.pdf.sha256",
-    "output/pdf/Qarinah-Technical-White-Paper-v1.8.build.json",
+    "output/pdf/Qarinah-Technical-White-Paper-v1.9.pdf",
+    "output/pdf/Qarinah-Technical-White-Paper-v1.9.source.sha256",
+    "output/pdf/Qarinah-Technical-White-Paper-v1.9.pdf.sha256",
+    "output/pdf/Qarinah-Technical-White-Paper-v1.9.build.json",
     "LICENSE",
     "NOTICE",
     "THIRD_PARTY_NOTICES.md",
@@ -203,7 +206,14 @@
     "integrations/vscode/qarinah-memory/",
     "integrations/jetbrains/qarinah-lsp/",
     "server.json",
-    "README.md"
+    "README.md",
+    "docs/RELEASE-0.7.0.md",
+    "docs/CRYPTOGRAPHIC-EVIDENCE.md",
+    "assets/architecture/qarinah-pipeline.svg",
+    "output/pdf/Qarinah-Technical-White-Paper-v1.8.pdf",
+    "output/pdf/Qarinah-Technical-White-Paper-v1.8.source.sha256",
+    "output/pdf/Qarinah-Technical-White-Paper-v1.8.pdf.sha256",
+    "output/pdf/Qarinah-Technical-White-Paper-v1.8.build.json"
   ],
   "scripts": {
     "adoption:funnel": "node scripts/query-activation-funnel.mjs",
@@ -339,9 +349,7 @@
     "local-first",
     "developer-tools",
     "mcp-server",
-    "codex",
     "claude-code",
-    "codex-plugin",
     "claude-code-plugin",
     "audit-log",
     "knowledge-graph",
@@ -363,5 +371,8 @@
     "tree-sitter-wasms": "0.1.13",
     "typescript-classic": "npm:typescript@5.9.3",
     "web-tree-sitter": "0.20.8"
+  },
+  "overrides": {
+    "sharp": "0.35.5"
   }
 }

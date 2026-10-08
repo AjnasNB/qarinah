@@ -240,7 +240,7 @@ export const PROJECT_STRUCTURE_SCHEMA_VERSION: "qarinah.project-structure.v2";
 export const SQLITE_READ_MODEL_SCHEMA_VERSION: 1;
 export const SQLITE_READ_MODEL_FILENAME: "qarinah.db";
 export const MEMORY_ATTACHMENT_SCHEMA_VERSION: "qarinah.memory-attachment.v1";
-export const QARINAH_VERSION: "0.6.0";
+export const QARINAH_VERSION: "0.7.0";
 export const EVENT_KINDS: readonly QarinahEventKind[];
 export const RELATION_TYPES: readonly QarinahRelationType[];
 export function inspectGitWorktree(start?: string): Promise<QarinahGitWorktree | null>;
@@ -1701,6 +1701,71 @@ export function setupWorkspace(options?: {
   backupMaxBytes?: number;
   backupMaxFiles?: number;
 }): Promise<Readonly<Record<string, unknown>>>;
+export const AUTO_INIT_SCHEMA_VERSION: "qarinah.auto-init.v1";
+export interface QarinahAutoInitPolicy {
+  readonly schemaVersion: "qarinah.auto-init.v1";
+  readonly enabled: boolean;
+  readonly capture: "metadata" | "content";
+  readonly roots: readonly string[];
+  readonly excludedRoots: readonly string[];
+  readonly fullChat: boolean;
+  readonly compactSummaries: boolean;
+  readonly summaryMaxChars: number;
+  readonly contextMaxChars: number;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+  readonly policyHash: `sha256:${string}`;
+}
+export function autoInitPolicyPath(): string;
+export function readAutoInitPolicy(): Promise<QarinahAutoInitPolicy | null>;
+export function configureAutoInit(options: {
+  enabled: boolean;
+  capture?: "metadata" | "content";
+  roots?: string[];
+  excludedRoots?: string[];
+  fullChat?: boolean;
+  compactSummaries?: boolean;
+  summaryMaxChars?: number;
+  contextMaxChars?: number;
+}): Promise<QarinahAutoInitPolicy>;
+export function ensureAutoWorkspace(start?: string, options?: { exact?: boolean }): Promise<Readonly<{
+  initialized: boolean;
+  reason: string;
+  workspace?: QarinahWorkspace;
+}>>;
+export const CHAT_MEMORY_SCHEMA_VERSION: "qarinah.chat-memory.v1";
+export function recallChatMemory(query?: string, options?: {
+  cwd?: string;
+  detail?: "summary" | "full";
+  eventIds?: string[];
+  offset?: number;
+  maxChars?: number;
+  limit?: number;
+}): Promise<Readonly<Record<string, unknown>>>;
+export function recordModelChatSummary(options: {
+  cwd?: string;
+  title: string;
+  text: string;
+  eventIds: string[];
+}): Promise<Readonly<{ eventId: string; hash: string; confidence: "inferred" }>>;
+export function renderChatMarkdown(events: readonly QarinahEvent[], workspaceId: string): string;
+export function writeChatMarkdown(start: string): Promise<string>;
+export function capturePortableHook(adapter: "cursor" | "antigravity" | "opencode" | "kilo",
+  input: Record<string, unknown>, options?: { eventName?: string }): Promise<Readonly<{
+    captured: boolean; reason?: string; eventId?: string; hash?: string;
+  }>>;
+export const USER_SETUP_SCHEMA_VERSION: "qarinah.user-setup.v1";
+export function setupUser(options?: {
+  home?: string;
+  nodePath?: string;
+  runtimeSource?: string;
+  targets?: Array<"codex" | "claude" | "cursor" | "antigravity" | "opencode" | "kilo">;
+  capture?: "metadata" | "content";
+  fullChat?: boolean;
+  roots?: string[];
+  excludedRoots?: string[];
+  contextMaxChars?: number;
+}): Promise<Readonly<Record<string, unknown>>>;
 export type QarinahHostIntegration = "codex" | "claude" | "cursor" | "kimi" | "antigravity" | "freebuff";
 export const HOST_INSTALL_MANIFEST_SCHEMA_VERSION: "qarinah.host-install-manifest.v1";
 export function previewHostInstall(options: {
@@ -1787,11 +1852,13 @@ export interface QarinahMcpServer {
 }
 export function createMcpServer(options?: {
   cwd?: string;
+  autoInitialize?: boolean;
   write?: (message: unknown) => void;
   queryPermit?: { workspaceId: `ws_${string}`; policyHash: `sha256:${string}`; maxChars?: number; maxItems?: number };
 }): QarinahMcpServer;
 export function runMcpServer(options?: {
   cwd?: string;
+  autoInitialize?: boolean;
   input?: AsyncIterable<Uint8Array | string>;
   maximumFrameBytes?: number;
   write?: (message: unknown) => void;

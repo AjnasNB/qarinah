@@ -301,7 +301,9 @@ export async function initializeWorkspace(target = process.cwd(), options = {}) 
       "!.gitignore", "!config.json", ""
     ].join("\n"));
     if (!existingEvent) await atomicWriteFile(eventPath, "");
-    await grantWorkspaceConsent(root, config, { eventCount: 0, headHash: null, logBytes: 0 });
+    await grantWorkspaceConsent(root, config, { eventCount: 0, headHash: null, logBytes: 0 }, {
+      preserveRevocation: options.preserveRevocation === true
+    });
     await atomicWriteFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
     const workspace = await loadWorkspace(root);
     const { rebuildDerivedState } = await import("./indexer.js");

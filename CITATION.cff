@@ -2,8 +2,8 @@ cff-version: 1.2.0
 message: "If you use Qarinah, please cite the software and its technical white paper."
 title: "Qarinah"
 type: software
-version: 0.6.0
-date-released: 2026-08-22
+version: 0.7.0
+date-released: 2026-10-08
 license: Apache-2.0
 authors:
   - family-names: "N B"
@@ -24,10 +24,10 @@ preferred-citation:
   type: article
   title: "Qarinah: Proof-Carrying Project Memory"
   subtitle: "Multi-language developer memory with verifiable task packets"
-  version: "1.8"
+  version: "1.9"
   year: 2026
   authors:
     - family-names: "N B"
       given-names: "Ajnas"
-  doi: "10.5281/zenodo.21547684"
-  url: "https://doi.org/10.5281/zenodo.21547684"
+  doi: "10.5281/zenodo.23242919"
+  url: "https://doi.org/10.5281/zenodo.23242919"

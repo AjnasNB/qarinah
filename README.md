@@ -1,4 +1,8 @@
 <p align="center">
+  <img src="assets/architecture/qarinah-pipeline.svg" width="100%" alt="Qarinah pipeline: permitted activity, machine-local opt-in, SHA-256 evidence ledger, reproducible views, summary-first recall, and cited task context">
+</p>
+
+<p align="center">
   <img src="assets/launch/qarinah-social-preview.svg" width="100%" alt="Qarinah - your project remembers across coding agents">
 </p>
 
@@ -7,7 +11,7 @@
 <p align="center"><strong>Start a new coding-agent session without re-explaining your project.</strong></p>
 
 <p align="center">
-  Qarinah remembers the decisions, code relationships, tool outcomes, and Git worktree history your project is allowed to retain. A fresh Codex, Claude Code, Cursor, Kimi, Antigravity, Freebuff, CLI, or compatible MCP session receives only the relevant cited context instead of another full-history replay.
+  Qarinah remembers the decisions, code relationships, tool outcomes, and Git worktree history your project is allowed to retain. A fresh supported coding-agent, CLI, or MCP session receives only the relevant cited context instead of another full-history replay.
 </p>
 
 ```sh
@@ -46,8 +50,8 @@ The two-minute recording removes the fixture's temporary Session A transcript, o
 Need a specific host or a content-enabled workflow? Keep that choice explicit:
 
 ```sh
-npx qarinah install . --host codex --scope project --dry-run
-npx qarinah setup . --codex --capture content --auto-compact
+npx qarinah setup .
+npx qarinah setup . --capture content --auto-compact
 ```
 
 Optional, content-free activation measurement is disabled by default. Pass `--share-activation` only if you choose to share five once-only milestones: setup, first capture, first retrieval, first cross-session handoff, and seven-day return. No project name, path, repository, query, event body, file, agent transcript, hostname, username, or IP-derived field is included in the application payload. [Read the privacy contract and disable it at any time.](PRIVACY.md#optional-content-free-activation-measurement)
@@ -59,6 +63,24 @@ With `--auto-compact`, the completed-turn hook compiles a bounded cited pack and
 For one task-aware packet that joins current decisions, temporal facts, and query-ranked code symbols, run `npx qarinah proof "your task" --format markdown`. Every selected event, file, symbol, and fact includes its selection basis and verifiable identity under one packet manifest. [Read the proof-carrying context guide.](docs/PROOF-CARRYING-CONTEXT.md)
 
 For an explicit foreground loop that also notices source changes, refreshes the symbol graph, and regenerates every local read model, run `npx qarinah watch`. Unchanged cycles create no duplicate checkpoints. Qarinah does not install a hidden background service or passively inspect unrelated applications. [Read the automatic project-memory guide.](docs/AUTOMATIC-PROJECT-MEMORY.md)
+
+## Automatic memory with verifiable evidence
+
+**Qarinah 0.7.0** adds machine-local automatic project initialization, visible-chat retention when explicitly enabled, summary-first recall, and bounded expansion to exact cited sources. Install once for your user account:
+
+```sh
+npx qarinah@latest setup-user --capture content --full-chat
+npx qarinah@latest auto-init status
+npx qarinah@latest dashboard --serve --worktrees
+```
+
+The machine opt-in applies to safe active project roots. Existing disabled, revoked, and excluded projects stay protected. Remote hosts require their own setup. [Review the installation and host coverage.](docs/AUTO-INITIALIZATION.md)
+
+Every retained event carries a **SHA-256 content digest**, a **SHA-256 record digest**, and its **previous record hash**. Context packets retain the selected identities and manifest. [Inspect the exact hashing contract and reproducible example.](docs/CRYPTOGRAPHIC-EVIDENCE.md)
+
+**OKF means Open Knowledge Format.** Qarinah exports deterministic OKF 0.1 Draft Markdown with event identities, relations, citations, and hashes. The JSONL ledger remains authoritative. Run `npx qarinah export okf` to produce the portable view.
+
+[Release details](docs/RELEASE-0.7.0.md) · [Whitepaper v1.9](output/pdf/Qarinah-Technical-White-Paper-v1.9.pdf) · [Dashboard](docs/DASHBOARD.md)
 
 ## Resume the work, not the whole chat
 
@@ -86,34 +108,34 @@ npx qarinah dashboard --serve --worktrees
 
 ### Reproducible proof-context result
 
-The 0.6.0 evaluator creates a 12-file repository across ten registered language families and pairs every current decision with a superseded predecessor. It passes **12 / 12** task-packet scenarios: the expected file and symbol are selected, current evidence is retrieved, stale evidence is excluded and identified, hashes remain valid, the packet stays inside 4,096 portable estimated tokens, and an unchanged rerun reproduces the same manifest. A separate mutation is rejected by `validateProofContext()`.
+The 0.7.0 evaluator creates a 12-file repository across ten registered language families and pairs every current decision with a superseded predecessor. It passes **12 / 12** task-packet scenarios: the expected file and symbol are selected, current evidence is retrieved, stale evidence is excluded and identified, hashes remain valid, the packet stays inside 4,096 portable estimated tokens, and an unchanged rerun reproduces the same manifest. A separate mutation is rejected by `validateProofContext()`.
 
 ```sh
 npm run evaluate:proof-context
 npm run check:proof-context-evidence
 ```
 
-Inspect the [machine-readable result](bench/results/proof-context-0.6.0.json) and [evaluator](scripts/evaluate-proof-context.mjs). This is deterministic acceptance evidence over a generated repository, not a universal accuracy, cost, or cross-product claim.
+Inspect the [machine-readable result](bench/results/proof-context-0.7.0.json) and [evaluator](scripts/evaluate-proof-context.mjs). This is deterministic acceptance evidence over a generated repository, not a universal accuracy, cost, or cross-product claim.
 
 ### Reproducible public-checkout memory result
 
-The current evaluator copies Qarinah's public source into an isolated temporary Git repository and runs the product end to end. It passes **10 / 10** structural scenarios, indexes **all 187 eligible source files**, resolves four exact implementation definitions, records one completed session lifecycle, writes a minimized v2 receipt, compiles cited continuation context, and verifies the complete ledger chain. It uses no private data or provider calls.
+The current evaluator copies Qarinah's public source into an isolated temporary Git repository and runs the product end to end. It passes **10 / 10** structural scenarios, indexes **all 201 eligible source files**, resolves four exact implementation definitions, records one completed session lifecycle, writes a minimized v2 receipt, compiles cited continuation context, and verifies the complete ledger chain. It uses no private data or provider calls.
 
 ```sh
 npm run check:public-project-memory
 ```
 
-Read the [method and boundaries](docs/PUBLIC-PROJECT-MEMORY-EVALUATION.md) or inspect the [0.6.0 machine-readable result](bench/results/public-project-memory-v0.6.0.json). Historical receipts remain unchanged, and exact file counts are refreshed before each release commit.
+Read the [method and boundaries](docs/PUBLIC-PROJECT-MEMORY-EVALUATION.md) or inspect the [0.7.0 machine-readable result](bench/results/public-project-memory-v0.7.0.json). Historical receipts remain unchanged, and exact file counts are refreshed before each release commit.
 
 ### Reproducible deep-memory product result
 
-The 0.6.0 product evaluator runs the full local path in a temporary initialized project: incremental source refresh, symbol and cross-file-reference indexing, cited fact consolidation, two encrypted content snapshots, integrity verification, and exact byte restoration. It passes **12 / 12** scenarios, restores **390,226 source bytes exactly**, reuses **2 of 3** chunks in the second snapshot, indexes **4 symbols** and **3 resolved references**, and retains **2 cited facts**.
+The 0.7.0 product evaluator runs the full local path in a temporary initialized project: incremental source refresh, symbol and cross-file-reference indexing, cited fact consolidation, two encrypted content snapshots, integrity verification, and exact byte restoration. It passes **12 / 12** scenarios, restores **390,226 source bytes exactly**, reuses **2 of 3** chunks in the second snapshot, indexes **4 symbols** and **3 resolved references**, and retains **2 cited facts**.
 
 ```sh
 npm run check:deep-memory
 ```
 
-Inspect the [machine-readable result](bench/results/deep-memory-platform-v0.6.0.json) and [evaluator](scripts/evaluate-deep-memory-platform.mjs). Historical receipts remain unchanged. This is local product-acceptance evidence, not a cross-product comparison or a promise about arbitrary repositories.
+Inspect the [machine-readable result](bench/results/deep-memory-platform-v0.7.0.json) and [evaluator](scripts/evaluate-deep-memory-platform.mjs). Historical receipts remain unchanged. This is local product-acceptance evidence, not a cross-product comparison or a promise about arbitrary repositories.
 
 ### Reproducible real-Git-worktree acceptance result
 
@@ -205,7 +227,7 @@ npx qarinah setup . --capture content --auto-compact
 
 <p align="center">
   <strong>Claude Code:</strong> <code>/qarinah release provenance</code>&nbsp;&middot;&nbsp;
-  <strong>Codex:</strong> <code>$qarinah</code>&nbsp;&middot;&nbsp;
+  <strong>coding host:</strong> <code>$qarinah</code>&nbsp;&middot;&nbsp;
   <strong>Any host:</strong> <code>npx qarinah query "release provenance"</code>
 </p>
 
@@ -232,7 +254,7 @@ npx qarinah setup . --capture content
 # See the whole project in one readable page.
 npx qarinah overview
 
-# Bring an exported Codex, Claude, Kimi, or portable JSONL history with you.
+# Bring an exported supported visible agent, or portable JSONL history with you.
 npx qarinah import ./agent-exports --format auto --mode compact
 ```
 
@@ -242,7 +264,7 @@ If a native chat later disappears, Qarinah can still retrieve the permitted even
 
 | Setup | What Qarinah gives you |
 | --- | --- |
-| Personal project | One local cited memory shared by Codex, Claude Code, Cursor, Kimi, Antigravity, CLI tools, and compatible MCP clients |
+| Personal project | One local cited memory shared by supported coding agents, CLI tools, and compatible MCP clients |
 | Parallel Git worktrees | Isolated ledgers per checkout, one repository group, branch-and-commit-aware snapshots, and one local graph dashboard |
 | Coding harness | Automatic completed-turn checkpoints, bounded packs, actual per-worktree token estimates, and optional model-assisted summaries that retain source IDs and hashes |
 | Portable review | Rebuildable SQLite, Markdown, JSON, graph, OKF, and responsive static or live-loopback dashboards for inspecting project memory |
@@ -289,7 +311,7 @@ The JSONL chain remains authoritative. Graph, index, Markdown, dashboard, and OK
 
 <p align="center">
   <a href="docs/WHITEPAPER.md">Technical paper</a>&nbsp;&middot;&nbsp;
-  <a href="output/pdf/Qarinah-Technical-White-Paper-v1.8.pdf">Technical white paper v1.8</a>&nbsp;&middot;&nbsp;
+  <a href="output/pdf/Qarinah-Technical-White-Paper-v1.9.pdf">Technical white paper v1.9</a>&nbsp;&middot;&nbsp;
   <a href="https://doi.org/10.5281/zenodo.21547684">Paper series DOI</a>&nbsp;&middot;&nbsp;
   <a href="https://doi.org/10.5281/zenodo.21850747">Published historical v1.4</a>&nbsp;&middot;&nbsp;
   <a href="docs/ARCHITECTURE.md">Architecture</a>&nbsp;&middot;&nbsp;
@@ -327,9 +349,9 @@ npx qarinah query "release provenance" \
 
 Start with the [feature map](docs/FEATURES.md) and [five-minute installation guide](docs/GETTING-STARTED.md), then use the [coding context harness](docs/CODING-CONTEXT-HARNESS.md), [worktree context](docs/WORKTREE-CONTEXT.md), [symbol graph and language server](docs/SYMBOL-GRAPH.md), [host compatibility](docs/HOST-COMPATIBILITY.md), the [project overview](docs/PROJECT-OVERVIEW.md), [agent archive import](docs/AGENT-ARCHIVE-IMPORT.md), [lossless content archive](docs/CONTENT-ARCHIVE.md), [external archive backup](docs/AGENT-ARCHIVE-BACKUP.md), [private-project guide](docs/PRIVATE-PROJECTS.md), [cross-agent handoff guide](docs/CROSS-AGENT-HANDOFFS.md), [dashboard guide](docs/DASHBOARD.md), [team-memory guide](docs/TEAM-MEMORY.md), [CLI reference](docs/CLI-REFERENCE.md), [JavaScript API reference](docs/API-REFERENCE.md), [MCP guide](docs/MCP-GUIDE.md), [task recipes](docs/RECIPES.md), or [troubleshooting guide](docs/TROUBLESHOOTING.md).
 
-Your project already contains the decisions and evidence behind its changes. Qarinah lets the next agent query that record and receive a bounded, cited pack selected for the current task. The same local memory can support Codex, Claude Code, CLI workflows, and compatible MCP clients instead of locking project context to one editor.
+Your project already contains the decisions and evidence behind its changes. Qarinah lets the next agent query that record and receive a bounded, cited pack selected for the current task. The same local memory can support supported coding hosts, CLI workflows, and compatible MCP clients instead of locking project context to one editor.
 
-Qarinah is a local memory and retrieval stack for coding agents. It turns captured agent activity, project structure, and explicitly committed decisions into durable project memory for Codex, Claude Code, CLIs, IDEs, and compatible MCP clients. It preserves evidence in a typed graph and deterministic Markdown and JSON views, then compiles a bounded cited pack selected for the current query instead of making an opaque summary or a full transcript the source of truth.
+Qarinah is a local memory and retrieval stack for coding agents. It turns captured agent activity, project structure, and explicitly committed decisions into durable project memory for supported coding hosts, CLIs, IDEs, and compatible MCP clients. It preserves evidence in a typed graph and deterministic Markdown and JSON views, then compiles a bounded cited pack selected for the current query instead of making an opaque summary or a full transcript the source of truth.
 
 ## Why Qarinah
 
@@ -366,7 +388,7 @@ npx qarinah dashboard --serve
 
 ## Compile memory before the model request
 
-When a host or orchestrator queries Qarinah before constructing a model request, Qarinah compiles the retained project history into a bounded cited pack first. That same pack can be supplied to a small local model, a large-context model, or a high-reasoning Codex or Claude session. The compiler itself does not need an embedding API, a hosted memory service, or a Qarinah API key.
+When a host or orchestrator queries Qarinah before constructing a model request, Qarinah compiles the retained project history into a bounded cited pack first. That same pack can be supplied to a small local model, a large-context model, or a high-reasoning coding host or Claude session. The compiler itself does not need an embedding API, a hosted memory service, or a Qarinah API key.
 
 Packs are requested explicitly. Hosts can call the CLI or JavaScript API, use Qarinah's zero-write MCP `context.query` tool for an explicitly initialized, enabled, machine-trusted workspace, or optionally route a query through Maqam when policy or approval is useful. Every MCP query names the exact absolute workspace and remains bounded by that workspace's approved context ceiling.
 
@@ -398,7 +420,7 @@ Qarinah is intentionally small, local, and inspectable:
 | Retrieval | SQLite FTS5, BM25, typo tolerance, graph traversal, reciprocal-rank fusion, time and freshness filters, host-owned authority scopes, repository isolation, conflict/supersession handling, and diversity |
 | Context compiler | Complete-output character and token budgets, explicit output headroom, evidence-coverage gates, deterministic citations, and reproducible manifests |
 | Human-readable views | Rebuildable Markdown, JSON, graph, index, and Google OKF 0.1 Draft exports |
-| Agent integration | One-command Codex, Claude Code, Cursor, Kimi, and Antigravity setup; reviewed Codex/Claude lifecycle hooks; strict JSON stdin; typed JavaScript API; and workspace-authorized stdio MCP retrieval |
+| Agent integration | One-command supported coding hosts, Cursor, Kimi, and Antigravity setup; reviewed supported-host lifecycle hooks; strict JSON stdin; typed JavaScript API; and workspace-authorized stdio MCP retrieval |
 | Optional adapters | Local or customer-provided embeddings, query expansion, and rerankers may reorder admitted cited evidence without replacing ledger authority |
 | Team continuity | Client-side encrypted immutable bundles, a self-hosted opaque sync service, tenant-bound roles, exact bundle identities, bounded rate limits, and token-free audit evidence |
 | Infrastructure | No required vector database, hosted backend, embedding bill, model provider, daemon, analytics endpoint, or Qarinah API key |
@@ -416,18 +438,18 @@ The package is designed for local use. It does not require a hosted Qarinah acco
 
 ## Initialize once, remember across supported sessions
 
-`npx qarinah setup . --capture content` is the one-time, explicit opt-in for that exact workspace and capture policy. It initializes SQLite and the other derived views, records a bounded map of the codebase, installs project-local integrations, configures workspace-authorized MCP retrieval, and runs a health check. Codex and Claude Code have reviewed lifecycle capture adapters. Cursor, Kimi, and Antigravity use their documented project-level MCP surfaces; their host history is imported only from an explicit supported export. Qarinah can then compile a small cited pack on demand, so a new task in that folder does not need the whole retained history replayed into its prompt.
+`npx qarinah setup . --capture content` is the one-time, explicit opt-in for that exact workspace and capture policy. It initializes SQLite and the other derived views, records a bounded map of the codebase, installs project-local integrations, configures workspace-authorized MCP retrieval, and runs a health check. supported coding hosts have reviewed lifecycle capture adapters. Cursor, Kimi, and Antigravity use their documented project-level MCP surfaces; their host history is imported only from an explicit supported export. Qarinah can then compile a small cited pack on demand, so a new task in that folder does not need the whole retained history replayed into its prompt.
 
 Qarinah is project memory, not an always-running agent or application supervisor. It does not keep an agent running, prevent provider-side context compaction, or capture host activity the host does not expose. When a host compacts its own conversation, Qarinah preserves only the permitted evidence it actually received and makes it available to an explicit CLI/API query or a workspace-authorized, bounded MCP query.
 
-Existing visible Codex, Claude, Kimi stream-json, or portable agent exports can be streamed in later with `qarinah import`. The safe compact mode is designed for large histories: it records cited per-session summaries and source digests rather than copying every raw byte into Qarinah. Full visible-history import is available only in a content-authorized workspace and remains bounded by the configured ledger limits.
+Existing visible supported visible agent stream-json, or portable agent exports can be streamed in later with `qarinah import`. The safe compact mode is designed for large histories: it records cited per-session summaries and source digests rather than copying every raw byte into Qarinah. Full visible-history import is available only in a content-authorized workspace and remains bounded by the configured ledger limits.
 
 ## Team-memory platform
 
 The public package now includes:
 
 - workspace-authorized, zero-write MCP `context.query` with exact-root selection and machine-local trust;
-- one-command Codex, Claude Code, Cursor, Kimi, and Antigravity setup;
+- one-command supported coding hosts, Cursor, Kimi, and Antigravity setup;
 - a local visual dashboard for decisions, supersession, conflicts, citations, activity, savings, and affected files;
 - freshness checks for changed, missing, or unsafe cited files;
 - temporal validity, point-in-time queries, stale-citation detection, conflicts, and supersessions;
@@ -504,7 +526,7 @@ Qarinah does not claim that a large source archive becomes a lossless few-kiloby
 
 JavaScript callers can pass an `AbortSignal` to `appendEvent`, `readEvents`, and `rebuildDerivedState`. A cancelled writer-lock wait makes no durable change; once an append has crossed its irreversible log boundary, Qarinah finishes the matching identity and checkpoint metadata so the ledger remains recoverable.
 
-To preserve an exported Codex/Claude/portable JSONL archive on an external drive during setup, add explicit `--backup-source` and `--backup-destination` paths. Qarinah streams only JSONL/NDJSON files, enforces limits, rejects linked paths, verifies SHA-256 digests, writes an external manifest, and records a compact project receipt. See [External agent-archive backup](docs/AGENT-ARCHIVE-BACKUP.md).
+To preserve an exported supported-host/portable JSONL archive on an external drive during setup, add explicit `--backup-source` and `--backup-destination` paths. Qarinah streams only JSONL/NDJSON files, enforces limits, rejects linked paths, verifies SHA-256 digests, writes an external manifest, and records a compact project receipt. See [External agent-archive backup](docs/AGENT-ARCHIVE-BACKUP.md).
 
 Read the complete [local memory dashboard guide](docs/DASHBOARD.md) for every panel, data lineage, CLI and JavaScript APIs, population recipes, privacy guidance, and troubleshooting. Release maintainers should also use the [0.5.0 readiness checklist](docs/RELEASE-READINESS-0.5.md).
 
@@ -586,54 +608,24 @@ Context-pack v2 adds evidence coverage:
 
 `minimumCoverage: "partial"` rejects no-evidence packs. `minimumCoverage: "direct"` accepts only a record containing every normalized query term. Coverage is a deterministic retrieval diagnostic, not a claim that a model answer is correct.
 
-## Codex and Claude Code
+## supported coding hosts
 
-The repository includes generated, dependency-free plugin runtimes for Codex and Claude Code. Both provide:
+The repository includes generated, dependency-free plugin runtimes for supported coding hosts. Both provide:
 
 - allowlisted lifecycle hooks;
 - a Qarinah context skill;
 - zero-write `context_status`, `context_doctor`, and bounded `context.query` MCP tools, all with exact workspace selection;
 - explicit CLI querying for user-directed local workflows.
 
-Codex and Claude Code plugin caches are immutable copies. Reinstall the reviewed plugin and start a new task after an upgrade. Claude requires an explicitly selected absolute Node 22, 24, or 26 executable. Codex still inherits the host's reviewed Node `PATH` boundary because its current plugin schema does not expose an equivalent file setting. See [host integrations](docs/HOST-INTEGRATIONS.md).
+supported coding hosts plugin caches are immutable copies. Reinstall the reviewed plugin and start a new task after an upgrade. Claude requires an explicitly selected absolute Node 22, 24, or 26 executable. coding host still inherits the host's reviewed Node `PATH` boundary because its current plugin schema does not expose an equivalent file setting. See [host integrations](docs/HOST-INTEGRATIONS.md).
 
 Ambient MCP context disclosure remains disabled. `context.query` requires an exact initialized, enabled, machine-trusted workspace and enforces strict item and character limits. A legacy server-start permit may further narrow those limits, but it is no longer a second prerequisite. Durable MCP writes remain unavailable.
 
-The repository also runs `npm run mcp:smoke` against the exact bundled Codex and Claude runtimes. The smoke test starts each stdio server from its packaged manifest, exercises Codex without MCP roots using an exact trusted workspace selector, exercises Claude with negotiated roots, lists the two annotated tools, calls both tools against a temporary trusted ledger, and verifies clean shutdown without stderr output.
+The repository also runs `npm run mcp:smoke` against the exact bundled supported coding hosts runtimes. The smoke test starts each stdio server from its packaged manifest, exercises coding host without MCP roots using an exact trusted workspace selector, exercises Claude with negotiated roots, lists the two annotated tools, calls both tools against a temporary trusted ledger, and verifies clean shutdown without stderr output.
 
-### Install once, initialize each project
+### Install once, initialize automatically
 
-Install the reviewed `v0.6.0` plugin once in each host after the alpha is published:
-
-```sh
-# Codex: personal installation, available to opted-in projects.
-codex plugin marketplace add AjnasNB/qarinah --ref v0.6.0
-codex plugin add qarinah@qarinah
-
-# Claude Code: personal installation across projects.
-claude plugin marketplace add AjnasNB/qarinah@v0.6.0 --scope user
-claude plugin install qarinah@qarinah --scope user
-```
-
-Then opt in from the root of each project that should retain context:
-
-```sh
-npx -y qarinah@next init . --capture content
-npx -y qarinah@next scan
-npx -y qarinah@next doctor
-```
-
-Use `--capture metadata` when event bodies should not be retained. Content mode records only bounded, redacted fields exposed by supported hooks; it does not parse hidden transcripts or reasoning. At the start of a later task, ask the installed Qarinah context skill for direct evidence related to the task, or run a bounded query:
-
-```sh
-npx -y qarinah@latest query "checkout dialog focus trap" \
-  --minimum-coverage direct \
-  --max-tokens 1500 \
-  --reserve-tokens 200 \
-  --format markdown
-```
-
-The returned pack selects complete cited records from the verified event chain. It is not a model-written rolling summary. Plugin installation is host-wide; capture permission and retained context remain project-specific. See [host integrations](docs/HOST-INTEGRATIONS.md) for current private-clone testing, Claude project/local scopes, upgrades, and interpreter trust.
+Use `npx qarinah@latest setup-user --capture content --full-chat` for machine-local automatic initialization, then restart the selected hosts and complete any host-required hook review. See [automatic initialization](docs/AUTO-INITIALIZATION.md) and [host integrations](docs/HOST-INTEGRATIONS.md) for exact host identifiers, upgrades, and coverage.
 
 ## Optional ecosystem connections
 
@@ -709,7 +701,7 @@ The software-task evaluator keeps the required current source snippets on both s
 
 The long-document evaluator adds a fixed 600-token ceiling over a deterministic 34,751-estimated-token handbook fixture. All 16 exact and typo-tolerant lookups return the cited answer-bearing section at rank 1, with an average pack of 534 estimated tokens and a worst-case estimated reduction of 98.4%; four unsupported questions fail closed when the caller requires direct evidence coverage. This is a segmented synthetic retrieval fixture - not whole-book summarization, native PDF ingestion, or provider-billed token usage.
 
-The [cross-session continuation benchmark](docs/CROSS-SESSION-CONTINUATION-BENCHMARK.md) adds a 42-record two-session fixture for context summarization, evidence links, and fresh-session retrieval. Its complete 1,039-token cited audit pack is 89.05% smaller than the 9,489-token full-ledger estimate and preserves all three summary source IDs and hashes. A separate 119-token model-facing capsule points to that verified pack and the selected summary event, reaching 98.75% reduction on the same unchanged fixture without removing the audit trail. The read also leaves deliberately stale derived state unchanged. A separate provider-backed Codex-to-Codex smoke uses distinct ephemeral sessions with native resume disabled, requires the second session to query Qarinah and cite its evidence, and verifies the resulting patch with tests. The provider smoke is product evidence, not a controlled research result.
+The [cross-session continuation benchmark](docs/CROSS-SESSION-CONTINUATION-BENCHMARK.md) adds a 42-record two-session fixture for context summarization, evidence links, and fresh-session retrieval. Its complete 1,039-token cited audit pack is 89.05% smaller than the 9,489-token full-ledger estimate and preserves all three summary source IDs and hashes. A separate 119-token model-facing capsule points to that verified pack and the selected summary event, reaching 98.75% reduction on the same unchanged fixture without removing the audit trail. The read also leaves deliberately stale derived state unchanged. A separate provider-backed fresh-session smoke uses distinct ephemeral sessions with native resume disabled, requires the second session to query Qarinah and cite its evidence, and verifies the resulting patch with tests. The provider smoke is product evidence, not a controlled research result.
 
 The separate [real-repository research track](docs/RESEARCH-BENCHMARK.md) pins 300 public SWE-bench Lite tasks into a chronological 60-task warm-up / 240-task development split. Frozen exploratory v0.1 found that BM25 beat the original balanced Qarinah ranker. Admission-first v2 preserves admitted BM25 ranking while retaining repository, temporal, retention, disclosure, conflict, supersession, provenance, and budget controls; online MRR improves from 0.601 to 0.696 against balanced-v1 under the graded structural development oracle. Graph ranking adds no measured value here. Historical v0.3 calibrated a conservative decision over frozen v0.2 scores. The immutable [production-bound v0.4 recomputation](docs/RESEARCH-DEVELOPMENT-RESULTS-v0.4.md) uses `evidence-sufficiency-v2`: it observed 10/10 static and 15/15 online direct accepts as structural-oracle positives, with 0/49 and 0/31 false accepts. Exact 95% false-acceptance upper bounds remain 7.25% and 11.22%, and coverage remains deliberately low at 4.17%-6.25%.
 
