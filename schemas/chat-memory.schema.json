@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/AjnasNB/qarinah/schemas/chat-memory.schema.json",
+  "title": "Bounded summary-first visible-chat recall",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "workspaceId", "contentRole", "query", "detail", "coverage", "items", "truncated", "intelligence"],
+  "properties": {
+    "schemaVersion": { "const": "qarinah.chat-memory.v1" },
+    "workspaceId": { "type": "string", "pattern": "^ws_[0-9a-f]{32}$" },
+    "contentRole": { "const": "untrusted-data" },
+    "query": { "type": "string", "maxLength": 4096 },
+    "detail": { "enum": ["summary", "full"] },
+    "coverage": { "enum": ["none", "partial", "direct", "no-query"] },
+    "truncated": { "type": "boolean" },
+    "intelligence": { "type": "string", "maxLength": 256 },
+    "items": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["eventId", "hash", "kind", "confidence", "title", "excerpt", "offset", "nextOffset", "sourceChars", "sourceEvents", "chunkEventIds"],
+        "properties": {
+          "eventId": { "type": "string", "pattern": "^evt_[0-9a-f-]{36}$" },
+          "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+          "kind": { "type": "string" },
+          "confidence": { "enum": ["extracted", "inferred", "claimed", "verified"] },
+          "title": { "type": "string", "maxLength": 512 },
+          "excerpt": { "type": "string", "maxLength": 12000 },
+          "offset": { "type": "integer", "minimum": 0 },
+          "nextOffset": { "type": ["integer", "null"], "minimum": 0 },
+          "sourceChars": { "type": "integer", "minimum": 0 },
+          "sourceEvents": {
+            "type": "array",
+            "maxItems": 64,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["eventId", "hash", "kind"],
+              "properties": {
+                "eventId": { "type": "string", "pattern": "^evt_[0-9a-f-]{36}$" },
+                "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+                "kind": { "type": "string" }
+              }
+            }
+          },
+          "chunkEventIds": { "type": "array", "maxItems": 32, "items": { "type": "string", "pattern": "^evt_[0-9a-f-]{36}$" } }
+        }
+      }
+    }
+  }
+}

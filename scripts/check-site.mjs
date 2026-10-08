@@ -37,7 +37,7 @@ const required = [
   "search-index.json",
   "metrics.json",
   "paper/index.html",
-  "paper/Qarinah-Technical-White-Paper-v1.8.pdf",
+  "paper/Qarinah-Technical-White-Paper-v1.9.pdf",
   "paper/Qarinah-Technical-White-Paper-v1.7.pdf",
   "paper/Qarinah-Technical-White-Paper-v1.4.pdf",
   "paper/Qarinah-Technical-White-Paper-v1.5.pdf",
@@ -374,8 +374,8 @@ if (!home.includes("Verifiable project memory, exact source recovery, and cited 
   errors.push("Homepage is missing the worktree-aware category or the separate historical benchmark scope.");
 }
 if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
-  || publicMetrics.productVersion !== "0.6.0"
-  || publicMetrics.updatedAt !== "2026-08-22"
+  || publicMetrics.productVersion !== "0.7.0"
+  || publicMetrics.updatedAt !== "2026-10-08"
   || publicMetrics.providerBillingMeasurement !== false
   || publicMetrics.metrics?.proofCarryingTaskContext?.scenarios !== 12
   || publicMetrics.metrics?.proofCarryingTaskContext?.accepted !== 12
@@ -399,7 +399,7 @@ if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.indexedSymbols !== 4
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.resolvedReferences !== 3
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.citedFacts !== 2
-  || publicMetrics.metrics?.deepMemoryProductAcceptance?.artifactHash !== "sha256:4736652101ffde46e450983285be3f41c74f850728bc4b59848c45b063afb112"
+  || publicMetrics.metrics?.deepMemoryProductAcceptance?.artifactHash !== "sha256:43e4d3d61a4a3ab5fed5d59a30b8a16df02dcb5ea60e973a9fa906b61089dd2d"
   || publicMetrics.metrics?.publicProjectMemory?.scenarios !== 10
   || publicMetrics.metrics?.publicProjectMemory?.passed !== 10
   || publicMetrics.metrics?.publicProjectMemory?.indexedSymbolFiles !== publicMetrics.metrics?.publicProjectMemory?.eligibleSymbolFiles
@@ -547,15 +547,15 @@ if (!faq.includes('"@type":"FAQPage"') || !faq.includes('"mainEntity"')) {
 if (!paper.includes('src="/assets/qarinah-flow.svg"')) {
   errors.push("Paper architecture image is not bound to the deployed asset.");
 }
-if (!paper.includes("/paper/Qarinah-Technical-White-Paper-v1.8.pdf")) {
+if (!paper.includes("/paper/Qarinah-Technical-White-Paper-v1.9.pdf")) {
   errors.push("Paper download does not point to the versioned website PDF.");
 }
 if (!paper.includes("https://doi.org/10.5281/zenodo.21850747")
   || !paper.includes("https://doi.org/10.5281/zenodo.21547684")
   || !paper.includes("https://doi.org/10.5281/zenodo.21843240")
   || !paper.includes('"creativeWorkStatus":"Published"')
-  || !paper.includes('"datePublished":"2026-08-22"')) {
-  errors.push("Paper page must bind current v1.8 to the paper series and preserve published v1.4/v1.3 DOIs.");
+  || !paper.includes('"datePublished":"2026-10-08"')) {
+  errors.push("Paper page must bind current v1.9 to the paper series and preserve published v1.4/v1.3 DOIs.");
 }
 if (/activates on publication|not registered or published|DOI reserved|assigned only when this manuscript is deposited|assigned by Zenodo when v1\.4 is deposited|A version DOI is assigned/iu.test(paper)) {
   errors.push("Paper page contains stale pre-publication lifecycle wording.");

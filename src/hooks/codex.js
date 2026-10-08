@@ -4,7 +4,8 @@ import { sha256 } from "../canonical.js";
 import { QarinahError } from "../errors.js";
 import { snapshotJsonBoundary } from "../interoperability/boundary.js";
 import { appendEvent } from "../store.js";
-import { loadWorkspace } from "../workspace.js";
+import { loadHookWorkspace } from "../auto-init.js";
+import { finishCapturedHook } from "../chat-memory.js";
 import {
   hookRetentionMetadata,
   retainHookContent,
@@ -241,9 +242,10 @@ export async function captureCodexHook(input, options = {}) {
   validateHookInput(input, eventName);
   let workspace;
   try {
-    workspace = await loadWorkspace(options.cwd || input.cwd || process.cwd());
+    workspace = await loadHookWorkspace(options.cwd || input.cwd || process.cwd());
   } catch (error) {
-    if (error instanceof QarinahError && ["WORKSPACE_NOT_INITIALIZED", "WORKSPACE_DISABLED", "WORKSPACE_NOT_TRUSTED"].includes(error.code)) {
+    if (error instanceof QarinahError && ["WORKSPACE_NOT_INITIALIZED", "WORKSPACE_DISABLED", "WORKSPACE_NOT_TRUSTED",
+      "AUTO_INIT_EXCLUDED", "AUTO_INIT_PROJECT_STOPPED"].includes(error.code)) {
       return Object.freeze({ captured: false, reason: error.code });
     }
     throw error;
@@ -255,5 +257,6 @@ export async function captureCodexHook(input, options = {}) {
     capture: workspace.config.capture,
     idempotent: Object.hasOwn(payload, "eventId")
   });
+  await finishCapturedHook(workspace, event, input);
   return Object.freeze({ captured: true, eventId: event.eventId, hash: event.hash });
 }

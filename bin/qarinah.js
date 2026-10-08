@@ -13,6 +13,11 @@ import {
   buildProofContext,
   captureClaudeHook,
   captureCodexHook,
+  capturePortableHook,
+  configureAutoInit,
+  ensureAutoWorkspace,
+  readAutoInitPolicy,
+  recallChatMemory,
   compileContext,
   compileTaskMemoryPack,
   consolidateProjectFacts,
@@ -50,6 +55,7 @@ import {
   serveMemoryDashboard,
   setWorkspaceEnabled,
   setupWorkspace,
+  setupUser,
   previewHostInstall,
   uninstallHostIntegration,
   verifyStore,
@@ -297,6 +303,10 @@ function help() {
 
 Usage:
   qarinah init [path] [--capture metadata|content]
+  qarinah auto-init enable|disable|status [--capture metadata|content] [--full-chat]
+  qarinah auto-init ensure [absolute-project-path]
+  qarinah setup-user [--capture metadata|content] [--full-chat] [--hosts codex,claude,cursor,antigravity,opencode,kilo]
+  qarinah recall --stdin-json
   qarinah setup [path] [--codex] [--claude] [--cursor] [--kimi] [--antigravity] [--freebuff] [--capture metadata|content] [--auto-compact] [--share-activation] [--backup-source <export>] [--backup-destination <external-directory>]
   qarinah demo [--output <empty-directory>]
   qarinah activation status | enable | disable
@@ -304,7 +314,7 @@ Usage:
   qarinah uninstall [path] --host codex|claude|cursor|kimi|antigravity|freebuff --scope project
   qarinah record --kind <kind> --title <title> [--body <text>] [--data-json <json>] [--relation type:target]
   qarinah record --stdin-json
-  qarinah hook codex|claude
+  qarinah hook codex|claude|cursor|antigravity
   qarinah mcp [--allow-query --workspace-id ws_<id> --policy-hash sha256:<digest>] [--max-chars n] [--max-items n]
   qarinah build | rebuild
   qarinah scan [--max-files n] [--max-file-bytes n] [--max-total-bytes n] [--max-depth n]
@@ -355,7 +365,7 @@ async function run(argv) {
     process.stdout.write(help());
     return;
   }
-  if (!["setup", "demo", "activation", "mcp", "hook"].includes(command)) {
+  if (!["setup", "setup-user", "bridge", "demo", "activation", "mcp", "hook", "auto-init", "recall"].includes(command)) {
     await recordActivationEvent("seven_day_return", { cwd: process.cwd() });
   }
   if (command === "demo") {
@@ -378,6 +388,78 @@ async function run(argv) {
     const target = positionals(args)[0] || process.cwd();
     const workspace = await initializeWorkspace(target, { capture: option(args, "--capture", "metadata") });
     process.stdout.write(`${JSON.stringify({ ok: true, root: workspace.root, workspaceId: workspace.config.workspaceId, capture: workspace.config.capture }, null, 2)}\n`);
+    return;
+  }
+  if (command === "auto-init") {
+    const [action, ...rest] = args;
+    if (action === "status") {
+      if (rest.length) throw new TypeError("auto-init status does not accept options.");
+      process.stdout.write(`${JSON.stringify(await readAutoInitPolicy() ?? { enabled: false }, null, 2)}\n`);
+      return;
+    }
+    if (action === "ensure") {
+      if (rest.length > 1) throw new TypeError("auto-init ensure accepts one absolute project path.");
+      const result = await ensureAutoWorkspace(rest[0] ?? process.cwd(), { exact: true });
+      process.stdout.write(`${JSON.stringify({ initialized: result.initialized, reason: result.reason,
+        workspaceId: result.workspace?.config.workspaceId ?? null }, null, 2)}\n`);
+      return;
+    }
+    if (!["enable", "disable"].includes(action)) throw new TypeError("auto-init requires enable, disable, status, or ensure.");
+    if (action === "disable" && rest.length > 0) throw new TypeError("auto-init disable takes no options.");
+    const allowed = new Set(["--capture", "--full-chat", "--root", "--exclude-root", "--max-chars"]);
+    for (let index = 0; index < rest.length; index += 1) {
+      if (!allowed.has(rest[index])) throw new TypeError(`Unsupported auto-init option ${rest[index]}.`);
+      if (rest[index] !== "--full-chat") {
+        if (rest[index + 1] === undefined || rest[index + 1].startsWith("--")) throw new TypeError(`${rest[index]} requires a value.`);
+        index += 1;
+      }
+    }
+    const policy = await configureAutoInit({
+      enabled: action === "enable", capture: option(rest, "--capture"),
+      fullChat: rest.includes("--full-chat") ? true : undefined,
+      roots: rest.includes("--root") ? [option(rest, "--root")] : undefined,
+      excludedRoots: rest.includes("--exclude-root") ? [option(rest, "--exclude-root")] : undefined,
+      contextMaxChars: integerOption(rest, "--max-chars")
+    });
+    process.stdout.write(`${JSON.stringify(policy, null, 2)}\n`);
+    return;
+  }
+  if (command === "setup-user") {
+    const rest = args.filter((value) => value !== "--full-chat");
+    if (args.filter((value) => value === "--full-chat").length > 1) throw new TypeError("setup-user received --full-chat more than once.");
+    const parsed = strictValueOptions(rest, "setup-user", ["--capture", "--hosts", "--max-chars"]);
+    if (parsed.positionals.length) throw new TypeError("setup-user does not accept a positional path.");
+    const result = await setupUser({
+      capture: parsed.values.get("--capture") ?? "metadata",
+      fullChat: args.includes("--full-chat"),
+      targets: parsed.values.has("--hosts") ? parsed.values.get("--hosts").split(",") : undefined,
+      contextMaxChars: parsed.values.has("--max-chars") ? Number(parsed.values.get("--max-chars")) : undefined
+    });
+    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+    return;
+  }
+  if (command === "bridge") {
+    const request = await readStdinJsonRequest(args, "bridge", 1024 * 1024,
+      new Set(["host", "workspace", "event", "sessionId", "turnId", "text"]));
+    if (!request || !["opencode", "kilo"].includes(request.host)
+      || typeof request.workspace !== "string" || !path.isAbsolute(request.workspace)
+      || !["sessionStart", "beforeSubmitPrompt", "afterAgentResponse"].includes(request.event)) {
+      throw new TypeError("bridge requires a supported host, exact absolute workspace, and visible event.");
+    }
+    const result = await capturePortableHook(request.host, {
+      hook_event_name: request.event, workspace_roots: [request.workspace],
+      conversation_id: request.sessionId, generation_id: request.turnId,
+      ...(request.event === "beforeSubmitPrompt" ? { prompt: request.text } : {}),
+      ...(request.event === "afterAgentResponse" ? { text: request.text } : {})
+    });
+    process.stdout.write(`${JSON.stringify(result)}\n`);
+    return;
+  }
+  if (command === "recall") {
+    const request = await readStdinJsonRequest(args, "recall", 16384,
+      new Set(["query", "detail", "eventIds", "offset", "maxChars", "limit"]));
+    if (!request) throw new TypeError("recall requires --stdin-json.");
+    process.stdout.write(`${JSON.stringify(await recallChatMemory(request.query ?? "", { cwd: process.cwd(), ...request }), null, 2)}\n`);
     return;
   }
   if (command === "setup") {
@@ -541,18 +623,31 @@ async function run(argv) {
     return;
   }
   if (command === "hook") {
-    const adapter = positionals(args)[0];
-    if (!["codex", "claude"].includes(adapter)) throw new TypeError("hook requires the codex or claude adapter.");
+    const adapter = args[0];
+    if (!["codex", "claude", "cursor", "antigravity"].includes(adapter)) throw new TypeError("hook requires a supported host adapter.");
     const input = JSON.parse(await readStdin());
-    const result = adapter === "codex" ? await captureCodexHook(input) : await captureClaudeHook(input);
-    if (!args.includes("--quiet")) process.stdout.write(`${JSON.stringify(result)}\n`);
+    const result = adapter === "codex" ? await captureCodexHook(input)
+      : adapter === "claude" ? await captureClaudeHook(input)
+        : await capturePortableHook(adapter, input, { eventName: option(args, "--event") });
+    if (args.includes("--quiet")) {
+      if (adapter === "cursor" && input.hook_event_name === "beforeSubmitPrompt") {
+        process.stdout.write('{"continue":true}\n');
+      } else if (["Stop", "SubagentStop"].includes(input.hook_event_name) || adapter === "antigravity" || adapter === "cursor") {
+        process.stdout.write("{}\n");
+      }
+    } else process.stdout.write(`${JSON.stringify(result)}\n`);
     return;
   }
   if (command === "mcp") {
     const valueOptions = new Set(["--workspace-id", "--policy-hash", "--max-chars", "--max-items"]);
-    const parsed = { allowQuery: false, values: new Map() };
+    const parsed = { allowQuery: false, autoInitialize: false, values: new Map() };
     for (let index = 0; index < args.length; index += 1) {
       const value = args[index];
+      if (value === "--auto-init") {
+        if (parsed.autoInitialize) throw new TypeError("mcp received --auto-init more than once.");
+        parsed.autoInitialize = true;
+        continue;
+      }
       if (value === "--allow-query") {
         if (parsed.allowQuery) throw new TypeError("mcp received --allow-query more than once.");
         parsed.allowQuery = true;
@@ -584,7 +679,7 @@ async function run(argv) {
           maxItems: bounded("--max-items", 20)
         }
       : undefined;
-    await runMcpServer({ queryPermit });
+    await runMcpServer({ queryPermit, autoInitialize: parsed.autoInitialize });
     return;
   }
   if (command === "build" || command === "rebuild") {

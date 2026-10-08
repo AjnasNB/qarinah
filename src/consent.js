@@ -32,7 +32,7 @@ function normalizedRoot(root) {
   return process.platform === "win32" ? resolved.toLowerCase() : resolved;
 }
 
-function stateRoot() {
+export function machineStateRoot() {
   if (process.env.QARINAH_STATE_DIR) return path.resolve(process.env.QARINAH_STATE_DIR);
   if (process.platform === "win32") {
     return path.join(process.env.LOCALAPPDATA || path.join(os.homedir(), "AppData", "Local"), "Qarinah");
@@ -47,11 +47,11 @@ function workspaceDigest(root) {
 
 function trustPath(root) {
   const digest = workspaceDigest(root);
-  return path.join(stateRoot(), "trusted-workspaces", `${digest}.json`);
+  return path.join(machineStateRoot(), "trusted-workspaces", `${digest}.json`);
 }
 
 function revocationPath(root) {
-  return path.join(stateRoot(), "revoked-workspaces", `${workspaceDigest(root)}.json`);
+  return path.join(machineStateRoot(), "revoked-workspaces", `${workspaceDigest(root)}.json`);
 }
 
 function isWithin(root, candidate) {
@@ -350,6 +350,10 @@ async function readRevocation(root) {
   });
 }
 
+export async function workspaceConsentRevoked(root) {
+  return (await readRevocation(await canonicalRealRoot(root))) !== null;
+}
+
 async function assertNotRevoked(root) {
   const revocation = await readRevocation(root);
   if (revocation !== null) {
@@ -392,11 +396,12 @@ async function writeTrustRecord(root, record) {
   return record;
 }
 
-export async function grantWorkspaceConsent(root, config, checkpoint = {}) {
+export async function grantWorkspaceConsent(root, config, checkpoint = {}, options = {}) {
   const actualRoot = await canonicalRealRoot(root);
   // A new grant is the only operation allowed to clear a prior machine-local
   // revocation. Clearing first means a concurrent revoke always wins.
-  await rm(revocationPath(actualRoot), { force: true });
+  if (options.preserveRevocation === true) await assertNotRevoked(actualRoot);
+  else await rm(revocationPath(actualRoot), { force: true });
   const record = createTrustRecord(actualRoot, config, checkpoint);
   return writeTrustRecord(actualRoot, record);
 }

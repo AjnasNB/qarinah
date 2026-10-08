@@ -6,6 +6,7 @@ export interface QarinahMcpServer {
 
 export function createMcpServer(options?: {
   cwd?: string;
+  autoInitialize?: boolean;
   write?: (message: unknown) => void;
   queryPermit?: {
     workspaceId: `ws_${string}`;
@@ -17,6 +18,7 @@ export function createMcpServer(options?: {
 
 export function runMcpServer(options?: {
   cwd?: string;
+  autoInitialize?: boolean;
   input?: AsyncIterable<Uint8Array | string>;
   maximumFrameBytes?: number;
   write?: (message: unknown) => void;

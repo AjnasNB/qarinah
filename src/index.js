@@ -113,6 +113,10 @@ export { captureCodexHook } from "./hooks/codex.js";
 export { captureClaudeHook } from "./hooks/claude.js";
 export { createMcpServer, runMcpServer } from "./mcp/server.js";
 export { setupWorkspace } from "./setup.js";
+export { AUTO_INIT_SCHEMA_VERSION, autoInitPolicyPath, configureAutoInit, ensureAutoWorkspace, readAutoInitPolicy } from "./auto-init.js";
+export { CHAT_MEMORY_SCHEMA_VERSION, recallChatMemory, recordModelChatSummary, renderChatMarkdown, writeChatMarkdown } from "./chat-memory.js";
+export { capturePortableHook } from "./hooks/portable.js";
+export { USER_SETUP_SCHEMA_VERSION, setupUser } from "./user-setup.js";
 export {
   HOST_INSTALL_MANIFEST_SCHEMA_VERSION,
   installHostIntegration,

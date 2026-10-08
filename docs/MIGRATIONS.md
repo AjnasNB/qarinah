@@ -90,3 +90,7 @@ Qarinah 0.5.0 also adds the optional `qarinah.team-sync-service.v1` HTTP boundar
 Qarinah now derives `.qarinah/graph/linked-memory.json` alongside the existing graph, index, SQLite, and Markdown views. This is an additive, disposable `qarinah.linked-project-memory.v1` projection; the authoritative JSONL event contract is unchanged. Run `qarinah build` to create or repair it. Consumers can use `qarinah map` or the exported JavaScript APIs without migrating the ledger.
 
 Large valid ledgers remain supported. The linked view selects a deterministic bounded event and relation window and reports omitted coverage rather than rejecting a ledger that is valid under the existing store limits. Query consumers should inspect coverage, especially `authorityComplete`, before treating a scoped result set as complete.
+
+## Optional persistent auto-initialization
+
+`setup-user` introduces an explicit machine-local opt-in for new projects. Defaults remain per-workspace and metadata-only. Existing disabled, untrusted, revoked, or capture-mismatched ledgers are not migrated automatically. See [auto-initialization](AUTO-INITIALIZATION.md) for user-level installation, full visible-chat Markdown, source-linked summaries, and separate cloud setup.
