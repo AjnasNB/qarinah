@@ -1,0 +1,1875 @@
+{
+  "schemaVersion": "qarinah.context-efficiency-development-protocol-amendment.v3.001",
+  "amendmentVersion": "3.0.0-development-amendment-001",
+  "classification": "pre-execution inspected-development protocol amendment",
+  "createdAt": "2026-08-08T11:18:34.043Z",
+  "companionDocument": {
+    "path": "docs/CONTEXT-EFFICIENCY-DEVELOPMENT-v3-AMENDMENT-001.md",
+    "sha256": "sha256:d3f96fb909920a72c01e49a9c99aba836d9d74f2900d5ee67deb76835541daa8"
+  },
+  "baseProtocol": {
+    "tag": "research-context-efficiency-development-v3-protocol",
+    "commit": "be872f39f97c5528b845830f5ce815f77f12df3e",
+    "manifestPath": "bench/research/context-efficiency-development-v3-protocol.json",
+    "manifestSha256": "sha256:0184d04b8fe67411eb5ccc93222f4674304d8035fe83fb8e9dd50b4c1c3cda9a",
+    "manifestGitBlob": "1c7043cb934c7dc0cb361aad55558acb9f0e6c7c",
+    "documentPath": "docs/CONTEXT-EFFICIENCY-DEVELOPMENT-v3-PROTOCOL.md",
+    "documentSha256": "sha256:e7ca373821eee0e4719febeb2d8f5e7d51e903e6eaa02523a911631a9f7fc5be",
+    "documentGitBlob": "343b130bddbf3dbcc0f6cd4b7261233b5963535a"
+  },
+  "timing": {
+    "v3RankerRunForThisAmendment": false,
+    "v3EvaluatorRunForThisAmendment": false,
+    "v3ScorerOrOracleRunForThisAmendment": false,
+    "v3OutcomeOpenedForThisAmendment": false,
+    "finalOrProviderOutcomeOpenedForThisAmendment": false,
+    "materializationArtifactsExistAtAuthorship": false,
+    "executionAuthorized": false,
+    "releasePublishDeployMergeOrClaimAuthorized": false,
+    "existingScaffoldEligibility": "ineligible and non-executable; it may not be tagged, authorized, or modified after review as a substitute for the lifecycle below"
+  },
+  "precedence": {
+    "overridesBaseProtocolWhereConflict": true,
+    "baseProtocolOtherwiseRemainsNormative": true,
+    "amendmentCommitAllowedPathsExactly": [
+      "docs/CONTEXT-EFFICIENCY-DEVELOPMENT-v3-AMENDMENT-001.md",
+      "bench/research/context-efficiency-development-v3-amendment-001.json"
+    ],
+    "postOutcomeParameterChangeAllowed": false,
+    "changeRequiresNewProtocolAttemptAndDestination": true
+  },
+  "canonicalJson": {
+    "encoding": "UTF-8 without BOM",
+    "serialization": "null and primitive JSON values unchanged; arrays preserve order; object keys sorted by JavaScript default string order recursively; no insignificant whitespace; no trailing LF",
+    "numbers": "finite JSON numbers only; negative zero, NaN, and infinities rejected",
+    "objects": "plain objects with Object.prototype or null prototype only; enumerable own string data properties only; symbols, accessors, non-enumerable properties, undefined, holes, and custom prototypes rejected",
+    "contentDigest": "sha256: plus lowercase SHA-256 hex over canonical UTF-8 bytes of the exact object with only its contentDigest property omitted"
+  },
+  "sourceBindings": {
+    "dataset": {
+      "id": "princeton-nlp/SWE-bench_Lite",
+      "revision": "6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2",
+      "config": "default",
+      "split": "test",
+      "rowCount": 300
+    },
+    "upstreamProvenanceArtifact": {
+      "classification": "contains gold and is readable only in materialize phase",
+      "path": "data/test-00000-of-00001.parquet",
+      "url": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/data/test-00000-of-00001.parquet",
+      "bytes": 1119540,
+      "sha256": "sha256:7a21f37b8bc179c7db5beeb14e88ac538ba283455c776e6b2535bbfb6e3551b4",
+      "retainedInRepository": false,
+      "rankTimeReadAllowed": false
+    },
+    "existingDevelopmentCorpus": {
+      "classification": "materializer provenance only; not rank-time input",
+      "path": "bench/research/swe-bench-lite-development-v0.2.json",
+      "sha256": "sha256:d30f94bba88f72db737340f05a9d3ad3c739c46f84307abc8802a78ca4de0482",
+      "gitBlob": "06e59248134c6c4beff720eb8e201ec58b51a6bb",
+      "logicalDigest": "sha256:01b35115ac639c1fcd3779561f83d5bb21988eb74ee5e93798c5d7579d757863",
+      "rankTimeReadAllowed": false
+    },
+    "existingDatasetLoader": {
+      "classification": "materializer provenance only; not the rank-time loader",
+      "path": "bench/research/swe-bench-lite.mjs",
+      "sha256": "sha256:3b92352951a07854786b1a74ee5d2e6e5cbe1247b7c39d2f1135593cfed431dc",
+      "gitBlob": "062eaa44d937674785b445435d413fdb63c8726c"
+    },
+    "existingPreparationScript": {
+      "classification": "materializer provenance only; not the v3 generator",
+      "path": "scripts/prepare-research-benchmark-v0.2.mjs",
+      "sha256": "sha256:a4a9fde86e7febd8278ca313f281eb0bd3025823f6b41a7ee408c0819db7054a",
+      "gitBlob": "48c582f94cef6917206ab5baca2b0fd9f367db4b"
+    },
+    "productionContracts": {
+      "path": "src/contracts.js",
+      "sha256": "sha256:d74d0487fad186901c7aa1a8c8530c0920fe3908c611ce85ec17c6336d575650",
+      "gitBlob": "17f0aaf4756c17301a7a0da21f46863433ac27dd",
+      "requiredExports": [
+        "createEventEnvelope",
+        "validateStoredEvent"
+      ]
+    },
+    "productionRetrieval": {
+      "path": "src/retrieval.js",
+      "sha256": "sha256:729991b59ea5a0b073c6cdd93fef15c622c819c7f46947b1167f44d598b3a68a",
+      "gitBlob": "28add92c827c05d8e08b19934d57baf02b47571a",
+      "requiredExports": [
+        "resolveContextAdmission",
+        "resolveCurrentContextState"
+      ]
+    },
+    "productionIndexer": {
+      "path": "src/indexer.js",
+      "sha256": "sha256:868c6e433dc858cd665c3c844bb72449e102bf1bc288f1c9daf41ecf4986ff4b",
+      "gitBlob": "69b1fd6608ee3ff2af661de5dba08a09a6a15d75",
+      "allowedUse": "construct validated production index projection for admission/current-state only; its term statistics are discarded"
+    },
+    "productionImportClosure": [
+      {
+        "path": "src/canonical.js",
+        "sha256": "sha256:c24859c69ff8571128107c7de6718fc02aad9cb64f807f174d23bf8b12293225",
+        "gitBlob": "86a8b38c1adb7b46a5e2eb841ec23073068f971d"
+      },
+      {
+        "path": "src/capture-policy.js",
+        "sha256": "sha256:d44ff7930758a1e52107a9e825c6851899bb1e395f613da7514235f5e73c0957",
+        "gitBlob": "7e44b6b5e37884bc69c4ad7dc6859d6602fa0730"
+      },
+      {
+        "path": "src/consent.js",
+        "sha256": "sha256:9d28dd610673f8d1adc7e73f6beac4c691815fe35e9f89066e71907ba6fd99ea",
+        "gitBlob": "893c8055722f19ae7ca5609b8dbcda066a61d755"
+      },
+      {
+        "path": "src/errors.js",
+        "sha256": "sha256:50f322712164afc7167be56407f4cd0597f5907d9390f3706f798f3849ab2695",
+        "gitBlob": "6b7725487a5a93f86f295128a528e61f5f2ff39b"
+      },
+      {
+        "path": "src/interoperability/boundary.js",
+        "sha256": "sha256:80798113257019fa38573acf262ed69b8f1b2b887ceb8ce37f53951c2f1d3118",
+        "gitBlob": "a07f932f48c4a78e437f4274e26334d6d41637e9"
+      },
+      {
+        "path": "src/markdown.js",
+        "sha256": "sha256:2a2dcf71a0b59bb4d3697c0574b89e899824f60bfa28cb82671e29eec09b2ab6",
+        "gitBlob": "bd1c90e3dd3757f5505acb708a2165fb515ef26c"
+      },
+      {
+        "path": "src/redact.js",
+        "sha256": "sha256:6198154b1d4a37adfea308f8b2723c89788ab8046ca587210e278952ca4454b4",
+        "gitBlob": "9e9050eaa8eb0fcff0311ae64912ac139e029524"
+      },
+      {
+        "path": "src/sqlite-read-model.js",
+        "sha256": "sha256:c5ef63b416494387e234a54145ae3727d68ff6b59c32bf15d03a2b569906da2e",
+        "gitBlob": "1a770ba62ca881b99d8dc7a9e284a0af54e584fd"
+      },
+      {
+        "path": "src/store.js",
+        "sha256": "sha256:4a522b92e0b51bc4f7e7ed52012484e74d74bdf8fb64c6fc37eea12b80074f06",
+        "gitBlob": "50599c474823669f8a8f63e92c5482e424775029"
+      },
+      {
+        "path": "src/workspace.js",
+        "sha256": "sha256:d616e43063e961b8bf40ea86c5848ecb04ab531b2c54f9a60c5710834334db5f",
+        "gitBlob": "4ec2aa0e975e64aaf3fbe1ed6188d98bbbd47704"
+      }
+    ],
+    "renderer": {
+      "path": "scripts/context-efficiency-v2-renderer.mjs",
+      "sha256": "sha256:643ea33df0b7b983c34cdad3e5a1a4e51da89c4e4953f810811a33260ffeb25b",
+      "gitBlob": "a21cda5676ac0770927601582fe1435ad00314a2",
+      "relationshipMetadata": "not rendered; path diagnostics remain evaluator-only",
+      "allowedExportsExactly": [
+        "renderModelFacingFrame",
+        "assertCanonicalFrame",
+        "estimatedPortableTokens"
+      ]
+    },
+    "constructedFixture": {
+      "path": "bench/fixtures/software-task-scenarios.mjs",
+      "sha256": "sha256:46d460d22be26b06023eb261ef32466402485a806d5d279251520a6f773365db",
+      "gitBlob": "7a5a1ef283cb1e501895eb0f6ed0e5d1662f2acf"
+    }
+  },
+  "materialization": {
+    "requiredBeforeEvaluatorCommit": true,
+    "outcomeUseAllowed": false,
+    "paths": {
+      "goldFreeRows": "bench/research/context-efficiency-development-v3-gold-free-rows.json",
+      "goldFreeCorpus": "bench/research/context-efficiency-development-v3-gold-free-corpus.json",
+      "oracle": "bench/research/context-efficiency-development-v3-oracle.json",
+      "constructedInput": "bench/research/context-efficiency-development-v3-constructed-input.json",
+      "constructedOracle": "bench/research/context-efficiency-development-v3-constructed-oracle.json",
+      "generator": "scripts/materialize-context-efficiency-development-v3.mjs",
+      "rankTimeLoader": "scripts/context-efficiency-development-v3-corpus.mjs",
+      "receipt": "bench/research/context-efficiency-development-v3-materialization.json"
+    },
+    "futureBindingRule": {
+      "bindingMoment": "materialization commit before evaluator implementation",
+      "everyPathMustExist": true,
+      "everyPathMustBeRegularFile": true,
+      "symlinkOrReparseAllowed": false,
+      "everyFileRequires": [
+        "exact repository-relative path",
+        "byte count",
+        "sha256",
+        "Git blob ID",
+        "schema or module identity"
+      ],
+      "placeholdersAllowed": false,
+      "mutableReferenceAllowed": false,
+      "wildcardAllowed": false,
+      "missingBindingBlocksEvaluatorTag": true,
+      "authorizationMustRepeatAndMatch": true
+    },
+    "receiptSchema": {
+      "schemaVersion": "qarinah.context-efficiency-development-materialization.v3.001",
+      "unknownFieldsAllowed": false,
+      "exactTopLevelFields": [
+        "schemaVersion",
+        "classification",
+        "baseProtocol",
+        "amendment",
+        "dataset",
+        "upstreamArtifact",
+        "remoteResponses",
+        "inputs",
+        "outputs",
+        "generator",
+        "loader",
+        "runtime",
+        "audits",
+        "createdAt",
+        "contentDigest"
+      ],
+      "classificationRequired": "pre-evaluator deterministic materialization; no retrieval outcome",
+      "inputOutputBindingFieldsExactly": [
+        "path",
+        "bytes",
+        "sha256",
+        "gitBlob",
+        "schemaVersion",
+        "logicalDigest"
+      ],
+      "moduleBindingFieldsExactly": [
+        "path",
+        "bytes",
+        "sha256",
+        "gitBlob",
+        "exports",
+        "importClosure"
+      ],
+      "remoteResponseItemFieldsExactly": [
+        "requestedUrl",
+        "finalUrl",
+        "status",
+        "bytes",
+        "sha256",
+        "redirected"
+      ],
+      "remoteResponseCount": 3,
+      "remoteResponseOrder": "requestedUrl by JavaScript default string order",
+      "remoteResponseRequirements": "each requestedUrl equals one phaseReadAllowlists.materialize.networkUrlsExactly member; status 200; finalUrl equals requestedUrl; bytes and sha256 cover the post-content-decoding response body returned by Response.arrayBuffer; bytes positive safe integer; redirects forbidden; response bindings committed before evaluator implementation",
+      "taggedBindingFieldsExactly": [
+        "tag",
+        "commit",
+        "path",
+        "sha256",
+        "gitBlob"
+      ],
+      "datasetFieldsExactly": [
+        "id",
+        "revision",
+        "config",
+        "split",
+        "rowCount"
+      ],
+      "upstreamArtifactFieldsExactly": [
+        "path",
+        "url",
+        "bytes",
+        "sha256",
+        "retainedInRepository"
+      ],
+      "runtimeFieldsExactly": [
+        "nodePath",
+        "nodeBinarySha256",
+        "nodeVersion",
+        "v8Version",
+        "abi",
+        "platform",
+        "arch"
+      ],
+      "auditFieldsExactly": [
+        "sourceRowCount",
+        "goldFreeRowCount",
+        "heldoutCaseCount",
+        "constructedCaseCount",
+        "queryRefusalCount",
+        "duplicateCount",
+        "collisionCount",
+        "equalTimeCandidateCount",
+        "futureCandidateCount",
+        "otherRepositoryCandidateCount",
+        "targetGoldFieldCount",
+        "rankerCalls",
+        "scorerCalls",
+        "oracleCalls",
+        "outcomeReads",
+        "passed"
+      ],
+      "importClosureItemFieldsExactly": [
+        "path",
+        "bytes",
+        "sha256",
+        "gitBlob"
+      ],
+      "objectSchemaMap": {
+        "baseProtocol": "taggedBinding",
+        "amendment": "taggedBinding",
+        "dataset": "dataset",
+        "upstreamArtifact": "upstreamArtifact",
+        "generator": "moduleBinding",
+        "loader": "moduleBinding",
+        "runtime": "runtime",
+        "audits": "audits"
+      },
+      "arrayItemSchemaMap": {
+        "remoteResponses": "remoteResponseItem",
+        "inputs": "inputOutputBinding",
+        "outputs": "inputOutputBinding",
+        "generator.importClosure": "importClosureItem",
+        "loader.importClosure": "importClosureItem"
+      },
+      "arrayOrdering": {
+        "remoteResponses": "requestedUrl",
+        "inputs": "path",
+        "outputs": "path",
+        "generator.importClosure": "path",
+        "loader.importClosure": "path"
+      },
+      "inputPathsExactly": [
+        "bench/research/swe-bench-lite-development-v0.2.json",
+        "bench/fixtures/software-task-scenarios.mjs"
+      ],
+      "outputPathsExactly": [
+        "bench/research/context-efficiency-development-v3-gold-free-rows.json",
+        "bench/research/context-efficiency-development-v3-gold-free-corpus.json",
+        "bench/research/context-efficiency-development-v3-oracle.json",
+        "bench/research/context-efficiency-development-v3-constructed-input.json",
+        "bench/research/context-efficiency-development-v3-constructed-oracle.json"
+      ],
+      "nullability": "no null field is allowed in this receipt",
+      "scalarDomains": "all counts and byte lengths are non-negative safe integers (bytes positive where stated); rowCount is 300; booleans are primitive; SHA-256 values match ^sha256:[0-9a-f]{64}$; Git blobs match ^[0-9a-f]{40}$; commits match ^[0-9a-f]{40}$; paths and versions are non-empty primitive strings",
+      "createdAtRule": "canonical YYYY-MM-DDTHH:mm:ss.sssZ",
+      "contentDigestRule": "canonicalJson.contentDigest",
+      "unknownFieldsRejectedRecursively": true
+    },
+    "goldFreeRowsSchema": {
+      "schemaVersion": "qarinah.context-efficiency-development-gold-free-rows.v3.001",
+      "topLevelFieldsExactly": [
+        "schemaVersion",
+        "dataset",
+        "revision",
+        "split",
+        "rows",
+        "contentDigest"
+      ],
+      "rowFieldsExactly": [
+        "repositoryId",
+        "opaqueTaskId",
+        "problemStatement",
+        "createdAt",
+        "version",
+        "phase",
+        "repositorySequence"
+      ],
+      "rowCount": 300,
+      "rowOrder": "repositoryId then createdAt then opaqueTaskId, each by JavaScript default string order except canonical timestamp chronology",
+      "fieldDomains": {
+        "repositoryId": "primitive string length 1..256",
+        "opaqueTaskId": "^tsk_[0-9a-f]{64}$",
+        "problemStatement": "normalized source statement primitive string, 1..65536 UTF-16 code units; retained for strictly later historical evidence even when too long to be a target query",
+        "createdAt": "chronology canonical timestamp",
+        "version": "primitive string length 1..128",
+        "phase": [
+          "warmup",
+          "heldout"
+        ],
+        "repositorySequence": "safe integer 1..repository row count"
+      },
+      "nullability": "no row field is null",
+      "contentDigestRule": "canonicalJson.contentDigest",
+      "unknownFieldsRejectedRecursively": true,
+      "prohibitedKeysRecursively": [
+        "repo",
+        "instance_id",
+        "instanceId",
+        "issueUrl",
+        "base_commit",
+        "baseCommit",
+        "environment_setup_commit",
+        "environmentSetupCommit",
+        "hints_text",
+        "hintsText",
+        "patch",
+        "test_patch",
+        "testPatch",
+        "patchFiles",
+        "testFiles",
+        "changedFiles",
+        "changedSymbols",
+        "moduleScopes",
+        "FAIL_TO_PASS",
+        "PASS_TO_PASS",
+        "hashes",
+        "grade",
+        "requiredEventIds",
+        "expectedResult"
+      ]
+    },
+    "goldFreeCorpusSchema": {
+      "schemaVersion": "qarinah.context-efficiency-development-gold-free-corpus.v3.001",
+      "topLevelFieldsExactly": [
+        "schemaVersion",
+        "sourceBindings",
+        "caseCount",
+        "cases",
+        "contentDigest"
+      ],
+      "caseFieldsExactly": [
+        "opaqueCaseId",
+        "repositoryId",
+        "asOf",
+        "query",
+        "phase",
+        "repositorySequence",
+        "settings"
+      ],
+      "settingFieldsExactly": [
+        "id",
+        "candidateCount",
+        "events",
+        "candidateSetDigest"
+      ],
+      "eventFieldsExactly": [
+        "event"
+      ],
+      "sourceBindingsFieldsExactly": [
+        "goldFreeRowsSha256",
+        "generatorSha256",
+        "contractsSha256",
+        "retrievalSha256",
+        "indexerSha256"
+      ],
+      "storedEventFieldsExactly": [
+        "schemaVersion",
+        "eventId",
+        "timestamp",
+        "workspaceId",
+        "sessionId",
+        "turnId",
+        "kind",
+        "actor",
+        "title",
+        "body",
+        "data",
+        "confidence",
+        "repository",
+        "disclosure",
+        "relations",
+        "provenance",
+        "retention",
+        "previousHash",
+        "hash"
+      ],
+      "actorFieldsExactly": [
+        "type",
+        "id"
+      ],
+      "repositoryFieldsExactly": [
+        "id",
+        "branch",
+        "commit"
+      ],
+      "disclosureFieldsExactly": [
+        "classification",
+        "scopes"
+      ],
+      "relationFieldsExactly": [
+        "type",
+        "target"
+      ],
+      "provenanceFieldsExactly": [
+        "adapter",
+        "sourceId",
+        "contentHash"
+      ],
+      "retentionFieldsExactly": [
+        "class",
+        "expiresAt"
+      ],
+      "storedEventNullFieldsExactly": [
+        "sessionId",
+        "turnId",
+        "repository.branch",
+        "repository.commit",
+        "retention.expiresAt",
+        "first repository event previousHash"
+      ],
+      "scalarDomains": "production validateStoredEvent contract plus exact event values in eventMaterialization; candidateCount non-negative safe integer; caseCount 240; hashes use bound patterns",
+      "storedEventAbsentFieldsExactly": [
+        "authority",
+        "temporal",
+        "freshness"
+      ],
+      "settingsExactly": [
+        "static",
+        "online/prequential"
+      ],
+      "caseCount": 240,
+      "caseOrder": "repositoryId then asOf then opaqueCaseId",
+      "caseFieldDomains": {
+        "opaqueCaseId": "^tsk_[0-9a-f]{64}$ and equals target opaqueTaskId",
+        "repositoryId": "non-empty primitive string",
+        "asOf": "chronology canonical timestamp",
+        "query": "normalized primitive string or exact query refusal object",
+        "phase": "heldout",
+        "repositorySequence": "positive safe integer",
+        "settings": "exact two setting objects"
+      },
+      "settingOrder": "static then online/prequential",
+      "eventOrder": "event timestamp ascending then tieKey ascending",
+      "objectSchemaMap": {
+        "sourceBindings": "sourceBindings",
+        "cases[]": "case",
+        "cases[].settings[]": "setting",
+        "cases[].settings[].events[]": "eventWrapper",
+        "cases[].settings[].events[].event": "storedEvent",
+        "cases[].settings[].events[].event.actor": "actor",
+        "cases[].settings[].events[].event.repository": "repository",
+        "cases[].settings[].events[].event.disclosure": "disclosure",
+        "cases[].settings[].events[].event.provenance": "provenance",
+        "cases[].settings[].events[].event.retention": "retention"
+      },
+      "arrayItemSchemaMap": {
+        "cases": "case",
+        "cases[].settings": "setting",
+        "cases[].settings[].events": "eventWrapper",
+        "cases[].settings[].events[].event.relations": "relation",
+        "cases[].settings[].events[].event.disclosure.scopes": "primitiveString"
+      },
+      "contentDigestRule": "canonicalJson.contentDigest",
+      "unknownFieldsRejectedRecursively": true,
+      "targetGoldFieldsAllowed": false,
+      "equalOrFutureEventsAllowed": false,
+      "otherRepositoryEventsAllowed": false
+    },
+    "oracleSchema": {
+      "schemaVersion": "qarinah.context-efficiency-development-oracle.v3.001",
+      "topLevelFieldsExactly": [
+        "schemaVersion",
+        "caseCount",
+        "cases",
+        "contentDigest"
+      ],
+      "caseFieldsExactly": [
+        "opaqueCaseId",
+        "settings"
+      ],
+      "settingFieldsExactly": [
+        "id",
+        "grades",
+        "forbiddenPairs",
+        "futurePairs",
+        "supersessionComponents"
+      ],
+      "gradeItemFieldsExactly": [
+        "eventId",
+        "eventHash",
+        "grade"
+      ],
+      "pairItemFieldsExactly": [
+        "eventId",
+        "eventHash",
+        "reason"
+      ],
+      "supersessionComponentFieldsExactly": [
+        "componentId",
+        "currentEventIds",
+        "supersededEventIds"
+      ],
+      "gradeDomain": [
+        0,
+        1,
+        2
+      ],
+      "gradeDerivation": {
+        "directGrade2": "candidate prior production patchFiles intersect target production patchFiles, or candidate prior changedSymbols intersect target changedSymbols",
+        "supportingGrade1": "not direct and candidate prior moduleScopes intersect target moduleScopes",
+        "notPositiveGrade0": "neither direct nor supporting",
+        "patchFileParser": "sourceBindings.existingDatasetLoader changedFiles over patch only; never test_patch",
+        "changedSymbolParser": "sourceBindings.existingDatasetLoader changedSymbols over patch only",
+        "moduleScopeParser": "sourceBindings.existingDatasetLoader moduleScopes over production patchFiles",
+        "candidateDomain": "the exact case-setting admitted-current candidate IDs only",
+        "targetGoldReadPhase": "materialize oracle construction only, then postSealScore through sealed oracle",
+        "rankInputAvailability": false
+      },
+      "itemOrder": "eventId by JavaScript default string order within each array",
+      "caseOrder": "opaqueCaseId by JavaScript default string order",
+      "settingOrder": "static then online/prequential",
+      "supersessionComponentOrder": "componentId by JavaScript default string order; event-ID arrays by JavaScript default string order",
+      "forbiddenReasonDomain": [
+        "future",
+        "equal-time",
+        "expired",
+        "restricted",
+        "wrong-repository",
+        "superseded"
+      ],
+      "objectSchemaMap": {
+        "cases[]": "oracleCase",
+        "cases[].settings[]": "oracleSetting"
+      },
+      "arrayItemSchemaMap": {
+        "cases": "oracleCase",
+        "cases[].settings": "oracleSetting",
+        "cases[].settings[].grades": "gradeItem",
+        "cases[].settings[].forbiddenPairs": "pairItem",
+        "cases[].settings[].futurePairs": "pairItem",
+        "cases[].settings[].supersessionComponents": "supersessionComponent",
+        "cases[].settings[].supersessionComponents[].currentEventIds": "primitiveString",
+        "cases[].settings[].supersessionComponents[].supersededEventIds": "primitiveString"
+      },
+      "nullability": "no null field is allowed",
+      "scalarDomains": "grade is integer 0..2; event IDs and hashes must resolve exactly to the corresponding case-setting corpus; reasons use forbiddenReasonDomain; component arrays are unique",
+      "contentDigestRule": "canonicalJson.contentDigest",
+      "queryOrRenderableTextAllowed": false,
+      "rankTimeReadAllowed": false,
+      "unknownFieldsRejectedRecursively": true
+    },
+    "constructedInputSchema": {
+      "schemaVersion": "qarinah.context-efficiency-development-constructed-input.v3.001",
+      "topLevelFieldsExactly": [
+        "schemaVersion",
+        "caseCount",
+        "cases",
+        "contentDigest"
+      ],
+      "caseFieldsExactly": [
+        "opaqueCaseId",
+        "asOf",
+        "query",
+        "repositoryIds",
+        "authorityScopes",
+        "currentSources",
+        "events"
+      ],
+      "caseCount": 6,
+      "eventRepresentation": "exact production stored event envelope with all oracle-only data and role/scenario fields removed before hashing the constructed input artifact",
+      "materializationAlgorithm": {
+        "sourceExport": "softwareTaskScenarios and unrelatedRecordCount from the exactly bound fixture",
+        "asOf": "2026-08-01T00:00:00.000Z",
+        "requiredOrder": "fixture case order; target then support array order",
+        "trustedSourceEventId": "'evt_00000000-0000-4000-8000-' + oneBasedSequence as 12 decimal digits; used only as input to opaque remapping and never emitted",
+        "requiredEventCount": 24,
+        "noiseCount": 216,
+        "totalEventCount": 240,
+        "timestampFormula": "new Date(Date.UTC(2026,4,1,0,0,oneBasedSequence)).toISOString()",
+        "targetTitleBody": "scenario.target title and body exact primitive strings after event title/body validation",
+        "supportTitleBody": "scenario.support array title/body exact primitive strings after event title/body validation",
+        "supportRelations": "one outgoing references edge to the same case target after constructed ID remap",
+        "noiseTitle": "'Unrelated accumulated history ' + zero-padded three-digit zeroBasedNoiseIndex",
+        "noiseBody": "component-{zeroBasedNoiseIndex modulo 17, two decimal digits} completed operation-{zeroBasedNoiseIndex, three decimal digits} in an unrelated project area. The retained outcome includes its bounded tool result, review state, affected module, test observation, and follow-up status. This record represents ordinary accumulated agent history that a full-history replay would resend even though it is irrelevant to the current task. It contains no credentials, hidden reasoning, private transcript, or authority over another component.",
+        "eventData": {},
+        "repositoryAuthorityTemporalFreshnessDisclosure": "absent",
+        "retention": {
+          "class": "project",
+          "expiresAt": null
+        },
+        "kind": "decision",
+        "actor": {
+          "type": "human",
+          "id": "context-comparison-owner"
+        },
+        "confidence": "verified",
+        "workspaceId": "'ws_' + first32hex(sha256('qarinah-v3-constructed-workspace-v1' + NUL + fixtureGitBlob))",
+        "previousHash": "previous constructed event hash in exact 240-event order, else null",
+        "provenanceAdapter": "context-efficiency-development-v3-constructed",
+        "provenanceSourceId": "'src_' + hex(sha256('qarinah-v3-constructed-provenance-v1' + NUL + constructedEventId))"
+      },
+      "constructedStoredEventFieldsExactly": [
+        "schemaVersion",
+        "eventId",
+        "timestamp",
+        "workspaceId",
+        "sessionId",
+        "turnId",
+        "kind",
+        "actor",
+        "title",
+        "body",
+        "data",
+        "confidence",
+        "relations",
+        "provenance",
+        "retention",
+        "previousHash",
+        "hash"
+      ],
+      "storedEventSchema": "production validateStoredEvent plus constructedStoredEventFieldsExactly and goldFreeCorpusSchema actor/relation/provenance/retention nested schemas",
+      "caseFieldDomains": {
+        "opaqueCaseId": "^cfx_[0-9a-f]{64}$",
+        "asOf": "chronology canonical timestamp",
+        "query": "query normalized string; constructed query refusal uses query.refusalRepresentation",
+        "repositoryIds": "0..64 unique primitive strings length 1..256 in JavaScript default string order",
+        "authorityScopes": "0..64 unique primitive strings length 1..256 in JavaScript default string order",
+        "currentSources": "fixture order array of exact {path,content}; evaluator renderer only and never sanitized ranker input",
+        "events": "exact 240 stored events in materialization sequence for previousHash validation; sanitized ranker input later reorders by tieKey"
+      },
+      "currentSourceFieldsExactly": [
+        "path",
+        "content"
+      ],
+      "arrayItemSchemaMap": {
+        "cases": "constructedCase",
+        "cases[].repositoryIds": "primitiveString",
+        "cases[].authorityScopes": "primitiveString",
+        "cases[].currentSources": "currentSource",
+        "cases[].events": "storedEvent"
+      },
+      "oracleOrRequiredIdsAllowed": false,
+      "caseOrder": "opaqueCaseId by JavaScript default string order",
+      "unknownFieldsRejectedRecursively": true
+    },
+    "constructedOracleSchema": {
+      "schemaVersion": "qarinah.context-efficiency-development-constructed-oracle.v3.001",
+      "topLevelFieldsExactly": [
+        "schemaVersion",
+        "caseCount",
+        "cases",
+        "contentDigest"
+      ],
+      "caseFieldsExactly": [
+        "opaqueCaseId",
+        "requiredEvidence",
+        "grades",
+        "forbiddenPairs",
+        "futurePairs",
+        "supersessionComponents"
+      ],
+      "caseCount": 6,
+      "gradeDerivation": "target event grade 2; three support events grade 1; all 216 noise events grade 0; required positive count 24; direct count 6",
+      "requiredEvidenceItemFieldsExactly": [
+        "role",
+        "eventId",
+        "eventHash"
+      ],
+      "requiredRoleOrder": [
+        "target",
+        "support-1",
+        "support-2",
+        "support-3"
+      ],
+      "baseSpecificRecoveryRule": "the base protocol's inspected source event ID is used only inside trusted materialization to locate typescript-codebase-refactor/support-3, then is replaced by its constructed opaque eventId and hash; the source ID never crosses the constructed oracle boundary",
+      "gradePairAndSupersessionSchemas": "materialization.oracleSchema gradeItem, pairItem, and supersessionComponent",
+      "arrayItemSchemaMap": {
+        "cases": "constructedOracleCase",
+        "cases[].requiredEvidence": "requiredEvidenceItem",
+        "cases[].grades": "gradeItem",
+        "cases[].forbiddenPairs": "pairItem",
+        "cases[].futurePairs": "pairItem",
+        "cases[].supersessionComponents": "supersessionComponent"
+      },
+      "queryOrRenderableTextAllowed": false,
+      "rankTimeReadAllowed": false,
+      "caseOrder": "opaqueCaseId by JavaScript default string order",
+      "unknownFieldsRejectedRecursively": true
+    },
+    "generatorClosureRule": "materialization receipt lists every transitive repository module by exact path, SHA-256, and Git blob; network access is limited to the three complete pinned rows URLs; every response byte count and SHA-256 is committed in remoteResponses before evaluator implementation; row projection is verified before output",
+    "rankTimeLoaderRule": "exports only strict schema validation and immutable case lookup for goldFreeRows and goldFreeCorpus; has no import or path to upstream, oracle, scorer, final data, provider data, network, environment, result, or publication code"
+  },
+  "query": {
+    "sourceFieldExactly": "problem_statement",
+    "fieldSelection": "source row must have exactly one enumerable own string data property named problem_statement and no other own key whose ASCII-lowercase form with underscores removed equals problemstatement",
+    "ambiguousCondition": "a noncanonical alias exists, more than one normalized alias exists, or duplicate source rows map different problem_statement bytes to the same source tuple",
+    "fallbackAllowed": false,
+    "hintConcatenationAllowed": false,
+    "solutionOrSourceContentAllowed": false,
+    "normalizationOrder": [
+      "require primitive string",
+      "reject unpaired UTF-16 surrogate",
+      "reject NUL and C0/C1 controls except HT LF CR",
+      "replace CRLF and CR with LF",
+      "Unicode NFKC",
+      "JavaScript String.prototype.trim",
+      "validate 1..65536 history length, then classify target query at 4096"
+    ],
+    "utf16CodeUnitsInclusive": [
+      1,
+      4096
+    ],
+    "historyStatementUtf16CodeUnitsInclusive": [
+      1,
+      65536
+    ],
+    "truncationAllowed": false,
+    "refusals": {
+      "ambiguous": "QUERY_AMBIGUOUS",
+      "missing": "QUERY_MISSING",
+      "nonString": "QUERY_TYPE",
+      "invalidControl": "QUERY_CONTROL",
+      "unpairedSurrogate": "QUERY_UNPAIRED_SURROGATE",
+      "empty": "QUERY_EMPTY",
+      "tooLong": "QUERY_TOO_LONG",
+      "tooLongForHistory": "HISTORY_STATEMENT_TOO_LONG"
+    },
+    "errorPrecedence": [
+      "QUERY_AMBIGUOUS",
+      "QUERY_MISSING",
+      "QUERY_TYPE",
+      "QUERY_UNPAIRED_SURROGATE",
+      "QUERY_CONTROL",
+      "QUERY_EMPTY",
+      "HISTORY_STATEMENT_TOO_LONG",
+      "QUERY_TOO_LONG"
+    ],
+    "fixedMessages": {
+      "QUERY_AMBIGUOUS": "query is ambiguous",
+      "QUERY_MISSING": "query is missing",
+      "QUERY_TYPE": "query is not a string",
+      "QUERY_UNPAIRED_SURROGATE": "query contains an unpaired surrogate",
+      "QUERY_CONTROL": "query contains a forbidden control",
+      "QUERY_EMPTY": "query is empty after normalization",
+      "HISTORY_STATEMENT_TOO_LONG": "source statement exceeds 65536 UTF-16 code units",
+      "QUERY_TOO_LONG": "query exceeds 4096 UTF-16 code units"
+    },
+    "refusedCaseRankerCalls": 0,
+    "refusedCaseRemovedFromDenominator": false,
+    "materializationAbortCodes": [
+      "QUERY_AMBIGUOUS",
+      "QUERY_MISSING",
+      "QUERY_TYPE",
+      "QUERY_UNPAIRED_SURROGATE",
+      "QUERY_CONTROL",
+      "QUERY_EMPTY",
+      "HISTORY_STATEMENT_TOO_LONG"
+    ],
+    "caseRefusalCodesExactly": [
+      "QUERY_TOO_LONG"
+    ],
+    "lengthBehavior": "after successful normalization, 1..4096 is both target query and future history statement; 4097..65536 is stored as problemStatement/history evidence but target case query becomes {code:'QUERY_TOO_LONG'}; above 65536 aborts materialization as HISTORY_STATEMENT_TOO_LONG",
+    "structuralFailureBehavior": "a materializationAbortCodes condition aborts the whole materialization before any output publication because a trustworthy future history record cannot be formed",
+    "amendsSanitizedInputMinimumFromZeroToOne": true,
+    "refusalRepresentation": {
+      "caseStatus": "INPUT_REFUSAL",
+      "sanitizedInputSha256": "sha256 over canonical JSON {schemaVersion:'qarinah.context-efficiency-development-refusal-input.v3.001', opaqueCaseId, settingId, refusalCode}",
+      "entityDiagnostics": {
+        "matchedTotal": 0,
+        "unmatchedTotal": 0,
+        "matched": [],
+        "unmatched": [],
+        "matchedTruncated": 0,
+        "unmatchedTruncated": 0,
+        "contentDigest": "canonical digest of these six preceding fields"
+      },
+      "methodIdsExactly": [
+        "admitted-title-body-bm25-v3",
+        "admitted-title-body-bm25-one-hop-v3",
+        "qarinah-evidence-bundle-v3-no-graph",
+        "qarinah-evidence-bundle-v3-no-entity",
+        "qarinah-evidence-bundle-v3-no-provenance",
+        "qarinah-evidence-bundle-v3",
+        "qarinah-evidence-bundle-v3-no-entity-no-provenance"
+      ],
+      "perMethodTuple": "orderedEventIds [], orderedEventHashes [], pathDiagnostics [], rawCitationNumerator 0, rawCitationDenominator 0, failure {code: refusalCode, message: query.fixedMessages[refusalCode], timeout:false, rawCitationNumerator:0, rawCitationDenominator:0}",
+      "orderSeal": "expectedMethodCount 7, sealedMethodCount 7, tupleDigest over the seven canonical refusal tuples, sealedBeforeOracle true",
+      "postOrderGrades": "sealed oracle grades loaded only after the global refusal-inclusive order seal, so positive/direct denominators remain intact",
+      "caseMetrics": "the exact base-protocol method-failure metric observations, with null reasons INPUT_REFUSAL where the base value is null",
+      "metricHandling": "base protocol positive/no-positive failure rules; refusal remains in task method repository runtime safety and failure denominators",
+      "scorerReceivesSealedRefusal": true
+    }
+  },
+  "opaqueIdentity": {
+    "hash": "lowercase SHA-256 over UTF-8",
+    "separator": "one NUL byte",
+    "taskIdFormula": "'tsk_' + hex(sha256('qarinah-v3-task-id-v1' + NUL + revision + NUL + repository + NUL + sourceInstanceId))",
+    "opaqueCaseIdFormula": "opaqueTaskId of the target row; no separate case-identity derivation",
+    "constructedOpaqueCaseIdFormula": "'cfx_' + hex(sha256('qarinah-v3-constructed-case-v1' + NUL + fixtureGitBlob + NUL + sourceCaseId))",
+    "constructedEventIdFormula": "for required target/support events, same UUID construction as eventId using hex(sha256('qarinah-v3-constructed-event-v1' + NUL + constructedOpaqueCaseId + NUL + sourceEventId))",
+    "constructedNoiseEventIdFormula": "for shared noise events, same UUID construction as eventId using hex(sha256('qarinah-v3-constructed-noise-v1' + NUL + fixtureGitBlob + NUL + zeroBasedNoiseIndex))",
+    "constructedRelationRemap": "every source and target ID is replaced through the complete constructed event-ID map before input envelope hashes are rebuilt; missing target refuses materialization",
+    "resultCaseIdRule": "SWE result caseId equals target opaqueTaskId; constructed result caseId equals constructedOpaqueCaseId",
+    "eventId": {
+      "digestFormula": "hex(sha256('qarinah-v3-event-id-v1' + NUL + revision + NUL + repository + NUL + sourceInstanceId))",
+      "uuidConstruction": [
+        "take first 32 lowercase digest hex characters",
+        "save original digit at zero-based index 16",
+        "replace zero-based index 12 with '4'",
+        "replace zero-based index 16 with ['8','9','a','b'][parseInt(original digit,16) modulo 4]",
+        "format 8-4-4-4-12 and prefix 'evt_'"
+      ]
+    },
+    "provenanceSourceIdFormula": "'src_' + hex(sha256('qarinah-v3-provenance-v1' + NUL + revision + NUL + repository + NUL + sourceInstanceId))",
+    "workspaceIdFormula": "'ws_' + first 32 hex characters of sha256('qarinah-v3-workspace-v1' + NUL + repository)",
+    "sourceInstanceIdAllowedAfterMaterialization": false,
+    "rankerAllowedEventIdOperations": [
+      "copy",
+      "exact equality"
+    ],
+    "collisionRules": {
+      "duplicateSourceTuple": "MATERIALIZATION_COLLISION",
+      "duplicateOpaqueTaskId": "MATERIALIZATION_COLLISION",
+      "duplicateEventId": "MATERIALIZATION_COLLISION",
+      "duplicateProvenanceSourceId": "MATERIALIZATION_COLLISION",
+      "duplicateHashForDifferentCanonicalEvent": "MATERIALIZATION_COLLISION",
+      "crossPopulationOpaqueCaseOrEventCollision": "MATERIALIZATION_COLLISION",
+      "suffixOrRetryAllowed": false,
+      "rowDeletionAllowed": false,
+      "wholeMaterializationAborts": true
+    }
+  },
+  "eventMaterialization": {
+    "rowOrder": [
+      "repository by JavaScript default string order",
+      "canonical createdAt ascending",
+      "opaqueTaskId by JavaScript default string order"
+    ],
+    "productionContract": "sourceBindings.productionContracts.createEventEnvelope",
+    "eventInputFieldsAndValues": {
+      "eventId": "opaqueIdentity.eventId",
+      "timestamp": "canonical source created_at",
+      "kind": "artifact",
+      "actor": {
+        "type": "source",
+        "id": "swe-bench-lite"
+      },
+      "title": "first non-empty JavaScript-trimmed LF-delimited line of normalized prior problem statement; take at most 512 UTF-16 code units, reducing to 511 if position 511 is a high surrogate followed by a low surrogate",
+      "body": "normalized prior problem statement exactly; no patch-derived suffix",
+      "bodyMaximumUtf16CodeUnits": 65536,
+      "bodyOverflow": "EVENT_BODY_TOO_LONG and abort materialization",
+      "data": {},
+      "confidence": "verified",
+      "repository": {
+        "id": "source repository",
+        "branch": null,
+        "commit": null
+      },
+      "disclosure": {
+        "classification": "public",
+        "scopes": []
+      },
+      "relations": [],
+      "provenance": {
+        "adapter": "context-efficiency-development-v3-materializer",
+        "sourceId": "opaqueIdentity.provenanceSourceId"
+      },
+      "retention": {
+        "class": "durable",
+        "expiresAt": null
+      },
+      "authority": "absent",
+      "temporal": "absent",
+      "freshness": "absent",
+      "sessionId": "absent",
+      "turnId": "absent"
+    },
+    "workspaceId": "opaqueIdentity.workspaceIdFormula",
+    "previousHash": "previous event.hash in the same repository canonical row order, else null",
+    "eventHash": "the exact hash returned by bound production createEventEnvelope, including sha256: prefix",
+    "availabilityBoundary": {
+      "sourceCreatedAtProvesIssueTextAvailable": true,
+      "sourceCreatedAtProvesResolutionPatchAvailable": false,
+      "patchDerivedHistoricalTextAllowed": false,
+      "patchDerivedHistoricalRelationsAllowed": false,
+      "hintsTestPatchChangedFilesChangedSymbolsModuleScopesAllowed": false,
+      "futureResolutionAvailabilityTimestampCouldEnablePatchEvidence": "only through a new pre-outcome amendment binding a trustworthy immutable timestamp"
+    },
+    "canonicalEnvelopeValidationRequired": true,
+    "hashMismatchStatus": "MATERIALIZATION_HASH_FAILURE"
+  },
+  "chronology": {
+    "asOfSource": "target normalized created_at",
+    "sourceFieldSelection": "source row must have exactly one enumerable own string data property named created_at and no other own key whose ASCII-lowercase form with underscores removed equals createdat",
+    "acceptedTimestampGrammar": "^(?<year>[0-9]{4})-(?<month>[0-9]{2})-(?<day>[0-9]{2})T(?<hour>[0-9]{2}):(?<minute>[0-9]{2}):(?<second>[0-9]{2})(?:\\.(?<fraction>[0-9]{1,3}))?(?<zone>Z|[+-][0-9]{2}:[0-9]{2})$",
+    "timestampValidation": "year 0001..9999; month 01..12; day valid for Gregorian month/leap year; hour 00..23; minute and second 00..59; offset hour 00..23 and minute 00..59; explicit Z or numeric offset mandatory; fraction right-padded to exactly three digits",
+    "timestampNormalization": "after grammar and component validation, construct the UTC epoch by Gregorian civil components minus the signed numeric offset using integer arithmetic, require it is within JavaScript Date range, then new Date(epochMilliseconds).toISOString(); Date.parse is not the validator",
+    "timestampAmbiguousCondition": "missing explicit zone, a noncanonical createdAt alias, more than one normalized alias, or duplicate source rows mapping different created_at bytes to one source tuple",
+    "timestampFailureCodes": {
+      "ambiguous": "TIMESTAMP_AMBIGUOUS",
+      "missing": "TIMESTAMP_MISSING",
+      "nonString": "TIMESTAMP_TYPE",
+      "grammarOrCalendarInvalid": "TIMESTAMP_INVALID",
+      "outOfRange": "TIMESTAMP_RANGE"
+    },
+    "timestampErrorPrecedence": [
+      "TIMESTAMP_AMBIGUOUS",
+      "TIMESTAMP_MISSING",
+      "TIMESTAMP_TYPE",
+      "TIMESTAMP_INVALID",
+      "TIMESTAMP_RANGE"
+    ],
+    "timestampFailureBehavior": "abort the entire materialization before any output path is published; no row is silently removed or repaired",
+    "asOfFormat": "canonical YYYY-MM-DDTHH:mm:ss.sssZ",
+    "temporalBoundary": "strict-before",
+    "candidatePredicate": "candidate.timestamp < target.asOf by epoch milliseconds and canonical timestamp lexical comparison; both comparisons must agree",
+    "equalTimeIncluded": false,
+    "dateRoundingAllowed": false,
+    "equalTimeTieBreak": "opaqueTaskId JavaScript default string order stabilizes materialization bytes only and never grants eligibility",
+    "targetCount": 240,
+    "settings": {
+      "static": "same-repository warmup rows satisfying strict-before",
+      "online/prequential": "all same-repository rows satisfying strict-before"
+    },
+    "warmupRule": "within each repository canonical chronology, max(1, Math.round(repositoryRowCount * 0.2)) earliest rows are warmup; remaining rows are heldout",
+    "preTargetOnly": true,
+    "targetEqualFutureOtherRepositoryInCandidateSetAllowed": false,
+    "futureMayAffectDocumentStatisticsOrRelations": false,
+    "candidateSetMustBeIdenticalAcrossSixPrimaryMethods": true
+  },
+  "graphDerivation": {
+    "sweBenchLite": {
+      "relationsExactly": [],
+      "reason": "created_at proves issue text availability, not resolution-patch availability; no trustworthy resolution timestamp is bound",
+      "graphRankingContributionExpected": "none on this development population; graph metrics remain descriptive and no improvement claim is permitted"
+    },
+    "constructedSixCase": {
+      "source": "materialization.paths.constructedInput",
+      "retainedRelationTypesExactly": [
+        "references"
+      ],
+      "sourceAndTargetMustBothBeGoldFreeInputEvents": true,
+      "targetTimestampMustBeStrictlyEarlierThanSourceTimestamp": true,
+      "targetTimestampMayEqualSourceTimestamp": false,
+      "targetMustBeInSameCase": true,
+      "relationCannotReintroduceAdmissionOrCurrentStateExclusion": true,
+      "oracleMayCreateRemoveWeightReverseOrOrderEdge": false,
+      "relationCountAbove128": "CONSTRUCTED_INPUT_RELATION_LIMIT and materialization abort",
+      "sourceFixtureRoleScenarioRequiredIdsRemovedBeforeInputHash": true
+    },
+    "edgeInputsForbiddenEverywhere": [
+      "target task patch",
+      "target task test patch",
+      "target query entities",
+      "target oracle labels",
+      "future record",
+      "equal-time record",
+      "post-target fact",
+      "test patch",
+      "similarity score",
+      "method outcome"
+    ],
+    "newPatchDerivedGraphRequiresNewPreOutcomeAmendment": true
+  },
+  "admissionAndCurrentState": {
+    "indexConstruction": "bound production indexer may validate envelope/index shape only; all index term statistics are discarded",
+    "admissionCall": {
+      "function": "resolveContextAdmission",
+      "arguments": {
+        "asOf": "target asOf",
+        "temporalBoundary": "strict-before",
+        "repositoryIds": "array containing exactly target repositoryId",
+        "authorityScopes": []
+      }
+    },
+    "repositorySelectorHardening": {
+      "productionHelperNullBehaviorObserved": "a null repository is permitted by the bound helper even when repositoryIds is non-empty",
+      "v3Rule": "when repositoryIds is non-empty, intersect production admission.eligibleEventIds with events whose repository is non-null and whose repository.id exactly occurs in repositoryIds",
+      "sweGeneratedEventRepository": "required non-null and exactly equal to target repository",
+      "relationCannotReintroduceIntersectionExclusion": true
+    },
+    "authorityAndDisclosureSemantics": {
+      "sweGeneratedAuthorityField": "absent",
+      "sweGeneratedDisclosure": "public with empty scopes",
+      "restrictedDisclosureRule": "bound production permittedByDisclosure semantics; at least one event disclosure scope must exactly occur in authorityScopes",
+      "authorityObjectAsAdditionalAdmissionCriterion": false,
+      "reason": "the bound production admission helper does not treat authority assignment expiry or revocation as an admission filter; v3 does not silently invent a different authority-object policy",
+      "futureAuthorityPolicyChangeRequiresAmendment": true
+    },
+    "currentStateCall": {
+      "function": "resolveCurrentContextState",
+      "eventIds": "admission.eligibleEventIds",
+      "arguments": {
+        "asOf": "target asOf",
+        "query": "",
+        "supersessionPolicy": "prefer-current",
+        "policyEligibleEventIds": "admission.eligibleEventIds"
+      },
+      "queryMustBeLiteralEmptyString": true,
+      "realQueryPassedToCurrentState": false,
+      "substringOrExactIdExceptionAllowed": false
+    },
+    "sanitizedInputBuiltFrom": "currentState.eligibleEventIds only",
+    "realQueryAddedAfterCurrentState": true,
+    "statisticsRecomputedAfterCurrentStateFromTitleBodyOnly": true,
+    "eventDataReadForRanking": false,
+    "excludedRelationTargetRemovedBeforeSanitization": true
+  },
+  "entityDiagnosticSidecar": {
+    "owner": "parent evaluator",
+    "rankerReceivesSidecar": false,
+    "fileCreated": false,
+    "resultLocation": "cases[].entityDiagnostics",
+    "extraction": "baseProtocol.queryEntityExtraction repeated independently against admitted-current title/body corpus",
+    "matched": {
+      "predicate": "admittedDocumentFrequency > 0",
+      "order": "admitted-corpus IDF descending then entity by JavaScript default string order",
+      "maximumRetained": 64,
+      "itemFieldsExactly": [
+        "entity",
+        "admittedDocumentFrequency",
+        "idf",
+        "selectedRank"
+      ]
+    },
+    "unmatched": {
+      "predicate": "admittedDocumentFrequency = 0",
+      "order": "entity by JavaScript default string order",
+      "maximumRetained": 64,
+      "itemFieldsExactly": [
+        "entity"
+      ]
+    },
+    "objectFieldsExactly": [
+      "matchedTotal",
+      "unmatchedTotal",
+      "matched",
+      "unmatched",
+      "matchedTruncated",
+      "unmatchedTruncated",
+      "contentDigest"
+    ],
+    "entityMaximumUtf16CodeUnits": 256,
+    "duplicateAllowed": false,
+    "sameEntityInBothArraysAllowed": false,
+    "countFormula": "truncated = total - retained length",
+    "unknownFieldsAllowed": false,
+    "incorrectSidecarStatus": "PREFLIGHT_FAILURE with zero ranker calls for attempt"
+  },
+  "orderSeal": {
+    "scope": "all expected case-setting-method tuples globally before any scoring; a refused case is represented by a sealed refusal/failure tuple with zero method calls",
+    "caseSettingPopulation": {
+      "constructed": "6 opaque constructed cases with settingId constructed",
+      "swe": "240 opaque heldout cases each with settingId static and online/prequential",
+      "totalCaseSettingPairs": 486
+    },
+    "methodIdsExactly": [
+      "admitted-title-body-bm25-v3",
+      "admitted-title-body-bm25-one-hop-v3",
+      "qarinah-evidence-bundle-v3-no-graph",
+      "qarinah-evidence-bundle-v3-no-entity",
+      "qarinah-evidence-bundle-v3-no-provenance",
+      "qarinah-evidence-bundle-v3",
+      "qarinah-evidence-bundle-v3-no-entity-no-provenance"
+    ],
+    "methodCount": 7,
+    "expectedTupleCount": 3402,
+    "diagnosticMethodsExecutedInThisAttempt": false,
+    "tupleFieldsExactly": [
+      "opaqueCaseId",
+      "settingId",
+      "methodId",
+      "sanitizedInputSha256",
+      "orderedEventIds",
+      "orderedEventHashes",
+      "pathDiagnostics",
+      "rawCitationNumerator",
+      "rawCitationDenominator",
+      "failure"
+    ],
+    "tupleSerialization": "canonicalJson",
+    "tupleDigest": "canonicalJson.contentDigest over tuple",
+    "globalSealFieldsExactly": [
+      "schemaVersion",
+      "expectedTupleCount",
+      "sealedTupleCount",
+      "tuples",
+      "contentDigest"
+    ],
+    "globalTupleOrder": "opaqueCaseId, settingId, methodId by JavaScript default string order",
+    "completeBeforeOracle": true,
+    "scorerDynamicImportAfterSealOnly": true,
+    "oracleDynamicImportAfterSealOnly": true,
+    "rankerTerminatedBeforeOracle": true,
+    "postSealRankerCallAllowed": false,
+    "missingDuplicateChangedOrUnsealedTupleStatus": "ORDER_SEAL_FAILURE",
+    "oracleMissingIsNotGradeZero": true
+  },
+  "phaseReadAllowlists": {
+    "pathIdentity": "repository-relative POSIX path after realpath; case-sensitive exact equality; regular file only",
+    "commonDenials": [
+      "bench/final/**",
+      "bench/results/** except fixed terminal path in terminal phases",
+      "provider transcripts or receipts",
+      "credentials or environment-secret files",
+      "network except pinned materialize endpoints",
+      "symlink or reparse traversal",
+      "alternate data streams",
+      "directory enumeration",
+      "unlisted path",
+      "mutable latest reference"
+    ],
+    "everyListedPathBoundByAuthorization": true,
+    "everyPhaseSetHasCanonicalDigest": true,
+    "phaseSetDigestFormula": "canonicalJson.contentDigest of {phase, members}, where members are exact {path, mode, sha256, gitBlob} objects sorted by path then mode using JavaScript default string order",
+    "executionClosureDigestFormula": "canonicalJson.contentDigest of the complete transitive repository module array of exact {path, sha256, gitBlob} sorted by path",
+    "materialize": {
+      "readRepositoryPathsExactly": [
+        "docs/CONTEXT-EFFICIENCY-DEVELOPMENT-v3-PROTOCOL.md",
+        "bench/research/context-efficiency-development-v3-protocol.json",
+        "docs/CONTEXT-EFFICIENCY-DEVELOPMENT-v3-AMENDMENT-001.md",
+        "bench/research/context-efficiency-development-v3-amendment-001.json",
+        "bench/research/swe-bench-lite-development-v0.2.json",
+        "bench/research/swe-bench-lite.mjs",
+        "bench/fixtures/software-task-scenarios.mjs",
+        "scripts/prepare-research-benchmark-v0.2.mjs",
+        "src/canonical.js",
+        "src/contracts.js",
+        "src/interoperability/boundary.js",
+        "src/redact.js",
+        "scripts/materialize-context-efficiency-development-v3.mjs"
+      ],
+      "networkUrlsExactly": [
+        "https://datasets-server.huggingface.co/rows?dataset=princeton-nlp%2FSWE-bench_Lite&config=default&split=test&offset=0&length=100&revision=6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2",
+        "https://datasets-server.huggingface.co/rows?dataset=princeton-nlp%2FSWE-bench_Lite&config=default&split=test&offset=100&length=100&revision=6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2",
+        "https://datasets-server.huggingface.co/rows?dataset=princeton-nlp%2FSWE-bench_Lite&config=default&split=test&offset=200&length=100&revision=6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2"
+      ],
+      "networkRequestPolicy": "GET only, redirect error, no credentials, user-agent qarinah-context-efficiency-development-v3-materializer/1, 60000 ms timeout, no retry after any complete HTTP response, maximum 16 MiB response per URL",
+      "writeRepositoryPathsExactly": [
+        "bench/research/context-efficiency-development-v3-gold-free-rows.json",
+        "bench/research/context-efficiency-development-v3-gold-free-corpus.json",
+        "bench/research/context-efficiency-development-v3-oracle.json",
+        "bench/research/context-efficiency-development-v3-constructed-input.json",
+        "bench/research/context-efficiency-development-v3-constructed-oracle.json",
+        "bench/research/context-efficiency-development-v3-materialization.json"
+      ],
+      "rankerScorerOracleCallsAllowed": 0
+    },
+    "bindingsOnly": {
+      "readRepositoryPathsExactly": [
+        "package.json",
+        "docs/CONTEXT-EFFICIENCY-DEVELOPMENT-v3-PROTOCOL.md",
+        "bench/research/context-efficiency-development-v3-protocol.json",
+        "docs/CONTEXT-EFFICIENCY-DEVELOPMENT-v3-AMENDMENT-001.md",
+        "bench/research/context-efficiency-development-v3-amendment-001.json",
+        "bench/research/context-efficiency-development-v3-materialization.json",
+        "bench/research/context-efficiency-development-v3-gold-free-rows.json",
+        "bench/research/context-efficiency-development-v3-gold-free-corpus.json",
+        "bench/research/context-efficiency-development-v3-oracle.json",
+        "bench/research/context-efficiency-development-v3-constructed-input.json",
+        "bench/research/context-efficiency-development-v3-constructed-oracle.json",
+        "bench/research/context-efficiency-development-v3-authorization-review.json",
+        "bench/research/context-efficiency-development-v3-authorization.json",
+        "bench/fixtures/software-task-scenarios.mjs",
+        "src/canonical.js",
+        "src/capture-policy.js",
+        "src/consent.js",
+        "src/contracts.js",
+        "src/errors.js",
+        "src/indexer.js",
+        "src/interoperability/boundary.js",
+        "src/markdown.js",
+        "src/redact.js",
+        "src/retrieval.js",
+        "src/sqlite-read-model.js",
+        "src/store.js",
+        "src/workspace.js",
+        "scripts/materialize-context-efficiency-development-v3.mjs",
+        "scripts/context-efficiency-development-v3-corpus.mjs",
+        "scripts/context-efficiency-v2-renderer.mjs",
+        "bench/research/methods/evidence-bundle-v3.mjs",
+        "scripts/context-efficiency-development-v3-input.mjs",
+        "scripts/context-efficiency-development-v3-lib.mjs",
+        "scripts/context-efficiency-development-v3-scorer.mjs",
+        "scripts/context-efficiency-development-v3-worker.mjs",
+        "scripts/evaluate-context-efficiency-development-v3.mjs"
+      ],
+      "opaqueHashOnlyPaths": [
+        "bench/fixtures/software-task-scenarios.mjs",
+        "bench/research/context-efficiency-development-v3-gold-free-rows.json",
+        "bench/research/context-efficiency-development-v3-gold-free-corpus.json",
+        "bench/research/context-efficiency-development-v3-oracle.json",
+        "bench/research/context-efficiency-development-v3-constructed-input.json",
+        "bench/research/context-efficiency-development-v3-constructed-oracle.json"
+      ],
+      "rankerScorerOracleCallsAllowed": 0,
+      "writesAllowed": 0
+    },
+    "rankInput": {
+      "readRepositoryPathsExactly": [
+        "bench/research/context-efficiency-development-v3-gold-free-rows.json",
+        "bench/research/context-efficiency-development-v3-gold-free-corpus.json",
+        "bench/research/context-efficiency-development-v3-constructed-input.json",
+        "src/canonical.js",
+        "src/capture-policy.js",
+        "src/consent.js",
+        "src/contracts.js",
+        "src/errors.js",
+        "src/indexer.js",
+        "src/interoperability/boundary.js",
+        "src/markdown.js",
+        "src/redact.js",
+        "src/retrieval.js",
+        "src/sqlite-read-model.js",
+        "src/store.js",
+        "src/workspace.js",
+        "scripts/context-efficiency-development-v3-corpus.mjs",
+        "scripts/context-efficiency-v2-renderer.mjs",
+        "bench/research/methods/evidence-bundle-v3.mjs",
+        "scripts/context-efficiency-development-v3-input.mjs",
+        "scripts/context-efficiency-development-v3-lib.mjs",
+        "scripts/context-efficiency-development-v3-worker.mjs",
+        "scripts/evaluate-context-efficiency-development-v3.mjs"
+      ],
+      "oraclePathReadable": false,
+      "networkAllowed": false,
+      "writesAllowed": 0
+    },
+    "orderSeal": {
+      "readRepositoryPathsExactly": [
+        "scripts/context-efficiency-development-v3-lib.mjs",
+        "scripts/evaluate-context-efficiency-development-v3.mjs"
+      ],
+      "newFileReadsAllowed": false,
+      "writesAllowed": 0
+    },
+    "postSealScore": {
+      "readRepositoryPathsExactly": [
+        "bench/research/context-efficiency-development-v3-oracle.json",
+        "bench/research/context-efficiency-development-v3-constructed-oracle.json",
+        "scripts/context-efficiency-development-v3-scorer.mjs",
+        "scripts/context-efficiency-development-v3-lib.mjs",
+        "scripts/evaluate-context-efficiency-development-v3.mjs"
+      ],
+      "requiresVerifiedGlobalSeal": true,
+      "rankerCallsAllowed": 0,
+      "networkAllowed": false,
+      "writesAllowed": 0
+    },
+    "terminalWrite": {
+      "readRepositoryPathsExactly": [
+        "scripts/context-efficiency-development-v3-lib.mjs",
+        "scripts/evaluate-context-efficiency-development-v3.mjs"
+      ],
+      "writeRepositoryPathsExactly": [
+        "bench/results/context-efficiency-development-v3.json",
+        "bench/results/context-efficiency-development-v3-attempt-001-failure.json",
+        "bench/results/.context-efficiency-development-v3-attempt-001-result.tmp",
+        "bench/results/.context-efficiency-development-v3-attempt-001-failure.tmp"
+      ],
+      "retrievalScorerOracleCallsAllowed": 0,
+      "networkAllowed": false
+    },
+    "verifyResult": {
+      "readRepositoryPathsExactly": [
+        "docs/CONTEXT-EFFICIENCY-DEVELOPMENT-v3-PROTOCOL.md",
+        "bench/research/context-efficiency-development-v3-protocol.json",
+        "docs/CONTEXT-EFFICIENCY-DEVELOPMENT-v3-AMENDMENT-001.md",
+        "bench/research/context-efficiency-development-v3-amendment-001.json",
+        "bench/research/context-efficiency-development-v3-materialization.json",
+        "bench/research/context-efficiency-development-v3-authorization-review.json",
+        "bench/research/context-efficiency-development-v3-authorization.json",
+        "bench/results/context-efficiency-development-v3.json",
+        "scripts/context-efficiency-development-v3-lib.mjs",
+        "scripts/evaluate-context-efficiency-development-v3.mjs"
+      ],
+      "rankerScorerOracleCallsAllowed": 0,
+      "writesAllowed": 0
+    },
+    "terminalVerify": {
+      "readRepositoryPathsExactly": [
+        "docs/CONTEXT-EFFICIENCY-DEVELOPMENT-v3-PROTOCOL.md",
+        "bench/research/context-efficiency-development-v3-protocol.json",
+        "docs/CONTEXT-EFFICIENCY-DEVELOPMENT-v3-AMENDMENT-001.md",
+        "bench/research/context-efficiency-development-v3-amendment-001.json",
+        "bench/research/context-efficiency-development-v3-materialization.json",
+        "bench/research/context-efficiency-development-v3-authorization-review.json",
+        "bench/research/context-efficiency-development-v3-authorization.json",
+        "bench/results/context-efficiency-development-v3.json",
+        "bench/results/context-efficiency-development-v3-attempt-001-failure.json",
+        "scripts/verify-context-efficiency-development-v3-terminal.mjs"
+      ],
+      "terminalArtifactRule": "success XOR failure",
+      "rankerScorerOracleCallsAllowed": 0,
+      "writesAllowed": 0
+    }
+  },
+  "antiLeakage": {
+    "preflightMustCompleteBeforeMethodImport": true,
+    "throwingSpiesInstalledFor": [
+      "oracle file parse",
+      "oracle grade lookup",
+      "required-event-ID lookup",
+      "scorer dynamic import",
+      "scorer call",
+      "final manifest read",
+      "provider or credential read",
+      "result or failure publication"
+    ],
+    "requiredCountsBeforeGlobalSeal": {
+      "oracleFileParse": 0,
+      "oracleGradeLookup": 0,
+      "requiredIdLookup": 0,
+      "scorerImport": 0,
+      "scorerCall": 0,
+      "finalManifestRead": 0,
+      "providerRead": 0,
+      "publicationCall": 0
+    },
+    "methodImportGraph": {
+      "importsAllowed": 0,
+      "dynamicImportAllowed": false,
+      "requireAllowed": false,
+      "processGetBuiltinModuleAllowed": false,
+      "evalOrFunctionConstructorAllowed": false,
+      "filesystemNetworkEnvironmentCredentialProtocolOracleScorerPublisherAccessAllowed": false,
+      "workerReceivesOnly": [
+        "deep-frozen sanitized ranker input",
+        "deep-frozen exact algorithm config"
+      ]
+    },
+    "failedPreflight": {
+      "methodCalls": 0,
+      "scorerImports": 0,
+      "scorerCalls": 0,
+      "oracleReads": 0,
+      "writes": 0
+    },
+    "mutationsRequired": [
+      "each prohibited query-only raw key",
+      "target patch",
+      "target test patch",
+      "target hint",
+      "source instance ID",
+      "oracle grade",
+      "required event ID",
+      "event data",
+      "future record",
+      "equal-time record",
+      "expired record",
+      "restricted record",
+      "wrong-repository record",
+      "superseded record",
+      "relation target",
+      "raw row order",
+      "object key order",
+      "opaque ID collision",
+      "event hash mismatch",
+      "query missing/type/control/surrogate/empty/length",
+      "entity sidecar count/order/DF/IDF",
+      "ordering seal byte",
+      "early oracle read",
+      "early scorer import",
+      "unlisted file read",
+      "network attempt"
+    ],
+    "mutationPassRule": "reject before method call, or prove byte-identical sanitized input and full ordering when the mutated field is explicitly non-ranking",
+    "edgeReversalExpectedAbsenceAllowed": false,
+    "edgeReversalRule": "because both graph directions are traversed, assert the exact protocol-derived diagnostic and ordering change rather than assume the neighbor disappears",
+    "outcomeSelectedMutationAllowed": false
+  },
+  "resultSchemaAmendment": {
+    "baseSchemaVersion": "qarinah.context-efficiency-development-result.v3",
+    "amendedSchemaVersion": "qarinah.context-efficiency-development-result.v3.001",
+    "bindingsFieldsExactly": [
+      "protocol",
+      "amendment",
+      "materialization",
+      "evaluator",
+      "method",
+      "authorizationReview",
+      "authorization",
+      "runtime",
+      "inputBuilder",
+      "algorithmConfig",
+      "fixture",
+      "goldFreeRows",
+      "goldFreeCorpus",
+      "oracle",
+      "constructedInput",
+      "constructedOracle",
+      "generator",
+      "corpusLoader",
+      "scorer",
+      "renderer",
+      "estimator",
+      "phaseReadAllowlists",
+      "executionClosure"
+    ],
+    "caseItemFieldsExactly": [
+      "caseId",
+      "settingId",
+      "sanitizedInputSha256",
+      "entityDiagnostics",
+      "orderSeal",
+      "methods",
+      "postOrderGrades",
+      "metrics",
+      "status"
+    ],
+    "caseSettingRules": {
+      "constructed": "settingId constructed",
+      "swe": "each caseId appears exactly twice, once static and once online/prequential",
+      "resultOrder": "caseId then settingId by JavaScript default string order",
+      "duplicateCaseIdSettingPairAllowed": false
+    },
+    "entityDiagnosticsFieldsExactly": [
+      "matchedTotal",
+      "unmatchedTotal",
+      "matched",
+      "unmatched",
+      "matchedTruncated",
+      "unmatchedTruncated",
+      "contentDigest"
+    ],
+    "matchedEntityItemFieldsExactly": [
+      "entity",
+      "admittedDocumentFrequency",
+      "idf",
+      "selectedRank"
+    ],
+    "unmatchedEntityItemFieldsExactly": [
+      "entity"
+    ],
+    "orderSealFieldsExactly": [
+      "expectedMethodCount",
+      "sealedMethodCount",
+      "tupleDigest",
+      "sealedBeforeOracle"
+    ],
+    "preflightFieldsExactly": [
+      "passed",
+      "rankerCallsBeforeCompletion",
+      "scorerCallsBeforeOrderSeal",
+      "oracleCallsBeforeOrderSeal",
+      "oracleReadCountBeforeGlobalSeal",
+      "scorerImportCountBeforeGlobalSeal",
+      "scorerCallCountBeforeGlobalSeal",
+      "publicationCallCountBeforeGlobalSeal",
+      "phaseReadSetDigests",
+      "pathObservations",
+      "bindingObservations"
+    ],
+    "phaseReadSetDigestItemFieldsExactly": [
+      "phase",
+      "sha256"
+    ],
+    "arrayItemSchemaMapAdditions": {
+      "cases[].entityDiagnostics.matched": "matchedEntityItem",
+      "cases[].entityDiagnostics.unmatched": "unmatchedEntityItem",
+      "preflight.phaseReadSetDigests": "phaseReadSetDigestItem"
+    },
+    "objectSchemaMapAdditions": {
+      "cases[].entityDiagnostics": "entityDiagnostics",
+      "cases[].orderSeal": "orderSeal"
+    },
+    "unknownFieldsRejectedRecursively": true,
+    "metricClarifications": {
+      "recallAtK": "unique known event IDs occurring in first k raw output positions intersect positive set divided by positive-set size; duplicate and unknown occurrences consume positions; null when positive set empty",
+      "directRecallAtK": "unique known event IDs occurring in first k raw output positions intersect direct set divided by direct-set size; duplicate and unknown occurrences consume positions; null when direct set empty",
+      "hitAtK": "1 iff a unique known ID in first k raw positions intersects positive set, else 0; null when positive set empty",
+      "failure": "uses base protocol explicit failure values and never masquerades as a successful empty ordering",
+      "exposure": "at full, rank, and packed-budget scopes count raw occurrences whose exact ID/hash pair is in post-order forbidden/future set; denominator raw item count; empty count 0; empty rate null",
+      "citation": "raw returned items at each scope",
+      "supersessionAndRedundancy": "validated ordering only; null on method failure"
+    }
+  },
+  "authorizationSchemaAmendment": {
+    "reviewSchemaVersion": "qarinah.context-efficiency-development-authorization-review.v3.001",
+    "authorizationSchemaVersion": "qarinah.context-efficiency-development-authorization.v3.001",
+    "reviewTopLevelFieldsExactly": [
+      "schemaVersion",
+      "authorizationCoreDigest",
+      "reviewer",
+      "reviewedAt",
+      "approved",
+      "scope",
+      "contentDigest"
+    ],
+    "reviewScopeRequiredValue": "every execution-affecting authorization-core field, amendment override, materialization binding, phase read set, and execution-closure blob reviewed",
+    "authorizationTopLevelFieldsExactly": [
+      "schemaVersion",
+      "attemptId",
+      "executionAuthorized",
+      "protocol",
+      "amendment",
+      "materialization",
+      "evaluator",
+      "method",
+      "inputBuilder",
+      "algorithmConfig",
+      "inputs",
+      "runtime",
+      "phaseReadSets",
+      "executionClosure",
+      "command",
+      "destinations",
+      "review",
+      "createdAt",
+      "contentDigest"
+    ],
+    "taggedDocumentBindingFieldsExactly": [
+      "tag",
+      "commit",
+      "path",
+      "sha256",
+      "gitBlob"
+    ],
+    "materializationBindingFieldsExactly": [
+      "tag",
+      "commit",
+      "receiptPath",
+      "receiptSha256",
+      "receiptGitBlob",
+      "goldFreeRowsSha256",
+      "goldFreeRowsGitBlob",
+      "goldFreeCorpusSha256",
+      "goldFreeCorpusGitBlob",
+      "oracleSha256",
+      "oracleGitBlob",
+      "constructedInputSha256",
+      "constructedInputGitBlob",
+      "constructedOracleSha256",
+      "constructedOracleGitBlob",
+      "generatorSha256",
+      "generatorGitBlob",
+      "loaderSha256",
+      "loaderGitBlob"
+    ],
+    "methodBindingFieldsExactly": [
+      "path",
+      "sha256",
+      "gitBlob",
+      "export"
+    ],
+    "inputBuilderBindingFieldsExactly": [
+      "path",
+      "sha256",
+      "gitBlob"
+    ],
+    "algorithmConfigFieldsExactly": [
+      "schemaVersion",
+      "canonicalBytesSha256"
+    ],
+    "inputsFieldsExactly": [
+      "fixtureSha256",
+      "goldFreeRowsSha256",
+      "goldFreeCorpusSha256",
+      "oracleSha256",
+      "constructedInputSha256",
+      "constructedOracleSha256",
+      "rendererSha256",
+      "scorerSha256",
+      "estimatorId",
+      "estimatorVersion"
+    ],
+    "phaseReadSetItemFieldsExactly": [
+      "phase",
+      "members",
+      "contentDigest"
+    ],
+    "phaseReadSetMemberFieldsExactly": [
+      "path",
+      "mode",
+      "sha256",
+      "gitBlob"
+    ],
+    "executionClosureItemFieldsExactly": [
+      "path",
+      "sha256",
+      "gitBlob"
+    ],
+    "runtimeFieldsExactly": [
+      "nodePath",
+      "nodeBinarySha256",
+      "nodeVersion",
+      "v8Version",
+      "abi",
+      "platform",
+      "arch"
+    ],
+    "destinationsFieldsExactly": [
+      "successPath",
+      "failurePath",
+      "resultTemporaryPath",
+      "failureTemporaryPath",
+      "successAbsent",
+      "failureAbsent",
+      "resultTemporaryAbsent",
+      "failureTemporaryAbsent"
+    ],
+    "reviewBindingFieldsExactly": [
+      "artifactPath",
+      "artifactSha256",
+      "artifactGitBlob",
+      "artifactCommit",
+      "artifactTag",
+      "reviewedAuthorizationCoreDigest",
+      "reviewedAt",
+      "reviewer"
+    ],
+    "authorizationCoreDefinition": "final authorization object with exactly review and contentDigest omitted",
+    "authorizationCoreIncludesCreatedAt": true,
+    "createdAtRule": "canonical YYYY-MM-DDTHH:mm:ss.sssZ",
+    "contentDigestRule": "canonicalJson.contentDigest",
+    "arrayItemSchemaMap": {
+      "phaseReadSets": "phaseReadSetItem",
+      "phaseReadSets[].members": "phaseReadSetMember",
+      "executionClosure": "executionClosureItem"
+    },
+    "unknownFieldsRejectedRecursively": true,
+    "reviewArtifactMustPreexistAuthorization": true,
+    "reviewedCoreByteEqualRequired": true,
+    "missingOrPlaceholderBindingBlocksAuthorization": true
+  },
+  "lifecycleReplacement": {
+    "attemptId": "attempt-001",
+    "linearHistoryRequired": true,
+    "stages": [
+      {
+        "stage": 1,
+        "id": "base-protocol",
+        "commit": "be872f39f97c5528b845830f5ce815f77f12df3e",
+        "tag": "research-context-efficiency-development-v3-protocol",
+        "alreadyComplete": true
+      },
+      {
+        "stage": 2,
+        "id": "amendment",
+        "directParent": "be872f39f97c5528b845830f5ce815f77f12df3e",
+        "allowedDiffStatusExactly": "A two amendment paths and no other status",
+        "tag": "research-context-efficiency-development-v3-amendment-001",
+        "annotatedTagRequired": true
+      },
+      {
+        "stage": 3,
+        "id": "materialization",
+        "directParent": "amendment commit",
+        "allowedAddedPathsExactly": [
+          "scripts/materialize-context-efficiency-development-v3.mjs",
+          "scripts/context-efficiency-development-v3-corpus.mjs",
+          "bench/research/context-efficiency-development-v3-gold-free-rows.json",
+          "bench/research/context-efficiency-development-v3-gold-free-corpus.json",
+          "bench/research/context-efficiency-development-v3-oracle.json",
+          "bench/research/context-efficiency-development-v3-constructed-input.json",
+          "bench/research/context-efficiency-development-v3-constructed-oracle.json",
+          "bench/research/context-efficiency-development-v3-materialization.json"
+        ],
+        "tag": "research-context-efficiency-development-v3-materialization",
+        "annotatedTagRequired": true,
+        "independentReviewNoP1P2Required": true,
+        "rankerEvaluatorOutcomeAllowed": false
+      },
+      {
+        "stage": 4,
+        "id": "evaluator",
+        "directParent": "materialization commit",
+        "allowedChangedOrAddedPathsExactly": [
+          "package.json",
+          "bench/research/methods/evidence-bundle-v3.mjs",
+          "scripts/context-efficiency-development-v3-input.mjs",
+          "scripts/context-efficiency-development-v3-lib.mjs",
+          "scripts/context-efficiency-development-v3-scorer.mjs",
+          "scripts/context-efficiency-development-v3-worker.mjs",
+          "scripts/evaluate-context-efficiency-development-v3.mjs",
+          "test/context-efficiency-development-v3-method.test.js",
+          "test/context-efficiency-development-v3-input.test.js",
+          "test/context-efficiency-development-v3-evaluator.test.js",
+          "test/context-efficiency-development-v3-lifecycle.test.js"
+        ],
+        "tag": "research-context-efficiency-development-v3-evaluator",
+        "annotatedTagRequired": true,
+        "independentReviewNoP1P2Required": true,
+        "executeAndVerifyMustBeFullyImplementedButAuthorizationGated": true,
+        "taggedEvaluatorMayChangeLater": false
+      },
+      {
+        "stage": 5,
+        "id": "authorization-review",
+        "directParent": "evaluator commit",
+        "allowedAddedPathsExactly": [
+          "bench/research/context-efficiency-development-v3-authorization-review.json"
+        ],
+        "tag": "research-context-efficiency-development-v3-authorization-review",
+        "annotatedTagRequired": true
+      },
+      {
+        "stage": 6,
+        "id": "authorization",
+        "directParent": "authorization-review commit",
+        "allowedAddedPathsExactly": [
+          "bench/research/context-efficiency-development-v3-authorization.json"
+        ],
+        "tag": "research-context-efficiency-development-v3-authorization",
+        "annotatedTagRequired": true,
+        "reviewedCoreByteEqualRequired": true
+      },
+      {
+        "stage": 7,
+        "id": "terminal",
+        "directParent": "authorization commit",
+        "allowedAddedPath": "success XOR failure only",
+        "successPath": "bench/results/context-efficiency-development-v3.json",
+        "failurePath": "bench/results/context-efficiency-development-v3-attempt-001-failure.json",
+        "successTag": "research-context-efficiency-development-v3-result-attempt-001",
+        "failureTag": "research-context-efficiency-development-v3-failure-attempt-001",
+        "annotatedMatchingTagRequired": true,
+        "postResultFailureAllowed": false
+      },
+      {
+        "stage": 8,
+        "id": "independent-verifier",
+        "directParent": "terminal commit",
+        "allowedAddedPathsExactly": [
+          "scripts/verify-context-efficiency-development-v3-terminal.mjs",
+          "test/context-efficiency-development-v3-terminal-verifier.test.js"
+        ],
+        "tag": "research-context-efficiency-development-v3-verifier",
+        "annotatedTagRequired": true
+      }
+    ],
+    "authorizationReviewExtensions": {
+      "authorizationCoreMustBind": [
+        "base protocol tag commit paths SHA-256 and Git blobs",
+        "amendment tag commit paths SHA-256 and Git blobs",
+        "materialization tag commit receipt outputs generator loader hashes and Git blobs",
+        "evaluator tag commit and complete execution closure hashes and Git blobs",
+        "algorithm config hash",
+        "phase read allowlist canonical digests",
+        "runtime binary and versions",
+        "exact command and attempt",
+        "four fixed destinations and absence observations",
+        "review artifact identity hash commit tag reviewer and timestamp"
+      ],
+      "authorizationCoreDefinition": "final authorization object with only review and contentDigest omitted",
+      "reviewMustPreexistAuthorization": true,
+      "reviewedCoreDigestByteEqual": true,
+      "canonicalCreatedAtRequired": true,
+      "unknownFieldsRejectedRecursively": true
+    },
+    "terminalCommitChecks": [
+      "direct parent is exact authorization commit",
+      "exactly one terminal path introduced and no other change",
+      "matching annotated tag resolves to terminal commit",
+      "opposite artifact and tag absent at terminal commit verifier HEAD and worktree",
+      "tagged blob equals terminal-commit blob verifier-HEAD blob and worktree bytes/hash",
+      "terminal artifact never mutated after terminal commit",
+      "no post-result failure receipt",
+      "canonical digest and recursively exact schema",
+      "raw metric statistics safety mutation and decision reconstruction",
+      "no fabricated winner claim favorable subset or omitted denominator"
+    ],
+    "independentVerifier": {
+      "genericSuccessOrFailure": true,
+      "importsEvaluatorMethodScorerOracleCorpusLoaderOrMaterializer": false,
+      "rankerScorerOracleNetworkCalls": 0,
+      "writes": 0,
+      "repairAllowed": false,
+      "mustBeIntroducedAfterTerminalCommitAndTag": true
+    },
+    "exactCommands": {
+      "bindingsOnly": "node scripts/evaluate-context-efficiency-development-v3.mjs --bindings-only",
+      "authorizedExecute": "node scripts/evaluate-context-efficiency-development-v3.mjs --execute --write --attempt attempt-001",
+      "verifyResult": "node scripts/evaluate-context-efficiency-development-v3.mjs --verify-result",
+      "terminalVerify": "node scripts/verify-context-efficiency-development-v3-terminal.mjs"
+    },
+    "authorizedAttemptsNow": 0,
+    "futureAuthorizationMayPermitExactlyOne": true
+  },
+  "claimBoundary": {
+    "developmentOnly": true,
+    "developmentWinnerClaimAllowed": false,
+    "lowestContextClaimAllowed": false,
+    "bestOrIndustryClaimAllowed": false,
+    "providerTokenCostTaskSuccessCodeQualityClaimAllowed": false,
+    "productionReleasePublicationDoiMarketingClaimAllowed": false,
+    "untouchedConfirmationAuthorized": false,
+    "finalManifestReadAllowed": false,
+    "providerExperimentAllowed": false,
+    "allowedWording": "This pre-execution amendment freezes gold-free materialization, strict chronology, oracle isolation, entity diagnostics, anti-leakage, and lifecycle requirements for an inspected development evaluation; it contains no v3 outcome."
+  }
+}
