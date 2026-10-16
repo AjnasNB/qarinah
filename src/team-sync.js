@@ -11,6 +11,7 @@ import {
 import { canonicalStringify, deepFreezeJson, sha256 } from "./canonical.js";
 import { readEvents, verifyStore } from "./store.js";
 import { loadWorkspace } from "./workspace.js";
+import { validateStoredEvent } from "./contracts.js";
 
 const ROLES = new Set(["owner", "maintainer", "reader"]);
 
@@ -109,6 +110,11 @@ export function decryptEncryptedSyncBundle(bundle, options) {
   if (bundle?.schemaVersion !== "qarinah.encrypted-sync-bundle.v1" || bundle.algorithm !== "AES-256-GCM") {
     throw new TypeError("Unsupported encrypted sync bundle.");
   }
+  if (typeof bundle.ciphertext !== "string" || bundle.ciphertext.length > 96 * 1024 * 1024
+    || typeof bundle.nonce !== "string" || Buffer.from(bundle.nonce, "base64").length !== 12
+    || typeof bundle.authenticationTag !== "string" || Buffer.from(bundle.authenticationTag, "base64").length !== 16) {
+    throw new TypeError("Encrypted sync bundle exceeds its cryptographic boundary.");
+  }
   const manifest = createTeamManifest(options.manifest);
   if (manifest.manifestHash !== bundle.teamManifestHash || manifest.workspaceId !== bundle.workspaceId) {
     throw new TypeError("Encrypted sync bundle authority does not match the team manifest.");
@@ -121,7 +127,21 @@ export function decryptEncryptedSyncBundle(bundle, options) {
     decipher.update(Buffer.from(bundle.ciphertext, "base64")),
     decipher.final()
   ]);
-  return deepFreezeJson(JSON.parse(payload.toString("utf8")));
+  const knowledge = JSON.parse(payload.toString("utf8"));
+  if (!knowledge || Object.keys(knowledge).sort().join(",") !== "events,schemaVersion,teamManifest,workspaceId"
+    || knowledge.schemaVersion !== "qarinah.sync-payload.v1" || knowledge.workspaceId !== manifest.workspaceId
+    || canonicalStringify(knowledge.teamManifest) !== canonicalStringify(manifest)
+    || !Array.isArray(knowledge.events) || knowledge.events.length > 100000) throw new TypeError("Decrypted knowledge does not match its trusted manifest.");
+  let previousHash = null;
+  const ids = new Set();
+  const events = knowledge.events.map((event) => {
+    const verified = validateStoredEvent(event, { workspaceId: manifest.workspaceId, expectedPreviousHash: previousHash, maximumEventBytes: 1024 * 1024 });
+    if (ids.has(verified.eventId)) throw new TypeError("Decrypted knowledge contains duplicate event identities.");
+    ids.add(verified.eventId); previousHash = verified.hash;
+    return verified;
+  });
+  if (options.expectedHeadHash !== undefined && options.expectedHeadHash !== previousHash) throw new TypeError("Decrypted knowledge does not match the pinned ledger head.");
+  return deepFreezeJson({ ...knowledge, events });
 }
 
 export async function createSignedCheckpoint(options) {

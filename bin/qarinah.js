@@ -3,6 +3,8 @@ import process from "node:process";
 import path from "node:path";
 import {
   QarinahError,
+  evaluateMatchedTasks,
+  inspectRuntimeHealth,
   appendEvent,
   approveWorkspaceTrust,
   backupAgentArchives,
@@ -40,6 +42,8 @@ import {
   measureMemoryFootprint,
   queryLinkedProjectMemory,
   readEvents,
+  readProviderUsage,
+  recordProviderUsage,
   rebuildDerivedState,
   renderProjectOverviewMarkdown,
   renderProofContextMarkdown,
@@ -314,6 +318,10 @@ Usage:
   qarinah uninstall [path] --host codex|claude|cursor|kimi|antigravity|freebuff --scope project
   qarinah record --kind <kind> --title <title> [--body <text>] [--data-json <json>] [--relation type:target]
   qarinah record --stdin-json
+  qarinah usage
+  qarinah usage record --stdin-json
+  qarinah compare --stdin-json
+  qarinah health [--online]
   qarinah hook codex|claude|cursor|antigravity
   qarinah mcp [--allow-query --workspace-id ws_<id> --policy-hash sha256:<digest>] [--max-chars n] [--max-items n]
   qarinah build | rebuild
@@ -430,8 +438,8 @@ async function run(argv) {
     const parsed = strictValueOptions(rest, "setup-user", ["--capture", "--hosts", "--max-chars"]);
     if (parsed.positionals.length) throw new TypeError("setup-user does not accept a positional path.");
     const result = await setupUser({
-      capture: parsed.values.get("--capture") ?? "metadata",
-      fullChat: args.includes("--full-chat"),
+      capture: parsed.values.get("--capture"),
+      fullChat: args.includes("--full-chat") ? true : undefined,
       targets: parsed.values.has("--hosts") ? parsed.values.get("--hosts").split(",") : undefined,
       contextMaxChars: parsed.values.has("--max-chars") ? Number(parsed.values.get("--max-chars")) : undefined
     });
@@ -594,6 +602,31 @@ async function run(argv) {
   }
   if (command === "untrust") {
     process.stdout.write(`${JSON.stringify(await revokeWorkspaceTrust(process.cwd()), null, 2)}\n`);
+    return;
+  }
+  if (command === "health") {
+    if (args.some(arg => arg !== "--online") || args.length > 1) throw new TypeError("Usage: qarinah health [--online]");
+    process.stdout.write(`${JSON.stringify(await inspectRuntimeHealth({ online: args.includes("--online") }), null, 2)}\n`);
+    return;
+  }
+  if (command === "compare") {
+    const input = await readStdinJsonRequest(args, "compare", 8_000_000, new Set(["schemaVersion", "baselineMethod", "pairs"]));
+    if (input === null) throw new TypeError("compare requires --stdin-json.");
+    process.stdout.write(`${JSON.stringify(evaluateMatchedTasks(input), null, 2)}\n`);
+    return;
+  }
+  if (command === "usage") {
+    if (args.length === 0) {
+      process.stdout.write(`${JSON.stringify(await readProviderUsage(), null, 2)}\n`);
+      return;
+    }
+    if (args[0] !== "record") throw new TypeError("Usage: qarinah usage [record --stdin-json]");
+    const request = await readStdinJsonRequest(args.slice(1), "usage record", 4096, new Set([
+      "schemaVersion", "provider", "model", "callId", "attempt", "sessionId", "purpose", "outcome",
+      "inputTokens", "outputTokens", "cachedInputTokens", "reasoningTokens"
+    ]));
+    if (request === null) throw new TypeError("usage record requires --stdin-json.");
+    process.stdout.write(`${JSON.stringify(await recordProviderUsage(request), null, 2)}\n`);
     return;
   }
   if (command === "record") {

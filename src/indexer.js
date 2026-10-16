@@ -14,6 +14,7 @@ import {
 } from "./sqlite-read-model.js";
 import { atomicWriteFile, loadWorkspace, openSecureReadFile, secureStoragePath } from "./workspace.js";
 import { renderChatMarkdown } from "./chat-memory.js";
+import { verifiedDerivedState, verifiedRetrievalIndex } from "./verified-read-cache.js";
 
 export const INDEX_SCHEMA_VERSION = "qarinah.index.v2";
 export const GRAPH_SCHEMA_VERSION = "qarinah.graph.v2";
@@ -242,23 +243,12 @@ function coalesceGraphEdges(edges) {
       });
 }
 
-export function buildDerivedState(events, workspaceId) {
+export function buildRetrievalIndex(events, workspaceId) {
   const projections = events.map(eventProjection);
   const postings = Object.create(null);
   const documentFrequency = Object.create(null);
   const adjacency = Object.create(null);
-  const nodes = [];
-  const edges = [];
-
   for (const event of projections) {
-    nodes.push({
-      id: event.eventId,
-      type: event.kind,
-      timestamp: event.timestamp,
-      title: event.title,
-      confidence: event.confidence,
-      hash: event.hash
-    });
     adjacency[event.eventId] = [];
     for (const term of event.terms) {
       if (!postings[term]) postings[term] = [];
@@ -267,26 +257,17 @@ export function buildDerivedState(events, workspaceId) {
     }
     for (const relation of event.relations) {
       adjacency[event.eventId].push({ type: relation.type, target: relation.target });
-      edges.push({ source: event.eventId, type: relation.type, target: relation.target });
     }
   }
-
-  const projectStructure = appendProjectGraph(events, nodes, edges);
-  closeRelationTargets(nodes, edges);
-
   for (const term of Object.keys(postings)) postings[term].sort();
   for (const id of Object.keys(adjacency)) {
     adjacency[id].sort((left, right) => `${left.type}\0${left.target}`.localeCompare(`${right.type}\0${right.target}`));
   }
-  nodes.sort((left, right) => left.id.localeCompare(right.id));
-  const coalescedEdges = coalesceGraphEdges(edges);
-  coalescedEdges.sort((left, right) => `${left.source}\0${left.type}\0${left.target}`.localeCompare(`${right.source}\0${right.type}\0${right.target}`));
-
   const headHash = events.at(-1)?.hash ?? null;
   const averageDocumentLength = projections.length === 0
     ? 0
     : projections.reduce((total, event) => total + event.documentLength, 0) / projections.length;
-  const index = {
+  return deepFreezeJson({
       schemaVersion: INDEX_SCHEMA_VERSION,
       workspaceId,
       eventCount: projections.length,
@@ -296,7 +277,21 @@ export function buildDerivedState(events, workspaceId) {
       documentFrequency,
       averageDocumentLength,
       adjacency
-    };
+    });
+}
+
+export function buildDerivedState(events, workspaceId) {
+  const index = buildRetrievalIndex(events, workspaceId);
+  const projections = index.events;
+  const nodes = projections.map((event) => ({ id: event.eventId, type: event.kind, timestamp: event.timestamp,
+    title: event.title, confidence: event.confidence, hash: event.hash }));
+  const edges = projections.flatMap((event) => event.relations.map((relation) => ({ source: event.eventId, type: relation.type, target: relation.target })));
+  const projectStructure = appendProjectGraph(events, nodes, edges);
+  closeRelationTargets(nodes, edges);
+  nodes.sort((left, right) => left.id.localeCompare(right.id));
+  const coalescedEdges = coalesceGraphEdges(edges);
+  coalescedEdges.sort((left, right) => `${left.source}\0${left.type}\0${left.target}`.localeCompare(`${right.source}\0${right.type}\0${right.target}`));
+  const headHash = index.headHash;
   const graph = {
       schemaVersion: GRAPH_SCHEMA_VERSION,
       workspaceId,
@@ -447,8 +442,8 @@ export async function loadIndex(start = process.cwd(), options = {}) {
   const workspace = await loadWorkspace(start);
   if (options.inMemory === true) {
     const events = await readEvents(workspace, { updateCheckpoint: options.updateCheckpoint !== false });
-    const expected = buildDerivedState(events, workspace.config.workspaceId);
-    return Object.freeze({ workspace, index: expected.index });
+    const index = verifiedRetrievalIndex(events, workspace.config.workspaceId, buildRetrievalIndex);
+    return Object.freeze({ workspace, index });
   }
   const rebuild = options.rebuild !== false && options.updateCheckpoint !== false;
   const maximumIndexBytes = Math.min(256 * 1024 * 1024, workspace.config.maxLogBytes * 4);
@@ -467,7 +462,7 @@ export async function loadIndex(start = process.cwd(), options = {}) {
     throw new QarinahError("INDEX_INVALID", "Derived index has an unsupported schema or workspace id.");
   }
   const events = await readEvents(workspace, { updateCheckpoint: options.updateCheckpoint !== false });
-  const expected = buildDerivedState(events, workspace.config.workspaceId);
+  const expected = verifiedDerivedState(events, workspace.config.workspaceId, buildDerivedState);
   let persistedViewsCurrent = true;
   if (canonicalStringify(index) !== canonicalStringify(expected.index)) {
     persistedViewsCurrent = false;

@@ -1,5 +1,7 @@
 # CLI reference
 
+Version 0.8 adds `qarinah health [--online]`, `qarinah usage`, `qarinah usage record --stdin-json`, and `qarinah compare --stdin-json`. Health distinguishes configuration and observed capture from unobserved provider delivery. Usage records actual per-attempt counts; compare accepts bounded versioned matched-task input. See [usage](PROVIDER-USAGE.md), [comparison](TASK-COMPARISON.md), and [release limits](RELIABILITY-0.8.md).
+
 ## Git worktrees
 
 ```bash
@@ -937,3 +939,13 @@ See [Shared and verifiable team memory](TEAM-MEMORY.md) for all seven task profi
 | `CHECKPOINT_ROLLBACK` / `CHECKPOINT_MISMATCH` | The log is older than or differs from the trusted checkpoint. | Stop. Restore the reviewed authoritative record; do not rebuild over it. |
 
 See [Troubleshooting](TROUBLESHOOTING.md) for recovery procedures and boundaries.
+
+
+## Provider token usage
+
+`qarinah usage` reads retained per-attempt input/output usage as JSON without
+changing the ledger. `qarinah usage record --stdin-json` accepts one strict
+`qarinah.provider-usage.v1` receipt on standard input. Both require an existing,
+trusted workspace. Unknown counts remain null; production and test usage are
+separate. See [Provider usage](PROVIDER-USAGE.md) for the receipt contract,
+retry accounting, and the distinction between usage and savings.

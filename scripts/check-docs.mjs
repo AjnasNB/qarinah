@@ -288,15 +288,15 @@ for (const relativePath of publicMarkdown) {
 }
 
 const currentReleaseDocRequirements = new Map([
-  ["docs/API-REFERENCE.md", ["version 0.7.0", "| `QARINAH_VERSION` | `\"0.7.0\"` |"]],
-  ["docs/FAQ.md", ["Qarinah 0.7.0 supports", "multifile-context-0.7.0.json"]],
-  ["docs/HOST-COMPATIBILITY.md", ["The 0.7.0 installer"]],
-  ["docs/HOST-INTEGRATIONS.md", ["--ref v0.7.0", "qarinah@v0.7.0"]],
-  ["docs/MCP-GUIDE.md", ["Qarinah 0.7.0 includes", "qarinah@0.7.0"]],
-  ["docs/TOKEN-EFFICIENT-CONTEXT.md", ["--ref v0.7.0", "qarinah@v0.7.0"]],
-  ["docs/RECIPES.md", ["--ref v0.7.0", "qarinah@v0.7.0"]],
-  ["docs/BENCHMARKS.md", ["deep-memory-platform-v0.7.0.json", "0.7.0 machine-readable result", "multifile-context-0.7.0.json"]],
-  ["docs/PUBLIC-METRICS.md", ["deep-memory-platform-v0.7.0.json", "multifile-context-0.7.0.json"]]
+  ["docs/API-REFERENCE.md", [`version ${packageJson.version}`, `| \`QARINAH_VERSION\` | \`"${packageJson.version}"\` |`]],
+  ["docs/FAQ.md", [`Qarinah ${packageJson.version} supports`, `multifile-context-${packageJson.version}.json`]],
+  ["docs/HOST-COMPATIBILITY.md", [`The ${packageJson.version} installer`]],
+  ["docs/HOST-INTEGRATIONS.md", [`--ref v${packageJson.version}`, `qarinah@v${packageJson.version}`]],
+  ["docs/MCP-GUIDE.md", [`Qarinah ${packageJson.version} includes`, `qarinah@${packageJson.version}`]],
+  ["docs/TOKEN-EFFICIENT-CONTEXT.md", [`--ref v${packageJson.version}`, `qarinah@v${packageJson.version}`]],
+  ["docs/RECIPES.md", [`--ref v${packageJson.version}`, `qarinah@v${packageJson.version}`]],
+  ["docs/BENCHMARKS.md", [`deep-memory-platform-v${packageJson.version}.json`, `${packageJson.version} machine-readable result`, `multifile-context-${packageJson.version}.json`]],
+  ["docs/PUBLIC-METRICS.md", [`deep-memory-platform-v${packageJson.version}.json`, `multifile-context-${packageJson.version}.json`]]
 ]);
 for (const [relativePath, requiredSnippets] of currentReleaseDocRequirements) {
   const markdown = await read(relativePath);

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/AjnasNB/qarinah/schemas/runtime-health.schema.json",
+  "title": "Qarinah body-free runtime health",
+  "type": "object", "additionalProperties": false,
+  "required": ["schemaVersion", "version", "workspaceId", "integrity", "capture", "retainedEvents", "lastRetainedAt", "lastObservedHostCaptureAt", "machineAutoInitEnabled", "userRuntime", "hostLifecycle", "providerDelivery", "publicRelease", "knowledgeBoundary"],
+  "properties": {
+    "schemaVersion": { "const": "qarinah.runtime-health.v1" },
+    "version": { "type": "string", "maxLength": 32 },
+    "workspaceId": { "type": "string", "pattern": "^ws_[0-9a-f]{32}$" },
+    "integrity": { "const": "verified-local-chain" },
+    "capture": { "enum": ["metadata", "content"] },
+    "retainedEvents": { "type": "integer", "minimum": 0, "maximum": 100000 },
+    "lastRetainedAt": { "type": ["string", "null"], "format": "date-time" },
+    "lastObservedHostCaptureAt": { "type": ["string", "null"], "format": "date-time" },
+    "machineAutoInitEnabled": { "type": "boolean" },
+    "userRuntime": { "oneOf": [{ "type": "null" }, { "type": "object", "additionalProperties": false,
+      "required": ["version", "configuredHosts"], "properties": { "version": { "type": ["string", "null"], "maxLength": 32 },
+        "configuredHosts": { "type": "array", "maxItems": 16, "items": { "type": "string" } } } }] },
+    "hostLifecycle": { "type": "string", "maxLength": 512 },
+    "providerDelivery": { "const": "unobserved" },
+    "publicRelease": { "type": "object", "additionalProperties": false, "required": ["status", "version"],
+      "properties": { "status": { "enum": ["aligned", "version-mismatch", "unavailable", "not-queried"] },
+        "version": { "type": ["string", "null"], "maxLength": 32 }, "sourceCommit": { "type": ["string", "null"], "pattern": "^[0-9a-f]{40}$" } } },
+    "knowledgeBoundary": { "type": "string", "maxLength": 512 }
+  }
+}

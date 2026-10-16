@@ -1,6 +1,6 @@
 # MCP guide
 
-Qarinah 0.7.0 includes a native Model Context Protocol server. Its default mode is zero-write. It provides local ledger status, integrity diagnostics, and bounded `context.query` retrieval for an explicitly initialized, enabled, machine-trusted workspace.
+Qarinah 0.8.0 includes a native Model Context Protocol server. Its default mode is zero-write. It provides local ledger status, integrity diagnostics, and bounded `context.query` retrieval for an explicitly initialized, enabled, machine-trusted workspace.
 
 That narrow boundary is intentional:
 
@@ -19,7 +19,7 @@ That narrow boundary is intentional:
 | --- | --- |
 | MCP name | `io.github.AjnasNB/qarinah` |
 | npm package | `qarinah` |
-| Version | `0.7.0` |
+| Version | `0.8.0` |
 | Transport | `stdio` |
 | CLI entry | `npx qarinah mcp` |
 | Read-only tools | `context_status`, `context_doctor`, `context.query` |
@@ -67,7 +67,7 @@ For a host configuration that accepts an MCP command object:
   "mcpServers": {
     "qarinah-context": {
       "command": "npx",
-      "args": ["-y", "qarinah@0.7.0", "mcp"]
+      "args": ["-y", "qarinah@0.8.0", "mcp"]
     }
   }
 }
@@ -108,7 +108,7 @@ The packaged Codex integration defines:
 Install the reviewed release:
 
 ```sh
-codex plugin marketplace add AjnasNB/qarinah --ref v0.7.0
+codex plugin marketplace add AjnasNB/qarinah --ref v0.8.0
 codex plugin add qarinah@qarinah
 ```
 
@@ -150,14 +150,14 @@ The packaged Claude integration defines:
 Install:
 
 ```sh
-claude plugin marketplace add AjnasNB/qarinah@v0.7.0 --scope user
+claude plugin marketplace add AjnasNB/qarinah@v0.8.0 --scope user
 claude plugin install qarinah@qarinah --scope user
 ```
 
 Project and local scopes are also supported by Claude Code:
 
 ```sh
-claude plugin marketplace add AjnasNB/qarinah@v0.7.0 --scope project
+claude plugin marketplace add AjnasNB/qarinah@v0.8.0 --scope project
 claude plugin install qarinah@qarinah --scope project
 ```
 

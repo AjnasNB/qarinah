@@ -9,3 +9,6 @@ artifacts/
 tmp/
 __pycache__/
 *.pyc
+.wrangler/
+.dev.vars
+.dev.vars.*

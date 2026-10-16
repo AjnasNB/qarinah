@@ -4,7 +4,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-import { setupUser, readAutoInitPolicy } from "../src/index.js";
+import { setupUser, readAutoInitPolicy, configureAutoInit } from "../src/index.js";
 import { temporaryDirectory } from "../test-support/helpers.js";
 
 const repository = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -77,4 +77,17 @@ test("user setup preserves existing config, backs up changes, and installs a sel
     runtimeSource: path.join(repository, "integrations", "codex", "qarinah", "runtime", "qarinah.mjs") });
   const repeated = JSON.parse(await readFile(path.join(home, ".claude", "settings.json"), "utf8"));
   assert.equal(repeated.hooks.Stop.length, 2);
+});
+
+test("repeated user setup preserves project exclusions, capture choices and context budgets", async (t) => {
+  const home = await temporaryDirectory(t), previousState = process.env.QARINAH_STATE_DIR;
+  process.env.QARINAH_STATE_DIR = path.join(home, "machine-state");
+  t.after(() => { if (previousState === undefined) delete process.env.QARINAH_STATE_DIR; else process.env.QARINAH_STATE_DIR = previousState; });
+  const roots = [path.join(home, "projects")], excludedRoots = [path.join(home, "projects", "private")];
+  await mkdir(excludedRoots[0], { recursive: true });
+  const before = await configureAutoInit({ enabled: true, roots, excludedRoots, capture: "content", fullChat: true,
+    compactSummaries: false, summaryMaxChars: 640, contextMaxChars: 3000 });
+  await setupUser({ home, targets: ["codex"], runtimeSource: path.join(repository, "integrations", "codex", "qarinah", "runtime", "qarinah.mjs") });
+  const after = await readAutoInitPolicy();
+  for (const field of ["roots", "excludedRoots", "capture", "fullChat", "compactSummaries", "summaryMaxChars", "contextMaxChars"]) assert.deepEqual(after[field], before[field], field);
 });

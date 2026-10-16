@@ -68,6 +68,8 @@ try {
       entryPoints: [path.join(repositoryRoot, "bin", "qarinah.js")],
       outfile: outputFile,
       bundle: true,
+      absWorkingDir: repositoryRoot,
+      preserveSymlinks: true,
       platform: "node",
       format: "esm",
       target: "node22",
@@ -88,6 +90,8 @@ try {
     assert.deepEqual(unsafeExternal, [], `${plugin.name} bundle has non-Node external imports: ${unsafeExternal.join(", ")}`);
     const generated = await readFile(outputFile);
     assert.equal(generated.includes(Buffer.from(repositoryRoot)), false, `${plugin.name} bundle contains an absolute repository path.`);
+    assert.equal(generated.includes(Buffer.from(repositoryRoot.replaceAll("\\", "/"))), false, `${plugin.name} bundle contains a normalized absolute repository path.`);
+    assert.equal(generated.includes(Buffer.from(os.homedir().replaceAll("\\", "/"))), false, `${plugin.name} bundle contains an absolute user dependency path.`);
     if (checking) {
       const committed = await readFile(path.join(plugin.root, "runtime", "qarinah.mjs"));
       assert.ok(

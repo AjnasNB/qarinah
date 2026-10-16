@@ -151,6 +151,7 @@ async function buildReceipt(workspace, sessionId, events, options) {
     },
     unsupportedQueryCount: pack.items.length === 0 ? 1 : 0,
     boundaries: {
+      delivery: "The legacy delivered field describes a pack compiled for this session. It does not acknowledge host injection or provider receipt; those remain unobserved unless separately instrumented.",
       providerUsage: "No provider-billed usage is inferred. Token values use the named portable estimator.",
       content: "The receipt contains identities, counts, timings, and hashes, not retained event bodies.",
       session: "Only events carrying this exact host-supplied sessionId are measured.",

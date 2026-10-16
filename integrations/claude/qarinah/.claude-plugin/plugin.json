@@ -1,6 +1,6 @@
 {
   "name": "qarinah",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Qarinah is proof-carrying project memory for coding agents - multi-language, worktree-aware, recoverable, and cited.",
   "author": {
     "name": "Ajnas NB",
@@ -9,7 +9,12 @@
   },
   "repository": "https://github.com/AjnasNB/qarinah",
   "license": "Apache-2.0",
-  "keywords": ["context", "provenance", "git-worktree", "claude-code"],
+  "keywords": [
+    "context",
+    "provenance",
+    "git-worktree",
+    "claude-code"
+  ],
   "userConfig": {
     "node_path": {
       "type": "file",

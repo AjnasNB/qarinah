@@ -1,11 +1,12 @@
 import { canonicalStringify, deepFreezeJson } from "./canonical.js";
 import { CONTEXT_PACK_SCHEMA_VERSION, createManifestHash, validateStoredEvent } from "./contracts.js";
 import { QarinahError } from "./errors.js";
-import { buildDerivedState, loadIndex } from "./indexer.js";
+import { buildRetrievalIndex, loadIndex } from "./indexer.js";
 import { markdownDataBlock, markdownInline, markdownSafeText } from "./markdown.js";
 import { rankContextEvents } from "./retrieval.js";
 import { validateProjectStructureSnapshot } from "./project-structure.js";
 import { querySqliteReadModel } from "./sqlite-read-model.js";
+import { verifiedRetrievalIndex } from "./verified-read-cache.js";
 import {
   createTokenBudget,
   estimateTokens,
@@ -460,7 +461,7 @@ export async function compileContextFromVerifiedEvents(query = "", request = {})
   if (!workspace?.config?.workspaceId || !Array.isArray(events)) {
     throw new TypeError("compileContextFromVerifiedEvents requires a loaded workspace and verified events array.");
   }
-  const index = buildDerivedState(events, workspace.config.workspaceId).index;
+  const index = verifiedRetrievalIndex(events, workspace.config.workspaceId, buildRetrievalIndex);
   return compileContextWithIndex(query, { ...options, inMemory: true }, workspace, index);
 }
 
