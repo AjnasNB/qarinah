@@ -43,4 +43,4 @@ qarinah health --online
 qarinah dashboard --serve --worktrees
 ```
 
-Review supported setup options before replacing host configuration. Machine opt-in, exclusions, project trust, and capture consent remain authoritative.
+Repeated setup preserves saved root restrictions, exclusions, capture choices, and context budgets unless explicitly changed. Review supported options before replacing host configuration. Native hooks still require the host's normal review and trust; setup does not bypass it. Machine opt-in, project trust, and capture consent remain authoritative.

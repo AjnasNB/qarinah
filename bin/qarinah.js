@@ -438,8 +438,8 @@ async function run(argv) {
     const parsed = strictValueOptions(rest, "setup-user", ["--capture", "--hosts", "--max-chars"]);
     if (parsed.positionals.length) throw new TypeError("setup-user does not accept a positional path.");
     const result = await setupUser({
-      capture: parsed.values.get("--capture") ?? "metadata",
-      fullChat: args.includes("--full-chat"),
+      capture: parsed.values.get("--capture"),
+      fullChat: args.includes("--full-chat") ? true : undefined,
       targets: parsed.values.has("--hosts") ? parsed.values.get("--hosts").split(",") : undefined,
       contextMaxChars: parsed.values.has("--max-chars") ? Number(parsed.values.get("--max-chars")) : undefined
     });

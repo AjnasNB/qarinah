@@ -346,10 +346,10 @@ export async function setupUser(options = {}) {
   // Publish the explicit opt-in last: hooks remain inert for new workspaces
   // until all requested host configuration has been written successfully.
   const policy = await configureAutoInit({
-    enabled: true, capture: options.capture ?? "metadata",
-    fullChat: options.fullChat ?? false, compactSummaries: true,
-    roots: options.roots ?? [], excludedRoots: options.excludedRoots ?? [],
-    contextMaxChars: options.contextMaxChars ?? 6000, summaryMaxChars: 1200
+    enabled: true, capture: options.capture,
+    fullChat: options.fullChat,
+    roots: options.roots, excludedRoots: options.excludedRoots,
+    contextMaxChars: options.contextMaxChars
   });
   const result = { schemaVersion: USER_SETUP_SCHEMA_VERSION, ok: true, runtime, version: QARINAH_VERSION, targets: configured,
     files, backups, policyHash: policy.policyHash, capture: policy.capture, fullChat: policy.fullChat,
