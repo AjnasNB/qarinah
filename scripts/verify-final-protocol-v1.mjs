@@ -50,7 +50,8 @@ assert.ok(amendments.includes("A001"));
 assert.ok(amendments.includes("20 no-prior-memory tasks"));
 assert.ok(packageJson.files.includes("docs/FINAL-EXPERIMENT-PROTOCOL-v1.md"));
 assert.ok(packageJson.files.includes("docs/PROTOCOL-AMENDMENTS.md"));
-assert.ok(packageJson.files.includes("bench/final/"));
+assert.equal(packageJson.files.includes("bench/final/"), false, "Frozen research data belongs to the matching source checkout, outside the runtime package.");
+assert.ok(packageJson.files.includes("docs/TASK-COMPARISON.md"));
 assert.equal(packageJson.scripts["check:research-protocol"], "node scripts/verify-final-protocol-v1.mjs && node scripts/verify-protocol-amendment-001.mjs");
 
 process.stdout.write(`Final experiment protocol v1 is frozen at ${receipt.protocolSha256}.\n`);

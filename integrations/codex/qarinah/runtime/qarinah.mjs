@@ -1553,9 +1553,9 @@ var init_markdown = __esm({
   }
 });
 
-// C:/Users/20cs0/.codex-task-cache/release-20261016/qarinah-reliability-20261016-runtime/node_modules/ignore/index.js
+// node_modules/ignore/index.js
 var require_ignore = __commonJS({
-  "C:/Users/20cs0/.codex-task-cache/release-20261016/qarinah-reliability-20261016-runtime/node_modules/ignore/index.js"(exports, module) {
+  "node_modules/ignore/index.js"(exports, module) {
     function makeArray(subject) {
       return Array.isArray(subject) ? subject : [subject];
     }

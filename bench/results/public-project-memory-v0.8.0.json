@@ -43,8 +43,8 @@
     ],
     "eligibleSymbolFiles": 216,
     "indexedSymbolFiles": 216,
-    "declarations": 38660,
-    "references": 68714,
+    "declarations": 38662,
+    "references": 68727,
     "definitions": [
       {
         "query": "appendEvent",
@@ -130,5 +130,5 @@
     "No provider model, learned embedding service, wall-clock performance, billing, or private agent history is measured.",
     "A passing result proves these exact structural scenarios, not universal task success or semantic correctness."
   ],
-  "manifestHash": "sha256:562cf3a17271cd3e7cb382c250a06ce3dbcd51c8ff524eca75ffc3ea0a642cc9"
+  "manifestHash": "sha256:09cc127e8289c9d4a418e05c1df06779d517b5cfffb3aca266aa332aedc5baef"
 }
