@@ -4,7 +4,7 @@ import { QarinahError } from "./errors.js";
 import { markdownDataBlock, markdownInline } from "./markdown.js";
 import { redactText } from "./redact.js";
 import { appendEvent, readEvents } from "./store.js";
-import { buildDerivedState } from "./indexer.js";
+import { buildDerivedState, tokenize } from "./indexer.js";
 import { rankContextEvents } from "./retrieval.js";
 import { atomicWriteFile, loadWorkspace, secureStoragePath } from "./workspace.js";
 
@@ -218,12 +218,22 @@ export async function recallChatMemory(query = "", options = {}) {
         return event;
       })
     : ranked.ranked.map(({ event }) => byId.get(event.eventId));
-  const summaries = selected.filter((event) => event.kind === "summary");
-  const ordered = options.detail === "full" || summaries.length === 0 ? selected : summaries;
+  const queryTerms = tokenize(query);
+  const overlap = (text) => {
+    const terms = new Set(tokenize(text));
+    return queryTerms.filter((term) => terms.has(term)).length;
+  };
+  // A compact summary is useful only if it does not displace stronger evidence.
+  // Retain raw fallbacks when a summary is unavailable or fails its source checks.
+  const ordered = options.detail === "full" || options.eventIds !== undefined ? selected
+    : selected.map((event, rank) => ({ event, rank, matches: overlap(extractiveText(event.body, 1200, query)) }))
+      .sort((left, right) => right.matches - left.matches
+        || Number(right.event.kind === "summary") - Number(left.event.kind === "summary")
+        || left.rank - right.rank).map(({ event }) => event);
   const pack = {
     schemaVersion: CHAT_MEMORY_SCHEMA_VERSION, workspaceId: workspace.config.workspaceId,
     contentRole: "untrusted-data", query, detail: options.detail ?? "summary",
-    coverage: ranked.coverage.status, items: [], truncated: false,
+    coverage: "none", items: [], truncated: false,
     intelligence: "Local ranked retrieval; the calling model decides whether cited full text is needed."
   };
   for (const event of ordered) {
@@ -258,5 +268,9 @@ export async function recallChatMemory(query = "", options = {}) {
     pack.items.push(item);
     if (item.nextOffset !== null) pack.truncated = true;
   }
+  const bestDeliveredMatch = Math.max(0, ...pack.items.map((item) => overlap(item.excerpt)));
+  pack.coverage = queryTerms.length === 0 ? "no-query"
+    : bestDeliveredMatch === 0 ? "none"
+    : bestDeliveredMatch === queryTerms.length ? "direct" : "partial";
   return Object.freeze(pack);
 }
