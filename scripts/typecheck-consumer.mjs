@@ -57,6 +57,8 @@ try {
     "import {",
     "  appendCockroachBrowserOutcome,",
     "  appendEvent,",
+    "  evaluateMatchedTasks, inspectRuntimeHealth, validateEncryptedKnowledgeBundle, knowledgeBundleId,",
+    "  putEncryptedKnowledge, getEncryptedKnowledge, listEncryptedKnowledge,",
     "  configureAutoInit, ensureAutoWorkspace, readAutoInitPolicy, autoInitPolicyPath,",
     "  recallChatMemory, recordModelChatSummary, renderChatMarkdown, writeChatMarkdown,",
     "  capturePortableHook, setupUser,",
@@ -264,6 +266,11 @@ try {
     "void recordProviderUsage({schemaVersion:'qarinah.provider-usage.v1',provider:'azure',model:'model',callId:'call',sessionId:'session',attempt:1,purpose:'test',outcome:'completed',inputTokens:1,outputTokens:2,cachedInputTokens:null,reasoningTokens:null},{cwd:'/workspace'});",
     "void readProviderUsage({cwd:'/workspace'}).then(r => r.production.inputTokens);",
     "void validateProviderUsage({}); void summarizeProviderUsage([]);",
+    "void evaluateMatchedTasks({schemaVersion:'qarinah.matched-task-evaluation.v1',baselineMethod:'project-notes-and-search',pairs:[]});",
+    "void inspectRuntimeHealth({cwd:'/workspace',online:false});",
+    "const encrypted = validateEncryptedKnowledgeBundle({}); void knowledgeBundleId(encrypted);",
+    "const knowledgeService = {endpoint:'https://knowledge.example',teamId:'team',workspaceId:'workspace',token:'token'};",
+    "void putEncryptedKnowledge(encrypted,knowledgeService); void getEncryptedKnowledge('bundle',knowledgeService); void listEncryptedKnowledge(knowledgeService);",
   ].join("\n"));
 
   const installed = await runNode([
@@ -384,6 +391,14 @@ try {
   assert.equal(usageSchema.additionalProperties, false);
   assert.ok(usageSchema.required.includes("outputTokens"));
   await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "docs", "PROVIDER-USAGE.md"), "utf8");
+  for (const name of ["matched-task-input", "encrypted-knowledge", "runtime-health"]) {
+    assert.equal(installedPackage.exports[`./schemas/${name}.json`], `./schemas/${name}.schema.json`);
+    const schema = JSON.parse(await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "schemas", `${name}.schema.json`), "utf8"));
+    assert.equal(schema.additionalProperties, false);
+  }
+  for (const name of ["RELIABILITY-0.8", "TASK-COMPARISON", "ENCRYPTED-KNOWLEDGE"]) {
+    await readFile(path.join(temporaryDirectory, "node_modules", "qarinah", "docs", `${name}.md`), "utf8");
+  }
   process.stdout.write("Exact cockroach-browser@0.1.0 TypeScript and registry-integrity contract passed.\n");
 } finally {
   await rm(temporaryDirectory, { recursive: true, force: true });

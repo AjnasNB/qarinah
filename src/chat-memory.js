@@ -4,8 +4,9 @@ import { QarinahError } from "./errors.js";
 import { markdownDataBlock, markdownInline } from "./markdown.js";
 import { redactText } from "./redact.js";
 import { appendEvent, readEvents } from "./store.js";
-import { buildDerivedState, tokenize } from "./indexer.js";
+import { buildRetrievalIndex, tokenize } from "./indexer.js";
 import { rankContextEvents } from "./retrieval.js";
+import { verifiedRetrievalIndex } from "./verified-read-cache.js";
 import { atomicWriteFile, loadWorkspace, secureStoragePath } from "./workspace.js";
 
 export const CHAT_MEMORY_SCHEMA_VERSION = "qarinah.chat-memory.v1";
@@ -132,7 +133,7 @@ export async function recordModelChatSummary(options = {}) {
     throw new TypeError("Model summaries require bounded title/text and from 1 to 16 genuine source event IDs.");
   }
   const events = await readEvents(workspace, { updateCheckpoint: false });
-  const index = buildDerivedState(events, workspace.config.workspaceId).index;
+  const index = verifiedRetrievalIndex(events, workspace.config.workspaceId, buildRetrievalIndex);
   const ranking = rankContextEvents(index, "", { asOf: new Date().toISOString(), limit: 100 });
   const admitted = new Set(ranking.admission.eligibleEventIds);
   const sources = [...new Set(options.eventIds)].map((id) => {
@@ -203,7 +204,7 @@ export async function recallChatMemory(query = "", options = {}) {
     throw new TypeError("Full recall requires explicit cited source eventIds.");
   }
   const events = await readEvents(workspace, { updateCheckpoint: false });
-  const index = buildDerivedState(events, workspace.config.workspaceId).index;
+  const index = verifiedRetrievalIndex(events, workspace.config.workspaceId, buildRetrievalIndex);
   const ranked = rankContextEvents(index, query, { asOf: new Date().toISOString(), limit: 100 });
   const admitted = new Set(ranked.admission.eligibleEventIds);
   const byId = new Map(events.map((event) => [event.eventId, event]));

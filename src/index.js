@@ -7,6 +7,10 @@ export {
   validateStoredEvent
 } from "./contracts.js";
 export { QarinahError } from "./errors.js";
+export { MATCHED_TASK_SCHEMA_VERSION, evaluateMatchedTasks } from "./matched-evaluation.js";
+export { MAX_ENCRYPTED_KNOWLEDGE_BYTES, validateEncryptedKnowledgeBundle, knowledgeBundleId,
+  putEncryptedKnowledge, getEncryptedKnowledge, listEncryptedKnowledge } from "./encrypted-knowledge.js";
+export { inspectRuntimeHealth } from "./runtime-health.js";
 export { QARINAH_VERSION } from "./version.js";
 export { inspectGitWorktree, listGitWorktrees } from "./git-worktrees.js";
 export { appendEvent, approveWorkspaceTrust, inspectWorkspacePolicy, readEvents, verifyStore } from "./store.js";

@@ -3,6 +3,8 @@ import process from "node:process";
 import path from "node:path";
 import {
   QarinahError,
+  evaluateMatchedTasks,
+  inspectRuntimeHealth,
   appendEvent,
   approveWorkspaceTrust,
   backupAgentArchives,
@@ -318,6 +320,8 @@ Usage:
   qarinah record --stdin-json
   qarinah usage
   qarinah usage record --stdin-json
+  qarinah compare --stdin-json
+  qarinah health [--online]
   qarinah hook codex|claude|cursor|antigravity
   qarinah mcp [--allow-query --workspace-id ws_<id> --policy-hash sha256:<digest>] [--max-chars n] [--max-items n]
   qarinah build | rebuild
@@ -598,6 +602,17 @@ async function run(argv) {
   }
   if (command === "untrust") {
     process.stdout.write(`${JSON.stringify(await revokeWorkspaceTrust(process.cwd()), null, 2)}\n`);
+    return;
+  }
+  if (command === "health") {
+    if (args.some(arg => arg !== "--online") || args.length > 1) throw new TypeError("Usage: qarinah health [--online]");
+    process.stdout.write(`${JSON.stringify(await inspectRuntimeHealth({ online: args.includes("--online") }), null, 2)}\n`);
+    return;
+  }
+  if (command === "compare") {
+    const input = await readStdinJsonRequest(args, "compare", 8_000_000, new Set(["schemaVersion", "baselineMethod", "pairs"]));
+    if (input === null) throw new TypeError("compare requires --stdin-json.");
+    process.stdout.write(`${JSON.stringify(evaluateMatchedTasks(input), null, 2)}\n`);
     return;
   }
   if (command === "usage") {

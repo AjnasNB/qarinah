@@ -1,5 +1,9 @@
 # JavaScript and TypeScript API reference
 
+The 0.8 additions are `inspectRuntimeHealth`, `validateProviderUsage`, `recordProviderUsage`, `readProviderUsage`, `summarizeProviderUsage`, `evaluateMatchedTasks`, `validateEncryptedKnowledgeBundle`, `knowledgeBundleId`, `putEncryptedKnowledge`, `getEncryptedKnowledge`, and `listEncryptedKnowledge`. Public declarations ship in `types/index.d.ts`; closed input schemas ship under `qarinah/schemas/`.
+
+See [provider usage](PROVIDER-USAGE.md), [matched tasks](TASK-COMPARISON.md), [encrypted knowledge](ENCRYPTED-KNOWLEDGE.md), and [migration and release limits](RELIABILITY-0.8.md). New optional functionality does not upload projects automatically or change the authoritative event format.
+
 ## Git worktree identity
 
 ```ts
@@ -27,7 +31,7 @@ import { captureClaudeHook } from "qarinah/claude";
 import { createMcpServer, runMcpServer } from "qarinah/mcp";
 ```
 
-The declarations shipped in `types/index.d.ts`, `types/codex.d.ts`, `types/claude.d.ts`, and `types/mcp.d.ts` are the exact compile-time contract for version 0.7.0. JSON Schemas are available through package exports such as `qarinah/schemas/event.json` and `qarinah/schemas/proof-context.json`.
+The declarations shipped in `types/index.d.ts`, `types/codex.d.ts`, `types/claude.d.ts`, and `types/mcp.d.ts` are the exact compile-time contract for version 0.8.0. JSON Schemas are available through package exports such as `qarinah/schemas/event.json` and `qarinah/schemas/proof-context.json`.
 
 ## Proof-carrying task context
 
@@ -101,9 +105,9 @@ Invalid JavaScript argument shapes generally throw `TypeError`. Storage, trust, 
 
 ## Version and contract constants
 
-| Export | Value in 0.7.0 |
+| Export | Value in 0.8.0 |
 | --- | --- |
-| `QARINAH_VERSION` | `"0.7.0"` |
+| `QARINAH_VERSION` | `"0.8.0"` |
 | `EVENT_SCHEMA_VERSION` | `"qarinah.event.v1"` |
 | `CONTEXT_PACK_SCHEMA_VERSION` | `"qarinah.context-pack.v2"` |
 | `CONFIG_SCHEMA_VERSION` | `"qarinah.config.v1"` |
@@ -1245,7 +1249,7 @@ qarinah/schemas/fact-consolidation.json
 
 Anything outside this export map is internal and may change without becoming a public API.
 
-## Automatic initialization and cited chat memory (0.7.0)
+## Automatic initialization and cited chat memory (0.8.0)
 
 `configureAutoInit({ enabled, capture, roots, excludedRoots, fullChat, compactSummaries, summaryMaxChars, contextMaxChars })` saves an explicit machine-local policy. `readAutoInitPolicy()` reads it; `autoInitPolicyPath()` returns its location. `ensureAutoWorkspace(start, { exact })` admits only a safe active project under that policy and preserves disabled, untrusted, or excluded workspaces.
 

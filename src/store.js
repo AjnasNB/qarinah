@@ -15,6 +15,7 @@ import {
 } from "./consent.js";
 import { createEventEnvelope, validateStoredEvent } from "./contracts.js";
 import { QarinahError } from "./errors.js";
+import { cachedVerifiedEvents, rememberVerifiedEvents, verifiedLedgerCacheKey } from "./verified-read-cache.js";
 import {
   atomicWriteFile,
   loadWorkspace,
@@ -687,17 +688,26 @@ async function readEventsFromWorkspace(workspace, options = {}) {
     await opened.handle.close();
     throw new QarinahError("LOG_LIMIT_EXCEEDED", "Event log exceeds the configured maximum size.");
   }
-  let contents;
+  let contents, cacheKey, cachedEvents;
   try {
     const buffer = await opened.handle.readFile();
     if (buffer.length !== opened.metadata.size) {
       throw new QarinahError("STORAGE_RACE_DETECTED", "The authoritative event log changed while it was being read.");
     }
-    contents = buffer.toString("utf8");
+    cacheKey = verifiedLedgerCacheKey(workspace, buffer);
+    cachedEvents = cachedVerifiedEvents(cacheKey);
+    if (!cachedEvents) contents = buffer.toString("utf8");
   } finally {
     await opened.handle.close();
   }
   throwIfAborted(signal);
+  if (cachedEvents) {
+    if (options.skipCheckpoint !== true) {
+      await reconcileCheckpoint(workspace, cachedEvents, opened.metadata.size, { updateCheckpoint: options.updateCheckpoint !== false });
+    }
+    return options.includeLogMetadata === true ? Object.freeze({ events: Object.freeze(cachedEvents),
+      logBytes: opened.metadata.size, dev: opened.metadata.dev, ino: opened.metadata.ino }) : cachedEvents;
+  }
   if (contents !== "" && !contents.endsWith("\n")) {
     throw new QarinahError("EVENT_LOG_NON_CANONICAL", "Event log must end with a newline.");
   }
@@ -737,6 +747,7 @@ async function readEventsFromWorkspace(workspace, options = {}) {
     throwIfAborted(signal);
     await reconcileCheckpoint(workspace, events, opened.metadata.size, { updateCheckpoint: options.updateCheckpoint !== false });
   }
+  rememberVerifiedEvents(cacheKey, events, opened.metadata.size);
   if (options.includeLogMetadata === true) {
     return Object.freeze({
       events: Object.freeze(events),

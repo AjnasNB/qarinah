@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/AjnasNB/qarinah/schemas/matched-task-input.schema.json",
+  "title": "Observed matched coding-task runs",
+  "type": "object", "additionalProperties": false,
+  "required": ["schemaVersion", "baselineMethod", "pairs"],
+  "properties": {
+    "schemaVersion": { "const": "qarinah.matched-task-evaluation.v1" },
+    "baselineMethod": { "enum": ["project-notes-and-search", "native-host", "competitor", "full-history"] },
+    "pairs": { "type": "array", "minItems": 1, "maxItems": 500, "items": { "$ref": "#/$defs/pair" } }
+  },
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "run": {
+      "type": "object", "additionalProperties": false,
+      "required": ["configurationHash", "outcome", "taskPassed", "elapsedMs", "retrievalMs", "costMicrosUsd", "usage"],
+      "properties": {
+        "configurationHash": { "$ref": "#/$defs/hash" },
+        "outcome": { "enum": ["completed", "failed", "cancelled"] },
+        "taskPassed": { "type": "boolean" },
+        "elapsedMs": { "type": "integer", "minimum": 0, "maximum": 1000000000000 },
+        "retrievalMs": { "type": "integer", "minimum": 0, "maximum": 1000000000000 },
+        "costMicrosUsd": { "type": ["integer", "null"], "minimum": 0, "maximum": 1000000000000 },
+        "usage": { "type": "array", "minItems": 1, "maxItems": 1000, "items": { "$ref": "provider-usage.schema.json" } }
+      }
+    },
+    "pair": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "repositoryRevision", "taskHash", "baseline", "qarinah"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "repositoryRevision": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "taskHash": { "$ref": "#/$defs/hash" },
+        "baseline": { "$ref": "#/$defs/run" },
+        "qarinah": { "$ref": "#/$defs/run" }
+      }
+    }
+  },
+  "description": "Runtime additionally requires unique task and attempt identities, equal paired configuration/model profiles, test-purpose receipts, consistent completion outcomes, and retrieval time within total elapsed time. Provider counts and outcomes are caller supplied."
+}

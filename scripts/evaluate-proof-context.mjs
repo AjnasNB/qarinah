@@ -1,3 +1,4 @@
+import { QARINAH_VERSION } from "../src/version.js";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -124,7 +125,7 @@ try {
   const count = (field) => results.filter((result) => result.observed[field]).length;
   const artifact = {
     schemaVersion: "qarinah.proof-context-evaluation.v1",
-    implementation: "0.7.0",
+    implementation: QARINAH_VERSION,
     generatedAt,
     method: {
       fixture: "generated 12-file multi-language repository with paired current and superseded decisions",
@@ -156,7 +157,7 @@ try {
   };
   const output = `${JSON.stringify(artifact, null, 2)}\n`;
   if (process.argv.includes("--write")) {
-    const destination = path.join(root, "bench", "results", "proof-context-0.7.0.json");
+    const destination = path.join(root, "bench", "results", `proof-context-${QARINAH_VERSION}.json`);
     await writeFile(destination, output);
     process.stdout.write(`${destination}\n`);
   } else {

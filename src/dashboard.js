@@ -1,5 +1,6 @@
 import path from "node:path";
 import { summarizeProviderUsage } from "./provider-usage.js";
+import { inspectRuntimeHealth } from "./runtime-health.js";
 import { deepFreezeJson } from "./canonical.js";
 import { buildLinkedProjectMemory, rankLinkedProjectMemory } from "./linked-memory.js";
 import { measureMemoryFootprint } from "./memory-footprint.js";
@@ -161,6 +162,7 @@ export async function buildMemoryDashboard(options = {}) {
       baselineToPackRatio
     },
     providerUsage: summarizeProviderUsage(events),
+    runtimeHealth: await inspectRuntimeHealth({ cwd: workspace.root }),
     sessionReceipts,
     memoryFootprint,
     currentDecisions: projectRecords.decisions.filter((decision) => decision.status === "current"),
@@ -226,6 +228,8 @@ function tableRegion(label, content) {
 }
 
 export function renderMemoryDashboard(data, options = {}) {
+  const health = data.runtimeHealth;
+  const healthPanel = health ? `<section class="wide"><h2>Memory health</h2><p>Runtime <strong>${escapeHtml(health.version)}</strong> · Capture <strong>${escapeHtml(health.capture)}</strong> · ${health.retainedEvents} retained events · Local event chain verified.</p><p>Last retained event: ${escapeHtml(health.lastRetainedAt ?? "None yet")}. Last observed host capture: ${escapeHtml(health.lastObservedHostCaptureAt ?? "Not observed")}. Machine auto-initialization: ${health.machineAutoInitEnabled ? "enabled" : "disabled"}.</p><p>User runtime: ${escapeHtml(health.userRuntime?.version ?? "Not recorded")}. Configured hosts: ${escapeHtml(health.userRuntime?.configuredHosts.join(", ") || "Not recorded")}. Reload hosts after a runtime upgrade.</p><p>Provider delivery: <strong>Unobserved</strong>. Session receipts describe compiled context. ${escapeHtml(health.knowledgeBoundary)}</p></section>` : "";
   const usage = data.providerUsage ?? summarizeProviderUsage([]);
   const count = value => value === null ? "Unknown" : value.toLocaleString();
   const usagePanel = `<section class="wide"><h2>Model token usage</h2>
@@ -366,6 +370,7 @@ li:first-child{border-top:0}li strong{min-width:0;overflow-wrap:anywhere}li span
 <main><div class="grid">
 ${worktreeComparison}
 ${usagePanel}
+${healthPanel}
 <section class="wide"><h2>Worktree context graph</h2><p>Explore the active Git worktree, current memories, concepts, files, and their evidence-backed relationships in a circular project map. Drag nodes to untangle a cluster, click any point for its source identity, or run ranked search to see the exact score basis.</p>
 <div class="graph-toolbar"><label>Ranked project-memory search<input type="search" data-graph-search data-search-path="${escapeHtml(options.searchPath ?? "")}" maxlength="256" placeholder="Try a branch, decision, or src/index.js"></label><label>Node type<select data-graph-type><option value="all">All node types</option><option value="worktree">Git worktrees</option><option value="memory">Memories</option><option value="file">Files</option><option value="concept">Concepts</option><option value="directory">Directories</option><option value="reference">References</option></select></label><button class="graph-reset" type="button" data-graph-reset>Reset map</button><output class="graph-summary" data-graph-summary aria-live="polite"></output></div>
 <div class="graph-shell"><div class="graph-stage"><span class="graph-live-badge">Real local ledger data</span><svg class="graph-canvas" data-linked-graph viewBox="0 0 1040 620" role="img" aria-label="Interactive circular project-memory graph"><g data-graph-orbits></g><g data-graph-edges></g><g data-graph-nodes></g></svg></div><aside class="graph-details" aria-live="polite"><div><span class="graph-details-kicker">Selected graph node</span><h3 data-graph-title>Choose a node</h3><p data-graph-description>Click a labeled node or a result to inspect its real retained data, rank, connections, and evidence identity.</p><dl><dt>Type</dt><dd data-graph-detail="type">-</dd><dt>Status</dt><dd data-graph-detail="status">-</dd><dt>Importance</dt><dd data-graph-detail="importance">-</dd><dt>Connections</dt><dd data-graph-detail="connections">-</dd><dt>Score basis</dt><dd data-graph-detail="basis">Browse rank</dd><dt>Evidence</dt><dd data-graph-detail="evidence">-</dd></dl></div><div><strong>Visible or ranked results</strong><ol class="graph-results" data-graph-results aria-label="Linked project-memory results"></ol></div></aside></div>

@@ -1,6 +1,7 @@
 import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { execFileSync } from "node:child_process";
 import { marked } from "marked";
 import { addHeadingIds, plainText, tableOfContents } from "./site-html.mjs";
 
@@ -24,9 +25,9 @@ const historicalPaperPdfs = new Map([
   ["Qarinah-Technical-White-Paper-v1.7.pdf", "/paper/Qarinah-Technical-White-Paper-v1.7.pdf"],
   ["Qarinah-Technical-White-Paper-v1.8.pdf", "/paper/Qarinah-Technical-White-Paper-v1.8.pdf"]
 ]);
-const releaseDate = "2026-10-08";
+const releaseDate = "2026-10-16";
 const paperPublishedDate = "2026-10-08";
-const publicMetricsUpdatedDate = "2026-10-08";
+const publicMetricsUpdatedDate = "2026-10-16";
 const toolkitArticleDate = "2026-08-16";
 const worktreeArticleDate = "2026-08-16";
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
@@ -34,7 +35,7 @@ const benchmarkRelease = JSON.parse(await readFile(path.join(root, "bench", "res
 const worktreeContinuity = JSON.parse(await readFile(path.join(root, "bench", "results", "worktree-continuity-v0.4.0.json"), "utf8"));
 const deepMemoryPlatform = JSON.parse(await readFile(path.join(root, "bench", "results", `deep-memory-platform-v${packageJson.version}.json`), "utf8"));
 const publicProjectMemory = JSON.parse(await readFile(path.join(root, "bench", "results", `public-project-memory-v${packageJson.version}.json`), "utf8"));
-const proofContext = JSON.parse(await readFile(path.join(root, "bench", "results", "proof-context-0.7.0.json"), "utf8"));
+const proofContext = JSON.parse(await readFile(path.join(root, "bench", "results", `proof-context-${packageJson.version}.json`), "utf8"));
 const productVersion = packageJson.version;
 const productPositioning = "Verifiable project memory, exact source recovery, and cited context for coding agents.";
 const productExplanation = "Qarinah keeps permitted project evidence and explicitly archived source bytes beside the repository, connects symbols, decisions, outcomes, and Git worktrees in one searchable graph, and compiles the cited context needed by supported coding agents and compatible tools.";
@@ -55,7 +56,7 @@ if (deepMemoryPlatform.schemaVersion !== "qarinah.deep-memory-platform-evaluatio
   || deepMemoryPlatform.observed.indexedSymbols !== 4
   || deepMemoryPlatform.observed.resolvedReferences !== 3
   || deepMemoryPlatform.observed.citedFacts !== 2
-  || deepMemoryPlatform.artifactHash !== "sha256:43e4d3d61a4a3ab5fed5d59a30b8a16df02dcb5ea60e973a9fa906b61089dd2d") {
+  || deepMemoryPlatform.artifactHash !== "sha256:ce4f2019b2e2c46398fac200089eef704567a9a086a6f43858e0b9f49203dd19") {
   throw new Error("The deep-memory website claim does not match the checked release artifact.");
 }
 if (publicProjectMemory.schemaVersion !== "qarinah.public-project-memory-evaluation.v1"
@@ -70,7 +71,7 @@ if (publicProjectMemory.schemaVersion !== "qarinah.public-project-memory-evaluat
   throw new Error("The public-project website claim does not match the checked release artifact.");
 }
 if (proofContext.schemaVersion !== "qarinah.proof-context-evaluation.v1"
-  || proofContext.implementation !== "0.7.0"
+  || proofContext.implementation !== packageJson.version
   || proofContext.metrics.acceptedTaskPackets !== 12
   || proofContext.metrics.expectedFileHitAt5 !== 1
   || proofContext.metrics.expectedSymbolHitAt5Files !== 1
@@ -121,7 +122,7 @@ const publicMetrics = {
       budgetConformance: proofContext.metrics.budgetConformance,
       deterministicManifestReproduction: proofContext.metrics.deterministicManifestReproduction,
       manifestTamperRejection: proofContext.metrics.manifestTamperRejection,
-      evidenceSource: `${github}/blob/main/bench/results/proof-context-0.7.0.json`,
+      evidenceSource: `${github}/blob/main/bench/results/proof-context-${packageJson.version}.json`,
       boundary: proofContext.boundaries
     },
     realGitWorktreeContinuity: {
@@ -442,6 +443,9 @@ const agentStackQuestions = [
 ];
 
 const docPages = [
+ {route: "docs/reliability", source: "docs/RELIABILITY-0.8.md", title: "Qarinah 0.8 reliability release", description: "Relevant recall, provider accounting, runtime health, bounded read caching, and encrypted shared knowledge with explicit evidence limits.", section: "Operate", aliases: ["0.8.0", "latest release", "upgrade", "product roadmap"]},
+ {route: "docs/encrypted-knowledge", source: "docs/ENCRYPTED-KNOWLEDGE.md", title: "Client-encrypted shared knowledge", description: "Store immutable encrypted knowledge bundles in private R2 storage through scoped authenticated access.", section: "Connect", aliases: ["cloud knowledge", "encryption", "AES-256-GCM"]},
+ {route: "docs/task-comparison", source: "docs/TASK-COMPARISON.md", title: "Measure task outcomes and provider usage", description: "Compare matched coding tasks with practical baselines using actual per-attempt provider usage.", section: "Verify", aliases: ["net token savings", "provider billing", "competitors"]},
   {
     route: "docs/cross-agent-handoffs",
     source: "docs/CROSS-AGENT-HANDOFFS.md",
@@ -704,7 +708,7 @@ const docPages = [
     title: "Qarinah 0.7.0 release",
     description: "Automatic machine-local initialization, summary-first recall, host coverage, migration, and release verification.",
     section: "Operate",
-    aliases: ["0.7.0", "latest release", "upgrade"]
+    aliases: ["0.7.0", "historical release"]
   },
   {
     route: "docs/benchmarks",
@@ -1386,7 +1390,7 @@ function homePage() {
     body: `
       <section class="section shell" aria-label="Qarinah evidence pipeline">
         <img src="/assets/qarinah-pipeline.svg" alt="Qarinah pipeline from permitted project activity through local opt-in and a SHA-256 ledger to readable OKF and summary-first cited recall" width="1440" height="700" style="display:block;width:100%;height:auto;border-radius:16px">
-        <p><a href="/docs/auto-initialization/">Automatic memory setup</a> · <a href="/docs/cryptographic-evidence/">Inspect SHA-256 and OKF</a> · <a href="/docs/release-0-7-0/">0.7.0 release details</a></p>
+        <p><a href="/docs/auto-initialization/">Automatic memory setup</a> · <a href="/docs/cryptographic-evidence/">Inspect SHA-256 and OKF</a> · <a href="/docs/reliability/">${productVersion} release details</a></p>
       </section>
       <section class="hero">
         <div class="shell hero-grid">
@@ -1610,8 +1614,8 @@ function homePage() {
           <article class="use-mode-card">
             <span>Teams</span>
             <h3>Share memory without flattening authority</h3>
-            <p>Connect repositories with typed relationships, preserve their separate access boundaries, and exchange immutable encrypted bundles through the optional self-hosted opaque sync service.</p>
-            <a href="/docs/team-sync-service/">Open the sync contract</a>
+            <p>Connect repositories with typed relationships, preserve their separate access boundaries, and exchange immutable client-encrypted knowledge bundles through a private Cloudflare Worker and R2 bucket.</p>
+            <a href="/docs/encrypted-knowledge/">Set up shared knowledge</a>
           </article>
           <article class="use-mode-card">
             <span>Optional add-on</span>
@@ -2154,6 +2158,15 @@ await mkdir(searchDestination, { recursive: true });
 await writeFile(path.join(searchDestination, "index.html"), searchPage());
 await writeFile(path.join(output, "search-index.json"), `${JSON.stringify(searchEntries, null, 2)}\n`);
 await writeFile(path.join(output, "metrics.json"), `${JSON.stringify(publicMetrics, null, 2)}\n`);
+let sourceCommit = null, sourceState = "unavailable";
+try {
+  const commit = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+  if (/^[0-9a-f]{40}$/u.test(commit)) sourceCommit = commit;
+  sourceState = execFileSync("git", ["status", "--porcelain", "--untracked-files=normal"], { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim() ? "uncommitted" : "clean";
+} catch { /* A source archive has no Git metadata; do not invent a commit. */ }
+await writeFile(path.join(output, "release.json"), `${JSON.stringify({ schemaVersion: "qarinah.public-release.v1",
+  version: productVersion, sourceCommit, sourceState, paperVersion, package: npmPackage,
+  knowledge: "/docs/encrypted-knowledge/", healthCommand: "qarinah health --online" }, null, 2)}\n`);
 
 const sitemapRoutes = [
   "/",

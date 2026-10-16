@@ -8,9 +8,9 @@ Qarinah publishes outcome-first numbers only when the repository contains the fi
 
 The committed evaluator restores **390,226 source bytes exactly**, reuses **2 of 3** chunks in the second snapshot, indexes **4 symbols** and **3 resolved references**, and preserves **2 cited facts**. These are end-to-end acceptance observations from a small deterministic TypeScript fixture. They are not a benchmark against another product and do not establish universal repository, language, storage, or retrieval performance.
 
-- [Deep-memory machine-readable result](../bench/results/deep-memory-platform-v0.7.0.json)
+- [Deep-memory machine-readable result](../bench/results/deep-memory-platform-v0.8.0.json)
 - [Deep-memory evaluator](../scripts/evaluate-deep-memory-platform.mjs)
-- Artifact hash: `sha256:43e4d3d61a4a3ab5fed5d59a30b8a16df02dcb5ea60e973a9fa906b61089dd2d`
+- Artifact hash: `sha256:ce4f2019b2e2c46398fac200089eef704567a9a086a6f43858e0b9f49203dd19`
 
 ## Separate repeated-context result
 
@@ -79,10 +79,10 @@ Qarinah keeps one verifiable project memory across Codex, Claude Code, Cursor, C
 
 - [Machine-readable public metrics](https://qarinah.io/metrics.json)
 - [Benchmark methodology and complete results](BENCHMARKS.md)
-- [Deep-memory product-acceptance result](../bench/results/deep-memory-platform-v0.7.0.json)
+- [Deep-memory product-acceptance result](../bench/results/deep-memory-platform-v0.8.0.json)
 - [Six-task result](../bench/results/software-task-context-0.1.0.json)
 - [Release benchmark receipt](../bench/results/benchmark-release-0.1.6.json)
-- [Current multi-file result](../bench/results/multifile-context-0.7.0.json)
+- [Current multi-file result](../bench/results/multifile-context-0.8.0.json)
 - [Historical 0.1.6 multi-file result](../bench/results/multifile-context-0.1.6.json)
 
 ## Do not publish these claims

@@ -240,7 +240,7 @@ export const PROJECT_STRUCTURE_SCHEMA_VERSION: "qarinah.project-structure.v2";
 export const SQLITE_READ_MODEL_SCHEMA_VERSION: 1;
 export const SQLITE_READ_MODEL_FILENAME: "qarinah.db";
 export const MEMORY_ATTACHMENT_SCHEMA_VERSION: "qarinah.memory-attachment.v1";
-export const QARINAH_VERSION: "0.7.0";
+export const QARINAH_VERSION: "0.8.0";
 export const EVENT_KINDS: readonly QarinahEventKind[];
 export const RELATION_TYPES: readonly QarinahRelationType[];
 export function inspectGitWorktree(start?: string): Promise<QarinahGitWorktree | null>;
@@ -1368,8 +1368,23 @@ export function decryptEncryptedSyncBundle(
     manifest: Parameters<typeof createTeamManifest>[0];
     memberId: string;
     key: Uint8Array;
+    expectedHeadHash?: string | null;
   }
 ): Readonly<Record<string, unknown>>;
+export const MAX_ENCRYPTED_KNOWLEDGE_BYTES: 8000000;
+export interface QarinahKnowledgeServiceOptions {
+  endpoint: string;
+  teamId: string;
+  workspaceId: string;
+  token: string;
+  fetcher?: typeof fetch;
+  cursor?: string;
+}
+export function validateEncryptedKnowledgeBundle(value: unknown): Readonly<QarinahEncryptedSyncBundle>;
+export function knowledgeBundleId(bundle: QarinahEncryptedSyncBundle): string;
+export function putEncryptedKnowledge(bundle: QarinahEncryptedSyncBundle, options: QarinahKnowledgeServiceOptions): Promise<Readonly<Record<string, unknown>>>;
+export function getEncryptedKnowledge(bundleId: string, options: QarinahKnowledgeServiceOptions): Promise<Readonly<QarinahEncryptedSyncBundle>>;
+export function listEncryptedKnowledge(options: QarinahKnowledgeServiceOptions): Promise<Readonly<Record<string, unknown>>>;
 export function createSignedCheckpoint(options: {
   cwd?: string;
   signer: string;
@@ -1735,6 +1750,30 @@ export function ensureAutoWorkspace(start?: string, options?: { exact?: boolean 
   workspace?: QarinahWorkspace;
 }>>;
 export const CHAT_MEMORY_SCHEMA_VERSION: "qarinah.chat-memory.v1";
+export const MATCHED_TASK_SCHEMA_VERSION: "qarinah.matched-task-evaluation.v1";
+export function inspectRuntimeHealth(options?: { cwd?: string; online?: boolean }): Promise<Readonly<{
+  schemaVersion: "qarinah.runtime-health.v1"; version: string; workspaceId: string;
+  integrity: "verified-local-chain"; capture: "metadata" | "content"; retainedEvents: number;
+  lastRetainedAt: string | null; lastObservedHostCaptureAt: string | null; machineAutoInitEnabled: boolean;
+  userRuntime: { version: string | null; configuredHosts: string[] } | null;
+  providerDelivery: "unobserved"; publicRelease: { status: string; version: string | null; sourceCommit?: string | null };
+  hostLifecycle: string; knowledgeBoundary: string;
+}>>;
+export interface QarinahMatchedTaskRun {
+  configurationHash: string;
+  outcome: "completed" | "failed" | "cancelled";
+  taskPassed: boolean;
+  elapsedMs: number;
+  retrievalMs: number;
+  costMicrosUsd: number | null;
+  usage: ProviderUsage[];
+}
+export interface QarinahMatchedTaskInput {
+  schemaVersion: typeof MATCHED_TASK_SCHEMA_VERSION;
+  baselineMethod: "project-notes-and-search" | "native-host" | "competitor" | "full-history";
+  pairs: Array<{ id: string; repositoryRevision: string; taskHash: string; baseline: QarinahMatchedTaskRun; qarinah: QarinahMatchedTaskRun }>;
+}
+export function evaluateMatchedTasks(input: QarinahMatchedTaskInput): Readonly<Record<string, unknown>>;
 export function recallChatMemory(query?: string, options?: {
   cwd?: string;
   detail?: "summary" | "full";

@@ -66,7 +66,7 @@ For an explicit foreground loop that also notices source changes, refreshes the 
 
 ## Automatic memory with verifiable evidence
 
-**Qarinah 0.7.0** adds machine-local automatic project initialization, visible-chat retention when explicitly enabled, summary-first recall, and bounded expansion to exact cited sources. Install once for your user account:
+**Qarinah 0.8.0** improves relevant recall, actual provider usage accounting, runtime health, repeated-query performance, and optional client-encrypted shared knowledge. Machine-local automatic initialization and bounded cited expansion remain available. Install once for your user account:
 
 ```sh
 npx qarinah@latest setup-user --capture content --full-chat
@@ -80,7 +80,7 @@ Every retained event carries a **SHA-256 content digest**, a **SHA-256 record di
 
 **OKF means Open Knowledge Format.** Qarinah exports deterministic OKF 0.1 Draft Markdown with event identities, relations, citations, and hashes. The JSONL ledger remains authoritative. Run `npx qarinah export okf` to produce the portable view.
 
-[Release details](docs/RELEASE-0.7.0.md) · [Whitepaper v1.9](output/pdf/Qarinah-Technical-White-Paper-v1.9.pdf) · [Dashboard](docs/DASHBOARD.md)
+[Release details](docs/RELIABILITY-0.8.md) · [Whitepaper v1.9](output/pdf/Qarinah-Technical-White-Paper-v1.9.pdf) · [Dashboard](docs/DASHBOARD.md)
 
 ## Resume the work, not the whole chat
 
@@ -108,34 +108,34 @@ npx qarinah dashboard --serve --worktrees
 
 ### Reproducible proof-context result
 
-The 0.7.0 evaluator creates a 12-file repository across ten registered language families and pairs every current decision with a superseded predecessor. It passes **12 / 12** task-packet scenarios: the expected file and symbol are selected, current evidence is retrieved, stale evidence is excluded and identified, hashes remain valid, the packet stays inside 4,096 portable estimated tokens, and an unchanged rerun reproduces the same manifest. A separate mutation is rejected by `validateProofContext()`.
+The 0.8.0 evaluator creates a 12-file repository across ten registered language families and pairs every current decision with a superseded predecessor. It passes **12 / 12** task-packet scenarios: the expected file and symbol are selected, current evidence is retrieved, stale evidence is excluded and identified, hashes remain valid, the packet stays inside 4,096 portable estimated tokens, and an unchanged rerun reproduces the same manifest. A separate mutation is rejected by `validateProofContext()`.
 
 ```sh
 npm run evaluate:proof-context
 npm run check:proof-context-evidence
 ```
 
-Inspect the [machine-readable result](bench/results/proof-context-0.7.0.json) and [evaluator](scripts/evaluate-proof-context.mjs). This is deterministic acceptance evidence over a generated repository, not a universal accuracy, cost, or cross-product claim.
+Inspect the [machine-readable result](bench/results/proof-context-0.8.0.json) and [evaluator](scripts/evaluate-proof-context.mjs). This is deterministic acceptance evidence over a generated repository, not a universal accuracy, cost, or cross-product claim.
 
 ### Reproducible public-checkout memory result
 
-The current evaluator copies Qarinah's public source into an isolated temporary Git repository and runs the product end to end. It passes **10 / 10** structural scenarios, indexes **all 201 eligible source files**, resolves four exact implementation definitions, records one completed session lifecycle, writes a minimized v2 receipt, compiles cited continuation context, and verifies the complete ledger chain. It uses no private data or provider calls.
+The current evaluator copies Qarinah's public source into an isolated temporary Git repository and runs the product end to end. It passes **10 / 10** structural scenarios, indexes **every eligible source file**, resolves four exact implementation definitions, records one completed session lifecycle, writes a minimized v2 receipt, compiles cited continuation context, and verifies the complete ledger chain. It uses no private data or provider calls.
 
 ```sh
 npm run check:public-project-memory
 ```
 
-Read the [method and boundaries](docs/PUBLIC-PROJECT-MEMORY-EVALUATION.md) or inspect the [0.7.0 machine-readable result](bench/results/public-project-memory-v0.7.0.json). Historical receipts remain unchanged, and exact file counts are refreshed before each release commit.
+Read the [method and boundaries](docs/PUBLIC-PROJECT-MEMORY-EVALUATION.md) or inspect the [0.8.0 machine-readable result](bench/results/public-project-memory-v0.8.0.json). Historical receipts remain unchanged, and exact file counts are refreshed before each release commit.
 
 ### Reproducible deep-memory product result
 
-The 0.7.0 product evaluator runs the full local path in a temporary initialized project: incremental source refresh, symbol and cross-file-reference indexing, cited fact consolidation, two encrypted content snapshots, integrity verification, and exact byte restoration. It passes **12 / 12** scenarios, restores **390,226 source bytes exactly**, reuses **2 of 3** chunks in the second snapshot, indexes **4 symbols** and **3 resolved references**, and retains **2 cited facts**.
+The 0.8.0 product evaluator runs the full local path in a temporary initialized project: incremental source refresh, symbol and cross-file-reference indexing, cited fact consolidation, two encrypted content snapshots, integrity verification, and exact byte restoration. It passes **12 / 12** scenarios, restores **390,226 source bytes exactly**, reuses **2 of 3** chunks in the second snapshot, indexes **4 symbols** and **3 resolved references**, and retains **2 cited facts**.
 
 ```sh
 npm run check:deep-memory
 ```
 
-Inspect the [machine-readable result](bench/results/deep-memory-platform-v0.7.0.json) and [evaluator](scripts/evaluate-deep-memory-platform.mjs). Historical receipts remain unchanged. This is local product-acceptance evidence, not a cross-product comparison or a promise about arbitrary repositories.
+Inspect the [machine-readable result](bench/results/deep-memory-platform-v0.8.0.json) and [evaluator](scripts/evaluate-deep-memory-platform.mjs). Historical receipts remain unchanged. This is local product-acceptance evidence, not a cross-product comparison or a promise about arbitrary repositories.
 
 ### Reproducible real-Git-worktree acceptance result
 

@@ -221,6 +221,7 @@ test("package routes normal research evidence checks through the post-result ver
   assert.equal(packageJson.scripts["check:research-retrieval:v0.5:result"], "node scripts/verify-research-retrieval-v0.5-result.mjs");
   assert.equal(packageJson.scripts["evaluate:research-retrieval:v0.4"], "node scripts/evaluate-research-retrieval-v0.4.mjs");
   assert.equal(packageJson.scripts["evaluate:research-retrieval:v0.4:write"], "node scripts/evaluate-research-retrieval-v0.4.mjs --write");
-  assert.equal(packageJson.files.includes("scripts/verify-research-retrieval-v0.5-result.mjs"), true);
-  assert.equal(packageJson.files.includes(V05_RESULT_PATH), true);
+  assert.equal(packageJson.files.some(entry => entry.startsWith("scripts/") || entry.startsWith("bench/")), false);
+  const reproduction = await readFile(path.join(repositoryRoot, "docs", "TASK-COMPARISON.md"), "utf8");
+  assert.match(reproduction, /Clone the matching release tag/u);
 });

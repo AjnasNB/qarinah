@@ -1,6 +1,6 @@
 {
   "name": "qarinah",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Qarinah is proof-carrying project memory for coding agents - multi-language, worktree-aware, recoverable, and cited.",
   "author": {
     "name": "Ajnas NB",
@@ -9,7 +9,12 @@
   },
   "repository": "https://github.com/AjnasNB/qarinah",
   "license": "Apache-2.0",
-  "keywords": ["context", "provenance", "git-worktree", "codex"],
+  "keywords": [
+    "context",
+    "provenance",
+    "git-worktree",
+    "codex"
+  ],
   "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "interface": {
@@ -18,7 +23,10 @@
     "longDescription": "Qarinah gives every initialized Git worktree its own evidence-linked memory, builds a multi-language source graph, records lifecycle-bound receipts and recoverable checkpoints, and groups sibling checkouts into one repository context graph. It captures explicitly permitted Codex lifecycle metadata into a local tamper-evident record, while read-only MCP tools report status, integrity, and compact cited task context.",
     "developerName": "Ajnas NB",
     "category": "Productivity",
-    "capabilities": ["Interactive", "Write"],
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
     "defaultPrompt": [
       "Build a cited context pack for this task.",
       "Show the decisions related to this change.",

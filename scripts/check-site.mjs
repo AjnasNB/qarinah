@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 const output = path.join(root, "site-dist");
 const required = [
   "index.html",
@@ -374,8 +375,8 @@ if (!home.includes("Verifiable project memory, exact source recovery, and cited 
   errors.push("Homepage is missing the worktree-aware category or the separate historical benchmark scope.");
 }
 if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
-  || publicMetrics.productVersion !== "0.7.0"
-  || publicMetrics.updatedAt !== "2026-10-08"
+  || publicMetrics.productVersion !== packageJson.version
+  || publicMetrics.updatedAt !== "2026-10-16"
   || publicMetrics.providerBillingMeasurement !== false
   || publicMetrics.metrics?.proofCarryingTaskContext?.scenarios !== 12
   || publicMetrics.metrics?.proofCarryingTaskContext?.accepted !== 12
@@ -399,7 +400,7 @@ if (publicMetrics.schemaVersion !== "qarinah.public-metrics.v1"
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.indexedSymbols !== 4
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.resolvedReferences !== 3
   || publicMetrics.metrics?.deepMemoryProductAcceptance?.citedFacts !== 2
-  || publicMetrics.metrics?.deepMemoryProductAcceptance?.artifactHash !== "sha256:43e4d3d61a4a3ab5fed5d59a30b8a16df02dcb5ea60e973a9fa906b61089dd2d"
+  || publicMetrics.metrics?.deepMemoryProductAcceptance?.artifactHash !== "sha256:ce4f2019b2e2c46398fac200089eef704567a9a086a6f43858e0b9f49203dd19"
   || publicMetrics.metrics?.publicProjectMemory?.scenarios !== 10
   || publicMetrics.metrics?.publicProjectMemory?.passed !== 10
   || publicMetrics.metrics?.publicProjectMemory?.indexedSymbolFiles !== publicMetrics.metrics?.publicProjectMemory?.eligibleSymbolFiles

@@ -1,0 +1,13 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "qarinah-knowledge",
+  "main": "index.mjs",
+  "compatibility_date": "2026-10-06",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "upload_source_maps": true,
+  "r2_buckets": [{ "binding": "KNOWLEDGE", "bucket_name": "qarinah-knowledge-private" }],
+  "ratelimits": [{ "name": "RATE_LIMITER", "namespace_id": "2026101601", "simple": { "limit": 120, "period": 60 } }],
+  "observability": { "enabled": true, "head_sampling_rate": 1 }
+}

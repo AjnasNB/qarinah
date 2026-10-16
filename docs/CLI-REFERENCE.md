@@ -1,5 +1,7 @@
 # CLI reference
 
+Version 0.8 adds `qarinah health [--online]`, `qarinah usage`, `qarinah usage record --stdin-json`, and `qarinah compare --stdin-json`. Health distinguishes configuration and observed capture from unobserved provider delivery. Usage records actual per-attempt counts; compare accepts bounded versioned matched-task input. See [usage](PROVIDER-USAGE.md), [comparison](TASK-COMPARISON.md), and [release limits](RELIABILITY-0.8.md).
+
 ## Git worktrees
 
 ```bash
