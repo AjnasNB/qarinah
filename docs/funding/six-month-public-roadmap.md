@@ -49,4 +49,3 @@ Success means an external contributor can install Qarinah on all three supported
 Publish the funded issue outcomes, relevant assessment reports or advisories, reproduction methods and limitations, public implementation artifacts, and final spending report. Proposed external assessment does not constitute a current security certification, and project-specific benchmark evidence does not establish universal savings or performance.
 
 Work or hours funded elsewhere must be disclosed and excluded or offset to avoid charging the same deliverable twice.
-
