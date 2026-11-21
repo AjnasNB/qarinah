@@ -48,7 +48,6 @@ const required = [
   "assets/qarinah-memory-mark.svg",
   "assets/qarinah-river-hero.webp",
   "assets/qarinah-river-hero-mobile.webp",
-  "assets/qarinah-river-detail.webp",
   "assets/qarinah-flow.svg",
   "assets/qarinah-social-preview.png",
   "assets/qarinah-what-you-save.png",
@@ -56,6 +55,7 @@ const required = [
   "assets/qarinah-worktree-context-graph.png",
   "site.css",
   "site.js",
+  "river-motion.js",
   "primer.css",
   "_headers",
   "_redirects",
@@ -326,6 +326,9 @@ for (const responsiveHeroRule of [
 ]) {
   if (!responsiveCss.includes(responsiveHeroRule)) errors.push(`site.css is missing responsive first-run hero behavior: ${responsiveHeroRule}`);
 }
+if (home.includes("memory-rail") || home.includes("qarinah-river-detail")) {
+  errors.push("Homepage still contains the retired rail or second river photo.");
+}
 if (home.includes('"@type":"SearchAction"') || home.includes("search_term_string")) {
   errors.push("Homepage must not emit the retired sitelinks-search SearchAction or its crawlable URL template.");
 }
@@ -353,7 +356,10 @@ for (const worktreeHeroProof of [
   "across repositories you’ve explicitly connected",
   "Follow a decision through an example handoff.",
   'data-home-theme',
-  'class="memory-rail"',
+  'class="memory-river-motion"',
+  'class="memory-current-signal"',
+  'aria-label="Copy install command"',
+  'Public demo',
   'href="/assets/qarinah-memory-mark.svg"',
   "npx qarinah@latest setup .",
   "Metadata-only by default.",
@@ -379,10 +385,10 @@ for (const dashboardProof of [
   if (!home.includes(dashboardProof)) errors.push(`Homepage is missing the real dashboard proof: ${dashboardProof}`);
 }
 const memoryHeroIndex = home.indexOf('<section class="hero memory-hero"');
-const memoryModesIndex = home.indexOf('<section class="memory-modes section shell"');
+const memoryFlowIndex = home.indexOf('<section class="memory-flow section shell"');
 const handoffDemoIndex = home.indexOf('<section class="handoff-video section shell"');
-if (memoryHeroIndex < 0 || memoryModesIndex <= memoryHeroIndex || handoffDemoIndex <= memoryModesIndex) {
-  errors.push("Homepage must introduce memory and the three ways to use it before the handoff demonstration.");
+if (memoryHeroIndex < 0 || memoryFlowIndex <= memoryHeroIndex || handoffDemoIndex <= memoryFlowIndex) {
+  errors.push("Homepage must show the animated handoff and public demo directly after the hero.");
 }
 if (!home.includes("Verifiable project memory, exact source recovery, and cited context for coding agents.")
   || !home.includes("Measured, reproducible, and explicitly scoped.")) {

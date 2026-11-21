@@ -26,15 +26,39 @@
   });
 
   for (const button of document.querySelectorAll(".copy-button")) {
+    const icon = button.hasAttribute("data-copy-icon");
+    const label = icon ? button.getAttribute("aria-label") : button.textContent;
+    let reset;
+    const feedback = (message) => {
+      if (icon) {
+        button.dataset.copyState = message === "Copied" ? "copied" : "error";
+        button.setAttribute("aria-label", message);
+        button.title = message;
+        button.closest(".memory-install").querySelector("[role=status]").textContent = message;
+      } else {
+        button.textContent = message;
+      }
+    };
     button.addEventListener("click", async () => {
-      const original = button.textContent;
-      await navigator.clipboard.writeText(button.dataset.copy || "");
-      button.textContent = "Copied";
-      setTimeout(() => { button.textContent = original; }, 1400);
+      clearTimeout(reset);
+      try {
+        await navigator.clipboard.writeText(button.dataset.copy || "");
+        feedback("Copied");
+      } catch {
+        feedback("Copy failed");
+      }
+      reset = setTimeout(() => {
+        if (icon) {
+          delete button.dataset.copyState;
+          button.setAttribute("aria-label", label);
+          button.title = label;
+          button.closest(".memory-install").querySelector("[role=status]").textContent = "";
+        } else {
+          button.textContent = label;
+        }
+      }, 1600);
     });
   }
-
-
 
   const flow = document.querySelector(".memory-flow-tabs");
   if (flow) {
@@ -72,6 +96,7 @@
     const paused = root.classList.toggle("memory-motion-paused");
     motion.setAttribute("aria-pressed", String(paused));
     motion.textContent = paused ? "Resume motion" : "Pause motion";
+    document.dispatchEvent(new Event("qarinah:motion"));
   });
 
   const searchInput = document.querySelector('input[type="search"]');

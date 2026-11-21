@@ -2808,7 +2808,7 @@ a {
 }
 
 .memory-landscape {
-  z-index: -2;
+  z-index: -3;
 }
 
 .memory-landscape img {
@@ -2946,20 +2946,6 @@ a:is(:hover, :focus-visible, :active) .memory-arrow {
   text-wrap: balance;
 }
 
-.memory-photo {
-  display: block;
-  margin-top: 22px;
-}
-
-.memory-photo img {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 3 / 2;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
 .memory-modes-list > a {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -3002,6 +2988,14 @@ a:is(:hover, :focus-visible, :active) .memory-arrow {
   text-align: center;
 }
 
+.memory-flow .section-heading {
+  margin-inline: auto;
+}
+
+[data-home-theme] .memory-flow {
+  padding-block: clamp(52px, 6vw, 84px);
+}
+
 .memory-flow .section-heading p {
   margin: 10px auto 0;
 }
@@ -3039,7 +3033,7 @@ a:is(:hover, :focus-visible, :active) .memory-arrow {
 
 .memory-flow-panels {
   width: min(100%, 63ch);
-  min-height: 130px;
+  min-height: 90px;
   margin: 24px auto 0;
   padding: 0 6px;
 }
@@ -3051,36 +3045,6 @@ a:is(:hover, :focus-visible, :active) .memory-arrow {
 .memory-flow-panels p {
   margin: 8px 0 0;
   color: #b7c6d7;
-}
-
-.memory-rail {
-  position: fixed;
-  z-index: 2;
-  inset: 0 clamp(3px, .8vw, 16px) 0 auto;
-  width: 2px;
-  overflow: hidden;
-  background: #344960;
-  opacity: .8;
-  pointer-events: none;
-}
-
-.memory-rail::after {
-  position: absolute;
-  inset: auto 0;
-  top: 0;
-  height: 13vh;
-  content: "";
-  background: linear-gradient(transparent, #8cede6);
-  animation: memory-travel 7s linear infinite;
-}
-
-@keyframes memory-travel {
-  from { transform: translateY(-16vh); }
-  to { transform: translateY(104vh); }
-}
-
-.memory-motion-paused .memory-rail::after {
-  animation-play-state: paused;
 }
 
 .memory-motion-toggle {
@@ -3122,18 +3086,98 @@ a:is(:hover, :focus-visible, :active) .memory-arrow {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .memory-photo img {
-    max-height: 300px;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .memory-rail,
   .memory-motion-toggle {
     display: none;
   }
 
   .memory-arrow {
     transition: none;
+  }
+}
+
+.memory-river-motion {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.memory-install [data-copy-icon] {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+}
+
+.copy-confirmation,
+[data-copy-state="copied"] .copy-glyph {
+  display: none;
+}
+
+[data-copy-state="copied"] .copy-confirmation {
+  display: block;
+  color: #a6f2cf;
+}
+
+[data-copy-state="error"] {
+  outline: 2px solid #f5ad9f;
+}
+
+.memory-copy-message {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.memory-quote {
+  margin: 0;
+}
+
+.memory-current {
+  display: block;
+  width: min(100%, 640px);
+  margin: 28px auto 14px;
+  overflow: visible;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.memory-current-bed {
+  stroke: #355064;
+}
+
+.memory-current-signal {
+  stroke: #8ce4c5;
+  stroke-dasharray: 14 86;
+  animation: memory-current-flow 6s linear infinite;
+}
+
+@keyframes memory-current-flow {
+  from { stroke-dashoffset: 14; }
+  to { stroke-dashoffset: -86; }
+}
+
+.memory-motion-paused .memory-current-signal {
+  animation-play-state: paused;
+}
+
+.memory-modes .section-heading {
+  max-width: 36ch;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .memory-river-motion,
+  .memory-current-signal {
+    display: none;
   }
 }

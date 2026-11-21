@@ -848,6 +848,7 @@ await mkdir(path.join(output, "paper"), { recursive: true });
 
 await cp(path.join(root, "website", "site.css"), path.join(output, "site.css"));
 await cp(path.join(root, "website", "site.js"), path.join(output, "site.js"));
+await cp(path.join(root, "website", "river-motion.js"), path.join(output, "river-motion.js"));
 await cp(path.join(root, "website", "static"), output, { recursive: true });
 await cp(path.join(root, "node_modules", "@primer", "css", "dist", "primer.css"), path.join(output, "primer.css"));
 await cp(path.join(root, "assets", "brand", "qarinah-mark.svg"), path.join(output, "assets", "qarinah-mark.svg"));
@@ -1369,9 +1370,9 @@ function layout({ title, description, body, active = "", canonical = "/", kind =
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   ${nav(active)}
-  <main id="main">${kind === "home" ? '<div class="memory-rail" aria-hidden="true"></div>' : ""}${body}</main>
+  <main id="main">${body}</main>
   ${footer()}
-  <script src="/site.js" defer></script>
+  <script src="/site.js" defer></script>${kind === "home" ? '\n  <script src="/river-motion.js" defer></script>' : ""}
 </body>
 </html>`;
 }
@@ -1395,12 +1396,17 @@ function homePage() {
           <source media="(max-width: 620px)" srcset="/assets/qarinah-river-hero-mobile.webp">
           <img src="/assets/qarinah-river-hero.webp" alt="" width="1536" height="1024" fetchpriority="high">
         </picture>
+        <canvas class="memory-river-motion" aria-hidden="true"></canvas>
         <div class="shell memory-hero-content">
           <h1 id="memory-title">Memory that keeps AI moving.</h1>
           <p class="hero-lede">Pick up where you left off in a new chat, a different project, or another coding agent.</p>
           <div class="memory-install" aria-label="Install Qarinah locally">
             <code>npx qarinah@latest setup .</code>
-            <button class="copy-button" type="button" data-copy="npx qarinah@latest setup .">Copy</button>
+            <button class="copy-button" type="button" data-copy="npx qarinah@latest setup ." data-copy-icon aria-label="Copy install command" title="Copy install command">
+              <svg class="copy-glyph" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
+              <svg class="copy-confirmation" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>
+            </button>
+            <span class="memory-copy-message" role="status"></span>
           </div>
           <div class="hero-actions">
             <a class="btn btn-primary btn-large" href="/docs/getting-started/">Set up memory <span class="memory-arrow" aria-hidden="true">↗</span></a>
@@ -1410,25 +1416,15 @@ function homePage() {
         </div>
       </section>
 
-      <section class="memory-modes section shell" aria-labelledby="memory-modes-title">
-        <div>
-          <h2 id="memory-modes-title">The project remembers.</h2>
-          <picture class="memory-photo">
-            <img src="/assets/qarinah-river-detail.webp" alt="" width="900" height="600" loading="lazy" decoding="async">
-          </picture>
-        </div>
-        <div class="memory-modes-list">
-          <a href="/docs/auto-initialization/"><h3>Cross-chat memory</h3><p>Open a fresh conversation and recover what you decided, tried, and left unfinished.</p><span class="memory-arrow" aria-hidden="true">↗</span></a>
-          <a href="/docs/team-memory/"><h3>Cross-project memory</h3><p>Return to the right project history or search across repositories you’ve explicitly connected.</p><span class="memory-arrow" aria-hidden="true">↗</span></a>
-          <a href="/docs/cross-agent-handoffs/"><h3>Cross-agent memory</h3><p>Start in Codex, continue in Claude Code or Cursor, and bring the relevant sources with you.</p><span class="memory-arrow" aria-hidden="true">↗</span></a>
-        </div>
-      </section>
-
       <section class="memory-flow section shell" aria-labelledby="memory-flow-title">
         <div class="section-heading">
-          <h2 id="memory-flow-title">From one agent to the next.</h2>
+          <blockquote class="memory-quote"><h2 id="memory-flow-title">“A chat ends.<br>The work keeps flowing.”</h2></blockquote>
           <p>Follow a decision through an example handoff.</p>
         </div>
+        <svg class="memory-current" viewBox="0 0 700 52" fill="none" aria-hidden="true">
+          <path class="memory-current-bed" d="M2 30C88 30 106 12 175 12s105 28 175 28 105-28 175-28 88 18 173 18"/>
+          <path class="memory-current-signal" pathLength="100" d="M2 30C88 30 106 12 175 12s105 28 175 28 105-28 175-28 88 18 173 18"/>
+        </svg>
         <div class="memory-flow-tabs" role="tablist" aria-label="Handoff stages">
           <button id="memory-stage-codex" type="button" role="tab" aria-controls="memory-panel-codex" aria-selected="true">Codex</button>
           <button id="memory-stage-qarinah" type="button" role="tab" aria-controls="memory-panel-qarinah" aria-selected="false" tabindex="-1"><img src="/assets/qarinah-memory-mark.svg" width="23" height="23" alt="">Qarinah</button>
@@ -1444,10 +1440,10 @@ function homePage() {
       <section class="handoff-video section shell" aria-labelledby="handoff-video-title">
         <div class="section-heading split-heading">
           <div>
-            <p class="eyebrow">A real fresh-session handoff</p>
-            <h2 id="handoff-video-title">Watch the old session disappear. See the next one recover the exact decision.</h2>
+            <p class="eyebrow">Public demo</p>
+            <h2 id="handoff-video-title">See a new session recover the decision.</h2>
           </div>
-          <p>This two-minute reproducible fixture creates an isolated project, records a tested retry boundary, removes the temporary Session A transcript, and retrieves the cited decision in a fresh Session B. The video uses the real generated dashboard, event ID, and evidence hash.</p>
+          <p>The two-minute demo records a tested retry rule, removes the first session’s transcript, and recovers the decision in a fresh session. You can inspect its source event and SHA-256 hash.</p>
         </div>
         <div class="handoff-video-frame">
           <video controls preload="metadata" playsinline poster="/assets/qarinah-fresh-session-handoff-poster.png">
@@ -1459,6 +1455,15 @@ function homePage() {
           <a class="text-link" href="https://github.com/AjnasNB/qarinah/issues/new?template=design_partner.yml">Join the maintainer pilot</a>
           <a class="btn btn-primary" href="/docs/getting-started/#try-the-isolated-demo-first">Try the two-minute demo</a>
           <a class="text-link" href="/assets/qarinah-fresh-session-handoff.mp4">Download the two-minute MP4</a>
+        </div>
+      </section>
+
+      <section class="memory-modes section shell" aria-labelledby="memory-modes-title">
+        <div class="section-heading"><h2 id="memory-modes-title">Memory where you work.</h2></div>
+        <div class="memory-modes-list">
+          <a href="/docs/auto-initialization/"><h3>Cross-chat memory</h3><p>Open a fresh conversation and recover what you decided, tried, and left unfinished.</p><span class="memory-arrow" aria-hidden="true">↗</span></a>
+          <a href="/docs/team-memory/"><h3>Cross-project memory</h3><p>Return to the right project history or search across repositories you’ve explicitly connected.</p><span class="memory-arrow" aria-hidden="true">↗</span></a>
+          <a href="/docs/cross-agent-handoffs/"><h3>Cross-agent memory</h3><p>Start in Codex, continue in Claude Code or Cursor, and bring the relevant sources with you.</p><span class="memory-arrow" aria-hidden="true">↗</span></a>
         </div>
       </section>
 
