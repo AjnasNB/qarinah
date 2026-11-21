@@ -45,6 +45,10 @@ const required = [
   "paper/Qarinah-Technical-White-Paper-v1.3.pdf",
   "paper/Qarinah-Technical-White-Paper-v1.2.pdf",
   "assets/qarinah-mark.svg",
+  "assets/qarinah-memory-mark.svg",
+  "assets/qarinah-river-hero.webp",
+  "assets/qarinah-river-hero-mobile.webp",
+  "assets/qarinah-river-detail.webp",
   "assets/qarinah-flow.svg",
   "assets/qarinah-social-preview.png",
   "assets/qarinah-what-you-save.png",
@@ -342,12 +346,15 @@ if (!home.includes("What coding agents and developers need to know.") || !home.i
   errors.push("Homepage is missing the direct answer-engine surface.");
 }
 for (const worktreeHeroProof of [
-  "Memory that helps AI <em>keep going.</em>",
+  "Memory that keeps AI moving.",
   "Cross-chat memory",
   "Cross-project memory",
   "Cross-agent memory",
   "across repositories you’ve explicitly connected",
-  "Example handoff",
+  "Follow a decision through an example handoff.",
+  'data-home-theme',
+  'class="memory-rail"',
+  'href="/assets/qarinah-memory-mark.svg"',
   "npx qarinah@latest setup .",
   "Metadata-only by default.",
   "npx qarinah demo",

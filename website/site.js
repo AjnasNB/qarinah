@@ -1,7 +1,7 @@
 (() => {
   const root = document.documentElement;
   const storedTheme = localStorage.getItem("qarinah-theme");
-  if (storedTheme === "light" || storedTheme === "dark") {
+  if (!root.hasAttribute("data-home-theme") && (storedTheme === "light" || storedTheme === "dark")) {
     root.dataset.colorMode = storedTheme;
     root.dataset.lightTheme = storedTheme;
     root.dataset.darkTheme = storedTheme;
@@ -33,6 +33,46 @@
       setTimeout(() => { button.textContent = original; }, 1400);
     });
   }
+
+
+
+  const flow = document.querySelector(".memory-flow-tabs");
+  if (flow) {
+    const tabs = [...flow.querySelectorAll('[role="tab"]')];
+    const select = (tab) => {
+      for (const item of tabs) {
+        const active = item === tab;
+        item.setAttribute("aria-selected", String(active));
+        item.tabIndex = active ? 0 : -1;
+        document.getElementById(item.getAttribute("aria-controls")).hidden = !active;
+      }
+    };
+    flow.addEventListener("click", (event) => {
+      const tab = event.target.closest('[role="tab"]');
+      if (tab) select(tab);
+    });
+    flow.addEventListener("keydown", (event) => {
+      const current = tabs.indexOf(event.target);
+      if (current < 0) return;
+      const next = {
+        ArrowLeft: (current + tabs.length - 1) % tabs.length,
+        ArrowRight: (current + 1) % tabs.length,
+        Home: 0,
+        End: tabs.length - 1
+      }[event.key];
+      if (next === undefined) return;
+      event.preventDefault();
+      select(tabs[next]);
+      tabs[next].focus();
+    });
+  }
+
+  const motion = document.querySelector(".memory-motion-toggle");
+  motion?.addEventListener("click", () => {
+    const paused = root.classList.toggle("memory-motion-paused");
+    motion.setAttribute("aria-pressed", String(paused));
+    motion.textContent = paused ? "Resume motion" : "Pause motion";
+  });
 
   const searchInput = document.querySelector('input[type="search"]');
   document.addEventListener("keydown", (event) => {
@@ -70,7 +110,7 @@
           const keywords = normalize((entry.keywords || []).join(" "));
           const headings = normalize((entry.headings || []).map((heading) => heading.text).join(" "));
           const content = normalize(entry.content || "");
-          let score = 0;
+          let score = entry.route === "/" && ["qarinah", "qarinah io"].includes(normalizedQuery) ? 1000 : 0;
           if (title.includes(normalizedQuery)) score += 24;
           if (keywords.includes(normalizedQuery)) score += 18;
           if (headings.includes(normalizedQuery)) score += 14;

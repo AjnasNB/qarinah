@@ -796,10 +796,10 @@ const routesBySource = new Map(docPages.map((page) => [page.source.replaceAll("\
 const searchEntries = [
   {
     route: "/",
-    title: "Qarinah - Git Worktree Memory and Context Graphs for Coding Agents",
+    title: "Qarinah | Local AI Memory for Chats, Projects, and Coding Agents",
     description: productPositioning,
     headings: [],
-    keywords: ["git worktree memory", "coding agent memory", "project memory", "context graph", "token-efficient context"],
+    keywords: ["Qarinah.io", "cross-chat memory", "cross-project memory", "cross-agent memory", "git worktree memory", "coding agent memory"],
     content: "Qarinah keeps an isolated evidence-linked project record per Git checkout, groups sibling worktrees, and compiles the small cited context pack needed for the current coding task."
   },
   {
@@ -953,7 +953,7 @@ function nav(active = "") {
     <header class="site-header">
       <div class="shell header-inner">
         <a class="brand" href="/" aria-label="Qarinah home">
-          <img src="/assets/qarinah-mark.svg" width="30" height="30" alt="">
+          <img src="/assets/qarinah-memory-mark.svg" width="30" height="30" alt="">
           <span>Qarinah</span>
           <span class="version-label">${productVersion}</span>
         </a>
@@ -961,7 +961,7 @@ function nav(active = "") {
         <nav id="primary-nav" class="primary-nav" aria-label="Primary navigation">
           ${items.map(([label, href, id]) => `<a class="${active === id ? "selected" : ""}" href="${href}">${label}</a>`).join("")}
           <a href="${github}" rel="noreferrer">GitHub</a>
-          <button class="theme-toggle" type="button" aria-label="Toggle color theme">Theme</button>
+          ${active === "home" ? '<button class="memory-motion-toggle" type="button" aria-pressed="false">Pause motion</button>' : '<button class="theme-toggle" type="button" aria-label="Toggle color theme">Theme</button>'}
         </nav>
       </div>
     </header>`;
@@ -972,7 +972,7 @@ function footer() {
     <footer class="site-footer">
       <div class="shell footer-grid">
         <div>
-          <a class="brand footer-brand" href="/"><img src="/assets/qarinah-mark.svg" width="28" height="28" alt=""><span>Qarinah</span></a>
+          <a class="brand footer-brand" href="/"><img src="/assets/qarinah-memory-mark.svg" width="28" height="28" alt=""><span>Qarinah</span></a>
           <p>${productPositioning}</p>
         </div>
         <div>
@@ -1062,6 +1062,7 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
         "@id": `${siteOrigin}/#website`,
         url: `${siteOrigin}/`,
         name: "Qarinah",
+        alternateName: "Qarinah.io",
         description,
         inLanguage: "en",
         publisher: { "@id": person["@id"] }
@@ -1325,14 +1326,14 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
 
 function layout({ title, description, body, active = "", canonical = "/", kind = "doc" }) {
   const fullTitle = canonical === "/"
-    ? "Qarinah - Your project remembers across coding agents"
+    ? "Qarinah | Local AI Memory for Chats, Projects, and Coding Agents"
     : `${title} - Qarinah`;
   const url = `${siteOrigin}${canonical}`;
   const ogType = kind === "home" || kind === "search" ? "website" : "article";
   const schema = JSON.stringify(structuredData({ title: fullTitle, description, canonical, kind }))
     .replaceAll("</", "<\\/");
   return `<!doctype html>
-<html lang="en" data-color-mode="auto" data-light-theme="light" data-dark-theme="dark">
+<html lang="en" data-color-mode="${kind === "home" ? "dark" : "auto"}" data-light-theme="light" data-dark-theme="dark"${kind === "home" ? " data-home-theme" : ""}>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1360,7 +1361,7 @@ function layout({ title, description, body, active = "", canonical = "/", kind =
   <meta name="twitter:description" content="${description}">
   <meta name="twitter:image" content="${siteOrigin}/assets/qarinah-social-preview.png">
   <meta name="twitter:image:alt" content="Qarinah - your project remembers across coding agents.">
-  <link rel="icon" href="/assets/qarinah-mark.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/qarinah-memory-mark.svg" type="image/svg+xml" sizes="any">
   <link rel="stylesheet" href="/primer.css">
   <link rel="stylesheet" href="/site.css">
   <script type="application/ld+json">${schema}</script>
@@ -1368,7 +1369,7 @@ function layout({ title, description, body, active = "", canonical = "/", kind =
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   ${nav(active)}
-  <main id="main">${body}</main>
+  <main id="main">${kind === "home" ? '<div class="memory-rail" aria-hidden="true"></div>' : ""}${body}</main>
   ${footer()}
   <script src="/site.js" defer></script>
 </body>
@@ -1390,44 +1391,53 @@ function homePage() {
     body: `
 
       <section class="hero memory-hero" aria-labelledby="memory-title">
-        <div class="shell hero-grid">
-          <div class="hero-copy">
-            <p class="memory-label"><span aria-hidden="true"></span> Local-first memory for coding agents</p>
-            <h1 id="memory-title">Memory that helps AI <em>keep going.</em></h1>
-            <p class="hero-lede">Open a new chat, come back to a project, or switch coding agents. Qarinah brings forward the decisions, code, and evidence you’ve allowed it to remember.</p>
-            ${commandBlock("npx qarinah@latest setup .", "Install in your project")}
-            <div class="hero-actions">
-              <a class="btn btn-primary btn-large" href="/docs/getting-started/">Set up memory</a>
-              <a class="hero-text-link" href="#handoff-video-title">Watch a real handoff <span aria-hidden="true">↘</span></a>
-            </div>
-            <p class="hero-privacy"><strong>Metadata-only by default.</strong> No account required. Try <code>npx qarinah demo</code> in an isolated project.</p>
+        <picture class="memory-landscape" aria-hidden="true">
+          <source media="(max-width: 620px)" srcset="/assets/qarinah-river-hero-mobile.webp">
+          <img src="/assets/qarinah-river-hero.webp" alt="" width="1536" height="1024" fetchpriority="high">
+        </picture>
+        <div class="shell memory-hero-content">
+          <h1 id="memory-title">Memory that keeps AI moving.</h1>
+          <p class="hero-lede">Pick up where you left off in a new chat, a different project, or another coding agent.</p>
+          <div class="memory-install" aria-label="Install Qarinah locally">
+            <code>npx qarinah@latest setup .</code>
+            <button class="copy-button" type="button" data-copy="npx qarinah@latest setup .">Copy</button>
           </div>
-          <figure class="memory-handoff">
-            <div class="memory-handoff-label">Example handoff</div>
-            <div class="memory-handoff-setup"><span>Codex</span><span aria-hidden="true">→</span><span>Claude Code</span></div>
-            <div class="memory-handoff-content">
-              <span class="memory-handoff-status">Decision recovered</span>
-              <p>Retry timeouts. Leave validation errors alone.</p>
-              <dl>
-                <div><dt>Decision</dt><dd>Keep retries at the request boundary</dd></div>
-                <div><dt>Evidence</dt><dd><code>retry-policy.test.ts</code></dd></div>
-                <div><dt>Continue</dt><dd>Check the timeout regression</dd></div>
-              </dl>
-            </div>
-            <figcaption>A cited decision travels with the project. <a href="/docs/cross-agent-handoffs/">See how it works&nbsp;↗</a></figcaption>
-          </figure>
+          <div class="hero-actions">
+            <a class="btn btn-primary btn-large" href="/docs/getting-started/">Set up memory <span class="memory-arrow" aria-hidden="true">↗</span></a>
+            <a class="hero-text-link" href="#handoff-video-title">Watch a handoff <span class="memory-arrow" aria-hidden="true">↓</span></a>
+          </div>
+          <p class="hero-privacy"><strong>Metadata-only by default.</strong> No account needed. Try <code>npx qarinah demo</code> in an isolated project.</p>
         </div>
       </section>
 
       <section class="memory-modes section shell" aria-labelledby="memory-modes-title">
-        <div class="memory-modes-intro">
-          <h2 id="memory-modes-title">Keep the thread of the work.</h2>
-          <p>The right memory follows the task while each project keeps its own boundaries.</p>
+        <div>
+          <h2 id="memory-modes-title">The project remembers.</h2>
+          <picture class="memory-photo">
+            <img src="/assets/qarinah-river-detail.webp" alt="" width="900" height="600" loading="lazy" decoding="async">
+          </picture>
         </div>
         <div class="memory-modes-list">
-          <a href="/docs/auto-initialization/"><h3>Cross-chat memory</h3><p>Open a fresh chat and recover what you decided, tried, and left unfinished.</p><span aria-hidden="true">↗</span></a>
-          <a href="/docs/team-memory/"><h3>Cross-project memory</h3><p>Return to the right project history, or search across repositories you’ve explicitly connected.</p><span aria-hidden="true">↗</span></a>
-          <a href="/docs/cross-agent-handoffs/"><h3>Cross-agent memory</h3><p>Start in Codex, continue in Claude Code or Cursor, and bring the relevant sources with you.</p><span aria-hidden="true">↗</span></a>
+          <a href="/docs/auto-initialization/"><h3>Cross-chat memory</h3><p>Open a fresh conversation and recover what you decided, tried, and left unfinished.</p><span class="memory-arrow" aria-hidden="true">↗</span></a>
+          <a href="/docs/team-memory/"><h3>Cross-project memory</h3><p>Return to the right project history or search across repositories you’ve explicitly connected.</p><span class="memory-arrow" aria-hidden="true">↗</span></a>
+          <a href="/docs/cross-agent-handoffs/"><h3>Cross-agent memory</h3><p>Start in Codex, continue in Claude Code or Cursor, and bring the relevant sources with you.</p><span class="memory-arrow" aria-hidden="true">↗</span></a>
+        </div>
+      </section>
+
+      <section class="memory-flow section shell" aria-labelledby="memory-flow-title">
+        <div class="section-heading">
+          <h2 id="memory-flow-title">From one agent to the next.</h2>
+          <p>Follow a decision through an example handoff.</p>
+        </div>
+        <div class="memory-flow-tabs" role="tablist" aria-label="Handoff stages">
+          <button id="memory-stage-codex" type="button" role="tab" aria-controls="memory-panel-codex" aria-selected="true">Codex</button>
+          <button id="memory-stage-qarinah" type="button" role="tab" aria-controls="memory-panel-qarinah" aria-selected="false" tabindex="-1"><img src="/assets/qarinah-memory-mark.svg" width="23" height="23" alt="">Qarinah</button>
+          <button id="memory-stage-claude" type="button" role="tab" aria-controls="memory-panel-claude" aria-selected="false" tabindex="-1">Claude Code</button>
+        </div>
+        <div class="memory-flow-panels">
+          <div id="memory-panel-codex" role="tabpanel" aria-labelledby="memory-stage-codex" tabindex="0"><strong>Record the decision</strong><p>Retry timeouts. Leave validation errors alone. The session has a test result to back that up.</p></div>
+          <div id="memory-panel-qarinah" role="tabpanel" aria-labelledby="memory-stage-qarinah" tabindex="0" hidden><strong>Keep the source with it</strong><p>Qarinah stores the permitted decision and its evidence beside the project.</p></div>
+          <div id="memory-panel-claude" role="tabpanel" aria-labelledby="memory-stage-claude" tabindex="0" hidden><strong>Continue from the evidence</strong><p>The next agent receives a concise handoff and can inspect the test evidence before changing the code.</p></div>
         </div>
       </section>
 
@@ -2218,7 +2228,7 @@ await writeFile(
 );
 await writeFile(
   path.join(output, "sitemap.xml"),
-  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapRoutes.map((route) => `  <url><loc>${siteOrigin}${route}</loc><lastmod>${releaseDate}</lastmod></url>`).join("\n")}\n</urlset>\n`
+  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapRoutes.map((route) => `  <url><loc>${siteOrigin}${route}</loc><lastmod>${route === "/" ? "2026-11-21" : releaseDate}</lastmod></url>`).join("\n")}\n</urlset>\n`
 );
 
 console.log(`Built ${sitemapRoutes.length} Qarinah pages in ${path.relative(root, output)}.`);

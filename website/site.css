@@ -2756,259 +2756,342 @@ a {
   }
 }
 
-/* Homepage memory introduction. The documentation keeps its shared theme. */
+
+/* Dark homepage built around one continuous memory trace. */
+[data-home-theme] {
+  scroll-padding-top: 90px;
+}
+
+[data-home-theme] body {
+  background: #0b111a;
+  color: #edf1f7;
+}
+
+[data-home-theme] .site-header {
+  background: #0b111a;
+  border-bottom-color: #283646;
+  backdrop-filter: none;
+}
+
+[data-home-theme] .brand {
+  gap: 9px;
+}
+
+[data-home-theme] .section {
+  padding-block: clamp(60px, 7.5vw, 108px);
+}
+
+[data-home-theme] .section-heading h2 {
+  letter-spacing: -.035em;
+  text-wrap: balance;
+}
+
 .memory-hero {
-  color: #f2f7ef;
-  background: #142820;
-  border-bottom-color: #304a3d;
-}
-
-.memory-hero .hero-grid {
-  min-height: 0;
-  grid-template-columns: minmax(0, 1.12fr) minmax(0, .88fr);
-  gap: clamp(36px, 7vw, 100px);
-  padding-block: clamp(58px, 8vw, 108px);
-}
-
-.memory-hero .hero-copy {
-  text-align: left;
-}
-
-.memory-label {
-  display: flex;
+  position: relative;
+  isolation: isolate;
+  display: grid;
   align-items: center;
-  gap: 10px;
-  margin: 0 0 20px;
-  color: #bcdfc6;
-  font-size: .875rem;
-  font-weight: 600;
+  min-height: min(750px, calc(100svh - 68px));
+  color: #f6f8fc;
+  background: #142235;
+  border-bottom: 1px solid #2a394e;
+  text-align: center;
 }
 
-.memory-label span,
-.memory-handoff-status::before {
-  width: 8px;
-  height: 8px;
-  flex: 0 0 8px;
-  border-radius: 50%;
-  background: currentColor;
+.memory-landscape,
+.memory-landscape img,
+.memory-hero::before {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.memory-landscape {
+  z-index: -2;
+}
+
+.memory-landscape img {
+  display: block;
+  object-fit: cover;
+  object-position: center 56%;
+}
+
+.memory-hero::before {
+  z-index: -1;
+  content: "";
+  background: linear-gradient(180deg, #0b111a99, #0b111a52 32%, #0b111a52 65%, #0b111ae8);
+}
+
+.memory-hero-content {
+  padding-block: clamp(84px, 11vw, 156px);
 }
 
 .memory-hero h1 {
-  max-width: 14ch;
-  margin-inline: 0;
-  font-family: var(--q-serif);
-  font-size: clamp(3.15rem, 6.6vw, 5.75rem);
-  line-height: .99;
-  letter-spacing: -.035em;
-  text-wrap: initial;
-}
-
-.memory-hero h1 em {
-  color: #b9e3ad;
-  font-weight: inherit;
+  max-width: none;
+  margin-inline: auto;
+  font-family: inherit;
+  font-size: clamp(2.75rem, 7.1vw, 5.4rem);
+  font-weight: 650;
+  letter-spacing: -.04em;
+  line-height: 1.04;
+  text-wrap: balance;
 }
 
 .memory-hero .hero-lede {
-  max-width: 47ch;
-  margin: 24px 0 0;
-  color: #d4e1d6;
-  font-size: clamp(1rem, 1.55vw, 1.25rem);
+  max-width: 46ch;
+  margin: 22px auto 0;
+  color: #e1e9f3;
+  font-size: clamp(1.05rem, 2vw, 1.35rem);
 }
 
-.memory-hero .command-block {
-  max-width: 440px;
-  margin: 25px 0 0;
-  border: 1px solid #52705f;
-  background: #0e1d17;
-  color: #f2f7ef;
+.memory-install {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(12px, 2vw, 28px);
+  width: fit-content;
+  max-width: 100%;
+  margin: 29px auto 0;
+  padding: 0 6px 0 clamp(12px, 2vw, 17px);
+  min-height: 49px;
+  border: 1px solid #5f758d;
+  border-radius: 8px;
+  background: #0c1726;
+  color: #edf4fa;
+}
+
+.memory-install code {
+  color: inherit;
+  font: 600 clamp(.74rem, 2.5vw, .92rem)/1.35 var(--q-mono);
+  overflow-wrap: anywhere;
+}
+
+.memory-install button {
+  min-width: 53px;
+  min-height: 37px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 5px;
+  background: #23384d;
+  color: #eaf3fc;
+  font-family: inherit;
+  font-size: .79rem;
+  font-weight: 650;
+  cursor: pointer;
 }
 
 .memory-hero .hero-actions {
-  justify-content: flex-start;
+  justify-content: center;
   flex-wrap: wrap;
-  margin-top: 20px;
+  margin-top: 23px;
+  gap: 12px 16px;
 }
 
 .memory-hero .hero-actions .btn-primary {
-  border-color: #b9e3ad;
-  background: #b9e3ad;
-  color: #13281c;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #0d1d23;
+  border-color: #ccefe1;
+  background: #ccefe1;
 }
 
 .memory-hero .hero-actions .btn-primary:hover {
-  background: #daf0cf;
+  background: #e3f9f1;
 }
 
 .memory-hero .hero-text-link,
 .memory-hero .hero-privacy strong,
 .memory-hero .hero-privacy code {
-  color: #f2f7ef;
+  color: #edf4fa;
 }
 
-.memory-hero .hero-text-link span {
-  margin-left: 6px;
+.memory-hero .hero-text-link {
+  gap: 7px;
 }
 
 .memory-hero .hero-privacy {
-  max-width: 48ch;
-  color: #c3d4c8;
+  max-width: 56ch;
+  margin: 20px auto 0;
+  color: #c9d7e5;
 }
 
-.memory-handoff {
-  min-width: 0;
-  margin: 0;
-  padding: clamp(18px, 3vw, 34px);
-  border-radius: 12px;
-  color: #182a1d;
-  background: #e5eddb;
+.memory-arrow {
+  display: inline-block;
+  transition: transform .2s ease;
 }
 
-.memory-handoff-setup {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+a:is(:hover, :focus-visible, :active) .memory-arrow {
+  transform: translate(3px, -3px);
 }
 
-.memory-handoff-label {
-  color: #405749;
-  font-family: var(--q-mono);
-  font-size: .8rem;
-}
-
-.memory-handoff-setup {
-  flex-wrap: wrap;
-  margin-block: 16px 20px;
-  font-weight: 750;
-}
-
-.memory-handoff-setup span:nth-child(2) {
-  color: #405749;
-}
-
-.memory-handoff-content {
-  padding: clamp(16px, 2.5vw, 28px);
-  border: 1px solid #b5c8b0;
-  border-radius: 8px;
-  background: #f5f8f0;
-}
-
-.memory-handoff-status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #235b40;
-  font-size: .825rem;
-  font-weight: 700;
-}
-
-.memory-handoff-status::before {
-  content: "";
-}
-
-.memory-handoff-content > p {
-  margin: 13px 0 20px;
-  font-family: var(--q-serif);
-  font-size: clamp(1.6rem, 3.5vw, 2.9rem);
-  letter-spacing: -.035em;
-  line-height: 1.07;
-  text-wrap: balance;
-}
-
-.memory-handoff dl,
-.memory-handoff dd {
-  margin: 0;
-}
-
-.memory-handoff dl > div {
-  display: grid;
-  grid-template-columns: minmax(5rem, .4fr) minmax(0, 1fr);
-  gap: 8px;
-  padding-block: 8px;
-  border-top: 1px solid #ccd8c5;
-  font-size: .875rem;
-}
-
-.memory-handoff dt {
-  color: #405749;
-}
-
-.memory-handoff dd {
-  overflow-wrap: anywhere;
-}
-
-.memory-handoff figcaption {
-  margin-top: 17px;
-  color: #405749;
-  font-size: .85rem;
-}
-
-.memory-handoff a {
-  color: #235b40;
-  text-underline-offset: 3px;
+.hero-text-link:is(:hover, :focus-visible, :active) .memory-arrow {
+  transform: translateY(4px);
 }
 
 .memory-modes {
   display: grid;
-  grid-template-columns: minmax(0, .76fr) minmax(0, 1.24fr);
-  gap: clamp(24px, 6vw, 88px);
-  padding-block: clamp(56px, 8vw, 100px);
-  border-bottom: 1px solid var(--q-border);
+  grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: clamp(28px, 6vw, 86px);
 }
 
-.memory-modes h2 {
-  max-width: 13ch;
-  margin: 0 0 15px;
-  font: 500 clamp(2.8rem, 5.5vw, 5rem)/1.02 var(--q-serif);
+.memory-modes h2,
+.memory-flow h2 {
+  margin: 0;
+  font: 650 clamp(2rem, 4vw, 3.6rem)/1.13 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   letter-spacing: -.035em;
   text-wrap: balance;
 }
 
-.memory-modes p {
-  color: var(--q-muted);
+.memory-photo {
+  display: block;
+  margin-top: 22px;
 }
 
-.memory-modes-intro p {
-  max-width: 37ch;
-  margin-bottom: 0;
+.memory-photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: 8px;
 }
 
 .memory-modes-list > a {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   column-gap: 16px;
-  padding: 17px 2px;
-  border-top: 1px solid var(--q-border);
-  color: var(--q-fg);
+  padding: clamp(16px, 3vw, 27px) 1px;
+  border-top: 1px solid #334355;
+  color: #edf4fa;
   text-decoration: none;
 }
 
 .memory-modes-list > a:last-child {
-  border-bottom: 1px solid var(--q-border);
+  border-bottom: 1px solid #334355;
 }
 
 .memory-modes-list h3 {
   margin: 0;
   color: inherit;
-  font-size: clamp(1.12rem, 2vw, 1.5rem);
+  font-size: clamp(1.1rem, 2vw, 1.45rem);
 }
 
 .memory-modes-list p {
   grid-row: 2;
-  margin: 4px 0 0;
+  margin: 5px 0 0;
+  color: #b7c6d7;
 }
 
-.memory-modes-list span {
+.memory-modes-list .memory-arrow {
   grid-column: 2;
   grid-row: 1 / span 2;
   align-self: center;
-  color: var(--q-accent);
-  font-size: 1.25rem;
+  color: #83e5ba;
 }
 
 .memory-modes-list > a:hover h3 {
-  color: var(--q-accent);
-  text-decoration: underline;
-  text-underline-offset: 4px;
+  color: #a6f2cf;
+}
+
+.memory-flow {
+  border-block: 1px solid #2a394e;
+  text-align: center;
+}
+
+.memory-flow .section-heading p {
+  margin: 10px auto 0;
+}
+
+.memory-flow-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px clamp(6px, 4vw, 42px);
+}
+
+.memory-flow-tabs button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 45px;
+  padding: 7px 9px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: #b7c6d7;
+  font: 650 clamp(.83rem, 2.2vw, 1rem)/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  cursor: pointer;
+}
+
+.memory-flow-tabs button[aria-selected="true"] {
+  border-color: #83e5ba;
+  color: #f0fff7;
+}
+
+.memory-flow-tabs button:hover {
+  color: #f0fff7;
+}
+
+.memory-flow-panels {
+  width: min(100%, 63ch);
+  min-height: 130px;
+  margin: 24px auto 0;
+  padding: 0 6px;
+}
+
+.memory-flow-panels strong {
+  font-size: 1.2rem;
+}
+
+.memory-flow-panels p {
+  margin: 8px 0 0;
+  color: #b7c6d7;
+}
+
+.memory-rail {
+  position: fixed;
+  z-index: 2;
+  inset: 0 clamp(3px, .8vw, 16px) 0 auto;
+  width: 2px;
+  overflow: hidden;
+  background: #344960;
+  opacity: .8;
+  pointer-events: none;
+}
+
+.memory-rail::after {
+  position: absolute;
+  inset: auto 0;
+  top: 0;
+  height: 13vh;
+  content: "";
+  background: linear-gradient(transparent, #8cede6);
+  animation: memory-travel 7s linear infinite;
+}
+
+@keyframes memory-travel {
+  from { transform: translateY(-16vh); }
+  to { transform: translateY(104vh); }
+}
+
+.memory-motion-paused .memory-rail::after {
+  animation-play-state: paused;
+}
+
+.memory-motion-toggle {
+  padding: 6px 10px;
+  border: 1px solid #52677d;
+  border-radius: 6px;
+  background: transparent;
+  color: #d7e5f3;
+  font: inherit;
+  font-size: .78rem;
+  cursor: pointer;
 }
 
 .memory-architecture-layout {
@@ -3025,28 +3108,32 @@ a {
   border-radius: 12px;
 }
 
-@media (max-width: 850px) {
-  .memory-hero .hero-grid,
+@media (max-width: 760px) {
+  .memory-hero {
+    min-height: min(680px, calc(100svh - 68px));
+  }
+
+  .memory-hero .hero-actions .btn {
+    width: auto;
+  }
+
   .memory-modes,
   .memory-architecture-layout {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .memory-hero h1 {
-    max-width: 14ch;
-  }
-
-  .memory-handoff {
-    max-width: 560px;
+  .memory-photo img {
+    max-height: 300px;
   }
 }
 
-@media (max-width: 420px) {
-  .memory-hero h1 {
-    font-size: clamp(2.55rem, 12vw, 3.15rem);
+@media (prefers-reduced-motion: reduce) {
+  .memory-rail,
+  .memory-motion-toggle {
+    display: none;
   }
 
-  .memory-handoff dl > div {
-    grid-template-columns: minmax(4.1rem, .35fr) minmax(0, 1fr);
+  .memory-arrow {
+    transition: none;
   }
 }
