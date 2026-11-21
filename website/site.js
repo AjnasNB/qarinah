@@ -19,11 +19,22 @@
 
   const menu = document.querySelector(".mobile-menu");
   const nav = document.querySelector("#primary-nav");
-  menu?.addEventListener("click", () => {
-    const open = menu.getAttribute("aria-expanded") === "true";
-    menu.setAttribute("aria-expanded", String(!open));
-    nav?.classList.toggle("open", !open);
-  });
+  if (menu && nav) {
+    const setMenu = (open) => {
+      menu.setAttribute("aria-expanded", String(open));
+      menu.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+      nav.classList.toggle("open", open);
+    };
+    menu.addEventListener("click", () => setMenu(!nav.classList.contains("open")));
+    nav.addEventListener("click", (event) => {
+      if (event.target.closest("a") && nav.classList.contains("open")) setMenu(false);
+    });
+    menu.closest(".site-header").addEventListener("keydown", (event) => {
+      if (event.key !== "Escape" || !nav.classList.contains("open")) return;
+      setMenu(false);
+      menu.focus();
+    });
+  }
 
   for (const button of document.querySelectorAll(".copy-button")) {
     const icon = button.hasAttribute("data-copy-icon");

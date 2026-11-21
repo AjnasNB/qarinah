@@ -958,7 +958,11 @@ function nav(active = "") {
           <span>Qarinah</span>
           <span class="version-label">${productVersion}</span>
         </a>
-        <button class="mobile-menu" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
+        <button class="mobile-menu" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
+          <svg class="mobile-menu-glyph" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true">
+            <path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/>
+          </svg>
+        </button>
         <nav id="primary-nav" class="primary-nav" aria-label="Primary navigation">
           ${items.map(([label, href, id]) => `<a class="${active === id ? "selected" : ""}" href="${href}">${label}</a>`).join("")}
           <a href="${github}" rel="noreferrer">GitHub</a>
@@ -1414,27 +1418,22 @@ function homePage() {
           </div>
           <p class="hero-privacy"><strong>Metadata-only by default.</strong> No account needed. Try <code>npx qarinah demo</code> in an isolated project.</p>
         </div>
-      </section>
-
-      <section class="memory-flow section shell" aria-labelledby="memory-flow-title">
-        <div class="section-heading">
-          <blockquote class="memory-quote"><h2 id="memory-flow-title">“A chat ends.<br>The work keeps flowing.”</h2></blockquote>
-          <p>Follow a decision through an example handoff.</p>
-        </div>
-        <svg class="memory-current" viewBox="0 0 700 52" fill="none" aria-hidden="true">
-          <path class="memory-current-bed" d="M2 30C88 30 106 12 175 12s105 28 175 28 105-28 175-28 88 18 173 18"/>
-          <path class="memory-current-signal" pathLength="100" d="M2 30C88 30 106 12 175 12s105 28 175 28 105-28 175-28 88 18 173 18"/>
-        </svg>
-        <div class="memory-flow-tabs" role="tablist" aria-label="Handoff stages">
-          <button id="memory-stage-codex" type="button" role="tab" aria-controls="memory-panel-codex" aria-selected="true">Codex</button>
-          <button id="memory-stage-qarinah" type="button" role="tab" aria-controls="memory-panel-qarinah" aria-selected="false" tabindex="-1"><img src="/assets/qarinah-memory-mark.svg" width="23" height="23" alt="">Qarinah</button>
-          <button id="memory-stage-claude" type="button" role="tab" aria-controls="memory-panel-claude" aria-selected="false" tabindex="-1">Claude Code</button>
-        </div>
-        <div class="memory-flow-panels">
-          <div id="memory-panel-codex" role="tabpanel" aria-labelledby="memory-stage-codex" tabindex="0"><strong>Record the decision</strong><p>Retry timeouts. Leave validation errors alone. The session has a test result to back that up.</p></div>
-          <div id="memory-panel-qarinah" role="tabpanel" aria-labelledby="memory-stage-qarinah" tabindex="0" hidden><strong>Keep the source with it</strong><p>Qarinah stores the permitted decision and its evidence beside the project.</p></div>
-          <div id="memory-panel-claude" role="tabpanel" aria-labelledby="memory-stage-claude" tabindex="0" hidden><strong>Continue from the evidence</strong><p>The next agent receives a concise handoff and can inspect the test evidence before changing the code.</p></div>
-        </div>
+        <section class="memory-flow section shell" aria-labelledby="memory-flow-title">
+          <div class="section-heading">
+            <h2 id="memory-flow-title"><span>“A chat ends.</span> <span>The work keeps flowing.”</span></h2>
+            <p>Follow a decision through an example handoff.</p>
+          </div>
+          <div class="memory-flow-tabs" role="tablist" aria-label="Handoff stages">
+            <button id="memory-stage-codex" type="button" role="tab" aria-controls="memory-panel-codex" aria-selected="true">Codex</button>
+            <button id="memory-stage-qarinah" type="button" role="tab" aria-controls="memory-panel-qarinah" aria-selected="false" tabindex="-1"><img src="/assets/qarinah-memory-mark.svg" width="23" height="23" alt="">Qarinah</button>
+            <button id="memory-stage-claude" type="button" role="tab" aria-controls="memory-panel-claude" aria-selected="false" tabindex="-1">Claude Code</button>
+          </div>
+          <div class="memory-flow-panels">
+            <div id="memory-panel-codex" role="tabpanel" aria-labelledby="memory-stage-codex" tabindex="0"><strong>Record the decision</strong><p>Retry timeouts. Leave validation errors alone. The session has a test result to back that up.</p></div>
+            <div id="memory-panel-qarinah" role="tabpanel" aria-labelledby="memory-stage-qarinah" tabindex="0" hidden><strong>Keep the source with it</strong><p>Qarinah stores the permitted decision and its evidence beside the project.</p></div>
+            <div id="memory-panel-claude" role="tabpanel" aria-labelledby="memory-stage-claude" tabindex="0" hidden><strong>Continue from the evidence</strong><p>The next agent receives a concise handoff and can inspect the test evidence before changing the code.</p></div>
+          </div>
+        </section>
       </section>
 
       <section class="handoff-video section shell" aria-labelledby="handoff-video-title">

@@ -4,7 +4,7 @@
   const drawing = canvas?.getContext("2d");
   if (!drawing || !photo) return;
 
-  // Trace the water in the original 1536 × 1024 photograph. The mobile crop uses the same trace.
+  // Trace the water in the original 1536 × 1024 image. The mobile crop uses the same trace.
   const river = [
     [560, 938, 3], [580, 923, 7], [597, 906, 6], [614, 886, 9],
     [627, 895, 7], [641, 924, 10], [656, 956, 13], [677, 971, 15],
@@ -29,7 +29,11 @@
       const progress = (y - start) / (end - start);
       const center = fromX + (toX - fromX) * progress;
       const width = fromWidth + (toWidth - fromWidth) * progress + 5;
-      bands.push({ y, x: center - width, width: 2 * width, height: Math.min(4, end - y) });
+      const sheen = drawing.createLinearGradient(center - width, 0, center + width, 0);
+      sheen.addColorStop(0, "#9fc5df00");
+      sheen.addColorStop(.5, "#9fc5df");
+      sheen.addColorStop(1, "#9fc5df00");
+      bands.push({ y, x: center - width, width: 2 * width, height: Math.min(4, end - y), sheen });
     }
   }
 
@@ -52,11 +56,13 @@
     const cropLeft = Math.max(0, 1536 - photo.naturalWidth / sourceScale) * .52;
     const fit = Math.max(width / photo.naturalWidth, height / photo.naturalHeight);
     const scale = fit * sourceScale;
+    const [alignX, alignY] = getComputedStyle(photo).objectPosition.split(" ").map(value => parseFloat(value) / 100);
     view = {
       sourceScale, cropLeft,
       scale: scale * pixelRatio,
-      x: ((width - photo.naturalWidth * fit) * .5 - cropLeft * scale) * pixelRatio,
-      y: (height - photo.naturalHeight * fit) * .56 * pixelRatio
+      x: ((width - photo.naturalWidth * fit) * alignX - cropLeft * scale) * pixelRatio,
+      y: (height - photo.naturalHeight * fit) * alignY * pixelRatio,
+      reflection: width <= 620 ? .34 : .27
     };
     sync();
   }
@@ -65,24 +71,26 @@
     frame = 0;
     if (time - lastDraw >= 36) {
       lastDraw = time;
-      const { sourceScale, cropLeft, scale, x, y } = view;
+      const { sourceScale, cropLeft, scale, x, y, reflection } = view;
       drawing.clearRect(0, 0, canvas.width, canvas.height);
       drawing.save();
       drawing.setTransform(scale, 0, 0, scale, x, y);
       drawing.clip(outline);
       const t = time / 1000;
       for (const band of bands) {
-        // Phase moves downstream. Refracting the photograph leaves the banks and trees still.
-        const wave = band.y * .16 - t * 3.4;
-        const dx = Math.sin(wave + band.x * .018) * 2.6;
-        const dy = Math.sin(wave * .55) * 3.5;
+        // Both waves move downstream, with offsets that break up the reflections across bends.
+        const wave = band.y * .095 - t * 4.2;
+        const ripple = band.y * .21 - t * 6.4 + band.x * .024;
+        const dx = Math.sin(ripple) * 3.8;
+        const dy = Math.sin(wave) * 4.6;
         drawing.globalAlpha = .82;
         drawing.drawImage(photo, (band.x + dx - cropLeft) * sourceScale, (band.y + dy) * sourceScale,
           band.width * sourceScale, band.height * sourceScale,
           band.x, band.y, band.width, band.height + .2);
-        drawing.globalAlpha = .12 * Math.max(0, Math.sin(wave)) ** 4;
-        drawing.fillStyle = "#86adce";
-        drawing.fillRect(band.x, band.y, band.width, band.height + .2);
+        const glint = Math.max(0, Math.sin(wave + Math.cos(ripple) * .45)) ** 4;
+        drawing.globalAlpha = .055 + reflection * glint;
+        drawing.fillStyle = band.sheen;
+        drawing.fillRect(band.x, band.y, band.width, band.height);
       }
       drawing.restore();
     }

@@ -160,6 +160,26 @@ a {
 
 .mobile-menu {
   display: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+}
+
+.mobile-menu-glyph path {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.mobile-menu[aria-expanded="true"] path:first-child {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.mobile-menu[aria-expanded="true"] path:nth-child(2) {
+  opacity: 0;
+}
+
+.mobile-menu[aria-expanded="true"] path:last-child {
+  transform: translateY(-6px) rotate(-45deg);
 }
 
 .benchmark-ribbon {
@@ -2010,19 +2030,22 @@ a {
   }
 }
 
-@media (max-width: 860px) {
+@media (max-width: 940px) {
   .mobile-menu {
-    display: block;
+    display: grid;
+    place-items: center;
   }
 
   .primary-nav {
     position: absolute;
-    top: 58px;
+    top: 100%;
     right: 20px;
     left: 20px;
     display: none;
     flex-direction: column;
     align-items: stretch;
+    max-height: calc(100dvh - 84px);
+    overflow-y: auto;
     padding: 10px;
     border: 1px solid var(--q-border);
     border-radius: 8px;
@@ -2033,7 +2056,9 @@ a {
   .primary-nav.open {
     display: flex;
   }
+}
 
+@media (max-width: 860px) {
   .hero-grid,
   .handoff-stage-grid,
   .workflow-grid,
@@ -2769,7 +2794,7 @@ a {
 
 [data-home-theme] .site-header {
   background: #0b111a;
-  border-bottom-color: #283646;
+  border-bottom: 0;
   backdrop-filter: none;
 }
 
@@ -2787,44 +2812,51 @@ a {
 }
 
 .memory-hero {
+  --memory-scene-height: min(100%, clamp(650px, 94svh, 900px));
   position: relative;
   isolation: isolate;
-  display: grid;
-  align-items: center;
-  min-height: min(750px, calc(100svh - 68px));
   color: #f6f8fc;
-  background: #142235;
-  border-bottom: 1px solid #2a394e;
+  background: #0b111a;
+  border: 0;
   text-align: center;
 }
 
 .memory-landscape,
-.memory-landscape img,
+.memory-river-motion,
 .memory-hero::before {
   position: absolute;
-  inset: 0;
+  inset: 0 0 auto;
   width: 100%;
-  height: 100%;
+  height: var(--memory-scene-height);
 }
 
 .memory-landscape {
   z-index: -3;
 }
 
+.memory-river-motion {
+  z-index: -2;
+  pointer-events: none;
+}
+
 .memory-landscape img {
   display: block;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  object-position: center 56%;
+  object-position: 50% 70%;
 }
 
 .memory-hero::before {
   z-index: -1;
   content: "";
-  background: linear-gradient(180deg, #0b111a99, #0b111a52 32%, #0b111a52 65%, #0b111ae8);
+  background: linear-gradient(180deg, #0b111a36, #0b111a28 44%, #0b111a08 72%, #0b111a50 88%, #0b111a);
 }
 
 .memory-hero-content {
-  padding-block: clamp(84px, 11vw, 156px);
+  min-height: clamp(550px, 72svh, 710px);
+  padding-block: clamp(64px, 11svh, 124px) clamp(140px, 23svh, 240px);
+  text-shadow: 0 2px 14px #0b111acc;
 }
 
 .memory-hero h1 {
@@ -2983,17 +3015,16 @@ a:is(:hover, :focus-visible, :active) .memory-arrow {
   color: #a6f2cf;
 }
 
-.memory-flow {
-  border-block: 1px solid #2a394e;
-  text-align: center;
+.memory-flow .section-heading {
+  margin: 0 auto clamp(17px, 3vw, 30px);
 }
 
-.memory-flow .section-heading {
-  margin-inline: auto;
+.memory-flow h2 span {
+  display: inline-block;
 }
 
 [data-home-theme] .memory-flow {
-  padding-block: clamp(52px, 6vw, 84px);
+  padding-block: clamp(40px, 6vw, 76px) clamp(36px, 5vw, 68px);
 }
 
 .memory-flow .section-heading p {
@@ -3074,7 +3105,12 @@ a:is(:hover, :focus-visible, :active) .memory-arrow {
 
 @media (max-width: 760px) {
   .memory-hero {
-    min-height: min(680px, calc(100svh - 68px));
+    --memory-scene-height: min(100%, clamp(670px, 90svh, 790px));
+  }
+
+  .memory-hero-content {
+    min-height: 0;
+    padding-block: clamp(54px, 9svh, 86px) clamp(158px, 23svh, 210px);
   }
 
   .memory-hero .hero-actions .btn {
@@ -3088,23 +3124,29 @@ a:is(:hover, :focus-visible, :active) .memory-arrow {
 
 }
 
+@media (max-width: 620px) {
+  .memory-landscape img {
+    object-position: 50% 66%;
+  }
+
+  .memory-hero .hero-actions {
+    flex-direction: row;
+  }
+
+  .memory-flow h2 {
+    font-size: clamp(1.6rem, 7.4vw, 2rem);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .memory-motion-toggle {
+  .memory-motion-toggle,
+  .memory-river-motion {
     display: none;
   }
 
   .memory-arrow {
     transition: none;
   }
-}
-
-.memory-river-motion {
-  position: absolute;
-  z-index: -2;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
 }
 
 .memory-install [data-copy-icon] {
@@ -3139,45 +3181,6 @@ a:is(:hover, :focus-visible, :active) .memory-arrow {
   white-space: nowrap;
 }
 
-.memory-quote {
-  margin: 0;
-}
-
-.memory-current {
-  display: block;
-  width: min(100%, 640px);
-  margin: 28px auto 14px;
-  overflow: visible;
-  stroke-width: 2;
-  stroke-linecap: round;
-}
-
-.memory-current-bed {
-  stroke: #355064;
-}
-
-.memory-current-signal {
-  stroke: #8ce4c5;
-  stroke-dasharray: 14 86;
-  animation: memory-current-flow 6s linear infinite;
-}
-
-@keyframes memory-current-flow {
-  from { stroke-dashoffset: 14; }
-  to { stroke-dashoffset: -86; }
-}
-
-.memory-motion-paused .memory-current-signal {
-  animation-play-state: paused;
-}
-
 .memory-modes .section-heading {
   max-width: 36ch;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .memory-river-motion,
-  .memory-current-signal {
-    display: none;
-  }
 }

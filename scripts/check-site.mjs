@@ -357,7 +357,9 @@ for (const worktreeHeroProof of [
   "Follow a decision through an example handoff.",
   'data-home-theme',
   'class="memory-river-motion"',
-  'class="memory-current-signal"',
+  "“A chat ends.",
+  "The work keeps flowing.”",
+  'class="mobile-menu-glyph"',
   'aria-label="Copy install command"',
   'Public demo',
   'href="/assets/qarinah-memory-mark.svg"',
@@ -387,8 +389,9 @@ for (const dashboardProof of [
 const memoryHeroIndex = home.indexOf('<section class="hero memory-hero"');
 const memoryFlowIndex = home.indexOf('<section class="memory-flow section shell"');
 const handoffDemoIndex = home.indexOf('<section class="handoff-video section shell"');
-if (memoryHeroIndex < 0 || memoryFlowIndex <= memoryHeroIndex || handoffDemoIndex <= memoryFlowIndex) {
-  errors.push("Homepage must show the animated handoff and public demo directly after the hero.");
+if (memoryHeroIndex < 0 || memoryFlowIndex <= memoryHeroIndex || handoffDemoIndex <= memoryFlowIndex
+  || home.slice(memoryHeroIndex, memoryFlowIndex).includes("</section>")) {
+  errors.push("Homepage must include the handoff inside the river hero, followed by the public demo.");
 }
 if (!home.includes("Verifiable project memory, exact source recovery, and cited context for coding agents.")
   || !home.includes("Measured, reproducible, and explicitly scoped.")) {
