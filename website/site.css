@@ -2850,12 +2850,11 @@ a {
 .memory-hero::before {
   z-index: -1;
   content: "";
-  background: linear-gradient(180deg, #0b111a36, #0b111a28 44%, #0b111a08 72%, #0b111a50 88%, #0b111a);
+  background: linear-gradient(180deg, #0b111a36, #0b111a28 44%, #0b111a20 67%, #0b111a98 85%, #0b111a);
 }
 
 .memory-hero-content {
-  min-height: clamp(550px, 72svh, 710px);
-  padding-block: clamp(64px, 11svh, 124px) clamp(140px, 23svh, 240px);
+  padding-top: clamp(56px, 9svh, 100px);
   text-shadow: 0 2px 14px #0b111acc;
 }
 
@@ -3017,6 +3016,7 @@ a:is(:hover, :focus-visible, :active) .memory-arrow {
 
 .memory-flow .section-heading {
   margin: 0 auto clamp(17px, 3vw, 30px);
+  text-shadow: 0 2px 14px #0b111acc;
 }
 
 .memory-flow h2 span {
@@ -3024,7 +3024,11 @@ a:is(:hover, :focus-visible, :active) .memory-arrow {
 }
 
 [data-home-theme] .memory-flow {
-  padding-block: clamp(40px, 6vw, 76px) clamp(36px, 5vw, 68px);
+  padding-block: clamp(60px, 10svh, 100px) clamp(24px, 4vw, 48px);
+}
+
+[data-home-theme] .handoff-video {
+  padding-top: clamp(40px, 5vw, 72px);
 }
 
 .memory-flow .section-heading p {
@@ -3106,11 +3110,6 @@ a:is(:hover, :focus-visible, :active) .memory-arrow {
 @media (max-width: 760px) {
   .memory-hero {
     --memory-scene-height: min(100%, clamp(670px, 90svh, 790px));
-  }
-
-  .memory-hero-content {
-    min-height: 0;
-    padding-block: clamp(54px, 9svh, 86px) clamp(158px, 23svh, 210px);
   }
 
   .memory-hero .hero-actions .btn {
