@@ -1382,38 +1382,52 @@ function commandBlock(command, label = "Terminal") {
 
 function homePage() {
   return layout({
-    title: "Qarinah - Start a New Coding-Agent Session Without Starting Over",
-    description: "Qarinah keeps permitted decisions, code relationships, tool outcomes, and worktree history beside your project so a fresh coding-agent session can resume with cited context.",
+    title: "Qarinah - Memory Across Chats, Projects, and Coding Agents",
+    description: "Give coding agents local, cited memory across chats and projects. Resume work in a new session, switch agents, and retrieve the evidence you’ve allowed Qarinah to keep.",
     active: "home",
     canonical: "/",
     kind: "home",
     body: `
-      <section class="section shell" aria-label="Qarinah evidence pipeline">
-        <img src="/assets/qarinah-pipeline.svg" alt="Qarinah pipeline from permitted project activity through local opt-in and a SHA-256 ledger to readable OKF and summary-first cited recall" width="1440" height="700" style="display:block;width:100%;height:auto;border-radius:16px">
-        <p><a href="/docs/auto-initialization/">Automatic memory setup</a> · <a href="/docs/cryptographic-evidence/">Inspect SHA-256 and OKF</a> · <a href="/docs/reliability/">${productVersion} release details</a></p>
-      </section>
-      <section class="hero">
+
+      <section class="hero memory-hero" aria-labelledby="memory-title">
         <div class="shell hero-grid">
           <div class="hero-copy">
-            <p class="eyebrow">Project memory for coding agents</p>
-            <h1>Start a new coding-agent session without re-explaining your project.</h1>
-            <p class="hero-lede">Qarinah keeps permitted decisions, code relationships, tool outcomes, and Git worktree history beside your repository. A fresh coding agent retrieves only the relevant cited context instead of replaying the whole chat.</p>
-            ${commandBlock("npx qarinah@latest setup .", "Safe local setup")}
-            <p class="hero-privacy"><strong>Metadata-only by default.</strong> No account, hosted memory service, content disclosure, or activation metrics. Try <code>npx qarinah demo</code> first to create an isolated populated graph outside your project.</p>
+            <p class="memory-label"><span aria-hidden="true"></span> Local-first memory for coding agents</p>
+            <h1 id="memory-title">Memory that helps AI <em>keep going.</em></h1>
+            <p class="hero-lede">Open a new chat, come back to a project, or switch coding agents. Qarinah brings forward the decisions, code, and evidence you’ve allowed it to remember.</p>
+            ${commandBlock("npx qarinah@latest setup .", "Install in your project")}
             <div class="hero-actions">
-              <a class="btn btn-primary btn-large" href="/docs/getting-started/#try-the-isolated-demo-first">Try the two-minute demo</a>
-              <a class="hero-text-link" href="https://github.com/AjnasNB/qarinah/issues/new?template=design_partner.yml">Join the first 10 maintainers</a>
+              <a class="btn btn-primary btn-large" href="/docs/getting-started/">Set up memory</a>
+              <a class="hero-text-link" href="#handoff-video-title">Watch a real handoff <span aria-hidden="true">↘</span></a>
             </div>
+            <p class="hero-privacy"><strong>Metadata-only by default.</strong> No account required. Try <code>npx qarinah demo</code> in an isolated project.</p>
           </div>
-          <aside class="worktree-hero-map" aria-label="How Qarinah groups isolated Git worktree memory">
-            <div class="worktree-map-header"><span>LOCAL CONTEXT GRAPH</span><strong>one repository · two isolated ledgers</strong></div>
-            <div class="worktree-repository"><small>repository group</small><strong>Qarinah project</strong><code>repo_27c94f…</code></div>
-            <div class="worktree-branches">
-              <article><span>main</span><strong>release context</strong><code>639ee4787a</code><small>own ledger · own consent</small></article>
-              <article><span>feature/context</span><strong>graph implementation</strong><code>721a841379</code><small>own ledger · own consent</small></article>
+          <figure class="memory-handoff">
+            <div class="memory-handoff-label">Example handoff</div>
+            <div class="memory-handoff-setup"><span>Codex</span><span aria-hidden="true">→</span><span>Claude Code</span></div>
+            <div class="memory-handoff-content">
+              <span class="memory-handoff-status">Decision recovered</span>
+              <p>Retry timeouts. Leave validation errors alone.</p>
+              <dl>
+                <div><dt>Decision</dt><dd>Keep retries at the request boundary</dd></div>
+                <div><dt>Evidence</dt><dd><code>retry-policy.test.ts</code></dd></div>
+                <div><dt>Continue</dt><dd>Check the timeout regression</dd></div>
+              </dl>
             </div>
-            <div class="worktree-map-footer"><span>branch + commit in snapshot hash</span><span>files + decisions in cited graph</span></div>
-          </aside>
+            <figcaption>A cited decision travels with the project. <a href="/docs/cross-agent-handoffs/">See how it works&nbsp;↗</a></figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="memory-modes section shell" aria-labelledby="memory-modes-title">
+        <div class="memory-modes-intro">
+          <h2 id="memory-modes-title">Keep the thread of the work.</h2>
+          <p>The right memory follows the task while each project keeps its own boundaries.</p>
+        </div>
+        <div class="memory-modes-list">
+          <a href="/docs/auto-initialization/"><h3>Cross-chat memory</h3><p>Open a fresh chat and recover what you decided, tried, and left unfinished.</p><span aria-hidden="true">↗</span></a>
+          <a href="/docs/team-memory/"><h3>Cross-project memory</h3><p>Return to the right project history, or search across repositories you’ve explicitly connected.</p><span aria-hidden="true">↗</span></a>
+          <a href="/docs/cross-agent-handoffs/"><h3>Cross-agent memory</h3><p>Start in Codex, continue in Claude Code or Cursor, and bring the relevant sources with you.</p><span aria-hidden="true">↗</span></a>
         </div>
       </section>
 
@@ -1432,7 +1446,8 @@ function homePage() {
           </video>
         </div>
         <div class="handoff-video-actions">
-          <a class="btn btn-primary" href="/docs/getting-started/#try-the-isolated-demo-first">Reproduce the demo</a>
+          <a class="text-link" href="https://github.com/AjnasNB/qarinah/issues/new?template=design_partner.yml">Join the maintainer pilot</a>
+          <a class="btn btn-primary" href="/docs/getting-started/#try-the-isolated-demo-first">Try the two-minute demo</a>
           <a class="text-link" href="/assets/qarinah-fresh-session-handoff.mp4">Download the two-minute MP4</a>
         </div>
       </section>
@@ -1470,6 +1485,23 @@ function homePage() {
           <article class="use-mode-card"><span>Task proof</span><h3>One packet, every selection explained</h3><p>Join current events, temporal facts, ranked files, and exact code symbols under one budget and tamper-evident manifest.</p><a href="/docs/proof-carrying-context/">Inspect the task packet</a></article>
         </div>
         <p class="benchmark-ribbon-note"><strong>Reproducible acceptance result:</strong> a fresh local evaluator creates three actual Git worktrees and passes all 16 isolation, retrieval, receipt, conflict, and incremental-compaction scenarios. <a href="/docs/worktree-context/">Method and machine-readable artifact</a>.</p>
+      </section>
+
+      <section class="section shell" aria-labelledby="memory-architecture-title">
+        <div class="section-heading"><h2 id="memory-architecture-title">How the project keeps its memory.</h2></div>
+        <div class="memory-architecture-layout">
+          <img src="/assets/qarinah-pipeline.svg" alt="Qarinah turns permitted project activity into a local ledger and cited recall" width="1440" height="700" loading="lazy" decoding="async">
+          <aside class="worktree-hero-map" aria-label="How Qarinah groups isolated Git worktree memory">
+            <div class="worktree-map-header"><span>LOCAL CONTEXT GRAPH</span><strong>one repository · two isolated ledgers</strong></div>
+            <div class="worktree-repository"><small>repository group</small><strong>Qarinah project</strong><code>repo_27c94f…</code></div>
+            <div class="worktree-branches">
+              <article><span>main</span><strong>release context</strong><code>639ee4787a</code><small>own ledger · own consent</small></article>
+              <article><span>feature/context</span><strong>graph implementation</strong><code>721a841379</code><small>own ledger · own consent</small></article>
+            </div>
+            <div class="worktree-map-footer"><span>branch + commit in snapshot hash</span><span>files + decisions in cited graph</span></div>
+          </aside>
+        </div>
+        <p><a href="/docs/auto-initialization/">Automatic memory setup</a> · <a href="/docs/cryptographic-evidence/">Inspect SHA-256 and OKF</a> · <a href="/docs/reliability/">${productVersion} release details</a></p>
       </section>
 
       <section class="handoff-stage" aria-labelledby="handoff-stage-title">

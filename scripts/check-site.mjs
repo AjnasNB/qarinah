@@ -342,13 +342,17 @@ if (!home.includes("What coding agents and developers need to know.") || !home.i
   errors.push("Homepage is missing the direct answer-engine surface.");
 }
 for (const worktreeHeroProof of [
-  "Start a new coding-agent session without re-explaining your project.",
-  "Project memory for coding agents",
+  "Memory that helps AI <em>keep going.</em>",
+  "Cross-chat memory",
+  "Cross-project memory",
+  "Cross-agent memory",
+  "across repositories you’ve explicitly connected",
+  "Example handoff",
   "npx qarinah@latest setup .",
   "Metadata-only by default.",
   "npx qarinah demo",
   "Try the two-minute demo",
-  "Join the first 10 maintainers",
+  "Join the maintainer pilot",
   "one repository · two isolated ledgers",
   "branch + commit in snapshot hash",
   'href="/docs/getting-started/#try-the-isolated-demo-first"'
@@ -367,8 +371,11 @@ for (const dashboardProof of [
 ]) {
   if (!home.includes(dashboardProof)) errors.push(`Homepage is missing the real dashboard proof: ${dashboardProof}`);
 }
-if (home.indexOf('<section class="hero">') > home.indexOf('<section class="benchmark-ribbon"')) {
-  errors.push("Homepage must lead with the centered product hero before benchmark detail.");
+const memoryHeroIndex = home.indexOf('<section class="hero memory-hero"');
+const memoryModesIndex = home.indexOf('<section class="memory-modes section shell"');
+const handoffDemoIndex = home.indexOf('<section class="handoff-video section shell"');
+if (memoryHeroIndex < 0 || memoryModesIndex <= memoryHeroIndex || handoffDemoIndex <= memoryModesIndex) {
+  errors.push("Homepage must introduce memory and the three ways to use it before the handoff demonstration.");
 }
 if (!home.includes("Verifiable project memory, exact source recovery, and cited context for coding agents.")
   || !home.includes("Measured, reproducible, and explicitly scoped.")) {
