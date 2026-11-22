@@ -2872,6 +2872,7 @@ a {
 }
 
 .memory-hero {
+  --opening-spacing: clamp(0px, 12svh - 96px, 24px);
   position: relative;
   isolation: isolate;
   min-height: calc(100svh - 68px);
@@ -2924,7 +2925,7 @@ a {
 }
 
 .memory-hero-content {
-  padding-top: clamp(28px, 5svh, 52px);
+  padding-top: calc(clamp(28px, 5svh, 52px) + var(--opening-spacing) / 2);
   text-shadow: 0 2px 16px #0f1910df;
 }
 
@@ -2993,7 +2994,7 @@ a {
 .memory-hero .hero-actions {
   justify-content: center;
   flex-wrap: wrap;
-  margin-top: 12px;
+  margin-top: calc(12px + var(--opening-spacing) / 2);
   gap: 10px;
   text-shadow: none;
 }
@@ -3125,7 +3126,7 @@ a:is(:hover, :focus-visible, :active) .memory-arrow {
 }
 
 [data-home-theme] .memory-flow {
-  padding-block: clamp(24px, 3.5svh, 38px) clamp(24px, 4vw, 48px);
+  padding-block: calc(clamp(24px, 3.5svh, 38px) + var(--opening-spacing)) clamp(24px, 4vw, 48px);
 }
 
 [data-home-theme] .handoff-video {
@@ -3175,7 +3176,7 @@ a:is(:hover, :focus-visible, :active) .memory-arrow {
 .memory-flow-panels {
   width: min(100%, 74ch);
   min-height: 90px;
-  margin: 14px auto 0;
+  margin: calc(14px + var(--opening-spacing) / 2) auto 0;
   padding: 0 6px;
 }
 
