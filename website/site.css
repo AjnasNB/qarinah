@@ -2924,14 +2924,14 @@ a {
 }
 
 .memory-hero-content {
-  padding-top: clamp(58px, 10svh, 108px);
+  padding-top: clamp(28px, 5svh, 52px);
   text-shadow: 0 2px 16px #0f1910df;
 }
 
 .memory-hero h1 {
   max-width: none;
   margin-inline: auto;
-  font: 400 clamp(4rem, 10.3vw, 9rem)/.88 var(--q-serif);
+  font: 400 clamp(4rem, min(9vw, 13.8svh), 8rem)/.88 var(--q-serif);
   letter-spacing: -.028em;
 }
 
@@ -2944,8 +2944,8 @@ a {
 }
 
 .memory-hero .hero-lede {
-  max-width: 44ch;
-  margin: clamp(24px, 4svh, 36px) auto 0;
+  max-width: 68ch;
+  margin: clamp(15px, 2.5svh, 24px) auto 0;
   color: #f1ebdb;
   font-size: clamp(1rem, 1.7vw, 1.22rem);
 }
@@ -2965,7 +2965,7 @@ a {
   gap: clamp(12px, 2vw, 28px);
   width: fit-content;
   max-width: 100%;
-  margin: 25px auto 0;
+  margin: 17px auto 0;
   padding: 4px 4px 4px clamp(12px, 2vw, 17px);
   border-radius: 12px;
   color: var(--q-fg);
@@ -2993,7 +2993,7 @@ a {
 .memory-hero .hero-actions {
   justify-content: center;
   flex-wrap: wrap;
-  margin-top: 18px;
+  margin-top: 12px;
   gap: 10px;
   text-shadow: none;
 }
@@ -3035,8 +3035,8 @@ a {
 }
 
 .memory-hero .hero-privacy {
-  max-width: 56ch;
-  margin: 16px auto 0;
+  max-width: 72ch;
+  margin: 10px auto 0;
   color: #e2e4d6;
 }
 
@@ -3107,8 +3107,12 @@ a:is(:hover, :focus-visible, :active) .memory-arrow {
 
 .memory-flow .section-heading {
   max-width: 1050px;
-  margin: 0 auto clamp(17px, 3vw, 30px);
+  margin: 0 auto clamp(12px, 2.2svh, 20px);
   text-shadow: 0 2px 14px #111b12d9;
+}
+
+.memory-flow h2 {
+  font-size: clamp(2.5rem, min(4.6vw, 8svh), 4rem);
 }
 
 .memory-flow h2 span {
@@ -3121,7 +3125,7 @@ a:is(:hover, :focus-visible, :active) .memory-arrow {
 }
 
 [data-home-theme] .memory-flow {
-  padding-block: clamp(50px, 8svh, 80px) clamp(24px, 4vw, 48px);
+  padding-block: clamp(24px, 3.5svh, 38px) clamp(24px, 4vw, 48px);
 }
 
 [data-home-theme] .handoff-video {
@@ -3129,7 +3133,7 @@ a:is(:hover, :focus-visible, :active) .memory-arrow {
 }
 
 .memory-flow .section-heading p {
-  margin: 10px auto 0;
+  margin: 8px auto 0;
 }
 
 .memory-flow-tabs {
@@ -3169,9 +3173,9 @@ a:is(:hover, :focus-visible, :active) .memory-arrow {
 }
 
 .memory-flow-panels {
-  width: min(100%, 63ch);
+  width: min(100%, 74ch);
   min-height: 90px;
-  margin: 24px auto 0;
+  margin: 14px auto 0;
   padding: 0 6px;
 }
 
@@ -3210,6 +3214,24 @@ a:is(:hover, :focus-visible, :active) .memory-arrow {
   border-radius: 12px;
 }
 
+@media (min-width: 621px) and (max-height: 800px) {
+  .memory-hero-content {
+    padding-top: clamp(24px, 4svh, 33px);
+  }
+
+  .memory-hero h1 {
+    font-size: clamp(3.75rem, min(9vw, 11.6svh), 8rem);
+  }
+
+  .memory-flow h2 {
+    font-size: clamp(2.3rem, min(4.6vw, 7svh), 3.6rem);
+  }
+
+  .memory-flow-panels {
+    margin-top: 11px;
+  }
+}
+
 @media (max-width: 760px) {
   .memory-hero .hero-actions .btn {
     width: auto;
@@ -3237,6 +3259,21 @@ a:is(:hover, :focus-visible, :active) .memory-arrow {
 
   .memory-flow h2 {
     font-size: clamp(2.1rem, 8.7vw, 3.2rem);
+  }
+}
+
+@media (max-width: 360px) {
+  .memory-hero .hero-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  .memory-hero .hero-actions .btn-primary,
+  .memory-hero .hero-text-link {
+    gap: 5px;
+    padding-inline: 8px;
+    font-size: .875rem;
   }
 }
 

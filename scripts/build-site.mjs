@@ -1397,8 +1397,8 @@ function homePage() {
       <section class="hero memory-hero" aria-labelledby="memory-title">
         <div class="memory-garden" aria-hidden="true">
           <picture class="memory-landscape">
-            <source media="(max-width: 620px)" srcset="/assets/qarinah-garden-mobile.webp" width="650" height="1024">
-            <img src="/assets/qarinah-garden.webp" alt="" width="1536" height="1024" fetchpriority="high">
+            <source media="(max-width: 620px)" srcset="/assets/qarinah-garden-dusk-mobile.webp" width="650" height="1024">
+            <img src="/assets/qarinah-garden-dusk.webp" alt="" width="1536" height="1024" fetchpriority="high">
           </picture>
         </div>
         <div class="shell memory-hero-content">
