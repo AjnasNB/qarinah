@@ -2903,7 +2903,7 @@ a {
   object-fit: cover;
   object-position: 56% 60%;
   transform-origin: 61% 57%;
-  animation: garden-drift 28s ease-in-out infinite alternate;
+  animation: garden-drift 4s ease-out both;
 }
 
 .memory-garden::after {
@@ -2917,11 +2917,7 @@ a {
 
 @keyframes garden-drift {
   from { transform: scale(1.015); }
-  to { transform: scale(1.075) translate(-.55%, .3%); }
-}
-
-.memory-motion-paused .memory-landscape img {
-  animation-play-state: paused;
+  to { transform: scale(1.04) translate(-.35%, .2%); }
 }
 
 .memory-hero-content {
@@ -3189,18 +3185,6 @@ a:is(:hover, :focus-visible, :active) .memory-arrow {
   color: var(--q-muted);
 }
 
-.memory-motion-toggle {
-  padding: 6px 10px;
-  border: 1px solid var(--garden-glass-edge);
-  border-radius: 8px;
-  background: #f4e6c810;
-  color: var(--q-fg);
-  font: inherit;
-  font-size: .78rem;
-  white-space: nowrap;
-  cursor: pointer;
-}
-
 .memory-architecture-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
@@ -3281,10 +3265,6 @@ a:is(:hover, :focus-visible, :active) .memory-arrow {
 @media (prefers-reduced-motion: reduce) {
   [data-home-theme] {
     scroll-behavior: auto;
-  }
-
-  .memory-motion-toggle {
-    display: none;
   }
 
   .memory-landscape img {

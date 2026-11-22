@@ -102,13 +102,6 @@
     });
   }
 
-  const motion = document.querySelector(".memory-motion-toggle");
-  motion?.addEventListener("click", () => {
-    const paused = root.classList.toggle("memory-motion-paused");
-    motion.setAttribute("aria-pressed", String(paused));
-    motion.textContent = paused ? "Resume motion" : "Pause motion";
-  });
-
   const searchInput = document.querySelector('input[type="search"]');
   document.addEventListener("keydown", (event) => {
     if (event.key !== "/" || event.ctrlKey || event.metaKey || event.altKey) return;

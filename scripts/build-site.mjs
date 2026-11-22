@@ -964,8 +964,7 @@ function nav(active = "") {
         </button>
         <nav id="primary-nav" class="primary-nav" aria-label="Primary navigation">
           ${items.map(([label, href, id]) => `<a class="${active === id ? "selected" : ""}" href="${href}">${label}</a>`).join("")}
-          <a href="${github}" rel="noreferrer">GitHub</a>
-          ${active === "home" ? '<button class="memory-motion-toggle" type="button" aria-pressed="false">Pause motion</button>' : '<button class="theme-toggle" type="button" aria-label="Toggle color theme">Theme</button>'}
+          <a href="${github}" rel="noreferrer">GitHub</a>${active !== "home" ? '\n          <button class="theme-toggle" type="button" aria-label="Toggle color theme">Theme</button>' : ""}
         </nav>
       </div>
     </header>`;
