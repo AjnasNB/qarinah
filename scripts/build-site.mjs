@@ -848,7 +848,6 @@ await mkdir(path.join(output, "paper"), { recursive: true });
 
 await cp(path.join(root, "website", "site.css"), path.join(output, "site.css"));
 await cp(path.join(root, "website", "site.js"), path.join(output, "site.js"));
-await cp(path.join(root, "website", "river-motion.js"), path.join(output, "river-motion.js"));
 await cp(path.join(root, "website", "static"), output, { recursive: true });
 await cp(path.join(root, "node_modules", "@primer", "css", "dist", "primer.css"), path.join(output, "primer.css"));
 await cp(path.join(root, "assets", "brand", "qarinah-mark.svg"), path.join(output, "assets", "qarinah-mark.svg"));
@@ -1345,7 +1344,7 @@ function layout({ title, description, body, active = "", canonical = "/", kind =
   <title>${fullTitle}</title>
   <meta name="description" content="${description}">
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
-  <meta name="theme-color" content="#0d1117">
+  <meta name="theme-color" content="${kind === "home" ? "#121c14" : "#0d1117"}">
   <link rel="canonical" href="${url}">
   <link rel="alternate" hreflang="en" href="${url}">
   <link rel="alternate" hreflang="x-default" href="${url}">
@@ -1368,7 +1367,7 @@ function layout({ title, description, body, active = "", canonical = "/", kind =
   <meta name="twitter:image:alt" content="Qarinah - your project remembers across coding agents.">
   <link rel="icon" href="/assets/qarinah-memory-mark.svg" type="image/svg+xml" sizes="any">
   <link rel="stylesheet" href="/primer.css">
-  <link rel="stylesheet" href="/site.css">
+  <link rel="stylesheet" href="/site.css">${kind === "home" ? '\n  <link rel="preload" href="/assets/fonts/instrument-serif-latin.woff2" as="font" type="font/woff2" crossorigin>' : ""}
   <script type="application/ld+json">${schema}</script>
 </head>
 <body>
@@ -1376,7 +1375,7 @@ function layout({ title, description, body, active = "", canonical = "/", kind =
   ${nav(active)}
   <main id="main">${body}</main>
   ${footer()}
-  <script src="/site.js" defer></script>${kind === "home" ? '\n  <script src="/river-motion.js" defer></script>' : ""}
+  <script src="/site.js" defer></script>
 </body>
 </html>`;
 }
@@ -1396,13 +1395,14 @@ function homePage() {
     body: `
 
       <section class="hero memory-hero" aria-labelledby="memory-title">
-        <picture class="memory-landscape" aria-hidden="true">
-          <source media="(max-width: 620px)" srcset="/assets/qarinah-river-hero-mobile.webp">
-          <img src="/assets/qarinah-river-hero.webp" alt="" width="1536" height="1024" fetchpriority="high">
-        </picture>
-        <canvas class="memory-river-motion" aria-hidden="true"></canvas>
+        <div class="memory-garden" aria-hidden="true">
+          <picture class="memory-landscape">
+            <source media="(max-width: 620px)" srcset="/assets/qarinah-garden-mobile.webp" width="650" height="1024">
+            <img src="/assets/qarinah-garden.webp" alt="" width="1536" height="1024" fetchpriority="high">
+          </picture>
+        </div>
         <div class="shell memory-hero-content">
-          <h1 id="memory-title">Memory that keeps AI moving.</h1>
+          <h1 id="memory-title"><span>Memory that</span> <em>keeps AI moving.</em></h1>
           <p class="hero-lede">Pick up where you left off in a new chat, a different project, or another coding agent.</p>
           <div class="memory-install" aria-label="Install Qarinah locally">
             <code>npx qarinah@latest setup .</code>

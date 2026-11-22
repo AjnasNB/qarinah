@@ -107,7 +107,6 @@
     const paused = root.classList.toggle("memory-motion-paused");
     motion.setAttribute("aria-pressed", String(paused));
     motion.textContent = paused ? "Resume motion" : "Pause motion";
-    document.dispatchEvent(new Event("qarinah:motion"));
   });
 
   const searchInput = document.querySelector('input[type="search"]');

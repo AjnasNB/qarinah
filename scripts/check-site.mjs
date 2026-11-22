@@ -46,8 +46,11 @@ const required = [
   "paper/Qarinah-Technical-White-Paper-v1.2.pdf",
   "assets/qarinah-mark.svg",
   "assets/qarinah-memory-mark.svg",
-  "assets/qarinah-river-hero.webp",
-  "assets/qarinah-river-hero-mobile.webp",
+  "assets/qarinah-garden.webp",
+  "assets/qarinah-garden-mobile.webp",
+  "assets/fonts/dm-sans-latin.woff2",
+  "assets/fonts/instrument-serif-latin.woff2",
+  "assets/fonts/instrument-serif-italic-latin.woff2",
   "assets/qarinah-flow.svg",
   "assets/qarinah-social-preview.png",
   "assets/qarinah-what-you-save.png",
@@ -55,7 +58,6 @@ const required = [
   "assets/qarinah-worktree-context-graph.png",
   "site.css",
   "site.js",
-  "river-motion.js",
   "primer.css",
   "_headers",
   "_redirects",
@@ -349,14 +351,14 @@ if (!home.includes("What coding agents and developers need to know.") || !home.i
   errors.push("Homepage is missing the direct answer-engine surface.");
 }
 for (const worktreeHeroProof of [
-  "Memory that keeps AI moving.",
+  '<h1 id="memory-title"><span>Memory that</span> <em>keeps AI moving.</em></h1>',
   "Cross-chat memory",
   "Cross-project memory",
   "Cross-agent memory",
   "across repositories you’ve explicitly connected",
   "Follow a decision through an example handoff.",
   'data-home-theme',
-  'class="memory-river-motion"',
+  'class="memory-garden"',
   "“A chat ends.",
   "The work keeps flowing.”",
   'class="mobile-menu-glyph"',
@@ -391,7 +393,7 @@ const memoryFlowIndex = home.indexOf('<section class="memory-flow section shell"
 const handoffDemoIndex = home.indexOf('<section class="handoff-video section shell"');
 if (memoryHeroIndex < 0 || memoryFlowIndex <= memoryHeroIndex || handoffDemoIndex <= memoryFlowIndex
   || home.slice(memoryHeroIndex, memoryFlowIndex).includes("</section>")) {
-  errors.push("Homepage must include the handoff inside the river hero, followed by the public demo.");
+  errors.push("Homepage must include the handoff inside the garden hero, followed by the public demo.");
 }
 if (!home.includes("Verifiable project memory, exact source recovery, and cited context for coding agents.")
   || !home.includes("Measured, reproducible, and explicitly scoped.")) {
