@@ -1,8 +1,8 @@
-# QARNH
+# Qarinah
 
 > Your project remembers. Every agent gets the proof.
 
-QARNH is the local project-memory tool published as `qarinah` on npm and GitHub. It preserves permitted project evidence and explicitly archived source bytes beside the code. It links symbols, decisions, outcomes, sessions, and Git worktrees in one searchable graph, then compiles bounded cited context for Codex, Claude Code, Cursor, Kimi, Antigravity, Freebuff, and compatible tools.
+Qarinah is the local project-memory tool published as `qarinah` on npm and GitHub. It preserves permitted project evidence and explicitly archived source bytes beside the code. It links symbols, decisions, outcomes, sessions, and Git worktrees in one searchable graph, then compiles bounded cited context for Codex, Claude Code, Cursor, Kimi, Antigravity, Freebuff, and compatible tools.
 
 This file is a convenience map for tools that choose to read it. It is not a ranking signal or a substitute for the canonical documentation.
 

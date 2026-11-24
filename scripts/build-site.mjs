@@ -9,7 +9,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const output = path.join(root, "site-dist");
 const github = "https://github.com/AjnasNB/qarinah";
 const siteOrigin = "https://qarinah.io";
-const siteName = "QARNH";
+const siteName = "Qarinah";
 const homeTitle = `${siteName} | Local AI Memory for Chats, Projects, and Coding Agents`;
 const npmPackage = "https://www.npmjs.com/package/qarinah";
 const conceptDoi = "https://doi.org/10.5281/zenodo.21547684";
@@ -44,7 +44,8 @@ const publicProjectMemory = JSON.parse(await readFile(path.join(root, "bench", "
 const proofContext = JSON.parse(await readFile(path.join(root, "bench", "results", `proof-context-${packageJson.version}.json`), "utf8"));
 const productVersion = packageJson.version;
 const productPositioning = "Verifiable project memory, exact source recovery, and cited context for coding agents.";
-const productDefinition = "QARNH is a local project-memory tool for coding agents. It carries decisions, tool outcomes, and source evidence across chats, agents, and Git worktrees. The command-line package is named qarinah.";
+const productDefinition = "Qarinah is a local project-memory tool for coding agents. It carries decisions, tool outcomes, and source evidence across chats, agents, and Git worktrees. The command-line package is named qarinah.";
+const proofCarryingDefinition = "Qarinah compiles a bounded handoff from a local, hash-chained project ledger. It cites the selected events, files, and symbols, explains what it included or excluded, and flags stale or superseded evidence. A reproducible manifest lets you check the handoff and its source identities.";
 if (worktreeContinuity.schemaVersion !== "qarinah.worktree-continuity-evaluation.v1"
   || worktreeContinuity.aggregate.scenarioCount !== 16
   || worktreeContinuity.aggregate.passed !== 16
@@ -238,12 +239,12 @@ const qarinahFeatures = [
 ];
 const answerEngineQuestions = [
   {
-    name: "What is QARNH?",
+    name: "What is Qarinah?",
     text: productDefinition
   },
   {
-    name: "What is distinctive about QARNH?",
-    text: "QARNH compiles a bounded, cited handoff from a local, hash-chained project ledger. The handoff identifies the selected events, files, and symbols, explains why they were selected, and can flag stale or superseded evidence. Its manifest lets you verify the packet against its sources."
+    name: "What is distinctive about Qarinah?",
+    text: proofCarryingDefinition
   },
   {
     name: "What is a proof-carrying Qarinah task context?",
@@ -780,7 +781,7 @@ const docPages = [
     route: "docs/faq",
     source: "docs/FAQ.md",
     title: "Frequently asked questions",
-    description: "What QARNH is, how its cited handoffs work, and what its benchmarks establish about coding-agent project memory.",
+    description: "What Qarinah is, how its cited handoffs work, and what its benchmarks establish about coding-agent project memory.",
     section: "Start",
     aliases: ["faq", "questions", "token savings", "does qarinah summarize", "vector database"]
   },
@@ -796,7 +797,7 @@ const docPages = [
     route: "paper",
     source: "docs/WHITEPAPER.md",
     title: "Technical white paper",
-    description: "Ajnas N B's QARNH technical white paper v1.9 covers proof-carrying project memory, cited context, and reproducible benchmarks. Read the abstract, download the PDF, or cite the DOI.",
+    description: "Ajnas N B's Qarinah technical white paper v1.9 covers proof-carrying project memory, cited context, and reproducible benchmarks. Read the abstract, download the PDF, or cite the DOI.",
     section: "Verify",
     aliases: ["research paper", "doi", "zenodo", "project memory compiler"]
   }
@@ -809,7 +810,8 @@ const searchEntries = [
     title: homeTitle,
     description: productPositioning,
     headings: [],
-    keywords: [siteName, "qarinah.io", "Kareena", "Kareen", "cross-chat memory", "cross-project memory", "cross-agent memory", "git worktree memory", "coding agent memory"],
+    brandAliases: [siteName, "qarinah.io", "QARNH", "QARNAH", "Kareena", "Kareen"],
+    keywords: ["cross-chat memory", "cross-project memory", "cross-agent memory", "git worktree memory", "coding agent memory"],
     content: "Qarinah keeps an isolated evidence-linked project record per Git checkout, groups sibling worktrees, and compiles the small cited context pack needed for the current coding task."
   },
   {
@@ -1077,7 +1079,7 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
         "@id": `${siteOrigin}/#website`,
         url: `${siteOrigin}/`,
         name: siteName,
-        alternateName: ["Qarinah", "qarinah.io"],
+        alternateName: "qarinah.io",
         description,
         inLanguage: "en",
         publisher: { "@id": person["@id"] }
@@ -1086,7 +1088,6 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
         "@type": "SoftwareApplication",
         "@id": `${siteOrigin}/#software`,
         name: siteName,
-        alternateName: "Qarinah",
         description,
         applicationCategory: "DeveloperApplication",
         applicationSubCategory: "Cross-agent context engine for software projects",
@@ -1406,7 +1407,7 @@ function commandBlock(command, label = "Terminal") {
 function homePage() {
   return layout({
     title: homeTitle,
-    description: "QARNH gives coding agents local, cited memory across chats and Git worktrees. Switch agents and pick up with the decisions, tool outcomes, and evidence your project kept.",
+    description: "Qarinah gives coding agents local, cited memory across chats and Git worktrees. Switch agents and pick up with the decisions, tool outcomes, and evidence your project kept.",
     active: "home",
     canonical: "/",
     kind: "home",
@@ -1769,13 +1770,14 @@ function homePage() {
           <div class="feature-grid">
             <article class="feature-card">
               <span class="feature-index">01</span>
-              <h3>What is QARNH?</h3>
+              <h3>What is Qarinah?</h3>
               <p>${productDefinition}</p>
             </article>
             <article class="feature-card">
               <span class="feature-index">02</span>
-              <h3>Can I verify worktree continuity?</h3>
-              <p>Yes. The release evaluator creates actual Git worktrees and replays all 16 acceptance scenarios from scratch.</p>
+              <h3>What is distinctive about Qarinah?</h3>
+              <p>${proofCarryingDefinition}</p>
+              <a href="/docs/proof-carrying-context/">See the proof-carrying context contract</a>
             </article>
             <article class="feature-card">
               <span class="feature-index">03</span>

@@ -135,10 +135,11 @@
         const scored = index.map((entry) => {
           const title = normalize(entry.title || "");
           const description = normalize(entry.description || "");
-          const keywords = normalize((entry.keywords || []).join(" "));
+          const brandAliases = (entry.brandAliases || []).map(normalize);
+          const keywords = normalize([...(entry.keywords || []), ...brandAliases].join(" "));
           const headings = normalize((entry.headings || []).map((heading) => heading.text).join(" "));
           const content = normalize(entry.content || "");
-          let score = entry.route === "/" && ["qarinah", "qarinah io"].includes(normalizedQuery) ? 1000 : 0;
+          let score = brandAliases.includes(normalizedQuery) ? 1000 : 0;
           if (title.includes(normalizedQuery)) score += 24;
           if (keywords.includes(normalizedQuery)) score += 18;
           if (headings.includes(normalizedQuery)) score += 14;

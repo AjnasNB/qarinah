@@ -304,9 +304,9 @@ for (const canonicalResource of [
 ]) {
   if (!llms.includes(canonicalResource)) errors.push(`llms.txt is missing ${canonicalResource}`);
 }
-if (!/^# QARNH\r?\n/u.test(llms) || !llmsFull.includes("- Name: QARNH")
+if (!/^# Qarinah\r?\n/u.test(llms) || !llmsFull.includes("- Name: Qarinah")
   || !llmsFull.includes("https://doi.org/10.5281/zenodo.23242919")) {
-  errors.push("Machine-readable maps must identify QARNH and the current paper DOI.");
+  errors.push("Machine-readable maps must identify Qarinah and the current paper DOI.");
 }
 
 const home = await readFile(path.join(output, "index.html"), "utf8");
@@ -314,14 +314,17 @@ const worktreeArticle = await readFile(path.join(output, "articles", "git-worktr
 const toolkit = await readFile(path.join(output, "articles", "open-source-agent-memory-stack", "index.html"), "utf8");
 const paper = await readFile(path.join(output, "paper", "index.html"), "utf8");
 const faq = await readFile(path.join(output, "docs", "faq", "index.html"), "utf8");
-const website = JSON.parse(home.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1] ?? "{}")["@graph"]
-  ?.find((item) => item["@type"] === "WebSite");
-const homeKeywords = searchIndex.find((entry) => entry.route === "/")?.keywords ?? [];
-if (website?.name !== "QARNH" || website.url !== "https://qarinah.io/"
-  || !website.alternateName?.includes("Qarinah")
-  || !home.includes('<meta property="og:site_name" content="QARNH">')
-  || !["QARNH", "Kareena", "Kareen"].every((keyword) => homeKeywords.includes(keyword))) {
-  errors.push("Homepage identity and on-site brand search terms must point to QARNH.");
+const homeGraph = JSON.parse(home.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1] ?? "{}")["@graph"] ?? [];
+const website = homeGraph.find((item) => item["@type"] === "WebSite");
+const software = homeGraph.find((item) => item["@type"] === "SoftwareApplication");
+const brandAliases = searchIndex.find((entry) => entry.route === "/")?.brandAliases ?? [];
+const searchVariants = ["QARNH", "QARNAH", "Kareena", "Kareen"];
+if (website?.name !== "Qarinah" || website.url !== "https://qarinah.io/"
+  || website.alternateName !== "qarinah.io" || software?.name !== "Qarinah"
+  || !home.includes('<meta property="og:site_name" content="Qarinah">')
+  || !["Qarinah", "qarinah.io", ...searchVariants].every((alias) => brandAliases.includes(alias))
+  || searchVariants.some((variant) => [home, faq, paper, llms, llmsFull].some((page) => page.includes(variant)))) {
+  errors.push("Qarinah must be the public identity, with spelling variants confined to site search.");
 }
 const features = await readFile(path.join(output, "docs", "features", "index.html"), "utf8");
 const publicMetricsPage = await readFile(path.join(output, "docs", "public-metrics", "index.html"), "utf8");
@@ -585,9 +588,10 @@ if (!siteCss.includes(".toolkit-project-grid")
 if (!faq.includes('"@type":"FAQPage"') || !faq.includes('"mainEntity"')) {
   errors.push("FAQ is missing answer-oriented structured data.");
 }
-for (const question of ["What is QARNH?", "What is distinctive about QARNH?"]) {
-  if (!faq.includes(`>${question}</h2>`) || !faq.includes(`"name":"${question}"`)) {
-    errors.push(`FAQ must expose ${question} in visible HTML and structured data.`);
+for (const question of ["What is Qarinah?", "What is distinctive about Qarinah?"]) {
+  if (!home.includes(`>${question}</h3>`) || !faq.includes(`>${question}</h2>`)
+    || !faq.includes(`"name":"${question}"`)) {
+    errors.push(`Homepage and FAQ must expose ${question} in visible HTML and FAQ structured data.`);
   }
 }
 if (!paper.includes('src="/assets/qarinah-flow.svg"')) {
