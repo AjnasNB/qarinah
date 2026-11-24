@@ -288,6 +288,7 @@ for (const crawler of ["Googlebot", "Bingbot", "OAI-SearchBot", "Claude-SearchBo
 }
 
 const llms = await readFile(path.join(output, "llms.txt"), "utf8");
+const llmsFull = await readFile(path.join(output, "llms-full.txt"), "utf8");
 for (const canonicalResource of [
   "https://qarinah.io/docs/",
   "https://qarinah.io/docs/features/",
@@ -298,9 +299,14 @@ for (const canonicalResource of [
   "https://qarinah.io/articles/open-source-agent-memory-stack/",
   "https://www.npmjs.com/package/qarinah",
   "https://github.com/AjnasNB/qarinah",
-  "https://doi.org/10.5281/zenodo.21547684"
+  "https://doi.org/10.5281/zenodo.21547684",
+  "https://doi.org/10.5281/zenodo.23242919"
 ]) {
   if (!llms.includes(canonicalResource)) errors.push(`llms.txt is missing ${canonicalResource}`);
+}
+if (!/^# Qarinah\r?\n/u.test(llms) || !llmsFull.includes("- Name: Qarinah")
+  || !llmsFull.includes("https://doi.org/10.5281/zenodo.23242919")) {
+  errors.push("Machine-readable maps must identify Qarinah and the current paper DOI.");
 }
 
 const home = await readFile(path.join(output, "index.html"), "utf8");
@@ -308,6 +314,19 @@ const worktreeArticle = await readFile(path.join(output, "articles", "git-worktr
 const toolkit = await readFile(path.join(output, "articles", "open-source-agent-memory-stack", "index.html"), "utf8");
 const paper = await readFile(path.join(output, "paper", "index.html"), "utf8");
 const faq = await readFile(path.join(output, "docs", "faq", "index.html"), "utf8");
+const homeGraph = JSON.parse(home.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1] ?? "{}")["@graph"] ?? [];
+const website = homeGraph.find((item) => item["@type"] === "WebSite");
+const software = homeGraph.find((item) => item["@type"] === "SoftwareApplication");
+const brandAliases = searchIndex.find((entry) => entry.route === "/")?.brandAliases ?? [];
+const searchVariants = ["QARNH", "QARNAH", "Kareena", "Kareen", "Karreena", "Karren", "Qareen", "Qari in A", "Qarina", "KRNA"];
+const publicVariant = new RegExp(`\\b(?:${searchVariants.join("|")})\\b`, "iu");
+if (website?.name !== "Qarinah" || website.url !== "https://qarinah.io/"
+  || website.alternateName !== "qarinah.io" || software?.name !== "Qarinah"
+  || !home.includes('<meta property="og:site_name" content="Qarinah">')
+  || !["Qarinah", "qarinah.io", ...searchVariants].every((alias) => brandAliases.includes(alias))
+  || [home, faq, paper, llms, llmsFull].some((page) => publicVariant.test(page))) {
+  errors.push("Qarinah must be the public identity, with spelling variants confined to site search.");
+}
 const features = await readFile(path.join(output, "docs", "features", "index.html"), "utf8");
 const publicMetricsPage = await readFile(path.join(output, "docs", "public-metrics", "index.html"), "utf8");
 const publicMetrics = JSON.parse(await readFile(path.join(output, "metrics.json"), "utf8"));
@@ -570,15 +589,33 @@ if (!siteCss.includes(".toolkit-project-grid")
 if (!faq.includes('"@type":"FAQPage"') || !faq.includes('"mainEntity"')) {
   errors.push("FAQ is missing answer-oriented structured data.");
 }
+for (const question of ["What is Qarinah?", "What is distinctive about Qarinah?"]) {
+  if (!home.includes(`>${question}</h3>`) || !faq.includes(`>${question}</h2>`)
+    || !faq.includes(`"name":"${question}"`)) {
+    errors.push(`Homepage and FAQ must expose ${question} in visible HTML and FAQ structured data.`);
+  }
+}
 if (!paper.includes('src="/assets/qarinah-flow.svg"')) {
   errors.push("Paper architecture image is not bound to the deployed asset.");
 }
 if (!paper.includes("/paper/Qarinah-Technical-White-Paper-v1.9.pdf")) {
   errors.push("Paper download does not point to the versioned website PDF.");
 }
+for (const [name, value] of Object.entries({
+  title: "Qarinah: Proof-Carrying Project Memory",
+  author: "Ajnas N B",
+  publication_date: "2026/10/08",
+  pdf_url: "https://qarinah.io/paper/Qarinah-Technical-White-Paper-v1.9.pdf",
+  doi: "10.5281/zenodo.23242919"
+})) {
+  if (!paper.includes(`<meta name="citation_${name}" content="${value}">`)) {
+    errors.push(`Paper page citation_${name} must match the archived v1.9 manuscript.`);
+  }
+}
 if (!paper.includes("https://doi.org/10.5281/zenodo.21850747")
   || !paper.includes("https://doi.org/10.5281/zenodo.21547684")
   || !paper.includes("https://doi.org/10.5281/zenodo.21843240")
+  || !paper.includes('"identifier":"10.5281/zenodo.23242919"')
   || !paper.includes('"creativeWorkStatus":"Published"')
   || !paper.includes('"datePublished":"2026-10-08"')) {
   errors.push("Paper page must bind current v1.9 to the paper series and preserve published v1.4/v1.3 DOIs.");
