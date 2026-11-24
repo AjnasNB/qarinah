@@ -119,7 +119,12 @@
   const searchResults = document.querySelector("[data-search-results]");
   const searchStatus = document.querySelector("[data-search-status]");
   if (searchForm && searchInput && searchResults && searchStatus) {
-    const normalize = (value) => value.toLowerCase().normalize("NFKD").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+    const normalize = (value) => value.toLowerCase().normalize("NFKD")
+      .replace(/\p{M}/gu, "")
+      .replace(/[^\p{L}\p{N}]+/gu, " ")
+      .trim();
+    const brandIntent = "(?:local )?(?:ai(?: agent)?(?: memory)?|coding agent memory)";
+    const brandIntentAtEdges = new RegExp(`^${brandIntent} | ${brandIntent}$`, "gu");
     const query = new URLSearchParams(window.location.search).get("q")?.trim() || "";
     searchInput.value = query;
 
@@ -131,7 +136,7 @@
         if (!response.ok) throw new Error(`Search index returned ${response.status}.`);
         const index = await response.json();
         const normalizedQuery = normalize(query);
-        const brandQuery = normalizedQuery.replace(/(?: ai(?: memory)?)$/u, "");
+        const brandQuery = normalizedQuery.replace(brandIntentAtEdges, "").replaceAll(" ", "");
         const terms = [...new Set(normalizedQuery.split(/\s+/).filter((term) => term.length > 1))];
         const scored = index.map((entry) => {
           const title = normalize(entry.title || "");
@@ -140,7 +145,8 @@
           const keywords = normalize([...(entry.keywords || []), ...brandAliases].join(" "));
           const headings = normalize((entry.headings || []).map((heading) => heading.text).join(" "));
           const content = normalize(entry.content || "");
-          let score = brandAliases.includes(brandQuery) ? 1000 : 0;
+          const exactBrandMatch = brandAliases.some((alias) => alias.replaceAll(" ", "") === brandQuery);
+          let score = exactBrandMatch ? 1000 : 0;
           if (title.includes(normalizedQuery)) score += 24;
           if (keywords.includes(normalizedQuery)) score += 18;
           if (headings.includes(normalizedQuery)) score += 14;

@@ -318,12 +318,13 @@ const homeGraph = JSON.parse(home.match(/<script type="application\/ld\+json">([
 const website = homeGraph.find((item) => item["@type"] === "WebSite");
 const software = homeGraph.find((item) => item["@type"] === "SoftwareApplication");
 const brandAliases = searchIndex.find((entry) => entry.route === "/")?.brandAliases ?? [];
-const searchVariants = ["QARNH", "QARNAH", "Kareena", "Kareen", "Karreena", "Karren", "Qareen"];
+const searchVariants = ["QARNH", "QARNAH", "Kareena", "Kareen", "Karreena", "Karren", "Qareen", "Qari in A", "Qarina", "KRNA"];
+const publicVariant = new RegExp(`\\b(?:${searchVariants.join("|")})\\b`, "iu");
 if (website?.name !== "Qarinah" || website.url !== "https://qarinah.io/"
   || website.alternateName !== "qarinah.io" || software?.name !== "Qarinah"
   || !home.includes('<meta property="og:site_name" content="Qarinah">')
   || !["Qarinah", "qarinah.io", ...searchVariants].every((alias) => brandAliases.includes(alias))
-  || searchVariants.some((variant) => [home, faq, paper, llms, llmsFull].some((page) => page.includes(variant)))) {
+  || [home, faq, paper, llms, llmsFull].some((page) => publicVariant.test(page))) {
   errors.push("Qarinah must be the public identity, with spelling variants confined to site search.");
 }
 const features = await readFile(path.join(output, "docs", "features", "index.html"), "utf8");

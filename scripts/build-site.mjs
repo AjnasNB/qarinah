@@ -44,7 +44,7 @@ const publicProjectMemory = JSON.parse(await readFile(path.join(root, "bench", "
 const proofContext = JSON.parse(await readFile(path.join(root, "bench", "results", `proof-context-${packageJson.version}.json`), "utf8"));
 const productVersion = packageJson.version;
 const productPositioning = "Verifiable project memory, exact source recovery, and cited context for coding agents.";
-const productDefinition = "Qarinah is a local project-memory tool for coding agents. It carries decisions, tool outcomes, and source evidence across chats, agents, and Git worktrees. The command-line package is named qarinah.";
+const productDefinition = "Qarinah is local AI memory for coding agents. It carries decisions, tool outcomes, and source evidence across chats, agents, and Git worktrees. The official site is qarinah.io and the command-line package is named qarinah.";
 const proofCarryingDefinition = "Qarinah compiles a bounded handoff from a local, hash-chained project ledger. It cites the selected events, files, and symbols, explains what it included or excluded, and flags stale or superseded evidence. A reproducible manifest lets you check the handoff and its source identities.";
 if (worktreeContinuity.schemaVersion !== "qarinah.worktree-continuity-evaluation.v1"
   || worktreeContinuity.aggregate.scenarioCount !== 16
@@ -810,7 +810,7 @@ const searchEntries = [
     title: homeTitle,
     description: productPositioning,
     headings: [],
-    brandAliases: [siteName, "qarinah.io", "QARNH", "QARNAH", "Kareena", "Kareen", "Karreena", "Karren", "Qareen"],
+    brandAliases: [siteName, "qarinah.io", "QARNH", "QARNAH", "Kareena", "Kareen", "Karreena", "Karren", "Qareen", "Qari in A", "Qarina", "KRNA"],
     keywords: ["cross-chat memory", "cross-project memory", "cross-agent memory", "git worktree memory", "coding agent memory"],
     content: "Qarinah keeps an isolated evidence-linked project record per Git checkout, groups sibling worktrees, and compiles the small cited context pack needed for the current coding task."
   },

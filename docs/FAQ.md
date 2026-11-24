@@ -2,7 +2,7 @@
 
 ## What is Qarinah?
 
-Qarinah is a local project-memory tool for coding agents. It carries decisions, tool outcomes, and source evidence across chats, agents, and Git worktrees. The command-line package is named `qarinah`. You can install it from [the official site](https://qarinah.io/) and use it with Codex, Claude Code, Cursor, and other supported agents.
+Qarinah is local AI memory for coding agents. It carries decisions, tool outcomes, and source evidence across chats, agents, and Git worktrees. The official site is [qarinah.io](https://qarinah.io/) and the command-line package is named `qarinah`. Use it with Codex, Claude Code, Cursor, and other supported agents.
 
 It is also a universal context engine for software projects: it selects bounded, complete records from retained project memory before a host constructs the next model request.
 
