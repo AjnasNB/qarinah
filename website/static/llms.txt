@@ -1,8 +1,8 @@
-# Qarinah
+# QARNH
 
 > Your project remembers. Every agent gets the proof.
 
-Qarinah preserves permitted project evidence and explicitly archived source bytes beside the code. It links symbols, decisions, outcomes, sessions, and Git worktrees in one searchable graph, then compiles bounded cited context for Codex, Claude Code, Cursor, Kimi, Antigravity, Freebuff, and compatible tools.
+QARNH is the local project-memory tool published as `qarinah` on npm and GitHub. It preserves permitted project evidence and explicitly archived source bytes beside the code. It links symbols, decisions, outcomes, sessions, and Git worktrees in one searchable graph, then compiles bounded cited context for Codex, Claude Code, Cursor, Kimi, Antigravity, Freebuff, and compatible tools.
 
 This file is a convenience map for tools that choose to read it. It is not a ranking signal or a substitute for the canonical documentation.
 
@@ -88,7 +88,7 @@ This file is a convenience map for tools that choose to read it. It is not a ran
 - [Troubleshooting](https://qarinah.io/docs/troubleshooting/): Diagnose trust, capture, rebuild, query, MCP, and host-integration failures.
 - [FAQ](https://qarinah.io/docs/faq/): Direct answers about storage, privacy, context reduction, hosts, and operating boundaries.
 - [Migration guide](https://qarinah.io/docs/migrations/): Upgrade persisted Qarinah workspaces safely.
-- [Technical white paper](https://qarinah.io/paper/): Implementation-backed paper version 1.8 for Qarinah 0.6.0. Version 1.8 has no version DOI until separately deposited; the persistent paper-series DOI is 10.5281/zenodo.21547684 and published v1.4 remains historical.
+- [Technical white paper](https://qarinah.io/paper/): Ajnas N B's implementation-backed v1.9 for software 0.7.0, archived at [its version DOI](https://doi.org/10.5281/zenodo.23242919).
 
 ## Publication and support
 

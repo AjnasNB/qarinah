@@ -1,12 +1,16 @@
-# Qarinah FAQ
+# QARNH FAQ
 
-## What is Qarinah?
+## What is QARNH?
 
-Qarinah is the evidence-linked cross-agent context engine for software projects. It lets Codex, Claude Code, Cursor, and other supported coding agents continue the same project using a shared, cited record of decisions, outcomes, code relationships, and current evidence.
+QARNH is a local project-memory tool for coding agents. It carries decisions, tool outcomes, and source evidence across chats, agents, and Git worktrees. The command-line package is named `qarinah`. You can install it from [the official site](https://qarinah.io/) and use it with Codex, Claude Code, Cursor, and other supported agents.
 
 It is also a universal context engine for software projects: it selects bounded, complete records from retained project memory before a host constructs the next model request.
 
-Qarinah works as an independent local tool for one developer and one repository. Team memory, encrypted exchange, and optional Maqam policy or approval controls build on that same project-owned record; they are not required for the personal workflow.
+QARNH works as an independent local tool for one developer and one repository. Team memory, encrypted exchange, and optional Maqam policy or approval controls build on that same project-owned record.
+
+## What is distinctive about QARNH?
+
+QARNH compiles a bounded, cited handoff from a local, hash-chained project ledger. The handoff identifies the selected events, files, and symbols, explains why they were selected, and can flag stale or superseded evidence. Its manifest lets you verify the packet against its sources. Read the [proof-carrying context contract](PROOF-CARRYING-CONTEXT.md) and [technical white paper](WHITEPAPER.md) for the mechanism and measured scope.
 
 ## How do I switch coding agents without starting over?
 

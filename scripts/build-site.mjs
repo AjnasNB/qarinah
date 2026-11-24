@@ -9,12 +9,17 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const output = path.join(root, "site-dist");
 const github = "https://github.com/AjnasNB/qarinah";
 const siteOrigin = "https://qarinah.io";
+const siteName = "QARNH";
+const homeTitle = `${siteName} | Local AI Memory for Chats, Projects, and Coding Agents`;
 const npmPackage = "https://www.npmjs.com/package/qarinah";
 const conceptDoi = "https://doi.org/10.5281/zenodo.21547684";
-const doi = conceptDoi;
 const publishedV14Doi = "https://doi.org/10.5281/zenodo.21850747";
 const historicalVersionDoi = "https://doi.org/10.5281/zenodo.21843240";
 const paperVersion = "1.9";
+const paperTitle = "Qarinah: Proof-Carrying Project Memory";
+const paperAuthor = "Ajnas N B";
+const paperVersionDoi = "10.5281/zenodo.23242919";
+const paperArchive = `https://doi.org/${paperVersionDoi}`;
 const paperPdf = `/paper/Qarinah-Technical-White-Paper-v${paperVersion}.pdf`;
 const historicalPaperPdfs = new Map([
   ["Qarinah-Technical-White-Paper-v1.2.pdf", "/paper/Qarinah-Technical-White-Paper-v1.2.pdf"],
@@ -27,6 +32,7 @@ const historicalPaperPdfs = new Map([
 ]);
 const releaseDate = "2026-10-16";
 const paperPublishedDate = "2026-10-08";
+const discoverabilityUpdatedDate = "2026-11-24";
 const publicMetricsUpdatedDate = "2026-10-16";
 const toolkitArticleDate = "2026-08-16";
 const worktreeArticleDate = "2026-08-16";
@@ -38,7 +44,7 @@ const publicProjectMemory = JSON.parse(await readFile(path.join(root, "bench", "
 const proofContext = JSON.parse(await readFile(path.join(root, "bench", "results", `proof-context-${packageJson.version}.json`), "utf8"));
 const productVersion = packageJson.version;
 const productPositioning = "Verifiable project memory, exact source recovery, and cited context for coding agents.";
-const productExplanation = "Qarinah keeps permitted project evidence and explicitly archived source bytes beside the repository, connects symbols, decisions, outcomes, and Git worktrees in one searchable graph, and compiles the cited context needed by supported coding agents and compatible tools.";
+const productDefinition = "QARNH is a local project-memory tool for coding agents. It carries decisions, tool outcomes, and source evidence across chats, agents, and Git worktrees. The command-line package is named qarinah.";
 if (worktreeContinuity.schemaVersion !== "qarinah.worktree-continuity-evaluation.v1"
   || worktreeContinuity.aggregate.scenarioCount !== 16
   || worktreeContinuity.aggregate.passed !== 16
@@ -232,12 +238,16 @@ const qarinahFeatures = [
 ];
 const answerEngineQuestions = [
   {
-    name: "What is a proof-carrying Qarinah task context?",
-    text: "It is one bounded packet that joins current cited project events, temporal facts, and query-ranked files and symbols. Every selection includes a reason and verifiable identity, and the complete packet has a tamper-evident manifest."
+    name: "What is QARNH?",
+    text: productDefinition
   },
   {
-    name: "What is Qarinah?",
-    text: `${productPositioning} ${productExplanation}`
+    name: "What is distinctive about QARNH?",
+    text: "QARNH compiles a bounded, cited handoff from a local, hash-chained project ledger. The handoff identifies the selected events, files, and symbols, explains why they were selected, and can flag stale or superseded evidence. Its manifest lets you verify the packet against its sources."
+  },
+  {
+    name: "What is a proof-carrying Qarinah task context?",
+    text: "It is one bounded packet that joins current cited project events, temporal facts, and query-ranked files and symbols. Every selection includes a reason and verifiable identity, and the complete packet has a tamper-evident manifest."
   },
   {
     name: "Can Qarinah recover exact project files?",
@@ -770,7 +780,7 @@ const docPages = [
     route: "docs/faq",
     source: "docs/FAQ.md",
     title: "Frequently asked questions",
-    description: "Answers about Qarinah project memory, context reduction, token estimates, privacy, MCP, Codex, and Claude Code.",
+    description: "What QARNH is, how its cited handoffs work, and what its benchmarks establish about coding-agent project memory.",
     section: "Start",
     aliases: ["faq", "questions", "token savings", "does qarinah summarize", "vector database"]
   },
@@ -786,7 +796,7 @@ const docPages = [
     route: "paper",
     source: "docs/WHITEPAPER.md",
     title: "Technical white paper",
-    description: "The implementation-backed technical white paper for Qarinah local project memory and cited context compilation.",
+    description: "Ajnas N B's QARNH technical white paper v1.9 covers proof-carrying project memory, cited context, and reproducible benchmarks. Read the abstract, download the PDF, or cite the DOI.",
     section: "Verify",
     aliases: ["research paper", "doi", "zenodo", "project memory compiler"]
   }
@@ -796,10 +806,10 @@ const routesBySource = new Map(docPages.map((page) => [page.source.replaceAll("\
 const searchEntries = [
   {
     route: "/",
-    title: "Qarinah | Local AI Memory for Chats, Projects, and Coding Agents",
+    title: homeTitle,
     description: productPositioning,
     headings: [],
-    keywords: ["Qarinah.io", "cross-chat memory", "cross-project memory", "cross-agent memory", "git worktree memory", "coding agent memory"],
+    keywords: [siteName, "qarinah.io", "Kareena", "Kareen", "cross-chat memory", "cross-project memory", "cross-agent memory", "git worktree memory", "coding agent memory"],
     content: "Qarinah keeps an isolated evidence-linked project record per Git checkout, groups sibling worktrees, and compiles the small cited context pack needed for the current coding task."
   },
   {
@@ -934,7 +944,9 @@ function rewritePublicationLink(markdown, source) {
     .replace(
       `https://github.com/AjnasNB/qarinah/blob/main/output/pdf/Qarinah-Technical-White-Paper-v${paperVersion}.pdf`,
       paperPdf
-    );
+    )
+    .replace("was reserved for this manuscript before deposit; DOI registration occurs when Zenodo publishes the record.", "identifies the published Zenodo archive for this manuscript.")
+    .replace(" (reserved before deposit; registered on publication)", "");
 }
 
 function nav(active = "") {
@@ -952,9 +964,9 @@ function nav(active = "") {
   return `
     <header class="site-header">
       <div class="shell header-inner">
-        <a class="brand" href="/" aria-label="Qarinah home">
+        <a class="brand" href="/" aria-label="${siteName} home">
           <img src="/assets/qarinah-memory-mark.svg" width="30" height="30" alt="">
-          <span>Qarinah</span>
+          <span>${siteName}</span>
           <span class="version-label">${productVersion}</span>
         </a>
         <button class="mobile-menu" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
@@ -975,7 +987,7 @@ function footer() {
     <footer class="site-footer">
       <div class="shell footer-grid">
         <div>
-          <a class="brand footer-brand" href="/"><img src="/assets/qarinah-memory-mark.svg" width="28" height="28" alt=""><span>Qarinah</span></a>
+          <a class="brand footer-brand" href="/"><img src="/assets/qarinah-memory-mark.svg" width="28" height="28" alt=""><span>${siteName}</span></a>
           <p>${productPositioning}</p>
         </div>
         <div>
@@ -1032,7 +1044,7 @@ function footer() {
 
 function breadcrumbSchema(canonical, title) {
   if (canonical === "/") return null;
-  const parts = [{ name: "Qarinah", item: `${siteOrigin}/` }];
+  const parts = [{ name: siteName, item: `${siteOrigin}/` }];
   if (canonical.startsWith("/docs/") && canonical !== "/docs/") {
     parts.push({ name: "Documentation", item: `${siteOrigin}/docs/` });
   }
@@ -1053,7 +1065,7 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
   const person = {
     "@type": "Person",
     "@id": `${siteOrigin}/#ajnas-nb`,
-    name: "Ajnas N B",
+    name: paperAuthor,
     url: "https://github.com/AjnasNB"
   };
   const graph = [person];
@@ -1064,8 +1076,8 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
         "@type": "WebSite",
         "@id": `${siteOrigin}/#website`,
         url: `${siteOrigin}/`,
-        name: "Qarinah",
-        alternateName: "Qarinah.io",
+        name: siteName,
+        alternateName: ["Qarinah", "qarinah.io"],
         description,
         inLanguage: "en",
         publisher: { "@id": person["@id"] }
@@ -1073,7 +1085,8 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
       {
         "@type": "SoftwareApplication",
         "@id": `${siteOrigin}/#software`,
-        name: "Qarinah",
+        name: siteName,
+        alternateName: "Qarinah",
         description,
         applicationCategory: "DeveloperApplication",
         applicationSubCategory: "Cross-agent context engine for software projects",
@@ -1094,7 +1107,8 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
           priceCurrency: "USD"
         },
         author: { "@id": person["@id"] },
-        sameAs: [github, npmPackage, doi]
+        sameAs: [github, npmPackage],
+        subjectOf: { "@id": `${siteOrigin}/paper/#paper` }
       },
       {
         "@type": "SoftwareSourceCode",
@@ -1113,14 +1127,14 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
     graph.push({
       "@type": "ScholarlyArticle",
       "@id": `${url}#paper`,
-      headline: title,
+      headline: paperTitle,
       description,
       url,
       inLanguage: "en",
       dateCreated: paperPublishedDate,
       dateModified: paperPublishedDate,
       version: paperVersion,
-      identifier: doi,
+      identifier: paperVersionDoi,
       creativeWorkStatus: "Published",
       datePublished: paperPublishedDate,
       license: "https://www.apache.org/licenses/LICENSE-2.0",
@@ -1131,10 +1145,11 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
       },
       encoding: {
         "@type": "MediaObject",
-        contentUrl: paperPdf,
+        contentUrl: `${siteOrigin}${paperPdf}`,
         encodingFormat: "application/pdf"
       },
-      sameAs: [doi],
+      sameAs: [paperArchive],
+      about: { "@id": `${siteOrigin}/#software` },
       isPartOf: { "@id": `${siteOrigin}/#website` }
     });
   } else if (kind === "worktree-article") {
@@ -1298,7 +1313,7 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
       description,
       url,
       inLanguage: "en",
-      dateModified: releaseDate,
+      dateModified: discoverabilityUpdatedDate,
       author: { "@id": person["@id"] },
       mainEntity: answerEngineQuestions.map((entry) => ({
         "@type": "Question",
@@ -1328,28 +1343,32 @@ function structuredData({ title, description, canonical, kind = "doc" }) {
 }
 
 function layout({ title, description, body, active = "", canonical = "/", kind = "doc" }) {
-  const fullTitle = canonical === "/"
-    ? "Qarinah | Local AI Memory for Chats, Projects, and Coding Agents"
-    : `${title} - Qarinah`;
+  const fullTitle = kind === "home" ? title : `${title} - ${siteName}`;
   const url = `${siteOrigin}${canonical}`;
   const ogType = kind === "home" || kind === "search" ? "website" : "article";
   const schema = JSON.stringify(structuredData({ title: fullTitle, description, canonical, kind }))
     .replaceAll("</", "<\\/");
+  const citationMetadata = kind === "paper" ? `
+  <meta name="citation_title" content="${paperTitle}">
+  <meta name="citation_author" content="${paperAuthor}">
+  <meta name="citation_publication_date" content="${paperPublishedDate.replaceAll("-", "/")}">
+  <meta name="citation_pdf_url" content="${siteOrigin}${paperPdf}">
+  <meta name="citation_doi" content="${paperVersionDoi}">` : "";
   return `<!doctype html>
 <html lang="en" data-color-mode="${kind === "home" ? "dark" : "auto"}" data-light-theme="light" data-dark-theme="dark"${kind === "home" ? " data-home-theme" : ""}>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${fullTitle}</title>
-  <meta name="description" content="${description}">
+  <meta name="description" content="${description}">${citationMetadata}
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
   <meta name="theme-color" content="${kind === "home" ? "#121c14" : "#0d1117"}">
   <link rel="canonical" href="${url}">
   <link rel="alternate" hreflang="en" href="${url}">
   <link rel="alternate" hreflang="x-default" href="${url}">
-  <link rel="alternate" type="text/plain" href="/llms.txt" title="Qarinah machine-readable overview">
+  <link rel="alternate" type="text/plain" href="/llms.txt" title="${siteName} machine-readable overview">
   <meta property="og:type" content="${ogType}">
-  <meta property="og:site_name" content="Qarinah">
+  <meta property="og:site_name" content="${siteName}">
   <meta property="og:locale" content="en_US">
   <meta property="og:title" content="${fullTitle}">
   <meta property="og:description" content="${description}">
@@ -1358,12 +1377,12 @@ function layout({ title, description, body, active = "", canonical = "/", kind =
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1280">
   <meta property="og:image:height" content="640">
-  <meta property="og:image:alt" content="Qarinah - your project remembers across coding agents.">
+  <meta property="og:image:alt" content="${siteName} project memory for coding agents">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${fullTitle}">
   <meta name="twitter:description" content="${description}">
   <meta name="twitter:image" content="${siteOrigin}/assets/qarinah-social-preview.png">
-  <meta name="twitter:image:alt" content="Qarinah - your project remembers across coding agents.">
+  <meta name="twitter:image:alt" content="${siteName} project memory for coding agents">
   <link rel="icon" href="/assets/qarinah-memory-mark.svg" type="image/svg+xml" sizes="any">
   <link rel="stylesheet" href="/primer.css">
   <link rel="stylesheet" href="/site.css">${kind === "home" ? '\n  <link rel="preload" href="/assets/fonts/instrument-serif-latin.woff2" as="font" type="font/woff2" crossorigin>' : ""}
@@ -1386,8 +1405,8 @@ function commandBlock(command, label = "Terminal") {
 
 function homePage() {
   return layout({
-    title: "Qarinah - Memory Across Chats, Projects, and Coding Agents",
-    description: "Give coding agents local, cited memory across chats and projects. Resume work in a new session, switch agents, and retrieve the evidence you’ve allowed Qarinah to keep.",
+    title: homeTitle,
+    description: "QARNH gives coding agents local, cited memory across chats and Git worktrees. Switch agents and pick up with the decisions, tool outcomes, and evidence your project kept.",
     active: "home",
     canonical: "/",
     kind: "home",
@@ -1424,7 +1443,7 @@ function homePage() {
           </div>
           <div class="memory-flow-tabs" role="tablist" aria-label="Handoff stages">
             <button id="memory-stage-codex" type="button" role="tab" aria-controls="memory-panel-codex" aria-selected="true">Codex</button>
-            <button id="memory-stage-qarinah" type="button" role="tab" aria-controls="memory-panel-qarinah" aria-selected="false" tabindex="-1"><img src="/assets/qarinah-memory-mark.svg" width="23" height="23" alt="">Qarinah</button>
+            <button id="memory-stage-qarinah" type="button" role="tab" aria-controls="memory-panel-qarinah" aria-selected="false" tabindex="-1"><img src="/assets/qarinah-memory-mark.svg" width="23" height="23" alt="">${siteName}</button>
             <button id="memory-stage-claude" type="button" role="tab" aria-controls="memory-panel-claude" aria-selected="false" tabindex="-1">Claude Code</button>
           </div>
           <div class="memory-flow-panels">
@@ -1750,8 +1769,8 @@ function homePage() {
           <div class="feature-grid">
             <article class="feature-card">
               <span class="feature-index">01</span>
-              <h3>What is Qarinah?</h3>
-              <p>Worktree-aware project memory and cited context graphs for coding agents.</p>
+              <h3>What is QARNH?</h3>
+              <p>${productDefinition}</p>
             </article>
             <article class="feature-card">
               <span class="feature-index">02</span>
@@ -2141,11 +2160,11 @@ async function markdownPage(page) {
             ? "install"
             : "docs";
   const publicationLink = page.route === "paper"
-    ? `<a href="${paperPdf}">Download v${paperVersion} PDF</a> · <a href="${conceptDoi}">Paper series DOI</a> · <a href="${publishedV14Doi}">Published v1.4</a> · <a href="${historicalVersionDoi}">Published v1.3</a>`
+    ? `<a href="${paperPdf}">Download v${paperVersion} PDF</a> · <a href="${paperArchive}">Cite v${paperVersion} DOI</a> · <a href="${conceptDoi}">Paper series DOI</a> · <a href="${publishedV14Doi}">Published v1.4</a> · <a href="${historicalVersionDoi}">Published v1.3</a>`
     : "";
 
   return layout({
-    title: page.title,
+    title: page.route === "paper" ? paperTitle : page.title,
     description: page.description,
     active,
     canonical: `/${page.route}/`,
@@ -2231,7 +2250,10 @@ await writeFile(
 );
 await writeFile(
   path.join(output, "sitemap.xml"),
-  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapRoutes.map((route) => `  <url><loc>${siteOrigin}${route}</loc><lastmod>${route === "/" ? "2026-11-21" : releaseDate}</lastmod></url>`).join("\n")}\n</urlset>\n`
+  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapRoutes.map((route) => {
+    const updated = ["/", "/docs/faq/", "/paper/"].includes(route) ? discoverabilityUpdatedDate : releaseDate;
+    return `  <url><loc>${siteOrigin}${route}</loc><lastmod>${updated}</lastmod></url>`;
+  }).join("\n")}\n</urlset>\n`
 );
 
 console.log(`Built ${sitemapRoutes.length} Qarinah pages in ${path.relative(root, output)}.`);
