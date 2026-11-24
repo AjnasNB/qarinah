@@ -810,7 +810,7 @@ const searchEntries = [
     title: homeTitle,
     description: productPositioning,
     headings: [],
-    brandAliases: [siteName, "qarinah.io", "QARNH", "QARNAH", "Kareena", "Kareen"],
+    brandAliases: [siteName, "qarinah.io", "QARNH", "QARNAH", "Kareena", "Kareen", "Karreena", "Karren", "Qareen"],
     keywords: ["cross-chat memory", "cross-project memory", "cross-agent memory", "git worktree memory", "coding agent memory"],
     content: "Qarinah keeps an isolated evidence-linked project record per Git checkout, groups sibling worktrees, and compiles the small cited context pack needed for the current coding task."
   },

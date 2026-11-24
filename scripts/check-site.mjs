@@ -318,7 +318,7 @@ const homeGraph = JSON.parse(home.match(/<script type="application\/ld\+json">([
 const website = homeGraph.find((item) => item["@type"] === "WebSite");
 const software = homeGraph.find((item) => item["@type"] === "SoftwareApplication");
 const brandAliases = searchIndex.find((entry) => entry.route === "/")?.brandAliases ?? [];
-const searchVariants = ["QARNH", "QARNAH", "Kareena", "Kareen"];
+const searchVariants = ["QARNH", "QARNAH", "Kareena", "Kareen", "Karreena", "Karren", "Qareen"];
 if (website?.name !== "Qarinah" || website.url !== "https://qarinah.io/"
   || website.alternateName !== "qarinah.io" || software?.name !== "Qarinah"
   || !home.includes('<meta property="og:site_name" content="Qarinah">')

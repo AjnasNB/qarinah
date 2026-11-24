@@ -131,6 +131,7 @@
         if (!response.ok) throw new Error(`Search index returned ${response.status}.`);
         const index = await response.json();
         const normalizedQuery = normalize(query);
+        const brandQuery = normalizedQuery.replace(/(?: ai(?: memory)?)$/u, "");
         const terms = [...new Set(normalizedQuery.split(/\s+/).filter((term) => term.length > 1))];
         const scored = index.map((entry) => {
           const title = normalize(entry.title || "");
@@ -139,7 +140,7 @@
           const keywords = normalize([...(entry.keywords || []), ...brandAliases].join(" "));
           const headings = normalize((entry.headings || []).map((heading) => heading.text).join(" "));
           const content = normalize(entry.content || "");
-          let score = brandAliases.includes(normalizedQuery) ? 1000 : 0;
+          let score = brandAliases.includes(brandQuery) ? 1000 : 0;
           if (title.includes(normalizedQuery)) score += 24;
           if (keywords.includes(normalizedQuery)) score += 18;
           if (headings.includes(normalizedQuery)) score += 14;
