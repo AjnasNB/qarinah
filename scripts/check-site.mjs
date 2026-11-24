@@ -45,6 +45,12 @@ const required = [
   "paper/Qarinah-Technical-White-Paper-v1.3.pdf",
   "paper/Qarinah-Technical-White-Paper-v1.2.pdf",
   "assets/qarinah-mark.svg",
+  "assets/qarinah-memory-mark.svg",
+  "assets/qarinah-garden-dusk.webp",
+  "assets/qarinah-garden-dusk-mobile.webp",
+  "assets/fonts/dm-sans-latin.woff2",
+  "assets/fonts/instrument-serif-latin.woff2",
+  "assets/fonts/instrument-serif-italic-latin.woff2",
   "assets/qarinah-flow.svg",
   "assets/qarinah-social-preview.png",
   "assets/qarinah-what-you-save.png",
@@ -322,6 +328,9 @@ for (const responsiveHeroRule of [
 ]) {
   if (!responsiveCss.includes(responsiveHeroRule)) errors.push(`site.css is missing responsive first-run hero behavior: ${responsiveHeroRule}`);
 }
+if (home.includes("memory-rail") || home.includes("qarinah-river-detail")) {
+  errors.push("Homepage still contains the retired rail or second river photo.");
+}
 if (home.includes('"@type":"SearchAction"') || home.includes("search_term_string")) {
   errors.push("Homepage must not emit the retired sitelinks-search SearchAction or its crawlable URL template.");
 }
@@ -342,13 +351,25 @@ if (!home.includes("What coding agents and developers need to know.") || !home.i
   errors.push("Homepage is missing the direct answer-engine surface.");
 }
 for (const worktreeHeroProof of [
-  "Start a new coding-agent session without re-explaining your project.",
-  "Project memory for coding agents",
+  '<h1 id="memory-title"><span>Memory that</span> <em>keeps AI moving.</em></h1>',
+  "Cross-chat memory",
+  "Cross-project memory",
+  "Cross-agent memory",
+  "across repositories you’ve explicitly connected",
+  "Follow a decision through an example handoff.",
+  'data-home-theme',
+  'class="memory-garden"',
+  "“A chat ends.",
+  "The work keeps flowing.”",
+  'class="mobile-menu-glyph"',
+  'aria-label="Copy install command"',
+  'Public demo',
+  'href="/assets/qarinah-memory-mark.svg"',
   "npx qarinah@latest setup .",
   "Metadata-only by default.",
   "npx qarinah demo",
   "Try the two-minute demo",
-  "Join the first 10 maintainers",
+  "Join the maintainer pilot",
   "one repository · two isolated ledgers",
   "branch + commit in snapshot hash",
   'href="/docs/getting-started/#try-the-isolated-demo-first"'
@@ -367,8 +388,12 @@ for (const dashboardProof of [
 ]) {
   if (!home.includes(dashboardProof)) errors.push(`Homepage is missing the real dashboard proof: ${dashboardProof}`);
 }
-if (home.indexOf('<section class="hero">') > home.indexOf('<section class="benchmark-ribbon"')) {
-  errors.push("Homepage must lead with the centered product hero before benchmark detail.");
+const memoryHeroIndex = home.indexOf('<section class="hero memory-hero"');
+const memoryFlowIndex = home.indexOf('<section class="memory-flow section shell"');
+const handoffDemoIndex = home.indexOf('<section class="handoff-video section shell"');
+if (memoryHeroIndex < 0 || memoryFlowIndex <= memoryHeroIndex || handoffDemoIndex <= memoryFlowIndex
+  || home.slice(memoryHeroIndex, memoryFlowIndex).includes("</section>")) {
+  errors.push("Homepage must include the handoff inside the garden hero, followed by the public demo.");
 }
 if (!home.includes("Verifiable project memory, exact source recovery, and cited context for coding agents.")
   || !home.includes("Measured, reproducible, and explicitly scoped.")) {

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>Qarinah</title>
+  <rect width="64" height="64" rx="15" fill="#111c29"/>
+  <path d="M44 42a19 19 0 1 0-9 5" fill="none" stroke="#d9f6e7" stroke-width="5" stroke-linecap="round"/>
+  <path d="M29 30c11 0 9 18 22 18" fill="none" stroke="#7fe6bc" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="29" cy="30" r="3.5" fill="#7fe6bc"/>
+</svg>

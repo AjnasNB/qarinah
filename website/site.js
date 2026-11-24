@@ -1,7 +1,7 @@
 (() => {
   const root = document.documentElement;
   const storedTheme = localStorage.getItem("qarinah-theme");
-  if (storedTheme === "light" || storedTheme === "dark") {
+  if (!root.hasAttribute("data-home-theme") && (storedTheme === "light" || storedTheme === "dark")) {
     root.dataset.colorMode = storedTheme;
     root.dataset.lightTheme = storedTheme;
     root.dataset.darkTheme = storedTheme;
@@ -19,18 +19,86 @@
 
   const menu = document.querySelector(".mobile-menu");
   const nav = document.querySelector("#primary-nav");
-  menu?.addEventListener("click", () => {
-    const open = menu.getAttribute("aria-expanded") === "true";
-    menu.setAttribute("aria-expanded", String(!open));
-    nav?.classList.toggle("open", !open);
-  });
+  if (menu && nav) {
+    const setMenu = (open) => {
+      menu.setAttribute("aria-expanded", String(open));
+      menu.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+      nav.classList.toggle("open", open);
+    };
+    menu.addEventListener("click", () => setMenu(!nav.classList.contains("open")));
+    nav.addEventListener("click", (event) => {
+      if (event.target.closest("a") && nav.classList.contains("open")) setMenu(false);
+    });
+    menu.closest(".site-header").addEventListener("keydown", (event) => {
+      if (event.key !== "Escape" || !nav.classList.contains("open")) return;
+      setMenu(false);
+      menu.focus();
+    });
+  }
 
   for (const button of document.querySelectorAll(".copy-button")) {
+    const icon = button.hasAttribute("data-copy-icon");
+    const label = icon ? button.getAttribute("aria-label") : button.textContent;
+    let reset;
+    const feedback = (message) => {
+      if (icon) {
+        button.dataset.copyState = message === "Copied" ? "copied" : "error";
+        button.setAttribute("aria-label", message);
+        button.title = message;
+        button.closest(".memory-install").querySelector("[role=status]").textContent = message;
+      } else {
+        button.textContent = message;
+      }
+    };
     button.addEventListener("click", async () => {
-      const original = button.textContent;
-      await navigator.clipboard.writeText(button.dataset.copy || "");
-      button.textContent = "Copied";
-      setTimeout(() => { button.textContent = original; }, 1400);
+      clearTimeout(reset);
+      try {
+        await navigator.clipboard.writeText(button.dataset.copy || "");
+        feedback("Copied");
+      } catch {
+        feedback("Copy failed");
+      }
+      reset = setTimeout(() => {
+        if (icon) {
+          delete button.dataset.copyState;
+          button.setAttribute("aria-label", label);
+          button.title = label;
+          button.closest(".memory-install").querySelector("[role=status]").textContent = "";
+        } else {
+          button.textContent = label;
+        }
+      }, 1600);
+    });
+  }
+
+  const flow = document.querySelector(".memory-flow-tabs");
+  if (flow) {
+    const tabs = [...flow.querySelectorAll('[role="tab"]')];
+    const select = (tab) => {
+      for (const item of tabs) {
+        const active = item === tab;
+        item.setAttribute("aria-selected", String(active));
+        item.tabIndex = active ? 0 : -1;
+        document.getElementById(item.getAttribute("aria-controls")).hidden = !active;
+      }
+    };
+    flow.addEventListener("click", (event) => {
+      const tab = event.target.closest('[role="tab"]');
+      if (tab) select(tab);
+    });
+    flow.addEventListener("keydown", (event) => {
+      const current = tabs.indexOf(event.target);
+      if (current < 0) return;
+      const next = {
+        ArrowLeft: (current + tabs.length - 1) % tabs.length,
+        ArrowRight: (current + 1) % tabs.length,
+        Home: 0,
+        End: tabs.length - 1
+      }[event.key];
+      if (next === undefined) return;
+      event.preventDefault();
+      select(tabs[next]);
+      tabs[next].focus();
     });
   }
 
@@ -70,7 +138,7 @@
           const keywords = normalize((entry.keywords || []).join(" "));
           const headings = normalize((entry.headings || []).map((heading) => heading.text).join(" "));
           const content = normalize(entry.content || "");
-          let score = 0;
+          let score = entry.route === "/" && ["qarinah", "qarinah io"].includes(normalizedQuery) ? 1000 : 0;
           if (title.includes(normalizedQuery)) score += 24;
           if (keywords.includes(normalizedQuery)) score += 18;
           if (headings.includes(normalizedQuery)) score += 14;
